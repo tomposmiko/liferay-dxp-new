@@ -29,6 +29,8 @@ import {
 	getAllApplications,
 	getApplications,
 } from '../../../../common/services';
+import {getPicklistByName} from '../../../../common/services/Picklists';
+import {getProducts} from '../../../../common/services/Products';
 import {Parameters} from '../../../../common/services/index';
 import formatDate from '../../../../common/utils/dateFormatter';
 import {redirectTo} from '../../../../common/utils/liferay';
@@ -74,7 +76,15 @@ const HEADERS = [
 	},
 ];
 
-const STATUS_DISABLED = ['Bound', 'Quoted'];
+const STATUS_EDIT_DISABLED = ['Bound', 'Quoted'];
+
+const STATUS_DELETE_DISABLED = [
+	'Bound',
+	'Quoted',
+	'Rejected',
+	'Reviewed',
+	'Underwriting',
+];
 
 type Application = {
 	applicationCreateDate: Date;
@@ -98,6 +108,7 @@ type TableItemType = {
 };
 
 type TableRowContentType = {[keys: string]: string};
+
 type itemsApplications = {
 	[keys: string]: string;
 };
@@ -105,6 +116,14 @@ type itemsApplications = {
 type itemsApplicationsFilter = {
 	applicationStatus: {name: string};
 	productName: string;
+};
+
+type itemsProducts = {
+	[keys: string]: string;
+};
+
+type itemsPicklists = {
+	[keys: string]: string;
 };
 
 const ApplicationsTable = () => {
@@ -208,8 +227,6 @@ const ApplicationsTable = () => {
 			!filterStatusCheck.length &&
 			!filterProductCheck.length
 		) {
-			setPage(1);
-
 			return setParameters(generateParameters());
 		}
 	};
@@ -236,12 +253,20 @@ const ApplicationsTable = () => {
 		alert(`Edit ${externalReferenceCode} Action`);
 	};
 
-	const setDisabledAction = (identifier: string) => {
+	const setDisabledEditAction = (externalReferenceCode: string) => {
 		const application = applications.find(
-			(application) => application.key === identifier
+			(application) => application.key === externalReferenceCode
 		) as TableContent;
 
-		return STATUS_DISABLED.includes(application.name);
+		return STATUS_EDIT_DISABLED.includes(application.name);
+	};
+
+	const setDisabledDeleteAction = (externalReferenceCode: string) => {
+		const application = applications.find(
+			(application) => application.key === externalReferenceCode
+		) as TableContent;
+
+		return STATUS_DELETE_DISABLED.includes(application.name);
 	};
 
 	const itemsCreate = (listItem: string[], checkedItem: []) => {
@@ -293,20 +318,31 @@ const ApplicationsTable = () => {
 						});
 					}
 				);
-				const filterApplications = (propertyName: string) => {
-					const filterList: string[] = [];
-					allItems.map((item: itemsApplications) => {
-						if (filterList.includes(item[propertyName])) {
-							return filterList;
+
+				getProducts().then((results) => {
+					const productsResult = results?.data?.items;
+
+					const products = productsResult?.map(
+						(product: itemsProducts) => {
+							return product.name;
 						}
+					);
 
-						return filterList.push(item[propertyName]);
-					});
+					setProductFilterItems(products);
+				});
 
-					return filterList;
-				};
-				setProductFilterItems(filterApplications('productName'));
-				setStatusFilterItems(filterApplications('name'));
+				getPicklistByName('ApplicationStatus').then((results) => {
+					const applicationStatusResult =
+						results?.data?.listTypeEntries;
+
+					const applicationStatuses = applicationStatusResult?.map(
+						(applicationStatusPicklist: itemsPicklists) => {
+							return applicationStatusPicklist.name;
+						}
+					);
+
+					setStatusFilterItems(applicationStatuses);
+				});
 			});
 
 			return;
@@ -739,11 +775,12 @@ const ApplicationsTable = () => {
 				actions={[
 					{
 						action: handleEditApplication,
-						disabled: setDisabledAction,
+						disabled: setDisabledEditAction,
 						value: 'Edit',
 					},
 					{
 						action: handleDeleteApplication,
+						disabled: setDisabledDeleteAction,
 						value: 'Delete',
 					},
 				]}

@@ -204,7 +204,7 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 
 		CProduct cProduct =
 			_cProductLocalService.fetchCProductByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (cProduct == null) {
 			throw new NoSuchCPDefinitionException(
@@ -281,7 +281,7 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 
 		CProduct cProduct =
 			_cProductLocalService.fetchCProductByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (cProduct == null) {
 			throw new NoSuchCPDefinitionException(
@@ -401,8 +401,8 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 			commerceCatalog =
 				_commerceCatalogLocalService.
 					fetchCommerceCatalogByExternalReferenceCode(
-						contextCompany.getCompanyId(),
-						catalogExternalReferenceCode);
+						catalogExternalReferenceCode,
+						contextCompany.getCompanyId());
 		}
 
 		if (commerceCatalog == null) {

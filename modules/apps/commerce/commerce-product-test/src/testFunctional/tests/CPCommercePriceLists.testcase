@@ -614,15 +614,15 @@ definition {
 
 		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
 
-		Accounts.openAccountsAdmin();
+		Account.openAccountsAdmin();
 
-		Accounts.addBusinessAccount(
+		Account.addBusinessAccount(
 			accountDescription = "This is an Account added for Account Group.",
 			accountName = "Account1");
 
 		Navigator.gotoBack();
 
-		Accounts.addBusinessAccount(
+		Account.addBusinessAccount(
 			accountDescription = "This is an Account added for Account Group.",
 			accountName = "Account2");
 
@@ -1100,7 +1100,7 @@ definition {
 		property custom.properties = "jsonws.web.service.paths.excludes=${line.separator}company.security.strangers.verify=false";
 		property osgi.module.configuration.file.names = "com.liferay.commerce.price.list.configuration.CommercePriceEntryConfiguration.config";
 		property osgi.module.configurations = "checkInterval=\"1\"";
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 		property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 
 		// TODO COMMERCE-9089 Find alternative to having a pause to wait for a timed expiration and publication
@@ -1507,7 +1507,7 @@ definition {
 	}
 
 	test AssertPriceListIsAppliedToAllAssociatedAccounts {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 		property portal.upstream = "true";
 
 		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
@@ -2034,7 +2034,7 @@ definition {
 			panel = "Commerce",
 			portlet = "Price Lists");
 
-		while ((IsElementPresent(key_name = "Test Price List", locator1 = "CommerceEntry#ASSERT_PRICE_LIST_STATUS", value1 = "APPROVED")) && (maxIterations = "40")) {
+		while ((IsTextEqual(key_name = "Test Price List", locator1 = "CommerceEntry#ASSERT_PRICE_LIST_STATUS", value1 = "APPROVED")) && (maxIterations = "40")) {
 
 			// We need this pause for waiting for the Price List to expire
 
@@ -2186,7 +2186,7 @@ definition {
 			locator1 = "CommerceAccelerators#PRODUCT_CARD_PRICE",
 			value1 = "$ 30.00");
 
-		while ((IsElementPresent(key_productName = "U-Joint", locator1 = "CommerceAccelerators#PRODUCT_CARD_PRICE", value1 = "$ 30.00")) && (maxIterations = "40")) {
+		while ((IsTextEqual(key_productName = "U-Joint", locator1 = "CommerceAccelerators#PRODUCT_CARD_PRICE", value1 = "$ 30.00")) && (maxIterations = "40")) {
 
 			// We need this pause for waiting for the Price List to expire
 
@@ -2538,7 +2538,7 @@ definition {
 
 		CommerceAcceleratorsInitializer.changeProductsSorting(sortingType = "Relevance");
 
-		while ((IsElementPresent(key_productName = "U-Joint", locator1 = "CommerceAccelerators#PRODUCT_CARD_PRICE", value1 = "$ 30.00")) && (maxIterations = "40")) {
+		while ((IsTextEqual(key_productName = "U-Joint", locator1 = "CommerceAccelerators#PRODUCT_CARD_PRICE", value1 = "$ 30.00")) && (maxIterations = "40")) {
 
 			// We need this pause for waiting for the Price List to expire
 

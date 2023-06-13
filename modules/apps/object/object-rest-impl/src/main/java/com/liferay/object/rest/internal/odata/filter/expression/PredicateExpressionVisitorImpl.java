@@ -26,10 +26,14 @@ import com.liferay.petra.sql.dsl.spi.expression.DefaultPredicate;
 import com.liferay.petra.sql.dsl.spi.expression.Operand;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
+import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -48,7 +52,12 @@ import com.liferay.portal.odata.filter.expression.MethodExpression;
 import com.liferay.portal.odata.filter.expression.PrimitivePropertyExpression;
 import com.liferay.portal.odata.filter.expression.UnaryExpression;
 
+import java.text.DateFormat;
+import java.text.Format;
+import java.text.ParseException;
+
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -343,6 +352,30 @@ public class PredicateExpressionVisitorImpl
 
 	private Object _getValue(Object left, Object right) {
 		EntityField entityField = _getEntityField(left);
+
+		EntityField.Type entityType = entityField.getType();
+
+		DB db = DBManagerUtil.getDB();
+
+		if (entityType.equals(EntityField.Type.DATE_TIME) &&
+			(db.getDBType() == DBType.HYPERSONIC)) {
+
+			try {
+				Format format = FastDateFormatFactoryUtil.getSimpleDateFormat(
+					"dd-MMM-yyyy HH:mm:ss.SSS");
+
+				DateFormat dateFormat =
+					DateFormatFactoryUtil.getSimpleDateFormat(
+						"yyyy-MM-dd'T'HH:mm:ss");
+
+				Date date = dateFormat.parse(right.toString());
+
+				right = format.format(date);
+			}
+			catch (ParseException parseException) {
+				throw new RuntimeException(parseException);
+			}
+		}
 
 		String entityFieldFilterableName = entityField.getFilterableName(null);
 		String entityFieldName = entityField.getName();

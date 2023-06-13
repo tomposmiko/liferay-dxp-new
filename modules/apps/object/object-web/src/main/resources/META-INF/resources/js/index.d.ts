@@ -38,6 +38,7 @@ interface ObjectAction {
 	name: string;
 	objectActionExecutorKey: string;
 	objectActionTriggerKey: string;
+	objectDefinitionId?: number;
 	objectDefinitionsRelationshipsURL: string;
 	parameters?: ObjectActionParameters;
 	script?: string;
@@ -221,6 +222,7 @@ type ObjectFieldSettingName =
 	| 'objectRelationshipName'
 	| 'output'
 	| 'readOnly'
+	| 'readOnlyScript'
 	| 'script'
 	| 'showCounter'
 	| 'showFilesInDocumentsAndMedia'

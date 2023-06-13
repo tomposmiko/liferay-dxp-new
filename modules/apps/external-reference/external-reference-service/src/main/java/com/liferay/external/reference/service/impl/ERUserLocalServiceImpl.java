@@ -53,8 +53,8 @@ public class ERUserLocalServiceImpl extends ERUserLocalServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.fetchUserByReferenceCode(
-			companyId, externalReferenceCode);
+		User user = _userLocalService.fetchUserByExternalReferenceCode(
+			externalReferenceCode, companyId);
 
 		if (user == null) {
 			user = _userLocalService.addUser(

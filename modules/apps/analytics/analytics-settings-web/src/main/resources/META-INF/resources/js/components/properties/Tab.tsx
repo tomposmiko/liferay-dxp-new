@@ -15,10 +15,12 @@
 import {Text} from '@clayui/core';
 import React from 'react';
 
-import Table, {TColumn, TItem} from '../table/Table';
+import Table from '../table/Table';
+import {TColumn, TTableRequestParams} from '../table/types';
+import {getIds} from '../table/utils';
 import {TProperty} from './Properties';
 
-type TRawItem = {
+export type TRawItem = {
 	channelName?: string;
 	friendlyURL?: string;
 	id: string;
@@ -31,11 +33,12 @@ interface ITabProps {
 	description?: string;
 	emptyStateTitle: string;
 	enableCheckboxs?: boolean;
-	fetchFn: (queryString?: string) => Promise<any>;
 	header: TColumn[];
+	initialIds: number[];
 	noResultsTitle: string;
-	onItemsChange: (items: TItem[]) => void;
+	onItemsChange: (ids: number[]) => void;
 	property: TProperty;
+	requestFn: (params: TTableRequestParams) => Promise<any>;
 }
 
 const Tab: React.FC<ITabProps> = ({
@@ -43,11 +46,12 @@ const Tab: React.FC<ITabProps> = ({
 	description,
 	emptyStateTitle,
 	enableCheckboxs = true,
-	fetchFn,
 	header,
+	initialIds,
 	noResultsTitle,
 	onItemsChange,
 	property,
+	requestFn,
 }) => (
 	<>
 		{description && (
@@ -56,15 +60,18 @@ const Tab: React.FC<ITabProps> = ({
 			</div>
 		)}
 
-		<Table
+		<Table<TRawItem>
 			columns={header}
 			disabled={!enableCheckboxs}
 			emptyStateTitle={emptyStateTitle}
-			fetchFn={fetchFn}
 			mapperItems={(items: TRawItem[]) => {
 				return items.map((item) => ({
-					checked: !!item.channelName,
-					columns: columns.map((column) => item?.[column] ?? ''),
+					checked: !!(
+						item.channelName && item.channelName === property.name
+					),
+					columns: columns.map((column) => ({
+						label: item?.[column] ?? '',
+					})),
 					disabled: !!(
 						item.channelName && item.channelName !== property.name
 					),
@@ -72,7 +79,8 @@ const Tab: React.FC<ITabProps> = ({
 				}));
 			}}
 			noResultsTitle={noResultsTitle}
-			onItemsChange={onItemsChange}
+			onItemsChange={(items) => onItemsChange(getIds(items, initialIds))}
+			requestFn={requestFn}
 		/>
 	</>
 );

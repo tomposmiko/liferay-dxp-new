@@ -94,6 +94,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
@@ -308,7 +309,7 @@ public class BundleSiteInitializerTest {
 		AssetCategory testAssetCategory1 =
 			_assetCategoryLocalService.
 				fetchAssetCategoryByExternalReferenceCode(
-					companyGroup.getGroupId(), "TESTCAT0001");
+					"TESTCAT0001", companyGroup.getGroupId());
 
 		Assert.assertNotNull(testAssetCategory1);
 		Assert.assertEquals(
@@ -326,7 +327,7 @@ public class BundleSiteInitializerTest {
 		AssetCategory testAssetCategory3 =
 			_assetCategoryLocalService.
 				fetchAssetCategoryByExternalReferenceCode(
-					group.getGroupId(), "TESTCAT0003");
+					"TESTCAT0003", group.getGroupId());
 
 		Assert.assertNotNull(testAssetCategory3);
 		Assert.assertEquals(
@@ -393,7 +394,7 @@ public class BundleSiteInitializerTest {
 		ClientExtensionEntry clientExtensionEntry =
 			_clientExtensionEntryLocalService.
 				fetchClientExtensionEntryByExternalReferenceCode(
-					group.getCompanyId(), "ERC001");
+					"ERC001", group.getCompanyId());
 
 		Assert.assertNotNull(clientExtensionEntry);
 
@@ -410,7 +411,7 @@ public class BundleSiteInitializerTest {
 		CommerceCatalog commerceCatalog1 =
 			_commerceCatalogLocalService.
 				fetchCommerceCatalogByExternalReferenceCode(
-					group.getCompanyId(), "TESTCATG0001");
+					"TESTCATG0001", group.getCompanyId());
 
 		Assert.assertNotNull(commerceCatalog1);
 		Assert.assertEquals(
@@ -419,7 +420,7 @@ public class BundleSiteInitializerTest {
 		CommerceCatalog commerceCatalog2 =
 			_commerceCatalogLocalService.
 				fetchCommerceCatalogByExternalReferenceCode(
-					group.getCompanyId(), "TESTCATG0002");
+					"TESTCATG0002", group.getCompanyId());
 
 		Assert.assertNotNull(commerceCatalog2);
 		Assert.assertEquals(
@@ -448,7 +449,7 @@ public class BundleSiteInitializerTest {
 		CommerceInventoryWarehouse commerceInventoryWarehouse =
 			_commerceInventoryWarehouseLocalService.
 				fetchCommerceInventoryWarehouseByExternalReferenceCode(
-					group.getCompanyId(), "TESTWARE0001");
+					"TESTWARE0001", group.getCompanyId());
 
 		Assert.assertNotNull(commerceInventoryWarehouse);
 		Assert.assertEquals(
@@ -976,6 +977,7 @@ public class BundleSiteInitializerTest {
 
 		_assertObjectActions(3, objectDefinition1);
 		_assertObjectEntries(group.getGroupId(), objectDefinition1, 0);
+		_assertObjectFields(objectDefinition1, 9);
 		_assertObjectRelationships(objectDefinition1, serviceContext);
 
 		ObjectDefinition objectDefinition2 =
@@ -988,6 +990,7 @@ public class BundleSiteInitializerTest {
 
 		_assertObjectActions(2, objectDefinition2);
 		_assertObjectEntries(group.getGroupId(), objectDefinition2, 0);
+		_assertObjectFields(objectDefinition2, 8);
 
 		ObjectDefinition objectDefinition3 =
 			_objectDefinitionLocalService.fetchObjectDefinition(
@@ -1002,6 +1005,7 @@ public class BundleSiteInitializerTest {
 
 		_assertObjectActions(0, objectDefinition3);
 		_assertObjectEntries(0, objectDefinition3, 5);
+		_assertObjectFields(objectDefinition3, 7);
 	}
 
 	private void _assertObjectEntries(
@@ -1013,6 +1017,15 @@ public class BundleSiteInitializerTest {
 			objectEntriesCount,
 			_objectEntryLocalService.getObjectEntriesCount(
 				groupId, objectDefinition.getObjectDefinitionId()));
+	}
+
+	private void _assertObjectFields(
+		ObjectDefinition objectDefinition, int objectFieldsCount) {
+
+		Assert.assertEquals(
+			objectFieldsCount,
+			_objectFieldLocalService.getObjectFieldsCount(
+				objectDefinition.getObjectDefinitionId()));
 	}
 
 	private void _assertObjectRelationships(
@@ -1542,14 +1555,14 @@ public class BundleSiteInitializerTest {
 
 		UserGroup userGroup1 =
 			_userGroupLocalService.fetchUserGroupByExternalReferenceCode(
-				group.getCompanyId(), "TESTUSERGROUP1");
+				"TESTUSERGROUP1", group.getCompanyId());
 
 		Assert.assertNotNull(userGroup1);
 		Assert.assertTrue(userGroups.contains(userGroup1));
 
 		UserGroup userGroup2 =
 			_userGroupLocalService.fetchUserGroupByExternalReferenceCode(
-				group.getCompanyId(), "TESTUSERGROUP2");
+				"TESTUSERGROUP2", group.getCompanyId());
 
 		Assert.assertNotNull(userGroup2);
 		Assert.assertTrue(userGroups.contains(userGroup2));
@@ -1900,6 +1913,9 @@ public class BundleSiteInitializerTest {
 
 	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Inject
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Inject
 	private ObjectRelationshipResource.Factory

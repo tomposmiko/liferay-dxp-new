@@ -29,7 +29,6 @@ import com.liferay.knowledge.base.constants.KBArticleConstants;
 import com.liferay.knowledge.base.constants.KBConstants;
 import com.liferay.knowledge.base.constants.KBFolderConstants;
 import com.liferay.knowledge.base.constants.KBPortletKeys;
-import com.liferay.knowledge.base.exception.DuplicateKBArticleExternalReferenceCodeException;
 import com.liferay.knowledge.base.exception.KBArticleContentException;
 import com.liferay.knowledge.base.exception.KBArticleExpirationDateException;
 import com.liferay.knowledge.base.exception.KBArticleParentException;
@@ -49,6 +48,7 @@ import com.liferay.knowledge.base.internal.util.KBCommentUtil;
 import com.liferay.knowledge.base.internal.util.KBSectionEscapeUtil;
 import com.liferay.knowledge.base.internal.util.constants.KnowledgeBaseConstants;
 import com.liferay.knowledge.base.model.KBArticle;
+import com.liferay.knowledge.base.model.KBArticleTable;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.service.base.KBArticleLocalServiceBaseImpl;
 import com.liferay.knowledge.base.service.persistence.KBCommentPersistence;
@@ -56,6 +56,7 @@ import com.liferay.knowledge.base.service.persistence.KBFolderPersistence;
 import com.liferay.knowledge.base.util.KnowledgeBaseUtil;
 import com.liferay.knowledge.base.util.comparator.KBArticlePriorityComparator;
 import com.liferay.knowledge.base.util.comparator.KBArticleVersionComparator;
+import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -91,6 +92,7 @@ import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -105,7 +107,6 @@ import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.HtmlParser;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -186,8 +187,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		double priority = _getPriority(groupId, parentResourcePrimKey);
 
 		long kbArticleId = counterLocalService.increment();
-
-		_validateExternalReferenceCode(externalReferenceCode, groupId);
 
 		_validate(expirationDate, content, reviewDate, sourceURL, title);
 		_validateParent(parentResourceClassNameId, parentResourcePrimKey);
@@ -338,6 +337,11 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		TempFileEntryUtil.addTempFileEntry(
 			groupId, userId, tempFolderName, fileName, inputStream, mimeType);
+	}
+
+	@Override
+	public void checkKBArticles() throws PortalException {
+		_checkKBArticles(new Date());
 	}
 
 	@Override
@@ -1152,7 +1156,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		KBArticle kbArticle = null;
 
-		if (oldKBArticle.isApproved()) {
+		if (oldKBArticle.isApproved() || oldKBArticle.isExpired()) {
 			long kbArticleId = counterLocalService.increment();
 
 			kbArticle = kbArticlePersistence.create(kbArticleId);
@@ -1207,7 +1211,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		kbArticle = kbArticlePersistence.update(kbArticle);
 
-		if (oldKBArticle.isApproved()) {
+		if (oldKBArticle.isApproved() || oldKBArticle.isExpired()) {
 			oldKBArticle.setModifiedDate(oldKBArticle.getModifiedDate());
 			oldKBArticle.setLatest(false);
 
@@ -1539,13 +1543,32 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		return dynamicQuery.add(junction);
 	}
 
+	private void _checkKBArticles(Date expirationDate) throws PortalException {
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Expiring file entries with expiration date previous to " +
+					expirationDate);
+		}
+
+		_companyLocalService.forEachCompanyId(
+			companyId -> _expireKBArticlesByCompanyId(
+				companyId, expirationDate, new ServiceContext()));
+	}
+
 	private void _deleteAssets(KBArticle kbArticle) throws PortalException {
 		_assetEntryLocalService.deleteEntry(
 			KBArticle.class.getName(), kbArticle.getClassPK());
 
-		if (!kbArticle.isApproved() && !kbArticle.isFirstVersion()) {
-			_assetEntryLocalService.deleteEntry(
-				KBArticle.class.getName(), kbArticle.getResourcePrimKey());
+		if (!kbArticle.isApproved()) {
+			int kbArticleVersionsCount =
+				kbArticleLocalService.getKBArticleVersionsCount(
+					kbArticle.getResourcePrimKey(),
+					WorkflowConstants.STATUS_ANY);
+
+			if ((kbArticleVersionsCount == 0) || !kbArticle.isFirstVersion()) {
+				_assetEntryLocalService.deleteEntry(
+					KBArticle.class.getName(), kbArticle.getResourcePrimKey());
+			}
 		}
 	}
 
@@ -1560,6 +1583,45 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		for (Subscription subscription : subscriptions) {
 			unsubscribeKBArticle(
 				subscription.getUserId(), subscription.getClassPK());
+		}
+	}
+
+	private void _expireKBArticlesByCompanyId(
+			long companyId, Date expirationDate, ServiceContext serviceContext)
+		throws PortalException {
+
+		long userId = _userLocalService.getDefaultUserId(companyId);
+
+		List<KBArticle> kbArticles = _getKBArticlesByCompanyIdAndExpirationDate(
+			companyId, expirationDate);
+
+		for (KBArticle kbArticle : kbArticles) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Expiring KB Article ", kbArticle.getKbArticleId(),
+						" with expiration date ",
+						kbArticle.getExpirationDate()));
+			}
+
+			updateStatus(
+				userId, kbArticle.getResourcePrimKey(),
+				WorkflowConstants.STATUS_EXPIRED, serviceContext);
+
+			AssetEntry assetEntry = _assetEntryLocalService.getEntry(
+				KBArticle.class.getName(), kbArticle.getResourcePrimKey());
+
+			_assetEntryLocalService.updateEntry(
+				userId, kbArticle.getGroupId(), kbArticle.getCreateDate(),
+				kbArticle.getModifiedDate(), KBArticle.class.getName(),
+				kbArticle.getResourcePrimKey(), kbArticle.getUuid(), 0,
+				assetEntry.getCategoryIds(), assetEntry.getTagNames(), true,
+				false, null, null, null, kbArticle.getExpirationDate(),
+				ContentTypes.TEXT_HTML, kbArticle.getTitle(),
+				kbArticle.getDescription(), assetEntry.getSummary(), null, null,
+				0, 0, null);
+
+			_indexKBArticle(kbArticle);
 		}
 	}
 
@@ -1662,6 +1724,26 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		).setParameter(
 			"selectedItemId", kbArticle.getResourcePrimKey()
 		).buildString();
+	}
+
+	private List<KBArticle> _getKBArticlesByCompanyIdAndExpirationDate(
+		long companyId, Date expirationDate) {
+
+		return kbArticlePersistence.dslQuery(
+			DSLQueryFactoryUtil.select(
+				KBArticleTable.INSTANCE
+			).from(
+				KBArticleTable.INSTANCE
+			).where(
+				KBArticleTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					KBArticleTable.INSTANCE.expirationDate.lte(expirationDate)
+				).and(
+					KBArticleTable.INSTANCE.status.neq(
+						WorkflowConstants.STATUS_EXPIRED)
+				)
+			));
 	}
 
 	private KBGroupServiceConfiguration _getKBGroupServiceConfiguration(
@@ -2015,35 +2097,16 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			Date expirationDate, Date reviewDate)
 		throws PortalException {
 
-		if ((expirationDate != null) &&
-			expirationDate.before(DateUtil.newDate())) {
+		Date now = new Date();
 
+		if ((expirationDate != null) && expirationDate.before(now)) {
 			throw new KBArticleExpirationDateException(
-				"Expiration date is in the past");
+				"Expiration date " + expirationDate + " is in the past");
 		}
 
-		if ((reviewDate != null) && reviewDate.before(DateUtil.newDate())) {
+		if ((reviewDate != null) && reviewDate.before(now)) {
 			throw new KBArticleReviewDateException(
-				"Review date is in the past");
-		}
-	}
-
-	private void _validateExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws PortalException {
-
-		if (Validator.isNull(externalReferenceCode)) {
-			return;
-		}
-
-		KBArticle kbArticle = fetchLatestKBArticleByExternalReferenceCode(
-			groupId, externalReferenceCode);
-
-		if (kbArticle != null) {
-			throw new DuplicateKBArticleExternalReferenceCodeException(
-				StringBundler.concat(
-					"Duplicate knowledge base article external reference code ",
-					externalReferenceCode, " in group ", groupId));
+				"Review date is " + reviewDate + " in the past");
 		}
 	}
 
@@ -2175,6 +2238,9 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;

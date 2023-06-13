@@ -46,12 +46,12 @@ public class ProjectTemplatesPanelAppTest
 	@ClassRule
 	public static final MavenExecutor mavenExecutor = new MavenExecutor();
 
-	@Parameterized.Parameters(name = "Testcase-{index}: testing {0}")
+	@Parameterized.Parameters(name = "Testcase-{index}: testing {1} {0}")
 	public static Iterable<Object[]> data() {
 		return Arrays.asList(
 			new Object[][] {
-				{"7.0.6-2", "dxp"}, {"7.1.3-1", "dxp"}, {"7.2.1-1", "dxp"},
-				{"7.3.7", "portal"}, {"7.4.3.36", "portal"}
+				{"dxp", "7.0.10.17"}, {"dxp", "7.1.10.7"}, {"dxp", "7.2.10.7"},
+				{"portal", "7.3.7"}, {"portal", "7.4.3.36"}
 			});
 	}
 
@@ -71,9 +71,11 @@ public class ProjectTemplatesPanelAppTest
 		_gradleDistribution = URI.create(gradleDistribution);
 	}
 
-	public ProjectTemplatesPanelAppTest(String liferayVersion, String product) {
+	public ProjectTemplatesPanelAppTest(
+		String liferayProduct, String liferayVersion) {
+
+		_liferayProduct = liferayProduct;
 		_liferayVersion = liferayVersion;
-		_product = product;
 	}
 
 	@Test
@@ -90,7 +92,8 @@ public class ProjectTemplatesPanelAppTest
 
 		File gradleProjectDir = buildTemplateWithGradle(
 			gradleWorkspaceModulesDir, template, name, "--class-name", "Foo",
-			"--liferay-version", _liferayVersion, "--product", _product);
+			"--liferay-product", _liferayProduct, "--liferay-version",
+			_liferayVersion);
 
 		testExists(gradleProjectDir, "bnd.bnd");
 
@@ -142,8 +145,8 @@ public class ProjectTemplatesPanelAppTest
 		File mavenProjectDir = buildTemplateWithMaven(
 			mavenModulesDir, mavenModulesDir, template, name, "com.test",
 			mavenExecutor, "-DclassName=Foo",
-			"-DliferayVersion=" + _liferayVersion, "-Dpackage=gradle.test",
-			"-Dproduct=" + _product);
+			"-DliferayProduct=" + _liferayProduct,
+			"-DliferayVersion=" + _liferayVersion, "-Dpackage=gradle.test");
 
 		if (!_liferayVersion.startsWith("7.0")) {
 			testContains(
@@ -167,7 +170,7 @@ public class ProjectTemplatesPanelAppTest
 
 	private static URI _gradleDistribution;
 
+	private final String _liferayProduct;
 	private final String _liferayVersion;
-	private final String _product;
 
 }

@@ -24,6 +24,7 @@ import com.liferay.petra.string.StringUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,18 +43,22 @@ public class ClientExtension {
 	public Map<String, Object> toJSONMap() throws Exception {
 		Map<String, Object> config = new HashMap<>();
 
-		config.put("baseURL", _BASE_URL_PREFIX + projectName);
+		config.put("baseURL", "${portalURL}/o/" + projectName);
 		config.put("description", description);
 		config.put("dxp.lxc.liferay.com.virtualInstanceId", "default");
 		config.put("name", name);
 		config.put("sourceCodeURL", sourceCodeURL);
 		config.put("type", type);
 
-		String pid = _clientExtensionFactoryPids.get(type);
+		Properties clientExtensionProperties = _getClientExtensionProperties();
+
+		String pid = clientExtensionProperties.getProperty(type);
 
 		if ((pid != null) &&
-			(pid.equals(_OAUTH_HEADLESS_SERVER_PID) ||
-			 pid.equals(_OAUTH_USER_AGENT_PID)) &&
+			(type.equals("notificationType") ||
+			 type.equals("oAuthApplicationHeadlessServer") ||
+			 type.equals("oAuthApplicationUserAgent") ||
+			 type.equals("workflowAction")) &&
 			(_typeSettings.get("homePageURL") == null)) {
 
 			_typeSettings.put(
@@ -67,7 +72,7 @@ public class ClientExtension {
 
 		List<String> typeSettings = stream.peek(
 			entry -> {
-				if (!pid.equals(_CET_CONFIGURATION_PID)) {
+				if (!pid.contains("CETConfiguration")) {
 					config.put(entry.getKey(), entry.getValue());
 				}
 			}
@@ -90,7 +95,7 @@ public class ClientExtension {
 
 		Map<String, Object> jsonMap = new HashMap<>();
 
-		jsonMap.put(_clientExtensionFactoryPids.get(type) + "~" + id, config);
+		jsonMap.put(pid + "~" + id, config);
 
 		return jsonMap;
 	}
@@ -102,44 +107,14 @@ public class ClientExtension {
 	public String sourceCodeURL = "";
 	public String type;
 
-	private static final String _BASE_URL_PREFIX = "${portalURL}/o/";
+	private Properties _getClientExtensionProperties() throws Exception {
+		Properties properties = new Properties();
 
-	private static final String _CET_CONFIGURATION_PID =
-		"com.liferay.client.extension.type.configuration.CETConfiguration";
+		properties.load(
+			ClientExtension.class.getResourceAsStream(
+				"client-extension.properties"));
 
-	private static final String _FUNCTION_OBJECT_ACTION_PID =
-		ClientExtension._OBJECT_INTERNAL_PREFIX +
-			"FunctionObjectActionExecutorImplConfiguration";
-
-	private static final String _OAUTH_HEADLESS_SERVER_PID =
-		ClientExtension._OAUTH_PROVIDER_PREFIX + "HeadlessServerConfiguration";
-
-	private static final String _OAUTH_PROVIDER_PREFIX =
-		"com.liferay.oauth2.provider.configuration.OAuth2ProviderApplication";
-
-	private static final String _OAUTH_USER_AGENT_PID =
-		_OAUTH_PROVIDER_PREFIX + "UserAgentConfiguration";
-
-	private static final String _OBJECT_INTERNAL_PREFIX =
-		"com.liferay.object.internal.configuration.";
-
-	private static final Map<String, String> _clientExtensionFactoryPids =
-		new HashMap<>();
-	{
-		_clientExtensionFactoryPids.put(
-			"customElement", _CET_CONFIGURATION_PID);
-		_clientExtensionFactoryPids.put("globalCSS", _CET_CONFIGURATION_PID);
-		_clientExtensionFactoryPids.put("globalJS", _CET_CONFIGURATION_PID);
-		_clientExtensionFactoryPids.put("iframe", _CET_CONFIGURATION_PID);
-		_clientExtensionFactoryPids.put(
-			"oauthApplicationHeadlessServer", _OAUTH_HEADLESS_SERVER_PID);
-		_clientExtensionFactoryPids.put(
-			"oauthApplicationUserAgent", _OAUTH_USER_AGENT_PID);
-		_clientExtensionFactoryPids.put(
-			"objectAction", _FUNCTION_OBJECT_ACTION_PID);
-		_clientExtensionFactoryPids.put("themeCSS", _CET_CONFIGURATION_PID);
-		_clientExtensionFactoryPids.put("themeFavicon", _CET_CONFIGURATION_PID);
-		_clientExtensionFactoryPids.put("themeJS", _CET_CONFIGURATION_PID);
+		return properties;
 	}
 
 	private final Map<String, Object> _typeSettings = new HashMap<>();

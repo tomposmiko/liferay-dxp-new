@@ -83,6 +83,18 @@ public class CPDefinitionItemSelectorViewDisplayContext
 					httpServletRequest, "checkedCPDefinitionIds"));
 		}
 
+		long commerceChannelGroupId = ParamUtil.getLong(
+			httpServletRequest, CPField.COMMERCE_CHANNEL_GROUP_ID);
+
+		portletURL.setParameter(
+			CPField.COMMERCE_CHANNEL_GROUP_ID,
+			String.valueOf(commerceChannelGroupId));
+
+		portletURL.setParameter(
+			"ignoreCommerceAccountGroup",
+			Boolean.toString(
+				ParamUtil.getBoolean(
+					httpServletRequest, "ignoreCommerceAccountGroup")));
 		portletURL.setParameter(
 			"singleSelection", Boolean.toString(isSingleSelection()));
 
@@ -115,19 +127,24 @@ public class CPDefinitionItemSelectorViewDisplayContext
 		long commerceChannelGroupId = ParamUtil.getLong(
 			httpServletRequest, CPField.COMMERCE_CHANNEL_GROUP_ID);
 
+		boolean ignoreCommerceAccountGroup = ParamUtil.getBoolean(
+			httpServletRequest, "ignoreCommerceAccountGroup");
+
 		if (commerceChannelGroupId != 0) {
 			cpDefinitionBaseModelSearchResult =
 				_cpDefinitionService.searchCPDefinitionsByChannelGroupId(
 					cpRequestHelper.getCompanyId(), commerceChannelGroupId,
 					getKeywords(), WorkflowConstants.STATUS_APPROVED,
-					searchContainer.getStart(), searchContainer.getEnd(), sort);
+					ignoreCommerceAccountGroup, searchContainer.getStart(),
+					searchContainer.getEnd(), sort);
 		}
 		else {
 			cpDefinitionBaseModelSearchResult =
 				_cpDefinitionService.searchCPDefinitions(
 					cpRequestHelper.getCompanyId(), getKeywords(),
 					WorkflowConstants.STATUS_APPROVED,
-					searchContainer.getStart(), searchContainer.getEnd(), sort);
+					ignoreCommerceAccountGroup, searchContainer.getStart(),
+					searchContainer.getEnd(), sort);
 		}
 
 		searchContainer.setResultsAndTotal(cpDefinitionBaseModelSearchResult);

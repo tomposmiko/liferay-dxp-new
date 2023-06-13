@@ -22,15 +22,19 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.rest.dto.v1_0.FileEntry;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
+import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryRelatedObjectsResourceImpl;
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceImpl;
 import com.liferay.object.rest.internal.resource.v1_0.OpenAPIResourceImpl;
 import com.liferay.object.rest.internal.vulcan.openapi.contributor.ObjectEntryOpenAPIContributor;
 import com.liferay.object.rest.openapi.v1_0.ObjectEntryOpenAPIResource;
+import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.portal.kernel.util.TreeMapBuilder;
 import com.liferay.portal.vulcan.batch.engine.Field;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.openapi.DTOProperty;
 import com.liferay.portal.vulcan.openapi.OpenAPISchemaFilter;
 import com.liferay.portal.vulcan.resource.OpenAPIResource;
@@ -52,6 +56,8 @@ import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -136,16 +142,25 @@ public class ObjectEntryOpenAPIResourceImpl
 
 		return _openAPIResource.getOpenAPI(
 			new ObjectEntryOpenAPIContributor(
-				_objectDefinition, _objectDefinitionLocalService, this,
-				_objectRelationshipLocalService),
+				_bundleContext, _dtoConverterRegistry,
+				_objectActionLocalService, _objectDefinition,
+				_objectDefinitionLocalService, this,
+				_objectRelationshipLocalService, _openAPIResource,
+				_systemObjectDefinitionMetadataRegistry),
 			_getOpenAPISchemaFilter(_objectDefinition.getRESTContextPath()),
 			new HashSet<Class<?>>() {
 				{
+					add(ObjectEntryRelatedObjectsResourceImpl.class);
 					add(ObjectEntryResourceImpl.class);
 					add(OpenAPIResourceImpl.class);
 				}
 			},
 			type, uriInfo);
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_bundleContext = bundleContext;
 	}
 
 	private DTOProperty _getDTOProperty(ObjectField objectField) {
@@ -206,7 +221,7 @@ public class ObjectEntryOpenAPIResourceImpl
 		openAPISchemaFilter.setApplicationPath(applicationPath);
 
 		DTOProperty dtoProperty = new DTOProperty(
-			new HashMap<>(), "ObjectEntry", "object");
+			new HashMap<>(), "ObjectEntry", "Object");
 
 		List<DTOProperty> dtoProperties = new ArrayList<>();
 
@@ -238,11 +253,30 @@ public class ObjectEntryOpenAPIResourceImpl
 
 		dtoProperty.setDTOProperties(dtoProperties);
 
-		openAPISchemaFilter.setDTOProperties(Arrays.asList(dtoProperty));
+		DTOProperty pageDTOProperty = new DTOProperty(
+			new HashMap<>(), "PageObject", "Object");
+
+		pageDTOProperty.setDTOProperties(
+			Arrays.asList(
+				new DTOProperty(new HashMap<>(), "items", "Array") {
+					{
+						setDTOProperties(
+							Arrays.asList(
+								new DTOProperty(
+									new HashMap<>(), "ObjectEntry", "Object")));
+					}
+				}));
+
+		openAPISchemaFilter.setDTOProperties(
+			Arrays.asList(dtoProperty, pageDTOProperty));
 
 		openAPISchemaFilter.setSchemaMappings(
-			HashMapBuilder.put(
+			TreeMapBuilder.<String, String>create(
+				Collections.reverseOrder()
+			).put(
 				"ObjectEntry", _objectDefinition.getShortName()
+			).put(
+				"PageObject", "Page" + _objectDefinition.getShortName()
 			).put(
 				"PageObjectEntry", "Page" + _objectDefinition.getShortName()
 			).build());
@@ -260,6 +294,14 @@ public class ObjectEntryOpenAPIResourceImpl
 		return requiredPropertySchemaNames;
 	}
 
+	private BundleContext _bundleContext;
+
+	@Reference
+	private DTOConverterRegistry _dtoConverterRegistry;
+
+	@Reference
+	private ObjectActionLocalService _objectActionLocalService;
+
 	private ObjectDefinition _objectDefinition;
 
 	@Reference
@@ -273,5 +315,9 @@ public class ObjectEntryOpenAPIResourceImpl
 
 	@Reference
 	private OpenAPIResource _openAPIResource;
+
+	@Reference
+	private SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataRegistry;
 
 }

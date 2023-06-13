@@ -77,7 +77,7 @@
 </tr>
 <tr>
 	<td>FIELD_REPEATABLE_BUTTON_BY_INDEX</td>
-	<td>//div[${key_duplicatedIndex}][contains(@class,'ddm-field')]//div[contains(@data-field-name,'${key_fieldName}')]//button[contains(@class,'ddm-form-field-repeatable-add-button')]</td>
+	<td>//div[${key_duplicatedIndex}][contains(@class,'ddm-field')]//div[contains(@data-field-name,'${key_fieldName}')]//button[contains(@class,'ddm-form-field-repeatable-add-button')] | //div[${key_duplicatedIndex}][@class="ddm-field"]//label[text()='${key_fieldName}']/..//button[contains(@class,'ddm-form-field-repeatable-add-button')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -87,7 +87,7 @@
 </tr>
 <tr>
 	<td>FIELD_ADD_SPECIFIC</td>
-	<td>//div[contains(@class,'lfr-ddm-form-container')]//div[contains(@data-field-name,'${key_fieldName}')][${key_repeatableFieldNumber}]//div[contains(@class,'lfr-ddm-form-field-repeatable-toolbar')]//button[contains(@class,'btn') and contains(@title,'Duplicate')]</td>
+	<td>//div[contains(@class,'lfr-ddm-form-container')]//div[contains(@data-field-name,'${key_fieldName}')][${key_repeatableFieldNumber}]//div[contains(@class,'lfr-ddm-form-field-repeatable-toolbar')]//button[contains(@class,'btn') and contains(@title,'Duplicate')] | //div[@class="ddm-field"]//label[text()='Upload'][${key_repeatableFieldNumber}]/..//div[contains(@class,'lfr-ddm-form-field-repeatable-toolbar')]//button[contains(@class,'btn') and contains(@title,'Duplicate')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -677,7 +677,7 @@
 </tr>
 <tr>
 	<td>TEXT_FIELD_LABEL_REPORT_CARD</td>
-	<td>//div[@class='report-cards-shortcut']//div[@class='field-label'][contains(text(),'${key_fieldName}')]</td>
+	<td>//div[@class='report-cards-shortcut']//div[@class='field-label'][contains(text(),'${key_fieldName}')] | //div[contains(@class,"form-report--cards-shortcut")]//div[text()='${key_fieldName}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -866,7 +866,7 @@
 </tr>
 <tr>
 	<td>SELECT_SELECT_LIST_INDEX</td>
-	<td>xpath=//label[contains(text(),'${key_fieldLabel}')]/../../..//div[contains(@class,'ddm-field') and contains(@data-field-name,'SelectFromList')][${key_index}]</td>
+	<td>xpath=//label[contains(text(),'${key_fieldLabel}')]/../../..//div[contains(@class,'ddm-field') and contains(@data-field-name,'SelectFromList')][${key_index}] | //div[@class="ddm-field"][${key_index}]//label[contains(text(),'${key_fieldLabel}')]/..//div[contains(@class,'option-selected')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -1142,12 +1142,12 @@
 </tr>
 <tr>
 	<td>UPLOAD_ON_WIDGET_ON_ANY_FIELD</td>
-	<td>//div[contains(@data-field-name,'${key_fieldName}')][${key_rowNumber}]//button[contains(.,'Select')]</td>
+	<td>//div[contains(@data-field-name,'${key_fieldName}')][${key_rowNumber}]//button[contains(.,'Select')] | //div[@class="ddm-field"][${key_rowNumber}]//span[text()='${key_fieldName}']/..//button[contains(.,'Select')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>UPLOAD_ON_WIDGET_SINGLE_ROW</td>
-	<td>//div[contains(@data-field-name,'${key_fieldName}')][1]//button[contains(.,'Select')]</td>
+	<td>//div[contains(@data-field-name,'${key_fieldName}')][1]//button[contains(.,'Select')] | //div[@class="ddm-field"][1]//span[text()='${key_fieldName}']/..//button[contains(.,'Select')]</td>
 	<td></td>
 </tr>
 <tr>

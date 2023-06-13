@@ -46,8 +46,11 @@ import com.liferay.asset.publisher.web.internal.util.AssetPublisherCustomizer;
 import com.liferay.asset.util.AssetHelper;
 import com.liferay.asset.util.AssetPublisherAddItemHolder;
 import com.liferay.asset.util.LinkedAssetEntryIdsUtil;
+import com.liferay.asset.util.comparator.AssetRendererFactoryTypeNameComparator;
 import com.liferay.document.library.kernel.document.conversion.DocumentConversionUtil;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.info.collection.provider.CollectionQuery;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.info.collection.provider.item.selector.criterion.InfoCollectionProviderItemSelectorCriterion;
@@ -55,7 +58,9 @@ import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.list.provider.item.selector.criterion.InfoListProviderItemSelectorReturnType;
 import com.liferay.info.pagination.InfoPage;
 import com.liferay.item.selector.ItemSelector;
+import com.liferay.item.selector.criteria.AssetEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.InfoListItemSelectorReturnType;
+import com.liferay.item.selector.criteria.asset.criterion.AssetEntryItemSelectorCriterion;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.petra.string.CharPool;
@@ -66,8 +71,10 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -846,6 +853,82 @@ public class AssetPublisherDisplayContext {
 
 	public String[] getDisplayStyles() {
 		return _assetPublisherPortletInstanceConfiguration.displayStyles();
+	}
+
+	public List<DropdownItem> getDropdownItems(Group group) throws Exception {
+		DropdownItemList dropdownItemList = new DropdownItemList();
+
+		List<AssetRendererFactory<?>> assetRendererFactories = ListUtil.sort(
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactories(
+				_themeDisplay.getCompanyId()),
+			new AssetRendererFactoryTypeNameComparator(
+				_themeDisplay.getLocale()));
+
+		for (AssetRendererFactory<?> assetRendererFactory :
+				assetRendererFactories) {
+
+			if (!assetRendererFactory.isSelectable()) {
+				continue;
+			}
+
+			long curGroupId = group.getGroupId();
+
+			if (group.isStagingGroup() &&
+				!group.isStagedPortlet(assetRendererFactory.getPortletId())) {
+
+				curGroupId = group.getLiveGroupId();
+			}
+
+			if (!assetRendererFactory.isSupportsClassTypes()) {
+				dropdownItemList.add(
+					dropdownItem -> {
+						dropdownItem.putData(
+							"href",
+							_getAssetEntryItemSelectorPortletURL(
+								assetRendererFactory,
+								_DEFAULT_SUBTYPE_SELECTION_ID));
+						dropdownItem.putData(
+							"title",
+							LanguageUtil.format(
+								_httpServletRequest, "select-x",
+								assetRendererFactory.getTypeName(
+									_themeDisplay.getLocale()),
+								false));
+						dropdownItem.setLabel(
+							assetRendererFactory.getTypeName(
+								_themeDisplay.getLocale()));
+					});
+
+				continue;
+			}
+
+			ClassTypeReader classTypeReader =
+				assetRendererFactory.getClassTypeReader();
+
+			List<ClassType> assetAvailableClassTypes =
+				classTypeReader.getAvailableClassTypes(
+					PortalUtil.getCurrentAndAncestorSiteGroupIds(curGroupId),
+					_themeDisplay.getLocale());
+
+			for (ClassType classType : assetAvailableClassTypes) {
+				dropdownItemList.add(
+					dropdownItem -> {
+						dropdownItem.putData(
+							"href",
+							_getAssetEntryItemSelectorPortletURL(
+								assetRendererFactory,
+								classType.getClassTypeId()));
+						dropdownItem.putData(
+							"title",
+							LanguageUtil.format(
+								_httpServletRequest, "select-x",
+								classType.getName(), false));
+						dropdownItem.setLabel(classType.getName());
+					});
+			}
+		}
+
+		return dropdownItemList;
 	}
 
 	public LocalizedValuesMap getEmailAssetEntryAddedBody() {
@@ -2055,6 +2138,30 @@ public class AssetPublisherDisplayContext {
 		return filteredAssetEntries;
 	}
 
+	private String _getAssetEntryItemSelectorPortletURL(
+		AssetRendererFactory<?> assetRendererFactory, long subtypeSelectionId) {
+
+		AssetEntryItemSelectorCriterion assetEntryItemSelectorCriterion =
+			new AssetEntryItemSelectorCriterion();
+
+		assetEntryItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			new AssetEntryItemSelectorReturnType());
+		assetEntryItemSelectorCriterion.setGroupId(
+			_themeDisplay.getScopeGroupId());
+		assetEntryItemSelectorCriterion.setShowNonindexable(true);
+		assetEntryItemSelectorCriterion.setShowScheduled(true);
+		assetEntryItemSelectorCriterion.setSubtypeSelectionId(
+			subtypeSelectionId);
+		assetEntryItemSelectorCriterion.setTypeSelection(
+			assetRendererFactory.getClassName());
+
+		return String.valueOf(
+			_itemSelector.getItemSelectorURL(
+				RequestBackedPortletURLFactoryUtil.create(_portletRequest),
+				_portletResponse.getNamespace() + "selectAsset",
+				assetEntryItemSelectorCriterion));
+	}
+
 	private String _getSegmentsAnonymousUserId() {
 		return GetterUtil.getString(
 			_portletRequest.getAttribute(
@@ -2140,6 +2247,8 @@ public class AssetPublisherDisplayContext {
 			_ddmStructureFieldLabel = classTypeField.getLabel();
 		}
 	}
+
+	private static final int _DEFAULT_SUBTYPE_SELECTION_ID = -1;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AssetPublisherDisplayContext.class);

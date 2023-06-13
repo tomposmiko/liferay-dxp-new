@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
+import com.liferay.commerce.product.exception.DuplicateCPOptionValueExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPOptionValueException;
 import com.liferay.commerce.product.model.CPOptionValue;
 import com.liferay.commerce.product.model.CPOptionValueTable;
@@ -2536,35 +2537,35 @@ public class CPOptionValuePersistenceImpl
 	private static final String _FINDER_COLUMN_C_K_KEY_3 =
 		"(cpOptionValue.key IS NULL OR cpOptionValue.key = '')";
 
-	private FinderPath _finderPathFetchByC_ERC;
-	private FinderPath _finderPathCountByC_ERC;
+	private FinderPath _finderPathFetchByERC_C;
+	private FinderPath _finderPathCountByERC_C;
 
 	/**
-	 * Returns the cp option value where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchCPOptionValueException</code> if it could not be found.
+	 * Returns the cp option value where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchCPOptionValueException</code> if it could not be found.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the matching cp option value
 	 * @throws NoSuchCPOptionValueException if a matching cp option value could not be found
 	 */
 	@Override
-	public CPOptionValue findByC_ERC(
-			long companyId, String externalReferenceCode)
+	public CPOptionValue findByERC_C(
+			String externalReferenceCode, long companyId)
 		throws NoSuchCPOptionValueException {
 
-		CPOptionValue cpOptionValue = fetchByC_ERC(
-			companyId, externalReferenceCode);
+		CPOptionValue cpOptionValue = fetchByERC_C(
+			externalReferenceCode, companyId);
 
 		if (cpOptionValue == null) {
 			StringBundler sb = new StringBundler(6);
 
 			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			sb.append("companyId=");
-			sb.append(companyId);
-
-			sb.append(", externalReferenceCode=");
+			sb.append("externalReferenceCode=");
 			sb.append(externalReferenceCode);
+
+			sb.append(", companyId=");
+			sb.append(companyId);
 
 			sb.append("}");
 
@@ -2579,30 +2580,30 @@ public class CPOptionValuePersistenceImpl
 	}
 
 	/**
-	 * Returns the cp option value where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the cp option value where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the matching cp option value, or <code>null</code> if a matching cp option value could not be found
 	 */
 	@Override
-	public CPOptionValue fetchByC_ERC(
-		long companyId, String externalReferenceCode) {
+	public CPOptionValue fetchByERC_C(
+		String externalReferenceCode, long companyId) {
 
-		return fetchByC_ERC(companyId, externalReferenceCode, true);
+		return fetchByERC_C(externalReferenceCode, companyId, true);
 	}
 
 	/**
-	 * Returns the cp option value where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the cp option value where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching cp option value, or <code>null</code> if a matching cp option value could not be found
 	 */
 	@Override
-	public CPOptionValue fetchByC_ERC(
-		long companyId, String externalReferenceCode, boolean useFinderCache) {
+	public CPOptionValue fetchByERC_C(
+		String externalReferenceCode, long companyId, boolean useFinderCache) {
 
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
@@ -2612,23 +2613,23 @@ public class CPOptionValuePersistenceImpl
 		Object[] finderArgs = null;
 
 		if (useFinderCache && productionMode) {
-			finderArgs = new Object[] {companyId, externalReferenceCode};
+			finderArgs = new Object[] {externalReferenceCode, companyId};
 		}
 
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByC_ERC, finderArgs, this);
+				_finderPathFetchByERC_C, finderArgs, this);
 		}
 
 		if (result instanceof CPOptionValue) {
 			CPOptionValue cpOptionValue = (CPOptionValue)result;
 
-			if ((companyId != cpOptionValue.getCompanyId()) ||
-				!Objects.equals(
+			if (!Objects.equals(
 					externalReferenceCode,
-					cpOptionValue.getExternalReferenceCode())) {
+					cpOptionValue.getExternalReferenceCode()) ||
+				(companyId != cpOptionValue.getCompanyId())) {
 
 				result = null;
 			}
@@ -2639,18 +2640,18 @@ public class CPOptionValuePersistenceImpl
 
 			sb.append(_SQL_SELECT_CPOPTIONVALUE_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
-
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
 			}
+
+			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -2663,18 +2664,18 @@ public class CPOptionValuePersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(companyId);
-
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
+
+				queryPos.add(companyId);
 
 				List<CPOptionValue> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache && productionMode) {
 						finderCache.putResult(
-							_finderPathFetchByC_ERC, finderArgs, list);
+							_finderPathFetchByERC_C, finderArgs, list);
 					}
 				}
 				else {
@@ -2702,32 +2703,32 @@ public class CPOptionValuePersistenceImpl
 	}
 
 	/**
-	 * Removes the cp option value where companyId = &#63; and externalReferenceCode = &#63; from the database.
+	 * Removes the cp option value where externalReferenceCode = &#63; and companyId = &#63; from the database.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the cp option value that was removed
 	 */
 	@Override
-	public CPOptionValue removeByC_ERC(
-			long companyId, String externalReferenceCode)
+	public CPOptionValue removeByERC_C(
+			String externalReferenceCode, long companyId)
 		throws NoSuchCPOptionValueException {
 
-		CPOptionValue cpOptionValue = findByC_ERC(
-			companyId, externalReferenceCode);
+		CPOptionValue cpOptionValue = findByERC_C(
+			externalReferenceCode, companyId);
 
 		return remove(cpOptionValue);
 	}
 
 	/**
-	 * Returns the number of cp option values where companyId = &#63; and externalReferenceCode = &#63;.
+	 * Returns the number of cp option values where externalReferenceCode = &#63; and companyId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the number of matching cp option values
 	 */
 	@Override
-	public int countByC_ERC(long companyId, String externalReferenceCode) {
+	public int countByERC_C(String externalReferenceCode, long companyId) {
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
@@ -2739,9 +2740,9 @@ public class CPOptionValuePersistenceImpl
 		Long count = null;
 
 		if (productionMode) {
-			finderPath = _finderPathCountByC_ERC;
+			finderPath = _finderPathCountByERC_C;
 
-			finderArgs = new Object[] {companyId, externalReferenceCode};
+			finderArgs = new Object[] {externalReferenceCode, companyId};
 
 			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 		}
@@ -2751,18 +2752,18 @@ public class CPOptionValuePersistenceImpl
 
 			sb.append(_SQL_COUNT_CPOPTIONVALUE_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
-
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
 			}
+
+			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -2775,11 +2776,11 @@ public class CPOptionValuePersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(companyId);
-
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
+
+				queryPos.add(companyId);
 
 				count = (Long)query.uniqueResult();
 
@@ -2798,14 +2799,14 @@ public class CPOptionValuePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_ERC_COMPANYID_2 =
-		"cpOptionValue.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2 =
+		"cpOptionValue.externalReferenceCode = ? AND ";
 
-	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2 =
-		"cpOptionValue.externalReferenceCode = ?";
+	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3 =
+		"(cpOptionValue.externalReferenceCode IS NULL OR cpOptionValue.externalReferenceCode = '') AND ";
 
-	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3 =
-		"(cpOptionValue.externalReferenceCode IS NULL OR cpOptionValue.externalReferenceCode = '')";
+	private static final String _FINDER_COLUMN_ERC_C_COMPANYID_2 =
+		"cpOptionValue.companyId = ?";
 
 	public CPOptionValuePersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
@@ -2846,10 +2847,10 @@ public class CPOptionValuePersistenceImpl
 			cpOptionValue);
 
 		finderCache.putResult(
-			_finderPathFetchByC_ERC,
+			_finderPathFetchByERC_C,
 			new Object[] {
-				cpOptionValue.getCompanyId(),
-				cpOptionValue.getExternalReferenceCode()
+				cpOptionValue.getExternalReferenceCode(),
+				cpOptionValue.getCompanyId()
 			},
 			cpOptionValue);
 	}
@@ -2939,13 +2940,13 @@ public class CPOptionValuePersistenceImpl
 			_finderPathFetchByC_K, args, cpOptionValueModelImpl);
 
 		args = new Object[] {
-			cpOptionValueModelImpl.getCompanyId(),
-			cpOptionValueModelImpl.getExternalReferenceCode()
+			cpOptionValueModelImpl.getExternalReferenceCode(),
+			cpOptionValueModelImpl.getCompanyId()
 		};
 
-		finderCache.putResult(_finderPathCountByC_ERC, args, Long.valueOf(1));
+		finderCache.putResult(_finderPathCountByERC_C, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathFetchByC_ERC, args, cpOptionValueModelImpl);
+			_finderPathFetchByERC_C, args, cpOptionValueModelImpl);
 	}
 
 	/**
@@ -3089,6 +3090,29 @@ public class CPOptionValuePersistenceImpl
 
 		if (Validator.isNull(cpOptionValue.getExternalReferenceCode())) {
 			cpOptionValue.setExternalReferenceCode(cpOptionValue.getUuid());
+		}
+		else {
+			CPOptionValue ercCPOptionValue = fetchByERC_C(
+				cpOptionValue.getExternalReferenceCode(),
+				cpOptionValue.getCompanyId());
+
+			if (isNew) {
+				if (ercCPOptionValue != null) {
+					throw new DuplicateCPOptionValueExternalReferenceCodeException(
+						"Duplicate cp option value with external reference code " +
+							cpOptionValue.getExternalReferenceCode());
+				}
+			}
+			else {
+				if ((ercCPOptionValue != null) &&
+					(cpOptionValue.getCPOptionValueId() !=
+						ercCPOptionValue.getCPOptionValueId())) {
+
+					throw new DuplicateCPOptionValueExternalReferenceCodeException(
+						"Duplicate cp option value with external reference code " +
+							cpOptionValue.getExternalReferenceCode());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =
@@ -3626,7 +3650,7 @@ public class CPOptionValuePersistenceImpl
 		_uniqueIndexColumnNames.add(new String[] {"CPOptionId", "key_"});
 
 		_uniqueIndexColumnNames.add(
-			new String[] {"companyId", "externalReferenceCode"});
+			new String[] {"externalReferenceCode", "companyId"});
 	}
 
 	/**
@@ -3732,15 +3756,15 @@ public class CPOptionValuePersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"CPOptionId", "key_"}, false);
 
-		_finderPathFetchByC_ERC = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByC_ERC",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "externalReferenceCode"}, true);
+		_finderPathFetchByERC_C = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByERC_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"externalReferenceCode", "companyId"}, true);
 
-		_finderPathCountByC_ERC = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_ERC",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "externalReferenceCode"}, false);
+		_finderPathCountByERC_C = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByERC_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"externalReferenceCode", "companyId"}, false);
 
 		_setCPOptionValueUtilPersistence(this);
 	}

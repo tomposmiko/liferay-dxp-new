@@ -1013,18 +1013,11 @@ public class UserLocalServiceUtil {
 		return getService().fetchUserByEmailAddress(companyId, emailAddress);
 	}
 
-	/**
-	 * Returns the user with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the user's external reference code
-	 * @return the matching user, or <code>null</code> if a matching user could not be found
-	 */
 	public static User fetchUserByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
 		return getService().fetchUserByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	/**
@@ -1089,17 +1082,6 @@ public class UserLocalServiceUtil {
 	 */
 	public static User fetchUserByPortraitId(long portraitId) {
 		return getService().fetchUserByPortraitId(portraitId);
-	}
-
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchUserByExternalReferenceCode(long, String)}
-	 */
-	@Deprecated
-	public static User fetchUserByReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return getService().fetchUserByReferenceCode(
-			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -1694,20 +1676,12 @@ public class UserLocalServiceUtil {
 		return getService().getUserByEmailAddress(companyId, emailAddress);
 	}
 
-	/**
-	 * Returns the user with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the user's external reference code
-	 * @return the matching user
-	 * @throws PortalException if a matching user could not be found
-	 */
 	public static User getUserByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException {
 
 		return getService().getUserByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	/**

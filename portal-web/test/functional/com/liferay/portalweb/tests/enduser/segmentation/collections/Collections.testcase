@@ -52,8 +52,9 @@ definition {
 				value1 = "Manual Asset List Test");
 
 			AssertTextEquals.assertPartialText(
-				key_type = "Manual",
-				locator1 = "AssetLists#ASSET_LIST_ENTRY_TYPE",
+				key_columnName = "lfr-type",
+				key_tableEntry = "Manual",
+				locator1 = "LexiconTable#TABLE_ENTRY_INFO",
 				value1 = "Manual");
 
 			AssertTextEquals.assertPartialText(
@@ -62,8 +63,9 @@ definition {
 				value1 = "Dynamic Asset List Test");
 
 			AssertTextEquals.assertPartialText(
-				key_type = "Dynamic",
-				locator1 = "AssetLists#ASSET_LIST_ENTRY_TYPE",
+				key_columnName = "lfr-type",
+				key_tableEntry = "Dynamic",
+				locator1 = "LexiconTable#TABLE_ENTRY_INFO",
 				value1 = "Dynamic");
 		}
 	}
@@ -93,6 +95,52 @@ definition {
 			AssertTextEquals.assertPartialText(
 				locator1 = "Message#ERROR_MODAL_CONTENT",
 				value1 = "A collection with that title already exists.");
+		}
+	}
+
+	@description = "This is a test for LPS-166893. The site designer could change the display style of Collections."
+	@priority = "5"
+	test ChangeDisplayStyleOfCollections {
+		task ("Given a site designer has collections") {
+			JSONAssetlist.addDynamicAssetListEntryWithItemType(
+				groupName = "Test Site Name",
+				itemType = "All Types",
+				title = "Dynamic Collection");
+
+			JSONAssetlist.addManualAssetListEntryWithItemType(
+				groupName = "Test Site Name",
+				itemType = "All Types",
+				title = "Manual Collection");
+		}
+
+		task ("When the site designer navigates to the Collections admin") {
+			AssetListsAdmin.openAssetListsAdmin(siteURLKey = "test-site-name");
+		}
+
+		task ("Then the site designer see the collections are displayed as table items") {
+			for (var collectionName : list "Dynamic Collection,Manual Collection") {
+				LexiconTable.viewTableEntryTitle(tableEntry = "${collectionName}");
+			}
+		}
+
+		task ("When the site designer change the display style to list") {
+			LexiconEntry.changeDisplayStyle(displayStyle = "list");
+		}
+
+		task ("Then the site designer see the collections are displayed as list items") {
+			for (var collectionName : list "Dynamic Collection,Manual Collection") {
+				LexiconList.viewListEntryTitle(listEntry = "${collectionName}");
+			}
+		}
+
+		task ("When the site designer change the display style to cards") {
+			LexiconEntry.changeDisplayStyle(displayStyle = "cards");
+		}
+
+		task ("Then the site designer see the collections are displayed as cards items") {
+			for (var collectionName : list "Dynamic Collection,Manual Collection") {
+				LexiconCard.viewCardTitle(card = "${collectionName}");
+			}
 		}
 	}
 
@@ -3081,8 +3129,9 @@ definition {
 				value1 = "Manual Asset List Edit");
 
 			AssertTextEquals.assertPartialText(
-				key_type = "Manual",
-				locator1 = "AssetLists#ASSET_LIST_ENTRY_TYPE",
+				key_columnName = "lfr-type",
+				key_tableEntry = "Manual",
+				locator1 = "LexiconTable#TABLE_ENTRY_INFO",
 				value1 = "Manual");
 		}
 	}
@@ -3758,7 +3807,7 @@ definition {
 		}
 
 		task ("View content of that variant") {
-			AssetListsAdmin.viewCollectionItems(assetTitleList = "WC_Title_1,WC_Title_2,WC_Title_3");
+			AssetListsAdmin.viewContent(assetTitleList = "WC_Title_1,WC_Title_2,WC_Title_3");
 		}
 	}
 

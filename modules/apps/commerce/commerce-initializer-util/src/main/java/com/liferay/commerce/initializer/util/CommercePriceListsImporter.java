@@ -90,8 +90,8 @@ public class CommercePriceListsImporter {
 
 			CommercePriceList parentPriceList =
 				_commercePriceListLocalService.
-					fetchCommercePriceListByReferenceCode(
-						serviceContext.getCompanyId(), externalReferenceCode);
+					fetchCommercePriceListByExternalReferenceCode(
+						externalReferenceCode, serviceContext.getCompanyId());
 
 			parentPriceListId = parentPriceList.getParentCommercePriceListId();
 		}

@@ -241,7 +241,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 
 		Organization organization =
 			organizationLocalService.fetchOrganizationByExternalReferenceCode(
-				user.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, user.getCompanyId());
 
 		if (organization == null) {
 			if (parentOrganizationId ==
@@ -443,7 +443,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 
 		Organization organization =
 			organizationLocalService.getOrganizationByExternalReferenceCode(
-				companyId, externalReferenceCode);
+				externalReferenceCode, companyId);
 
 		OrganizationPermissionUtil.check(
 			getPermissionChecker(), organization, ActionKeys.VIEW);

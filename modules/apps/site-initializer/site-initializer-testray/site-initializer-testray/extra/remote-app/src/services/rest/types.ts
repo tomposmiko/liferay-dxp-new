@@ -45,6 +45,11 @@ export type Role = {
 	name: string;
 };
 
+export type UserGroup = {
+	id: number;
+	name: string;
+};
+
 export type UserAccount = {
 	additionalName: string;
 	alternateName: string;
@@ -54,6 +59,7 @@ export type UserAccount = {
 	id: number;
 	image: string;
 	roleBriefs: Role[];
+	userGroupBriefs: UserGroup[];
 	uuid: number;
 };
 
@@ -233,11 +239,14 @@ export type TestrayRun = {
 };
 
 export type TestraySubTask = {
+	dateCreated: string;
 	dateModified: string;
 	dueStatus: PickList;
 	errors: string;
 	id: number;
+	mergedToSubtaskId: TestraySubTask;
 	name: string;
+	r_mergedToTestraySubtask_c_subtaskId: TestraySubTask;
 	r_taskToSubtasks_c_task: TestrayTask;
 	r_userToSubtasks_user: UserAccount;
 	score: number;

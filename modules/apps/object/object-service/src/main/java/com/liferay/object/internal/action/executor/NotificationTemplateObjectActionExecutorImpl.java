@@ -58,9 +58,6 @@ public class NotificationTemplateObjectActionExecutorImpl
 			_notificationTypeServiceTracker.getNotificationType(
 				notificationTemplate.getType());
 
-		NotificationContextBuilder notificationContextBuilder =
-			new NotificationContextBuilder();
-
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				payloadJSONObject.getLong("objectDefinitionId"));
@@ -71,7 +68,8 @@ public class NotificationTemplateObjectActionExecutorImpl
 				_systemObjectDefinitionMetadataRegistry);
 
 		notificationType.sendNotification(
-			notificationContextBuilder.className(
+			new NotificationContextBuilder(
+			).className(
 				objectDefinition.getClassName()
 			).classPK(
 				GetterUtil.getLong(termValues.get("id"))

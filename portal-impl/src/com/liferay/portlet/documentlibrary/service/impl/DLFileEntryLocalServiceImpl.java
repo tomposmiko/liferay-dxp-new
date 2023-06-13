@@ -1045,8 +1045,8 @@ public class DLFileEntryLocalServiceImpl
 	public DLFileEntry fetchFileEntryByExternalReferenceCode(
 		long groupId, String externalReferenceCode) {
 
-		return dlFileEntryPersistence.fetchByG_ERC(
-			groupId, externalReferenceCode);
+		return dlFileEntryPersistence.fetchByERC_G(
+			externalReferenceCode, groupId);
 	}
 
 	@Override
@@ -1264,8 +1264,8 @@ public class DLFileEntryLocalServiceImpl
 			long groupId, String externalReferenceCode)
 		throws PortalException {
 
-		return dlFileEntryPersistence.findByG_ERC(
-			groupId, externalReferenceCode);
+		return dlFileEntryPersistence.findByERC_G(
+			externalReferenceCode, groupId);
 	}
 
 	@Override
@@ -3431,8 +3431,8 @@ public class DLFileEntryLocalServiceImpl
 			return;
 		}
 
-		DLFileEntry dlFileEntry = dlFileEntryPersistence.fetchByG_ERC(
-			groupId, externalReferenceCode);
+		DLFileEntry dlFileEntry = dlFileEntryPersistence.fetchByERC_G(
+			externalReferenceCode, groupId);
 
 		if (dlFileEntry != null) {
 			throw new DuplicateFileEntryExternalReferenceCodeException(

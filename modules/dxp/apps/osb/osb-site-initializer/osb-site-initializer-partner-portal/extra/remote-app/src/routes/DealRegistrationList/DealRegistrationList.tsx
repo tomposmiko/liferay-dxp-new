@@ -12,25 +12,42 @@
 import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
+import {useModal} from '@clayui/modal';
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
+import {useState} from 'react';
 
+import Modal from '../../common/components/Modal';
 import Table from '../../common/components/Table';
+import TableHeader from '../../common/components/TableHeader';
+import Search from '../../common/components/TableHeader/Search';
 import {DealRegistrationColumnKey} from '../../common/enums/dealRegistrationColumnKey';
 import {PRMPageRoute} from '../../common/enums/prmPageRoute';
 import useLiferayNavigate from '../../common/hooks/useLiferayNavigate';
 import usePagination from '../../common/hooks/usePagination';
 import {DealRegistrationListItem} from '../../common/interfaces/dealRegistrationListItem';
 import {Liferay} from '../../common/services/liferay';
+import ModalContent from './components/ModalContent';
+import useFilters from './hooks/useFilters';
 import useGetListItemsFromDealRegistration from './hooks/useGetListItemsFromDealRegistration';
-type DealRegistrationItem = {
+
+export type DealRegistrationItem = {
 	[key in DealRegistrationColumnKey]?: any;
 };
 
 const DealRegistrationList = () => {
+	const {filters, filtersTerm, onFilter} = useFilters();
+	const [isVisibleModal, setIsVisibleModal] = useState(false);
+	const [modalContent, setModalContent] = useState<DealRegistrationItem>({});
+
+	const {observer, onClose} = useModal({
+		onClose: () => setIsVisibleModal(false),
+	});
+
 	const pagination = usePagination();
 	const {data, isValidating} = useGetListItemsFromDealRegistration(
 		pagination.activePage,
-		pagination.activeDelta
+		pagination.activeDelta,
+		filtersTerm
 	);
 
 	const siteURL = useLiferayNavigate();
@@ -65,6 +82,19 @@ const DealRegistrationList = () => {
 		},
 	];
 
+	const handleCustomClickOnRow = (item: DealRegistrationItem) => {
+		setIsVisibleModal(true);
+		setModalContent(item);
+	};
+
+	const getModal = () => {
+		return (
+			<Modal observer={observer} size="lg">
+				<ModalContent content={modalContent} onClose={onClose} />
+			</Modal>
+		);
+	};
+
 	const getTable = (totalCount: number, items?: DealRegistrationItem[]) => {
 		if (items) {
 			if (!totalCount) {
@@ -86,6 +116,7 @@ const DealRegistrationList = () => {
 					<Table<DealRegistrationListItem>
 						borderless
 						columns={columns}
+						customClickOnRow={handleCustomClickOnRow}
 						responsive
 						rows={items}
 					/>
@@ -101,19 +132,49 @@ const DealRegistrationList = () => {
 
 	return (
 		<div className="border-0 my-4">
-			<h1>Partner Deal Registration</h1>
+			<h1>Partner Opportunity Registration</h1>
 
-			<div className="bg-neutral-1 d-flex justify-content-end p-3 rounded">
-				<ClayButton
-					onClick={() =>
-						Liferay.Util.navigate(
-							`${siteURL}/${PRMPageRoute.CREATE_DEAL_REGISTRATION}`
-						)
-					}
-				>
-					Register New Deal
-				</ClayButton>
-			</div>
+			<TableHeader>
+				<div className="d-flex">
+					<div>
+						<Search
+							onSearchSubmit={(searchTerm: string) =>
+								onFilter({
+									searchTerm,
+								})
+							}
+						/>
+
+						<div className="bd-highlight flex-shrink-2 mt-1">
+							{!!filters.searchTerm &&
+								!!data.items?.length &&
+								!isValidating && (
+									<div>
+										<p className="font-weight-semi-bold m-0 ml-1 mt-3 text-paragraph-sm">
+											{data.items?.length > 1
+												? `${data.items?.length} results for ${filters.searchTerm}`
+												: `${data.items?.length} result for ${filters.searchTerm}`}
+										</p>
+									</div>
+								)}
+						</div>
+					</div>
+				</div>
+
+				<div className="mb-2 mb-lg-0">
+					<ClayButton
+						onClick={() =>
+							Liferay.Util.navigate(
+								`${siteURL}/${PRMPageRoute.CREATE_DEAL_REGISTRATION}`
+							)
+						}
+					>
+						Register New Opportunity
+					</ClayButton>
+				</div>
+			</TableHeader>
+
+			{isVisibleModal && getModal()}
 
 			{isValidating && <ClayLoadingIndicator />}
 

@@ -81,6 +81,12 @@ public interface ObjectEntryResource {
 			String externalReferenceCode, ObjectEntry objectEntry)
 		throws Exception;
 
+	public void
+			putByExternalReferenceCodeObjectEntryExternalReferenceCodeObjectActionObjectActionName(
+				String objectEntryExternalReferenceCode,
+				String objectActionName)
+		throws Exception;
+
 	public void deleteScopeScopeKeyByExternalReferenceCode(
 			String scopeKey, String externalReferenceCode)
 		throws Exception;
@@ -92,16 +98,6 @@ public interface ObjectEntryResource {
 	public ObjectEntry putScopeScopeKeyByExternalReferenceCode(
 			String scopeKey, String externalReferenceCode,
 			ObjectEntry objectEntry)
-		throws Exception;
-
-	public Page<ObjectEntry> getCurrentObjectEntriesObjectRelationshipNamePage(
-			Long currentObjectEntryId, String objectRelationshipName,
-			Pagination pagination)
-		throws Exception;
-
-	public ObjectEntry putCurrentObjectEntry(
-			Long currentObjectEntryId, String objectRelationshipName,
-			Long relatedObjectEntryId)
 		throws Exception;
 
 	public void deleteObjectEntry(Long objectEntryId) throws Exception;
@@ -120,6 +116,10 @@ public interface ObjectEntryResource {
 		throws Exception;
 
 	public Response putObjectEntryBatch(String callbackURL, Object object)
+		throws Exception;
+
+	public void putObjectEntryObjectActionObjectActionName(
+			Long objectEntryId, String objectActionName)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>

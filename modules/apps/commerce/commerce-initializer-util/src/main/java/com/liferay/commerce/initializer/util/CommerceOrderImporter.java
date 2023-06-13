@@ -138,8 +138,9 @@ public class CommerceOrderImporter {
 
 		String externalProductId = jsonObject.getString("externalProductId");
 
-		CProduct cProduct = _cProductLocalService.fetchCProductByReferenceCode(
-			serviceContext.getCompanyId(), externalProductId);
+		CProduct cProduct =
+			_cProductLocalService.fetchCProductByExternalReferenceCode(
+				externalProductId, serviceContext.getCompanyId());
 
 		if (cProduct == null) {
 			return;

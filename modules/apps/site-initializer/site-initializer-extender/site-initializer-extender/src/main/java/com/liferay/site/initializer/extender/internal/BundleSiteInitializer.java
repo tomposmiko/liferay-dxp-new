@@ -79,15 +79,19 @@ import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.notification.rest.dto.v1_0.NotificationTemplate;
 import com.liferay.notification.rest.resource.v1_0.NotificationTemplateResource;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
+import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectRelationship;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
+import com.liferay.object.admin.rest.resource.v1_0.ObjectFieldResource;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectRelationshipResource;
 import com.liferay.object.constants.ObjectDefinitionConstants;
-import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.rest.dto.v1_0.ObjectEntry;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.function.UnsafeSupplier;
@@ -156,10 +160,10 @@ import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.multipart.BinaryFile;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.pagination.Page;
-import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsEntryLocalService;
@@ -175,8 +179,6 @@ import com.liferay.site.navigation.service.SiteNavigationMenuLocalService;
 import com.liferay.site.navigation.type.SiteNavigationMenuItemType;
 import com.liferay.site.navigation.type.SiteNavigationMenuItemTypeRegistry;
 import com.liferay.style.book.zip.processor.StyleBookEntryZipProcessor;
-
-import java.io.Serializable;
 
 import java.net.URL;
 import java.net.URLConnection;
@@ -242,9 +244,12 @@ public class BundleSiteInitializer implements SiteInitializer {
 		ObjectActionLocalService objectActionLocalService,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectDefinitionResource.Factory objectDefinitionResourceFactory,
+		ObjectEntryLocalService objectEntryLocalService,
+		ObjectEntryManager objectEntryManager,
+		ObjectFieldLocalService objectFieldLocalService,
+		ObjectFieldResource.Factory objectFieldResourceFactory,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
 		ObjectRelationshipResource.Factory objectRelationshipResourceFactory,
-		ObjectEntryLocalService objectEntryLocalService,
 		OrganizationLocalService organizationLocalService,
 		OrganizationResource.Factory organizationResourceFactory, Portal portal,
 		ResourceActionLocalService resourceActionLocalService,
@@ -308,9 +313,12 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_objectActionLocalService = objectActionLocalService;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectDefinitionResourceFactory = objectDefinitionResourceFactory;
+		_objectEntryLocalService = objectEntryLocalService;
+		_objectEntryManager = objectEntryManager;
+		_objectFieldLocalService = objectFieldLocalService;
+		_objectFieldResourceFactory = objectFieldResourceFactory;
 		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_objectRelationshipResourceFactory = objectRelationshipResourceFactory;
-		_objectEntryLocalService = objectEntryLocalService;
 		_organizationLocalService = organizationLocalService;
 		_organizationResourceFactory = organizationResourceFactory;
 		_portal = portal;
@@ -1164,6 +1172,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 					jsonObject.getBoolean("active"),
 					jsonObject.getString("conditionExpression"),
 					jsonObject.getString("description"),
+					SiteInitializerUtil.toMap(
+						jsonObject.getString("errorMessage")),
+					SiteInitializerUtil.toMap(jsonObject.getString("label")),
 					jsonObject.getString("name"),
 					jsonObject.getString("objectActionExecutorKey"),
 					jsonObject.getString("objectActionTriggerKey"),
@@ -1174,6 +1185,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 		_invoke(
 			() -> _addOrUpdateObjectRelationships(
+				objectDefinitionIdsStringUtilReplaceValues, serviceContext));
+
+		_invoke(
+			() -> _addOrUpdateObjectFields(
+				listTypeDefinitionIdsStringUtilReplaceValues,
 				objectDefinitionIdsStringUtilReplaceValues, serviceContext));
 
 		Map<String, String> objectEntryIdsStringUtilReplaceValues = _invoke(
@@ -2434,6 +2450,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 				jsonObject.getBoolean("active"),
 				jsonObject.getString("conditionExpression"),
 				jsonObject.getString("description"),
+				SiteInitializerUtil.toMap(jsonObject.getString("errorMessage")),
+				SiteInitializerUtil.toMap(jsonObject.getString("label")),
 				jsonObject.getString("name"),
 				jsonObject.getString("objectActionExecutorKey"),
 				jsonObject.getString("objectActionTriggerKey"),
@@ -2510,20 +2528,16 @@ public class BundleSiteInitializer implements SiteInitializer {
 				continue;
 			}
 
-			long groupId = serviceContext.getScopeGroupId();
-
-			if (Objects.equals(
-					objectDefinition.getScope(),
-					ObjectDefinitionConstants.SCOPE_COMPANY)) {
-
-				groupId = 0;
-			}
-
 			JSONArray jsonArray = jsonObject.getJSONArray("object-entries");
 
 			if (JSONUtil.isEmpty(jsonArray)) {
 				continue;
 			}
+
+			DefaultDTOConverterContext defaultDTOConverterContext =
+				new DefaultDTOConverterContext(
+					false, null, null, null, null, LocaleUtil.getSiteDefault(),
+					null, serviceContext.fetchUser());
 
 			for (int i = 0; i < jsonArray.length(); i++) {
 				JSONObject objectEntryJSONObject = jsonArray.getJSONObject(i);
@@ -2531,21 +2545,20 @@ public class BundleSiteInitializer implements SiteInitializer {
 				String externalReferenceCode = objectEntryJSONObject.getString(
 					"externalReferenceCode");
 
-				ObjectEntry objectEntry =
-					_objectEntryLocalService.addOrUpdateObjectEntry(
-						externalReferenceCode, serviceContext.getUserId(),
-						groupId, objectDefinition.getObjectDefinitionId(),
-						ObjectMapperUtil.readValue(
-							Serializable.class,
-							String.valueOf(objectEntryJSONObject)),
-						serviceContext);
+				ObjectEntry objectEntry = ObjectEntry.toDTO(
+					JSONUtil.toString(objectEntryJSONObject));
+
+				objectEntry = _objectEntryManager.addOrUpdateObjectEntry(
+					serviceContext.getCompanyId(), defaultDTOConverterContext,
+					externalReferenceCode, objectDefinition, objectEntry,
+					String.valueOf(serviceContext.getScopeGroupId()));
 
 				if (Validator.isNotNull(externalReferenceCode)) {
 					objectEntryIdsStringUtilReplaceValues.put(
 						StringBundler.concat(
 							objectDefinition.getShortName(), "#",
 							externalReferenceCode),
-						String.valueOf(objectEntry.getObjectEntryId()));
+						String.valueOf(objectEntry.getId()));
 				}
 
 				String objectEntrySiteInitializerKey =
@@ -2556,22 +2569,79 @@ public class BundleSiteInitializer implements SiteInitializer {
 					continue;
 				}
 
+				com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+					_objectEntryLocalService.getObjectEntry(
+						objectEntry.getId());
+
 				siteNavigationMenuItemSettingsBuilder.put(
 					objectEntrySiteInitializerKey,
 					new SiteNavigationMenuItemSetting() {
 						{
-							className = objectEntry.getModelClassName();
+							className =
+								serviceBuilderObjectEntry.getModelClassName();
 							classPK = String.valueOf(
-								objectEntry.getObjectEntryId());
-							title =
-								objectDefinition.getName() + StringPool.SPACE +
-									objectEntry.getObjectEntryId();
+								serviceBuilderObjectEntry.getObjectEntryId());
+							title = StringBundler.concat(
+								objectDefinition.getName(), StringPool.SPACE,
+								serviceBuilderObjectEntry.getObjectEntryId());
 						}
 					});
 			}
 		}
 
 		return objectEntryIdsStringUtilReplaceValues;
+	}
+
+	private void _addOrUpdateObjectFields(
+			Map<String, String> listTypeDefinitionIdsStringUtilReplaceValues,
+			Map<String, String> objectDefinitionIdsStringUtilReplaceValues,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		Set<String> resourcePaths = _servletContext.getResourcePaths(
+			"/site-initializer/object-fields");
+
+		if (SetUtil.isEmpty(resourcePaths)) {
+			return;
+		}
+
+		ObjectFieldResource.Builder objectFieldResourceBuilder =
+			_objectFieldResourceFactory.create();
+
+		ObjectFieldResource objectFieldResource =
+			objectFieldResourceBuilder.user(
+				serviceContext.fetchUser()
+			).build();
+
+		for (String resourcePath : resourcePaths) {
+			String json = SiteInitializerUtil.read(
+				resourcePath, _servletContext);
+
+			json = _replace(
+				json, listTypeDefinitionIdsStringUtilReplaceValues,
+				objectDefinitionIdsStringUtilReplaceValues);
+
+			JSONObject jsonObject = _jsonFactory.createJSONObject(json);
+
+			long objectDefinitionId = GetterUtil.getLong(
+				(String)jsonObject.remove("objectDefinitionId"));
+
+			ObjectField objectField = ObjectField.toDTO(
+				JSONUtil.toString(jsonObject));
+
+			com.liferay.object.model.ObjectField existingObjectField =
+				_objectFieldLocalService.fetchObjectField(
+					objectDefinitionId, objectField.getName());
+
+			if (existingObjectField == null) {
+				objectFieldResource.postObjectDefinitionObjectField(
+					objectDefinitionId, objectField);
+			}
+			else {
+				objectFieldResource.putObjectField(
+					existingObjectField.getObjectFieldId(), objectField);
+			}
+		}
 	}
 
 	private void _addOrUpdateObjectRelationships(
@@ -3966,7 +4036,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			AssetCategory assetCategory =
 				_assetCategoryLocalService.
 					fetchAssetCategoryByExternalReferenceCode(
-						groupId, externalReferenceCode);
+						externalReferenceCode, groupId);
 
 			if (assetCategory != null) {
 				assetCategoryIds.add(assetCategory.getCategoryId());
@@ -4352,6 +4422,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final ObjectDefinitionResource.Factory
 		_objectDefinitionResourceFactory;
 	private final ObjectEntryLocalService _objectEntryLocalService;
+	private final ObjectEntryManager _objectEntryManager;
+	private final ObjectFieldLocalService _objectFieldLocalService;
+	private final ObjectFieldResource.Factory _objectFieldResourceFactory;
 	private final ObjectRelationshipLocalService
 		_objectRelationshipLocalService;
 	private final ObjectRelationshipResource.Factory

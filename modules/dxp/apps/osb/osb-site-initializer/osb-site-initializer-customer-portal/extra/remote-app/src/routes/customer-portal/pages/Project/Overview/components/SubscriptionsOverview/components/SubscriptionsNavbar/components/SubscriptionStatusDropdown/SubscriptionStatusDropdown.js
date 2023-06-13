@@ -46,7 +46,9 @@ const SubscriptionStatusDropdown = ({disabled, loading, onClick}) => {
 			return i18n.translate('all');
 		}
 
-		return activeItems.map((item) => item.label).join(', ');
+		return activeItems
+			.map((item) => i18n.translate(getKebabCase(item.label)))
+			.join(', ');
 	}, [activeItems]);
 
 	const handleOnClick = (index) => {

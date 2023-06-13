@@ -187,7 +187,6 @@ const InviteTeamMembersPage = ({
 			setIsLoadingUserInvitation(true);
 			const newMembersData = await addTeamMemberInvitation({
 				context: {
-					displaySuccess: false,
 					type: 'liferay-rest',
 				},
 				variables: {
@@ -204,6 +203,9 @@ const InviteTeamMembersPage = ({
 
 			filledEmails.map(async ({email, role}) => {
 				await associateUserAccount({
+					context: {
+						displaySuccess: false,
+					},
 					variables: {
 						accountKey: project.accountKey,
 						accountRoleId: role.id,

@@ -53,8 +53,7 @@ public class ObjectFieldUtil {
 			ObjectField objectField, long userId)
 		throws Exception {
 
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164278")) ||
-			Validator.isNull(
+		if (Validator.isNull(
 				objectField.getListTypeDefinitionExternalReferenceCode())) {
 
 			return 0;
@@ -63,8 +62,8 @@ public class ObjectFieldUtil {
 		ListTypeDefinition listTypeDefinition =
 			listTypeDefinitionLocalService.
 				fetchListTypeDefinitionByExternalReferenceCode(
-					companyId,
-					objectField.getListTypeDefinitionExternalReferenceCode());
+					objectField.getListTypeDefinitionExternalReferenceCode(),
+					companyId);
 
 		if (listTypeDefinition == null) {
 			listTypeDefinition =
@@ -114,8 +113,7 @@ public class ObjectFieldUtil {
 		long listTypeDefinitionId = GetterUtil.getLong(
 			objectField.getListTypeDefinitionId());
 
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164278")) ||
-			(listTypeDefinitionId != 0) ||
+		if ((listTypeDefinitionId != 0) ||
 			Validator.isNull(
 				objectField.getListTypeDefinitionExternalReferenceCode())) {
 
@@ -125,8 +123,8 @@ public class ObjectFieldUtil {
 		ListTypeDefinition listTypeDefinition =
 			listTypeDefinitionLocalService.
 				fetchListTypeDefinitionByExternalReferenceCode(
-					companyId,
-					objectField.getListTypeDefinitionExternalReferenceCode());
+					objectField.getListTypeDefinitionExternalReferenceCode(),
+					companyId);
 
 		if (listTypeDefinition == null) {
 			return 0;

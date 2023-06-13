@@ -13,21 +13,30 @@
  */
 
 import React from 'react';
-import {TColumn, TItem} from '../table/Table';
+import {TColumn, TTableRequestParams} from '../table/types';
+import {EPeople} from './People';
 export interface ICommonModalProps {
 	observer: any;
 	onCloseModal: () => void;
 	syncAllAccounts: boolean;
 	syncAllContacts: boolean;
+	syncedIds: {
+		[key in EPeople]: string[];
+	};
 }
 interface IModalProps {
 	columns: TColumn[];
 	emptyStateTitle: string;
-	fetchFn: () => Promise<any>;
+	name: EPeople;
 	noResultsTitle: string;
 	observer: any;
-	onAddItems: (items: TItem[]) => void;
 	onCloseModal: () => void;
+	requestFn: (params: TTableRequestParams) => Promise<any>;
+	syncAllAccounts: boolean;
+	syncAllContacts: boolean;
+	syncedIds: {
+		[key in EPeople]: string[];
+	};
 	title: string;
 }
 declare const Modal: React.FC<IModalProps>;

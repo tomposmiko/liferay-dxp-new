@@ -66,12 +66,16 @@ export const searchUtil = {
 	ne: (key: Key, value: Value) => `${key} ne '${value}'`,
 };
 
+export interface SearchBuilderConstructor {
+	useURIEncode?: boolean;
+}
+
 export class SearchBuilder {
 	private lock: boolean = false;
 	private query: string = '';
 	private useURIEncode?: boolean = true;
 
-	constructor({useURIEncode}: {useURIEncode?: boolean} = {}) {
+	constructor({useURIEncode}: SearchBuilderConstructor = {}) {
 		this.useURIEncode = useURIEncode;
 	}
 

@@ -58,12 +58,12 @@ definition {
 			panel = "Control Panel",
 			portlet = "Accounts");
 
-		Accounts.addBusinessAccount(
+		Account.addBusinessAccount(
 			accountDescription = "${accountDescription}",
 			accountName = "${accountName}",
 			accountTaxId = "${accountTaxId}");
 
-		Accounts.openAccountsAdmin();
+		Account.openAccountsAdmin();
 
 		LexiconEntry.viewEntryName(rowEntry = "${accountName}");
 	}
@@ -5945,9 +5945,7 @@ definition {
 
 		Navigator.gotoNavItem(navItem = "Elements");
 
-		while (IsElementNotPresent(locator1 = "Pagination#RESULTS")) {
-			Refresh();
-		}
+		WaitForElementPresent(locator1 = "Pagination#RESULTS");
 
 		var paginationResults = selenium.getText("Pagination#RESULTS");
 

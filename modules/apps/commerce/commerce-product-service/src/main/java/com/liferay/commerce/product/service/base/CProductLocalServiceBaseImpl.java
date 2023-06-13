@@ -266,48 +266,21 @@ public abstract class CProductLocalServiceBaseImpl
 		return cProductPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
-	/**
-	 * Returns the c product with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the c product's external reference code
-	 * @return the matching c product, or <code>null</code> if a matching c product could not be found
-	 */
 	@Override
 	public CProduct fetchCProductByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
-		return cProductPersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
+		return cProductPersistence.fetchByERC_C(
+			externalReferenceCode, companyId);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCProductByExternalReferenceCode(long, String)}
-	 */
-	@Deprecated
-	@Override
-	public CProduct fetchCProductByReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return fetchCProductByExternalReferenceCode(
-			companyId, externalReferenceCode);
-	}
-
-	/**
-	 * Returns the c product with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the c product's external reference code
-	 * @return the matching c product
-	 * @throws PortalException if a matching c product could not be found
-	 */
 	@Override
 	public CProduct getCProductByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException {
 
-		return cProductPersistence.findByC_ERC(
-			companyId, externalReferenceCode);
+		return cProductPersistence.findByERC_C(
+			externalReferenceCode, companyId);
 	}
 
 	/**

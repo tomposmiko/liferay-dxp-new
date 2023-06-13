@@ -14,81 +14,125 @@
 
 import {TreeView as ClayTreeView} from '@clayui/core';
 import ClayIcon from '@clayui/icon';
-import classNames from 'classnames';
-import React from 'react';
+import {useSessionState} from '@liferay/layout-content-page-editor-web';
+import PropTypes from 'prop-types';
+import React, {useRef} from 'react';
+
+const ENTER_KEYCODE = 13;
 
 export default function NavigationMenuItemsTree({
+	portletNamespace,
 	selectedSiteNavigationMenuItemId,
 	siteNavigationMenuItems,
 }) {
-	const selectedKeys = new Set([selectedSiteNavigationMenuItemId]);
+	const [
+		expandedKeys,
+		setExpandedKeys,
+	] = useSessionState(`${portletNamespace}_navigationMenusExpandedKeys`, [
+		selectedSiteNavigationMenuItemId,
+	]);
 
 	return (
-		<div className="navigation-menu-items-tree">
-			<ClayTreeView
-				defaultExpandedKeys={selectedKeys}
-				defaultItems={siteNavigationMenuItems}
-				displayType="dark"
-				expanderIcons={{
-					close: <ClayIcon symbol="hr" />,
-					open: <ClayIcon symbol="plus" />,
-				}}
-				nestedKey="children"
-				showExpanderOnHover={false}
-			>
-				{(item) => {
-					const hasUrl = item.url && item.url !== '#';
-
-					return (
-						<ClayTreeView.Item>
-							<ClayTreeView.ItemStack
-								className={classNames(
-									'navigation-menu-items-tree-node',
-									{selected: selectedKeys.has(item.id)}
-								)}
-							>
-								<ClayIcon
-									symbol={item.url ? 'page' : 'folder'}
-								/>
-
-								{hasUrl ? (
-									<a
-										className="d-block h-100 w-100"
-										href={item.url}
-									>
-										{item.name}
-									</a>
-								) : (
-									<p className="m-0">{item.name}</p>
-								)}
-							</ClayTreeView.ItemStack>
-
-							<ClayTreeView.Group items={item.children}>
-								{(item) => (
-									<ClayTreeView.Item>
-										<ClayIcon
-											symbol={
-												item.url ? 'page' : 'folder'
-											}
-										/>
-
-										{hasUrl ? (
-											<a
-												className="d-block h-100 w-100"
-												href={item.url}
-											>
-												{item.name}
-											</a>
-										) : (
-											<p className="m-0">{item.name}</p>
-										)}
-									</ClayTreeView.Item>
-								)}
-							</ClayTreeView.Group>
-						</ClayTreeView.Item>
-					);
-				}}
-			</ClayTreeView>
-		</div>
+		<ClayTreeView
+			defaultItems={siteNavigationMenuItems}
+			displayType="dark"
+			expandedKeys={new Set(expandedKeys)}
+			nestedKey="children"
+			onExpandedChange={(keys) => {
+				setExpandedKeys(Array.from(keys));
+			}}
+			showExpanderOnHover={false}
+		>
+			{(item) => (
+				<TreeItem
+					item={item}
+					selectedItemId={selectedSiteNavigationMenuItemId}
+				/>
+			)}
+		</ClayTreeView>
 	);
 }
+
+NavigationMenuItemsTree.propTypes = {
+	portletNamespace: PropTypes.string.isRequired,
+	selectedSiteNavigationMenuItemId: PropTypes.string.isRequired,
+	siteNavigationMenuItems: PropTypes.array.isRequired,
+};
+
+function TreeItem({item, selectedItemId}) {
+	const hasUrl = item.url && item.url !== '#';
+
+	const stackAnchorRef = useRef(null);
+	const itemAnchorRef = useRef(null);
+
+	return (
+		<ClayTreeView.Item>
+			<ClayTreeView.ItemStack
+				active={selectedItemId === item.id ? 'true' : null}
+				onKeyDown={(event) => {
+					if (event.keyCode === ENTER_KEYCODE && hasUrl) {
+						stackAnchorRef.current.click();
+					}
+				}}
+			>
+				<ClayIcon symbol={item.url ? 'page' : 'folder'} />
+
+				<div className="align-items-center d-flex pl-2">
+					{hasUrl ? (
+						<a
+							className="flex-grow-1 text-decoration-none text-truncate w-100"
+							data-tooltip-floating="true"
+							href={item.url}
+							ref={stackAnchorRef}
+							tabIndex="-1"
+							target={item.target}
+							title={item.name}
+						>
+							{item.name}
+						</a>
+					) : (
+						<span>{item.name}</span>
+					)}
+				</div>
+			</ClayTreeView.ItemStack>
+
+			<ClayTreeView.Group items={item.children}>
+				{(item) => (
+					<ClayTreeView.Item
+						active={selectedItemId === item.id ? 'true' : null}
+						onKeyDown={(event) => {
+							if (event.keyCode === ENTER_KEYCODE && hasUrl) {
+								stackAnchorRef.current.click();
+							}
+						}}
+					>
+						<ClayIcon symbol={item.url ? 'page' : 'folder'} />
+
+						<div className="align-items-center d-flex pl-2">
+							{hasUrl ? (
+								<a
+									className="flex-grow-1 text-decoration-none text-truncate w-100"
+									data-tooltip-floating="true"
+									href={item.url}
+									ref={itemAnchorRef}
+									tabIndex="-1"
+									target={item.target}
+									title={item.name}
+								>
+									{item.name}
+								</a>
+							) : (
+								<span>{item.name}</span>
+							)}
+						</div>
+					</ClayTreeView.Item>
+				)}
+			</ClayTreeView.Group>
+		</ClayTreeView.Item>
+	);
+}
+
+TreeItem.propTypes = {
+	items: PropTypes.array.isRequired,
+	selectedItemId: PropTypes.string.isRequired,
+};

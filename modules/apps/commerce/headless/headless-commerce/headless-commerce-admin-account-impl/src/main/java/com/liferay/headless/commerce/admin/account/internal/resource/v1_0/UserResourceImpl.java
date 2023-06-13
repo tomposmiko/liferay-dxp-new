@@ -75,7 +75,7 @@ public class UserResourceImpl extends BaseUserResourceImpl {
 		}
 		else if (Validator.isNotNull(user.getExternalReferenceCode())) {
 			invitedUser = _userLocalService.fetchUserByExternalReferenceCode(
-				contextCompany.getCompanyId(), user.getExternalReferenceCode());
+				user.getExternalReferenceCode(), contextCompany.getCompanyId());
 		}
 
 		if (invitedUser == null) {

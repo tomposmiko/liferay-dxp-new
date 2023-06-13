@@ -46,12 +46,12 @@ public class ProjectTemplatesTemplateContextContributorTest
 	@ClassRule
 	public static final MavenExecutor mavenExecutor = new MavenExecutor();
 
-	@Parameterized.Parameters(name = "Testcase-{index}: testing {0}")
+	@Parameterized.Parameters(name = "Testcase-{index}: testing {1} {0}")
 	public static Iterable<Object[]> data() {
 		return Arrays.asList(
 			new Object[][] {
-				{"7.0.10.17", "dxp"}, {"7.1.10.7", "dxp"}, {"7.2.10.7", "dxp"},
-				{"7.3.7", "portal"}, {"7.4.3.36", "portal"}
+				{"dxp", "7.0.10.17"}, {"dxp", "7.1.10.7"}, {"dxp", "7.2.10.7"},
+				{"portal", "7.3.7"}, {"portal", "7.4.3.36"}
 			});
 	}
 
@@ -72,10 +72,10 @@ public class ProjectTemplatesTemplateContextContributorTest
 	}
 
 	public ProjectTemplatesTemplateContextContributorTest(
-		String liferayVersion, String product) {
+		String liferayProduct, String liferayVersion) {
 
+		_liferayProduct = liferayProduct;
 		_liferayVersion = liferayVersion;
-		_product = product;
 	}
 
 	@Test
@@ -91,8 +91,8 @@ public class ProjectTemplatesTemplateContextContributorTest
 			gradleWorkspaceDir, "modules");
 
 		File gradleProjectDir = buildTemplateWithGradle(
-			gradleWorkspaceModulesDir, template, name, "--liferay-version",
-			_liferayVersion, "--product", _product);
+			gradleWorkspaceModulesDir, template, name, "--liferay-product",
+			_liferayProduct, "--liferay-version", _liferayVersion);
 
 		testExists(gradleProjectDir, "bnd.bnd");
 
@@ -124,8 +124,8 @@ public class ProjectTemplatesTemplateContextContributorTest
 		File mavenProjectDir = buildTemplateWithMaven(
 			mavenModulesDir, mavenModulesDir, template, name, "com.test",
 			mavenExecutor, "-DclassName=BladeTest",
-			"-DliferayVersion=" + _liferayVersion, "-Dpackage=blade.test",
-			"-Dproduct=" + _product);
+			"-DliferayProduct=" + _liferayProduct,
+			"-DliferayVersion=" + _liferayVersion, "-Dpackage=blade.test");
 
 		testContains(
 			mavenProjectDir, "bnd.bnd",
@@ -147,7 +147,7 @@ public class ProjectTemplatesTemplateContextContributorTest
 
 	private static URI _gradleDistribution;
 
+	private final String _liferayProduct;
 	private final String _liferayVersion;
-	private final String _product;
 
 }

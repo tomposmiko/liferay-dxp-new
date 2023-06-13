@@ -24,6 +24,12 @@ definition {
 			value1 = "${key_filter}");
 	}
 
+	macro assertMenuItem {
+		AssertElementPresent(
+			key_itemName = "${key_menuItem}",
+			locator1 = "FrontendDataSet#SELECT_OPTION_CUSTOM_VIEW");
+	}
+
 	macro changeCustomView {
 		Click(locator1 = "FrontendDataSet#SELECT_CUSTOM_VIEW");
 
@@ -49,7 +55,7 @@ definition {
 		Click(locator1 = "FrontendDataSet#SELECT_OPTION_HEADER");
 
 		Click(
-			key_itemName = "Save View As",
+			key_itemName = "Save View As...",
 			locator1 = "FrontendDataSet#SELECT_OPTION_CUSTOM_VIEW");
 
 		Type(
@@ -75,8 +81,6 @@ definition {
 		Click(
 			key_text = "Delete",
 			locator1 = "Modal#MODAL_FOOTER_BUTTON");
-
-		Alert.viewSuccessMessage();
 	}
 
 	macro getValueByPosition {

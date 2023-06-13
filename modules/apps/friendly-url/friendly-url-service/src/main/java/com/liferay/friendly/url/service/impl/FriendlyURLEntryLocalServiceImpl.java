@@ -668,6 +668,16 @@ public class FriendlyURLEntryLocalServiceImpl
 			return true;
 		}
 
+		friendlyURLEntryLocalization =
+			friendlyURLEntryLocalizationPersistence.fetchByG_C_NotL_U_First(
+				groupId, classNameId, languageId, urlTitle, null);
+
+		if ((friendlyURLEntryLocalization != null) &&
+			(friendlyURLEntryLocalization.getClassPK() != notClassPK)) {
+
+			return true;
+		}
+
 		return false;
 	}
 

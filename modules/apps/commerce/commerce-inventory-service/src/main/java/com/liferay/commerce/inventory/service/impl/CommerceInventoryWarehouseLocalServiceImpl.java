@@ -160,12 +160,25 @@ public class CommerceInventoryWarehouseLocalServiceImpl
 	}
 
 	@Override
+	public CommerceInventoryWarehouse deleteCommerceInventoryWarehouse(
+			long commerceInventoryWarehouseId)
+		throws PortalException {
+
+		CommerceInventoryWarehouse commerceInventoryWarehouse =
+			commerceInventoryWarehousePersistence.findByPrimaryKey(
+				commerceInventoryWarehouseId);
+
+		return commerceInventoryWarehouseLocalService.
+			deleteCommerceInventoryWarehouse(commerceInventoryWarehouse);
+	}
+
+	@Override
 	public CommerceInventoryWarehouse
 		fetchCommerceInventoryWarehouseByReferenceCode(
 			String externalReferenceCode, long companyId) {
 
-		return commerceInventoryWarehousePersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
+		return commerceInventoryWarehousePersistence.fetchByERC_C(
+			externalReferenceCode, companyId);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -517,8 +530,8 @@ public class CommerceInventoryWarehouseLocalServiceImpl
 		}
 
 		CommerceInventoryWarehouse commerceInventoryWarehouse =
-			commerceInventoryWarehousePersistence.fetchByC_ERC(
-				companyId, externalReferenceCode);
+			commerceInventoryWarehousePersistence.fetchByERC_C(
+				externalReferenceCode, companyId);
 
 		if (commerceInventoryWarehouse == null) {
 			return;

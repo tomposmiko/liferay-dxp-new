@@ -11,9 +11,9 @@
 
 import {useEffect, useState} from 'react';
 
+import getSearchFilterTerm from '../../../common/utils/getSearchFilterTerm';
 import {INITIAL_FILTER} from '../utils/constants/initialFilter';
 import getActivityPeriodFilterTerm from '../utils/getActivityPeriodFilterTerm';
-import getSearchFilterTerm from '../utils/getSearchFilterTerm';
 
 export default function useFilters() {
 	const [filters, setFilters] = useState(INITIAL_FILTER);

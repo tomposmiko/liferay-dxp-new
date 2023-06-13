@@ -21,6 +21,7 @@ import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.NoSuchTicketException;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Ticket;
@@ -37,7 +38,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.File;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -96,9 +97,16 @@ public class CreateAccountUserMVCActionCommand
 		JSONObject jsonObject = _jsonFactory.createJSONObject(
 			ticket.getExtraInfo());
 
+		JSONArray jsonArray = jsonObject.getJSONArray("accountRoleIds");
+
+		long[] accountRolesIds = new long[jsonArray.length()];
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			accountRolesIds[i] = jsonArray.getLong(i);
+		}
+
 		User user = _addUser(
-			actionRequest, ticket.getClassPK(),
-			(long[])jsonObject.get("accountRoleIds"),
+			actionRequest, ticket.getClassPK(), accountRolesIds,
 			jsonObject.getString("emailAddress"));
 
 		_ticketLocalService.deleteTicket(ticket);
@@ -174,7 +182,7 @@ public class CreateAccountUserMVCActionCommand
 		if (fileEntryId > 0) {
 			FileEntry fileEntry = _dlAppLocalService.getFileEntry(fileEntryId);
 
-			portraitBytes = FileUtil.getBytes(fileEntry.getContentStream());
+			portraitBytes = _file.getBytes(fileEntry.getContentStream());
 		}
 
 		if (portraitBytes != null) {
@@ -200,6 +208,9 @@ public class CreateAccountUserMVCActionCommand
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private File _file;
 
 	@Reference
 	private JSONFactory _jsonFactory;

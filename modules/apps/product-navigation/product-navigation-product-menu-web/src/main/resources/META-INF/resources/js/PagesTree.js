@@ -16,10 +16,9 @@ import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import {TreeView as ClayTreeView} from '@clayui/core';
 import {ClayDropDownWithItems} from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
-import {useSessionState} from '@liferay/layout-content-page-editor-web';
 import {fetch, openModal, openToast} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useCallback, useRef} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 
 const ENTER_KEYCODE = 13;
 const ROOT_ITEM_ID = '0';
@@ -30,6 +29,7 @@ export default function PagesTree({
 	isPrivateLayoutsTree,
 	items,
 	selectedLayoutId,
+	selectedLayoutPath,
 }) {
 	const {loadMoreItemsURL, maxPageSize, moveItemURL, namespace} = config;
 
@@ -81,10 +81,7 @@ export default function PagesTree({
 		[moveItemURL]
 	);
 
-	const [
-		expandedKeys,
-		setExpandedKeys,
-	] = useSessionState(`${namespace}_expandedKeys`, [ROOT_ITEM_ID]);
+	const [expandedKeys, setExpandedKeys] = useState(selectedLayoutPath);
 
 	return (
 		<div className="pages-tree">
@@ -103,6 +100,7 @@ export default function PagesTree({
 			>
 				{(item, selection, expand, load) => (
 					<TreeItem
+						config={config}
 						expand={expand}
 						item={item}
 						load={load}
@@ -122,13 +120,14 @@ PagesTree.propTypes = {
 	selectedLayoutId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
-function TreeItem({expand, item, load, namespace, selectedLayoutId}) {
+function TreeItem({config, expand, item, load, namespace, selectedLayoutId}) {
 	const stackAnchorRef = useRef(null);
 	const itemAnchorRef = useRef(null);
 
 	return (
 		<ClayTreeView.Item
 			actions={
+				!config.stagingEnabled &&
 				item.actions && (
 					<ClayDropDownWithItems
 						items={normalizeActions(item.actions, namespace)}
@@ -179,21 +178,23 @@ function TreeItem({expand, item, load, namespace, selectedLayoutId}) {
 				{(item) => (
 					<ClayTreeView.Item
 						actions={
-							<ClayDropDownWithItems
-								items={normalizeActions(
-									item.actions,
-									namespace
-								)}
-								renderMenuOnClick
-								trigger={
-									<ClayButtonWithIcon
-										className="component-action quick-action-item"
-										displayType={null}
-										small
-										symbol="ellipsis-v"
-									/>
-								}
-							/>
+							!config.stagingEnabled && (
+								<ClayDropDownWithItems
+									items={normalizeActions(
+										item.actions,
+										namespace
+									)}
+									renderMenuOnClick
+									trigger={
+										<ClayButtonWithIcon
+											className="component-action quick-action-item"
+											displayType={null}
+											small
+											symbol="ellipsis-v"
+										/>
+									}
+								/>
+							)
 						}
 						active={selectedLayoutId === item.id ? 'true' : null}
 						expandable={item.hasChildren}
