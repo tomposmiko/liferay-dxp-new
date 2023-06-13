@@ -59,7 +59,6 @@ import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.users.admin.configuration.UserFileUploadsConfiguration;
 
 import java.awt.image.RenderedImage;
 
@@ -83,10 +82,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Levente Hudák
  */
 @Component(
-	configurationPid = {
-		"com.liferay.document.library.configuration.DLConfiguration",
-		"com.liferay.users.admin.configuration.UserFileUploadsConfiguration"
-	},
+	configurationPid = "com.liferay.document.library.configuration.DLConfiguration",
 	property = {
 		"javax.portlet.name=" + ImageUploaderPortletKeys.IMAGE_UPLOADER,
 		"mvc.command.name=/image_uploader/upload_image"
@@ -100,8 +96,6 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 	protected void activate(Map<String, Object> properties) {
 		_dlConfiguration = ConfigurableUtil.createConfigurable(
 			DLConfiguration.class, properties);
-		_userFileUploadsConfiguration = ConfigurableUtil.createConfigurable(
-			UserFileUploadsConfiguration.class, properties);
 	}
 
 	@Override
@@ -146,7 +140,7 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 				JSONPortletResponseUtil.writeJSON(
 					actionRequest, actionResponse,
 					JSONUtil.put(
-						"tempImageFileName",
+						UploadImageUtil.TEMP_IMAGE_FILE_NAME,
 						() -> {
 							FileEntry tempImageFileEntry =
 								_addTempImageFileEntry(actionRequest);
@@ -205,7 +199,7 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 		try {
 			TempFileEntryUtil.deleteTempFileEntry(
 				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
-				UploadImageUtil.getTempImageFolderName(), fileName);
+				UploadImageUtil.TEMP_IMAGE_FOLDER_NAME, fileName);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
@@ -215,12 +209,8 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 
 		return TempFileEntryUtil.addTempFileEntry(
 			themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
-			UploadImageUtil.getTempImageFolderName(), fileName, file,
+			UploadImageUtil.TEMP_IMAGE_FOLDER_NAME, fileName, file,
 			contentType);
-	}
-
-	private String _getTempImageFileName(PortletRequest portletRequest) {
-		return ParamUtil.getString(portletRequest, "tempImageFileName");
 	}
 
 	private void _handleUploadException(
@@ -376,8 +366,10 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 					TempFileEntryUtil.deleteTempFileEntry(
 						themeDisplay.getScopeGroupId(),
 						themeDisplay.getUserId(),
-						UploadImageUtil.getTempImageFolderName(),
-						_getTempImageFileName(actionRequest));
+						UploadImageUtil.TEMP_IMAGE_FOLDER_NAME,
+						ParamUtil.getString(
+							actionRequest,
+							UploadImageUtil.TEMP_IMAGE_FILE_NAME));
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
@@ -387,9 +379,10 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 
 				return TempFileEntryUtil.addTempFileEntry(
 					themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
-					UploadImageUtil.getTempImageFolderName(),
-					_getTempImageFileName(actionRequest), file,
-					tempFileEntry.getMimeType());
+					UploadImageUtil.TEMP_IMAGE_FOLDER_NAME,
+					ParamUtil.getString(
+						actionRequest, UploadImageUtil.TEMP_IMAGE_FILE_NAME),
+					file, tempFileEntry.getMimeType());
 			}
 		}
 		catch (NoSuchFileEntryException noSuchFileEntryException) {
@@ -423,7 +416,5 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private UploadServletRequestConfigurationProvider
 		_uploadServletRequestConfigurationProvider;
-
-	private volatile UserFileUploadsConfiguration _userFileUploadsConfiguration;
 
 }

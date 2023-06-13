@@ -2538,7 +2538,7 @@ public abstract class BaseStructuredContentResourceImpl
 			if (parameters.containsKey("structuredContentFolderId")) {
 				structuredContentUnsafeConsumer = structuredContent ->
 					postStructuredContentFolderStructuredContent(
-						Long.parseLong(
+						_parseLong(
 							(String)parameters.get(
 								"structuredContentFolderId")),
 						structuredContent);
@@ -2634,26 +2634,25 @@ public abstract class BaseStructuredContentResourceImpl
 		if (parameters.containsKey("assetLibraryId")) {
 			return getAssetLibraryStructuredContentsPage(
 				(Long)parameters.get("assetLibraryId"),
-				Boolean.parseBoolean((String)parameters.get("flatten")), search,
-				null, filter, pagination, sorts);
+				_parseBoolean((String)parameters.get("flatten")), search, null,
+				filter, pagination, sorts);
 		}
 		else if (parameters.containsKey("siteId")) {
 			return getSiteStructuredContentsPage(
 				(Long)parameters.get("siteId"),
-				Boolean.parseBoolean((String)parameters.get("flatten")), search,
-				null, filter, pagination, sorts);
+				_parseBoolean((String)parameters.get("flatten")), search, null,
+				filter, pagination, sorts);
 		}
 		else if (parameters.containsKey("contentStructureId")) {
 			return getContentStructureStructuredContentsPage(
-				Long.parseLong((String)parameters.get("contentStructureId")),
+				_parseLong((String)parameters.get("contentStructureId")),
 				search, null, filter, pagination, sorts);
 		}
 		else if (parameters.containsKey("structuredContentFolderId")) {
 			return getStructuredContentFolderStructuredContentsPage(
-				Long.parseLong(
-					(String)parameters.get("structuredContentFolderId")),
-				Boolean.parseBoolean((String)parameters.get("flatten")), search,
-				null, filter, pagination, sorts);
+				_parseLong((String)parameters.get("structuredContentFolderId")),
+				_parseBoolean((String)parameters.get("flatten")), search, null,
+				filter, pagination, sorts);
 		}
 		else {
 			throw new NotSupportedException(
@@ -2700,7 +2699,7 @@ public abstract class BaseStructuredContentResourceImpl
 				structuredContent -> patchStructuredContent(
 					structuredContent.getId() != null ?
 						structuredContent.getId() :
-							Long.parseLong(
+							_parseLong(
 								(String)parameters.get("structuredContentId")),
 					structuredContent);
 		}
@@ -2710,7 +2709,7 @@ public abstract class BaseStructuredContentResourceImpl
 				structuredContent -> putStructuredContent(
 					structuredContent.getId() != null ?
 						structuredContent.getId() :
-							Long.parseLong(
+							_parseLong(
 								(String)parameters.get("structuredContentId")),
 					structuredContent);
 		}
@@ -2730,6 +2729,22 @@ public abstract class BaseStructuredContentResourceImpl
 				structuredContentUnsafeConsumer.accept(structuredContent);
 			}
 		}
+	}
+
+	private Boolean _parseBoolean(String value) {
+		if (value != null) {
+			return Boolean.parseBoolean(value);
+		}
+
+		return null;
+	}
+
+	private Long _parseLong(String value) {
+		if (value != null) {
+			return Long.parseLong(value);
+		}
+
+		return null;
 	}
 
 	protected String getPermissionCheckerActionsResourceName(Object id)

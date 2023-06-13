@@ -117,20 +117,6 @@ public interface FaroChannelModel
 	public void setCompanyId(long companyId);
 
 	/**
-	 * Returns the create time of this faro channel.
-	 *
-	 * @return the create time of this faro channel
-	 */
-	public long getCreateTime();
-
-	/**
-	 * Sets the create time of this faro channel.
-	 *
-	 * @param createTime the create time of this faro channel
-	 */
-	public void setCreateTime(long createTime);
-
-	/**
 	 * Returns the user ID of this faro channel.
 	 *
 	 * @return the user ID of this faro channel
@@ -172,6 +158,20 @@ public interface FaroChannelModel
 	 * @param userName the user name of this faro channel
 	 */
 	public void setUserName(String userName);
+
+	/**
+	 * Returns the create time of this faro channel.
+	 *
+	 * @return the create time of this faro channel
+	 */
+	public long getCreateTime();
+
+	/**
+	 * Sets the create time of this faro channel.
+	 *
+	 * @param createTime the create time of this faro channel
+	 */
+	public void setCreateTime(long createTime);
 
 	/**
 	 * Returns the modified time of this faro channel.

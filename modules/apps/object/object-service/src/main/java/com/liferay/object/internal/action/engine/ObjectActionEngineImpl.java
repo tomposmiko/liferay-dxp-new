@@ -227,6 +227,9 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 				_objectActionExecutorRegistry.getObjectActionExecutor(
 					objectAction.getObjectActionExecutorKey());
 
+			objectActionExecutor.validate(
+				objectDefinition.getCompanyId(), objectDefinition.getName());
+
 			objectActionExecutor.execute(
 				objectDefinition.getCompanyId(),
 				objectAction.getParametersUnicodeProperties(),

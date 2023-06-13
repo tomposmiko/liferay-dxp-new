@@ -285,36 +285,6 @@ definition {
 		return ${objectDefinitionStatus};
 	}
 
-	macro _getObjectEntryById {
-		Variables.assertDefined(parameterList = "${en_US_plural_label},${objectId}");
-
-		var en_US_plural_label_lowercase = StringUtil.lowerCase(${en_US_plural_label});
-
-		if (isSet(virtualHost)) {
-			if (!(isSet(port))) {
-				var port = 8080;
-			}
-
-			var portalURL = "http://${virtualHost}:${port}";
-		}
-		else {
-			var portalURL = JSONCompany.getPortalURL();
-		}
-
-		var curl = '''
-			${portalURL}/o/c/${en_US_plural_label_lowercase}/${objectId} \
-				-u test@liferay.com:test
-		''';
-
-		if (isSet(token)) {
-			var curl = StringUtil.add(${curl}, " -H 'Authorization: Bearer ${token}'", "");
-		}
-
-		var response = JSONCurlUtil.get(${curl});
-
-		return ${response};
-	}
-
 	macro _getObjectsWithAggregationTerms {
 		Variables.assertDefined(parameterList = ${aggregationTermsValue});
 
@@ -717,9 +687,9 @@ definition {
 			token = ${token},
 			virtualHost = ${virtualHost});
 
-		var response = ObjectDefinitionAPI._getObjectEntryById(
+		var response = CustomObjectAPI.getObjectEntryById(
 			en_US_plural_label = ${en_US_plural_label},
-			objectId = ${objectId},
+			objectEntryId = ${objectId},
 			token = ${token},
 			virtualHost = ${virtualHost});
 
@@ -1021,7 +991,7 @@ definition {
 			en_US_plural_label = ${parent_plural_label},
 			name = ${parentEntryName});
 
-		var curl = ObjectDefinitionAPI._curlObjectEntriesRelationship(
+		var curl = ObjectDefinitionAPI.relateObjectEntries(
 			en_US_plural_label = ${parent_plural_label},
 			objectEntry1 = ${parentEntryId},
 			objectEntry2 = ${childEntryId},

@@ -282,6 +282,20 @@ public class DocumentSerDes {
 			sb.append("\"");
 		}
 
+		if (document.getFileName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"fileName\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(document.getFileName()));
+
+			sb.append("\"");
+		}
+
 		if (document.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -605,6 +619,13 @@ public class DocumentSerDes {
 				"fileExtension", String.valueOf(document.getFileExtension()));
 		}
 
+		if (document.getFileName() == null) {
+			map.put("fileName", null);
+		}
+		else {
+			map.put("fileName", String.valueOf(document.getFileName()));
+		}
+
 		if (document.getId() == null) {
 			map.put("id", null);
 		}
@@ -824,6 +845,11 @@ public class DocumentSerDes {
 			else if (Objects.equals(jsonParserFieldName, "fileExtension")) {
 				if (jsonParserFieldValue != null) {
 					document.setFileExtension((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "fileName")) {
+				if (jsonParserFieldValue != null) {
+					document.setFileName((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {

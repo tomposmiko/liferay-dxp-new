@@ -131,20 +131,6 @@ public interface FaroUserModel
 	public void setCompanyId(long companyId);
 
 	/**
-	 * Returns the create time of this faro user.
-	 *
-	 * @return the create time of this faro user
-	 */
-	public long getCreateTime();
-
-	/**
-	 * Sets the create time of this faro user.
-	 *
-	 * @param createTime the create time of this faro user
-	 */
-	public void setCreateTime(long createTime);
-
-	/**
 	 * Returns the user ID of this faro user.
 	 *
 	 * @return the user ID of this faro user
@@ -186,6 +172,20 @@ public interface FaroUserModel
 	 * @param userName the user name of this faro user
 	 */
 	public void setUserName(String userName);
+
+	/**
+	 * Returns the create time of this faro user.
+	 *
+	 * @return the create time of this faro user
+	 */
+	public long getCreateTime();
+
+	/**
+	 * Sets the create time of this faro user.
+	 *
+	 * @param createTime the create time of this faro user
+	 */
+	public void setCreateTime(long createTime);
 
 	/**
 	 * Returns the modified time of this faro user.

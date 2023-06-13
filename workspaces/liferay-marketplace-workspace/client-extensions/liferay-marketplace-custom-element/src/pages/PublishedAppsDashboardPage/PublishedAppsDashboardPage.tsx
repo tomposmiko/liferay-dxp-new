@@ -12,6 +12,7 @@ import {PublishedAppsDashboardTableRow} from '../../components/DashboardTable/Pu
 import {MemberProfile} from '../../components/MemberProfile/MemberProfile';
 import {
 	getAccountInfoFromCommerce,
+	getAccounts,
 	getMyUserAccount,
 	getProductSpecifications,
 	getProducts,
@@ -34,6 +35,7 @@ import {
 } from './PublishedDashboardPageUtil';
 
 import './PublishedAppsDashboardPage.scss';
+import {ProjectsPage} from '../ProjectsPage/ProjectsPage';
 
 declare let Liferay: {
 	ThemeDisplay: {getLanguageId: () => string};
@@ -94,6 +96,8 @@ export function PublishedAppsDashboardPage() {
 	const [commerceAccount, setCommerceAccount] = useState<CommerceAccount>();
 	const [apps, setApps] = useState<AppProps[]>(Array<AppProps>());
 	const [selectedApp, setSelectedApp] = useState<AppProps>();
+	const [showDashboardNavigation, setShowDashboardNavigation] =
+		useState(true);
 	const [dashboardNavigationItems, setDashboardNavigationItems] = useState(
 		initialDashboardNavigationItems
 	);
@@ -220,32 +224,10 @@ export function PublishedAppsDashboardPage() {
 
 	useEffect(() => {
 		const makeFetch = async () => {
-			const userAccountsResponse = await getUserAccounts();
+			const accountsResponse = await getAccounts();
 
-			const userAccount = userAccountsResponse.items.map(
-				(accountBrief: AccountBriefProps) => {
-					return {
-						externalReferenceCode: accountBrief.externalReferenceCode,
-						id: accountBrief.id,
-						name: accountBrief.name,
-					} as Account;
-				}
-			);
-
-			const businessAccounts = userAccountsResponse.items[0].accountBriefs.map(
-				(accountBrief: AccountBriefProps) => {
-					return {
-						externalReferenceCode: accountBrief.externalReferenceCode,
-						id: accountBrief.id,
-						name: accountBrief.name,
-					} as Account;
-				}
-			);
-
-			const accounts = [...userAccount, ...businessAccounts]
-
-			setAccounts(accounts);
-			setSelectedAccount(accounts[0]);
+			setAccounts(accountsResponse.items);
+			setSelectedAccount(accountsResponse.items[0]);
 		};
 
 		makeFetch();
@@ -368,32 +350,34 @@ export function PublishedAppsDashboardPage() {
 					isPublisherAccount: false,
 				};
 
-				const currentUserAccountRoleBriefs =
+				const currentUserAccountBriefs =
 					currentUserAccount.accountBriefs.find(
 						(accountBrief: {name: string}) =>
 							accountBrief.name === selectedAccount.name
-					).roleBriefs;
+					);
 
-				customerRoles.forEach((customerRole) => {
-					if (
-						currentUserAccountRoleBriefs.find(
-							(role: {name: string}) => role.name === customerRole
-						)
-					) {
-						currentUserAccount.isCustomerAccount = true;
-					}
-				});
+				if (currentUserAccountBriefs) {
+					customerRoles.forEach((customerRole) => {
+						if (
+							currentUserAccountBriefs.roleBriefs.find(
+								(role: {name: string}) => role.name === customerRole
+							)
+						) {
+							currentUserAccount.isCustomerAccount = true;
+						}
+					});
 
-				publisherRoles.forEach((publisherRole) => {
-					if (
-						currentUserAccountRoleBriefs.find(
-							(role: {name: string}) =>
-								role.name === publisherRole
-						)
-					) {
-						currentUserAccount.isPublisherAccount = true;
-					}
-				});
+					publisherRoles.forEach((publisherRole) => {
+						if (
+							currentUserAccountBriefs.roleBriefs.find(
+								(role: {name: string}) =>
+									role.name === publisherRole
+							)
+						) {
+							currentUserAccount.isPublisherAccount = true;
+						}
+					});
+				}
 
 				const accountsListResponse = await getUserAccounts();
 
@@ -456,23 +440,27 @@ export function PublishedAppsDashboardPage() {
 
 	return (
 		<div className="published-apps-dashboard-page-container">
-			<DashboardNavigation
-				accountAppsNumber={apps.length.toString()}
-				accountIcon={commerceAccount?.logoURL ?? accountLogo}
-				accounts={accounts}
-				currentAccount={selectedAccount}
-				dashboardNavigationItems={dashboardNavigationItems}
-				onSelectAppChange={setSelectedApp}
-				selectedApp={selectedApp}
-				setDashboardNavigationItems={setDashboardNavigationItems}
-				setSelectedAccount={setSelectedAccount}
-			/>
+			{showDashboardNavigation && (
+				<DashboardNavigation
+					accountAppsNumber={apps.length.toString()}
+					accountIcon={commerceAccount?.logoURL ?? accountLogo}
+					accounts={accounts}
+					currentAccount={selectedAccount}
+					dashboardNavigationItems={dashboardNavigationItems}
+					onSelectAppChange={setSelectedApp}
+					setDashboardNavigationItems={setDashboardNavigationItems}
+					setSelectedAccount={setSelectedAccount}
+				/>
+			)}
 
 			{selectedNavigationItem === 'Apps' && (
 				<DashboardPage
+					buttonHref="/create-new-app"
 					buttonMessage="+ New App"
 					dashboardNavigationItems={dashboardNavigationItems}
 					messages={appMessages}
+					selectedApp={selectedApp}
+					setSelectedApp={setSelectedApp}
 				>
 					<DashboardTable<AppProps>
 						emptyStateMessage={appMessages.emptyStateMessage}
@@ -505,6 +493,14 @@ export function PublishedAppsDashboardPage() {
 						<></>
 					)}
 				</DashboardPage>
+			)}
+
+			{selectedNavigationItem === 'Projects' && (
+				<ProjectsPage
+					dashboardNavigationItems={dashboardNavigationItems}
+					selectedAccount={selectedAccount}
+					setShowDashboardNavigation={setShowDashboardNavigation}
+				/>
 			)}
 
 			{selectedNavigationItem === 'Members' && (

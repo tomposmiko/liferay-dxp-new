@@ -64,11 +64,28 @@ function refresh_liferay_sample_workspace {
 
 	mv gradle.properties.tmp gradle.properties
 
-	sed -i 's/name: "com.liferay.gradle.plugins.workspace", version: ".*"/name: "com.liferay.gradle.plugins.workspace", version: "5.0.3"/' settings.gradle
+	sed -i 's/name: "biz.aQute.bnd", version: ".*"/name: "biz.aQute.bnd.gradle", version: "5.2.0"/' settings.gradle
+	sed -i 's/name: "com.liferay.gradle.plugins.workspace", version: ".*"/name: "com.liferay.gradle.plugins.workspace", version: "5.0.4"/' settings.gradle
+
+	echo -en "\ninclude \"poshi\"" >> settings.gradle
 
 	popd
 
-	cp ${temp_dir}/.gitignore liferay-sample-workspace
+	cat <<EOF > liferay-sample-workspace/.gitignore
+.DS_Store
+/bundles
+/poshi/poshi-ext.properties
+/poshi/test-results
+/poshi/tests
+bin
+build
+dist
+node_modules
+node_modules_cache
+EOF
+
+	truncate -s -1 liferay-sample-workspace/.gitignore
+
 	cp ${temp_dir}/gradle.properties liferay-sample-workspace
 	cp ${temp_dir}/gradlew liferay-sample-workspace
 	cp ${temp_dir}/settings.gradle liferay-sample-workspace
@@ -82,7 +99,7 @@ function refresh_liferay_sample_workspace {
 	mkdir -p liferay-sample-workspace/modules
 
 	echo "Client extensions are the recommended way of customizing Liferay. Modules and" > liferay-sample-workspace/modules/README.markdown
-	echo "themes are supported for backwards compatibility." >> liferay-sample-workspace/modules/README.markdown
+	echo -n "themes are supported for backwards compatibility." >> liferay-sample-workspace/modules/README.markdown
 
 	mkdir -p liferay-sample-workspace/themes
 

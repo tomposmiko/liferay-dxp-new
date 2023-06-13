@@ -647,7 +647,7 @@ public abstract class BaseObjectActionResourceImpl
 			if (parameters.containsKey("objectDefinitionId")) {
 				objectActionUnsafeConsumer =
 					objectAction -> postObjectDefinitionObjectAction(
-						Long.parseLong(
+						_parseLong(
 							(String)parameters.get("objectDefinitionId")),
 						objectAction);
 			}
@@ -720,7 +720,7 @@ public abstract class BaseObjectActionResourceImpl
 
 		if (parameters.containsKey("objectDefinitionId")) {
 			return getObjectDefinitionObjectActionsPage(
-				Long.parseLong((String)parameters.get("objectDefinitionId")),
+				_parseLong((String)parameters.get("objectDefinitionId")),
 				search, pagination);
 		}
 		else {
@@ -766,14 +766,14 @@ public abstract class BaseObjectActionResourceImpl
 		if ("PARTIAL_UPDATE".equalsIgnoreCase(updateStrategy)) {
 			objectActionUnsafeConsumer = objectAction -> patchObjectAction(
 				objectAction.getId() != null ? objectAction.getId() :
-					Long.parseLong((String)parameters.get("objectActionId")),
+					_parseLong((String)parameters.get("objectActionId")),
 				objectAction);
 		}
 
 		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
 			objectActionUnsafeConsumer = objectAction -> putObjectAction(
 				objectAction.getId() != null ? objectAction.getId() :
-					Long.parseLong((String)parameters.get("objectActionId")),
+					_parseLong((String)parameters.get("objectActionId")),
 				objectAction);
 		}
 
@@ -792,6 +792,14 @@ public abstract class BaseObjectActionResourceImpl
 				objectActionUnsafeConsumer.accept(objectAction);
 			}
 		}
+	}
+
+	private Long _parseLong(String value) {
+		if (value != null) {
+			return Long.parseLong(value);
+		}
+
+		return null;
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {

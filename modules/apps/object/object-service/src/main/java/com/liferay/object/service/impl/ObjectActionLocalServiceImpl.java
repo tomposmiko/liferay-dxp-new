@@ -18,6 +18,7 @@ import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.service.NotificationTemplateLocalService;
+import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
@@ -41,6 +42,7 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.base.ObjectActionLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -62,7 +64,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -107,7 +108,8 @@ public class ObjectActionLocalServiceImpl
 		_validateErrorMessage(errorMessageMap, objectActionTriggerKey);
 		_validateLabel(labelMap);
 		_validateName(0, objectDefinitionId, name);
-		_validateObjectActionExecutorKey(objectActionExecutorKey);
+		_validateObjectActionExecutorKey(
+			objectActionExecutorKey, objectDefinition);
 		_validateObjectActionTriggerKey(
 			conditionExpression, objectActionTriggerKey, objectDefinition);
 
@@ -296,7 +298,13 @@ public class ObjectActionLocalServiceImpl
 
 		_validateErrorMessage(errorMessageMap, objectActionTriggerKey);
 		_validateLabel(labelMap);
-		_validateObjectActionExecutorKey(objectActionExecutorKey);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(
+				objectAction.getObjectDefinitionId());
+
+		_validateObjectActionExecutorKey(
+			objectActionExecutorKey, objectDefinition);
 
 		_validateParametersUnicodeProperties(
 			objectAction.getCompanyId(), objectAction.getUserId(),
@@ -316,10 +324,6 @@ public class ObjectActionLocalServiceImpl
 		objectAction.setObjectActionExecutorKey(objectActionExecutorKey);
 		objectAction.setParameters(parametersUnicodeProperties.toString());
 		objectAction.setStatus(ObjectActionConstants.STATUS_NEVER_RAN);
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionPersistence.findByPrimaryKey(
-				objectAction.getObjectDefinitionId());
 
 		if (objectDefinition.isApproved()) {
 			return objectActionPersistence.update(objectAction);
@@ -428,7 +432,7 @@ public class ObjectActionLocalServiceImpl
 	}
 
 	private void _validateObjectActionExecutorKey(
-			String objectActionExecutorKey)
+			String objectActionExecutorKey, ObjectDefinition objectDefinition)
 		throws PortalException {
 
 		if (!_objectActionExecutorRegistry.hasObjectActionExecutor(
@@ -439,7 +443,16 @@ public class ObjectActionLocalServiceImpl
 					"No object action executor is registered with " +
 						objectActionExecutorKey);
 			}
+
+			return;
 		}
+
+		ObjectActionExecutor objectActionExecutor =
+			_objectActionExecutorRegistry.getObjectActionExecutor(
+				objectActionExecutorKey);
+
+		objectActionExecutor.validate(
+			objectDefinition.getCompanyId(), objectDefinition.getName());
 	}
 
 	private void _validateObjectActionTriggerKey(

@@ -17,6 +17,7 @@ package com.liferay.osb.faro.contacts.demo.internal;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
@@ -47,8 +48,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -57,7 +56,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Matthew Kong
  */
-@Component(immediate = true, service = SnapshotDemoCreatorService.class)
+@Component(service = SnapshotDemoCreatorService.class)
 public class SnapshotDemoCreatorService extends DemoCreatorService {
 
 	@Override
@@ -158,7 +157,7 @@ public class SnapshotDemoCreatorService extends DemoCreatorService {
 				return localDateTime.format(dateTimeFormatter);
 			}
 			catch (Exception exception) {
-				_log.error(exception, exception);
+				_log.error(exception);
 			}
 		}
 
@@ -169,14 +168,13 @@ public class SnapshotDemoCreatorService extends DemoCreatorService {
 		String collectionName, List<Map<String, Object>> objects) {
 
 		if (Objects.equals(collectionName, "OSBAsahMarkers")) {
-			Stream<Map<String, Object>> stream = objects.stream();
+			for (Map<String, Object> object : objects) {
+				if (Objects.equals(object.get("id"), "Upgrade")) {
+					objects.remove(object);
 
-			stream.filter(
-				object -> Objects.equals(object.get("id"), "Upgrade")
-			).findFirst(
-			).ifPresent(
-				objects::remove
-			);
+					break;
+				}
+			}
 		}
 	}
 
@@ -201,16 +199,10 @@ public class SnapshotDemoCreatorService extends DemoCreatorService {
 					entry.getValue() instanceof List) {
 
 					if (dateField && (entry.getValue() instanceof List)) {
-						List<String> values = (List<String>)entry.getValue();
-
-						Stream<String> stream = values.stream();
-
 						entry.setValue(
-							stream.map(
-								value -> _addOffset(value, timeOffset)
-							).collect(
-								Collectors.toList()
-							));
+							TransformUtil.transform(
+								(List<String>)entry.getValue(),
+								value -> _addOffset(value, timeOffset)));
 					}
 					else {
 						_adjustTime(entry.getValue(), timeOffset);

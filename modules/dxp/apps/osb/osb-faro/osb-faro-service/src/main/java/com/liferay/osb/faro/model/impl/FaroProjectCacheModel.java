@@ -85,12 +85,12 @@ public class FaroProjectCacheModel
 		sb.append(groupId);
 		sb.append(", companyId=");
 		sb.append(companyId);
-		sb.append(", createTime=");
-		sb.append(createTime);
 		sb.append(", userId=");
 		sb.append(userId);
 		sb.append(", userName=");
 		sb.append(userName);
+		sb.append(", createTime=");
+		sb.append(createTime);
 		sb.append(", modifiedTime=");
 		sb.append(modifiedTime);
 		sb.append(", name=");
@@ -136,7 +136,6 @@ public class FaroProjectCacheModel
 		faroProjectImpl.setFaroProjectId(faroProjectId);
 		faroProjectImpl.setGroupId(groupId);
 		faroProjectImpl.setCompanyId(companyId);
-		faroProjectImpl.setCreateTime(createTime);
 		faroProjectImpl.setUserId(userId);
 
 		if (userName == null) {
@@ -146,6 +145,7 @@ public class FaroProjectCacheModel
 			faroProjectImpl.setUserName(userName);
 		}
 
+		faroProjectImpl.setCreateTime(createTime);
 		faroProjectImpl.setModifiedTime(modifiedTime);
 
 		if (name == null) {
@@ -258,10 +258,10 @@ public class FaroProjectCacheModel
 
 		companyId = objectInput.readLong();
 
-		createTime = objectInput.readLong();
-
 		userId = objectInput.readLong();
 		userName = objectInput.readUTF();
+
+		createTime = objectInput.readLong();
 
 		modifiedTime = objectInput.readLong();
 		name = objectInput.readUTF();
@@ -293,8 +293,6 @@ public class FaroProjectCacheModel
 
 		objectOutput.writeLong(companyId);
 
-		objectOutput.writeLong(createTime);
-
 		objectOutput.writeLong(userId);
 
 		if (userName == null) {
@@ -303,6 +301,8 @@ public class FaroProjectCacheModel
 		else {
 			objectOutput.writeUTF(userName);
 		}
+
+		objectOutput.writeLong(createTime);
 
 		objectOutput.writeLong(modifiedTime);
 
@@ -406,9 +406,9 @@ public class FaroProjectCacheModel
 	public long faroProjectId;
 	public long groupId;
 	public long companyId;
-	public long createTime;
 	public long userId;
 	public String userName;
+	public long createTime;
 	public long modifiedTime;
 	public String name;
 	public String accountKey;

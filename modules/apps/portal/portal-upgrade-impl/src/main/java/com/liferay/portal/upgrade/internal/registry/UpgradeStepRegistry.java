@@ -118,9 +118,9 @@ public class UpgradeStepRegistry implements UpgradeStepRegistrator.Registry {
 			_upgradeInfos.add(
 				new UpgradeInfo(
 					fromSchemaVersionString, toSchemaVersionString, buildNumber,
-					dbProcessContext -> {
+					() -> {
 						for (UpgradeStep upgradeStep : upgradeStepsList) {
-							upgradeStep.upgrade(dbProcessContext);
+							upgradeStep.upgrade();
 						}
 					}));
 		}

@@ -37,8 +37,8 @@ import {
 import {initialContributorShape} from '../../utils/types.es';
 import {sub} from '../../utils/utils';
 import ContributorInputs from '../criteria_builder/ContributorInputs.es';
-import ContributorsBuilder from '../criteria_builder/ContributorsBuilder.es';
-import LocalizedInput from '../title_editor/LocalizedInput.es';
+import ContributorsBuilder from '../criteria_builder/ContributorsBuilder';
+import LocalizedInput from '../title_editor/LocalizedInput';
 
 function SegmentEdit({
 	availableLocales,
@@ -61,12 +61,14 @@ function SegmentEdit({
 	validateForm,
 	values,
 }) {
+	const contributors = initialContributorsToContributors(
+		initialContributors,
+		propertyGroups
+	);
+
 	const [data, setData] = useState({
-		contributors: initialContributorsToContributors(
-			initialContributors,
-			propertyGroups
-		),
-		disabledSave: queryIsEmpty(initialContributors),
+		contributors,
+		disabledSave: queryIsEmpty(contributors),
 		editing: showInEditMode,
 		hasChanged: false,
 		hasEmptyValues: false,

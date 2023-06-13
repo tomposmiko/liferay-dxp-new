@@ -740,17 +740,29 @@ public class KBDropdownItemsProvider {
 			return dropdownItem -> {
 				dropdownItem.putData("action", "move");
 				dropdownItem.putData(
-					"moveItemUrl",
+					"itemClassNameId",
+					String.valueOf(kbArticle.getClassNameId()));
+				dropdownItem.putData(
+					"itemId", String.valueOf(kbArticle.getResourcePrimKey()));
+				dropdownItem.putData("itemType", "article");
+				dropdownItem.putData(
+					"moveKBItemActionURL",
+					PortletURLBuilder.createActionURL(
+						_liferayPortletResponse
+					).setActionName(
+						"/knowledge_base/move_kb_object"
+					).buildString());
+				dropdownItem.putData(
+					"moveKBItemModalURL",
 					PortletURLBuilder.createRenderURL(
 						_liferayPortletResponse
 					).setMVCPath(
 						"/admin/common/move_kb_object_modal.jsp"
 					).setParameter(
-						"selectedItemId", kbArticle.getResourcePrimKey()
+						"itemToMoveId", kbArticle.getResourcePrimKey()
 					).setWindowState(
 						LiferayWindowState.POP_UP
 					).buildString());
-
 				dropdownItem.setIcon("move-folder");
 				dropdownItem.setLabel(
 					LanguageUtil.get(
@@ -795,16 +807,30 @@ public class KBDropdownItemsProvider {
 			return dropdownItem -> {
 				dropdownItem.putData("action", "move");
 				dropdownItem.putData(
-					"moveItemUrl",
+					"itemClassNameId",
+					String.valueOf(kbFolder.getClassNameId()));
+				dropdownItem.putData(
+					"itemId", String.valueOf(kbFolder.getKbFolderId()));
+				dropdownItem.putData("itemType", "folder");
+				dropdownItem.putData(
+					"moveKBItemModalURL",
 					PortletURLBuilder.createRenderURL(
 						_liferayPortletResponse
 					).setMVCPath(
-						"/admin/common/move_object_modal.jsp"
+						"/admin/common/move_kb_object_modal.jsp"
 					).setParameter(
-						"selectedItemId", kbFolder.getKbFolderId()
+						"itemToMoveId", kbFolder.getKbFolderId()
 					).setWindowState(
 						LiferayWindowState.POP_UP
 					).buildString());
+				dropdownItem.putData(
+					"moveKBItemActionURL",
+					PortletURLBuilder.createActionURL(
+						_liferayPortletResponse
+					).setActionName(
+						"/knowledge_base/move_kb_object"
+					).buildString());
+
 				dropdownItem.setIcon("move-folder");
 				dropdownItem.setLabel(
 					LanguageUtil.get(

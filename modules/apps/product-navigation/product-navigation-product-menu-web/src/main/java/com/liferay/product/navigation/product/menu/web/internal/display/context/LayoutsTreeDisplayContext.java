@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.SessionClicks;
 import com.liferay.portal.kernel.util.SessionTreeJSClicks;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -72,6 +73,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
@@ -136,7 +138,7 @@ public class LayoutsTreeDisplayContext {
 			).put(
 				"items", _getLayoutsJSONArray()
 			).put(
-				"selectedLayoutId", _getSelPlid()
+				"selectedLayoutId", _getSelectedLayoutId()
 			).put(
 				"selectedLayoutPath", _getSelectedLayoutPath()
 			).build();
@@ -391,10 +393,11 @@ public class LayoutsTreeDisplayContext {
 	}
 
 	private JSONArray _getLayoutsJSONArray() throws Exception {
-		long[] openNodes = StringUtil.split(
-			SessionTreeJSClicks.getOpenNodes(
-				_httpServletRequest, "productMenuPagesTree"),
-			0L);
+		Set<Long> openNodes = SetUtil.fromArray(
+			StringUtil.split(
+				SessionTreeJSClicks.getOpenNodes(
+					_httpServletRequest, "productMenuPagesTree"),
+				0L));
 
 		JSONArray layoutsJSONArray = _layoutsTree.getLayoutsJSONArray(
 			openNodes, _getGroupId(), _httpServletRequest, true, true, false,
@@ -586,6 +589,34 @@ public class LayoutsTreeDisplayContext {
 		return _redirect;
 	}
 
+	private long _getSelectedLayoutId() {
+		Layout layout = _themeDisplay.getLayout();
+
+		if (layout.isTypeControlPanel()) {
+			long selPlid = ParamUtil.get(
+				_liferayPortletRequest, "selPlid",
+				LayoutConstants.DEFAULT_PLID);
+
+			if (selPlid > 0) {
+				layout = _layoutLocalService.fetchLayout(selPlid);
+
+				if (layout != null) {
+					return layout.getLayoutId();
+				}
+			}
+
+			return LayoutConstants.DEFAULT_PLID;
+		}
+
+		if (layout.isSystem() && layout.isTypeContent()) {
+			layout = _layoutLocalService.fetchLayout(layout.getClassPK());
+
+			return layout.getLayoutId();
+		}
+
+		return layout.getLayoutId();
+	}
+
 	private List<Long> _getSelectedLayoutPath() throws Exception {
 		long selPlid = _getSelPlid();
 
@@ -593,17 +624,18 @@ public class LayoutsTreeDisplayContext {
 
 		selectedLayoutPath.add(LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
-		if ((selPlid <= 0) ||
-			(_layoutLocalService.fetchLayout(selPlid) == null)) {
+		Layout layout = _layoutLocalService.fetchLayout(selPlid);
 
+		if ((selPlid <= 0) || (layout == null)) {
 			return selectedLayoutPath;
 		}
 
-		selectedLayoutPath.add(selPlid);
+		selectedLayoutPath.add(layout.getLayoutId());
 
 		selectedLayoutPath.addAll(
 			ListUtil.toList(
-				_layoutService.getAncestorLayouts(selPlid), Layout::getPlid));
+				_layoutService.getAncestorLayouts(selPlid),
+				Layout::getLayoutId));
 
 		return selectedLayoutPath;
 	}

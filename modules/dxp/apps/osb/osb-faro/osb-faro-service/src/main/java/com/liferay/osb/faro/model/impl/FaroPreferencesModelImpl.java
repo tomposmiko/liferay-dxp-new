@@ -71,8 +71,8 @@ public class FaroPreferencesModelImpl
 	public static final Object[][] TABLE_COLUMNS = {
 		{"mvccVersion", Types.BIGINT}, {"faroPreferencesId", Types.BIGINT},
 		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"createTime", Types.BIGINT}, {"userId", Types.BIGINT},
-		{"userName", Types.VARCHAR}, {"modifiedTime", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createTime", Types.BIGINT}, {"modifiedTime", Types.BIGINT},
 		{"ownerId", Types.BIGINT}, {"preferences", Types.VARCHAR}
 	};
 
@@ -84,16 +84,16 @@ public class FaroPreferencesModelImpl
 		TABLE_COLUMNS_MAP.put("faroPreferencesId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("createTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("createTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("modifiedTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("ownerId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("preferences", Types.VARCHAR);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table OSBFaro_FaroPreferences (mvccVersion LONG default 0 not null,faroPreferencesId LONG not null primary key,groupId LONG,companyId LONG,createTime LONG,userId LONG,userName VARCHAR(75) null,modifiedTime LONG,ownerId LONG,preferences STRING null)";
+		"create table OSBFaro_FaroPreferences (mvccVersion LONG default 0 not null,faroPreferencesId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createTime LONG,modifiedTime LONG,ownerId LONG,preferences STRING null)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table OSBFaro_FaroPreferences";
@@ -247,11 +247,11 @@ public class FaroPreferencesModelImpl
 				"groupId", FaroPreferences::getGroupId);
 			attributeGetterFunctions.put(
 				"companyId", FaroPreferences::getCompanyId);
-			attributeGetterFunctions.put(
-				"createTime", FaroPreferences::getCreateTime);
 			attributeGetterFunctions.put("userId", FaroPreferences::getUserId);
 			attributeGetterFunctions.put(
 				"userName", FaroPreferences::getUserName);
+			attributeGetterFunctions.put(
+				"createTime", FaroPreferences::getCreateTime);
 			attributeGetterFunctions.put(
 				"modifiedTime", FaroPreferences::getModifiedTime);
 			attributeGetterFunctions.put(
@@ -291,16 +291,16 @@ public class FaroPreferencesModelImpl
 				(BiConsumer<FaroPreferences, Long>)
 					FaroPreferences::setCompanyId);
 			attributeSetterBiConsumers.put(
-				"createTime",
-				(BiConsumer<FaroPreferences, Long>)
-					FaroPreferences::setCreateTime);
-			attributeSetterBiConsumers.put(
 				"userId",
 				(BiConsumer<FaroPreferences, Long>)FaroPreferences::setUserId);
 			attributeSetterBiConsumers.put(
 				"userName",
 				(BiConsumer<FaroPreferences, String>)
 					FaroPreferences::setUserName);
+			attributeSetterBiConsumers.put(
+				"createTime",
+				(BiConsumer<FaroPreferences, Long>)
+					FaroPreferences::setCreateTime);
 			attributeSetterBiConsumers.put(
 				"modifiedTime",
 				(BiConsumer<FaroPreferences, Long>)
@@ -385,20 +385,6 @@ public class FaroPreferencesModelImpl
 	}
 
 	@Override
-	public long getCreateTime() {
-		return _createTime;
-	}
-
-	@Override
-	public void setCreateTime(long createTime) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_createTime = createTime;
-	}
-
-	@Override
 	public long getUserId() {
 		return _userId;
 	}
@@ -445,6 +431,20 @@ public class FaroPreferencesModelImpl
 		}
 
 		_userName = userName;
+	}
+
+	@Override
+	public long getCreateTime() {
+		return _createTime;
+	}
+
+	@Override
+	public void setCreateTime(long createTime) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_createTime = createTime;
 	}
 
 	@Override
@@ -563,9 +563,9 @@ public class FaroPreferencesModelImpl
 		faroPreferencesImpl.setFaroPreferencesId(getFaroPreferencesId());
 		faroPreferencesImpl.setGroupId(getGroupId());
 		faroPreferencesImpl.setCompanyId(getCompanyId());
-		faroPreferencesImpl.setCreateTime(getCreateTime());
 		faroPreferencesImpl.setUserId(getUserId());
 		faroPreferencesImpl.setUserName(getUserName());
+		faroPreferencesImpl.setCreateTime(getCreateTime());
 		faroPreferencesImpl.setModifiedTime(getModifiedTime());
 		faroPreferencesImpl.setOwnerId(getOwnerId());
 		faroPreferencesImpl.setPreferences(getPreferences());
@@ -587,12 +587,12 @@ public class FaroPreferencesModelImpl
 			this.<Long>getColumnOriginalValue("groupId"));
 		faroPreferencesImpl.setCompanyId(
 			this.<Long>getColumnOriginalValue("companyId"));
-		faroPreferencesImpl.setCreateTime(
-			this.<Long>getColumnOriginalValue("createTime"));
 		faroPreferencesImpl.setUserId(
 			this.<Long>getColumnOriginalValue("userId"));
 		faroPreferencesImpl.setUserName(
 			this.<String>getColumnOriginalValue("userName"));
+		faroPreferencesImpl.setCreateTime(
+			this.<Long>getColumnOriginalValue("createTime"));
 		faroPreferencesImpl.setModifiedTime(
 			this.<Long>getColumnOriginalValue("modifiedTime"));
 		faroPreferencesImpl.setOwnerId(
@@ -683,8 +683,6 @@ public class FaroPreferencesModelImpl
 
 		faroPreferencesCacheModel.companyId = getCompanyId();
 
-		faroPreferencesCacheModel.createTime = getCreateTime();
-
 		faroPreferencesCacheModel.userId = getUserId();
 
 		faroPreferencesCacheModel.userName = getUserName();
@@ -694,6 +692,8 @@ public class FaroPreferencesModelImpl
 		if ((userName != null) && (userName.length() == 0)) {
 			faroPreferencesCacheModel.userName = null;
 		}
+
+		faroPreferencesCacheModel.createTime = getCreateTime();
 
 		faroPreferencesCacheModel.modifiedTime = getModifiedTime();
 
@@ -772,9 +772,9 @@ public class FaroPreferencesModelImpl
 	private long _faroPreferencesId;
 	private long _groupId;
 	private long _companyId;
-	private long _createTime;
 	private long _userId;
 	private String _userName;
+	private long _createTime;
 	private long _modifiedTime;
 	private long _ownerId;
 	private String _preferences;
@@ -811,9 +811,9 @@ public class FaroPreferencesModelImpl
 		_columnOriginalValues.put("faroPreferencesId", _faroPreferencesId);
 		_columnOriginalValues.put("groupId", _groupId);
 		_columnOriginalValues.put("companyId", _companyId);
-		_columnOriginalValues.put("createTime", _createTime);
 		_columnOriginalValues.put("userId", _userId);
 		_columnOriginalValues.put("userName", _userName);
+		_columnOriginalValues.put("createTime", _createTime);
 		_columnOriginalValues.put("modifiedTime", _modifiedTime);
 		_columnOriginalValues.put("ownerId", _ownerId);
 		_columnOriginalValues.put("preferences", _preferences);
@@ -838,11 +838,11 @@ public class FaroPreferencesModelImpl
 
 		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("createTime", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("createTime", 64L);
 
 		columnBitmasks.put("modifiedTime", 128L);
 

@@ -117,20 +117,6 @@ public interface FaroPreferencesModel
 	public void setCompanyId(long companyId);
 
 	/**
-	 * Returns the create time of this faro preferences.
-	 *
-	 * @return the create time of this faro preferences
-	 */
-	public long getCreateTime();
-
-	/**
-	 * Sets the create time of this faro preferences.
-	 *
-	 * @param createTime the create time of this faro preferences
-	 */
-	public void setCreateTime(long createTime);
-
-	/**
 	 * Returns the user ID of this faro preferences.
 	 *
 	 * @return the user ID of this faro preferences
@@ -172,6 +158,20 @@ public interface FaroPreferencesModel
 	 * @param userName the user name of this faro preferences
 	 */
 	public void setUserName(String userName);
+
+	/**
+	 * Returns the create time of this faro preferences.
+	 *
+	 * @return the create time of this faro preferences
+	 */
+	public long getCreateTime();
+
+	/**
+	 * Sets the create time of this faro preferences.
+	 *
+	 * @param createTime the create time of this faro preferences
+	 */
+	public void setCreateTime(long createTime);
 
 	/**
 	 * Returns the modified time of this faro preferences.

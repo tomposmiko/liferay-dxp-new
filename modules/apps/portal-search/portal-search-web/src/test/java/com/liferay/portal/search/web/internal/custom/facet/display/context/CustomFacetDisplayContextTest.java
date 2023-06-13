@@ -23,7 +23,6 @@ import com.liferay.portal.search.web.internal.facet.display.context.FacetDisplay
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -116,18 +115,16 @@ public class CustomFacetDisplayContextTest
 				getHttpServletRequest(
 					CustomFacetPortletInstanceConfiguration.class));
 
+		customFacetDisplayContextBuilder.setCustomDisplayCaption(
+			customDisplayCaption);
 		customFacetDisplayContextBuilder.setFacet(facet);
-		customFacetDisplayContextBuilder.setParameterName("custom");
-		customFacetDisplayContextBuilder.setParameterValue(parameterValue);
+		customFacetDisplayContextBuilder.setFieldToAggregate(fieldToAggregate);
 		customFacetDisplayContextBuilder.setFrequenciesVisible(true);
-
 		customFacetDisplayContextBuilder.setFrequencyThreshold(0);
 		customFacetDisplayContextBuilder.setMaxTerms(0);
 		customFacetDisplayContextBuilder.setOrder(order);
-
-		customFacetDisplayContextBuilder.setCustomDisplayCaption(
-			Optional.ofNullable(customDisplayCaption));
-		customFacetDisplayContextBuilder.setFieldToAggregate(fieldToAggregate);
+		customFacetDisplayContextBuilder.setParameterName("custom");
+		customFacetDisplayContextBuilder.setParameterValue(parameterValue);
 
 		return customFacetDisplayContextBuilder.build();
 	}

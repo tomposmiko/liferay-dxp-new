@@ -164,6 +164,10 @@ public class EditJournalFeedDisplayContext {
 		String contentField = ParamUtil.getString(
 			_httpServletRequest, "contentField");
 
+		if (Validator.isNull(contentField) && (_journalFeed != null)) {
+			contentField = _journalFeed.getContentField();
+		}
+
 		if (Validator.isNull(contentField) ||
 			((_getDDMStructure() == null) &&
 			 !contentField.equals(
@@ -213,9 +217,9 @@ public class EditJournalFeedDisplayContext {
 		}
 
 		long ddmStructureId = ParamUtil.getLong(
-			_httpServletRequest, "ddmStructureId");
+			_httpServletRequest, "ddmStructureId", -1);
 
-		if ((ddmStructureId == 0) && (_journalFeed != null)) {
+		if ((ddmStructureId < 0) && (_journalFeed != null)) {
 			ddmStructureId = _journalFeed.getDDMStructureId();
 		}
 

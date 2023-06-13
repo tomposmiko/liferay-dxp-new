@@ -57,7 +57,7 @@
 </tr>
 <tr>
 	<td>STATUS_BUTTON</td>
-	<td>//div[@Class='status-buttons']//button[contains(@id,'status') and contains(text(),'${key_statusButton}')]</td>
+	<td>//div[@Class='status-buttons']//button[contains(text(),'${key_statusButton}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -107,7 +107,7 @@
 </tr>
 <tr>
 	<td>EDIT_MDF_BUTTON</td>
-	<td>//div[contains(@class,'edit-button-mdf')]/div</td>
+	<td>//div[contains(@class,'edit-button-mdf-request')]//button[@id='edit-button-${key_roleName}']/div[contains(.,'Edit')]</td>
 	<td></td>
 </tr>
 </tbody>

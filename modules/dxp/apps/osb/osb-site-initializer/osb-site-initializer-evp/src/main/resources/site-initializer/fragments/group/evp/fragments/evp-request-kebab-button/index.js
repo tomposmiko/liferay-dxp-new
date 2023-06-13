@@ -1,3 +1,5 @@
+/* eslint-disable @liferay/portal/no-global-fetch */
+/* eslint-disable no-undef */
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -8,3 +10,93 @@
  * permissions and limitations under the License, including but not limited to
  * distribution rights of the Software.
  */
+
+const updateStatus = async (key, name, message) => {
+	const requestID = fragmentElement.querySelector('.requestID').value;
+
+	const requestBody = {
+		messageEVPManager: `${message}`,
+		requestStatus: {
+			key: `${key}`,
+			name: `${name}`,
+		},
+	};
+
+	await fetch(`/o/c/evprequests/${requestID}`, {
+		body: JSON.stringify(requestBody),
+		headers: {
+			'content-type': 'application/json',
+			'x-csrf-token': Liferay.authToken,
+		},
+		method: 'PATCH',
+	});
+	location.reload();
+};
+
+const layerForDendingUpdateStatus = async (message, attribute, key, value) => {
+	if (message === '') {
+		return attribute.removeAttribute('hidden');
+	}
+
+	return await updateStatus(key, value, message);
+};
+
+const getMessage = () => document.querySelector('#messageDescribed').value;
+const getAttributeHidden = () => document.querySelector('#messageDanger');
+
+const openModal = () => {
+	const requestName = fragmentElement.querySelector('.requestName').value;
+
+	Liferay.Util.openModal({
+		bodyHTML:
+			'<textarea id="messageDescribed" style="word-wrap: break-word;width:100%;height: 10em;resize: none; border-style: inset;border-width: 1px;border-radius: 5px;" placeholder="Describe here..."></textarea>' +
+			'<div id="messageDanger" class="alert alert-danger" role="alert" hidden>This field is mandatory, please fill it in.</div>',
+		buttons: [
+			{
+				displayType: 'secondary',
+				label: 'Request more Info',
+				async onClick() {
+					await layerForDendingUpdateStatus(
+						getMessage(),
+						getAttributeHidden(),
+						'awaitingMoreInfoFromEmployee',
+						'Awaiting More Info From Employee'
+					);
+				},
+				type: 'submit',
+			},
+			{
+				displayType: 'secondary',
+				label: 'Reject',
+				async onClick() {
+					await layerForDendingUpdateStatus(
+						getMessage(),
+						getAttributeHidden(),
+						'rejected',
+						'Rejected'
+					);
+				},
+				type: 'submit',
+			},
+			{
+				label: 'Approve',
+				async onClick() {
+					await layerForDendingUpdateStatus(
+						getMessage(),
+						getAttributeHidden(),
+						'awaitingFinanceReview',
+						'Awaiting Finance Review'
+					);
+				},
+				type: 'submit',
+			},
+		],
+		center: true,
+		headerHTML: `<p class="request-modal-header">Review Request:</p><p>${requestName}</p>`,
+		size: 'md',
+	});
+};
+const btnOpenModal = fragmentElement.querySelector('.btnOpenModal');
+if (btnOpenModal) {
+	btnOpenModal.onclick = openModal;
+}

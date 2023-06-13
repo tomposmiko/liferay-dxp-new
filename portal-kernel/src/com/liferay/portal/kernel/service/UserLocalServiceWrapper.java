@@ -3445,6 +3445,13 @@ public class UserLocalServiceWrapper
 		return _userLocalService.updateUser(user);
 	}
 
+	@Override
+	public void validateMaxUsers(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_userLocalService.validateMaxUsers(companyId);
+	}
+
 	/**
 	 * Verifies the email address of the ticket.
 	 *

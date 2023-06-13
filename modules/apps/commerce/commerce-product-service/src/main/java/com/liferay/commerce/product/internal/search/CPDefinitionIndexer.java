@@ -35,7 +35,6 @@ import com.liferay.commerce.product.model.CPSpecificationOption;
 import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.model.CommerceChannel;
-import com.liferay.commerce.product.model.CommerceChannelRel;
 import com.liferay.commerce.product.service.CPDefinitionLinkLocalService;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
@@ -93,7 +92,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -488,37 +486,27 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 			languageIdToUrlTitleMap.get(cpDefinitionDefaultLanguageId));
 		document.addText("defaultLanguageId", cpDefinitionDefaultLanguageId);
 
-		List<Long> commerceChannelGroupIds = new ArrayList<>();
-
-		for (CommerceChannelRel commerceChannelRel :
+		document.addNumber(
+			CPField.COMMERCE_CHANNEL_GROUP_IDS,
+			TransformUtil.transformToLongArray(
 				_commerceChannelRelLocalService.getCommerceChannelRels(
 					cpDefinition.getModelClassName(),
 					cpDefinition.getCPDefinitionId(), QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
+					QueryUtil.ALL_POS, null),
+				commerceChannelRel -> {
+					CommerceChannel commerceChannel =
+						commerceChannelRel.getCommerceChannel();
 
-			CommerceChannel commerceChannel =
-				commerceChannelRel.getCommerceChannel();
-
-			commerceChannelGroupIds.add(commerceChannel.getGroupId());
-		}
-
+					return commerceChannel.getGroupId();
+				}));
 		document.addNumber(
-			CPField.COMMERCE_CHANNEL_GROUP_IDS,
-			ArrayUtil.toLongArray(commerceChannelGroupIds));
-
-		List<CommerceAccountGroupRel> commerceAccountGroupRels =
-			_commerceAccountGroupRelService.getCommerceAccountGroupRels(
-				CPDefinition.class.getName(), cpDefinition.getCPDefinitionId(),
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-
-		Stream<CommerceAccountGroupRel> stream =
-			commerceAccountGroupRels.stream();
-
-		long[] commerceAccountGroupIds = stream.mapToLong(
-			CommerceAccountGroupRel::getCommerceAccountGroupId
-		).toArray();
-
-		document.addNumber("commerceAccountGroupIds", commerceAccountGroupIds);
+			"commerceAccountGroupIds",
+			TransformUtil.transformToLongArray(
+				_commerceAccountGroupRelService.getCommerceAccountGroupRels(
+					CPDefinition.class.getName(),
+					cpDefinition.getCPDefinitionId(), QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null),
+				CommerceAccountGroupRel::getCommerceAccountGroupId));
 
 		List<String> optionNames = new ArrayList<>();
 		List<Long> optionIds = new ArrayList<>();

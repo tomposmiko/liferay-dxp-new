@@ -12,6 +12,7 @@ import {PurchasedAppsDashboardTableRow} from '../../components/DashboardTable/Pu
 import {MemberProfile} from '../../components/MemberProfile/MemberProfile';
 import {getCompanyId} from '../../liferay/constants';
 import {
+	getAccounts,
 	getChannels,
 	getMyUserAccount,
 	getOrders,
@@ -129,34 +130,21 @@ export function PurchasedAppsDashboardPage() {
 
 	useEffect(() => {
 		const makeFetch = async () => {
-			const userAccountsResponse = await getUserAccounts();
+			const accountsResponse = await getAccounts();
 
-			const userAccount = userAccountsResponse.items.map(
-				(accountBrief: AccountBriefProps) => {
+			const accountsList = accountsResponse.items.map(
+				(account: Account) => {
 					return {
-						externalReferenceCode: accountBrief.externalReferenceCode,
-						id: accountBrief.id,
-						name: accountBrief.name,
+						externalReferenceCode: account.externalReferenceCode,
+						id: account.id,
+						name: account.name,
 					} as Account;
 				}
 			);
 
-			const businessAccounts = userAccountsResponse.items[0].accountBriefs.map(
-				(accountBrief: AccountBriefProps) => {
-					return {
-						externalReferenceCode: accountBrief.externalReferenceCode,
-						id: accountBrief.id,
-						name: accountBrief.name,
-					} as Account;
-				}
-			);
-
-			const accounts = [...userAccount, ...businessAccounts]
-
-			setAccounts(accounts);
-			setSelectedAccount(accounts[0]);
+			setAccounts(accountsList);
+			setSelectedAccount(accountsList[0]);
 		};
-
 		makeFetch();
 	}, []);
 
@@ -264,26 +252,35 @@ export function PurchasedAppsDashboardPage() {
 							accountBrief.name === selectedAccount.name
 					).roleBriefs;
 
-				customerRoles.forEach((customerRole) => {
-					if (
-						currentUserAccountRoleBriefs.find(
-							(role: {name: string}) => role.name === customerRole
-						)
-					) {
-						currentUserAccount.isCustomerAccount = true;
-					}
-				});
 
-				publisherRoles.forEach((publisherRole) => {
-					if (
-						currentUserAccountRoleBriefs.find(
-							(role: {name: string}) =>
-								role.name === publisherRole
-						)
-					) {
-						currentUserAccount.isCustomerAccount = true;
-					}
-				});
+				const currentUserAccountBriefs =
+					currentUserAccount.accountBriefs.find(
+						(accountBrief: {name: string}) =>
+							accountBrief.name === selectedAccount.name
+					);
+
+				if (currentUserAccountBriefs) {
+					customerRoles.forEach((customerRole) => {
+						if (
+							currentUserAccountBriefs.roleBriefs.find(
+								(role: {name: string}) => role.name === customerRole
+							)
+						) {
+							currentUserAccount.isCustomerAccount = true;
+						}
+					});
+
+					publisherRoles.forEach((publisherRole) => {
+						if (
+							currentUserAccountBriefs.roleBriefs.find(
+								(role: {name: string}) =>
+									role.name === publisherRole
+							)
+						) {
+							currentUserAccount.isPublisherAccount = true;
+						}
+					});
+				}
 
 				const accountsListResponse = await getUserAccounts();
 
@@ -347,7 +344,7 @@ export function PurchasedAppsDashboardPage() {
 	return (
 		<div className="purchased-apps-dashboard-page-container">
 			<DashboardNavigation
-				accountAppsNumber="0"
+				accountAppsNumber={purchasedAppTable.items.length.toString()}
 				accountIcon={accountLogo}
 				accounts={accounts}
 				currentAccount={selectedAccount}

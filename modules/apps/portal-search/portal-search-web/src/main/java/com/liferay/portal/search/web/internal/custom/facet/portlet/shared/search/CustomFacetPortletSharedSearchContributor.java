@@ -19,6 +19,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.facet.custom.CustomFacetSearchContributor;
 import com.liferay.portal.search.facet.nested.NestedFacetSearchContributor;
 import com.liferay.portal.search.web.internal.custom.facet.constants.CustomFacetPortletKeys;
@@ -28,8 +29,6 @@ import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchCo
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchSettings;
 
 import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -52,37 +51,35 @@ public class CustomFacetPortletSharedSearchContributor
 			new CustomFacetPortletPreferencesImpl(
 				portletSharedSearchSettings.getPortletPreferencesOptional());
 
-		Optional<String> fieldToAggregateOptional =
-			customFacetPortletPreferences.getAggregationFieldOptional();
+		String aggregationField =
+			customFacetPortletPreferences.getAggregationField();
 
-		if (!fieldToAggregateOptional.isPresent()) {
+		if (Validator.isNull(aggregationField)) {
 			return;
 		}
 
-		String fieldToAggregate = fieldToAggregateOptional.get();
-
 		if (!ddmIndexer.isLegacyDDMIndexFieldsEnabled() &&
-			fieldToAggregate.startsWith(DDMIndexer.DDM_FIELD_ARRAY)) {
+			aggregationField.startsWith(DDMIndexer.DDM_FIELD_ARRAY)) {
 
 			_contributeWithDDMFieldArray(
-				customFacetPortletPreferences, fieldToAggregate,
+				customFacetPortletPreferences, aggregationField,
 				portletSharedSearchSettings);
 		}
 		else if (!ddmIndexer.isLegacyDDMIndexFieldsEnabled() &&
-				 fieldToAggregate.startsWith(DDMIndexer.DDM_FIELD_PREFIX)) {
+				 aggregationField.startsWith(DDMIndexer.DDM_FIELD_PREFIX)) {
 
 			_contributeWithDDMField(
-				customFacetPortletPreferences, fieldToAggregate,
+				customFacetPortletPreferences, aggregationField,
 				portletSharedSearchSettings);
 		}
-		else if (fieldToAggregate.startsWith("nestedFieldArray")) {
+		else if (aggregationField.startsWith("nestedFieldArray")) {
 			_contributeWithNestedFieldArray(
-				customFacetPortletPreferences, fieldToAggregate,
+				customFacetPortletPreferences, aggregationField,
 				portletSharedSearchSettings);
 		}
 		else {
 			_contributeWithCustomFacet(
-				customFacetPortletPreferences, fieldToAggregate,
+				customFacetPortletPreferences, aggregationField,
 				portletSharedSearchSettings);
 		}
 	}
@@ -205,16 +202,20 @@ public class CustomFacetPortletSharedSearchContributor
 	private String _getParameterName(
 		CustomFacetPortletPreferences customFacetPortletPreferences) {
 
-		Optional<String> optional = Stream.of(
-			customFacetPortletPreferences.getParameterNameOptional(),
-			customFacetPortletPreferences.getAggregationFieldOptional()
-		).filter(
-			Optional::isPresent
-		).map(
-			Optional::get
-		).findFirst();
+		String parameterName = customFacetPortletPreferences.getParameterName();
 
-		return optional.orElse("customfield");
+		if (Validator.isNotNull(parameterName)) {
+			return parameterName;
+		}
+
+		String aggregationField =
+			customFacetPortletPreferences.getAggregationField();
+
+		if (Validator.isNotNull(aggregationField)) {
+			return aggregationField;
+		}
+
+		return "customfield";
 	}
 
 	private Locale _getSuffixLocale(String string) {

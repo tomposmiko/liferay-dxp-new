@@ -34,6 +34,8 @@ import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldSet;
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.field.type.TextInfoFieldType;
+import com.liferay.info.localized.bundle.FunctionInfoLocalizedValue;
+import com.liferay.journal.constants.JournalArticleConstants;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
@@ -61,10 +63,12 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -77,14 +81,19 @@ import com.liferay.template.info.item.provider.TemplateInfoItemFieldSetProvider;
 import com.liferay.template.model.TemplateEntry;
 import com.liferay.template.test.util.TemplateTestUtil;
 
+import java.text.DateFormat;
+
 import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -110,17 +119,13 @@ public class TemplateInfoItemFieldSetProviderTest {
 
 	@Before
 	public void setUp() throws Exception {
+		_originalServiceContext = ServiceContextThreadLocal.getServiceContext();
+		_originalSiteDefaultLocale = LocaleThreadLocal.getSiteDefaultLocale();
+		_originalThemeDisplayLocale = LocaleThreadLocal.getThemeDisplayLocale();
+
 		_group = GroupTestUtil.addGroup();
 
-		_assetVocabulary = AssetTestUtil.addVocabulary(_group.getGroupId());
-
-		_assetCategory = AssetTestUtil.addCategory(
-			_group.getGroupId(), _assetVocabulary.getVocabularyId());
-
 		_company = _companyLocalService.getCompany(_group.getCompanyId());
-		_journalArticle = JournalTestUtil.addArticle(
-			_group.getGroupId(),
-			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 		_layout = LayoutTestUtil.addTypePortletLayout(_group);
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
@@ -132,6 +137,17 @@ public class TemplateInfoItemFieldSetProviderTest {
 			_getMockHttpServletRequest(_getThemeDisplay()));
 
 		ServiceContextThreadLocal.pushServiceContext(_serviceContext);
+
+		_journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+	}
+
+	@After
+	public void tearDown() {
+		ServiceContextThreadLocal.pushServiceContext(_originalServiceContext);
+		LocaleThreadLocal.setSiteDefaultLocale(_originalSiteDefaultLocale);
+		LocaleThreadLocal.setThemeDisplayLocale(_originalThemeDisplayLocale);
 	}
 
 	@Test
@@ -282,39 +298,62 @@ public class TemplateInfoItemFieldSetProviderTest {
 				journalArticleTemplateEntry.getTemplateEntryId(),
 			infoField.getName());
 
+		Object value = infoFieldValue.getValue();
+
+		Assert.assertNotNull(value);
+		Assert.assertTrue(
+			value.toString(), value instanceof FunctionInfoLocalizedValue<?>);
+
+		FunctionInfoLocalizedValue functionInfoLocalizedValue =
+			(FunctionInfoLocalizedValue)value;
+
 		Assert.assertEquals(
 			infoFieldValue.toString(),
 			nameValue.getString(
 				_portal.getSiteDefaultLocale(_group.getGroupId())),
-			infoFieldValue.getValue());
+			functionInfoLocalizedValue.getValue());
 	}
 
 	@Test
-	public void testGetInfoFieldValuesByClassNameWhenNoTemplateEntryExists() {
+	public void testGetInfoFieldValuesByClassNameWhenNoTemplateEntryExists()
+		throws Exception {
+
+		AssetVocabulary assetVocabulary = AssetTestUtil.addVocabulary(
+			_group.getGroupId());
+
+		AssetCategory assetCategory = AssetTestUtil.addCategory(
+			_group.getGroupId(), assetVocabulary.getVocabularyId());
+
 		List<InfoFieldValue<Object>> infoFieldValues =
 			_templateInfoItemFieldSetProvider.getInfoFieldValues(
-				AssetCategory.class.getName(), _assetCategory);
+				AssetCategory.class.getName(), assetCategory);
 
 		Assert.assertTrue(infoFieldValues.isEmpty());
 	}
 
 	@Test
 	public void testGetInfoFieldValuesByClassNameWhenTemplateEntryExists()
-		throws PortalException {
+		throws Exception {
 
 		TemplateTestUtil.addTemplateEntry(
 			JournalArticle.class.getName(),
 			String.valueOf(_journalArticle.getDDMStructureId()),
 			_serviceContext);
 
+		AssetVocabulary assetVocabulary = AssetTestUtil.addVocabulary(
+			_group.getGroupId());
+
+		AssetCategory assetCategory = AssetTestUtil.addCategory(
+			_group.getGroupId(), assetVocabulary.getVocabularyId());
+
 		TemplateEntry categoryTemplateEntry = TemplateTestUtil.addTemplateEntry(
 			AssetCategory.class.getName(), StringPool.BLANK,
-			_assetCategory.getName(), RandomTestUtil.randomString(),
+			assetCategory.getName(), RandomTestUtil.randomString(),
 			JournalTestUtil.getSampleTemplateFTL(), _serviceContext);
 
 		List<InfoFieldValue<Object>> infoFieldValues =
 			_templateInfoItemFieldSetProvider.getInfoFieldValues(
-				AssetCategory.class.getName(), _assetCategory);
+				AssetCategory.class.getName(), assetCategory);
 
 		Assert.assertEquals(
 			infoFieldValues.toString(), 1, infoFieldValues.size());
@@ -330,9 +369,69 @@ public class TemplateInfoItemFieldSetProviderTest {
 			infoField.getName());
 
 		Assert.assertEquals(
-			infoFieldValue.toString(), _assetCategory.getName(),
+			infoFieldValue.toString(), assetCategory.getName(),
 			infoFieldValue.getValue(
 				_portal.getSiteDefaultLocale(_group.getGroupId())));
+	}
+
+	@Test
+	public void testGetInfoFieldValuesLocalizedContent() throws Exception {
+		_group = GroupTestUtil.updateDisplaySettings(
+			_group.getGroupId(),
+			ListUtil.fromArray(
+				LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US),
+			LocaleUtil.SPAIN);
+
+		LocaleThreadLocal.setSiteDefaultLocale(LocaleUtil.SPAIN);
+
+		Map<Locale, String> contentMap = _getRandomLocalizedMap();
+
+		_journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(), 0,
+			JournalArticleConstants.CLASS_NAME_ID_DEFAULT,
+			_getRandomLocalizedMap(), _getRandomLocalizedMap(), contentMap,
+			LocaleUtil.SPAIN, false, false, _serviceContext);
+
+		_assertLocalizedValues(
+			HashMapBuilder.put(
+				LocaleUtil.GERMANY, contentMap.get(LocaleUtil.SPAIN)
+			).put(
+				LocaleUtil.SPAIN, contentMap.get(LocaleUtil.SPAIN)
+			).put(
+				LocaleUtil.US, contentMap.get(LocaleUtil.US)
+			).build(),
+			"name");
+	}
+
+	@Test
+	public void testGetInfoFieldValuesLocalizedContentDifferentDefaultLocale()
+		throws Exception {
+
+		_group = GroupTestUtil.updateDisplaySettings(
+			_group.getGroupId(),
+			ListUtil.fromArray(
+				LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US),
+			LocaleUtil.SPAIN);
+
+		LocaleThreadLocal.setSiteDefaultLocale(LocaleUtil.SPAIN);
+
+		Map<Locale, String> contentMap = _getRandomLocalizedMap();
+
+		_journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(), 0,
+			JournalArticleConstants.CLASS_NAME_ID_DEFAULT,
+			_getRandomLocalizedMap(), _getRandomLocalizedMap(), contentMap,
+			LocaleUtil.US, false, false, _serviceContext);
+
+		_assertLocalizedValues(
+			HashMapBuilder.put(
+				LocaleUtil.GERMANY, contentMap.get(LocaleUtil.US)
+			).put(
+				LocaleUtil.SPAIN, contentMap.get(LocaleUtil.SPAIN)
+			).put(
+				LocaleUtil.US, contentMap.get(LocaleUtil.US)
+			).build(),
+			"name");
 	}
 
 	@Test
@@ -409,6 +508,8 @@ public class TemplateInfoItemFieldSetProviderTest {
 			_group.getGroupId(),
 			ListUtil.fromArray(LocaleUtil.US, LocaleUtil.SPAIN), LocaleUtil.US);
 
+		LocaleThreadLocal.setSiteDefaultLocale(LocaleUtil.US);
+
 		TemplateEntry journalArticleTemplateEntry =
 			TemplateTestUtil.addTemplateEntry(
 				JournalArticle.class.getName(),
@@ -439,7 +540,6 @@ public class TemplateInfoItemFieldSetProviderTest {
 		String value = (String)infoFieldValue.getValue(LocaleUtil.US);
 
 		Assert.assertNotNull(value);
-
 		Assert.assertEquals(
 			DateUtil.getDate(
 				_journalArticle.getCreateDate(),
@@ -451,12 +551,48 @@ public class TemplateInfoItemFieldSetProviderTest {
 	}
 
 	@Test
+	public void testGetInfoFieldValuesRenderingDateInfoFieldTypeLocalizedDateFormat()
+		throws Exception {
+
+		_group = GroupTestUtil.updateDisplaySettings(
+			_group.getGroupId(),
+			ListUtil.fromArray(
+				LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US),
+			LocaleUtil.SPAIN);
+
+		LocaleThreadLocal.setSiteDefaultLocale(LocaleUtil.SPAIN);
+
+		DDMFormField ddmFormField = _createDDMFormField(
+			false, Collections.emptyMap(), DDMFormFieldTypeConstants.DATE);
+
+		Date date = new Date();
+
+		_journalArticle = JournalTestUtil.addJournalArticle(
+			_dataDefinitionResourceFactory, ddmFormField,
+			_ddmFormValuesToFieldsConverter,
+			DateUtil.getDate(date, "yyyy-MM-dd", LocaleUtil.SPAIN),
+			_group.getGroupId(), _journalConverter);
+
+		_assertLocalizedValues(
+			HashMapBuilder.put(
+				LocaleUtil.GERMANY, _formatDate(date, LocaleUtil.GERMANY)
+			).put(
+				LocaleUtil.SPAIN, _formatDate(date, LocaleUtil.SPAIN)
+			).put(
+				LocaleUtil.US, _formatDate(date, LocaleUtil.US)
+			).build(),
+			ddmFormField.getName());
+	}
+
+	@Test
 	public void testGetInfoFieldValuesRenderingDateInfoFieldTypeSpainLocale()
 		throws Exception {
 
 		_group = GroupTestUtil.updateDisplaySettings(
 			_group.getGroupId(),
 			ListUtil.fromArray(LocaleUtil.US, LocaleUtil.SPAIN), LocaleUtil.US);
+
+		LocaleThreadLocal.setSiteDefaultLocale(LocaleUtil.US);
 
 		TemplateEntry journalArticleTemplateEntry =
 			TemplateTestUtil.addTemplateEntry(
@@ -495,7 +631,6 @@ public class TemplateInfoItemFieldSetProviderTest {
 		String value = (String)infoFieldValue.getValue(LocaleUtil.SPAIN);
 
 		Assert.assertNotNull(value);
-
 		Assert.assertEquals(
 			DateUtil.getDate(
 				_journalArticle.getCreateDate(),
@@ -562,6 +697,8 @@ public class TemplateInfoItemFieldSetProviderTest {
 		_group = GroupTestUtil.updateDisplaySettings(
 			_group.getGroupId(),
 			ListUtil.fromArray(LocaleUtil.US, LocaleUtil.SPAIN), LocaleUtil.US);
+
+		LocaleThreadLocal.setSiteDefaultLocale(LocaleUtil.US);
 
 		String expectedKey1 = RandomTestUtil.randomString(10);
 		String expectedKey2 = RandomTestUtil.randomString(10);
@@ -636,6 +773,8 @@ public class TemplateInfoItemFieldSetProviderTest {
 			_group.getGroupId(),
 			ListUtil.fromArray(LocaleUtil.US, LocaleUtil.SPAIN), LocaleUtil.US);
 
+		LocaleThreadLocal.setSiteDefaultLocale(LocaleUtil.US);
+
 		DDMFormField ddmFormField = _createDDMFormField(
 			false,
 			HashMapBuilder.put(
@@ -690,6 +829,8 @@ public class TemplateInfoItemFieldSetProviderTest {
 		_group = GroupTestUtil.updateDisplaySettings(
 			_group.getGroupId(),
 			ListUtil.fromArray(LocaleUtil.US, LocaleUtil.SPAIN), LocaleUtil.US);
+
+		LocaleThreadLocal.setSiteDefaultLocale(LocaleUtil.US);
 
 		String expectedKey = RandomTestUtil.randomString(10);
 
@@ -758,11 +899,69 @@ public class TemplateInfoItemFieldSetProviderTest {
 		}
 	}
 
+	private void _assertLocalizedValues(
+			Map<Locale, String> expectedValues, String fieldName)
+		throws Exception {
+
+		TemplateEntry templateEntry = TemplateTestUtil.addTemplateEntry(
+			JournalArticle.class.getName(),
+			String.valueOf(_journalArticle.getDDMStructureId()),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			TemplateTestUtil.getSampleScriptFTL(fieldName), _serviceContext);
+
+		Locale currentThemeDisplayLocale =
+			LocaleThreadLocal.getThemeDisplayLocale();
+
+		List<InfoFieldValue<Object>> infoFieldValues =
+			_templateInfoItemFieldSetProvider.getInfoFieldValues(
+				JournalArticle.class.getName(),
+				String.valueOf(_journalArticle.getDDMStructureId()),
+				_journalArticle);
+
+		Assert.assertEquals(
+			currentThemeDisplayLocale,
+			LocaleThreadLocal.getThemeDisplayLocale());
+
+		Assert.assertEquals(
+			infoFieldValues.toString(), 1, infoFieldValues.size());
+
+		InfoFieldValue<Object> infoFieldValue = infoFieldValues.get(0);
+
+		InfoField<?> infoField = infoFieldValue.getInfoField();
+
+		Assert.assertEquals(
+			infoField.toString(),
+			PortletDisplayTemplate.DISPLAY_STYLE_PREFIX +
+				templateEntry.getTemplateEntryId(),
+			infoField.getName());
+
+		Object value = infoFieldValue.getValue();
+
+		Assert.assertNotNull(value);
+		Assert.assertTrue(
+			value.toString(), value instanceof FunctionInfoLocalizedValue<?>);
+
+		Locale siteDefaultLocale = LocaleUtil.fromLanguageId(
+			_group.getDefaultLanguageId());
+
+		FunctionInfoLocalizedValue functionInfoLocalizedValue =
+			(FunctionInfoLocalizedValue)value;
+
+		Assert.assertEquals(
+			expectedValues.get(siteDefaultLocale),
+			functionInfoLocalizedValue.getValue());
+
+		for (Map.Entry<Locale, String> entry : expectedValues.entrySet()) {
+			Assert.assertEquals(
+				entry.getValue(),
+				functionInfoLocalizedValue.getValue(entry.getKey()));
+		}
+	}
+
 	private DDMFormField _createDDMFormField(
 		boolean multiple, Map<String, String> optionsMap, String type) {
 
-		DDMFormField ddmFormField = new DDMFormField(
-			RandomTestUtil.randomString(10), type);
+		DDMFormField ddmFormField = new DDMFormField("name", type);
 
 		ddmFormField.setDataType("text");
 		ddmFormField.setIndexType("text");
@@ -790,6 +989,15 @@ public class TemplateInfoItemFieldSetProviderTest {
 		return ddmFormField;
 	}
 
+	private String _formatDate(Date date, Locale locale) {
+		DateFormat dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+			DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+				FormatStyle.SHORT, null, IsoChronology.INSTANCE, locale),
+			locale);
+
+		return dateFormat.format(date);
+	}
+
 	private MockHttpServletRequest _getMockHttpServletRequest(
 			ThemeDisplay themeDisplay)
 		throws Exception {
@@ -801,6 +1009,14 @@ public class TemplateInfoItemFieldSetProviderTest {
 			WebKeys.THEME_DISPLAY, themeDisplay);
 
 		return mockHttpServletRequest;
+	}
+
+	private Map<Locale, String> _getRandomLocalizedMap() {
+		return HashMapBuilder.put(
+			LocaleUtil.SPAIN, RandomTestUtil.randomString()
+		).put(
+			LocaleUtil.US, RandomTestUtil.randomString()
+		).build();
 	}
 
 	private ThemeDisplay _getThemeDisplay() throws Exception {
@@ -829,12 +1045,8 @@ public class TemplateInfoItemFieldSetProviderTest {
 		return themeDisplay;
 	}
 
-	private AssetCategory _assetCategory;
-
 	@Inject
 	private AssetCategoryLocalService _assetCategoryLocalService;
-
-	private AssetVocabulary _assetVocabulary;
 
 	@Inject
 	private AssetVocabularyLocalService _assetVocabularyLocalService;
@@ -865,6 +1077,9 @@ public class TemplateInfoItemFieldSetProviderTest {
 	private JSONFactory _jsonFactory;
 
 	private Layout _layout;
+	private ServiceContext _originalServiceContext;
+	private Locale _originalSiteDefaultLocale;
+	private Locale _originalThemeDisplayLocale;
 
 	@Inject
 	private Portal _portal;

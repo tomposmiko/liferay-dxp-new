@@ -33,9 +33,20 @@ definition {
 	macro changeMDFStatus {
 		var key_statusButton = ${statusButton};
 
-		ClickNoError(
-			buttonId = ${statusButton},
-			locator1 = "PRMMDFRequest#STATUS_BUTTON");
+		if (${statusButton} == "Cancel") {
+			ClickNoError(
+				buttonId = "status-cancel",
+				locator1 = "Button#BUTTON_ID");
+		}
+		else {
+			ScrollWebElementIntoView(
+				buttonId = ${statusButton},
+				locator1 = "PRMMDFRequest#STATUS_BUTTON");
+
+			ClickNoError(
+				buttonId = ${statusButton},
+				locator1 = "PRMMDFRequest#STATUS_BUTTON");
+		}
 
 		Confirm.acceptAlert();
 	}
@@ -81,11 +92,15 @@ definition {
 	}
 
 	@summary = "Verify that is possible edit MDF activity "
-	macro editMDFActivity {
+	macro editActivity {
 		Click(locator1 = "PRMMDFRequest#EDIT_ACTIVITY_BUTTON");
 
 		if (!(isSet(activitiyIndex))) {
 			var activityIndex = 1;
+		}
+
+		if (!(isSet(budgetIndex))) {
+			var budgetIndex = 0;
 		}
 
 		Type(
@@ -93,23 +108,40 @@ definition {
 			locator1 = "PRMMDFRequest#TEXT_FIELD",
 			value1 = ${newActivityName});
 
-		Click.clickAtNotVisible(
-			key_buttonText = ${leadList},
-			key_fieldName = "activities[${activityIndex}].activityDescription.leadGenerated",
-			locator1 = "PRMMDFRequest#INPUT_BUTTON");
+		Type(
+			key_fieldName = "activities[${activityIndex}].budgets[${budgetIndex}].cost",
+			locator1 = "PRMMDFRequest#TEXT_FIELD",
+			value1 = ${newBugdetValue});
+	}
 
-		Button.click(button = "Continue");
+	macro editButton {
+		if (isSet(manager)) {
+			var roleName = "manager";
+		}
+		else {
+			var roleName = "user";
+		}
 
-		Button.click(button = "Continue");
-
-		Button.click(button = "Submit");
+		Click(
+			key_roleName = ${roleName},
+			locator1 = "PRMMDFRequest#EDIT_MDF_BUTTON");
 	}
 
 	@summary = "Verify that is possible edit some MDF informations "
-	macro editMDFinformations {
-		Click(locator1 = "PRMMDFRequest#EDIT_MDF_BUTTON");
-
+	macro editGoals {
 		PRMMDFRequest.fillGoalsPage(
+			accountName = ${accountName},
+			additionalOptions = ${additionalOptions},
+			campaignDescription = ${campaignDescription},
+			campaignName = ${campaignName},
+			countryName = ${countryName},
+			goalsOptions = ${goalsOptions},
+			targetMarketOptions = ${targetMarketOptions},
+			targetRolesOptions = ${targetRolesOptions});
+	}
+
+	macro editMDF {
+		PRMMDFRequest.editGoals(
 			accountName = ${accountName},
 			additionalOptions = ${additionalOptions},
 			campaignDescription = ${campaignDescription},
@@ -120,6 +152,23 @@ definition {
 			targetRolesOptions = ${targetRolesOptions});
 
 		Button.click(button = "Continue");
+
+		PRMMDFRequest.editActivity(
+			activityIndex = ${activityIndex},
+			newActivityName = ${newActivityName},
+			newBugdetValue = ${newBugdetValue});
+
+		Button.click(button = "Continue");
+
+		Button.click(button = "Continue");
+
+		ScrollWebElementIntoView(locator1 = "Button#SUBMIT");
+
+		Button.click(button = "Submit");
+
+		WaitForPageLoad();
+
+		Alert.viewSuccessMessage();
 	}
 
 	@summary = "Edit total MDF amount field"
@@ -707,7 +756,7 @@ definition {
 				locator1 = "PRMMDFRequest#DETAIL_FIELD");
 		}
 
-		if (isSet(ampaignName)) {
+		if (isSet(campaignName)) {
 			AssertElementPresent(
 				key_fieldName = "Name of the overall campaign",
 				key_nameValue = ${campaignName},

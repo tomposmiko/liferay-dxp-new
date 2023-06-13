@@ -80,7 +80,9 @@ export function useDragItem(item, onDragEnd) {
 		parentId,
 		setHorizontalOffset,
 		setParentId,
+		setTargetItemId,
 		setVerticalOffset,
+		targetItemId,
 	} = useContext(DragDropContext);
 
 	const [{isDragging}, handlerRef, previewRef] = useDrag({
@@ -94,7 +96,13 @@ export function useDragItem(item, onDragEnd) {
 		}),
 		end(_, monitor) {
 			if (Liferay.FeatureFlags['LPS-134527']) {
+				if (!targetItemId) {
+					return;
+				}
+
 				const dropResult = monitor.getDropResult();
+
+				setTargetItemId(null);
 
 				if (!dropResult) {
 					return;
@@ -148,17 +156,21 @@ export function useDropTarget(item) {
 function useNewDropTarget(item) {
 	const {siteNavigationMenuItemId} = item;
 
+	const cardWidthRef = useRef();
 	const [nestingLevel, setNestingLevel] = useState(0);
 	const nextItemNestingRef = useRef(null);
 	const items = useItems();
 	const itemPath = getItemPath(siteNavigationMenuItemId, items);
+	const {languageId} = useConstants();
+	const {setTargetItemId, targetItemId} = useContext(DragDropContext);
 	const targetRef = useRef();
 	const targetRectRef = useRef(null);
 
-	const {languageId} = useConstants();
 	const rtl = Liferay.Language.direction[languageId] === 'rtl';
 
-	const {setTargetItemId, targetItemId} = useContext(DragDropContext);
+	const isFirstItem =
+		itemPath.length === 1 &&
+		items[0]?.siteNavigationMenuItemId === siteNavigationMenuItemId;
 
 	const [, dndTargetRef] = useDrop({
 		accept: ACCEPTING_ITEM_TYPE,
@@ -166,11 +178,16 @@ function useNewDropTarget(item) {
 			return monitor.isOver();
 		},
 		drop() {
+			if (targetItemId === '0') {
+				return {
+					order: 0,
+					parentId: '0',
+				};
+			}
+
 			const lastNestingLevel = nestingLevel;
 
-			setTargetItemId(null);
-			setNestingLevel(0);
-
+			cardWidthRef.current = null;
 			nextItemNestingRef.current = null;
 			targetRectRef.current = null;
 
@@ -202,8 +219,16 @@ function useNewDropTarget(item) {
 		hover(source, monitor) {
 			if (monitor.canDrop(source, monitor)) {
 				if (!targetRef.current || itemPath.includes(source.id)) {
+					setTargetItemId(null);
+
 					return;
 				}
+
+				cardWidthRef.current =
+					cardWidthRef.current ||
+					targetRef.current
+						.querySelector('.card')
+						.getBoundingClientRect().width;
 
 				targetRectRef.current =
 					targetRectRef.current ||
@@ -240,6 +265,15 @@ function useNewDropTarget(item) {
 				const nextItemNesting = nextItemNestingRef.current;
 				const targetRect = targetRectRef.current;
 
+				if (
+					isFirstItem &&
+					itemPosition.y < targetRect.top + targetRect.height * 0.25
+				) {
+					setTargetItemId('0');
+
+					return;
+				}
+
 				setTargetItemId(siteNavigationMenuItemId);
 
 				let nesting = 1;
@@ -247,7 +281,9 @@ function useNewDropTarget(item) {
 				if (rtl) {
 					nesting =
 						Math.round(
-							(targetRect.width - itemPosition.x) / NESTING_MARGIN
+							(targetRect.right -
+								(itemPosition.x + cardWidthRef.current)) /
+								NESTING_MARGIN
 						) + 1;
 				}
 				else {
@@ -277,7 +313,9 @@ function useNewDropTarget(item) {
 
 	return {
 		isOver: targetItemId === siteNavigationMenuItemId,
-		nestingLevel,
+		isOverFirstItem: isFirstItem && targetItemId === '0',
+		nestingLevel:
+			targetItemId === siteNavigationMenuItemId ? nestingLevel : 0,
 		targetRef: updateTargetRef,
 	};
 }

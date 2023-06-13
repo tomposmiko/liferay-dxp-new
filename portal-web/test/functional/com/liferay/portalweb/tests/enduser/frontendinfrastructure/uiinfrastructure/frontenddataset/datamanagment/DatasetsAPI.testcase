@@ -1,0 +1,54 @@
+@component-name = "portal-frontend-infrastructure"
+definition {
+
+	property custom.properties = "feature.flag.LPS-164563=true";
+	property portal.acceptance = "true";
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.component.names = "Frontend Dataset";
+	property testray.main.component.name = "User Interface";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if (${testPortalInstance} == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			FrontendDataSetAdmin.deleteAllDatasetEntries();
+		}
+	}
+
+	@description = "LPS-178777. Confirm that the user can create a dataset view via API"
+	@priority = 5
+	test CanCreateDatasetEntryViaAPI {
+		task ("Given creating a Data Set via API") {
+			FrontendDataSetAdmin.goToDatasetAdminPage();
+
+			FrontendDataSetAdmin.createDatasetEntryViaAPI(
+				datasetName = "Test Dataset",
+				restApplication = "/c/fdsentries");
+		}
+
+		task ("and given access Datasets admin page") {
+			FrontendDataSetAdmin.goToDatasetAdminPage();
+
+			WaitForElementPresent(
+				key_itemName = "Test Dataset",
+				locator1 = "FrontendDataSetAdmin#TABLE_CELL");
+		}
+
+		task ("Then the data set is shown in the list") {
+			AssertElementPresent(
+				key_itemName = "Test Dataset",
+				locator1 = "FrontendDataSetAdmin#TABLE_CELL");
+		}
+	}
+
+}

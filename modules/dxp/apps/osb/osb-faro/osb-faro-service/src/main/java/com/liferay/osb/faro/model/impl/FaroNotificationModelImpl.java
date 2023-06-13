@@ -71,7 +71,7 @@ public class FaroNotificationModelImpl
 	public static final Object[][] TABLE_COLUMNS = {
 		{"mvccVersion", Types.BIGINT}, {"faroNotificationId", Types.BIGINT},
 		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"createTime", Types.BIGINT}, {"userId", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"createTime", Types.BIGINT},
 		{"modifiedTime", Types.BIGINT}, {"ownerId", Types.BIGINT},
 		{"scope", Types.VARCHAR}, {"read_", Types.BOOLEAN},
 		{"type_", Types.VARCHAR}, {"subtype", Types.VARCHAR}
@@ -85,8 +85,8 @@ public class FaroNotificationModelImpl
 		TABLE_COLUMNS_MAP.put("faroNotificationId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("createTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("createTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("modifiedTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("ownerId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("scope", Types.VARCHAR);
@@ -96,7 +96,7 @@ public class FaroNotificationModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table OSBFaro_FaroNotification (mvccVersion LONG default 0 not null,faroNotificationId LONG not null primary key,groupId LONG,companyId LONG,createTime LONG,userId LONG,modifiedTime LONG,ownerId LONG,scope VARCHAR(75) null,read_ BOOLEAN,type_ VARCHAR(75) null,subtype VARCHAR(75) null)";
+		"create table OSBFaro_FaroNotification (mvccVersion LONG default 0 not null,faroNotificationId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,createTime LONG,modifiedTime LONG,ownerId LONG,scope VARCHAR(75) null,read_ BOOLEAN,type_ VARCHAR(75) null,subtype VARCHAR(75) null)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table OSBFaro_FaroNotification";
@@ -274,9 +274,9 @@ public class FaroNotificationModelImpl
 				"groupId", FaroNotification::getGroupId);
 			attributeGetterFunctions.put(
 				"companyId", FaroNotification::getCompanyId);
+			attributeGetterFunctions.put("userId", FaroNotification::getUserId);
 			attributeGetterFunctions.put(
 				"createTime", FaroNotification::getCreateTime);
-			attributeGetterFunctions.put("userId", FaroNotification::getUserId);
 			attributeGetterFunctions.put(
 				"modifiedTime", FaroNotification::getModifiedTime);
 			attributeGetterFunctions.put(
@@ -321,13 +321,13 @@ public class FaroNotificationModelImpl
 				(BiConsumer<FaroNotification, Long>)
 					FaroNotification::setCompanyId);
 			attributeSetterBiConsumers.put(
-				"createTime",
-				(BiConsumer<FaroNotification, Long>)
-					FaroNotification::setCreateTime);
-			attributeSetterBiConsumers.put(
 				"userId",
 				(BiConsumer<FaroNotification, Long>)
 					FaroNotification::setUserId);
+			attributeSetterBiConsumers.put(
+				"createTime",
+				(BiConsumer<FaroNotification, Long>)
+					FaroNotification::setCreateTime);
 			attributeSetterBiConsumers.put(
 				"modifiedTime",
 				(BiConsumer<FaroNotification, Long>)
@@ -425,30 +425,6 @@ public class FaroNotificationModelImpl
 	}
 
 	@Override
-	public long getCreateTime() {
-		return _createTime;
-	}
-
-	@Override
-	public void setCreateTime(long createTime) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_createTime = createTime;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getColumnOriginalValue(String)}
-	 */
-	@Deprecated
-	public long getOriginalCreateTime() {
-		return GetterUtil.getLong(
-			this.<Long>getColumnOriginalValue("createTime"));
-	}
-
-	@Override
 	public long getUserId() {
 		return _userId;
 	}
@@ -476,6 +452,30 @@ public class FaroNotificationModelImpl
 
 	@Override
 	public void setUserUuid(String userUuid) {
+	}
+
+	@Override
+	public long getCreateTime() {
+		return _createTime;
+	}
+
+	@Override
+	public void setCreateTime(long createTime) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_createTime = createTime;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public long getOriginalCreateTime() {
+		return GetterUtil.getLong(
+			this.<Long>getColumnOriginalValue("createTime"));
 	}
 
 	@Override
@@ -679,8 +679,8 @@ public class FaroNotificationModelImpl
 		faroNotificationImpl.setFaroNotificationId(getFaroNotificationId());
 		faroNotificationImpl.setGroupId(getGroupId());
 		faroNotificationImpl.setCompanyId(getCompanyId());
-		faroNotificationImpl.setCreateTime(getCreateTime());
 		faroNotificationImpl.setUserId(getUserId());
+		faroNotificationImpl.setCreateTime(getCreateTime());
 		faroNotificationImpl.setModifiedTime(getModifiedTime());
 		faroNotificationImpl.setOwnerId(getOwnerId());
 		faroNotificationImpl.setScope(getScope());
@@ -705,10 +705,10 @@ public class FaroNotificationModelImpl
 			this.<Long>getColumnOriginalValue("groupId"));
 		faroNotificationImpl.setCompanyId(
 			this.<Long>getColumnOriginalValue("companyId"));
-		faroNotificationImpl.setCreateTime(
-			this.<Long>getColumnOriginalValue("createTime"));
 		faroNotificationImpl.setUserId(
 			this.<Long>getColumnOriginalValue("userId"));
+		faroNotificationImpl.setCreateTime(
+			this.<Long>getColumnOriginalValue("createTime"));
 		faroNotificationImpl.setModifiedTime(
 			this.<Long>getColumnOriginalValue("modifiedTime"));
 		faroNotificationImpl.setOwnerId(
@@ -805,9 +805,9 @@ public class FaroNotificationModelImpl
 
 		faroNotificationCacheModel.companyId = getCompanyId();
 
-		faroNotificationCacheModel.createTime = getCreateTime();
-
 		faroNotificationCacheModel.userId = getUserId();
+
+		faroNotificationCacheModel.createTime = getCreateTime();
 
 		faroNotificationCacheModel.modifiedTime = getModifiedTime();
 
@@ -905,8 +905,8 @@ public class FaroNotificationModelImpl
 	private long _faroNotificationId;
 	private long _groupId;
 	private long _companyId;
-	private long _createTime;
 	private long _userId;
+	private long _createTime;
 	private long _modifiedTime;
 	private long _ownerId;
 	private String _scope;
@@ -948,8 +948,8 @@ public class FaroNotificationModelImpl
 		_columnOriginalValues.put("faroNotificationId", _faroNotificationId);
 		_columnOriginalValues.put("groupId", _groupId);
 		_columnOriginalValues.put("companyId", _companyId);
-		_columnOriginalValues.put("createTime", _createTime);
 		_columnOriginalValues.put("userId", _userId);
+		_columnOriginalValues.put("createTime", _createTime);
 		_columnOriginalValues.put("modifiedTime", _modifiedTime);
 		_columnOriginalValues.put("ownerId", _ownerId);
 		_columnOriginalValues.put("scope", _scope);
@@ -988,9 +988,9 @@ public class FaroNotificationModelImpl
 
 		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("createTime", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("createTime", 32L);
 
 		columnBitmasks.put("modifiedTime", 64L);
 

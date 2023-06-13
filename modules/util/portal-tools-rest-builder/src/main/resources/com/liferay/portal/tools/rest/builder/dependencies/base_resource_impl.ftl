@@ -72,6 +72,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -127,12 +128,12 @@ public abstract class Base${schemaName}ResourceImpl
 
 		<#if stringUtil.equals(javaMethodSignature.methodName, "delete" + schemaName)>
 			<#assign deleteBatchJavaMethodSignature = javaMethodSignature />
-		<#elseif stringUtil.equals(javaMethodSignature.methodName, "get" + parentSchemaName + schemaName + "sPage")>
-			<#if stringUtil.equals(javaMethodSignature.methodName, "getAssetLibrary" + schemaName + "sPage")>
+		<#elseif stringUtil.equals(javaMethodSignature.methodName, "get" + parentSchemaName + schemaNames + "Page")>
+			<#if stringUtil.equals(javaMethodSignature.methodName, "getAssetLibrary" + schemaNames + "Page")>
 				<#assign getAssetLibraryBatchJavaMethodSignature = javaMethodSignature />
-			<#elseif stringUtil.equals(javaMethodSignature.methodName, "getSite" + schemaName + "sPage")>
+			<#elseif stringUtil.equals(javaMethodSignature.methodName, "getSite" + schemaNames + "Page")>
 				<#assign getSiteBatchJavaMethodSignature = javaMethodSignature />
-			<#elseif stringUtil.equals(javaMethodSignature.methodName, "get" + parentSchemaName + schemaName + "sPage")>
+			<#elseif stringUtil.equals(javaMethodSignature.methodName, "get" + parentSchemaName + schemaNames + "Page")>
 				<#if parentSchemaName?has_content>
 					<#assign getParentBatchJavaMethodSignatures = getParentBatchJavaMethodSignatures + [javaMethodSignature] />
 				<#else>
@@ -181,7 +182,7 @@ public abstract class Base${schemaName}ResourceImpl
 				return responseBuilder.entity(
 					vulcanBatchEngineImportTaskResource.deleteImportTask(${javaDataType}.class.getName(), callbackURL, object)
 				).build();
-			<#elseif generateBatch && stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + schemaName + "sPageExportBatch")>
+			<#elseif generateBatch && stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + schemaNames + "PageExportBatch")>
 				vulcanBatchEngineExportTaskResource.setContextAcceptLanguage(contextAcceptLanguage);
 				vulcanBatchEngineExportTaskResource.setContextCompany(contextCompany);
 				vulcanBatchEngineExportTaskResource.setContextHttpServletRequest(contextHttpServletRequest);
@@ -417,6 +418,8 @@ public abstract class Base${schemaName}ResourceImpl
 
 			createStrategies = freeMarkerTool.getVulcanBatchImplementationCreateStrategies(javaMethodSignatures, properties)
 			updateStrategies = freeMarkerTool.getVulcanBatchImplementationUpdateStrategies(javaMethodSignatures)
+
+			parserMethodDataTypes = []
 		/>
 		@Override
 		@SuppressWarnings("PMD.UnusedLocalVariable")
@@ -775,6 +778,22 @@ public abstract class Base${schemaName}ResourceImpl
 				throw new UnsupportedOperationException("This method needs to be implemented");
 			</#if>
 		}
+
+		<#list freeMarkerTool.distinct(parserMethodDataTypes) as parserMethodDataType>
+			private ${parserMethodDataType} _parse${parserMethodDataType}(String value){
+				if (value != null){
+					<#if stringUtil.equals(parserMethodDataType, "Date")>
+						return new Date(value);
+					<#elseif stringUtil.equals(parserMethodDataType, "Integer")>
+						return Integer.parseInt(value);
+					<#else>
+						return ${parserMethodDataType}.parse${parserMethodDataType}(value);
+					</#if>
+				}
+
+				return null;
+			}
+		</#list>
 	</#if>
 
 	<#if generateGetPermissionCheckerMethods>
@@ -1141,15 +1160,25 @@ public abstract class Base${schemaName}ResourceImpl
 		(${type})parameters.get("${value}")
 	<#else>
 		<#if type?contains("java.lang.Boolean")>
-			Boolean.parseBoolean(
+			<#assign parserMethodDataTypes = parserMethodDataTypes + ["Boolean"] />
+
+			_parseBoolean(
 		<#elseif type?contains("java.util.Date")>
-			new java.util.Date(
+			<#assign parserMethodDataTypes = parserMethodDataTypes + ["Date"] />
+
+			_parseDate(
 		<#elseif type?contains("java.lang.Double")>
-			Double.parseDouble(
+			<#assign parserMethodDataTypes = parserMethodDataTypes + ["Double"] />
+
+			_parseDouble(
 		<#elseif type?contains("java.lang.Integer")>
-			Integer.parseInt(
+			<#assign parserMethodDataTypes = parserMethodDataTypes + ["Integer"] />
+
+			_parseInteger(
 		<#elseif type?contains("java.lang.Long")>
-			Long.parseLong(
+			<#assign parserMethodDataTypes = parserMethodDataTypes + ["Long"] />
+
+			_parseLong(
 		</#if>
 
 		(String)parameters.get("${value}")

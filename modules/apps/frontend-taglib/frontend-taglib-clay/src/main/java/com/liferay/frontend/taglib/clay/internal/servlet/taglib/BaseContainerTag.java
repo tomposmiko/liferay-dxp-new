@@ -15,14 +15,11 @@
 package com.liferay.frontend.taglib.clay.internal.servlet.taglib;
 
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolvedPackageNameUtil;
-import com.liferay.frontend.js.module.launcher.JSModuleResolver;
 import com.liferay.frontend.taglib.clay.internal.servlet.ServletContextUtil;
 import com.liferay.frontend.taglib.clay.internal.servlet.taglib.util.ServicesProvider;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
@@ -367,25 +364,8 @@ public class BaseContainerTag extends AttributesTagSupport {
 			String propsTransformer = null;
 
 			if (Validator.isNotNull(_propsTransformer)) {
-				String resolvedPackageName;
-
-				try {
-					resolvedPackageName = NPMResolvedPackageNameUtil.get(
-						getPropsTransformerServletContext());
-				}
-				catch (UnsupportedOperationException
-							unsupportedOperationException) {
-
-					if (_log.isDebugEnabled()) {
-						_log.debug(unsupportedOperationException);
-					}
-
-					JSModuleResolver jsModuleResolver =
-						ServicesProvider.getJSModuleResolver();
-
-					resolvedPackageName = jsModuleResolver.resolveModule(
-						getPropsTransformerServletContext(), null);
-				}
+				String resolvedPackageName = NPMResolvedPackageNameUtil.get(
+					getPropsTransformerServletContext());
 
 				propsTransformer =
 					resolvedPackageName + "/" + _propsTransformer;
@@ -532,9 +512,6 @@ public class BaseContainerTag extends AttributesTagSupport {
 		jspWriter.write(cssClasses);
 		jspWriter.write("\"");
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseContainerTag.class);
 
 	private Map<String, Object> _additionalProps;
 	private String _componentId;
