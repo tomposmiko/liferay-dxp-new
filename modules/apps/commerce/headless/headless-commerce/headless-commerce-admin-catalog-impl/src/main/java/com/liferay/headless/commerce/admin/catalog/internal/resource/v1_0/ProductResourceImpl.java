@@ -26,7 +26,6 @@ import com.liferay.commerce.product.exception.NoSuchCatalogException;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPDefinitionOptionRel;
-import com.liferay.commerce.product.model.CPDefinitionSpecificationOptionValue;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CPAttachmentFileEntryService;
@@ -104,9 +103,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -368,17 +369,11 @@ public class ProductResourceImpl
 			serviceContext.setExpandoBridgeAttributes(expandoBridgeAttributes);
 		}
 
-		Calendar displayCalendar = CalendarFactoryUtil.getCalendar(
-			serviceContext.getTimeZone());
+		DateConfig displayDateConfig = _getDisplayDateConfig(
+			product.getDisplayDate(), serviceContext.getTimeZone());
 
-		DateConfig displayDateConfig = new DateConfig(displayCalendar);
-
-		Calendar expirationCalendar = CalendarFactoryUtil.getCalendar(
-			serviceContext.getTimeZone());
-
-		expirationCalendar.add(Calendar.MONTH, 1);
-
-		DateConfig expirationDateConfig = new DateConfig(expirationCalendar);
+		DateConfig expirationDateConfig = _getExpirationDateConfig(
+			product.getExpirationDate(), serviceContext.getTimeZone());
 
 		ProductShippingConfiguration shippingConfiguration =
 			_getProductShippingConfiguration(product);
@@ -527,6 +522,17 @@ public class ProductResourceImpl
 		).build();
 	}
 
+	private DateConfig _getDisplayDateConfig(Date date, TimeZone timeZone) {
+		if (date == null) {
+			return new DateConfig(CalendarFactoryUtil.getCalendar(timeZone));
+		}
+
+		Calendar calendar = CalendarFactoryUtil.getCalendar(
+			date.getTime(), timeZone);
+
+		return new DateConfig(calendar);
+	}
+
 	private Map<String, Serializable> _getExpandoBridgeAttributes(
 		Attachment attachment) {
 
@@ -543,6 +549,22 @@ public class ProductResourceImpl
 			CPDefinition.class.getName(), contextCompany.getCompanyId(),
 			product.getCustomFields(),
 			contextAcceptLanguage.getPreferredLocale());
+	}
+
+	private DateConfig _getExpirationDateConfig(Date date, TimeZone timeZone) {
+		if (date == null) {
+			Calendar expirationCalendar = CalendarFactoryUtil.getCalendar(
+				timeZone);
+
+			expirationCalendar.add(Calendar.MONTH, 1);
+
+			return new DateConfig(expirationCalendar);
+		}
+
+		Calendar calendar = CalendarFactoryUtil.getCalendar(
+			date.getTime(), timeZone);
+
+		return new DateConfig(calendar);
 	}
 
 	private ProductShippingConfiguration _getProductShippingConfiguration(
@@ -669,35 +691,19 @@ public class ProductResourceImpl
 			product.getProductSpecifications();
 
 		if (productSpecifications != null) {
+			_cpDefinitionSpecificationOptionValueService.
+				deleteCPDefinitionSpecificationOptionValues(
+					cpDefinition.getCPDefinitionId());
+
 			for (ProductSpecification productSpecification :
 					productSpecifications) {
 
-				CPDefinitionSpecificationOptionValue
-					cpDefinitionSpecificationOptionValue = null;
-
-				if (productSpecification.getId() != null) {
-					cpDefinitionSpecificationOptionValue =
-						_cpDefinitionSpecificationOptionValueService.
-							fetchCPDefinitionSpecificationOptionValue(
-								productSpecification.getId());
-				}
-
-				if (cpDefinitionSpecificationOptionValue == null) {
-					ProductSpecificationUtil.
-						addCPDefinitionSpecificationOptionValue(
-							_cpDefinitionSpecificationOptionValueService,
-							_cpSpecificationOptionService,
-							cpDefinition.getCPDefinitionId(),
-							productSpecification, serviceContext);
-				}
-				else {
-					ProductSpecificationUtil.
-						updateCPDefinitionSpecificationOptionValue(
-							_cpDefinitionSpecificationOptionValueService,
-							cpDefinitionSpecificationOptionValue,
-							_cpSpecificationOptionService, productSpecification,
-							serviceContext);
-				}
+				ProductSpecificationUtil.
+					addCPDefinitionSpecificationOptionValue(
+						_cpDefinitionSpecificationOptionValueService,
+						_cpSpecificationOptionService,
+						cpDefinition.getCPDefinitionId(), productSpecification,
+						serviceContext);
 			}
 		}
 
