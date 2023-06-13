@@ -13,10 +13,11 @@
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
+import ClayDropDown from '@clayui/drop-down';
+import ClayIcon from '@clayui/icon';
 import ClayList from '@clayui/list';
-import {ClayTooltipProvider} from '@clayui/tooltip';
 import classNames from 'classnames';
-import React, {useContext, useRef} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import {useDrag, useDrop} from 'react-dnd';
 
 import ViewContext, {TYPES} from '../context';
@@ -24,14 +25,14 @@ import ViewContext, {TYPES} from '../context';
 import './BuilderListItem.scss';
 
 interface Iprops {
+	aliasColumnText?: string;
 	index: number;
 	isDefaultSort?: boolean;
 	label?: string;
 	objectFieldName: string;
+	onEditing?: (boolean: boolean) => void;
 	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onEditingSort?: (boolean: boolean) => void;
-	onVisibleModal?: (boolean: boolean) => void;
-	sortOrder?: string;
+	onVisibleEditModal?: (boolean: boolean) => void;
 }
 
 type TItemHover = {
@@ -45,17 +46,21 @@ type TDraggedOffset = {
 } | null;
 
 const BuilderListItem: React.FC<Iprops> = ({
+	aliasColumnText,
 	index,
 	isDefaultSort,
 	label,
 	objectFieldName,
+	onEditing,
 	onEditingObjectFieldName,
-	onEditingSort,
-	onVisibleModal,
-	sortOrder,
+	onVisibleEditModal,
 }) => {
+	const [active, setActive] = useState<boolean>(false);
 	const [
-		{isFFObjectViewSortColumnConfigurationEnabled},
+		{
+			isFFObjectViewColumnAliasEnabled,
+			isFFObjectViewSortColumnConfigurationEnabled,
+		},
 		dispatch,
 	] = useContext(ViewContext);
 
@@ -143,8 +148,8 @@ const BuilderListItem: React.FC<Iprops> = ({
 
 	const handleEnableEditModal = (objectFieldName: string) => {
 		onEditingObjectFieldName && onEditingObjectFieldName(objectFieldName);
-		onEditingSort && onEditingSort(true);
-		onVisibleModal && onVisibleModal(true);
+		onEditing && onEditing(true);
+		onVisibleEditModal && onVisibleEditModal(true);
 	};
 
 	return (
@@ -166,44 +171,68 @@ const BuilderListItem: React.FC<Iprops> = ({
 				<ClayList.ItemTitle>{label}</ClayList.ItemTitle>
 			</ClayList.ItemField>
 
-			{isDefaultSort && (
-				<ClayList.ItemField
-					className="lfr-object__object-builder-list-item-sort-order"
-					expand
-				>
-					<ClayList.ItemText>
-						{sortOrder === 'asc'
-							? Liferay.Language.get('ascending')
-							: Liferay.Language.get('descending')}
-					</ClayList.ItemText>
-				</ClayList.ItemField>
-			)}
+			<ClayList.ItemField
+				className="lfr-object__object-builder-list-item-sort-order"
+				expand
+			>
+				<ClayList.ItemText>{aliasColumnText}</ClayList.ItemText>
+			</ClayList.ItemField>
 
-			<ClayList.ItemField className="lfr-object__object-custom-view-builder-item-action-menu">
-				{isDefaultSort && (
-					<ClayTooltipProvider>
-						<ClayList.QuickActionMenu.Item
-							data-tooltip-align="bottom"
+			<ClayDropDown
+				active={active}
+				onActiveChange={setActive}
+				trigger={
+					<ClayButtonWithIcon
+						displayType="unstyled"
+						symbol="ellipsis-v"
+					/>
+				}
+			>
+				<ClayDropDown.ItemList>
+					{isFFObjectViewColumnAliasEnabled ? (
+						<ClayDropDown.Item
 							onClick={() =>
 								handleEnableEditModal(objectFieldName)
 							}
-							symbol="pencil"
-							title={Liferay.Language.get('Edit')}
-						/>
-					</ClayTooltipProvider>
-				)}
+						>
+							<ClayIcon
+								className="lfr-object__object-custom-view-builder-item-icon"
+								symbol="pencil"
+							/>
 
-				<ClayTooltipProvider>
-					<ClayList.QuickActionMenu.Item
-						data-tooltip-align="bottom"
+							{Liferay.Language.get('edit')}
+						</ClayDropDown.Item>
+					) : (
+						isDefaultSort && (
+							<ClayDropDown.Item
+								onClick={() =>
+									handleEnableEditModal(objectFieldName)
+								}
+							>
+								<ClayIcon
+									className="lfr-object__object-custom-view-builder-item-icon"
+									symbol="pencil"
+								/>
+
+								{Liferay.Language.get('edit')}
+							</ClayDropDown.Item>
+						)
+					)}
+
+					<ClayDropDown.Item
 						onClick={() =>
 							handleDeleteColumn(objectFieldName, isDefaultSort)
 						}
-						symbol="times"
-						title={Liferay.Language.get('Delete')}
-					/>
-				</ClayTooltipProvider>
-			</ClayList.ItemField>
+					>
+						<ClayIcon
+							className="lfr-object__object-custom-view-builder-item-icon"
+							symbol="trash"
+						/>
+
+						{Liferay.Language.get('delete')}
+					</ClayDropDown.Item>
+				</ClayDropDown.ItemList>
+			</ClayDropDown>
 		</ClayList.Item>
 	);
 };

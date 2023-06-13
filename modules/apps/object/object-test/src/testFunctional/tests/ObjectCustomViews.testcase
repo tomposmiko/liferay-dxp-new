@@ -1,6 +1,7 @@
 @component-name = "portal-object"
 definition {
 
+	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Object";
@@ -374,12 +375,28 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify it is possible to search for a View"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanSearchView {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147753",
+			objectName = "CustomObject147753",
+			pluralLabelName = "Custom Objects 147753");
 
-		// TODO LPS-147753 CanSearchView pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147753");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "View A");
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom B");
+
+		Search.searchCP(searchTerm = "View A");
+
+		ObjectCustomViews.assertObjectView(viewLabel = "View A");
+
+		ObjectCustomViews.assertObjectViewNotPresent(viewLabel = "Custom B");
 	}
 
 	@description = "LPS-135394 - Verify it is possible to update a View"
@@ -409,6 +426,15 @@ definition {
 		Refresh();
 
 		ObjectCustomViews.assertObjectView(viewLabel = "New Custom Views");
+	}
+
+	@description = "LPS-148955 - Verify it is possible to view the values of 2 or more relationship fields for a same object"
+	@ignore = "Test Stub"
+	@priority = "4"
+	test CanView2RelationshipFieldValues {
+
+		// TODO LPS-149238 CanView2RelationshipFieldValues pending implementation
+
 	}
 
 	@description = "LPS-144902 - Verify if the entries from an object in a table view defined as default are presented correctly"
@@ -465,6 +491,16 @@ definition {
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject147770");
 
 		ObjectPortlet.viewEntry(entry = "Entry Test");
+	}
+
+	@description = "LPS-143190 - Verify that the metadata values are correctly displayed on a Custom View"
+	@ignore = "Test Stub"
+	@priority = "5"
+	test CanViewMetadataValues {
+		property portal.acceptance = "true";
+
+		// TODO LPS-149239 CanViewMetadataValues pending implementation
+
 	}
 
 	@description = "LPS-144902 - Verify if selected Columns on custom view are presented correctly during visualization"
@@ -531,24 +567,82 @@ definition {
 		}
 	}
 
-	@description = "LPS-144902 - Verify that custom view title is presented correctly"
-	@ignore = "Test Stub"
-	@priority = "5"
-	test CanViewTitle {
-		property portal.acceptance = "true";
-
-		// TODO LPS-147773 CanViewTitle pending implementation
-
-	}
-
 	@description = "LPS-144902 - Verify if the Columns on the custom view are presented following the predefined order during visualization"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test ColumnsAreOrdered {
 		property portal.acceptance = "true";
 
-		// TODO LPS-147772 ColumnsAreOrdered pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147772",
+			objectName = "CustomObject147772",
+			pluralLabelName = "Custom Objects 147772");
 
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldBusinessType = "Text",
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject147772");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147772");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.markViewAsDefault();
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		for (var columnOption : list "Author,Creation Date,ID") {
+			Click.clickAtNotVisible(
+				key_columnOption = "${columnOption}",
+				locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+		}
+
+		ObjectCustomViews.saveColumnsModal();
+
+		DragAndDrop.javaScriptDragAndDropToUp(
+			key_columnName = "Creation Date",
+			key_colunmName1 = "Author",
+			key_position = "1",
+			locator1 = "ObjectCustomViews#VIEW_BUILDER_SEARCH_RESULT",
+			locator2 = "ObjectCustomViews#VIEW_LIST_COLUMNS_BY_POSITION",
+			value1 = "");
+
+		Button.clickSave();
+
+		Navigator.openURL();
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject147772");
+
+		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+			fieldName = "customObjectField",
+			objectName = "CustomObject147772",
+			value = "Entry Test");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject147772");
+
+		WaitForPageLoad();
+
+		ObjectCustomViews.viewColumnsOrder(
+			colunmName = "Created Date",
+			position = "1");
+
+		ObjectCustomViews.viewColumnsOrder(
+			colunmName = "Author",
+			position = "2");
+
+		ObjectCustomViews.viewColumnsOrder(
+			colunmName = "ID",
+			position = "3");
 	}
 
 	@description = "LPS-135394 - Verify the empty state for the View Builder tab"
@@ -580,13 +674,13 @@ definition {
 	@priority = "3"
 	test EmptyStateViewTab {
 		ObjectAdmin.addObjectViaAPI(
-			labelName = "Custom Object",
-			objectName = "CustomObject",
-			pluralLabelName = "Custom Objects");
+			labelName = "Custom Object 201",
+			objectName = "CustomObject201",
+			pluralLabelName = "Custom Objects 201");
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectPortlet.selectCustomObject(label = "Custom Object");
+		ObjectPortlet.selectCustomObject(label = "Custom Object 201");
 
 		ObjectCustomViews.goToViewsTab();
 
@@ -628,19 +722,19 @@ definition {
 	@priority = "3"
 	test NoResultMessageView {
 		ObjectAdmin.addObjectViaAPI(
-			labelName = "Custom Object",
-			objectName = "CustomObject",
-			pluralLabelName = "Custom Objects");
+			labelName = "Custom Object 202",
+			objectName = "CustomObject202",
+			pluralLabelName = "Custom Objects 202");
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectPortlet.selectCustomObject(label = "Custom Object");
+		ObjectPortlet.selectCustomObject(label = "Custom Object 202");
 
 		ObjectCustomViews.goToViewsTab();
 
 		ObjectCustomViews.addObjectViewViaUI(labelName = "Custom View");
 
-		Search.searchCP(searchTerm = "ObjectTest");
+		Search.searchCP(searchTerm = "ObjectTest202");
 
 		AssertTextEquals(
 			locator1 = "Message#EMPTY_INFO",

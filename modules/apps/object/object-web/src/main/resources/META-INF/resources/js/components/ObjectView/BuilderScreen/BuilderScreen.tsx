@@ -16,18 +16,20 @@ import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import ClayEmptyState from '@clayui/empty-state';
 import ClayList from '@clayui/list';
 import ClayManagementToolbar from '@clayui/management-toolbar';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 
 import Card from '../../Card/Card';
 import {ManagementToolbarSearch} from '../ManagementToolbarSearch/ManagementToolbarSearch';
+import ViewContext from '../context';
 import {TObjectViewSortColumn} from '../types';
 import BuilderListItem from './BuilderListItem';
 
 import './BuilderScreen.scss';
 
 interface IProps {
+	aliasColumnHeader: string;
 	emptyState: {
 		buttonText: string;
 		description: string;
@@ -35,21 +37,28 @@ interface IProps {
 	};
 	isDefaultSort?: boolean;
 	objectColumns: TObjectViewSortColumn[];
+	onEditing?: (boolean: boolean) => void;
 	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onEditingSort?: (boolean: boolean) => void;
+	onVisibleEditModal: (boolean: boolean) => void;
 	onVisibleModal: (boolean: boolean) => void;
 	title: string;
 }
 
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
+
 export function BuilderScreen({
+	aliasColumnHeader,
 	emptyState,
 	isDefaultSort,
 	objectColumns,
+	onEditing,
 	onEditingObjectFieldName,
-	onEditingSort,
+	onVisibleEditModal,
 	onVisibleModal,
 	title,
 }: IProps) {
+	const [{isFFObjectViewColumnAliasEnabled}] = useContext(ViewContext);
+
 	const [query, setQuery] = useState('');
 	const [filteredItems, setFilteredItems] = useState(objectColumns);
 
@@ -59,7 +68,7 @@ export function BuilderScreen({
 
 	const newFilteredItems = filteredItems.filter(
 		(objectColumns: TObjectViewSortColumn) =>
-			objectColumns.label.toLowerCase().includes(query.toLowerCase())
+			objectColumns.fieldLabel.toLowerCase().includes(query.toLowerCase())
 	);
 
 	return (
@@ -102,18 +111,14 @@ export function BuilderScreen({
 													</ClayList.ItemField>
 												</ClayList.ItemField>
 
-												{isDefaultSort && (
-													<ClayList.ItemField
-														className="object-builder-screen-sorting"
-														expand
-													>
-														<ClayList.ItemField>
-															{Liferay.Language.get(
-																'sorting'
-															)}
-														</ClayList.ItemField>
+												<ClayList.ItemField
+													className="object-builder-screen-second-column"
+													expand
+												>
+													<ClayList.ItemField>
+														{aliasColumnHeader}
 													</ClayList.ItemField>
-												)}
+												</ClayList.ItemField>
 											</ClayList.Item>
 										)}
 
@@ -127,7 +132,7 @@ export function BuilderScreen({
 
 											<ClayList.ItemField expand>
 												<ClayList.ItemTitle>
-													{viewColumn.label}
+													{viewColumn.fieldLabel}
 												</ClayList.ItemTitle>
 											</ClayList.ItemField>
 
@@ -179,35 +184,48 @@ export function BuilderScreen({
 													</ClayList.ItemField>
 												</ClayList.ItemField>
 
-												{isDefaultSort && (
-													<ClayList.ItemField
-														className="object-builder-screen-sorting"
-														expand
-													>
-														<ClayList.ItemField>
-															{Liferay.Language.get(
-																'sorting'
-															)}
-														</ClayList.ItemField>
+												<ClayList.ItemField
+													className="object-builder-screen-second-column"
+													expand
+												>
+													<ClayList.ItemField>
+														{aliasColumnHeader}
 													</ClayList.ItemField>
-												)}
+												</ClayList.ItemField>
 											</ClayList.Item>
 										)}
 
 										<DndProvider backend={HTML5Backend}>
 											<BuilderListItem
+												aliasColumnText={
+													isDefaultSort
+														? viewColumn.sortOrder ===
+														  'asc'
+															? Liferay.Language.get(
+																	'ascending'
+															  )
+															: Liferay.Language.get(
+																	'descending'
+															  )
+														: isFFObjectViewColumnAliasEnabled
+														? viewColumn.label[
+																defaultLanguageId
+														  ]
+														: ''
+												}
 												index={index}
 												isDefaultSort={isDefaultSort}
-												label={viewColumn.label}
+												label={viewColumn.fieldLabel}
 												objectFieldName={
 													viewColumn.objectFieldName
 												}
+												onEditing={onEditing}
 												onEditingObjectFieldName={
 													onEditingObjectFieldName
 												}
-												onEditingSort={onEditingSort}
-												onVisibleModal={onVisibleModal}
-												sortOrder={viewColumn.sortOrder}
+												onVisibleEditModal={
+													onVisibleEditModal
+												}
 											/>
 										</DndProvider>
 									</React.Fragment>

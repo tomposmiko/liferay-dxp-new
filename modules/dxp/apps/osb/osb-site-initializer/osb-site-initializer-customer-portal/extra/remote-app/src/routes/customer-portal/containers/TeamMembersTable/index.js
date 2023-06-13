@@ -9,13 +9,29 @@
  * distribution rights of the Software.
  */
 
+import ClayAlert from '@clayui/alert';
 import {useEffect, useMemo, useState} from 'react';
 import client from '../../../../apolloClient';
 import {Table} from '../../../../common/components';
 import {Liferay} from '../../../../common/services/liferay';
-import {getAccountUserAccountsByExternalReferenceCode} from '../../../../common/services/liferay/graphql/queries';
+import {
+	associateUserAccountWithAccountAndAccountRole,
+	deleteAccountUserAccount,
+	getAccountUserAccountsByExternalReferenceCode,
+} from '../../../../common/services/liferay/graphql/queries';
+import {
+	associateContactRoleNameByEmailByProject,
+	deleteContactRoleNameByEmailByProject,
+} from '../../../../common/services/liferay/rest/raysource/LicenseKeys';
 import {ROLE_TYPES} from '../../../../common/utils/constants';
 import TeamMembersTableHeader from './components/Header';
+import RemoveUserModal from './components/RemoveUserModal';
+import useAccountUser from './hooks/useAccountUser';
+import {
+	STATUS_ACTION_TYPES,
+	STATUS_NAME_TYPES,
+	TEAM_MEMBERS_ACTION_TYPES,
+} from './utils/constants';
 import {
 	NameColumnType,
 	OptionsColumnType,
@@ -23,13 +39,25 @@ import {
 	StatusColumnType,
 	SupportSeatColumnType,
 } from './utils/constants/columns-definitions';
+import {deleteAllPreviousUserRoles} from './utils/deleteAllPreviousUserRoles';
 import {getColumnsByUserAccess} from './utils/getColumnsByUserAccess';
 
 const MAX_PAGE_SIZE = 9999;
+const ROLE_FILTER_NAME = 'contactRoleNames';
+const ALERT_TIMEOUT = 3000;
 
-const TeamMembersTable = ({project, sessionId}) => {
+const TeamMembersTable = ({licenseKeyDownloadURL, project, sessionId}) => {
+	const {
+		accountRoles,
+		administratorsAvailable,
+		setAdministratorsAvailable,
+	} = useAccountUser(project);
+
 	const [userAccounts, setUserAccounts] = useState([]);
 	const [isLoadingUserAccounts, setIsLoadingUserAccounts] = useState(false);
+	const [userAction, setUserAction] = useState();
+	const [selectedRole, setSelectedRole] = useState();
+	const [userActionStatus, setUserActionStatus] = useState();
 
 	useEffect(() => {
 		setIsLoadingUserAccounts(true);
@@ -63,6 +91,7 @@ const TeamMembersTable = ({project, sessionId}) => {
 					},
 					[]
 				);
+
 				setUserAccounts(accountUserAccounts);
 			}
 
@@ -70,6 +99,103 @@ const TeamMembersTable = ({project, sessionId}) => {
 		};
 		getAccountUserAccounts();
 	}, [project.accountKey]);
+
+	const handleChangeUserRole = async (userAccount) => {
+		if (selectedRole) {
+			const currentRole = accountRoles?.find(
+				(role) => role?.name === selectedRole
+			);
+
+			deleteAllPreviousUserRoles(
+				project.accountKey,
+				userAccount,
+				accountRoles
+			);
+
+			client.mutate({
+				mutation: associateUserAccountWithAccountAndAccountRole,
+				variables: {
+					accountKey: project.accountKey,
+					accountRoleId: currentRole.id,
+					emailAddress: userAccount?.emailAddress,
+				},
+			});
+
+			associateContactRoleNameByEmailByProject(
+				project.accountKey,
+				licenseKeyDownloadURL,
+				sessionId,
+				encodeURI(userAccount?.emailAddress),
+				currentRole?.raysourceName
+			);
+
+			setUserAccounts((previousUserAccounts) => {
+				const newUserAcconts = [...previousUserAccounts];
+				const accountIndexToUpdate = newUserAcconts.findIndex(
+					(userType) => userType?.id === userAccount?.id
+				);
+
+				if (accountIndexToUpdate !== -1) {
+					newUserAcconts[accountIndexToUpdate] = {
+						...newUserAcconts[accountIndexToUpdate],
+						roles: [currentRole?.key],
+					};
+				}
+
+				return newUserAcconts;
+			});
+			setUserActionStatus(STATUS_NAME_TYPES.onEditSuccess);
+			setSelectedRole();
+		}
+		setUserAction(TEAM_MEMBERS_ACTION_TYPES.close);
+	};
+
+	const handleRemoveUser = async () => {
+		const userToBeRemoved = userAccounts.find(
+			(userAccount) => userAccount.id === userAction?.userId
+		);
+
+		if (userToBeRemoved) {
+			await client.mutate({
+				mutation: deleteAccountUserAccount,
+				variables: {
+					accountKey: project.accountKey,
+					emailAddress: userToBeRemoved?.emailAddress,
+				},
+			});
+
+			const rolesToBeRemoved = userToBeRemoved.roles.reduce(
+				(rolesAccumulator, role, index) => {
+					const raysourceRole = accountRoles.find(
+						(roleType) => roleType.name === role
+					);
+
+					return `${rolesAccumulator}${
+						index > 0
+							? `&${ROLE_FILTER_NAME}=${raysourceRole?.raysourceName}`
+							: `${ROLE_FILTER_NAME}=${raysourceRole?.raysourceName}`
+					}`;
+				},
+				''
+			);
+
+			deleteContactRoleNameByEmailByProject(
+				project.accountKey,
+				licenseKeyDownloadURL,
+				sessionId,
+				encodeURI(userToBeRemoved?.emailAddress),
+				rolesToBeRemoved
+			);
+
+			setUserAccounts((previousUserAccounts) =>
+				previousUserAccounts.filter(
+					(userAccount) => userAccount.id !== userAction.userId
+				)
+			);
+
+			setUserActionStatus(STATUS_NAME_TYPES.onRemoveSuccess);
+		}
+	};
 
 	const hasAdminAccess = useMemo(() => {
 		const currentUser = userAccounts?.find(
@@ -80,7 +206,8 @@ const TeamMembersTable = ({project, sessionId}) => {
 			const hasAdminRoles = currentUser?.roles?.some(
 				(role) =>
 					role === ROLE_TYPES.admin.key ||
-					role === ROLE_TYPES.requester.key
+					role === ROLE_TYPES.requester.key ||
+					role === ROLE_TYPES.partnerManager.key
 			);
 
 			return hasAdminRoles;
@@ -91,10 +218,18 @@ const TeamMembersTable = ({project, sessionId}) => {
 
 	return (
 		<div className="pt-2">
+			<RemoveUserModal
+				onRemoveTeamMember={handleRemoveUser}
+				setUserAction={setUserAction}
+				userAction={userAction}
+			/>
+
 			<TeamMembersTableHeader
+				administratorsAvailable={administratorsAvailable}
 				hasAdminAccess={hasAdminAccess}
 				project={project}
 				sessionId={sessionId}
+				setAdministratorsAvailable={setAdministratorsAvailable}
 				setUserAccounts={setUserAccounts}
 				userAccounts={userAccounts}
 			/>
@@ -110,8 +245,24 @@ const TeamMembersTable = ({project, sessionId}) => {
 						</p>
 					),
 					name: <NameColumnType userAccount={userAccount} />,
-					options: <OptionsColumnType />,
-					role: <RoleColumnType roles={userAccount?.roles} />,
+					options: (
+						<OptionsColumnType
+							confirmChanges={handleChangeUserRole}
+							setSelectedRole={setSelectedRole}
+							setUserAction={setUserAction}
+							userAccount={userAccount}
+							userAction={userAction}
+						/>
+					),
+					role: (
+						<RoleColumnType
+							accountRoles={accountRoles}
+							selectedRole={selectedRole}
+							setSelectedRole={setSelectedRole}
+							userAccount={userAccount}
+							userAction={userAction}
+						/>
+					),
 					status: (
 						<StatusColumnType
 							hasLoggedBefore={userAccount?.lastLoginDate}
@@ -122,6 +273,21 @@ const TeamMembersTable = ({project, sessionId}) => {
 					),
 				}))}
 			/>
+
+			{userActionStatus && (
+				<ClayAlert.ToastContainer>
+					<ClayAlert
+						autoClose={ALERT_TIMEOUT}
+						className="cp-activation-key-download-alert px-4 py-3 text-paragraph"
+						displayType={
+							STATUS_ACTION_TYPES[userActionStatus]?.type
+						}
+						onClose={() => setUserActionStatus('')}
+					>
+						{STATUS_ACTION_TYPES[userActionStatus]?.message}
+					</ClayAlert>
+				</ClayAlert.ToastContainer>
+			)}
 		</div>
 	);
 };

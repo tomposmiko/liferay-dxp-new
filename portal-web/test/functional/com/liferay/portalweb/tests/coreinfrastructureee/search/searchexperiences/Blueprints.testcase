@@ -358,10 +358,10 @@ definition {
 
 	test BoostCustomLiferayObjectType {
 		ObjectAdmin.addObjectViaAPI(
-			labelName = "Custom Object",
-			objectName = "CustomObject",
+			labelName = "Custom Object 501",
+			objectName = "CustomObject501",
 			panelCategoryKey = "site_administration.content",
-			pluralLabelName = "Custom Objects",
+			pluralLabelName = "Custom Objects 501",
 			scope = "site");
 
 		ObjectAdmin.addObjectFieldViaAPI(
@@ -370,11 +370,11 @@ definition {
 			fieldName = "title",
 			fieldType = "String",
 			isRequired = "false",
-			objectName = "CustomObject");
+			objectName = "CustomObject501");
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectPortlet.selectCustomObject(label = "Custom Object");
+		ObjectPortlet.selectCustomObject(label = "Custom Object 501");
 
 		CreateObject.selectTitleField(fieldLabel = "Title");
 
@@ -384,7 +384,7 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
-			portlet = "Custom Objects");
+			portlet = "Custom Objects 501");
 
 		LexiconEntry.gotoAdd();
 
@@ -418,22 +418,18 @@ definition {
 		Button.click(button = "Select Asset Types");
 
 		AssertElementPresent(
-			assetType = "Custom Object",
+			assetType = "Custom Object 501",
 			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
 
 		Click(locator1 = "Modal#CLOSE_BUTTON");
 
 		Navigator.gotoNavNested(navNested = "Query Elements");
 
-		Click(
-			ariaLabel = "Add Query Element",
-			locator1 = "Button#ANY_WITH_ARIA_LABEL");
-
 		Blueprints.addElement(element = "Boost Asset Type");
 
 		Blueprints.configureElementDropdown(
 			dropdownName = "Asset Type",
-			option = "Custom Object");
+			option = "Custom Object 501");
 
 		Type(
 			elementName = "Boost Asset Type",
@@ -1206,9 +1202,21 @@ definition {
 
 		AssertNotVisible(locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_HEADER");
 
+		Navigator.gotoNavNested(navNested = "Query Settings");
+
+		Navigator.gotoNavNested(navNested = "Query Elements");
+
+		AssertNotVisible(locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_HEADER");
+
 		Click(
 			ariaLabel = "Add Query Element",
 			locator1 = "Button#ANY_WITH_ARIA_LABEL");
+
+		AssertVisible(locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_HEADER");
+
+		Navigator.gotoNavNested(navNested = "Query Settings");
+
+		Navigator.gotoNavNested(navNested = "Query Elements");
 
 		AssertVisible(locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_HEADER");
 	}
@@ -2091,13 +2099,13 @@ definition {
 		PortletEntry.save();
 
 		AssertTextEquals(
-			cellPosition = "1",
+			cellPosition = "2",
 			entryTitle = "Test Blueprint",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "Test Blueprint");
 
 		AssertTextEquals(
-			cellPosition = "2",
+			cellPosition = "3",
 			entryTitle = "Test Blueprint",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "Test Description");
@@ -2105,13 +2113,13 @@ definition {
 		var blueprintId = Blueprints.getBlueprintID(title = "Test Blueprint");
 
 		AssertTextEquals(
-			cellPosition = "3",
+			cellPosition = "4",
 			entryTitle = "Test Blueprint",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "${blueprintId}");
 
 		AssertTextEquals(
-			cellPosition = "4",
+			cellPosition = "5",
 			entryTitle = "Test Blueprint",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "Test Test");
@@ -2119,13 +2127,13 @@ definition {
 		var currentDate = DateUtil.getFormattedCurrentDate("MMM d, yyyy");
 
 		AssertTextEquals.assertPartialText(
-			cellPosition = "5",
+			cellPosition = "6",
 			entryTitle = "Test Blueprint",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "${currentDate}");
 
 		AssertTextEquals.assertPartialText(
-			cellPosition = "6",
+			cellPosition = "7",
 			entryTitle = "Test Blueprint",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "${currentDate}");
@@ -2706,13 +2714,13 @@ definition {
 		PortletEntry.save();
 
 		AssertTextEquals(
-			cellPosition = "1",
+			cellPosition = "2",
 			entryTitle = "Test Element",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "Test Element");
 
 		AssertTextEquals(
-			cellPosition = "2",
+			cellPosition = "3",
 			entryTitle = "Test Element",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "Test Element Description");
@@ -2720,13 +2728,13 @@ definition {
 		var elementId = Blueprints.getElementID(title = "Test Element");
 
 		AssertTextEquals(
-			cellPosition = "3",
+			cellPosition = "4",
 			entryTitle = "Test Element",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "${elementId}");
 
 		AssertTextEquals(
-			cellPosition = "4",
+			cellPosition = "5",
 			entryTitle = "Test Element",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "Test Test");
@@ -2734,13 +2742,13 @@ definition {
 		var currentDate = DateUtil.getFormattedCurrentDate("MMM d, yyyy");
 
 		AssertTextEquals.assertPartialText(
-			cellPosition = "5",
+			cellPosition = "6",
 			entryTitle = "Test Element",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "${currentDate}");
 
 		AssertTextEquals.assertPartialText(
-			cellPosition = "6",
+			cellPosition = "7",
 			entryTitle = "Test Element",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CELL",
 			value1 = "${currentDate}");

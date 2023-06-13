@@ -1,0 +1,15 @@
+definition {
+
+	macro deleteLanguage {
+		Click(locator1 = "ManageTranslations#LIST_ITEM_DELETE_LANGUAGE_BUTTON");
+
+		Click(locator1 = "Button#DONE");
+	}
+
+	macro searchLanguage {
+		Type.type(
+			locator1 = "ManageTranslations#SEARCH_FIELD",
+			value1 = "${key_language}");
+	}
+
+}

@@ -23,5 +23,6 @@ export const liferayUserAccountFragment = gql`
 		givenName
 		id
 		image
+		password
 	}
 `;

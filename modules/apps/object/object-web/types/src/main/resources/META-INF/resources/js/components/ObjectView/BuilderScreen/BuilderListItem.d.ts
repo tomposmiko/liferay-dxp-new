@@ -15,14 +15,14 @@
 import React from 'react';
 import './BuilderListItem.scss';
 interface Iprops {
+	aliasColumnText?: string;
 	index: number;
 	isDefaultSort?: boolean;
 	label?: string;
 	objectFieldName: string;
+	onEditing?: (boolean: boolean) => void;
 	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onEditingSort?: (boolean: boolean) => void;
-	onVisibleModal?: (boolean: boolean) => void;
-	sortOrder?: string;
+	onVisibleEditModal?: (boolean: boolean) => void;
 }
 declare const BuilderListItem: React.FC<Iprops>;
 export default BuilderListItem;

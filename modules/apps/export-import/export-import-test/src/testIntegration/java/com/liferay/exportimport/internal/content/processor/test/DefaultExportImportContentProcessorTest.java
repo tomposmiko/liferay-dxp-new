@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.VirtualLayoutConstants;
+import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
 import com.liferay.portal.kernel.repository.capabilities.ThumbnailCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
@@ -491,8 +492,8 @@ public class DefaultExportImportContentProcessorTest {
 
 		Group group = user.getGroup();
 
-		Layout privateLayout = LayoutTestUtil.addLayout(group, true);
-		Layout publicLayout = LayoutTestUtil.addLayout(group, false);
+		Layout privateLayout = LayoutTestUtil.addTypePortletLayout(group, true);
+		Layout publicLayout = LayoutTestUtil.addTypePortletLayout(group, false);
 
 		PortletDataContext portletDataContextExport =
 			PortletDataContextFactoryUtil.createExportPortletDataContext(
@@ -647,8 +648,8 @@ public class DefaultExportImportContentProcessorTest {
 
 	@Test
 	public void testImportLinksToLayoutsIdsReplacement() throws Exception {
-		LayoutTestUtil.addLayout(_liveGroup, true);
-		LayoutTestUtil.addLayout(_liveGroup, false);
+		LayoutTestUtil.addTypePortletLayout(_liveGroup, true);
+		LayoutTestUtil.addTypePortletLayout(_liveGroup, false);
 
 		_exportImportLayouts(true);
 		_exportImportLayouts(false);
@@ -692,7 +693,7 @@ public class DefaultExportImportContentProcessorTest {
 	public void testImportLinksToLayoutsInLayoutSetPrototype()
 		throws Exception {
 
-		LayoutTestUtil.addLayout(_liveGroup, true);
+		LayoutTestUtil.addTypePortletLayout(_liveGroup, true);
 
 		_exportImportLayouts(true);
 
@@ -798,7 +799,7 @@ public class DefaultExportImportContentProcessorTest {
 			friendlyURLMap.put(locale, friendlyURL);
 		}
 
-		return LayoutTestUtil.addLayout(
+		return LayoutTestUtil.addTypePortletLayout(
 			group.getGroupId(), privateLayout, nameMap, friendlyURLMap);
 	}
 
@@ -1080,9 +1081,11 @@ public class DefaultExportImportContentProcessorTest {
 				"[$WEB_CONTENT_DISPLAY_SERVLET_MAPPING$]", "[$WEB_ID$]"
 			},
 			new String[] {
-				"/b", VirtualLayoutConstants.CANONICAL_URL_SEPARATOR,
+				FriendlyURLResolverConstants.URL_SEPARATOR_X_BLOGS_ENTRY,
+				VirtualLayoutConstants.CANONICAL_URL_SEPARATOR,
 				GroupConstants.CONTROL_PANEL_FRIENDLY_URL,
-				PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL, "/d",
+				PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL,
+				FriendlyURLResolverConstants.URL_SEPARATOR_X_FILE_ENTRY,
 				_externalGroup.getFriendlyURL(),
 				_externalPrivateLayout.getFriendlyURL(),
 				_externalPublicLayout.getFriendlyURL(),
@@ -1105,7 +1108,9 @@ public class DefaultExportImportContentProcessorTest {
 				PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING,
 				_stagingPrivateLayout.getFriendlyURL(),
 				_stagingPublicLayout.getFriendlyURL(), fileEntry.getTitle(),
-				fileEntry.getUuid(), "/w", company.getWebId()
+				fileEntry.getUuid(),
+				FriendlyURLResolverConstants.URL_SEPARATOR_X_JOURNAL_ARTICLE,
+				company.getWebId()
 			});
 
 		if (!content.contains("[$TIMESTAMP")) {

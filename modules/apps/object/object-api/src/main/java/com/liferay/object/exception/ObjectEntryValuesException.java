@@ -21,19 +21,86 @@ import com.liferay.portal.kernel.exception.PortalException;
  */
 public class ObjectEntryValuesException extends PortalException {
 
-	public ObjectEntryValuesException() {
+	public static class Exceeds280Characters
+		extends ObjectEntryValuesException {
+
+		public Exceeds280Characters() {
+			super("The maximum length is 280 characters for text fields");
+		}
+
 	}
 
-	public ObjectEntryValuesException(String msg) {
-		super(msg);
+	public static class ExceedsIntegerSize extends ObjectEntryValuesException {
+
+		public ExceedsIntegerSize() {
+			super("Object entry value exceeds integer field allowed size");
+		}
+
 	}
 
-	public ObjectEntryValuesException(String msg, Throwable throwable) {
-		super(msg, throwable);
+	public static class ExceedsLongMaxSize extends ObjectEntryValuesException {
+
+		public ExceedsLongMaxSize() {
+			super("Object entry value exceeds maximum long field allowed size");
+		}
+
 	}
 
-	public ObjectEntryValuesException(Throwable throwable) {
-		super(throwable);
+	public static class ExceedsLongMinSize extends ObjectEntryValuesException {
+
+		public ExceedsLongMinSize() {
+			super("Object entry value exceeds minimum long field allowed size");
+		}
+
+	}
+
+	public static class ExceedsLongSize extends ObjectEntryValuesException {
+
+		public ExceedsLongSize() {
+			super("Object entry value exceeds long field allowed size");
+		}
+
+	}
+
+	public static class ListTypeEntry extends ObjectEntryValuesException {
+
+		public ListTypeEntry(String objectFieldName) {
+			super(
+				String.format(
+					"Object field name \"%s\" is not mapped to a valid list " +
+						"type entry",
+					objectFieldName));
+		}
+
+	}
+
+	public static class OneToOneConstraintViolation
+		extends ObjectEntryValuesException {
+
+		public OneToOneConstraintViolation(
+			String columnName, long columnValue, String tableName) {
+
+			super(
+				String.format(
+					"One to one constraint violation for %s.%s with value %s",
+					tableName, columnName, columnValue));
+		}
+
+	}
+
+	public static class Required extends ObjectEntryValuesException {
+
+		public Required(String objectFieldName) {
+			super(
+				String.format(
+					"No value was provided for required object field \"%s\"",
+					objectFieldName));
+		}
+
+	}
+
+	private ObjectEntryValuesException(String message) {
+		super(message);
 	}
 
 }

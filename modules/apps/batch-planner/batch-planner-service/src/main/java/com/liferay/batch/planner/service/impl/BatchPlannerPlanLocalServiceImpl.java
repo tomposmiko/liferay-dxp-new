@@ -22,12 +22,16 @@ import com.liferay.batch.planner.exception.DuplicateBatchPlannerPlanException;
 import com.liferay.batch.planner.exception.RequiredBatchPlannerPlanException;
 import com.liferay.batch.planner.model.BatchPlannerLog;
 import com.liferay.batch.planner.model.BatchPlannerPlan;
+import com.liferay.batch.planner.service.BatchPlannerLogLocalService;
 import com.liferay.batch.planner.service.base.BatchPlannerPlanLocalServiceBaseImpl;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
@@ -115,6 +119,29 @@ public class BatchPlannerPlanLocalServiceImpl
 			batchPlannerPlanId);
 
 		return batchPlannerPlan;
+	}
+
+	public BatchPlannerPlan updateActive(
+			boolean active, String batchEngineTaskERC, boolean export)
+		throws PortalException {
+
+		BatchPlannerLog batchPlannerLog =
+			_batchPlannerLogLocalService.fetchBatchPlannerLog(
+				batchEngineTaskERC, export);
+
+		if (batchPlannerLog == null) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Unable to update batch planner plan for batch engine ",
+						"task ERC ", batchEngineTaskERC, " and export ",
+						export));
+			}
+
+			return null;
+		}
+
+		return updateActive(batchPlannerLog.getBatchPlannerPlanId(), active);
 	}
 
 	@Override
@@ -216,5 +243,11 @@ public class BatchPlannerPlanLocalServiceImpl
 				"Batch planner plan name \"", name,
 				"\" already exists for company ", companyId));
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BatchPlannerPlanLocalServiceImpl.class);
+
+	@BeanReference(type = BatchPlannerLogLocalService.class)
+	private BatchPlannerLogLocalService _batchPlannerLogLocalService;
 
 }

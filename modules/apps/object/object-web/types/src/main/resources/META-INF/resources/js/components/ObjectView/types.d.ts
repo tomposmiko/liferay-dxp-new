@@ -30,13 +30,15 @@ export declare type TObjectField = {
 	type: string;
 };
 export declare type TObjectViewColumn = {
+	fieldLabel: string;
 	isDefaultSort: boolean;
-	label: string;
+	label: TName;
 	objectFieldName: string;
 	priority?: number;
 };
 export declare type TObjectViewSortColumn = {
-	label: string;
+	fieldLabel: string;
+	label: TName;
 	objectFieldName: string;
 	priority?: number;
 	sortOrder?: string;
@@ -48,6 +50,7 @@ export declare type TObjectView = {
 	objectViewSortColumns: TObjectViewSortColumn[];
 };
 export declare type TState = {
+	isFFObjectViewColumnAliasEnabled: boolean;
 	isFFObjectViewSortColumnConfigurationEnabled: boolean;
 	isViewOnly: boolean;
 	objectFields: TObjectField[];

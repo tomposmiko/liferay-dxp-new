@@ -32,6 +32,7 @@ import {DEFAULT_ERROR, SIDEBARS} from '../utils/constants';
 import {fetchData, fetchPreviewSearch} from '../utils/fetch';
 import {INPUT_TYPES} from '../utils/inputTypes';
 import {getLocalizedText} from '../utils/language';
+import {setStorageAddSXPElementSidebar} from '../utils/sessionStorage';
 import {TEST_IDS} from '../utils/testIds';
 import {
 	openErrorToast,
@@ -379,18 +380,16 @@ function EditSXPBlueprintForm({
 
 	useEffect(() => {
 		fetchData(
-			`/o/search-experiences-rest/v1.0/searchable-asset-names/${locale}`,
-			{method: 'GET'},
-			(responseContent) => setSearchableTypes(responseContent.items),
-			() => setSearchableTypes([])
-		);
+			`/o/search-experiences-rest/v1.0/searchable-asset-names/${locale}`
+		)
+			.then((responseContent) =>
+				setSearchableTypes(responseContent.items)
+			)
+			.catch(() => setSearchableTypes([]));
 
-		fetchData(
-			`/o/search-experiences-rest/v1.0/field-mapping-infos`,
-			{method: 'GET'},
-			(responseContent) => setIndexFields(responseContent.items),
-			() => setIndexFields([])
-		);
+		fetchData(`/o/search-experiences-rest/v1.0/field-mapping-infos`)
+			.then((responseContent) => setIndexFields(responseContent.items))
+			.catch(() => setIndexFields([]));
 
 		[
 			{
@@ -409,14 +408,14 @@ function EditSXPBlueprintForm({
 					'/o/search-experiences-rest/v1.0/query-prefilter-contributors',
 			},
 		].forEach(({setProperty, url}) =>
-			fetchData(
-				url,
-				{method: 'GET'},
-				(responseContent) =>
-					setProperty(filterAndSortClassNames(responseContent.items)),
-				() => setProperty([])
-			)
+			fetchData(url)
+				.then((responseContent) =>
+					setProperty(filterAndSortClassNames(responseContent.items))
+				)
+				.catch(() => setProperty([]))
 		);
+
+		setStorageAddSXPElementSidebar('open');
 	}, []); //eslint-disable-line
 
 	/**
@@ -758,6 +757,10 @@ function EditSXPBlueprintForm({
 	};
 
 	const _handleToggleSidebar = (type) => () => {
+		if (type === SIDEBARS.PREVIEW) {
+			setStorageAddSXPElementSidebar('closed');
+		}
+
 		setOpenSidebar(openSidebar === type ? '' : type);
 	};
 

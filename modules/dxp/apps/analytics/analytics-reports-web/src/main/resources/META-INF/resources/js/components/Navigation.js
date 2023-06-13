@@ -10,15 +10,23 @@
  */
 
 import ClayAlert from '@clayui/alert';
+import classnames from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useCallback, useContext, useState} from 'react';
+import React, {
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react';
 
 import {ChartStateContext} from '../context/ChartStateContext';
 import ConnectionContext from '../context/ConnectionContext';
 import {StoreStateContext} from '../context/StoreContext';
 import APIService from '../utils/APIService';
-import Detail from './Detail';
 import Main from './Main';
+import Detail from './detail/Detail';
+import Drawer from './detail/Drawer';
 
 const noop = () => {};
 
@@ -44,6 +52,8 @@ export default function Navigation({
 	const [trafficSourceName, setTrafficSourceName] = useState('');
 
 	const {timeSpanKey, timeSpanOffset} = useContext(ChartStateContext);
+
+	const detailRef = useRef(null);
 
 	const handleCurrentPage = useCallback((currentPage) => {
 		setCurrentPage({view: currentPage.view});
@@ -138,6 +148,14 @@ export default function Navigation({
 		return Promise.resolve(trafficSource?.value ?? '-');
 	}, [trafficSourceName, trafficSources]);
 
+	const showDetail = currentPage.view !== 'main';
+
+	useEffect(() => {
+		if (showDetail) {
+			detailRef.current.scrollIntoView();
+		}
+	}, [showDetail]);
+
 	return (
 		<>
 			{!validAnalyticsConnection && (
@@ -173,54 +191,57 @@ export default function Navigation({
 				</ClayAlert>
 			)}
 
-			{currentPage.view === 'main' && (
-				<div>
-					<Main
-						author={author}
-						canonicalURL={canonicalURL}
-						chartDataProviders={
-							endpoints.analyticsReportsHistoricalReadsURL
-								? [handleHistoricalViews, handleHistoricalReads]
-								: [handleHistoricalViews]
-						}
-						onSelectedLanguageClick={onSelectedLanguageClick}
-						onTrafficSourceClick={
+			<Main
+				author={author}
+				canonicalURL={canonicalURL}
+				chartDataProviders={
+					endpoints.analyticsReportsHistoricalReadsURL
+						? [handleHistoricalViews, handleHistoricalReads]
+						: [handleHistoricalViews]
+				}
+				className={classnames({
+					'analytics-reports-app-main--hide': showDetail,
+				})}
+				onSelectedLanguageClick={onSelectedLanguageClick}
+				onTrafficSourceClick={updateTrafficSourcesAndCurrentPage}
+				pagePublishDate={pagePublishDate}
+				pageTitle={pageTitle}
+				timeSpanOptions={timeSpanOptions}
+				totalReadsDataProvider={
+					endpoints.analyticsReportsTotalReadsURL && handleTotalReads
+				}
+				totalViewsDataProvider={handleTotalViews}
+				trafficSourcesDataProvider={handleTrafficSources}
+				viewURLs={viewURLs}
+			/>
+
+			{showDetail && (
+				<Drawer>
+					<Detail
+						currentPage={currentPage}
+						handleDetailPeriodChange={
 							updateTrafficSourcesAndCurrentPage
 						}
-						pagePublishDate={pagePublishDate}
-						pageTitle={pageTitle}
+						onCurrentPageChange={handleCurrentPage}
+						onTrafficSourceNameChange={handleTrafficSourceName}
+						refProp={detailRef}
 						timeSpanOptions={timeSpanOptions}
-						totalReadsDataProvider={
-							endpoints.analyticsReportsTotalReadsURL &&
-							handleTotalReads
-						}
-						totalViewsDataProvider={handleTotalViews}
+						trafficShareDataProvider={handleTrafficShare}
 						trafficSourcesDataProvider={handleTrafficSources}
-						viewURLs={viewURLs}
+						trafficVolumeDataProvider={handleTrafficVolume}
 					/>
-				</div>
-			)}
-
-			{currentPage.view !== 'main' && (
-				<Detail
-					currentPage={currentPage}
-					handleDetailPeriodChange={
-						updateTrafficSourcesAndCurrentPage
-					}
-					onCurrentPageChange={handleCurrentPage}
-					onTrafficSourceNameChange={handleTrafficSourceName}
-					timeSpanOptions={timeSpanOptions}
-					trafficShareDataProvider={handleTrafficShare}
-					trafficSourcesDataProvider={handleTrafficSources}
-					trafficVolumeDataProvider={handleTrafficVolume}
-				/>
+				</Drawer>
 			)}
 		</>
 	);
 }
 
+Navigation.defaultProps = {
+	author: null,
+};
+
 Navigation.propTypes = {
-	author: PropTypes.object.isRequired,
+	author: PropTypes.object,
 	canonicalURL: PropTypes.string.isRequired,
 	onSelectedLanguageClick: PropTypes.func.isRequired,
 	pagePublishDate: PropTypes.string.isRequired,

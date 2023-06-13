@@ -207,6 +207,14 @@ definition {
 				key_visitors = "${type}",
 				locator1 = "ACSites#TOOLTIP_UNIQUE_VISITORS");
 
+			if (isSet(notEquals)) {
+				AssertTextNotEquals(
+					key_value = "${value}",
+					key_visitors = "${type}",
+					locator1 = "ACSites#TOOLTIP_UNIQUE_VISITORS",
+					value1 = "${notEquals}");
+			}
+
 			var i = ${i} + 1;
 			var i = StringUtil.valueOf("${i}");
 		}
@@ -310,15 +318,6 @@ definition {
 				locator1 = "ACIndividualsDashboard#BASE_RESULTS_TIMELINE",
 				value1 = "${activityName}");
 		}
-	}
-
-	macro viewTotalActivities {
-		var key_userName = "${userName}";
-		var key_activitiesNumber = "${activitiesNumber}";
-
-		AssertTextEquals(
-			locator1 = "ACIndividualsDashboard#TOTAL_ACTIVITIES",
-			value1 = "${activitiesNumber}");
 	}
 
 }

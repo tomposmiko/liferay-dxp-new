@@ -1697,6 +1697,21 @@ definition {
 				key_fieldLabel = "Pagination",
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "${pagination}");
+
+			if ("${displayAllCollectionItems}" == "true") {
+				Check.checkNotVisible(
+					checkboxName = "Display All Collection Items",
+					locator1 = "Checkbox#ANY_CHECKBOX");
+
+				PageEditor.waitForAutoSave();
+			}
+			else {
+				Uncheck.uncheckNotVisible(
+					checkboxName = "Display All Collection Items",
+					locator1 = "Checkbox#ANY_CHECKBOX");
+
+				PageEditor.waitForAutoSave();
+			}
 		}
 
 		if (isSet(maxNumberOfItems)) {
@@ -2980,6 +2995,18 @@ definition {
 		var width = StringUtil.extractDigits("${width}");
 
 		return "${width}";
+	}
+
+	macro gotoAdvanced {
+		PageEditor.clickConfigurableField(
+			fragmentName = "${fragmentName}",
+			index = "${index}");
+
+		AssertVisible(
+			key_sidebarButton = "Browser",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+
+		Navigator.gotoNavTab(navTab = "Advanced");
 	}
 
 	macro gotoCommentList {

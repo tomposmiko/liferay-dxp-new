@@ -61,7 +61,10 @@ public class MappedProductResourceImpl
 
 	@Override
 	public void deleteMappedProduct(Long mappedProductId) throws Exception {
-		_csDiagramEntryService.deleteCSDiagramEntry(mappedProductId);
+		CSDiagramEntry csDiagramEntry =
+			_csDiagramEntryService.getCSDiagramEntry(mappedProductId);
+
+		_csDiagramEntryService.deleteCSDiagramEntry(csDiagramEntry);
 	}
 
 	@Override

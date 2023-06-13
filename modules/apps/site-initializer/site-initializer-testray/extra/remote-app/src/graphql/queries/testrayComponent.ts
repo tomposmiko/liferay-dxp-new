@@ -14,6 +14,9 @@
 
 import {gql} from '@apollo/client';
 
+import {testrayComponentFragment} from '../fragments';
+import {TestrayTeam} from './testrayTeam';
+
 export type TestrayComponent = {
 	dateCreated: string;
 	dateModified: string;
@@ -22,19 +25,8 @@ export type TestrayComponent = {
 	name: string;
 	originationKey: string;
 	status: string;
+	testrayTeam?: TestrayTeam;
 };
-
-const testrayComponentFragment = gql`
-	fragment TestrayComponentFragment on C_TestrayComponent {
-		dateCreated
-		dateModified
-		externalReferenceCode
-		id: testrayComponentId
-		name
-		originationKey
-		status
-	}
-`;
 
 export const getTestrayComponent = gql`
 	${testrayComponentFragment}

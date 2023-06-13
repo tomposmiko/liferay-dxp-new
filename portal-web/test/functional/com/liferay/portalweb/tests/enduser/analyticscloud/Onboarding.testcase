@@ -61,16 +61,12 @@ definition {
 			}
 
 			task ("Check skip button") {
-				AssertElementPresent(
-					key_buttonName = "Skip",
-					locator1 = "ACUtils#GENERIC_BUTTON");
+				ACUtils.viewGenericButton(buttonName = "Skip");
 			}
 		}
 
 		task ("Click on 'click here' and check if a new tab with connection documentation appears") {
-			Click(
-				key_textValue = "Click here",
-				locator1 = "ACUtils#GENERIC_TEXT");
+			ACUtils.clickGenericHyperlink(hyperlinkText = "Click here");
 
 			SelectWindow(locator1 = "title=Connecting Liferay DXP to Analytics Cloud — Liferay Learn");
 
@@ -121,22 +117,16 @@ definition {
 			}
 
 			task ("Check cancel button") {
-				AssertElementPresent(
-					key_buttonName = "Cancel",
-					locator1 = "ACUtils#GENERIC_BUTTON");
+				ACUtils.viewGenericButton(buttonName = "Cancel");
 			}
 
 			task ("Check skip button is not present") {
-				AssertElementNotPresent(
-					key_buttonName = "Skip",
-					locator1 = "ACUtils#GENERIC_BUTTON");
+				ACUtils.viewGenericButton(buttonName = "Skip");
 			}
 		}
 
 		task ("Click on 'click here' and check if a new tab with connection documentation appears") {
-			Click(
-				key_textValue = "Click here",
-				locator1 = "ACUtils#GENERIC_TEXT");
+			ACUtils.clickGenericHyperlink(hyperlinkText = "Click here");
 
 			SelectWindow(locator1 = "title=Connecting Liferay DXP to Analytics Cloud — Liferay Learn");
 

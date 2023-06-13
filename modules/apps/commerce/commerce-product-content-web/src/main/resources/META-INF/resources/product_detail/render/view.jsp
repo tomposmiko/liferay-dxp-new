@@ -17,6 +17,11 @@
 <%@ include file="/init.jsp" %>
 
 <%
+CommerceContext commerceContext = (CommerceContext)request.getAttribute(CommerceWebKeys.COMMERCE_CONTEXT);
+
+CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
+CommerceOrder commerceOrder = commerceContext.getCommerceOrder();
+
 CPContentHelper cpContentHelper = (CPContentHelper)request.getAttribute(CPContentWebKeys.CP_CONTENT_HELPER);
 
 CPCatalogEntry cpCatalogEntry = cpContentHelper.getCPCatalogEntry(request);
@@ -66,6 +71,22 @@ long cpDefinitionId = cpCatalogEntry.getCPDefinitionId();
 					<p class="product-description"><%= LanguageUtil.get(request, "this-product-is-discontinued.-you-can-see-the-replacement-product-by-clicking-on-the-button-below") %></p>
 
 					<aui:button cssClass="btn btn-primary btn-sm my-2" href="<%= cpContentHelper.getReplacementCommerceProductFriendlyURL(cpSku, themeDisplay) %>" value="replacement-product" />
+				</c:if>
+
+				<c:if test="<%= (cpSku != null) && (cpSku.getDiscontinuedDate() != null) %>">
+
+					<%
+					Format format = FastDateFormatFactoryUtil.getSimpleDateFormat("MMMMM dd, yyyy", locale, timeZone);
+					%>
+
+					<p class="my-2">
+						<span class="font-weight-semi-bold">
+							<%= LanguageUtil.get(request, "end-of-life") %>
+						</span>
+						<span>
+							<%= format.format(cpSku.getDiscontinuedDate()) %>
+						</span>
+					</p>
 				</c:if>
 
 				<%
@@ -303,6 +324,12 @@ List<CPOptionCategory> cpOptionCategories = cpContentHelper.getCPOptionCategorie
 		<clay:data-set-display
 			contextParams='<%=
 				HashMapBuilder.<String, String>put(
+					"commerceAccountId", (commerceAccount == null) ? "0" : String.valueOf(commerceAccount.getCommerceAccountId())
+				).put(
+					"commerceChannelGroupId", String.valueOf(commerceContext.getCommerceChannelGroupId())
+				).put(
+					"commerceOrderId", (commerceOrder == null) ? "0" : String.valueOf(commerceOrder.getCommerceOrderId())
+				).put(
 					"cpInstanceUuid", cpSku.getCPInstanceUuid()
 				).put(
 					"cProductId", String.valueOf(cpCatalogEntry.getCProductId())

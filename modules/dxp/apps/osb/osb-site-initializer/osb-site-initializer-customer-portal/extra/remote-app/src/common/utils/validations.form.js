@@ -11,6 +11,7 @@
 
 const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const LOWCASE_NUMBERS_REGEX = /^[0-9a-z]+$/;
+const FRIENDLY_URL_REGEX = /^\/[^. "]+[0-9a-z]+[^A-Z]$/;
 
 const required = (value) => {
 	if (!value) {
@@ -40,6 +41,20 @@ const isLowercaseAndNumbers = (value) => {
 	}
 };
 
+const isValidFriendlyURL = (value) => {
+	if (value[0] !== '/') {
+		return 'The Workspace URL should start with "/".';
+	}
+
+	if (value.indexOf(' ') > 0) {
+		return 'The Workspace URL most not have spaces.';
+	}
+
+	if (!FRIENDLY_URL_REGEX.test(value)) {
+		return 'Lowercase letters, numbers and dashes only.';
+	}
+};
+
 const validate = (validations, value) => {
 	let error;
 
@@ -56,4 +71,11 @@ const validate = (validations, value) => {
 	return error;
 };
 
-export {isLowercaseAndNumbers, isValidEmail, maxLength, required, validate};
+export {
+	isLowercaseAndNumbers,
+	isValidEmail,
+	isValidFriendlyURL,
+	maxLength,
+	required,
+	validate,
+};

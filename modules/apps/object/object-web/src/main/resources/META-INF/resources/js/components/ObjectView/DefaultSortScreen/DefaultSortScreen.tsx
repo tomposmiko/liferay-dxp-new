@@ -51,6 +51,7 @@ export function DefaultSortScreen() {
 			</ClayAlert>
 
 			<BuilderScreen
+				aliasColumnHeader={Liferay.Language.get('sorting')}
 				emptyState={{
 					buttonText: Liferay.Language.get('new-default-sort'),
 					description: Liferay.Language.get(
@@ -62,8 +63,9 @@ export function DefaultSortScreen() {
 				}}
 				isDefaultSort
 				objectColumns={objectViewSortColumns ?? []}
+				onEditing={setIsEditingSort}
 				onEditingObjectFieldName={setEditingObjectFieldName}
-				onEditingSort={setIsEditingSort}
+				onVisibleEditModal={setVisibleModal}
 				onVisibleModal={setVisibleModal}
 				title={Liferay.Language.get('default-sort')}
 			/>

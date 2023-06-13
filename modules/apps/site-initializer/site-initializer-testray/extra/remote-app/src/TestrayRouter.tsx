@@ -25,9 +25,8 @@ import Home from './pages/Project/Home';
 import Overview from './pages/Project/Overview';
 import ProjectOutlet from './pages/Project/ProjectOutlet';
 import Requirements from './pages/Project/Requirements';
-import AddRequirements from './pages/Project/Requirements/AddRequirements';
 import Requirement from './pages/Project/Requirements/Requirement';
-import Routine from './pages/Project/Routines';
+import Routines from './pages/Project/Routines';
 import Build from './pages/Project/Routines/Builds/Build';
 import BuildOutlet from './pages/Project/Routines/Builds/BuildOutlet';
 import CaseResult from './pages/Project/Routines/Builds/Inner/CaseResult';
@@ -38,9 +37,9 @@ import Components from './pages/Project/Routines/Builds/Inner/Components';
 import Results from './pages/Project/Routines/Builds/Inner/Results';
 import Runs from './pages/Project/Routines/Builds/Inner/Run';
 import Teams from './pages/Project/Routines/Builds/Inner/Teams';
+import Routine from './pages/Project/Routines/Routine';
 import RoutineArchived from './pages/Project/Routines/RoutineArchived';
 import RoutineOutlet from './pages/Project/Routines/RoutineOutlet';
-import Routines from './pages/Project/Routines/Routines';
 import Suites from './pages/Project/Suites';
 import Suite from './pages/Project/Suites/Suite';
 import Testflow from './pages/Testflow';
@@ -49,7 +48,6 @@ import TestflowArchived from './pages/Testflow/TestflowArchived';
 import TestflowOutlet from './pages/Testflow/TestflowOutlet';
 import TestFlowTasks from './pages/Testflow/TestflowTasks';
 import UserManagement from './pages/UserManagement';
-import AddUser from './pages/UserManagement/AddUser';
 import UserList from './pages/UserManagement/UsersList';
 
 const TestrayRoute = () => (
@@ -158,14 +156,7 @@ const TestrayRoute = () => (
 					<Route element={<OutletBridge />} path="manage">
 						<Route element={<UserManagement />} path="user" />
 
-						<Route element={<AddUser />} path="adduser" />
-
 						<Route element={<UserList />} path="userlist" />
-
-						<Route
-							element={<AddRequirements />}
-							path="requirements"
-						/>
 					</Route>
 
 					<Route element={<TestflowOutlet />} path="testflow">
