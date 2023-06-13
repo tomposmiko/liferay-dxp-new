@@ -1,0 +1,14 @@
+{
+	"fieldSets": [
+		{
+			"fields": [
+				{
+					"defaultValue": false,
+					"label": "include-search-in-dropdown",
+					"name": "includeSearch",
+					"type": "checkbox"
+				}
+			]
+		}
+	]
+}

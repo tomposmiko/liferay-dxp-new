@@ -2942,6 +2942,9 @@
 
 		<!-- Finder methods -->
 
+		<finder name="CompanyId" return-type="Collection">
+			<finder-column name="companyId" />
+		</finder>
 		<finder name="Hostname" return-type="VirtualHost" unique="true">
 			<finder-column name="hostname" />
 		</finder>

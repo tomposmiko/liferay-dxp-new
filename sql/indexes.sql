@@ -605,6 +605,7 @@ create index IX_A098EFBF on Users_Teams (userId);
 create index IX_BB65040C on Users_UserGroups (companyId);
 create index IX_66FF2503 on Users_UserGroups (userGroupId);
 
+create index IX_30C7B8AD on VirtualHost (companyId, ctCollectionId);
 create index IX_741D01F2 on VirtualHost (companyId, layoutSetId, ctCollectionId);
 create index IX_6A3E4238 on VirtualHost (companyId, layoutSetId, defaultVirtualHost, ctCollectionId);
 create unique index IX_76A64FBE on VirtualHost (hostname[$COLUMN_LENGTH:200$], ctCollectionId);

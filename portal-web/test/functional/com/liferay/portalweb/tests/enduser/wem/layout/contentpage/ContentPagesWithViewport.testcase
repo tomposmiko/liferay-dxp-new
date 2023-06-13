@@ -38,8 +38,6 @@ definition {
 	@description = "This is a test for 147512. The page editor cannot change background image on non-desktop viewports."
 	@priority = "4"
 	test CannotChangeBackgroundImageOfFragmentInNonDesktopViewport {
-		property custom.properties = "feature.flag.LPS-132571=true";
-
 		task ("Given a page creator has a content page where a Container fragment has a background image") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
@@ -75,8 +73,6 @@ definition {
 	@description = "This is a test for 147512. The page editor could customize styles on non-desktop viewports."
 	@priority = "5"
 	test CustomizeFragmentStylesInNonDesktopViewport {
-		property custom.properties = "feature.flag.LPS-132571=true";
-
 		task ("Given a page creator has a content page with a Heading fragment") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
@@ -280,9 +276,13 @@ definition {
 		}
 
 		task ("View the Text Align of Heading is left") {
-			PageEditor.viewFragmentStyle(
-				alignment = "left",
-				fragmentName = "Heading");
+			AssertCssValue(
+				fragmentName = "heading",
+				id = "element-text",
+				index = "1",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
+				locator2 = "text-align",
+				value1 = "start");
 		}
 
 		task ("Change the Text Align of Heading in other viewports") {
@@ -314,9 +314,13 @@ definition {
 		task ("View the Text Align of Heading in different viewports") {
 			PageEditor.switchViewport(deviceType = "Desktop");
 
-			PageEditor.viewFragmentStyle(
-				alignment = "left",
-				fragmentName = "Heading");
+			AssertCssValue(
+				fragmentName = "heading",
+				id = "element-text",
+				index = "1",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
+				locator2 = "text-align",
+				value1 = "start");
 
 			PageEditor.switchViewport(deviceType = "Tablet");
 
@@ -363,7 +367,7 @@ definition {
 				index = "1",
 				locator1 = "Fragment#FRAGMENT_BODY",
 				locator2 = "text-align",
-				value1 = "left");
+				value1 = "start");
 
 			SelectFrame(value1 = "relative=top");
 
@@ -690,8 +694,6 @@ definition {
 	@description = "This is a test for 147512. The page editor only could clear color picker selection defined on current non-desktop viewport."
 	@priority = "4"
 	test OnlyClearColorPickerSelectionInCurrentNonDesktopViewport {
-		property custom.properties = "feature.flag.LPS-132571=true";
-
 		task ("Given a page creator has a content page where a Heading fragment has a defined Text Color in desktop viewport") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
@@ -720,10 +722,9 @@ definition {
 
 			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#PAGE_EDITOR_GLOBAL_CONTEXT_IFRAME");
 
-			PageEditor.viewFragmentCommonStyle(
+			PageEditor.viewFragmentStyle(
 				fragmentName = "Heading",
-				styleName = "color",
-				styleValue = "success");
+				textColor = "success");
 		}
 
 		task ("When the page creator changes the Text Color to Warning") {
@@ -733,10 +734,9 @@ definition {
 
 			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#PAGE_EDITOR_GLOBAL_CONTEXT_IFRAME");
 
-			PageEditor.viewFragmentCommonStyle(
+			PageEditor.viewFragmentStyle(
 				fragmentName = "Heading",
-				styleName = "color",
-				styleValue = "warning");
+				textColor = "warning");
 		}
 
 		task ("Then the page creator could clear the color picker selection defined in Tablet viewport") {
@@ -751,10 +751,9 @@ definition {
 
 			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#PAGE_EDITOR_GLOBAL_CONTEXT_IFRAME");
 
-			PageEditor.viewFragmentCommonStyle(
+			PageEditor.viewFragmentStyle(
 				fragmentName = "Heading",
-				styleName = "color",
-				styleValue = "success");
+				textColor = "success");
 		}
 	}
 

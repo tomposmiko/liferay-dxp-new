@@ -1,0 +1,53 @@
+<div class="forms-select-from-list">
+	<input name="${input.name}" ${input.required?then('required', '')} type="hidden" />
+
+	<label id="${fragmentEntryLinkNamespace}-label" class="[#if !input.showLabel || !input.label?has_content]sr-only[/#if]">${input.label}[#if input.required][@clay["icon"] className="reference-mark" symbol="asterisk" /][/#if]</label>
+
+	<button [#if input.showHelpText && input.helpText?has_content]aria-describedby="${fragmentEntryLinkNamespace}-help-text" [/#if] aria-haspopup="${fragmentEntryLinkNamespace}-listbox" aria-labelledby="${fragmentEntryLinkNamespace}-label ${fragmentEntryLinkNamespace}-button" class="form-control text-left" id="${fragmentEntryLinkNamespace}-button" type="button">
+		<span class="forms-select-from-list-label"></span>
+		[@clay["icon"] symbol="caret-double" /]
+	</button>
+
+	[#if input.showHelpText && input.helpText?has_content]
+		<p class="mb-0 mt-1 text-secondary" id="${fragmentEntryLinkNamespace}-text-input-help-text">
+			${input.helpText}
+		</p>
+	[/#if]
+
+	<div class="dropdown-menu">
+		[#if configuration.includeSearch == true]
+			<div class="dropdown-section">
+				<div class="input-group input-group-sm">
+					<div class="input-group-item">
+						<input class="form-control forms-select-from-list-search input-group-inset input-group-inset-after" type="search" value="" />
+
+						<span class="input-group-inset-item input-group-inset-item-after">
+							[@clay["icon"] symbol="search" /]
+						</span>
+					</div>
+				</div>
+			</div>
+		[/#if]
+
+		<ul aria-labelledby="${fragmentEntryLinkNamespace}-label" class="list-unstyled" id="${fragmentEntryLinkNamespace}-listbox" role="listbox" tabindex="0">
+
+		[#list input.options as option]
+			<li class="dropdown-item" data-option-value="${option.value}" id="${fragmentEntryLinkNamespace}-option-${option?index}" role="option">
+				${option.label}
+			</li>
+		[/#list]
+
+		</ul>
+
+		[#if configuration.includeSearch == true]
+			<p aria-hidden="true" class="d-none forms-select-from-list-loading-results mt-3 mx-4">
+				<span class="sr-only">Loading results</span>
+				<span aria-hidden="true" class="loading-animation"></span>
+			</p>
+
+			<p aria-hidden="true" class="d-none forms-select-from-list-no-results mt-3 mx-4 text-secondary">
+				No results were found.
+			</p>
+		[/#if]
+	</div>
+</div>

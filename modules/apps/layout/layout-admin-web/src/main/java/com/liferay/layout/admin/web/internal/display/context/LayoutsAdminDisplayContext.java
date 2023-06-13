@@ -21,6 +21,7 @@ import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
 import com.liferay.client.extension.model.ClientExtensionEntryRel;
 import com.liferay.client.extension.service.ClientExtensionEntryRelLocalServiceUtil;
+import com.liferay.client.extension.type.CET;
 import com.liferay.client.extension.type.item.selector.CETItemSelectorReturnType;
 import com.liferay.client.extension.type.item.selector.criterion.CETItemSelectorCriterion;
 import com.liferay.client.extension.type.manager.CETManager;
@@ -517,7 +518,8 @@ public class LayoutsAdminDisplayContext {
 			return faviconURL;
 		}
 
-		return getThemeFavicon();
+		return themeDisplay.getPathThemeImages() + "/" +
+			PropsUtil.get(PropsKeys.THEME_SHORTCUT_ICON);
 	}
 
 	public String getFileEntryItemSelectorURL() {
@@ -528,11 +530,11 @@ public class LayoutsAdminDisplayContext {
 			new FileEntryItemSelectorReturnType());
 
 		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-153457"))) {
-			PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
-				RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
-				getSelectFaviconEventName(), itemSelectorCriterion);
-
-			return itemSelectorURL.toString();
+			return String.valueOf(
+				_itemSelector.getItemSelectorURL(
+					RequestBackedPortletURLFactoryUtil.create(
+						httpServletRequest),
+					getSelectFaviconEventName(), itemSelectorCriterion));
 		}
 
 		CETItemSelectorCriterion cetItemSelectorCriterion =
@@ -543,12 +545,11 @@ public class LayoutsAdminDisplayContext {
 		cetItemSelectorCriterion.setType(
 			ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
 
-		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
-			RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
-			getSelectFaviconEventName(), itemSelectorCriterion,
-			cetItemSelectorCriterion);
-
-		return itemSelectorURL.toString();
+		return String.valueOf(
+			_itemSelector.getItemSelectorURL(
+				RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
+				getSelectFaviconEventName(), itemSelectorCriterion,
+				cetItemSelectorCriterion));
 	}
 
 	public String getFirstColumnConfigureLayoutURL(boolean privatePages) {
@@ -1230,24 +1231,58 @@ public class LayoutsAdminDisplayContext {
 		String selectThemeCSSClientExtensionEventName =
 			"selectThemeCSSClientExtension";
 
+		LayoutSet setLayoutSet = getSelLayoutSet();
+
+		String className = LayoutSet.class.getName();
+		long classPK = setLayoutSet.getLayoutSetId();
+
+		Layout selLayout = getSelLayout();
+
+		if (selLayout != null) {
+			className = Layout.class.getName();
+			classPK = selLayout.getPlid();
+		}
+
+		ClientExtensionEntryRel clientExtensionEntryRel =
+			ClientExtensionEntryRelLocalServiceUtil.
+				fetchClientExtensionEntryRel(
+					PortalUtil.getClassNameId(className), classPK,
+					ClientExtensionEntryConstants.TYPE_THEME_CSS);
+
 		return HashMapBuilder.<String, Object>put(
 			"selectThemeCSSClientExtensionEventName",
 			selectThemeCSSClientExtensionEventName
 		).put(
 			"selectThemeCSSClientExtensionURL",
-			() -> {
-				PortletURL cetItemSelectorURL = getCETItemSelectorURL(
+			() -> String.valueOf(
+				getCETItemSelectorURL(
 					selectThemeCSSClientExtensionEventName,
-					ClientExtensionEntryConstants.TYPE_THEME_CSS);
+					ClientExtensionEntryConstants.TYPE_THEME_CSS))
+		).put(
+			"themeCSSCETExternalReferenceCode",
+			() -> {
+				if (clientExtensionEntryRel != null) {
+					return clientExtensionEntryRel.getExternalReferenceCode();
+				}
 
-				return cetItemSelectorURL.toString();
+				return StringPool.BLANK;
+			}
+		).put(
+			"themeCSSExtensionName",
+			() -> {
+				if (clientExtensionEntryRel != null) {
+					CET cet = _cetManager.getCET(
+						themeDisplay.getCompanyId(),
+						clientExtensionEntryRel.getCETExternalReferenceCode());
+
+					if (cet != null) {
+						return cet.getName(themeDisplay.getLocale());
+					}
+				}
+
+				return StringPool.BLANK;
 			}
 		).build();
-	}
-
-	public String getThemeFavicon() {
-		return themeDisplay.getPathThemeImages() + "/" +
-			PropsUtil.get(PropsKeys.THEME_SHORTCUT_ICON);
 	}
 
 	public String getThemeFaviconCETExternalReferenceCode() {

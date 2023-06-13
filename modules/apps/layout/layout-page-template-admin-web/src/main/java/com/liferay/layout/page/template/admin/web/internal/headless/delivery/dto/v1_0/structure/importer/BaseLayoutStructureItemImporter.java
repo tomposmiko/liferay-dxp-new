@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
@@ -227,52 +226,20 @@ public abstract class BaseLayoutStructureItemImporter {
 	protected JSONObject toFragmentViewportStylesJSONObject(
 		Map<String, Object> fragmentViewport) {
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
 		if (MapUtil.isEmpty(fragmentViewport)) {
-			return jsonObject;
+			return JSONFactoryUtil.createJSONObject();
 		}
 
 		Map<String, Object> fragmentViewportStyle =
 			(Map<String, Object>)fragmentViewport.get("fragmentViewportStyle");
 
 		if (MapUtil.isEmpty(fragmentViewportStyle)) {
-			return jsonObject;
+			return JSONFactoryUtil.createJSONObject();
 		}
 
-		Object hidden = fragmentViewportStyle.get("hidden");
-
-		if (hidden != null) {
-			if (GetterUtil.getBoolean(hidden)) {
-				jsonObject.put("display", "none");
-			}
-			else {
-				jsonObject.put("display", "block");
-			}
-		}
-
-		jsonObject.put(
-			"marginBottom", fragmentViewportStyle.get("marginBottom")
-		).put(
-			"marginLeft", fragmentViewportStyle.get("marginLeft")
-		).put(
-			"marginRight", fragmentViewportStyle.get("marginRight")
-		).put(
-			"marginTop", fragmentViewportStyle.get("marginTop")
-		).put(
-			"paddingBottom", fragmentViewportStyle.get("paddingBottom")
-		).put(
-			"paddingLeft", fragmentViewportStyle.get("paddingLeft")
-		).put(
-			"paddingRight", fragmentViewportStyle.get("paddingRight")
-		).put(
-			"paddingTop", fragmentViewportStyle.get("paddingTop")
-		).put(
-			"textAlign", fragmentViewportStyle.get("textAlign")
-		);
-
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-132571"))) {
-			jsonObject.put(
+		return JSONUtil.put(
+			"styles",
+			JSONUtil.put(
 				"backgroundColor", fragmentViewportStyle.get("backgroundColor")
 			).put(
 				"borderColor", fragmentViewportStyle.get("borderColor")
@@ -281,6 +248,21 @@ public abstract class BaseLayoutStructureItemImporter {
 			).put(
 				"borderWidth", fragmentViewportStyle.get("borderWidth")
 			).put(
+				"display",
+				() -> {
+					Object hidden = fragmentViewportStyle.get("hidden");
+
+					if (hidden != null) {
+						if (GetterUtil.getBoolean(hidden)) {
+							return "none";
+						}
+
+						return "block";
+					}
+
+					return null;
+				}
+			).put(
 				"fontFamily", fragmentViewportStyle.get("fontFamily")
 			).put(
 				"fontSize", fragmentViewportStyle.get("fontSize")
@@ -288,6 +270,14 @@ public abstract class BaseLayoutStructureItemImporter {
 				"fontWeight", fragmentViewportStyle.get("fontWeight")
 			).put(
 				"height", fragmentViewportStyle.get("height")
+			).put(
+				"marginBottom", fragmentViewportStyle.get("marginBottom")
+			).put(
+				"marginLeft", fragmentViewportStyle.get("marginLeft")
+			).put(
+				"marginRight", fragmentViewportStyle.get("marginRight")
+			).put(
+				"marginTop", fragmentViewportStyle.get("marginTop")
 			).put(
 				"maxHeight", fragmentViewportStyle.get("maxHeight")
 			).put(
@@ -301,15 +291,22 @@ public abstract class BaseLayoutStructureItemImporter {
 			).put(
 				"overflow", fragmentViewportStyle.get("overflow")
 			).put(
+				"paddingBottom", fragmentViewportStyle.get("paddingBottom")
+			).put(
+				"paddingLeft", fragmentViewportStyle.get("paddingLeft")
+			).put(
+				"paddingRight", fragmentViewportStyle.get("paddingRight")
+			).put(
+				"paddingTop", fragmentViewportStyle.get("paddingTop")
+			).put(
 				"shadow", fragmentViewportStyle.get("shadow")
+			).put(
+				"textAlign", fragmentViewportStyle.get("textAlign")
 			).put(
 				"textColor", fragmentViewportStyle.get("textColor")
 			).put(
 				"width", fragmentViewportStyle.get("width")
-			);
-		}
-
-		return JSONUtil.put("styles", jsonObject);
+			));
 	}
 
 	protected JSONObject toStylesJSONObject(

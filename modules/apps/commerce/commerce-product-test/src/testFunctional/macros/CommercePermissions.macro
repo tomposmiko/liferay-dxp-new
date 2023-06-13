@@ -1,5 +1,33 @@
 definition {
 
+	macro definePermissionsPG {
+		SelectFrameTop(value1 = "relative=top");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+		for (var roleTitle : list "${roleTitles}") {
+			var key_roleTitle = StringUtil.replace("${roleTitle}", " ", "-");
+
+			var key_roleTitle = StringUtil.lowerCase("${key_roleTitle}");
+
+			Check(locator1 = "Permissions#${permissionDefinitionKey}");
+		}
+
+		Button.clickSave();
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Message#SUCCESS",
+			value1 = "Your request completed successfully.");
+
+		for (var roleTitle : list "${roleTitles}") {
+			var key_roleTitle = StringUtil.replace("${roleTitle}", " ", "-");
+
+			var key_roleTitle = StringUtil.lowerCase("${key_roleTitle}");
+
+			AssertChecked(locator1 = "Permissions#${permissionDefinitionKey}");
+		}
+	}
+
 	macro removeAccountRolePermission {
 		Navigator.gotoNavTab(navTab = "Account Roles");
 
@@ -18,6 +46,34 @@ definition {
 			locator1 = "CommercePermissions#REMOVE_PERMISSION");
 
 		Click(locator1 = "CommerceNavigation#BACK");
+	}
+
+	macro removePermissionsPG {
+		SelectFrameTop(value1 = "relative=top");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+		for (var roleTitle : list "${roleTitles}") {
+			var key_roleTitle = StringUtil.replace("${roleTitle}", " ", "-");
+
+			var key_roleTitle = StringUtil.lowerCase("${key_roleTitle}");
+
+			Uncheck(locator1 = "Permissions#${permissionDefinitionKey}");
+		}
+
+		Button.clickSave();
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Message#SUCCESS",
+			value1 = "Your request completed successfully.");
+
+		for (var roleTitle : list "${roleTitles}") {
+			var key_roleTitle = StringUtil.replace("${roleTitle}", " ", "-");
+
+			var key_roleTitle = StringUtil.lowerCase("${key_roleTitle}");
+
+			AssertNotChecked(locator1 = "Permissions#${permissionDefinitionKey}");
+		}
 	}
 
 	macro removeRegularRolePermission {

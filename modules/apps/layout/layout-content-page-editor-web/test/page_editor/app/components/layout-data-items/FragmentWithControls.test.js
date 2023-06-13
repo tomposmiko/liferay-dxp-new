@@ -19,7 +19,6 @@ import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 
 import FragmentWithControls from '../../../../../src/main/resources/META-INF/resources/page_editor/app/components/layout-data-items/FragmentWithControls';
-import {config} from '../../../../../src/main/resources/META-INF/resources/page_editor/app/config';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../../../src/main/resources/META-INF/resources/page_editor/app/config/constants/layoutDataItemTypes';
 import {VIEWPORT_SIZES} from '../../../../../src/main/resources/META-INF/resources/page_editor/app/config/constants/viewportSizes';
 import {
@@ -82,6 +81,7 @@ const renderFragment = ({
 						fragmentEntryLinks: {
 							[fragmentEntryLink.fragmentEntryLinkId]: fragmentEntryLink,
 						},
+						layoutData,
 						permissions: {
 							LOCKED_SEGMENTS_EXPERIMENT: lockedExperience,
 							UPDATE: hasUpdatePermissions,
@@ -115,41 +115,7 @@ describe('FragmentWithControls', () => {
 		expect(queryByText(document.body, 'duplicate')).not.toBeInTheDocument();
 	});
 
-	it('does not show the fragment if it has been hidden by the user', async () => {
-		await act(async () => {
-			renderFragment({
-				fragmentConfig: {
-					styles: {
-						display: 'none',
-					},
-				},
-			});
-		});
-
-		expect(
-			document.body.querySelector('.page-editor__fragment-content')
-		).not.toBeVisible();
-	});
-
-	it('shows the fragment if it has not been hidden by the user', async () => {
-		await act(async () => {
-			renderFragment({
-				fragmentConfig: {
-					styles: {
-						display: 'block',
-					},
-				},
-			});
-		});
-
-		expect(
-			document.body.querySelector('.page-editor__fragment-content')
-		).toBeVisible();
-	});
-
 	it('set classes for referencing the item', async () => {
-		config.featureFlagLps132571 = true;
-
 		await act(async () => {
 			renderFragment();
 		});
@@ -168,8 +134,6 @@ describe('FragmentWithControls', () => {
 	});
 
 	it('does not set unique classNames when it has inner common styles', async () => {
-		config.featureFlagLps132571 = true;
-
 		await act(async () => {
 			renderFragment({
 				editableValues: {

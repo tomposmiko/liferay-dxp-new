@@ -191,7 +191,7 @@ definition {
 				uploadFileName = "Document_1.png");
 
 			PageEditor.viewContainerStyle(
-				backgroundImage = "Document_1.png",
+				backgroundImage = "Document_1\.png",
 				position = "1");
 
 			PageEditor.addFragment(
@@ -212,7 +212,7 @@ definition {
 
 			PageEditor.viewFragmentStyle(
 				alignment = "center",
-				fragmentName = "heading",
+				fragmentName = "Heading",
 				headingLevel = "h2",
 				textColor = "danger");
 
@@ -245,12 +245,12 @@ definition {
 			MastersPageTemplatesAdmin.gotoMasters(masterLayoutName = "Custom Masters Page Template");
 
 			PageEditor.viewContainerStyle(
-				backgroundImage = "Document_1.png",
+				backgroundImage = "Document_1\.png",
 				position = "1");
 
 			PageEditor.viewFragmentStyle(
 				alignment = "center",
-				fragmentName = "heading",
+				fragmentName = "Heading",
 				headingLevel = "h2",
 				textColor = "danger");
 		}

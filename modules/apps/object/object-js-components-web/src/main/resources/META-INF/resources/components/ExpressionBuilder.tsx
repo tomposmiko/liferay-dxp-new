@@ -24,6 +24,7 @@ import {FieldBase} from './FieldBase';
 import './ExpressionBuilder.scss';
 
 export function ExpressionBuilder({
+	buttonDisabled,
 	className,
 	component,
 	disabled,
@@ -67,6 +68,7 @@ export function ExpressionBuilder({
 
 				<ClayInput.GroupItem append shrink>
 					<ClayButtonWithIcon
+						disabled={buttonDisabled}
 						displayType="secondary"
 						onClick={onOpenModal}
 						symbol="code"
@@ -82,20 +84,20 @@ export function ExpressionBuilderModal({sidebarElements}: IModalProps) {
 	const {observer, onOpenChange} = useModal();
 	const editorRef = useRef<CodeMirror.Editor>(null);
 	const [
-		{error, onSave, source, validateExpressionBuilderContentURL},
+		{error, onSave, source, validateExpressionURL},
 		setState,
 	] = useState<{
 		error?: string;
 		onSave?: Callback;
 		source?: string;
-		validateExpressionBuilderContentURL?: string;
+		validateExpressionURL?: string;
 	}>({});
 
 	useEffect(() => {
 		const openModal = (params: {
 			onSave: Callback;
 			source: string;
-			validateExpressionBuilderContentURL: string;
+			validateExpressionURL: string;
 		}) => {
 			setState(params);
 		};
@@ -128,10 +130,10 @@ export function ExpressionBuilderModal({sidebarElements}: IModalProps) {
 		}
 		else if (
 			Liferay.FeatureFlags['LPS-152735'] &&
-			validateExpressionBuilderContentURL
+			validateExpressionURL
 		) {
 			const response = await fetch(
-				createResourceURL(validateExpressionBuilderContentURL, {
+				createResourceURL(validateExpressionURL, {
 					expression: source,
 				}).href
 			);
@@ -199,6 +201,7 @@ interface IModalProps {
 	sidebarElements: SidebarCategory[];
 }
 interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
+	buttonDisabled?: boolean;
 	component?: 'input' | 'textarea' | React.ForwardRefExoticComponent<any>;
 	disabled?: boolean;
 	error?: string;

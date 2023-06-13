@@ -18,6 +18,7 @@ import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryService;
 import com.liferay.depot.web.internal.constants.DepotPortletKeys;
 import com.liferay.document.library.configuration.DLSizeLimitConfigurationProvider;
+import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -87,6 +88,15 @@ public class EditDepotEntryMVCActionCommand extends BaseMVCActionCommand {
 					DepotEntry.class.getName(), actionRequest));
 
 			_updateDLSizeLimitConfiguration(group.getGroupId(), actionRequest);
+		}
+		catch (ConfigurationModelListenerException
+					configurationModelListenerException) {
+
+			SessionErrors.add(
+				actionRequest, configurationModelListenerException.getClass());
+
+			actionResponse.sendRedirect(
+				ParamUtil.getString(actionRequest, "redirect"));
 		}
 		catch (PortalException portalException) {
 			_log.error(portalException);

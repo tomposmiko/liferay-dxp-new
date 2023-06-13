@@ -137,8 +137,9 @@ public class ObjectFieldResourceImpl
 		throws Exception {
 
 		return _toObjectField(
-			_objectFieldService.updateCustomObjectField(
-				objectFieldId, objectField.getListTypeDefinitionId(),
+			_objectFieldService.updateObjectField(
+				objectFieldId, objectField.getExternalReferenceCode(),
+				objectField.getListTypeDefinitionId(),
 				objectField.getBusinessTypeAsString(),
 				ObjectFieldUtil.getDBType(
 					objectField.getDBTypeAsString(),

@@ -20,15 +20,17 @@ export default function EditObjectAction({
 	objectAction: {id, ...values},
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	readOnly,
-	validateExpressionBuilderContentURL,
+	validateExpressionURL,
 }: IProps): JSX.Element;
 interface IProps {
 	ffNotificationTemplates: boolean;
 	objectAction: ObjectAction;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
+	objectDefinitionsRelationshipsURL: string;
 	readOnly?: boolean;
-	validateExpressionBuilderContentURL: string;
+	validateExpressionURL: string;
 }
 export {};

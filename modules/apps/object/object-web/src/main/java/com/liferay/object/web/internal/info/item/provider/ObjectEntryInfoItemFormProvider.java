@@ -91,13 +91,6 @@ public class ObjectEntryInfoItemFormProvider
 	public InfoForm getInfoForm(String formVariationKey)
 		throws NoSuchFormVariationException {
 
-		return _getInfoForm(GetterUtil.getLong(formVariationKey));
-	}
-
-	@Override
-	public InfoForm getInfoForm(String formVariationKey, long groupId)
-		throws NoSuchFormVariationException {
-
 		long objectDefinitionId = GetterUtil.getLong(formVariationKey);
 
 		if (objectDefinitionId == 0) {
@@ -105,6 +98,13 @@ public class ObjectEntryInfoItemFormProvider
 		}
 
 		return _getInfoForm(objectDefinitionId);
+	}
+
+	@Override
+	public InfoForm getInfoForm(String formVariationKey, long groupId)
+		throws NoSuchFormVariationException {
+
+		return getInfoForm(formVariationKey);
 	}
 
 	private InfoFieldSet _getBasicInformationInfoFieldSet() {
@@ -190,6 +190,10 @@ public class ObjectEntryInfoItemFormProvider
 						_objectFieldLocalService.getObjectFields(
 							objectDefinitionId)) {
 
+					if (objectField.isSystem()) {
+						continue;
+					}
+
 					if (Validator.isNotNull(
 							objectField.getRelationshipType())) {
 
@@ -210,23 +214,26 @@ public class ObjectEntryInfoItemFormProvider
 					}
 
 					unsafeConsumer.accept(
-						InfoField.builder(
-						).infoFieldType(
-							ObjectFieldDBTypeUtil.getInfoFieldType(objectField)
-						).namespace(
-							ObjectField.class.getSimpleName()
-						).name(
-							objectField.getName()
-						).editable(
-							true
-						).labelInfoLocalizedValue(
-							InfoLocalizedValue.<String>builder(
-							).values(
-								objectField.getLabelMap()
-							).build()
-						).required(
-							objectField.isRequired()
-						).build());
+						ObjectFieldDBTypeUtil.addAttributes(
+							InfoField.builder(
+							).infoFieldType(
+								ObjectFieldDBTypeUtil.getInfoFieldType(
+									objectField)
+							).namespace(
+								ObjectField.class.getSimpleName()
+							).name(
+								objectField.getName()
+							).editable(
+								true
+							).labelInfoLocalizedValue(
+								InfoLocalizedValue.<String>builder(
+								).values(
+									objectField.getLabelMap()
+								).build()
+							).required(
+								objectField.isRequired()
+							),
+							objectField));
 				}
 			}
 		).labelInfoLocalizedValue(

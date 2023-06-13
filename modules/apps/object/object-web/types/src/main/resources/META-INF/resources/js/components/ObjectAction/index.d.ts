@@ -21,23 +21,25 @@ export default function Action({
 	objectAction: initialValues,
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	readOnly,
 	requestParams: {method, url},
 	successMessage,
-	validateExpressionBuilderContentURL,
+	validateExpressionURL,
 }: IProps): JSX.Element;
 interface IProps {
 	ffNotificationTemplates: boolean;
 	objectAction: Partial<ObjectAction>;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
+	objectDefinitionsRelationshipsURL: string;
 	readOnly?: boolean;
 	requestParams: {
-		method: HTTPMethods;
+		method: 'GET' | 'POST' | 'DELETE' | 'PUT';
 		url: string;
 	};
 	successMessage: string;
 	title: string;
-	validateExpressionBuilderContentURL: string;
+	validateExpressionURL: string;
 }
 export {};

@@ -29,6 +29,7 @@ import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
@@ -43,6 +44,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -90,9 +92,18 @@ public class ObjectRelationshipDDMFormFieldTemplateContextContributor
 						ddmFormFieldRenderingContext.getLocale()));
 			}
 		).put(
-			"value", ddmFormFieldRenderingContext.getValue()
+			"value",
+			() -> {
+				String value = ddmFormFieldRenderingContext.getValue();
+
+				if (Objects.equals(value, "0")) {
+					return StringPool.BLANK;
+				}
+
+				return value;
+			}
 		).put(
-			"valueKey", "externalReferenceCode"
+			"valueKey", "id"
 		).build();
 	}
 

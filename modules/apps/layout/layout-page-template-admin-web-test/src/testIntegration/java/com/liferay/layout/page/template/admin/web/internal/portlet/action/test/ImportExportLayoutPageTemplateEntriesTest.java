@@ -264,6 +264,25 @@ public class ImportExportLayoutPageTemplateEntriesTest {
 	}
 
 	@Test
+	public void testImportExportLayoutPageTemplateEntryContainerCssClasses()
+		throws Exception {
+
+		try (PropsTemporarySwapper propsTemporarySwapper =
+				new PropsTemporarySwapper(
+					"feature.flag.LPS-147511", Boolean.TRUE.toString())) {
+
+			_addTextFragmentEntry();
+
+			File expectedFile = _generateZipFile(
+				"container/css_classes/expected", null, null);
+			File inputFile = _generateZipFile(
+				"container/css_classes/input", null, null);
+
+			_validateImportExport(expectedFile, inputFile);
+		}
+	}
+
+	@Test
 	public void testImportExportLayoutPageTemplateEntryContainerDefault()
 		throws Exception {
 
@@ -407,6 +426,25 @@ public class ImportExportLayoutPageTemplateEntriesTest {
 	}
 
 	@Test
+	public void testImportExportLayoutPageTemplateEntryFragmentCssClasses()
+		throws Exception {
+
+		try (PropsTemporarySwapper propsTemporarySwapper =
+				new PropsTemporarySwapper(
+					"feature.flag.LPS-147511", Boolean.TRUE.toString())) {
+
+			_addTextFragmentEntry();
+
+			File expectedFile = _generateZipFile(
+				"fragment/css_classes/expected", null, null);
+			File inputFile = _generateZipFile(
+				"fragment/css_classes/input", null, null);
+
+			_validateImportExport(expectedFile, inputFile);
+		}
+	}
+
+	@Test
 	public void testImportExportLayoutPageTemplateEntryFragmentHidden()
 		throws Exception {
 
@@ -499,19 +537,14 @@ public class ImportExportLayoutPageTemplateEntriesTest {
 	public void testImportExportLayoutPageTemplateEntryFragmentResponsiveStyles()
 		throws Exception {
 
-		try (PropsTemporarySwapper propsTemporarySwapper =
-				new PropsTemporarySwapper(
-					"feature.flag.LPS-132571", Boolean.TRUE.toString())) {
+		_addTextFragmentEntry();
 
-			_addTextFragmentEntry();
+		File expectedFile = _generateZipFile(
+			"fragment/responsive/expected", null, null);
+		File inputFile = _generateZipFile(
+			"fragment/responsive/input", null, null);
 
-			File expectedFile = _generateZipFile(
-				"fragment/responsive/expected", null, null);
-			File inputFile = _generateZipFile(
-				"fragment/responsive/input", null, null);
-
-			_validateImportExport(expectedFile, inputFile);
-		}
+		_validateImportExport(expectedFile, inputFile);
 	}
 
 	@Test
@@ -901,10 +934,8 @@ public class ImportExportLayoutPageTemplateEntriesTest {
 		List<LayoutPageTemplatesImporterResultEntry>
 			layoutPageTemplatesImporterResultEntries = null;
 
-		ServiceContext serviceContext = _getServiceContext(
-			_group1, TestPropsValues.getUserId());
-
-		ServiceContextThreadLocal.pushServiceContext(serviceContext);
+		ServiceContextThreadLocal.pushServiceContext(
+			_getServiceContext(_group1, TestPropsValues.getUserId()));
 
 		try {
 			layoutPageTemplatesImporterResultEntries =

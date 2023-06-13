@@ -22,8 +22,9 @@ export default function EditObjectAction({
 	objectAction: {id, ...values},
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	readOnly,
-	validateExpressionBuilderContentURL,
+	validateExpressionURL,
 }: IProps) {
 	return (
 		<ObjectAction
@@ -31,6 +32,9 @@ export default function EditObjectAction({
 			objectAction={values}
 			objectActionExecutors={objectActionExecutors}
 			objectActionTriggers={objectActionTriggers}
+			objectDefinitionsRelationshipsURL={
+				objectDefinitionsRelationshipsURL
+			}
 			readOnly={readOnly}
 			requestParams={{
 				method: 'PUT',
@@ -40,9 +44,7 @@ export default function EditObjectAction({
 				'the-object-action-was-updated-successfully'
 			)}
 			title={Liferay.Language.get('action')}
-			validateExpressionBuilderContentURL={
-				validateExpressionBuilderContentURL
-			}
+			validateExpressionURL={validateExpressionURL}
 		/>
 	);
 }
@@ -52,6 +54,7 @@ interface IProps {
 	objectAction: ObjectAction;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
+	objectDefinitionsRelationshipsURL: string;
 	readOnly?: boolean;
-	validateExpressionBuilderContentURL: string;
+	validateExpressionURL: string;
 }

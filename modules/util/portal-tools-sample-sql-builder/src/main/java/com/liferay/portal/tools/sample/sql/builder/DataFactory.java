@@ -1434,14 +1434,11 @@ public class DataFactory {
 		// Other fields
 
 		commerceCurrencyModel.setCode("USD");
-
-		String name = StringBundler.concat(
-			"<?xml version=\"1.0\" encoding=\"UTF-8\"?><root available-locales",
-			"=\"en_US\" default-locale=\"en_US\"><Name language-id=\"en_US\">",
-			"US Dollar</Name></root>");
-
-		commerceCurrencyModel.setName(name);
-
+		commerceCurrencyModel.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><root available-",
+				"locales=\"en_US\" default-locale=\"en_US\"><Name language-id=",
+				"\"en_US\">US Dollar</Name></root>"));
 		commerceCurrencyModel.setRate(BigDecimal.valueOf(1));
 		commerceCurrencyModel.setFormatPattern(
 			StringBundler.concat(
@@ -1684,6 +1681,10 @@ public class DataFactory {
 
 		CommerceOrderItemModel commerceOrderItemModel =
 			new CommerceOrderItemModelImpl();
+
+		// UUID
+
+		commerceOrderItemModel.setUuid(SequentialUUID.generate());
 
 		// PK fields
 

@@ -17,6 +17,7 @@ package com.liferay.wiki.internal.upgrade;
 import com.liferay.comment.upgrade.UpgradeDiscussionSubscriptionClassName;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.settings.SettingsFactory;
+import com.liferay.portal.kernel.upgrade.BaseExternalReferenceCodeUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.BaseSQLServerDatetimeUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.kernel.upgrade.MVCCVersionUpgradeProcess;
@@ -33,8 +34,6 @@ import com.liferay.wiki.internal.upgrade.v1_0_0.WikiPageUpgradeProcess;
 import com.liferay.wiki.internal.upgrade.v1_1_0.WikiNodeUpgradeProcess;
 import com.liferay.wiki.internal.upgrade.v2_0_0.util.WikiNodeTable;
 import com.liferay.wiki.internal.upgrade.v2_0_0.util.WikiPageTable;
-import com.liferay.wiki.internal.upgrade.v2_2_0.WikiNodeExternalReferenceCodeUpgradeProcess;
-import com.liferay.wiki.internal.upgrade.v2_2_0.WikiPageExternalReferenceCodeUpgradeProcess;
 import com.liferay.wiki.model.WikiPage;
 
 import org.osgi.service.component.annotations.Component;
@@ -88,9 +87,20 @@ public class WikiServiceUpgrade implements UpgradeStepRegistrator {
 
 		registry.register("2.1.0", "2.1.1", new DummyUpgradeStep());
 
+		registry.register("2.1.1", "2.2.0", new DummyUpgradeStep());
+
 		registry.register(
-			"2.1.1", "2.2.0", new WikiNodeExternalReferenceCodeUpgradeProcess(),
-			new WikiPageExternalReferenceCodeUpgradeProcess());
+			"2.2.0", "2.3.0",
+			new BaseExternalReferenceCodeUpgradeProcess() {
+
+				@Override
+				protected String[][] getTableAndPrimaryKeyColumnNames() {
+					return new String[][] {
+						{"WikiNode", "nodeId"}, {"WikiPage", "pageId"}
+					};
+				}
+
+			});
 	}
 
 	@Reference

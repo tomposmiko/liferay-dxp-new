@@ -132,8 +132,6 @@ definition {
 
 			PageEditor.viewContainerStyle(
 				containerWidth = "Fluid",
-				paddingLeft = "0",
-				paddingRight = "0",
 				position = "1");
 		}
 
@@ -184,27 +182,35 @@ definition {
 				siteName = "Test Site Name");
 
 			var screenWidth = selenium.getElementWidth("//body");
-			var containerWidth = selenium.getElementWidth("//div[contains(@class,'container')][contains(@class,'pb-4')][contains(@class,'pt-2')]");
+			var containerWidth = selenium.getElementWidth("//div[contains(@class,'lfr-layout-structure-item-container')]");
 
 			TestUtils.assertNotEquals(
 				actual = "${containerWidth}",
 				expected = "${screenWidth}");
 
-			AssertVisible(locator1 = "//div[contains(@class,'container')][contains(@class,'pb-4')][contains(@class,'pt-2')]");
+			ContentPages.viewFragmentCommonStyle(
+				fragmentName = "container",
+				styleName = "backgroundColor",
+				styleValue = "success");
+
+			ContentPages.viewFragmentCommonStyle(
+				fragmentName = "container",
+				styleName = "paddingBottom",
+				styleValue = "4");
+
+			ContentPages.viewFragmentCommonStyle(
+				fragmentName = "container",
+				styleName = "paddingTop",
+				styleValue = "2");
 
 			AssertCssValue(
-				locator1 = "//div[contains(@class,'container')][contains(@class,'pb-4')][contains(@class,'pt-2')]",
-				locator2 = "background-color",
-				value1 = "rgba(40, 125, 60, 1)");
-
-			AssertCssValue(
-				locator1 = "//div[contains(@class,'container')][contains(@class,'pb-4')][contains(@class,'pt-2')]",
+				locator1 = "//div[contains(@class,'lfr-layout-structure-item-container')]",
 				locator2 = "max-width",
 				value1 = "${containerWidth}px");
 
-			AssertElementNotPresent(locator1 = "//div[contains(@class,'container')][contains(@class,'ml-0')]");
+			AssertElementNotPresent(locator1 = "//div[contains(@class,'lfr-layout-structure-item-container')][contains(@class,'ml-0')]");
 
-			AssertElementNotPresent(locator1 = "//div[contains(@class,'container')][contains(@class,'mr-0')]");
+			AssertElementNotPresent(locator1 = "//div[contains(@class,'lfr-layout-structure-item-container')][contains(@class,'mr-0')]");
 		}
 	}
 
@@ -861,7 +867,7 @@ definition {
 		}
 
 		task ("Assert the mapped image is shown in background image field") {
-			ContentPages.viewFragmentBackgroundImage(image = "Document_2.jpeg");
+			ContentPages.viewFragmentBackgroundImage(image = "Document_2\.jpeg");
 
 			PageEditor.publish();
 		}
@@ -876,7 +882,7 @@ definition {
 		}
 
 		task ("Assert the mapped image is shown in background image field in edit mode") {
-			ContentPages.viewFragmentBackgroundImage(image = "Document_2.jpeg");
+			ContentPages.viewFragmentBackgroundImage(image = "Document_2\.jpeg");
 
 			PageEditor.publish();
 		}
@@ -1004,7 +1010,7 @@ definition {
 			PageEditor.configureFragment(textColor = "White");
 
 			PageEditor.viewFragmentStyle(
-				fragmentName = "heading",
+				fragmentName = "Heading",
 				textColor = "white");
 		}
 
@@ -1015,8 +1021,13 @@ definition {
 				backgroundColor = "success",
 				position = "2");
 
+			PageEditor.viewFragmentStyle(
+				fragmentName = "Heading",
+				position = "2",
+				textColor = "white");
+
 			AssertElementPresent(
-				key_elementHeader = "//div[@aria-label='Heading']//div[contains(@class,'page-editor__topper__content')]//div[contains(@style,'color: var(--white)')]",
+				key_elementHeader = "//div[@aria-label='Heading']",
 				key_position = "2",
 				locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 		}

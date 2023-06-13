@@ -1,21 +1,5 @@
 definition {
 
-	macro addEntryOnRelationshipFieldViaUI {
-		LexiconEntry.gotoAdd();
-
-		WaitForSPARefresh();
-
-		Click(locator1 = "ObjectPortlet#SEARCH_RELATIONSHIP_ENTRY");
-
-		Click(
-			key_picklistOption = "${entryOption}",
-			locator1 = "ObjectAdmin#ENTRY_PICKLIST_OPTION");
-
-		Button.clickSave();
-
-		WaitForSPARefresh();
-	}
-
 	macro addLayoutBlockViaUI {
 		Click(locator1 = "ObjectAdmin#ADD_BLOCK_BUTTON");
 
@@ -59,7 +43,7 @@ definition {
 			whenAction = "${whenAction}");
 	}
 
-	macro addObjectBoleanFieldEntryViaUI {
+	macro addObjectBooleanFieldEntryViaUI {
 		ObjectAdmin.goToCustomObject(objectName = "${objectName}");
 
 		LexiconEntry.gotoAdd();
@@ -125,6 +109,14 @@ definition {
 				Click(
 					key_fieldType = "${fieldAttachment}",
 					locator1 = "ObjectField#TYPE_OPTION");
+
+				var enableShowFiles = "${enableShowFiles}";
+
+				if (isSet(enableShowFiles)) {
+					Check.checkNotVisible(
+						key_toggleSwitchLabel = "Show Files in Documents and Media",
+						locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+				}
 			}
 		}
 
@@ -176,7 +168,12 @@ definition {
 	macro addObjectPicklistFieldEntryViaUI {
 		LexiconEntry.gotoAdd();
 
-		Click(locator1 = "ObjectAdmin#ENTRY_CHOOSE_OPTION");
+		if (IsElementPresent(locator1 = "ObjectAdmin#ENTRY_CHOOSE_OPTION")) {
+			Click(locator1 = "ObjectAdmin#ENTRY_CHOOSE_OPTION");
+		}
+		else {
+			Click(locator1 = "ObjectPortlet#SEARCH_RELATIONSHIP_ENTRY");
+		}
 
 		Click(
 			key_picklistOption = "${picklistOption}",

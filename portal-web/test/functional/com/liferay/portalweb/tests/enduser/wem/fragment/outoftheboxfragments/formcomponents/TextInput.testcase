@@ -17,6 +17,23 @@ definition {
 			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
+		task ("Add a company Object with a Text field") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Purchase Order",
+				objectName = "PurchaseOrder",
+				pluralLabelName = "Purchase Orders");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Text",
+				fieldLabelName = "Region",
+				fieldName = "region",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "PurchaseOrder");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "PurchaseOrder");
+		}
+
 		task ("Enable Inputs Fragment collection in Gogo Shell") {
 			GogoShell.openGogoShellAdmin();
 
@@ -42,6 +59,232 @@ definition {
 			}
 
 			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+
+			ObjectAdmin.deleteObjectViaAPI(objectName = "PurchaseOrder");
+		}
+	}
+
+	@description = "This is a test for LPS-149725. The pages designer can map the Text Input fragment entities text fields."
+	@priority = "4"
+	test AddCustomTextInputFieldsOnContentPage {
+		property test.name.skip.portal.instance = "TextInput#AddCustomTextInputFieldsOnContentPage";
+
+		task ("Given a pages designer has a Text Input fragment inside a mapped Form Container") {
+			task ("Add a Form Container framgment to content page") {
+				JSONLayout.addPublicLayout(
+					groupName = "Test Site Name",
+					layoutName = "Test Page Name",
+					type = "content");
+
+				ContentPagesNavigator.openEditContentPage(
+					pageName = "Test Page Name",
+					siteName = "Test Site Name");
+
+				PageEditor.addFragment(
+					collectionName = "Form Components",
+					fragmentName = "Form Container");
+
+				PageEditor.editFormContainer(
+					contentType = "Purchase Order",
+					panel = "General");
+			}
+
+			task ("Add a Text Input inside Form Container") {
+				PageEditor.addFragmentToFormContainer(
+					collectionName = "Form Components",
+					fragmentName = "Text Input");
+			}
+		}
+
+		task ("When the pages designer adds a custom name in Text Input fields") {
+			PageEditor.editInput(
+				field = "Region",
+				fragmentName = "Text Input",
+				helpText = "Custom Help Text",
+				hideHelpText = "false",
+				label = "Custom Content Field",
+				placeholder = "Custom Placeholder");
+		}
+
+		task ("Then the pages designer can see the custom fields at edit mode") {
+			PageEditor.viewInputStyle(
+				helpText = "Custom Help Text",
+				label = "Custom Content Field",
+				placeholder = "Custom Placeholder",
+				showHelpText = "true",
+				showLabel = "true",
+				type = "text-input");
+		}
+
+		task ("When the page designer navigates to published content page at view mode") {
+			PageEditor.publish();
+
+			ContentPagesNavigator.openViewContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
+		}
+
+		task ("Then the pages designer can see the custom fields at view mode") {
+			PageEditor.viewInputStyle(
+				helpText = "Custom Help Text",
+				label = "Custom Content Field",
+				placeholder = "Custom Placeholder",
+				showHelpText = "true",
+				showLabel = "true",
+				type = "text-input");
+		}
+
+		task ("When the pages designer hides the label and help text fields") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
+
+			PageEditor.editInput(
+				fragmentName = "Text Input",
+				hideHelpText = "true",
+				hideLabel = "true");
+		}
+
+		task ("Then the pages designer cannot see hidden fields at edit mode") {
+			PageEditor.viewInputStyle(
+				helpText = "Custom Help Text",
+				label = "Custom Content Field",
+				showHelpText = "false",
+				showLabel = "false",
+				type = "text-input");
+		}
+
+		task ("When the page designer navigates to published content page at view mode") {
+			PageEditor.publish();
+
+			ContentPagesNavigator.openViewContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
+		}
+
+		task ("Then the pages designer cannot see hidden fields at view mode") {
+			PageEditor.viewInputStyle(
+				helpText = "Custom Help Text",
+				label = "Custom Content Field",
+				showHelpText = "false",
+				showLabel = "false",
+				type = "text-input");
+		}
+	}
+
+	@description = "This is a test for LPS-149725. The pages designer can map the Text Input fragment with translated entities text fields."
+	@priority = "4"
+	test AddCustomTextInputFieldsWithTranslation {
+		property test.name.skip.portal.instance = "TextInput#AddCustomTextInputFieldsWithTranslation";
+
+		task ("Given a pages designer has a Text Input fragment inside a mapped Form Container and Language Selector widget on a content page") {
+			task ("Add a Form Container framgment to content page") {
+				JSONLayout.addPublicLayout(
+					groupName = "Test Site Name",
+					layoutName = "Test Page Name",
+					type = "content");
+
+				ContentPagesNavigator.openEditContentPage(
+					pageName = "Test Page Name",
+					siteName = "Test Site Name");
+
+				PageEditor.addFragment(
+					collectionName = "Form Components",
+					fragmentName = "Form Container");
+
+				PageEditor.editFormContainer(
+					contentType = "Purchase Order",
+					panel = "General");
+			}
+
+			task ("Add a Text Input inside Form Container") {
+				PageEditor.addFragmentToFormContainer(
+					collectionName = "Form Components",
+					fragmentName = "Text Input");
+			}
+
+			task ("Add a Language Selector below Form Container") {
+				PageEditor.addWidget(
+					collectionName = "Tools",
+					portletName = "Language Selector",
+					targetFragmentName = "Form Container");
+			}
+		}
+
+		task ("When the pages designer adds a custom name in Text Input fields") {
+			PageEditor.editInput(
+				field = "Region",
+				fragmentName = "Text Input",
+				helpText = "Custom Help Text",
+				hideHelpText = "false",
+				label = "Custom Content Field",
+				placeholder = "Custom Placeholder");
+		}
+
+		task ("Then the pages designer can see the custom fields at edit mode") {
+			PageEditor.viewInputStyle(
+				helpText = "Custom Help Text",
+				label = "Custom Content Field",
+				placeholder = "Custom Placeholder",
+				showHelpText = "true",
+				showLabel = "true",
+				type = "text-input");
+		}
+
+		task ("When the pages designer adds a Spanish translation in Text Input fields") {
+			PageEditor.changeLocale(
+				currentLocale = "en-US",
+				locale = "es-ES");
+
+			PageEditor.editInput(
+				fragmentName = "Text Input",
+				helpText = "Texto de ayuda personalizado",
+				label = "Campo de contenido personalizado",
+				placeholder = "Marcador de posición personalizado");
+		}
+
+		task ("Then the pages designer can see the translated fields at edit mode") {
+			PageEditor.viewInputStyle(
+				helpText = "Texto de ayuda personalizado",
+				label = "Campo de contenido personalizado",
+				placeholder = "Marcador de posición personalizado",
+				showHelpText = "true",
+				showLabel = "true",
+				type = "text-input");
+		}
+
+		task ("When the page designer navigates to published content page at view mode") {
+			PageEditor.publish();
+
+			ContentPagesNavigator.openViewContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
+		}
+
+		task ("Then the pages designer can see custom fields at view mode") {
+			PageEditor.viewInputStyle(
+				helpText = "Custom Help Text",
+				label = "Custom Content Field",
+				placeholder = "Custom Placeholder",
+				showHelpText = "true",
+				showLabel = "true",
+				type = "text-input");
+		}
+
+		task ("When the pages designer changes the user language to Spanish") {
+			LanguagePortlet.selectLanguagePG(
+				locale = "es-ES",
+				textIcon = "español-España");
+		}
+
+		task ("Then the pages designer can see custom fields in Spanish") {
+			PageEditor.viewInputStyle(
+				helpText = "Texto de ayuda personalizado",
+				label = "Campo de contenido personalizado",
+				placeholder = "Marcador de posición personalizado",
+				showHelpText = "true",
+				showLabel = "true",
+				type = "text-input");
 		}
 	}
 
@@ -151,6 +394,69 @@ definition {
 		}
 	}
 
+	@description = "This is a test for LPS-149725. The pages designer cannot type more than 280 characters in the text input field."
+	@priority = "4"
+	test CannotType281CharactersInTextInputField {
+		property test.name.skip.portal.instance = "TextInput#CannotType281CharactersInTextInputField";
+
+		var actualText = "The number of characters is 280.The number of characters is 280.The number of characters is 280.The number of characters is 280.The number of characters is 280.The number of characters is 280.The number of characters is 280.The number of characters is 280.The number of characters";
+		var inputText = "The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characterss";
+		var modifiedText = "The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characters is 281.The number of characters";
+
+		task ("Given a pages designer has a Text Input fragment within published content page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Page Name",
+				type = "content");
+
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
+
+			PageEditor.addFragment(
+				collectionName = "Form Components",
+				fragmentName = "Text Input");
+
+			PageEditor.publish();
+		}
+
+		task ("When the pages designer types 281 characters in the Input Fragment") {
+			ContentPagesNavigator.openViewContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
+
+			Type.sendKeys(
+				key_text = "Text Input",
+				locator1 = "TextInput#ANY",
+				value1 = "${inputText}");
+		}
+
+		task ("Then the pages designer can see just 280 characters in Text Input field") {
+			AssertTextEquals(
+				key_text = "Text Input",
+				locator1 = "TextInput#ANY",
+				value1 = "${modifiedText}");
+		}
+
+		task ("When the pages designer types 280 characters in the Input Fragment") {
+			ContentPagesNavigator.openViewContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
+
+			Type.sendKeys(
+				key_text = "Text Input",
+				locator1 = "TextInput#ANY",
+				value1 = "${actualText}");
+		}
+
+		task ("Then the pages designer can see 280 characters in Text Input field") {
+			AssertTextEquals(
+				key_text = "Text Input",
+				locator1 = "TextInput#ANY",
+				value1 = "${actualText}");
+		}
+	}
+
 	@description = "This is a test for LPS-150278. View warning modal when hiding and publishing a layout elements that contains a required Text Input fragment on content page."
 	@priority = "4"
 	test ViewWarningWhenHideRequiredTextInputOnContentPage {
@@ -172,7 +478,7 @@ definition {
 					fragmentName = "Form Container");
 
 				PageEditor.editFormContainer(
-					contentType = "Web Content Article",
+					contentType = "Purchase Order",
 					panel = "General");
 			}
 
@@ -189,7 +495,7 @@ definition {
 					navTab = "Fragments");
 
 				PageEditor.editInput(
-					field = "Content",
+					field = "Region",
 					fragmentName = "Text Input",
 					markAsRequired = "true");
 			}
@@ -244,7 +550,7 @@ definition {
 				siteName = "Test Site Name");
 
 			AssertNotVisible(
-				key_text = "Content*",
+				key_text = "Region*",
 				locator1 = "Fragment#EDITABLE_FIELD_CONTENT");
 		}
 	}
@@ -272,7 +578,7 @@ definition {
 					fragmentName = "Form Container");
 
 				PageEditor.editFormContainer(
-					contentType = "Web Content Article",
+					contentType = "Purchase Order",
 					panel = "General");
 			}
 
@@ -290,7 +596,7 @@ definition {
 					navTab = "Fragments");
 
 				PageEditor.editInput(
-					field = "Content",
+					field = "Region",
 					fragmentName = "Text Input",
 					markAsRequired = "true");
 			}
@@ -354,7 +660,7 @@ definition {
 			ControlMenu.viewHeaderTitle(headerTitle = "Display Page Name");
 
 			AssertNotVisible(
-				key_text = "Content*",
+				key_text = "Region*",
 				locator1 = "Fragment#EDITABLE_FIELD_CONTENT");
 		}
 	}

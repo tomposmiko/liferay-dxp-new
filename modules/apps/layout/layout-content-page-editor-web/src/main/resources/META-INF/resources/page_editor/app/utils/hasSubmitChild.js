@@ -14,30 +14,18 @@
 
 import getLayoutDataItemUniqueClassName from './getLayoutDataItemUniqueClassName';
 
-function isVisible(element, globalContext) {
-	const computedStyle = globalContext.window.getComputedStyle(element);
-	const {parentElement} = element;
-
-	return (
-		computedStyle.display !== 'none' &&
-		computedStyle.visibility !== 'collapse' &&
-		computedStyle.visibility !== 'hidden' &&
-		!element.hasAttribute('hidden') &&
-		!element.hasAttribute('aria-hidden') &&
-		(!parentElement || isVisible(parentElement, globalContext))
-	);
-}
-
-export default function hasSubmitChild(itemId, globalContext) {
+export default function hasSubmitChild(itemId) {
 	const element = document.querySelector(
 		`.${getLayoutDataItemUniqueClassName(itemId)}`
 	);
 
-	return Array.from(
+	if (!element) {
+		return false;
+	}
+
+	return Boolean(
 		element.querySelectorAll(
 			'input[type=submit], button[type=submit], button:not([type])'
-		)
-	).some((buttonElement) => {
-		return isVisible(buttonElement, globalContext);
-	});
+		).length
+	);
 }

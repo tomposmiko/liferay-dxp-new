@@ -6782,15 +6782,14 @@ public class AssetVocabularyPersistenceImpl
 		AssetVocabularyModelImpl assetVocabularyModelImpl =
 			(AssetVocabularyModelImpl)assetVocabulary;
 
-		if (Validator.isNull(assetVocabulary.getExternalReferenceCode())) {
-			assetVocabulary.setExternalReferenceCode(
-				String.valueOf(assetVocabulary.getPrimaryKey()));
-		}
-
 		if (Validator.isNull(assetVocabulary.getUuid())) {
 			String uuid = PortalUUIDUtil.generate();
 
 			assetVocabulary.setUuid(uuid);
+		}
+
+		if (Validator.isNull(assetVocabulary.getExternalReferenceCode())) {
+			assetVocabulary.setExternalReferenceCode(assetVocabulary.getUuid());
 		}
 
 		ServiceContext serviceContext =
@@ -6915,7 +6914,9 @@ public class AssetVocabularyPersistenceImpl
 	 */
 	@Override
 	public AssetVocabulary fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(AssetVocabulary.class)) {
+		if (CTPersistenceHelperUtil.isProductionMode(
+				AssetVocabulary.class, primaryKey)) {
+
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 

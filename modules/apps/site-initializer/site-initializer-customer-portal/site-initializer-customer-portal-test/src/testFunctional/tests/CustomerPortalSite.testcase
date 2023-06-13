@@ -7,10 +7,23 @@ definition {
 	property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 	property testray.main.component.name = "Site Initializer Customer Portal";
 
-	setUp {
-		TestCase.setUpPortalInstance();
+	var testSiteName = "Test Customer Portal Name";
+	var testSiteURL = "test-customer-portal-name";
 
-		User.firstLoginUI();
+	setUp {
+		task ("Set up instance and sign in") {
+			TestCase.setUpPortalInstance();
+
+			User.firstLoginPG();
+		}
+
+		task ("Create a new Customer Portal Site") {
+			Site.openSitesAdmin();
+
+			TeamExtranet.addSiteTemplateCP(
+				siteName = "${testSiteName}",
+				siteTemplateName = "Liferay OSB Site Initializer Customer Portal");
+		}
 	}
 
 	tearDown {
@@ -20,17 +33,15 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			CustomerPortal.customerPortalTearDown();
+			JSONGroup.deleteGroupByName(groupName = "${testSiteName}");
 
-			User.logoutPG();
+			CustomerPortal.customerPortalApisTearDown();
 		}
 	}
 
 	@description = "LPS-146217 - Verify if when Customer Portal is created, Accounts Users will be created for it as well"
 	@priority = "4"
 	test AccountUsersAreCreatedForCP20 {
-		CustomerPortal.addCustomerPortalSite(siteName = "Customer Portal");
-
 		AccountUsers.openAccountUsersAdmin();
 
 		AssertElementPresent(
@@ -120,9 +131,16 @@ definition {
 		}
 
 		task ("Create CP2.0 and verify that it has been created") {
-			CustomerPortal.addCustomerPortalSite(siteName = "Customer Portal");
+			var testSiteName = "Test Customer Portal Name";
+			var testSiteURL = "test-customer-portal-name";
 
-			ApplicationsMenu.gotoSite(key_site = "Customer Portal");
+			Site.openSitesAdmin();
+
+			TeamExtranet.addSiteTemplateCP(
+				siteName = "${testSiteName}",
+				siteTemplateName = "Liferay OSB Site Initializer Customer Portal");
+
+			ApplicationsMenu.gotoSite(key_site = "Test Customer Portal Name");
 
 			AssertElementPresent(
 				locator1 = "CP2LiferayContact#PROJECT_CARD",
@@ -155,49 +173,22 @@ definition {
 	@description = "LPS-146215 - Verify if Customer Portal can be created"
 	@priority = "5"
 	test CanCP20BeCreated {
-		ApplicationsMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Sites");
+		property portal.acceptance = "true";
 
-		LexiconEntry.gotoAdd();
-
-		LexiconCard.clickCard(card = "Customer Portal");
-
-		SelectFrame(
-			key_title = "Add Site",
-			locator1 = "IFrame#MODAL_ANY");
-
-		PortletEntry.inputName(name = "Customer Portal");
-
-		Click(locator1 = "Button#ADD");
-
-		AssertElementPresent(locator1 = "Raylife#SAVE_LOADING_ANIMATION");
-
-		while (IsElementPresent(locator1 = "Raylife#SAVE_LOADING_ANIMATION")) {
-			Pause(locator1 = "1500");
+		task ("Go to Customer Portal Site") {
+			ApplicationsMenu.gotoSite(site = "${testSiteName}");
 		}
 
-		Refresh();
-
-		WaitForElementPresent(
-			key_itemName = "Site Configuration",
-			locator1 = "ListGroupItem#ITEM_TEXT");
-
-		Click(
-			key_itemName = "Site Configuration",
-			locator1 = "ListGroupItem#ITEM_TEXT");
-
-		AssertTextEquals(
-			locator1 = "SitesEditSite#DETAILS_NAME",
-			value1 = "Customer Portal");
+		task ("Assert the Customer Portal Page is present") {
+			AssertElementPresent(
+				key_title = "Welcome,",
+				locator1 = "CustomerPortalSite#FRAGMENT_HEADING");
+		}
 	}
 
 	@description = "LPS-146220 - Verify if when Customer Portal is created, Objects will be created for it as well"
 	@priority = "4"
 	test ObjectsAreCreatedForCP20 {
-		CustomerPortal.addCustomerPortalSite(siteName = "Customer Portal");
-
 		ObjectAdmin.openObjectAdmin();
 
 		AssertElementPresent(
@@ -208,8 +199,6 @@ definition {
 	@description = "LPS-146219 - Verify if when Customer Portal is created, Remote Apps will be created for it as well"
 	@priority = "4"
 	test RemoteAppsAreCreatedForCP20 {
-		CustomerPortal.addCustomerPortalSite(siteName = "Customer Portal");
-
 		RemoteApps.goToRemoteAppsPortlet();
 
 		AssertElementPresent(
@@ -220,8 +209,6 @@ definition {
 	@description = "LPS-146216 - Verify if when Customer Portal is created, Tests Accounts will be created for it as well"
 	@priority = "4"
 	test TestsAccountsAreCreatedForCP20 {
-		CustomerPortal.addCustomerPortalSite(siteName = "Customer Portal");
-
 		Accounts.openAccountsAdmin();
 
 		AssertElementPresent(

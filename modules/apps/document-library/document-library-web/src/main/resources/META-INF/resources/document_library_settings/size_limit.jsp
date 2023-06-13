@@ -23,6 +23,8 @@ DLSizeLimitConfigurationDisplayContext dlSizeLimitConfigurationDisplayContext = 
 <aui:form action="<%= dlSizeLimitConfigurationDisplayContext.getEditDLSizeLimitConfigurationURL() %>" method="post" name="fm">
 	<clay:sheet>
 		<clay:sheet-header>
+			<liferay-ui:error exception="<%= ConfigurationModelListenerException.class %>" message="mime-type-size-limit-error" />
+
 			<h2>
 				<liferay-ui:message key="dl-size-limit-configuration-name" />
 			</h2>

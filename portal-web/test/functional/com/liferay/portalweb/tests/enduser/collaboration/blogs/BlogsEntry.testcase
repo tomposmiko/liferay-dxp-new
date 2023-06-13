@@ -1321,12 +1321,12 @@ definition {
 		Navigator.gotoPage(pageName = "Blogs Page");
 
 		BlogsEntry.viewAbstractDisplay(
-			entryAbstractDescription = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web applications called social applications. The definition is simple: a social application is a web application that additionally leverages social identity, data, and features or services. In the left figure, the light blue squares represent...",
+			entryAbstractDescription = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web applications called social applications. The definition is simple: a social application is a web application that additionally leverages social identity, data, and features or services. In the left figure, the light blue squares...",
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
 
 		BlogsNavigator.gotoEntryWithAbstractPG(
-			entryAbstractDescription = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web applications called social applications. The definition is simple: a social application is a web application that additionally leverages social identity, data, and features or services. In the left figure, the light blue squares represent...",
+			entryAbstractDescription = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web applications called social applications. The definition is simple: a social application is a web application that additionally leverages social identity, data, and features or services. In the left figure, the light blue squares...",
 			entryTitle = "Blogs Entry Title");
 
 		BlogsEntry.viewEntryPG(
@@ -1387,10 +1387,8 @@ definition {
 	@description = "This ensures that an external video in the Blogs content field can be rendered correctly when publication is enabled."
 	@priority = "5"
 	test CanViewInlineVideoWithPublication {
-		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
-		property osgi.module.configurations = "enabled=B&quot;true&quot;";
-
-		JSONPublications.enablePublications();
+		property osgi.module.configuration.file.names = "com.liferay.change.tracking.configuration.CTSettingsConfiguration.config:com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;:enabled=B&quot;true&quot;";
 
 		JSONPublications.addPublication(publicationName = "Publication Name");
 

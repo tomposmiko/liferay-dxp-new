@@ -24,6 +24,7 @@ import com.liferay.object.service.ObjectFieldService;
 import com.liferay.object.service.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -164,9 +165,9 @@ public class ObjectFieldServiceTest {
 	}
 
 	@Test
-	public void testUpdateCustomObjectField() throws Exception {
+	public void testUpdateObjectField() throws Exception {
 		try {
-			_testUpdateCustomObjectField(_defaultUser);
+			_testUpdateObjectField(_defaultUser);
 
 			Assert.fail();
 		}
@@ -179,7 +180,7 @@ public class ObjectFieldServiceTest {
 						" must have UPDATE permission for"));
 		}
 
-		_testUpdateCustomObjectField(_user);
+		_testUpdateObjectField(_user);
 	}
 
 	private ObjectField _addObjectField(User user) throws Exception {
@@ -253,7 +254,7 @@ public class ObjectFieldServiceTest {
 		}
 	}
 
-	private void _testUpdateCustomObjectField(User user) throws Exception {
+	private void _testUpdateObjectField(User user) throws Exception {
 		ObjectField objectField = null;
 
 		try {
@@ -261,9 +262,10 @@ public class ObjectFieldServiceTest {
 
 			objectField = _addObjectField(user);
 
-			objectField = _objectFieldService.updateCustomObjectField(
-				objectField.getObjectFieldId(), 0, "Text", "String", true,
-				false, LanguageUtil.getLanguageId(LocaleUtil.getDefault()),
+			objectField = _objectFieldService.updateObjectField(
+				objectField.getObjectFieldId(), StringPool.BLANK, 0, "Text",
+				"String", true, false,
+				LanguageUtil.getLanguageId(LocaleUtil.getDefault()),
 				LocalizedMapUtil.getLocalizedMap("baker"), "baker", true,
 				Collections.emptyList());
 		}

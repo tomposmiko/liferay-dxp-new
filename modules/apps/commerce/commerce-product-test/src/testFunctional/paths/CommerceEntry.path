@@ -36,6 +36,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>VIEW_ITEM_FROM_LIST</td>
+	<td>//div[contains(@class,'table-list-title')]/a[contains(.,'${key_itemName}')]//following::div//a[contains(.,'View')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>WISH_LIST_NAME</td>
 	<td>//td[contains(@class,'lfr-name-column')]//*[contains(.,'${wishListName}')]</td>
 	<td></td>
@@ -43,6 +48,11 @@
 <tr>
 	<td>SELECTED_TABLE_PAGINATION</td>
 	<td>//li[contains(@class,'page-item active')]//button[contains(.,'${key_pageNumber}')]</td>
+		<td></td>
+</tr>
+<tr>
+	<td>VIEW_DISABLED_ENTRY</td>
+	<td>//label[contains(text(),'${key_entryName}')]/..//select[@class='form-control disabled']</td>
 	<td></td>
 </tr>
 <tr>
@@ -923,6 +933,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PAYMENT_SUBSCRIPTION_TOGGLE_ACTIVE</td>
+	<td>//h4[contains(text(), 'Payment Subscription')]//following-sibling::span[contains(@class,'toggle-switch-handle')]//following::div[contains(@class,'collapse show')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DELIVERY_SUBSCRIPTION_TOGGLE</td>
 	<td>//h4[contains(text(), 'Delivery Subscription')]//following-sibling::span[contains(@class,'toggle-switch-handle')]</td>
 	<td></td>
@@ -1052,7 +1067,7 @@
 </tr>
 <tr>
 	<td>QUANTITY_IN_SHIPMENT_BY_WAREHOUSE</td>
-	<td>//div[contains(@class,'dnd-tbody')]//div[contains(text(),'${key_warehouseName}')]/..//div[5]</td>
+	<td>//div[contains(@class,'dnd-tbody')]//div[contains(text(),'${key_warehouseName}')]/..//div[6]</td>
 	<td></td>
 </tr>
 

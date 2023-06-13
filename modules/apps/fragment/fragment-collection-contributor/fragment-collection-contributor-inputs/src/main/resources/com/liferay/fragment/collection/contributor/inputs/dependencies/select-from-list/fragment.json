@@ -1,0 +1,12 @@
+{
+	"cacheable": false,
+	"fragmentEntryKey": "select-from-list",
+	"icon": "select-from-list",
+	"name": "select-from-list",
+	"type": "input",
+	"typeOptions": {
+		"fieldTypes": [
+			"select"
+		]
+	}
+}

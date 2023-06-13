@@ -15,6 +15,7 @@
 package com.liferay.dispatch.internal.upgrade;
 
 import com.liferay.dispatch.internal.upgrade.v2_0_0.DispatchTriggerUpgradeProcess;
+import com.liferay.portal.kernel.upgrade.BaseUuidUpgradeProcess;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import org.osgi.service.component.annotations.Component;
@@ -64,6 +65,19 @@ public class DispatchUpgradeStepRegistrator implements UpgradeStepRegistrator {
 			"4.0.1", "4.1.0",
 			new com.liferay.dispatch.internal.upgrade.v4_1_0.
 				DispatchTriggerUpgradeProcess());
+
+		registry.register(
+			"4.1.0", "4.2.0",
+			new BaseUuidUpgradeProcess() {
+
+				@Override
+				protected String[][] getTableAndPrimaryKeyColumnNames() {
+					return new String[][] {
+						{"DispatchTrigger", "dispatchTriggerId"}
+					};
+				}
+
+			});
 	}
 
 }

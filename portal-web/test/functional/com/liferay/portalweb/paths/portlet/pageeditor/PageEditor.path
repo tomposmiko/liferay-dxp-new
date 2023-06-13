@@ -38,7 +38,7 @@
 
 <tr>
 	<td>FRAGMENT_INHERITED_FROM_CUSTOM_MASTERS</td>
-	<td>//div[contains(@class,'fragment-content--master')]//*[contains(@class,'component-${key_fragmentName}')]</td>
+	<td>//div[contains(@class,'fragment-content--master')][contains(@class,'component-${key_fragmentName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -51,17 +51,17 @@
 
 <tr>
 	<td>COLLECTION_DISPLAY_EMPTY_STATE</td>
-	<td>xpath=(//div[contains(@class,'block')])[${index}]//div[contains(@class,'empty-state')]</td>
+	<td>xpath=(//div[contains(@class,'lfr-layout-structure-item-collection')])[${index}]//div[contains(@class,'empty-state')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>COLLECTION_DISPLAY_COLUMN</td>
-	<td>xpath=(//div[@aria-label='Collection Display'])[${key_position}]//div[contains(@class,'row')][${key_rowNumber}]//div[contains(@class,'col-')][${key_columnNumber}]</td>
+	<td>xpath=(//div[@aria-label='Collection Display'])[${key_position}]//div[starts-with(@class,'row')][${key_rowNumber}]//div[contains(@class,'col-')][${key_columnNumber}]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>COLLECTION_DISPLAY_COLUMNS_NO_GUTTER</td>
-	<td>xpath=(//div[@aria-label='Collection Display'])[${key_position}]//div[contains(@class,'row') and contains(@class,'no-gutters')]</td>
+	<td>xpath=(//div[@aria-label='Collection Display'])[${key_position}]//div[starts-with(@class,'row') and contains(@class,'no-gutters')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -76,12 +76,12 @@
 </tr>
 <tr>
 	<td>COLLECTION_CELL_NESTED_ELEMENT</td>
-	<td>//div[@aria-label='${key_fragmentName}']//div[contains(@class,'page-editor__collection')]/div[contains(@class,'row')][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]${key_element}</td>
+	<td>//div[@aria-label='${key_fragmentName}']//div[contains(@class,'page-editor__collection')]/div[starts-with(@class,'row')][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]${key_element}</td>
 	<td></td>
 </tr>
 <tr>
 	<td>COLLECTION_ITEM</td>
-	<td>xpath=(//div[contains(@id,'main-content')]//div[contains(@class,'row')][not(.//label)])[${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]</td>
+	<td>xpath=(//div[contains(@id,'main-content')]//div[starts-with(@class,'row')][not(.//label)])[${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -141,7 +141,7 @@
 </tr>
 <tr>
 	<td>COLLECTION_ITEM_IMAGE</td>
-	<td>//div[@aria-label='${key_fragmentName}']//div[contains(@class,'page-editor__collection')]/div[contains(@class,'row')][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//*[contains(@style,'${key_entryImage}')]</td>
+	<td>//div[@aria-label='${key_fragmentName}']//div[contains(@class,'page-editor__collection')]/div[starts-with(@class,'row')][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//*[contains(@style,'${key_entryImage}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -171,7 +171,7 @@
 </tr>
 <tr>
 	<td>COLLECTION_ITEM_TITLE</td>
-	<td>//div[@aria-label='${key_fragmentName}']//div[contains(@class,'page-editor__collection')]/div[contains(@class,'row')][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//*[contains(@class,'item__title') and contains(.,'${key_entryTitle}')]</td>
+	<td>//div[@aria-label='${key_fragmentName}']//div[contains(@class,'page-editor__collection')]/div[starts-with(@class,'row')][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//*[contains(@class,'item__title') and contains(.,'${key_entryTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -704,7 +704,7 @@
 </tr>
 <tr>
 	<td>GRID_COLUMN_NESTED_ELEMENT</td>
-	<td>xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'row')][not(contains(@class,'alert'))])[${key_position}]/div[contains(@class,'col')][${key_columnNumber}]${key_elementHeader}</td>
+	<td>xpath=(//div[contains(@class,'layout-content')]//div[starts-with(@class,'row')][not(contains(@class,'alert'))])[${key_position}]/div[contains(@class,'col')][${key_columnNumber}]${key_elementHeader}</td>
 	<td></td>
 </tr>
 <tr>
@@ -721,33 +721,8 @@
 <!--LAYOUT_ELEMENTS_CONFIGURATION-->
 
 <tr>
-	<td>CONTAINER_CONFIGURATION_BACKGROUND_COLOR</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@style,'background-color: var(--${key_paletteItem})')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>CONTAINER_CONFIGURATION_BACKGROUND_IMAGE</td>
 	<td>xpath=(//div[contains(@class,'page-editor__container')])[${key_position}][contains(@style,'${key_imageName}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_BORDER_COLOR</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@style,'border-color: var(--${key_paletteItem})')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_BORDER_RADIUS</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@style,'border-radius: var(--${key_borderRadius})')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_BORDER_WIDTH</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@style,'border-width: ${key_borderWidth}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_BOX_SHADOW</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}][contains(@style,'box-shadow: var(--${key_boxShadow})')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -763,56 +738,6 @@
 <tr>
 	<td>CONTAINER_CONFIGURATION_JUSTIFY_CONTENT</td>
 	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@class,'justify-content-${key_justifyContent}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_HEIGHT</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@style,'height: ${key_height}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_MARGIN_BOTTOM</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@class,'mb-${key_marginBottom}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_MARGIN_LEFT</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}][contains(@class,'ml-${key_marginLeft}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_MARGIN_RIGHT</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}][contains(@class,'mr-${key_marginRight}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_MARGIN_TOP</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@class,'mt-${key_marginTop}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_OPACITY</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@style,'opacity: ${key_opacity}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_PADDING_BOTTOM</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@class,'pb-${key_paddingBottom}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_PADDING_LEFT</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@class,'pl-${key_paddingLeft}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_PADDING_RIGHT</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@class,'pr-${key_paddingRight}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONTAINER_CONFIGURATION_PADDING_TOP</td>
-	<td>xpath=(//div[@aria-label='Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')][contains(@class,'pt-${key_paddingTop}')]</td>
 	<td></td>
 </tr>
 <tr>
