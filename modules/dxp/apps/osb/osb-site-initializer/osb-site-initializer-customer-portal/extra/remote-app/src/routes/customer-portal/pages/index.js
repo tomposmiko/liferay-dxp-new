@@ -34,7 +34,13 @@ const Pages = () => {
 			Skeleton: <ActivationKeys.Skeleton />,
 		},
 		[pages.DXP_CLOUD]: {
-			Component: <DXPCloud />,
+			Component: (
+				<DXPCloud
+					project={project}
+					subscriptionGroups={subscriptionGroups}
+					userAccount={userAccount}
+				/>
+			),
 			Skeleton: <ActivationKeys.Skeleton />,
 		},
 		[pages.ENTERPRISE_SEARCH]: {
@@ -60,7 +66,7 @@ const Pages = () => {
 			Skeleton: <Overview.Skeleton />,
 		},
 		[pages.TEAM_MEMBERS]: {
-			Component: <TeamMembers />,
+			Component: <TeamMembers project={project} />,
 			Skeleton: <ActivationKeys.Skeleton />,
 		},
 	};

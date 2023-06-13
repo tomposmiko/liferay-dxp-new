@@ -19,6 +19,7 @@ import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.model.AssetLinkConstants;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetLinkLocalService;
+import com.liferay.diff.DiffHtml;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
@@ -54,7 +55,7 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
-import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
+import com.liferay.portal.kernel.bean.BeanProperties;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.Disjunction;
@@ -1606,13 +1607,14 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		Map<String, String> emailKBArticleDiffs = new HashMap<>();
 
 		for (String param : new String[] {"content", "title"}) {
-			String value = BeanPropertiesUtil.getString(kbArticle, param);
+			String value = _beanProperties.getString(kbArticle, param);
 
 			try {
 				value = KBArticleDiffUtil.getKBArticleDiff(
 					version -> getKBArticle(
 						kbArticle.getResourcePrimKey(), version),
-					kbArticle.getVersion() - 1, kbArticle.getVersion(), param);
+					kbArticle.getVersion() - 1, kbArticle.getVersion(), param,
+					_diffHtml);
 			}
 			catch (Exception exception) {
 				_log.error(exception, exception);
@@ -2085,10 +2087,16 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	private AssetLinkLocalService _assetLinkLocalService;
 
 	@Reference
+	private BeanProperties _beanProperties;
+
+	@Reference
 	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
+
+	@Reference
+	private DiffHtml _diffHtml;
 
 	@Reference
 	private DLURLHelper _dlURLHelper;

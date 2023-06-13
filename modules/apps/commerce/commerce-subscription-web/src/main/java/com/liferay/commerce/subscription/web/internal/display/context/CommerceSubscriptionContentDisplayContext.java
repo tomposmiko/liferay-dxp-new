@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.KeyValuePair;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -170,26 +169,20 @@ public class CommerceSubscriptionContentDisplayContext {
 			_cpRequestHelper.getLiferayPortletRequest(), getPortletURL(), null,
 			"there-are-no-subscriptions");
 
-		OrderByComparator<CommerceSubscriptionEntry> orderByComparator =
-			new CommerceSubscriptionEntryCreateDateComparator();
-
-		List<CommerceSubscriptionEntry> subscriptionEntries =
-			_commerceSubscriptionEntryService.getCommerceSubscriptionEntries(
-				_cpRequestHelper.getCompanyId(),
-				_cpRequestHelper.getCommerceChannelGroupId(),
-				_cpRequestHelper.getUserId(), _searchContainer.getStart(),
-				_searchContainer.getEnd(), orderByComparator);
-
-		_searchContainer.setResults(subscriptionEntries);
-
-		int subscriptionEntriesCount =
+		_searchContainer.setResultsAndTotal(
+			() ->
+				_commerceSubscriptionEntryService.
+					getCommerceSubscriptionEntries(
+						_cpRequestHelper.getCompanyId(),
+						_cpRequestHelper.getCommerceChannelGroupId(),
+						_cpRequestHelper.getUserId(),
+						_searchContainer.getStart(), _searchContainer.getEnd(),
+						new CommerceSubscriptionEntryCreateDateComparator()),
 			_commerceSubscriptionEntryService.
 				getCommerceSubscriptionEntriesCount(
 					_cpRequestHelper.getCompanyId(),
 					_cpRequestHelper.getCommerceChannelGroupId(),
-					_cpRequestHelper.getUserId());
-
-		_searchContainer.setTotal(subscriptionEntriesCount);
+					_cpRequestHelper.getUserId()));
 
 		return _searchContainer;
 	}

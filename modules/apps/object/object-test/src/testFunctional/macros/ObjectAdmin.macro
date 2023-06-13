@@ -122,6 +122,18 @@ definition {
 		WaitForPageLoad();
 	}
 
+	macro addObjectLongFieldEntryViaUI {
+		LexiconEntry.gotoAdd();
+
+		Type(
+			locator1 = "ObjectAdmin#ENTRY_LONG_VALUE_FIELD",
+			value1 = "${entryValue}");
+
+		Button.clickSave();
+
+		WaitForSPARefresh();
+	}
+
 	macro addObjectPicklistFieldEntryViaUI {
 		LexiconEntry.gotoAdd();
 
@@ -180,6 +192,15 @@ definition {
 
 	macro addObjectSingleFieldEntryViaAPI {
 		JSONObject.addObjectSingleFieldEntry(
+			fieldName = "${fieldName}",
+			objectName = "${objectName}",
+			userEmailAddress = "${userEmailAddress}",
+			userPassword = "${userPassword}",
+			value = "${value}");
+	}
+
+	macro addObjectSingleFieldNumericAndBooleanEntryViaAPI {
+		JSONObject.addObjectSingleFieldNumericAndBooleanEntry(
 			fieldName = "${fieldName}",
 			objectName = "${objectName}",
 			userEmailAddress = "${userEmailAddress}",
@@ -353,6 +374,16 @@ definition {
 			locator1 = "ObjectAdmin#FIELDS_RADIO_OPTION");
 	}
 
+	macro assertKeywordAndTextNotPresent {
+		AssertNotVisible(
+			key_radioOption = "Keyword",
+			locator1 = "ObjectAdmin#FIELDS_RADIO_OPTION");
+
+		AssertNotVisible(
+			key_radioOption = "Text",
+			locator1 = "ObjectAdmin#FIELDS_RADIO_OPTION");
+	}
+
 	macro assertLabelFieldRequired {
 		AssertElementPresent(locator1 = "ObjectAdmin#LABEL_FIELD_REQUIRED");
 	}
@@ -461,6 +492,12 @@ definition {
 			key_type = "${type}",
 			locator1 = "ObjectAdmin#RELATIONSHIPS_TYPE_DESCRIPTION",
 			value1 = "${description}");
+	}
+
+	macro assertRelationshipTabNotPresent {
+		AssertElementNotPresent(
+			key_tabName = "Relationship Tab",
+			locator1 = "ObjectAdmin#ENTRY_RELATIONSHIP_TAB");
 	}
 
 	macro assertRelationshipTabPresent {

@@ -17,6 +17,7 @@ package com.liferay.commerce.warehouse.web.internal.display.context;
 import com.liferay.commerce.country.CommerceCountryManager;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
 import com.liferay.commerce.inventory.service.CommerceInventoryWarehouseService;
+import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.model.CommerceChannelRel;
@@ -32,9 +33,9 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -158,15 +159,27 @@ public class CommerceInventoryWarehousesDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		return ParamUtil.getString(
+		if (Validator.isNotNull(_orderByCol)) {
+			return _orderByCol;
+		}
+
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
 			_cpRequestHelper.getRenderRequest(),
-			SearchContainer.DEFAULT_ORDER_BY_COL_PARAM, "name");
+			CPPortletKeys.COMMERCE_INVENTORY_WAREHOUSE, "name");
+
+		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		return ParamUtil.getString(
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
+		}
+
+		_orderByType = SearchOrderByUtil.getOrderByType(
 			_cpRequestHelper.getRenderRequest(),
-			SearchContainer.DEFAULT_ORDER_BY_TYPE_PARAM, "asc");
+			CPPortletKeys.COMMERCE_INVENTORY_WAREHOUSE, "asc");
+
+		return _orderByType;
 	}
 
 	public PortletURL getPortletURL() {
@@ -240,34 +253,28 @@ public class CommerceInventoryWarehousesDisplayContext {
 				"taglib-empty-result-message-header-has-plus-btn");
 		}
 
-		String orderByCol = getOrderByCol();
-		String orderByType = getOrderByType();
-
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator =
+		_searchContainer.setOrderByCol(getOrderByCol());
+		_searchContainer.setOrderByComparator(
 			CommerceUtil.getCommerceInventoryWarehouseOrderByComparator(
-				orderByCol, orderByType);
+				getOrderByCol(), getOrderByType()));
+		_searchContainer.setOrderByType(getOrderByType());
 
-		_searchContainer.setOrderByCol(orderByCol);
-		_searchContainer.setOrderByComparator(orderByComparator);
-		_searchContainer.setOrderByType(orderByType);
-		_searchContainer.setSearch(search);
+		Boolean navigationActive = active;
 
-		List<CommerceInventoryWarehouse> commerceInventoryWarehouses =
-			_commerceInventoryWarehouseService.search(
-				_cpRequestHelper.getCompanyId(), active,
+		_searchContainer.setResultsAndTotal(
+			() -> _commerceInventoryWarehouseService.search(
+				_cpRequestHelper.getCompanyId(), navigationActive,
 				countryTwoLettersIsoCode, _getKeywords(),
 				_searchContainer.getStart(), _searchContainer.getEnd(),
 				CommerceUtil.getCommerceInventoryWarehouseSort(
-					orderByCol, orderByType));
-
-		int commerceInventoryWarehousesCount =
+					_searchContainer.getOrderByCol(),
+					_searchContainer.getOrderByType())),
 			_commerceInventoryWarehouseService.
 				searchCommerceInventoryWarehousesCount(
-					_cpRequestHelper.getCompanyId(), active,
-					countryTwoLettersIsoCode, _getKeywords());
+					_cpRequestHelper.getCompanyId(), navigationActive,
+					countryTwoLettersIsoCode, _getKeywords()));
 
-		_searchContainer.setResults(commerceInventoryWarehouses);
-		_searchContainer.setTotal(commerceInventoryWarehousesCount);
+		_searchContainer.setSearch(search);
 
 		return _searchContainer;
 	}
@@ -340,6 +347,8 @@ public class CommerceInventoryWarehousesDisplayContext {
 	private final CountryService _countryService;
 	private final CPRequestHelper _cpRequestHelper;
 	private String _keywords;
+	private String _orderByCol;
+	private String _orderByType;
 	private SearchContainer<CommerceInventoryWarehouse> _searchContainer;
 
 }

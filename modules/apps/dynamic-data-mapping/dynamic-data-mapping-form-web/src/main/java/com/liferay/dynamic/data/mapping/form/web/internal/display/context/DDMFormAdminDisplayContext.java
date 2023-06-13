@@ -36,6 +36,7 @@ import com.liferay.dynamic.data.mapping.form.web.internal.configuration.activato
 import com.liferay.dynamic.data.mapping.form.web.internal.constants.DDMFormWebKeys;
 import com.liferay.dynamic.data.mapping.form.web.internal.display.context.helper.DDMFormAdminRequestHelper;
 import com.liferay.dynamic.data.mapping.form.web.internal.display.context.helper.FormInstancePermissionCheckerHelper;
+import com.liferay.dynamic.data.mapping.form.web.internal.display.context.util.DDMFormAdminActionDropdownItemsProvider;
 import com.liferay.dynamic.data.mapping.form.web.internal.instance.lifecycle.AddDefaultSharedFormLayoutPortalInstanceLifecycleListener;
 import com.liferay.dynamic.data.mapping.form.web.internal.search.DDMFormInstanceRowChecker;
 import com.liferay.dynamic.data.mapping.form.web.internal.search.DDMFormInstanceSearch;
@@ -219,6 +220,34 @@ public class DDMFormAdminDisplayContext {
 
 		_formInstancePermissionCheckerHelper =
 			new FormInstancePermissionCheckerHelper(ddmFormAdminRequestHelper);
+	}
+
+	public List<DropdownItem> getActionDropdownItems(
+			DDMFormInstance ddmFormInstance)
+		throws PortalException {
+
+		boolean invalidDDMFormInstance = false;
+
+		if (!hasValidDDMFormFields(ddmFormInstance) ||
+			!hasValidStorageType(ddmFormInstance)) {
+
+			invalidDDMFormInstance = true;
+		}
+
+		DDMFormAdminActionDropdownItemsProvider
+			ddmFormAdminActionDropdownItemsProvider =
+				new DDMFormAdminActionDropdownItemsProvider(
+					getAutocompleteUserURL(), ddmFormInstance,
+					_formInstancePermissionCheckerHelper,
+					isFormPublished(ddmFormInstance),
+					ddmFormAdminRequestHelper.getRequest(),
+					invalidDDMFormInstance,
+					getFormLocalizedNameJSONObject(ddmFormInstance),
+					getPublishedFormURL(ddmFormInstance), renderResponse,
+					getScopeGroupId(),
+					getShareFormInstanceURL(ddmFormInstance));
+
+		return ddmFormAdminActionDropdownItemsProvider.getActionDropdownItems();
 	}
 
 	public List<DropdownItem> getActionItemsDropdownItems() {
@@ -479,7 +508,7 @@ public class DDMFormAdminDisplayContext {
 		DDMFormLayout ddmFormLayout = DDMFormLayoutFactory.create(
 			DDMFormInstanceSettings.class);
 
-		_removeSubmissionsSettings(ddmFormLayout.getDDMFormLayoutPages());
+		_removeExpirationDateSetting(ddmFormLayout.getDDMFormLayoutPages());
 
 		ddmFormLayout.setPaginationMode(DDMFormLayout.TABBED_MODE);
 
@@ -1728,8 +1757,14 @@ public class DDMFormAdminDisplayContext {
 		);
 	}
 
-	private void _removeSubmissionsSettings(
+	private void _removeExpirationDateSetting(
 		List<DDMFormLayoutPage> ddmFormLayoutPages) {
+
+		if (_ffSubmissionsSettingsConfigurationActivator.
+				expirationDateEnabled()) {
+
+			return;
+		}
 
 		DDMFormLayoutPage ddmFormLayoutPage = ddmFormLayoutPages.get(3);
 
@@ -1742,28 +1777,8 @@ public class DDMFormAdminDisplayContext {
 		List<String> ddmFormFieldNames =
 			ddmFormLayoutColumn.getDDMFormFieldNames();
 
-		if (!_ffSubmissionsSettingsConfigurationActivator.
-				expirationDateEnabled()) {
-
-			ddmFormFieldNames.remove("expirationDate");
-			ddmFormFieldNames.remove("neverExpire");
-		}
-
-		if (!_ffSubmissionsSettingsConfigurationActivator.
-				limitToOneSubmissionEnabled()) {
-
-			ddmFormFieldNames.remove("limitToOneSubmissionPerUser");
-		}
-
-		if (!_ffSubmissionsSettingsConfigurationActivator.
-				showPartialResultsEnabled()) {
-
-			ddmFormFieldNames.remove("showPartialResultsToRespondents");
-		}
-
-		if (ddmFormFieldNames.isEmpty()) {
-			ddmFormLayoutPages.remove(3);
-		}
+		ddmFormFieldNames.remove("expirationDate");
+		ddmFormFieldNames.remove("neverExpire");
 	}
 
 	private String _serialize(List<DDMFormFieldType> ddmFormFieldTypes) {

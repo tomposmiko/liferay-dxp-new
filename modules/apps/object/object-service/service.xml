@@ -181,8 +181,10 @@
 
 		<column name="listTypeDefinitionId" type="long" />
 		<column name="objectDefinitionId" type="long" />
+		<column name="businessType" type="String" />
 		<column method-name="DBColumnName" name="dbColumnName" type="String" />
 		<column method-name="DBTableName" name="dbTableName" type="String" />
+		<column method-name="DBType" name="dbType" type="String" />
 		<column name="indexed" type="boolean" />
 		<column name="indexedAsKeyword" type="boolean" />
 		<column name="indexedLanguageId" type="String" />
@@ -190,7 +192,6 @@
 		<column name="name" type="String" />
 		<column name="relationshipType" type="String" />
 		<column name="required" type="boolean" />
-		<column name="type" type="String" />
 
 		<!-- Order -->
 
@@ -409,8 +410,65 @@
 			<finder-column name="type" />
 		</finder>
 	</entity>
+	<entity local-service="true" name="ObjectView" remote-service="true" uuid="true">
+
+		<!-- PK fields -->
+
+		<column name="objectViewId" primary="true" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="objectDefinitionId" type="long" />
+		<column name="defaultObjectView" type="boolean" />
+		<column localized="true" name="name" type="String" />
+
+		<!-- Finder methods -->
+
+		<finder name="ObjectDefinitionId" return-type="Collection">
+			<finder-column name="objectDefinitionId" />
+		</finder>
+		<finder name="ODI_DOV" return-type="Collection">
+			<finder-column name="objectDefinitionId" />
+			<finder-column name="defaultObjectView" />
+		</finder>
+	</entity>
+	<entity local-service="false" name="ObjectViewColumn" remote-service="true" uuid="true">
+
+		<!-- PK fields -->
+
+		<column name="objectViewColumnId" primary="true" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="objectViewId" type="long" />
+		<column name="objectFieldName" type="String" />
+		<column name="priority" type="int" />
+
+		<!-- Finder methods -->
+
+		<finder name="ObjectViewId" return-type="Collection">
+			<finder-column name="objectViewId" />
+		</finder>
+	</entity>
 	<exceptions>
 		<exception>DefaultObjectLayout</exception>
+		<exception>DefaultObjectView</exception>
 		<exception>DuplicateObjectRelationship</exception>
 		<exception>ObjectActionExecutorKey</exception>
 		<exception>ObjectActionName</exception>
@@ -423,10 +481,11 @@
 		<exception>ObjectDefinitionStatus</exception>
 		<exception>ObjectDefinitionVersion</exception>
 		<exception>ObjectEntryValues</exception>
+		<exception>ObjectFieldBusinessType</exception>
+		<exception>ObjectFieldDBType</exception>
 		<exception>ObjectFieldLabel</exception>
 		<exception>ObjectFieldName</exception>
 		<exception>ObjectFieldRelationshipType</exception>
-		<exception>ObjectFieldType</exception>
 		<exception>ObjectLayoutColumnSize</exception>
 		<exception>ObjectRelationshipName</exception>
 		<exception>ObjectRelationshipReverse</exception>

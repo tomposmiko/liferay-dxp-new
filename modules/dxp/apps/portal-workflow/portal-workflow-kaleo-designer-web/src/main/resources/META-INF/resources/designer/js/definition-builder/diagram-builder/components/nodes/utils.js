@@ -10,10 +10,14 @@
  */
 
 import {defaultLanguageId} from '../../../constants';
+import ConditionNode from './ConditionNode';
+import ForkNode from './ForkNode';
+import JoinNode from './JoinNode';
+import JoinXorNode from './JoinXorNode';
+import TaskNode from './TaskNode';
 import EndNode from './state/EndNode';
 import StartNode from './state/StartNode';
 import StateNode from './state/StateNode';
-import TaskNode from './state/TaskNode';
 
 const defaultNodes = [
 	{
@@ -37,17 +41,25 @@ const defaultNodes = [
 ];
 
 const nodeDescription = {
-	end: Liferay.Language.get('conclude-the-workflow'),
-	start: Liferay.Language.get('begin-a-workflow'),
-	state: Liferay.Language.get('execute-actions-in-the-workflow'),
-	task: Liferay.Language.get('ask-a-user-to-work-on-the-item'),
+	'condition': Liferay.Language.get('execute-conditional-logic'),
+	'end': Liferay.Language.get('conclude-the-workflow'),
+	'fork': Liferay.Language.get('split-the-workflow-into-multiple-paths'),
+	'join': Liferay.Language.get('all-interactions-need-to-be-closed'),
+	'join-xor': Liferay.Language.get('only-one-interaction-needs-to-be-closed'),
+	'start': Liferay.Language.get('begin-a-workflow'),
+	'state': Liferay.Language.get('execute-actions-in-the-workflow'),
+	'task': Liferay.Language.get('ask-a-user-to-work-on-the-item'),
 };
 
 const nodeTypes = {
-	end: EndNode,
-	start: StartNode,
-	state: StateNode,
-	task: TaskNode,
+	'condition': ConditionNode,
+	'end': EndNode,
+	'fork': ForkNode,
+	'join': JoinNode,
+	'join-xor': JoinXorNode,
+	'start': StartNode,
+	'state': StateNode,
+	'task': TaskNode,
 };
 
 export {defaultNodes, nodeDescription, nodeTypes};

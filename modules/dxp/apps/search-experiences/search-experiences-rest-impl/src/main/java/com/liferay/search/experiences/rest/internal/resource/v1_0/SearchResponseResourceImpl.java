@@ -17,6 +17,7 @@ package com.liferay.search.experiences.rest.internal.resource.v1_0;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -35,6 +36,8 @@ import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.search.experiences.blueprint.exception.InvalidElementInstanceException;
+import com.liferay.search.experiences.blueprint.exception.PrivateIPAddressException;
 import com.liferay.search.experiences.blueprint.search.request.enhancer.SXPBlueprintSearchRequestEnhancer;
 import com.liferay.search.experiences.exception.SXPExceptionUtil;
 import com.liferay.search.experiences.rest.dto.v1_0.DocumentField;
@@ -50,6 +53,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -80,15 +84,8 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 			return search(pagination, queryString, sxpBlueprint);
 		}
 		catch (RuntimeException runtimeException) {
-			if ((runtimeException.getClass() == RuntimeException.class) &&
-				Validator.isBlank(runtimeException.getMessage()) &&
-				ArrayUtil.isNotEmpty(runtimeException.getSuppressed())) {
-
-				OutputStream outputStream = new ByteArrayOutputStream();
-
-				runtimeException.printStackTrace(new PrintStream(outputStream));
-
-				throw new RuntimeException(outputStream.toString());
+			if (_isComposite(runtimeException)) {
+				throw new RuntimeException(_getTraceString(runtimeException));
 			}
 
 			throw runtimeException;
@@ -113,6 +110,8 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 					searchContext.setAttribute(
 						"search.experiences.ip.address",
 						contextHttpServletRequest.getRemoteAddr());
+					searchContext.setAttribute(
+						"search.experiences.scope.group.id", _getGroupId());
 					searchContext.setTimeZone(contextUser.getTimeZone());
 					searchContext.setUserId(contextUser.getUserId());
 				}
@@ -131,30 +130,33 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 			runtimeException.addSuppressed(exception);
 		}
 
-		if (SXPExceptionUtil.hasErrors(runtimeException)) {
-			throw runtimeException;
-		}
+		if (!SXPExceptionUtil.hasErrors(runtimeException)) {
+			try {
+				SearchResponse searchResponse = toSearchResponse(
+					_searcher.search(searchRequestBuilder.build()));
 
-		try {
-			SearchResponse searchResponse = toSearchResponse(
-				_searcher.search(searchRequestBuilder.build()));
+				if (ArrayUtil.isNotEmpty(runtimeException.getSuppressed())) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(runtimeException);
+					}
 
-			// TODO Add warnings to search response DTO for client side
-			// rendering
-
-			if (ArrayUtil.isNotEmpty(runtimeException.getSuppressed())) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(runtimeException);
+					searchResponse.setErrors(_toErrorMaps(runtimeException));
 				}
+
+				return searchResponse;
 			}
-
-			return searchResponse;
-		}
-		catch (Exception exception) {
-			runtimeException.addSuppressed(exception);
+			catch (Exception exception) {
+				runtimeException.addSuppressed(exception);
+			}
 		}
 
-		throw runtimeException;
+		_log.error(runtimeException);
+
+		return new SearchResponse() {
+			{
+				errors = _toErrorMaps(runtimeException);
+			}
+		};
 	}
 
 	protected SearchResponse toSearchResponse(
@@ -180,6 +182,52 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 							searchResponse.getSearchHits());
 					}
 				}));
+	}
+
+	private void _addErrorMaps(
+		List<Map<String, ?>> maps, Throwable throwable1,
+		Map<String, String> baseMap) {
+
+		Map<String, String> errorMap = new LinkedHashMap<>(baseMap);
+		Map<String, String> inheritMap = new LinkedHashMap<>(baseMap);
+
+		if (!_isComposite(throwable1)) {
+			Class<? extends Throwable> clazz = throwable1.getClass();
+
+			errorMap.put("exceptionClass", clazz.getName());
+
+			errorMap.put("exceptionTrace", _getTraceString(throwable1));
+			errorMap.put("msg", throwable1.getMessage());
+
+			if (throwable1 instanceof InvalidElementInstanceException) {
+				InvalidElementInstanceException
+					invalidElementInstanceException =
+						(InvalidElementInstanceException)throwable1;
+
+				String sxpElementId =
+					"querySXPElement-" +
+						invalidElementInstanceException.getIndex();
+
+				errorMap.put("localizedMessage", "Element skipped");
+				errorMap.put("severity", "WARN");
+				errorMap.put("sxpElementId", sxpElementId);
+
+				inheritMap.put("sxpElementId", sxpElementId);
+			}
+			else if (throwable1 instanceof PrivateIPAddressException) {
+				errorMap.put("severity", "WARN");
+			}
+			else {
+				errorMap.put("localizedMessage", "Error");
+				errorMap.put("severity", "ERROR");
+			}
+
+			maps.add(errorMap);
+		}
+
+		ArrayUtil.isNotEmptyForEach(
+			throwable1.getSuppressed(),
+			throwable2 -> _addErrorMaps(maps, throwable2, inheritMap));
 	}
 
 	private JSONObject _createJSONObject(String string) {
@@ -214,6 +262,15 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 		return null;
 	}
 
+	private long _getGroupId() {
+		try {
+			return contextCompany.getGroupId();
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
+	}
+
 	private Locale _getLocale(
 		com.liferay.portal.search.searcher.SearchResponse searchResponse) {
 
@@ -233,6 +290,25 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 		}
 
 		return score;
+	}
+
+	private String _getTraceString(Throwable throwable) {
+		OutputStream outputStream = new ByteArrayOutputStream();
+
+		throwable.printStackTrace(new PrintStream(outputStream));
+
+		return outputStream.toString();
+	}
+
+	private boolean _isComposite(Throwable throwable) {
+		if ((throwable.getClass() == RuntimeException.class) &&
+			Validator.isNull(throwable.getMessage()) &&
+			ArrayUtil.isNotEmpty(throwable.getSuppressed())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private Map<String, DocumentField> _toDocumentFields(
@@ -284,6 +360,14 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 			});
 
 		return documentFields;
+	}
+
+	private Map<String, ?>[] _toErrorMaps(RuntimeException runtimeException) {
+		List<Map<String, ?>> maps = new ArrayList<>();
+
+		_addErrorMaps(maps, runtimeException, Collections.emptyMap());
+
+		return maps.toArray(new Map[0]);
 	}
 
 	private Hit[] _toHits(Locale locale, List<SearchHit> searchHits) {

@@ -44,6 +44,8 @@ import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 import com.liferay.segments.SegmentsEntryRetriever;
 import com.liferay.segments.context.Context;
 
+import java.beans.ExceptionListener;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -78,13 +80,15 @@ public class UserSXPParameterContributor implements SXPParameterContributor {
 
 	@Override
 	public void contribute(
-		SearchContext searchContext, SXPBlueprint sxpBlueprint,
-		Set<SXPParameter> sxpParameters) {
+		ExceptionListener exceptionListener, SearchContext searchContext,
+		SXPBlueprint sxpBlueprint, Set<SXPParameter> sxpParameters) {
 
 		try {
 			_contribute(searchContext, sxpParameters);
 		}
 		catch (PortalException portalException) {
+			exceptionListener.exceptionThrown(portalException);
+
 			_log.error(portalException, portalException);
 		}
 	}
@@ -159,33 +163,31 @@ public class UserSXPParameterContributor implements SXPParameterContributor {
 			return;
 		}
 
-		Long scopeGroupId = (Long)searchContext.getAttribute(
-			"search.experiences.current.group.id");
+		long[] segmentsEntryIds = new long[0];
 
-		if (scopeGroupId != null) {
-			long[] segmentsEntryIds =
-				_segmentsEntryRetriever.getSegmentsEntryIds(
-					scopeGroupId, user.getUserId(),
-					new Context() {
-						{
-							put(
-								Context.LANGUAGE_ID,
-								_language.getLanguageId(
-									searchContext.getLocale()));
-							put(Context.SIGNED_IN, !user.isDefaultUser());
-						}
-					});
+		long scopeGroupId = GetterUtil.getLong(
+			searchContext.getAttribute("search.experiences.scope.group.id"));
+
+		if (scopeGroupId != 0) {
+			segmentsEntryIds = _segmentsEntryRetriever.getSegmentsEntryIds(
+				scopeGroupId, user.getUserId(),
+				new Context() {
+					{
+						put(
+							Context.LANGUAGE_ID,
+							_language.getLanguageId(searchContext.getLocale()));
+						put(Context.SIGNED_IN, !user.isDefaultUser());
+					}
+				});
 
 			segmentsEntryIds = ArrayUtil.filter(
 				segmentsEntryIds, segmentsEntryId -> segmentsEntryId > 0);
-
-			if (segmentsEntryIds.length > 0) {
-				sxpParameters.add(
-					new LongArraySXPParameter(
-						"user.active_segment_entry_ids", true,
-						ArrayUtil.toLongArray(segmentsEntryIds)));
-			}
 		}
+
+		sxpParameters.add(
+			new LongArraySXPParameter(
+				"user.active_segment_entry_ids", true,
+				ArrayUtil.toLongArray(segmentsEntryIds)));
 
 		sxpParameters.add(
 			new IntegerSXPParameter(

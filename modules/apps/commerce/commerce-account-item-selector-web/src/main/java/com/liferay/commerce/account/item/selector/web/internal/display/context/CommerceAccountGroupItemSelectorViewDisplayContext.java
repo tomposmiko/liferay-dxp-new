@@ -18,12 +18,9 @@ import com.liferay.commerce.account.item.selector.web.internal.display.context.h
 import com.liferay.commerce.account.item.selector.web.internal.search.CommerceAccountGroupItemSelectorChecker;
 import com.liferay.commerce.account.model.CommerceAccountGroup;
 import com.liferay.commerce.account.service.CommerceAccountGroupLocalService;
-import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ParamUtil;
-
-import java.util.List;
 
 import javax.portlet.PortletURL;
 
@@ -83,32 +80,22 @@ public class CommerceAccountGroupItemSelectorViewDisplayContext {
 		_searchContainer = new SearchContainer<>(
 			_commerceAccountItemSelectorRequestHelper.
 				getLiferayPortletRequest(),
-			getPortletURL(), null, null);
-
-		_searchContainer.setEmptyResultsMessage("there-are-no-account-groups");
+			getPortletURL(), null, "there-are-no-account-groups");
 
 		_searchContainer.setOrderByCol(getOrderByCol());
 		_searchContainer.setOrderByType(getOrderByType());
-
-		RowChecker rowChecker = new CommerceAccountGroupItemSelectorChecker(
-			_commerceAccountItemSelectorRequestHelper.getRenderResponse(),
-			_getCheckedCommerceAccountGroupIds());
-
-		_searchContainer.setRowChecker(rowChecker);
-
-		int total =
-			_commerceAccountGroupLocalService.searchCommerceAccountsGroupCount(
-				_commerceAccountItemSelectorRequestHelper.getCompanyId(),
-				getKeywords());
-
-		List<CommerceAccountGroup> results =
-			_commerceAccountGroupLocalService.search(
+		_searchContainer.setResultsAndTotal(
+			() -> _commerceAccountGroupLocalService.search(
 				_commerceAccountItemSelectorRequestHelper.getCompanyId(),
 				getKeywords(), _searchContainer.getStart(),
-				_searchContainer.getEnd(), null);
-
-		_searchContainer.setTotal(total);
-		_searchContainer.setResults(results);
+				_searchContainer.getEnd(), null),
+			_commerceAccountGroupLocalService.searchCommerceAccountsGroupCount(
+				_commerceAccountItemSelectorRequestHelper.getCompanyId(),
+				getKeywords()));
+		_searchContainer.setRowChecker(
+			new CommerceAccountGroupItemSelectorChecker(
+				_commerceAccountItemSelectorRequestHelper.getRenderResponse(),
+				_getCheckedCommerceAccountGroupIds()));
 
 		return _searchContainer;
 	}

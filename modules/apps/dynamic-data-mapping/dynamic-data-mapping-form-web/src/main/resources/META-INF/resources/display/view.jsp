@@ -18,6 +18,7 @@
 
 <%
 long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
+boolean limitToOneSubmissionPerUser = DDMFormInstanceSubmissionLimitStatusUtil.isLimitToOneSubmissionPerUser(ddmFormDisplayContext.getFormInstance());
 %>
 
 <c:choose>
@@ -46,7 +47,7 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 			</clay:container-fluid>
 		</div>
 	</c:when>
-	<c:when test="<%= (ddmFormDisplayContext.isLimitToOneSubmissionPerUserEnabled() && !ddmFormDisplayContext.isLoggedUser()) || ddmFormDisplayContext.isRequireAuthentication() %>">
+	<c:when test="<%= (!ddmFormDisplayContext.isLoggedUser() && limitToOneSubmissionPerUser) || ddmFormDisplayContext.isRequireAuthentication() %>">
 		<div class="ddm-form-basic-info">
 			<clay:container-fluid>
 				<clay:alert
@@ -79,12 +80,11 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 		%>
 
 		<c:choose>
-			<c:when test="<%= !preview && (expired || showSuccessPage || ddmFormDisplayContext.hasSubmittedAnEntry()) %>">
+			<c:when test="<%= !preview && (ddmFormDisplayContext.isSubmissionLimitReached() || expired || showSuccessPage) %>">
 
 				<%
 				String pageDescription = null;
 				String pageTitle = null;
-				boolean showPartialResultsToRespondents = ddmFormDisplayContext.isFFShowPartialResultsEnabled() && ddmFormDisplayContext.isShowPartialResultsToRespondents();
 
 				if (expired) {
 					pageDescription = LanguageUtil.get(request, "this-form-has-an-expiration-date");
@@ -114,9 +114,9 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 						).put(
 							"pageTitle", pageTitle
 						).put(
-							"showPartialResultsToRespondents", showPartialResultsToRespondents
+							"showPartialResultsToRespondents", ddmFormDisplayContext.isShowPartialResultsToRespondents()
 						).put(
-							"showSubmitAgainButton", !ddmFormDisplayContext.isLimitToOneSubmissionPerUserEnabled() && !expired
+							"showSubmitAgainButton", !expired && !limitToOneSubmissionPerUser
 						).build()
 					%>'
 				/>

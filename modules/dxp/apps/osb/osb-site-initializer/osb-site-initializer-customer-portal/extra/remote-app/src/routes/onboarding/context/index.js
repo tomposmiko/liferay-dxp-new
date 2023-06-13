@@ -11,10 +11,10 @@
 
 import {createContext, useContext, useEffect, useReducer} from 'react';
 import client from '../../../apolloClient';
-import FormProvider from '../../../common/providers/FormProvider';
-import {LiferayTheme} from '../../../common/services/liferay';
+import {Liferay} from '../../../common/services/liferay';
 import {
 	addAccountFlag,
+	getAccountRoles,
 	getAccountSubscriptionGroups,
 	getKoroneikiAccounts,
 	getUserAccount,
@@ -23,30 +23,11 @@ import {
 	PARAMS_KEYS,
 	SearchParams,
 } from '../../../common/services/liferay/search-params';
-import {ROUTES} from '../../../common/utils/constants';
+import {ROLES_PERMISSIONS, ROUTES} from '../../../common/utils/constants';
 import {isValidPage} from '../../../common/utils/page.validation';
 import {PRODUCTS} from '../../customer-portal/utils/constants';
-import {
-	getInitialDxpAdmin,
-	getInitialInvite,
-	roles,
-	steps,
-} from '../utils/constants';
+import {steps} from '../utils/constants';
 import reducer, {actionTypes} from './reducer';
-
-const initialForm = {
-	dxp: {
-		admins: [getInitialDxpAdmin()],
-		dataCenterRegion: {},
-		disasterDataCenterRegion: {},
-		projectId: '',
-	},
-	invites: [
-		getInitialInvite(),
-		getInitialInvite(roles.MEMBER.key),
-		getInitialInvite(roles.MEMBER.key),
-	],
-};
 
 const AppContext = createContext();
 
@@ -65,17 +46,33 @@ const AppContextProvider = ({assetsPath, children}) => {
 			const {data} = await client.query({
 				query: getUserAccount,
 				variables: {
-					id: LiferayTheme.getUserId(),
+					id: Liferay.ThemeDisplay.getUserId(),
 				},
 			});
 
 			if (data) {
+				const {data: accountRolesData} = await client.query({
+					query: getAccountRoles,
+					variables: {
+						filter: data.userAccount.id,
+					},
+				});
+
+				const isAccountAdministrator = !!accountRolesData.accountAccountRoles?.items?.find(
+					({name}) => name === ROLES_PERMISSIONS.ACCOUNT_ADMINISTRATOR
+				);
+
+				const userAccount = {
+					...data.userAccount,
+					isAdmin: isAccountAdministrator,
+				};
+
 				dispatch({
-					payload: data.userAccount,
+					payload: userAccount,
 					type: actionTypes.UPDATE_USER_ACCOUNT,
 				});
 
-				return data.userAccount;
+				return userAccount;
 			}
 		};
 
@@ -163,7 +160,7 @@ const AppContextProvider = ({assetsPath, children}) => {
 
 	return (
 		<AppContext.Provider value={[state, dispatch]}>
-			<FormProvider initialValues={initialForm}>{children}</FormProvider>
+			{children}
 		</AppContext.Provider>
 	);
 };

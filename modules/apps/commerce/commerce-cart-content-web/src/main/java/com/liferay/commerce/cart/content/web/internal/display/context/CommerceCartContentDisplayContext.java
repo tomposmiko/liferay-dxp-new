@@ -272,9 +272,7 @@ public class CommerceCartContentDisplayContext {
 
 		_searchContainer = new SearchContainer<>(
 			commerceCartContentRequestHelper.getLiferayPortletRequest(),
-			getPortletURL(), null, null);
-
-		_searchContainer.setEmptyResultsMessage("no-items-were-found");
+			getPortletURL(), null, "no-items-were-found");
 
 		long commerceOrderId = getCommerceOrderId();
 
@@ -282,17 +280,12 @@ public class CommerceCartContentDisplayContext {
 			return _searchContainer;
 		}
 
-		int total = _commerceOrderItemService.getCommerceOrderItemsCount(
-			commerceOrderId);
-
-		_searchContainer.setTotal(total);
-
-		List<CommerceOrderItem> results =
-			_commerceOrderItemService.getCommerceOrderItems(
+		_searchContainer.setResultsAndTotal(
+			() -> _commerceOrderItemService.getCommerceOrderItems(
 				commerceOrderId, _searchContainer.getStart(),
-				_searchContainer.getEnd());
-
-		_searchContainer.setResults(results);
+				_searchContainer.getEnd()),
+			_commerceOrderItemService.getCommerceOrderItemsCount(
+				commerceOrderId));
 
 		return _searchContainer;
 	}

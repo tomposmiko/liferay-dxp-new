@@ -22,12 +22,44 @@ function isIdDuplicated(elements, id) {
 }
 
 function getModalInfo(itemType) {
+	if (itemType === 'condition') {
+		return {
+			message: Liferay.Language.get(
+				'are-you-sure-you-want-to-delete-the-selected-condition-node'
+			),
+			title: Liferay.Language.get('delete-condition-node'),
+		};
+	}
 	if (itemType === 'end') {
 		return {
 			message: Liferay.Language.get(
 				'are-you-sure-you-want-to-delete-the-selected-end-node'
 			),
 			title: Liferay.Language.get('delete-end-node'),
+		};
+	}
+	else if (itemType === 'fork') {
+		return {
+			message: Liferay.Language.get(
+				'are-you-sure-you-want-to-delete-the-selected-fork-node'
+			),
+			title: Liferay.Language.get('delete-fork-node'),
+		};
+	}
+	else if (itemType === 'join') {
+		return {
+			message: Liferay.Language.get(
+				'are-you-sure-you-want-to-delete-the-selected-join-node'
+			),
+			title: Liferay.Language.get('delete-join-node'),
+		};
+	}
+	else if (itemType === 'join-xor') {
+		return {
+			message: Liferay.Language.get(
+				'are-you-sure-you-want-to-delete-the-selected-join-xor-node'
+			),
+			title: Liferay.Language.get('delete-join-xor-node'),
 		};
 	}
 	else if (itemType === 'start') {

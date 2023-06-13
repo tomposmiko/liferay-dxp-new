@@ -653,7 +653,7 @@ definition {
 		}
 
 		task ("Add widgets to page") {
-			for (var portletName : list "Asset Publisher,Categories Navigation") {
+			for (var portletName : list "Asset Publisher,Category Filter") {
 				JSONLayout.addWidgetToPublicLayout(
 					groupName = "Test Site Name",
 					layoutName = "Test Page Name",
@@ -1269,6 +1269,42 @@ definition {
 
 		task ("View empty search result") {
 			Subcategory.viewSearchResultsCP(nullResult = "true");
+		}
+	}
+
+	@description = "This is a use case for LPS-142234. The user could view error message when save site settings without required category."
+	@priority = "4"
+	test ViewErrorMessageWhenSaveSiteSettingsWithoutRequiredCategory {
+		task ("Add a vocabulary with associated asset type") {
+			Category.openCategoriesAdmin(siteURLKey = "test-site-name");
+
+			Vocabulary.addWithAssociatedAssetTypeCP(
+				assetType = "Site",
+				required = "true",
+				vocabularyName = "Vocabulary Name");
+		}
+
+		task ("Add a category") {
+			JSONCategory.addCategory(
+				groupName = "Test Site Name",
+				title = "Category Name",
+				vocabularyName = "Vocabulary Name");
+		}
+
+		task ("Go to Categorization settings") {
+			Site.openSiteSettingsAdmin(siteURLKey = "test-site-name");
+
+			Click(
+				key_itemName = "Assets",
+				locator1 = "ListGroupItem#ITEM_TEXT");
+
+			Navigator.gotoNavTab(navTab = "Categorization");
+		}
+
+		task ("View error message is shown when save site settings") {
+			Button.click(button = "Save");
+
+			Alert.viewErrorMessage(errorMessage = "Error: Please select at least one category for Vocabulary Name.");
 		}
 	}
 

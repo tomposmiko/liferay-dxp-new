@@ -137,6 +137,8 @@ public class ObjectLayoutLocalServiceTest {
 				_objectDefinition.getObjectDefinitionId(), true,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				Collections.singletonList(objectLayoutTab));
+
+			Assert.fail();
 		}
 		catch (DefaultObjectLayoutException defaultObjectLayoutException) {
 			String message = defaultObjectLayoutException.getMessage();
@@ -231,9 +233,9 @@ public class ObjectLayoutLocalServiceTest {
 
 		ObjectField objectField = _objectFieldLocalService.addCustomObjectField(
 			TestPropsValues.getUserId(), 0,
-			_objectDefinition.getObjectDefinitionId(), false, false, null,
-			LocalizedMapUtil.getLocalizedMap(name), StringUtil.randomId(), true,
-			"String");
+			_objectDefinition.getObjectDefinitionId(), "Text", "String", false,
+			false, null, LocalizedMapUtil.getLocalizedMap(name),
+			StringUtil.randomId(), true);
 
 		return objectField.getObjectFieldId();
 	}

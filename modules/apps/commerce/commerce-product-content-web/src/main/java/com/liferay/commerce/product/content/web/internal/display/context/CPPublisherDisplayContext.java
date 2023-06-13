@@ -117,11 +117,9 @@ public class CPPublisherDisplayContext extends BaseCPPublisherDisplayContext {
 				end = catalogEntries.size();
 			}
 
-			List<CPCatalogEntry> results = catalogEntries.subList(
-				_searchContainer.getStart(), end);
-
 			cpDataSourceResult = new CPDataSourceResult(
-				results, catalogEntries.size());
+				catalogEntries.subList(_searchContainer.getStart(), end),
+				catalogEntries.size());
 		}
 
 		return cpDataSourceResult;
@@ -159,9 +157,9 @@ public class CPPublisherDisplayContext extends BaseCPPublisherDisplayContext {
 		CPDataSourceResult cpDataSourceResult = getCPDataSourceResult();
 
 		if (cpDataSourceResult != null) {
-			_searchContainer.setTotal(cpDataSourceResult.getLength());
-			_searchContainer.setResults(
-				cpDataSourceResult.getCPCatalogEntries());
+			_searchContainer.setResultsAndTotal(
+				cpDataSourceResult::getCPCatalogEntries,
+				cpDataSourceResult.getLength());
 		}
 
 		return _searchContainer;

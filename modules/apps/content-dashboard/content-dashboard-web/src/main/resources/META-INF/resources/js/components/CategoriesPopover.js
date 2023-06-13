@@ -12,24 +12,20 @@
  * details.
  */
 
+import ClayButton from '@clayui/button';
 import ClayLabel from '@clayui/label';
 import ClayPopover from '@clayui/popover';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
-import useOnClickOutside from '../hooks/useOnClickOutside';
-
 const CategoriesPopover = ({categories, vocabulary}) => {
 	const [openPopover, setOpenPopover] = useState(false);
-
-	useOnClickOutside(['.categories-popover', '.category-label-see-more'], () =>
-		setOpenPopover(false)
-	);
 
 	return (
 		<ClayPopover
 			alignPosition="top"
 			className="categories-popover"
+			closeOnClickOutside={true}
 			disableScroll={true}
 			header={`${categories.length} ${vocabulary} ${Liferay.Language.get(
 				'categories'
@@ -37,16 +33,12 @@ const CategoriesPopover = ({categories, vocabulary}) => {
 			onShowChange={setOpenPopover}
 			show={openPopover}
 			trigger={
-				<ClayLabel
-					className="category-label-see-more"
-					large={true}
-					onClick={(event) => {
-						event.preventDefault();
-						setOpenPopover((open) => !open);
-					}}
+				<ClayButton
+					className="category-label category-label-see-more label label-lg label-secondary"
+					displayType="unstyled"
 				>
 					{`+ ${categories.length}`}
-				</ClayLabel>
+				</ClayButton>
 			}
 		>
 			{categories.map((cat, index) => (

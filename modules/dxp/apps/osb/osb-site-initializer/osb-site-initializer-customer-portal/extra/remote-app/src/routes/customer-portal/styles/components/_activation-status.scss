@@ -1,0 +1,27 @@
+.img-activation-status {
+	.not-active {
+		filter: opacity(0.5) saturate(0);
+	}
+
+	.in-progress {
+		filter: opacity(0.5) saturate(1);
+	}
+}
+
+.label-activation-status {
+	right: 0;
+	top: 0;
+}
+
+.activation-status-container {
+	border: 2px solid;
+	border-color: var(--color-neutral-2);
+	max-width: 496px;
+	transition: all 200ms ease-in-out;
+
+	&:hover {
+		border: none;
+		box-shadow: $elevation-fluffy-3 !important;
+		transform: scale(1.02);
+	}
+}

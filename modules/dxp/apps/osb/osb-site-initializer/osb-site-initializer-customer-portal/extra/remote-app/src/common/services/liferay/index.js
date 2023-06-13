@@ -9,61 +9,36 @@
  * distribution rights of the Software.
  */
 
-const getUserId = () => {
-	try {
-		// eslint-disable-next-line no-undef
-		if (!Liferay.ThemeDisplay) {
-			new Error('themeDisplay is not defined');
-		}
+export const Liferay = window.Liferay || {
+	BREAKPOINTS: {
+		PHONE: 0,
+		TABLET: 0,
+	},
+	ThemeDisplay: {
+		getCanonicalURL: () => window.location.href,
+		getCompanyGroupId: () => 0,
+		getPathThemeImages: () => null,
+		getScopeGroupId: () => 0,
+		getSiteGroupId: () => 0,
+		getUserId: () => 0,
+	},
+	authToken: '',
+	detach: (type, callback) => window.removeEventListener(type, callback),
+	on: (type, callback) => window.addEventListener(type, callback),
+	once: (type, callback) =>
+		window.addEventListener(type, function handler() {
+			this.removeEventListener(type, handler);
 
-		// eslint-disable-next-line no-undef
-		return Liferay.ThemeDisplay.getUserId();
-	}
-	catch (error) {
-		console.warn(error.message);
-	}
-};
-
-const getScopeGroupId = () => {
-	try {
-		// eslint-disable-next-line no-undef
-		if (!Liferay.ThemeDisplay) {
-			new Error('themeDisplay is not defined');
-		}
-
-		// eslint-disable-next-line no-undef
-		return Liferay.ThemeDisplay.getScopeGroupId();
-	}
-	catch (error) {
-		console.warn(error.message);
-	}
-};
-
-const getLiferaySiteName = () => {
-	let siteName = '/web/customer-portal';
-	try {
-		// eslint-disable-next-line no-undef
-		if (!Liferay.ThemeDisplay) {
-			new Error('themeDisplay is not defined');
-		}
-
-		// eslint-disable-next-line no-undef
-		const {pathname} = new URL(Liferay.ThemeDisplay.getCanonicalURL());
-		const pathSplit = pathname.split('/').filter(Boolean);
-		siteName = `${(pathSplit.length > 2
-			? pathSplit.slice(0, pathSplit.length - 1)
-			: pathSplit
-		).join('/')}`;
-	}
-	catch (error) {
-		console.warn('Not able to find Liferay PathName\n', error);
-	}
-
-	return siteName;
-};
-
-export const LiferayTheme = {
-	getLiferaySiteName,
-	getScopeGroupId,
-	getUserId,
+			callback();
+		}),
+	publish: (name) => ({
+		fire: (data) =>
+			window.dispatchEvent(
+				new CustomEvent(name, {
+					bubbles: true,
+					composed: true,
+					...data,
+				})
+			),
+	}),
 };

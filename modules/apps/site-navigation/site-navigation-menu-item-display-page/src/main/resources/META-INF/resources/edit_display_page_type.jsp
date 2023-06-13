@@ -29,6 +29,8 @@ DisplayPageTypeSiteNavigationMenuTypeDisplayContext displayPageTypeSiteNavigatio
 					HashMapBuilder.<String, Object>put(
 						"chooseItemProps", displayPageTypeSiteNavigationMenuTypeDisplayContext.getChooseInfoItemButtonContext(request, liferayPortletResponse)
 					).put(
+						"defaultLanguageId", displayPageTypeSiteNavigationMenuTypeDisplayContext.getDefaultLanguageId()
+					).put(
 						"item",
 						HashMapBuilder.<String, Object>put(
 							"classNameId", displayPageTypeSiteNavigationMenuTypeDisplayContext.getClassNameId()
@@ -36,6 +38,8 @@ DisplayPageTypeSiteNavigationMenuTypeDisplayContext displayPageTypeSiteNavigatio
 							"classPK", displayPageTypeSiteNavigationMenuTypeDisplayContext.getClassPK()
 						).put(
 							"classTypeId", displayPageTypeSiteNavigationMenuTypeDisplayContext.getClassTypeId()
+						).put(
+							"data", displayPageTypeSiteNavigationMenuTypeDisplayContext.getDataJSONArray()
 						).put(
 							"title", displayPageTypeSiteNavigationMenuTypeDisplayContext.getTitle()
 						).put(
@@ -46,7 +50,13 @@ DisplayPageTypeSiteNavigationMenuTypeDisplayContext displayPageTypeSiteNavigatio
 					).put(
 						"itemType", displayPageTypeSiteNavigationMenuTypeDisplayContext.getItemType()
 					).put(
+						"locales", displayPageTypeSiteNavigationMenuTypeDisplayContext.getAvailableLocalesJSONArray()
+					).put(
+						"localizedNames", displayPageTypeSiteNavigationMenuTypeDisplayContext.getLocalizedNamesJSONObject()
+					).put(
 						"namespace", liferayPortletResponse.getNamespace()
+					).put(
+						"useCustomName", displayPageTypeSiteNavigationMenuTypeDisplayContext.isUseCustomName()
 					).build()
 				%>'
 			/>
