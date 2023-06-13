@@ -41,6 +41,11 @@
 		<task summary="Add a blogs entry called 'Blogs Entry1 Title' with content 'Blogs Entry1 Content'">
 			<execute macro="Navigator#openURL" />
 
+			<execute class="ListUtil" method="add">
+				<arg value="${orderID}"/>
+				<arg value="${orderIDs}"/>
+			</execute>
+
 			<var name="camelCase" method="StringUtil#replace('${camelCase}', ' ', '')"/>
 			<var name="payload" method="StringUtil#replace('${payload}', '${payload}', '${payload}}')"/>
 

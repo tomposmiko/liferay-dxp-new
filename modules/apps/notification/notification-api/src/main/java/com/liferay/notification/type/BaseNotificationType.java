@@ -20,6 +20,7 @@ import com.liferay.notification.exception.NotificationTemplateAttachmentObjectFi
 import com.liferay.notification.exception.NotificationTemplateEditorTypeException;
 import com.liferay.notification.exception.NotificationTemplateNameException;
 import com.liferay.notification.exception.NotificationTemplateObjectDefinitionIdException;
+import com.liferay.notification.exception.NotificationTemplateSubjectException;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
@@ -138,6 +139,16 @@ public abstract class BaseNotificationType implements NotificationType {
 		NotificationTemplate notificationTemplate =
 			notificationContext.getNotificationTemplate();
 
+		if (notificationTemplate.getObjectDefinitionId() > 0) {
+			ObjectDefinition objectDefinition =
+				ObjectDefinitionLocalServiceUtil.fetchObjectDefinition(
+					notificationTemplate.getObjectDefinitionId());
+
+			if (objectDefinition == null) {
+				throw new NotificationTemplateObjectDefinitionIdException();
+			}
+		}
+
 		if (Validator.isNull(notificationTemplate.getEditorType())) {
 			throw new NotificationTemplateEditorTypeException(
 				"Editor type is null");
@@ -147,14 +158,8 @@ public abstract class BaseNotificationType implements NotificationType {
 			throw new NotificationTemplateNameException("Name is null");
 		}
 
-		if (notificationTemplate.getObjectDefinitionId() > 0) {
-			ObjectDefinition objectDefinition =
-				ObjectDefinitionLocalServiceUtil.fetchObjectDefinition(
-					notificationTemplate.getObjectDefinitionId());
-
-			if (objectDefinition == null) {
-				throw new NotificationTemplateObjectDefinitionIdException();
-			}
+		if (Validator.isNull(notificationTemplate.getSubject())) {
+			throw new NotificationTemplateSubjectException("Subject is null");
 		}
 
 		for (long attachmentObjectFieldId :

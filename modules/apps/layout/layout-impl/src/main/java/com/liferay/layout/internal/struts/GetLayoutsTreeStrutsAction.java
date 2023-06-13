@@ -67,8 +67,7 @@ public class GetLayoutsTreeStrutsAction implements StrutsAction {
 				"hasMoreElements",
 				() -> {
 					int childLayoutsCount = _layoutService.getLayoutsCount(
-						themeDisplay.getScopeGroupId(), privateLayout,
-						parentLayoutId);
+						groupId, privateLayout, parentLayoutId);
 
 					int start = ParamUtil.getInteger(
 						httpServletRequest, "start");
@@ -92,7 +91,7 @@ public class GetLayoutsTreeStrutsAction implements StrutsAction {
 			).put(
 				"items",
 				_layoutsTree.getLayoutsJSONArray(
-					null, groupId, httpServletRequest, false, incomplete,
+					null, groupId, httpServletRequest, false, incomplete, false,
 					parentLayoutId, privateLayout, "productMenuPagesTree")
 			).toString());
 

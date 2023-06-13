@@ -140,18 +140,31 @@ public class OAuth2ProviderApplicationUserAgentConfigurationFactory
 
 		User user = userLocalService.getDefaultUser(companyId);
 
+		String clientId = OAuth2SecureRandomGenerator.generateClientId();
+
 		OAuth2Application oAuth2Application =
+			oAuth2ApplicationLocalService.
+				fetchOAuth2ApplicationByExternalReferenceCode(
+					externalReferenceCode, companyId);
+
+		if (oAuth2Application != null) {
+			clientId = oAuth2Application.getClientId();
+		}
+
+		oAuth2Application =
 			oAuth2ApplicationLocalService.addOrUpdateOAuth2Application(
 				externalReferenceCode, user.getUserId(), user.getScreenName(),
 				ListUtil.fromArray(
 					GrantType.AUTHORIZATION_CODE_PKCE, GrantType.JWT_BEARER),
-				"none", user.getUserId(),
-				OAuth2SecureRandomGenerator.generateClientId(),
+				"none", user.getUserId(), clientId,
 				ClientProfile.USER_AGENT_APPLICATION.id(), null,
 				oAuth2ProviderApplicationUserAgentConfiguration.description(),
 				Arrays.asList("token.introspection"),
 				oAuth2ProviderApplicationUserAgentConfiguration.homePageURL(),
-				0, null, externalReferenceCode,
+				0, null,
+				getName(
+					oAuth2ProviderApplicationUserAgentConfiguration.name(),
+					externalReferenceCode),
 				oAuth2ProviderApplicationUserAgentConfiguration.
 					privacyPolicyURL(),
 				redirectURIsList, false, true, null, new ServiceContext());

@@ -1,5 +1,11 @@
 definition {
 
+	macro activityCollapseButton {
+		Click.mouseDownMouseUp(
+			key_textButton = "${button}",
+			locator1 = "PRMMDFRequest#TEXT_BUTTON");
+	}
+
 	@summary = "Add a new activity"
 	macro addNewActivity {
 		Click(

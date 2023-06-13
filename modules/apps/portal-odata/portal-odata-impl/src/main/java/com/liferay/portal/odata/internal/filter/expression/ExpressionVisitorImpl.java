@@ -27,7 +27,6 @@ import com.liferay.portal.odata.filter.expression.UnaryExpression;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmType;
@@ -76,17 +75,40 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 		Expression leftBinaryOperationExpression,
 		Expression rightBinaryOperationExpression) {
 
-		Optional<BinaryExpression.Operation> binaryExpressionOperationOptional =
-			_getOperationOptional(binaryOperatorKind);
+		BinaryExpression.Operation binaryExpressionOperation = null;
 
-		return binaryExpressionOperationOptional.map(
-			binaryExpressionOperation -> new BinaryExpressionImpl(
-				leftBinaryOperationExpression, binaryExpressionOperation,
-				rightBinaryOperationExpression)
-		).orElseThrow(
-			() -> new UnsupportedOperationException(
-				"Binary operator: " + binaryOperatorKind)
-		);
+		if (binaryOperatorKind == BinaryOperatorKind.AND) {
+			binaryExpressionOperation = BinaryExpression.Operation.AND;
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.EQ) {
+			binaryExpressionOperation = BinaryExpression.Operation.EQ;
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.GE) {
+			binaryExpressionOperation = BinaryExpression.Operation.GE;
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.GT) {
+			binaryExpressionOperation = BinaryExpression.Operation.GT;
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.LE) {
+			binaryExpressionOperation = BinaryExpression.Operation.LE;
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.LT) {
+			binaryExpressionOperation = BinaryExpression.Operation.LT;
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.NE) {
+			binaryExpressionOperation = BinaryExpression.Operation.NE;
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.OR) {
+			binaryExpressionOperation = BinaryExpression.Operation.OR;
+		}
+		else {
+			throw new UnsupportedOperationException(
+				"Binary operator: " + binaryOperatorKind);
+		}
+
+		return new BinaryExpressionImpl(
+			leftBinaryOperationExpression, binaryExpressionOperation,
+			rightBinaryOperationExpression);
 	}
 
 	@Override
@@ -296,37 +318,6 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 		throw new UnsupportedOperationException(
 			"An expression cannot be obtained from URI resources " +
 				uriResources);
-	}
-
-	private Optional<BinaryExpression.Operation> _getOperationOptional(
-		BinaryOperatorKind binaryOperatorKind) {
-
-		if (binaryOperatorKind == BinaryOperatorKind.AND) {
-			return Optional.of(BinaryExpression.Operation.AND);
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.EQ) {
-			return Optional.of(BinaryExpression.Operation.EQ);
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.GE) {
-			return Optional.of(BinaryExpression.Operation.GE);
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.GT) {
-			return Optional.of(BinaryExpression.Operation.GT);
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.LE) {
-			return Optional.of(BinaryExpression.Operation.LE);
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.LT) {
-			return Optional.of(BinaryExpression.Operation.LT);
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.NE) {
-			return Optional.of(BinaryExpression.Operation.NE);
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.OR) {
-			return Optional.of(BinaryExpression.Operation.OR);
-		}
-
-		return Optional.empty();
 	}
 
 	private NavigationPropertyExpression.Type _getType(
