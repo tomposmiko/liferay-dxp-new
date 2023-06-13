@@ -12,7 +12,6 @@
  * details.
  */
 
-import {deleteResource} from '.';
 import fetcher from '../fetcher';
 import {APIResponse} from './types';
 
@@ -56,6 +55,7 @@ class Rest<YupModel = any, ObjectModel = any> {
 
 	protected async beforeCreate(_data: YupModel) {}
 	protected async beforeUpdate(_id: number, _data: YupModel) {}
+	protected async beforeRemove(_id: number) {}
 
 	public async create(data: YupModel): Promise<ObjectModel> {
 		await this.beforeCreate(data);
@@ -78,8 +78,10 @@ class Rest<YupModel = any, ObjectModel = any> {
 		return `/${this.uri}/${id}?${this.nestedFields}`;
 	}
 
-	public remove(id: number): Promise<any> | undefined {
-		return deleteResource(`/${this.uri}/${id}`);
+	public async remove(id: number): Promise<void> {
+		await this.beforeRemove(id);
+
+		await fetcher.delete(`/${this.uri}/${id}`);
 	}
 
 	public async update(

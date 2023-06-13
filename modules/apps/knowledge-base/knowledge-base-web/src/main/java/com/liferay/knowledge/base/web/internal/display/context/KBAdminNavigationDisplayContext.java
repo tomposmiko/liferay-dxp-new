@@ -83,6 +83,9 @@ public class KBAdminNavigationDisplayContext {
 			renderResponse);
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		_kbDropdownItemsProvider = new KBDropdownItemsProvider(
+			_liferayPortletRequest, _liferayPortletResponse);
 	}
 
 	public List<NavigationItem> getInfoPanelNavigationItems() {
@@ -309,6 +312,10 @@ public class KBAdminNavigationDisplayContext {
 		for (KBArticle kbArticle : kbArticles) {
 			childrenJSONArray.put(
 				JSONUtil.put(
+					"actions",
+					_kbDropdownItemsProvider.getKBArticleDropdownItems(
+						kbArticle)
+				).put(
 					"children", _getChildKBArticlesJSONArray(kbArticle)
 				).put(
 					"href",
@@ -330,6 +337,9 @@ public class KBAdminNavigationDisplayContext {
 	private JSONArray _getChildrenJSONArray() throws PortalException {
 		return JSONUtil.put(
 			JSONUtil.put(
+				"actions",
+				_kbDropdownItemsProvider.getKBFolderDropdownItems(null)
+			).put(
 				"children",
 				_getChildrenJSONArray(
 					KBFolderConstants.DEFAULT_PARENT_FOLDER_ID)
@@ -354,10 +364,6 @@ public class KBAdminNavigationDisplayContext {
 
 		JSONArray childrenJSONArray = JSONFactoryUtil.createJSONArray();
 
-		KBDropdownItemsProvider kbDropdownItemsProvider =
-			new KBDropdownItemsProvider(
-				_liferayPortletRequest, _liferayPortletResponse);
-
 		List<Object> kbObjects = KBFolderServiceUtil.getKBFoldersAndKBArticles(
 			_themeDisplay.getScopeGroupId(), parentFolderId,
 			WorkflowConstants.STATUS_ANY, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
@@ -371,7 +377,7 @@ public class KBAdminNavigationDisplayContext {
 
 				jsonObject.put(
 					"actions",
-					kbDropdownItemsProvider.getKBFolderDropdownItems(kbFolder)
+					_kbDropdownItemsProvider.getKBFolderDropdownItems(kbFolder)
 				).put(
 					"children", _getChildrenJSONArray(kbFolder.getKbFolderId())
 				).put(
@@ -397,6 +403,10 @@ public class KBAdminNavigationDisplayContext {
 				KBArticle kbArticle = (KBArticle)kbObject;
 
 				jsonObject.put(
+					"actions",
+					_kbDropdownItemsProvider.getKBArticleDropdownItems(
+						kbArticle)
+				).put(
 					"children", _getChildKBArticlesJSONArray(kbArticle)
 				).put(
 					"href",
@@ -430,6 +440,10 @@ public class KBAdminNavigationDisplayContext {
 		for (KBTemplate kbTemplate : kbTemplates) {
 			navigationItemsJSONArray.put(
 				JSONUtil.put(
+					"actions",
+					_kbDropdownItemsProvider.getKBTemplateDropdownItems(
+						kbTemplate)
+				).put(
 					"href",
 					PortletURLBuilder.createRenderURL(
 						_liferayPortletResponse
@@ -450,6 +464,7 @@ public class KBAdminNavigationDisplayContext {
 
 	private final HttpServletRequest _httpServletRequest;
 	private final KBArticleURLHelper _kbArticleURLHelper;
+	private final KBDropdownItemsProvider _kbDropdownItemsProvider;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private final ThemeDisplay _themeDisplay;

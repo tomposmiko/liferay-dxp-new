@@ -25,6 +25,7 @@ import {
 	TestrayCase,
 	TestraySuiteCase,
 } from '../../../../../services/rest';
+import {getUniqueList} from '../../../../../util';
 import {searchUtil} from '../../../../../util/search';
 import {CaseListView} from '../../../Cases';
 import SuiteFormSelectModal from '../../../Suites/modal';
@@ -41,9 +42,9 @@ const BuildFormCases: React.FC<BuildFormCasesProps> = ({
 }) => {
 	const {modal} = useFormModal({
 		onSave: (newCases) =>
-			setCaseIds((prevCases) => [
-				...new Set([...prevCases, ...newCases]),
-			]),
+			setCaseIds((prevCases) =>
+				getUniqueList([...prevCases, ...newCases])
+			),
 	});
 
 	const {modal: buildSelectSuitesModal} = useFormModal({
@@ -55,15 +56,15 @@ const BuildFormCases: React.FC<BuildFormCasesProps> = ({
 				)}`
 			).then((response) => {
 				if (response?.totalCount) {
-					setCaseIds((prevCases) => [
-						...new Set([
+					setCaseIds((prevCases) =>
+						getUniqueList([
 							...prevCases,
 							...response.items.map(
 								({r_caseToSuitesCases_c_caseId}) =>
 									r_caseToSuitesCases_c_caseId
 							),
-						]),
-					]);
+						])
+					);
 				}
 			});
 		},
@@ -116,7 +117,7 @@ const BuildFormCases: React.FC<BuildFormCasesProps> = ({
 								},
 								{
 									key: 'component',
-									render: (component) => component.name,
+									render: (component) => component?.name,
 									value: i18n.translate('component'),
 								},
 								{
@@ -132,7 +133,9 @@ const BuildFormCases: React.FC<BuildFormCasesProps> = ({
 					}}
 				/>
 			) : (
-				<ClayAlert>There are no linked cases</ClayAlert>
+				<ClayAlert>
+					{i18n.translate('there-are-no-linked-cases')}
+				</ClayAlert>
 			)}
 
 			<BuildSelectSuitesModal modal={buildSelectSuitesModal} />

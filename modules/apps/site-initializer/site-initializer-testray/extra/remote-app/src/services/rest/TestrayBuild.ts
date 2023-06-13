@@ -12,15 +12,22 @@
  * details.
  */
 
+import i18n from '../../i18n';
 import {CategoryOptions} from '../../pages/Project/Routines/Builds/BuildForm/BuildFormRun';
 import yupSchema from '../../schema/yup';
 import {TEST_STATUS} from '../../util/constants';
+import {searchUtil} from '../../util/search';
 import Rest from './Rest';
 import {testrayCaseResultRest} from './TestrayCaseResult';
 import {testrayFactorRest} from './TestrayFactor';
 import {testrayRunRest} from './TestrayRun';
 
-import type {TestrayBuild} from './types';
+import type {
+	APIResponse,
+	TestrayBuild,
+	TestrayCaseResult,
+	TestrayRoutine,
+} from './types';
 
 type Build = typeof yupSchema.build.__outputType & {projectId: number};
 
@@ -72,6 +79,12 @@ class TestrayBuildRest extends Rest<Build, TestrayBuild> {
 				({factorOption}) => factorOption
 			);
 
+			const testrayRunName = factorOptionsList.join(' | ');
+
+			if (!testrayRunName) {
+				return build;
+			}
+
 			const testrayRun = await testrayRunRest.create({
 				buildId: build.id,
 				description: undefined,
@@ -106,7 +119,57 @@ class TestrayBuildRest extends Rest<Build, TestrayBuild> {
 			runIndex++;
 		}
 
-		return build as TestrayBuild;
+		return build;
+	}
+
+	public async hasBuildsInProjectId(projectId: number): Promise<boolean> {
+		const routineResponse = await this.fetcher<APIResponse<TestrayRoutine>>(
+			`/routines?filter=${searchUtil.eq(
+				'projectId',
+				projectId
+			)}&fields=id`
+		);
+
+		const [routine] = routineResponse?.items || [];
+
+		if (!routine) {
+			return false;
+		}
+
+		const buildResponse = await this.fetcher<APIResponse<TestrayBuild>>(
+			`/${this.uri}?filter=${searchUtil.eq(
+				'routineId',
+				routine.id
+			)}&fields=id`
+		);
+
+		return !!buildResponse?.totalCount;
+	}
+
+	protected async beforeCreate(build: Build) {
+		const response = await this.fetcher(
+			`/builds?filter=${searchUtil.eq('name', build.name)}`
+		);
+
+		if (response?.items.length) {
+			throw new Error(i18n.sub('the-x-name-already-exists', 'build'));
+		}
+	}
+
+	public async getCurrentCaseIds(buildId: string | number) {
+		const response = await this.fetcher(
+			`/caseresults?filter=${searchUtil.eq(
+				'buildId',
+				buildId
+			)}&pageSize=1000&fields=r_caseToCaseResult_c_caseId`
+		);
+
+		const caseIds: number[] =
+			response?.items.map(
+				(item: TestrayCaseResult) => item.r_caseToCaseResult_c_caseId
+			) || [];
+
+		return caseIds;
 	}
 }
 

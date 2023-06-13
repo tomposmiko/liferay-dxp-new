@@ -41,7 +41,6 @@ import com.liferay.item.selector.criteria.InfoItemItemSelectorReturnType;
 import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
-import com.liferay.object.constants.ObjectLayoutBoxConstants;
 import com.liferay.object.exception.NoSuchObjectLayoutException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeTracker;
@@ -148,38 +147,6 @@ public class ObjectEntryDisplayContext {
 		_objectRequestHelper = new ObjectRequestHelper(httpServletRequest);
 		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
-	}
-
-	public ObjectLayoutBox getCategorizationObjectLayoutBox()
-		throws PortalException {
-
-		ObjectDefinition objectDefinition = getObjectDefinition();
-
-		if (!StringUtil.equals(
-				objectDefinition.getStorageType(),
-				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT)) {
-
-			return null;
-		}
-
-		ObjectLayoutTab objectLayoutTab = getObjectLayoutTab();
-
-		if (objectLayoutTab == null) {
-			return null;
-		}
-
-		for (ObjectLayoutBox objectLayoutBox :
-				objectLayoutTab.getObjectLayoutBoxes()) {
-
-			if (StringUtil.equals(
-					objectLayoutBox.getType(),
-					ObjectLayoutBoxConstants.TYPE_CATEGORIZATION)) {
-
-				return objectLayoutBox;
-			}
-		}
-
-		return null;
 	}
 
 	public List<NavigationItem> getNavigationItems() throws PortalException {
@@ -303,6 +270,35 @@ public class ObjectEntryDisplayContext {
 
 			return null;
 		}
+	}
+
+	public ObjectLayoutBox getObjectLayoutBox(String type)
+		throws PortalException {
+
+		ObjectDefinition objectDefinition = getObjectDefinition();
+
+		if (!StringUtil.equals(
+				objectDefinition.getStorageType(),
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT)) {
+
+			return null;
+		}
+
+		ObjectLayoutTab objectLayoutTab = getObjectLayoutTab();
+
+		if (objectLayoutTab == null) {
+			return null;
+		}
+
+		for (ObjectLayoutBox objectLayoutBox :
+				objectLayoutTab.getObjectLayoutBoxes()) {
+
+			if (StringUtil.equals(objectLayoutBox.getType(), type)) {
+				return objectLayoutBox;
+			}
+		}
+
+		return null;
 	}
 
 	public ObjectLayoutTab getObjectLayoutTab() throws PortalException {
@@ -440,6 +436,14 @@ public class ObjectEntryDisplayContext {
 		User user = permissionChecker.getUser();
 
 		return user.isDefaultUser();
+	}
+
+	public boolean isEnableComments(ObjectDefinition objectDefinition) {
+		if (_readOnly) {
+			return false;
+		}
+
+		return objectDefinition.isEnableComments();
 	}
 
 	public boolean isReadOnly() {

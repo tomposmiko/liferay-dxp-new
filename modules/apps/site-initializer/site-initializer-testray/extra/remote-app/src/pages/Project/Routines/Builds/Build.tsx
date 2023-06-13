@@ -20,7 +20,6 @@ import Code from '../../../../components/Code';
 import Container from '../../../../components/Layout/Container';
 import ListViewRest from '../../../../components/ListView';
 import StatusBadge from '../../../../components/StatusBadge';
-import useAssignCaseResult from '../../../../hooks/useAssignCaseResult';
 import useMutate from '../../../../hooks/useMutate';
 import i18n from '../../../../i18n';
 import {filters} from '../../../../schema/filter';
@@ -35,7 +34,6 @@ import useBuildTestActions from './useBuildTestActions';
 
 const Build = () => {
 	const {buildId} = useParams();
-	const {onAssignToMeFetch} = useAssignCaseResult();
 	const {updateItemFromList} = useMutate();
 	const {actions, form} = useBuildTestActions();
 
@@ -107,7 +105,8 @@ const Build = () => {
 								return (
 									<AssignToMe
 										onClick={() =>
-											onAssignToMeFetch(caseResult)
+											testrayCaseResultRest
+												.assignToMe(caseResult)
 												.then(() => {
 													updateItemFromList(
 														mutate,
