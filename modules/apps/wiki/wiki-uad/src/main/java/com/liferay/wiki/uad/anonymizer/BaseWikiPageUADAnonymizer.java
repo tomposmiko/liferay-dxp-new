@@ -70,6 +70,11 @@ public abstract class BaseWikiPageUADAnonymizer
 	}
 
 	@Override
+	public Class<WikiPage> getTypeClass() {
+		return WikiPage.class;
+	}
+
+	@Override
 	protected ActionableDynamicQuery doGetActionableDynamicQuery() {
 		return wikiPageLocalService.getActionableDynamicQuery();
 	}

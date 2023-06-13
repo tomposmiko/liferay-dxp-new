@@ -44,25 +44,25 @@ BlogEntriesDisplayContext blogEntriesDisplayContext = new BlogEntriesDisplayCont
 
 blogEntriesDisplayContext.populateResults(entriesSearchContainer);
 
-BlogEntriesManagementToolbarDisplayContext blogEntriesManagementToolbarDisplayContext = new BlogEntriesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, currentURLObj, trashHelper);
+BlogEntriesManagementToolbarDisplayContext blogEntriesManagementToolbarDisplayContext = new BlogEntriesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, currentURLObj, trashHelper);
 
 String displayStyle = blogEntriesManagementToolbarDisplayContext.getDisplayStyle();
 %>
 
 <clay:management-toolbar
-	actionItems="<%= blogEntriesManagementToolbarDisplayContext.getActionDropdownItems() %>"
+	actionDropdownItems="<%= blogEntriesManagementToolbarDisplayContext.getActionDropdownItems() %>"
 	clearResultsURL="<%= blogEntriesManagementToolbarDisplayContext.getSearchActionURL() %>"
 	creationMenu="<%= blogEntriesManagementToolbarDisplayContext.getCreationMenu() %>"
 	disabled="<%= entriesSearchContainer.getTotal() <= 0 %>"
-	filterItems="<%= blogEntriesManagementToolbarDisplayContext.getFilterDropdownItems() %>"
+	filterDropdownItems="<%= blogEntriesManagementToolbarDisplayContext.getFilterDropdownItems() %>"
+	itemsTotal="<%= entriesSearchContainer.getTotal() %>"
 	searchActionURL="<%= blogEntriesManagementToolbarDisplayContext.getSearchActionURL() %>"
 	searchContainerId="blogEntries"
 	searchFormName="searchFm"
 	showInfoButton="<%= false %>"
 	sortingOrder="<%= blogEntriesManagementToolbarDisplayContext.getOrderByType() %>"
 	sortingURL="<%= String.valueOf(blogEntriesManagementToolbarDisplayContext.getSortingURL()) %>"
-	totalItems="<%= entriesSearchContainer.getTotal() %>"
-	viewTypes="<%= blogEntriesManagementToolbarDisplayContext.getViewTypes() %>"
+	viewTypeItems="<%= blogEntriesManagementToolbarDisplayContext.getViewTypes() %>"
 />
 
 <portlet:actionURL name="/blogs/edit_entry" var="restoreTrashEntriesURL">
@@ -114,14 +114,26 @@ String displayStyle = blogEntriesManagementToolbarDisplayContext.getDisplayStyle
 
 <aui:script>
 	function <portlet:namespace />deleteEntries() {
-		if (<%= trashHelper.isTrashEnabled(scopeGroupId) %> || confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries") %>')) {
-			var form = AUI.$(document.<portlet:namespace />fm);
+		if (<%= trashHelper.isTrashEnabled(scopeGroupId) %> || confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-entries" />')) {
+			var form = document.querySelector('#<portlet:namespace />fm');
 
-			form.attr('method', 'post');
-			form.fm('<%= Constants.CMD %>').val('<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>');
-			form.fm('deleteEntryIds').val(Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
+			if (form) {
+				form.setAttribute('method', 'post');
 
-			submitForm(form, '<portlet:actionURL name="/blogs/edit_entry" />');
+				var cmd = form.querySelector('#<portlet:namespace /><%= Constants.CMD %>');
+
+				if (cmd) {
+					cmd.value ='<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>';
+				}
+
+				var deleteEntryIds = form.querySelector('#<portlet:namespace />deleteEntryIds');
+
+				if (deleteEntryIds) {
+					deleteEntryIds.value = Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds');
+				}
+
+				submitForm(form, '<portlet:actionURL name="/blogs/edit_entry" />');
+			}
 		}
 	}
 </aui:script>

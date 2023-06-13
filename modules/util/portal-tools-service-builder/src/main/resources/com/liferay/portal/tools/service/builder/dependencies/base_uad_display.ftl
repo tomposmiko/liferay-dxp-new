@@ -1,8 +1,8 @@
-package ${packagePath}.uad.display;
+package ${entity.UADPackagePath}.uad.display;
 
 import ${apiPackagePath}.model.${entity.name};
 import ${apiPackagePath}.service.${entity.name}LocalService;
-import ${packagePath}.uad.constants.${portletShortName}UADConstants;
+import ${entity.UADPackagePath}.uad.constants.${entity.UADApplicationName}UADConstants;
 
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -35,23 +35,13 @@ public abstract class Base${entity.name}UADDisplay extends BaseModelUADDisplay<$
 	}
 
 	@Override
-	public String getApplicationName() {
-		return ${portletShortName}UADConstants.APPLICATION_NAME;
-	}
-
-	@Override
 	public String[] getDisplayFieldNames() {
 		return new String[]{<#list entity.UADNonanonymizableEntityColumns as uadNonanonymizableEntityColumn>"${uadNonanonymizableEntityColumn.name}"<#sep>, </#sep></#list>};
 	}
 
 	@Override
-	public String getKey() {
-		return ${portletShortName}UADConstants.CLASS_NAME_${entity.constantName};
-	}
-
-	@Override
-	public String getTypeName(Locale locale) {
-		return "${entity.name}";
+	public Class<${entity.name}> getTypeClass() {
+		return ${entity.name}.class;
 	}
 
 	@Override
@@ -71,7 +61,7 @@ public abstract class Base${entity.name}UADDisplay extends BaseModelUADDisplay<$
 
 	@Override
 	protected String[] doGetUserIdFieldNames() {
-		return ${portletShortName}UADConstants.USER_ID_FIELD_NAMES_${entity.constantName};
+		return ${entity.UADApplicationName}UADConstants.USER_ID_FIELD_NAMES_${entity.constantName};
 	}
 
 	@Reference

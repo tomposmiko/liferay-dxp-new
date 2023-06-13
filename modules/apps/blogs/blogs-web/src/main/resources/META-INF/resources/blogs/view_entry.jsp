@@ -33,6 +33,8 @@ BlogsEntry entry = (BlogsEntry)request.getAttribute(WebKeys.BLOGS_ENTRY);
 
 long entryId = ParamUtil.getLong(request, "entryId", entry.getEntryId());
 
+String entryTitle = BlogsEntryUtil.getDisplayTitle(resourceBundle, entry);
+
 AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(BlogsEntry.class.getName(), entry.getEntryId());
 
 AssetEntryServiceUtil.incrementViewCounter(assetEntry);
@@ -61,7 +63,7 @@ if (portletTitleBasedNavigation) {
 	portletDisplay.setShowBackIcon(true);
 	portletDisplay.setURLBack(redirect);
 
-	renderResponse.setTitle(BlogsEntryUtil.getDisplayTitle(resourceBundle, entry));
+	renderResponse.setTitle(entryTitle);
 }
 %>
 
@@ -71,7 +73,7 @@ if (portletTitleBasedNavigation) {
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="entryId" type="hidden" value="<%= String.valueOf(entryId) %>" />
 
-	<div class="widget-mode-detail">
+	<div class="widget-mode-detail" data-analytics-asset-id="<%= String.valueOf(entryId) %>" data-analytics-asset-title="<%= HtmlUtil.escapeAttribute(entryTitle) %>" data-analytics-asset-type="blog">
 		<liferay-util:include page="/blogs/view_entry_content_detail.jsp" servletContext="<%= application %>" />
 	</div>
 </aui:form>
@@ -80,7 +82,7 @@ if (portletTitleBasedNavigation) {
 	<c:if test="<%= PropsValues.BLOGS_ENTRY_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED %>">
 
 		<%
-		BlogsEntry[] prevAndNext = BlogsEntryLocalServiceUtil.getEntriesPrevAndNext(entryId);
+		BlogsEntry[] prevAndNext = BlogsEntryServiceUtil.getEntriesPrevAndNext(entryId);
 
 		BlogsEntry previousEntry = prevAndNext[0];
 		BlogsEntry nextEntry = prevAndNext[2];
@@ -97,13 +99,17 @@ if (portletTitleBasedNavigation) {
 								<div class="card">
 
 									<%
-									String smallImageURL = previousEntry.getSmallImageURL(themeDisplay);
+									String imageURL = previousEntry.getCoverImageURL(themeDisplay);
+
+									if (Validator.isNull(imageURL)) {
+										imageURL = previousEntry.getSmallImageURL(themeDisplay);
+									}
 									%>
 
-									<c:if test="<%= Validator.isNotNull(smallImageURL) %>">
+									<c:if test="<%= Validator.isNotNull(imageURL) %>">
 										<div class="card-header">
 											<div class="aspect-ratio aspect-ratio-8-to-3">
-												<img alt="thumbnail" class="aspect-ratio-item-center-middle aspect-ratio-item-fluid" src="<%= HtmlUtil.escape(smallImageURL) %>" />
+												<img alt="thumbnail" class="aspect-ratio-item-center-middle aspect-ratio-item-fluid" src="<%= HtmlUtil.escape(imageURL) %>" />
 											</div>
 										</div>
 									</c:if>
@@ -254,13 +260,17 @@ if (portletTitleBasedNavigation) {
 								<div class="card">
 
 									<%
-									String smallImageURL = nextEntry.getSmallImageURL(themeDisplay);
+									String imageURL = nextEntry.getCoverImageURL(themeDisplay);
+
+									if (Validator.isNull(imageURL)) {
+										imageURL = nextEntry.getSmallImageURL(themeDisplay);
+									}
 									%>
 
-									<c:if test="<%= Validator.isNotNull(smallImageURL) %>">
+									<c:if test="<%= Validator.isNotNull(imageURL) %>">
 										<div class="card-header">
 											<div class="aspect-ratio aspect-ratio-8-to-3">
-												<img alt="thumbnail" class="aspect-ratio-item-center-middle aspect-ratio-item-fluid" src="<%= HtmlUtil.escape(smallImageURL) %>" />
+												<img alt="thumbnail" class="aspect-ratio-item-center-middle aspect-ratio-item-fluid" src="<%= HtmlUtil.escape(imageURL) %>" />
 											</div>
 										</div>
 									</c:if>

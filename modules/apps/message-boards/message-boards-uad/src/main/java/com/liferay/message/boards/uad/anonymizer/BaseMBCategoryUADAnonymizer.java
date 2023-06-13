@@ -70,6 +70,11 @@ public abstract class BaseMBCategoryUADAnonymizer
 	}
 
 	@Override
+	public Class<MBCategory> getTypeClass() {
+		return MBCategory.class;
+	}
+
+	@Override
 	protected ActionableDynamicQuery doGetActionableDynamicQuery() {
 		return mbCategoryLocalService.getActionableDynamicQuery();
 	}

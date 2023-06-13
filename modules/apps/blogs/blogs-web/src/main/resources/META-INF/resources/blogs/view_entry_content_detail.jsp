@@ -148,27 +148,48 @@ RatingsStats ratingsStats = (RatingsStats)request.getAttribute("view_entry_conte
 
 		<c:if test="<%= Validator.isNotNull(coverImageURL) %>">
 			<div class="aspect-ratio aspect-ratio-bg-cover cover-image" style="background-image: url(<%= coverImageURL %>)"></div>
-
-			<div class="cover-image-caption">
-				<small><%= entry.getCoverImageCaption() %></small>
-			</div>
 		</c:if>
 
 		<!-- text resume -->
 
 		<div class="container widget-mode-detail-header" id="<portlet:namespace /><%= entry.getEntryId() %>">
+			<c:if test="<%= Validator.isNotNull(coverImageURL) %>">
+				<div class="row">
+					<div class="col-md-8 mx-auto">
+						<div class="cover-image-caption">
+							<small><%= entry.getCoverImageCaption() %></small>
+						</div>
+					</div>
+				</div>
+			</c:if>
+
 			<div class="row">
 				<div class="col-md-8 mx-auto widget-mode-detail-text">
 					<%= entry.getContent() %>
 				</div>
 			</div>
 
-			<div class="row">
-				<div class="col-md-8 mx-auto widget-mode-detail">
-					<liferay-asset:asset-tags-available
-						className="<%= BlogsEntry.class.getName() %>"
-						classPK="<%= entry.getEntryId() %>"
-					>
+			<liferay-expando:custom-attributes-available
+				className="<%= BlogsEntry.class.getName() %>"
+			>
+				<div class="row">
+					<div class="col-md-8 mx-auto widget-mode-detail">
+						<liferay-expando:custom-attribute-list
+							className="<%= BlogsEntry.class.getName() %>"
+							classPK="<%= entry.getEntryId() %>"
+							editable="<%= false %>"
+							label="<%= true %>"
+						/>
+					</div>
+				</div>
+			</liferay-expando:custom-attributes-available>
+
+			<liferay-asset:asset-tags-available
+				className="<%= BlogsEntry.class.getName() %>"
+				classPK="<%= entry.getEntryId() %>"
+			>
+				<div class="row">
+					<div class="col-md-8 mx-auto widget-mode-detail">
 						<div class="entry-tags">
 							<liferay-asset:asset-tags-summary
 								className="<%= BlogsEntry.class.getName() %>"
@@ -176,9 +197,9 @@ RatingsStats ratingsStats = (RatingsStats)request.getAttribute("view_entry_conte
 								portletURL="<%= renderResponse.createRenderURL() %>"
 							/>
 						</div>
-					</liferay-asset:asset-tags-available>
+					</div>
 				</div>
-			</div>
+			</liferay-asset:asset-tags-available>
 		</div>
 
 		<div class="row">

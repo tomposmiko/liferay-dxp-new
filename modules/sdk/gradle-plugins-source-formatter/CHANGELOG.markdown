@@ -1996,6 +1996,60 @@ another task with the same name is being executed in a parent project.
 - [LPS-80520]: Update the [Liferay Source Formatter] dependency to version
 1.0.623.
 
+## 2.3.151 - 2018-05-07
+
+### Changed
+- [LPS-78312]: Update the [Liferay Source Formatter] dependency to version
+1.0.624.
+
+## 2.3.152 - 2018-05-10
+
+### Changed
+- [LPS-80332]: Update the [Liferay Source Formatter] dependency to version
+1.0.625.
+
+## 2.3.153 - 2018-05-10
+
+### Changed
+- [LPS-80332]: Update the [Liferay Source Formatter] dependency to version
+1.0.626.
+
+## 2.3.154 - 2018-05-13
+
+### Changed
+- [LPS-79679]: Update the [Liferay Source Formatter] dependency to version
+1.0.627.
+
+## 2.3.155 - 2018-05-14
+
+### Changed
+- [LPS-79679]: Update the [Liferay Source Formatter] dependency to version
+1.0.628.
+
+## 2.3.156 - 2018-05-14
+
+### Changed
+- [LPS-79679]: Update the [Liferay Source Formatter] dependency to version
+1.0.629.
+
+## 2.3.157 - 2018-05-15
+
+### Changed
+- [LPS-74544]: Update the [Liferay Source Formatter] dependency to version
+1.0.630.
+
+## 2.3.158 - 2018-05-15
+
+### Changed
+- [LPS-79679]: Update the [Liferay Source Formatter] dependency to version
+1.0.631.
+
+## 2.3.159 - 2018-05-16
+
+### Changed
+- [LPS-79679]: Update the [Liferay Source Formatter] dependency to version
+1.0.632.
+
 [Liferay Source Formatter]: https://github.com/liferay/liferay-portal/tree/master/modules/util/source-formatter
 [LPS-52675]: https://issues.liferay.com/browse/LPS-52675
 [LPS-62970]: https://issues.liferay.com/browse/LPS-62970
@@ -2112,6 +2166,7 @@ another task with the same name is being executed in a parent project.
 [LPS-78261]: https://issues.liferay.com/browse/LPS-78261
 [LPS-78269]: https://issues.liferay.com/browse/LPS-78269
 [LPS-78308]: https://issues.liferay.com/browse/LPS-78308
+[LPS-78312]: https://issues.liferay.com/browse/LPS-78312
 [LPS-78436]: https://issues.liferay.com/browse/LPS-78436
 [LPS-78459]: https://issues.liferay.com/browse/LPS-78459
 [LPS-78669]: https://issues.liferay.com/browse/LPS-78669

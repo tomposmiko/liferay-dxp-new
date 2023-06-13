@@ -51,15 +51,15 @@ public class BlogEntriesManagementToolbarDisplayContext {
 
 	public BlogEntriesManagementToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse, PortletURL currentURLObj,
+		LiferayPortletResponse liferayPortletResponse,
+		HttpServletRequest request, PortletURL currentURLObj,
 		TrashHelper trashHelper) {
 
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
+		_request = request;
 		_currentURLObj = currentURLObj;
 		_trashHelper = trashHelper;
-
-		_request = _liferayPortletRequest.getHttpServletRequest();
 
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
 			liferayPortletRequest);
@@ -89,7 +89,7 @@ public class BlogEntriesManagementToolbarDisplayContext {
 							String label = "delete";
 
 							if (trashEnabled) {
-								label = "recycle-bin";
+								label = "move-to-the-recycle-bin";
 							}
 
 							dropdownItem.setLabel(
@@ -109,7 +109,7 @@ public class BlogEntriesManagementToolbarDisplayContext {
 				themeDisplay.getPermissionChecker(),
 				themeDisplay.getScopeGroupId(), ActionKeys.ADD_ENTRY)) {
 
-			return new CreationMenu();
+			return null;
 		}
 
 		CreationMenu creationMenu = new CreationMenu();

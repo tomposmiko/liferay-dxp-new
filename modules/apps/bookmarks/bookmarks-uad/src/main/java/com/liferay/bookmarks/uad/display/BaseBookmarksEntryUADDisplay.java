@@ -24,7 +24,6 @@ import com.liferay.user.associated.data.display.BaseModelUADDisplay;
 import java.io.Serializable;
 
 import java.util.List;
-import java.util.Locale;
 
 import org.osgi.service.component.annotations.Reference;
 
@@ -49,23 +48,13 @@ public abstract class BaseBookmarksEntryUADDisplay
 	}
 
 	@Override
-	public String getApplicationName() {
-		return BookmarksUADConstants.APPLICATION_NAME;
-	}
-
-	@Override
 	public String[] getDisplayFieldNames() {
 		return new String[] {"name", "description", "url"};
 	}
 
 	@Override
-	public String getKey() {
-		return BookmarksUADConstants.CLASS_NAME_BOOKMARKS_ENTRY;
-	}
-
-	@Override
-	public String getTypeName(Locale locale) {
-		return "BookmarksEntry";
+	public Class<BookmarksEntry> getTypeClass() {
+		return BookmarksEntry.class;
 	}
 
 	@Override

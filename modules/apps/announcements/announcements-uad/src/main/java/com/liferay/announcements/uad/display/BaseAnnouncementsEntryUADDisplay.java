@@ -23,7 +23,6 @@ import com.liferay.user.associated.data.display.BaseModelUADDisplay;
 import java.io.Serializable;
 
 import java.util.List;
-import java.util.Locale;
 
 import org.osgi.service.component.annotations.Reference;
 
@@ -47,20 +46,13 @@ public abstract class BaseAnnouncementsEntryUADDisplay
 			Long.valueOf(primaryKey.toString()));
 	}
 
-	public String getApplicationName() {
-		return AnnouncementsUADConstants.APPLICATION_NAME;
-	}
-
 	public String[] getDisplayFieldNames() {
 		return new String[] {"title", "content"};
 	}
 
-	public String getKey() {
-		return AnnouncementsUADConstants.CLASS_NAME_ANNOUNCEMENTS_ENTRY;
-	}
-
-	public String getTypeName(Locale locale) {
-		return "AnnouncementsEntry";
+	@Override
+	public Class<AnnouncementsEntry> getTypeClass() {
+		return AnnouncementsEntry.class;
 	}
 
 	@Override

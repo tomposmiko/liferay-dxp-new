@@ -393,6 +393,20 @@ public class MBMessageLocalServiceUtil {
 		return getService().getCategoryMessagesCount(groupId, categoryId, status);
 	}
 
+	public static java.util.List<com.liferay.message.boards.model.MBMessage> getChildMessages(
+		long parentMessageId, int status) {
+		return getService().getChildMessages(parentMessageId, status);
+	}
+
+	public static java.util.List<com.liferay.message.boards.model.MBMessage> getChildMessages(
+		long parentMessageId, int status, int start, int end) {
+		return getService().getChildMessages(parentMessageId, status, start, end);
+	}
+
+	public static int getChildMessagesCount(long parentMessageId, int status) {
+		return getService().getChildMessagesCount(parentMessageId, status);
+	}
+
 	public static java.util.List<com.liferay.message.boards.model.MBMessage> getCompanyMessages(
 		long companyId, int status, int start, int end) {
 		return getService().getCompanyMessages(companyId, status, start, end);
@@ -638,6 +652,24 @@ public class MBMessageLocalServiceUtil {
 		return getService().getPositionInThread(messageId);
 	}
 
+	public static java.util.List<com.liferay.message.boards.model.MBMessage> getRootMessages(
+		String className, long classPK, int status)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getRootMessages(className, classPK, status);
+	}
+
+	public static java.util.List<com.liferay.message.boards.model.MBMessage> getRootMessages(
+		String className, long classPK, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getRootMessages(className, classPK, status, start, end);
+	}
+
+	public static int getRootMessagesCount(String className, long classPK,
+		int status) {
+		return getService().getRootMessagesCount(className, classPK, status);
+	}
+
 	public static String[] getTempAttachmentNames(long groupId, long userId,
 		String folderName)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -810,6 +842,21 @@ public class MBMessageLocalServiceUtil {
 				   .updateMessage(userId, messageId, body, serviceContext);
 	}
 
+	public static com.liferay.message.boards.model.MBMessage updateMessage(
+		long userId, long messageId, String subject, String body,
+		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<String, java.io.InputStream>> inputStreamOVPs,
+		double priority, boolean allowPingbacks,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateMessage(userId, messageId, subject, body,
+			inputStreamOVPs, priority, allowPingbacks, serviceContext);
+	}
+
+	/**
+	* @deprecated As of 2.0.0, replaced by {@link #updateMessage(long, long, String, String, List, double, boolean, ServiceContext)}
+	*/
+	@Deprecated
 	public static com.liferay.message.boards.model.MBMessage updateMessage(
 		long userId, long messageId, String subject, String body,
 		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<String, java.io.InputStream>> inputStreamOVPs,

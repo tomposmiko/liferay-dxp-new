@@ -70,6 +70,11 @@ public abstract class BaseBookmarksEntryUADAnonymizer
 	}
 
 	@Override
+	public Class<BookmarksEntry> getTypeClass() {
+		return BookmarksEntry.class;
+	}
+
+	@Override
 	protected ActionableDynamicQuery doGetActionableDynamicQuery() {
 		return bookmarksEntryLocalService.getActionableDynamicQuery();
 	}

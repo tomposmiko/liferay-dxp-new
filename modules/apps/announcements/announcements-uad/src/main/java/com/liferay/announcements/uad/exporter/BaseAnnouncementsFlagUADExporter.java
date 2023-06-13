@@ -38,8 +38,8 @@ public abstract class BaseAnnouncementsFlagUADExporter
 	extends DynamicQueryUADExporter<AnnouncementsFlag> {
 
 	@Override
-	public String getApplicationName() {
-		return AnnouncementsUADConstants.APPLICATION_NAME;
+	public Class<AnnouncementsFlag> getTypeClass() {
+		return AnnouncementsFlag.class;
 	}
 
 	@Override

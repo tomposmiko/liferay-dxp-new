@@ -16,7 +16,6 @@ package com.liferay.bookmarks.uad.display.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.bookmarks.model.BookmarksEntry;
-import com.liferay.bookmarks.uad.constants.BookmarksUADConstants;
 import com.liferay.bookmarks.uad.test.BookmarksEntryUADTestHelper;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -55,11 +54,6 @@ public class BookmarksEntryUADDisplayTest
 	}
 
 	@Override
-	protected String getApplicationName() {
-		return BookmarksUADConstants.APPLICATION_NAME;
-	}
-
-	@Override
 	protected UADDisplay getUADDisplay() {
 		return _uadDisplay;
 	}
@@ -70,9 +64,7 @@ public class BookmarksEntryUADDisplayTest
 	@Inject
 	private BookmarksEntryUADTestHelper _bookmarksEntryUADTestHelper;
 
-	@Inject(
-		filter = "model.class.name=" + BookmarksUADConstants.CLASS_NAME_BOOKMARKS_ENTRY
-	)
+	@Inject(filter = "component.name=*.BookmarksEntryUADDisplay")
 	private UADDisplay _uadDisplay;
 
 }

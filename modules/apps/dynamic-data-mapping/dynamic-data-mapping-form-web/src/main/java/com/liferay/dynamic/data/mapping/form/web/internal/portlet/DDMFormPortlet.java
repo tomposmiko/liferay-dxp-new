@@ -58,6 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
+		"com.liferay.fragment.entry.processor.portlet.alias=form",
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.application-type=full-page-application",
 		"com.liferay.portlet.application-type=widget",
@@ -134,12 +135,12 @@ public class DDMFormPortlet extends MVCPortlet {
 		try {
 			setRenderRequestAttributes(renderRequest, renderResponse);
 
-			DDMFormDisplayContext ddlFormPortletDisplayContext =
+			DDMFormDisplayContext ddmFormPortletDisplayContext =
 				(DDMFormDisplayContext)renderRequest.getAttribute(
 					WebKeys.PORTLET_DISPLAY_CONTEXT);
 
 			checkFormIsNotRestricted(
-				renderRequest, renderResponse, ddlFormPortletDisplayContext);
+				renderRequest, renderResponse, ddmFormPortletDisplayContext);
 		}
 		catch (Exception e) {
 			if (isSessionErrorException(e)) {

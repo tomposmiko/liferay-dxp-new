@@ -477,6 +477,7 @@ public class PortalImpl implements Portal {
 		// Portal layout
 
 		_reservedParams.add("p_l_id");
+		_reservedParams.add("p_l_mode");
 		_reservedParams.add("p_l_reset");
 
 		// Portal portlet
@@ -1018,11 +1019,24 @@ public class PortalImpl implements Portal {
 
 			sb.append(DeterminateKeyGenerator.generate(input));
 			sb.append(StringPool.UNDERLINE);
-			sb.append(request.getAttribute(WebKeys.RENDER_PORTLET_COLUMN_ID));
-			sb.append(StringPool.UNDERLINE);
-			sb.append(request.getAttribute(WebKeys.RENDER_PORTLET_COLUMN_POS));
 
-			return JS.getSafeName(sb.toString());
+			Object columnId = request.getAttribute(
+				WebKeys.RENDER_PORTLET_COLUMN_ID);
+
+			if (columnId != null) {
+				sb.append(JS.getSafeName(columnId.toString()));
+			}
+
+			sb.append(StringPool.UNDERLINE);
+
+			Object columnPos = request.getAttribute(
+				WebKeys.RENDER_PORTLET_COLUMN_POS);
+
+			if (columnPos != null) {
+				sb.append(JS.getSafeName(columnPos.toString()));
+			}
+
+			return sb.toString();
 		}
 	}
 
@@ -1320,13 +1334,23 @@ public class PortalImpl implements Portal {
 			String completeURL, ThemeDisplay themeDisplay, Layout layout)
 		throws PortalException {
 
-		return getCanonicalURL(completeURL, themeDisplay, layout, false);
+		return getCanonicalURL(completeURL, themeDisplay, layout, false, true);
 	}
 
 	@Override
 	public String getCanonicalURL(
 			String completeURL, ThemeDisplay themeDisplay, Layout layout,
 			boolean forceLayoutFriendlyURL)
+		throws PortalException {
+
+		return getCanonicalURL(
+			completeURL, themeDisplay, layout, forceLayoutFriendlyURL, true);
+	}
+
+	@Override
+	public String getCanonicalURL(
+			String completeURL, ThemeDisplay themeDisplay, Layout layout,
+			boolean forceLayoutFriendlyURL, boolean includeQueryString)
 		throws PortalException {
 
 		String groupFriendlyURL = StringPool.BLANK;
@@ -1422,13 +1446,21 @@ public class PortalImpl implements Portal {
 			}
 
 			sb.append(canonicalLayoutFriendlyURL);
-			sb.append(parametersURL);
+
+			if (includeQueryString) {
+				sb.append(parametersURL);
+			}
 
 			return sb.toString();
 		}
 
-		return groupFriendlyURL.concat(canonicalLayoutFriendlyURL).concat(
-			parametersURL);
+		groupFriendlyURL = groupFriendlyURL.concat(canonicalLayoutFriendlyURL);
+
+		if (includeQueryString) {
+			groupFriendlyURL = groupFriendlyURL.concat(parametersURL);
+		}
+
+		return groupFriendlyURL;
 	}
 
 	@Override

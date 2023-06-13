@@ -96,10 +96,10 @@ else {
 String headerTitle = LanguageUtil.get(request, "add-message");
 
 if (curParentMessage != null) {
-	headerTitle = LanguageUtil.format(request, "reply-to-x", curParentMessage.getSubject(), false);
+	headerTitle = LanguageUtil.format(request, "reply-to-x", HtmlUtil.escape(curParentMessage.getSubject()), false);
 }
 else if (message != null) {
-	headerTitle = LanguageUtil.format(request, "edit-x", message.getSubject(), false);
+	headerTitle = LanguageUtil.format(request, "edit-x", HtmlUtil.escape(message.getSubject()), false);
 }
 
 boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
@@ -270,7 +270,7 @@ if (portletTitleBasedNavigation) {
 										<portlet:param name="<%= Constants.CMD %>" value="<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>" />
 										<portlet:param name="redirect" value="<%= currentURL %>" />
 										<portlet:param name="messageId" value="<%= String.valueOf(messageId) %>" />
-										<portlet:param name="fileName" value="<%= fileEntry.getTitle() %>" />
+										<portlet:param name="fileName" value="<%= HtmlUtil.unescape(fileEntry.getTitle()) %>" />
 									</liferay-portlet:actionURL>
 
 									<liferay-ui:icon-menu

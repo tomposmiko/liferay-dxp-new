@@ -47,13 +47,12 @@ public class BlogImagesManagementToolbarDisplayContext {
 	public BlogImagesManagementToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		PortletURL currentURLObj) {
+		HttpServletRequest request, PortletURL currentURLObj) {
 
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
+		_request = request;
 		_currentURLObj = currentURLObj;
-
-		_request = _liferayPortletRequest.getHttpServletRequest();
 
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
 			liferayPortletRequest);
@@ -132,20 +131,11 @@ public class BlogImagesManagementToolbarDisplayContext {
 	}
 
 	public PortletURL getSortingURL() throws PortletException {
-		PortletURL sortingURL = PortletURLUtil.clone(
-			_currentURLObj, _liferayPortletResponse);
-
-		sortingURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
+		PortletURL sortingURL = _getCurrentSortingURL();
 
 		sortingURL.setParameter(
 			"orderByType",
 			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc");
-
-		String keywords = ParamUtil.getString(_request, "keywords");
-
-		if (Validator.isNotNull(keywords)) {
-			sortingURL.setParameter("keywords", keywords);
-		}
 
 		return sortingURL;
 	}
@@ -189,6 +179,21 @@ public class BlogImagesManagementToolbarDisplayContext {
 		};
 	}
 
+	private PortletURL _getCurrentSortingURL() throws PortletException {
+		PortletURL sortingURL = PortletURLUtil.clone(
+			_currentURLObj, _liferayPortletResponse);
+
+		sortingURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
+
+		String keywords = ParamUtil.getString(_request, "keywords");
+
+		if (Validator.isNotNull(keywords)) {
+			sortingURL.setParameter("keywords", keywords);
+		}
+
+		return sortingURL;
+	}
+
 	private List<DropdownItem> _getOrderByDropdownItems() {
 		return new DropdownItemList() {
 			{
@@ -198,7 +203,7 @@ public class BlogImagesManagementToolbarDisplayContext {
 							dropdownItem.setActive(
 								"title".equals(getOrderByCol()));
 							dropdownItem.setHref(
-								getSortingURL(), "orderByCol", "title");
+								_getCurrentSortingURL(), "orderByCol", "title");
 							dropdownItem.setLabel(
 								LanguageUtil.get(_request, "title"));
 						}));
@@ -209,7 +214,7 @@ public class BlogImagesManagementToolbarDisplayContext {
 							dropdownItem.setActive(
 								"size".equals(getOrderByCol()));
 							dropdownItem.setHref(
-								getSortingURL(), "orderByCol", "size");
+								_getCurrentSortingURL(), "orderByCol", "size");
 							dropdownItem.setLabel(
 								LanguageUtil.get(_request, "size"));
 						}));

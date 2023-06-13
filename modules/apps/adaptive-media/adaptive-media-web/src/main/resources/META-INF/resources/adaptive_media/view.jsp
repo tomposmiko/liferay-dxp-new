@@ -18,7 +18,7 @@
 
 <clay:navigation-bar
 	inverted="<%= true %>"
-	items="<%=
+	navigationItems="<%=
 		new JSPNavigationItemList(pageContext) {
 			{
 				add(
@@ -33,18 +33,17 @@
 />
 
 <%
-AMManagementToolbarDisplayContext amManagementToolbarDisplayContext = new AMManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, currentURLObj);
+AMManagementToolbarDisplayContext amManagementToolbarDisplayContext = new AMManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, currentURLObj);
 %>
 
 <clay:management-toolbar
 	creationMenu="<%= amManagementToolbarDisplayContext.getCreationMenu() %>"
 	disabled="<%= amManagementToolbarDisplayContext.isDisabled() %>"
-	filterItems="<%= amManagementToolbarDisplayContext.getFilterDropdownItems() %>"
+	filterDropdownItems="<%= amManagementToolbarDisplayContext.getFilterDropdownItems() %>"
 	infoPanelId="infoPanelId"
+	itemsTotal="<%= amManagementToolbarDisplayContext.getTotalItems() %>"
 	searchContainerId="imageConfigurationEntries"
 	showSearch="<%= false %>"
-	totalItems="<%= amManagementToolbarDisplayContext.getTotalItems() %>"
-	viewTypes="<%= amManagementToolbarDisplayContext.getViewTypes() %>"
 />
 
 <%

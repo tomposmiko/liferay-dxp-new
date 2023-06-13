@@ -15,7 +15,6 @@
 package com.liferay.announcements.uad.display.test;
 
 import com.liferay.announcements.kernel.model.AnnouncementsEntry;
-import com.liferay.announcements.uad.constants.AnnouncementsUADConstants;
 import com.liferay.announcements.uad.test.AnnouncementsEntryUADTestHelper;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -55,11 +54,6 @@ public class AnnouncementsEntryUADDisplayTest
 	}
 
 	@Override
-	protected String getApplicationName() {
-		return AnnouncementsUADConstants.APPLICATION_NAME;
-	}
-
-	@Override
 	protected UADDisplay<AnnouncementsEntry> getUADDisplay() {
 		return _uadDisplay;
 	}
@@ -71,9 +65,7 @@ public class AnnouncementsEntryUADDisplayTest
 	@Inject
 	private AnnouncementsEntryUADTestHelper _announcementsEntryUADTestHelper;
 
-	@Inject(
-		filter = "model.class.name=" + AnnouncementsUADConstants.CLASS_NAME_ANNOUNCEMENTS_ENTRY
-	)
+	@Inject(filter = "component.name=*.AnnouncementsEntryUADDisplay")
 	private UADDisplay<AnnouncementsEntry> _uadDisplay;
 
 }

@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
+import com.liferay.portal.kernel.search.RelatedSearchResult;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.search.SearchResult;
@@ -111,8 +112,7 @@ public class DLAdminDisplayContext {
 
 		_permissionChecker = _themeDisplay.getPermissionChecker();
 
-		_computeFolder();
-		_computeRootFolder();
+		_computeFolders();
 	}
 
 	public String getDisplayStyle() {
@@ -254,8 +254,10 @@ public class DLAdminDisplayContext {
 		return mvcRenderCommandName.equals("/document_library/search");
 	}
 
-	private void _computeFolder() {
+	private void _computeFolders() {
 		try {
+			_computeRootFolder();
+
 			_folder = (Folder)_request.getAttribute(
 				WebKeys.DOCUMENT_LIBRARY_FOLDER);
 
@@ -607,9 +609,18 @@ public class DLAdminDisplayContext {
 			String className = searchResult.getClassName();
 
 			try {
-				if (className.equals(DLFileEntry.class.getName()) ||
-					FileEntry.class.isAssignableFrom(
-						Class.forName(className))) {
+				List<RelatedSearchResult<FileEntry>>
+					fileEntryRelatedSearchResults =
+						searchResult.getFileEntryRelatedSearchResults();
+
+				if (!fileEntryRelatedSearchResults.isEmpty()) {
+					fileEntryRelatedSearchResults.forEach(
+						fileEntryRelatedSearchResult -> dlSearchResults.add(
+							fileEntryRelatedSearchResult.getModel()));
+				}
+				else if (className.equals(DLFileEntry.class.getName()) ||
+						 FileEntry.class.isAssignableFrom(
+							 Class.forName(className))) {
 
 					fileEntry = DLAppLocalServiceUtil.getFileEntry(
 						searchResult.getClassPK());

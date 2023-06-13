@@ -39,8 +39,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 public abstract class BaseWikiPageUADExporter extends DynamicQueryUADExporter<WikiPage> {
 	@Override
-	public String getApplicationName() {
-		return WikiUADConstants.APPLICATION_NAME;
+	public Class<WikiPage> getTypeClass() {
+		return WikiPage.class;
 	}
 
 	@Override

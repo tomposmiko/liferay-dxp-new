@@ -13,17 +13,19 @@ AUI.add(
 
 		var CSS_INPUT_SELECT_WRAPPER = A.getClassName('input', 'select', 'wrapper');
 
-		var CSS_SEARCH_CHOSEN = A.getClassName('search', 'chosen');
+		var CSS_SEARCH_CHOSEN = A.getClassName('drop', 'chosen');
 
 		var CSS_SELECT_ARROW_DOWN = A.getClassName('select', 'arrow', 'down', 'container');
 
-		var CSS_SELECT_BADGE_ITEM_CLOSE = A.getClassName('trigger', 'badge', 'item', 'close');
+		var CSS_SELECT_DROPDOWN_ITEM = A.getClassName('dropdown', 'item');
+
+		var CSS_SELECT_LABEL_ITEM_CLOSE = A.getClassName('trigger', 'label', 'item', 'close');
 
 		var CSS_SELECT_OPTION_ITEM = A.getClassName('select', 'option', 'item');
 
-		var CSS_SELECT_DROPDOWN_ITEM = A.getClassName('dropdown', 'item');
-
 		var CSS_SELECT_TRIGGER_ACTION = A.getClassName('select', 'field', 'trigger');
+
+		var MAX_DROPDOWN_ITEMS = 11;
 
 		var Lang = A.Lang;
 
@@ -100,7 +102,7 @@ AUI.add(
 
 						instance._open = false;
 
-						instance._createBadgeTooltip();
+						instance._createLabelTooltip();
 
 						instance._eventHandlers.push(
 							A.one('doc').after('click', A.bind(instance._afterClickOutside, instance)),
@@ -166,14 +168,16 @@ AUI.add(
 						return A.merge(
 							SelectField.superclass.getTemplateContext.apply(instance, arguments),
 							{
-								badgeCloseIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('times')),
 								fixedOptions: instance.get('fixedOptions'),
+								labelCloseIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('times')),
 								multiple: instance.get('multiple'),
 								open: instance._open,
 								options: instance.get('options'),
 								predefinedValue: instance.get('readOnly') ? instance.get('predefinedValue') : instance.getValue(),
 								selectCaretDoubleIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('caret-double')),
 								selectSearchIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('search')),
+								showPlaceholderOption: instance._showPlaceholderOption(),
+								showSearch: instance._showSearch(),
 								strings: instance.get('strings'),
 								value: instance.getValue()
 							}
@@ -184,6 +188,18 @@ AUI.add(
 						var instance = this;
 
 						return instance.get('value') || [];
+					},
+
+					hasFocus: function(node) {
+						var instance = this;
+
+						var hasFocus = SelectField.superclass.hasFocus.apply(instance, arguments);
+
+						if (node && node.hasClass('trigger-label-item-close')) {
+							hasFocus = true;
+						}
+
+						return hasFocus;
 					},
 
 					openList: function() {
@@ -232,28 +248,6 @@ AUI.add(
 						instance.render();
 					},
 
-					_validateValue: function(value) {
-						var instance = this;
-
-						var fixedOptions = instance.get('fixedOptions');
-
-						var options = instance.get('options');
-
-						var fieldOptions = options.concat(fixedOptions);
-
-						var valid = false;
-
-						for (var indexOption in fieldOptions) {
-							for (var indexValue in value) {
-								if (fieldOptions[indexOption].value == value[indexValue]) {
-									valid = true;
-								}
-							}
-						}
-
-						return (value.length == 0) || valid;
-					},
-
 					showErrorMessage: function() {
 						var instance = this;
 
@@ -280,20 +274,20 @@ AUI.add(
 					_afterClickOutside: function(event) {
 						var instance = this;
 
-						if (!instance._preventDocumentClick && instance._isClickingOutSide(event)) {
+						if (!instance._preventDocumentClick && instance._isClickingOutside(event)) {
 							instance.closeList();
 						}
 
 						instance._preventDocumentClick = false;
 					},
 
-					_createBadgeTooltip: function() {
+					_createLabelTooltip: function() {
 						var instance = this;
 
 						instance._tooltip = new A.TooltipDelegate(
 							{
 								position: 'bottom',
-								trigger: '.multiple-badge-list .multiple-badge',
+								trigger: '.multiple-label-list .multiple-label',
 								triggerHideEvent: ['blur', 'mouseleave'],
 								triggerShowEvent: ['focus', 'mouseover'],
 								visible: false
@@ -315,16 +309,6 @@ AUI.add(
 						return instance.get('container').one('.' + CSS_SELECT_TRIGGER_ACTION);
 					},
 
-					_handleBadgeItemCloseClick: function(target) {
-						var instance = this;
-
-						var value = target.getAttribute('data-badge-value');
-
-						var values = instance._removeValue(value);
-
-						instance.setValue(values);
-					},
-
 					_handleContainerClick: function(event) {
 						var instance = this;
 
@@ -332,21 +316,18 @@ AUI.add(
 
 						var addRepeatebleButton = target.hasClass('lfr-ddm-form-field-repeatable-add-button');
 
-						var closeIconNode = target.ancestor('.' + CSS_SELECT_BADGE_ITEM_CLOSE, true);
+						var closeIconNode = target.ancestor('.' + CSS_SELECT_LABEL_ITEM_CLOSE, true);
 
 						var deleteRepeatebleButton = target.hasClass('lfr-ddm-form-field-repeatable-delete-button');
 
 						var optionNode = target.ancestor('.' + CSS_SELECT_OPTION_ITEM, true);
 
 						if (instance.get('multiple')) {
-							var optionNode = target.ancestor('.' + CSS_SELECT_DROPDOWN_ITEM, true);
-						} else {
-							var optionNode = target.ancestor('.' + CSS_SELECT_OPTION_ITEM, true);
-
+							optionNode = target.ancestor('.' + CSS_SELECT_DROPDOWN_ITEM, true);
 						}
 
 						if (closeIconNode) {
-							instance._handleBadgeItemCloseClick(closeIconNode);
+							instance._handleLabelItemCloseClick(closeIconNode);
 						}
 						else if (optionNode) {
 							instance._handleItemClick(optionNode);
@@ -378,7 +359,12 @@ AUI.add(
 							}
 						}
 						else {
-							value = [itemValue];
+							if (itemValue === '') {
+								value = [];
+							}
+							else {
+								value = [itemValue];
+							}
 
 							instance._open = false;
 						}
@@ -388,6 +374,16 @@ AUI.add(
 						instance.focus();
 
 						instance._fireStartedFillingEvent();
+					},
+
+					_handleLabelItemCloseClick: function(target) {
+						var instance = this;
+
+						var value = target.getAttribute('data-label-value');
+
+						var values = instance._removeValue(value);
+
+						instance.setValue(values);
 					},
 
 					_handleSelectTriggerClick: function(event) {
@@ -422,7 +418,7 @@ AUI.add(
 						return hasOption;
 					},
 
-					_isClickingOutSide: function(event) {
+					_isClickingOutside: function(event) {
 						var instance = this;
 
 						var container = instance.get('container');
@@ -493,6 +489,62 @@ AUI.add(
 						for (var i = 0; i < value.length; i++) {
 							instance._selectDOMOption(optionNode, value[i]);
 						}
+					},
+
+					_showPlaceholderOption: function() {
+						var instance = this;
+
+						var showPlaceholderOption = false;
+
+						if ((instance.get('fixedOptions') || instance.get('options')) && !instance.get('multiple')) {
+							showPlaceholderOption = true;
+						}
+
+						return showPlaceholderOption;
+					},
+
+					_showSearch: function() {
+						var instance = this;
+
+						var fixedOptions = instance.get('fixedOptions');
+
+						var options = instance.get('options');
+
+						var fieldOptions = options.concat(fixedOptions);
+
+						var showSearch = false;
+
+						if (fieldOptions.length > MAX_DROPDOWN_ITEMS) {
+							showSearch = true;
+						}
+
+						return showSearch;
+					},
+
+					_validateValue: function(value) {
+						var instance = this;
+
+						if (value.length == 0) {
+							return true;
+						}
+
+						var fixedOptions = instance.get('fixedOptions');
+
+						var options = instance.get('options');
+
+						var fieldOptions = options.concat(fixedOptions);
+
+						var valid = false;
+
+						for (var indexOption in fieldOptions) {
+							for (var indexValue in value) {
+								if (fieldOptions[indexOption].value == value[indexValue]) {
+									valid = true;
+								}
+							}
+						}
+
+						return valid;
 					}
 				}
 			}

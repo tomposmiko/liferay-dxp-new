@@ -30,8 +30,14 @@ long folderId = fileEntry.getFolderId();
 if (Validator.isNull(redirect)) {
 	PortletURL portletURL = renderResponse.createRenderURL();
 
-	portletURL.setParameter("mvcRenderCommandName", (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) ? "/document_library/view" : "/document_library/view_folder");
-	portletURL.setParameter("folderId", String.valueOf(folderId));
+	long parentFolderId = folderId;
+
+	if (!DLFolderPermission.contains(permissionChecker, fileEntry.getGroupId(), parentFolderId, ActionKeys.VIEW)) {
+		parentFolderId = DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
+	}
+
+	portletURL.setParameter("mvcRenderCommandName", (parentFolderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) ? "/document_library/view" : "/document_library/view_folder");
+	portletURL.setParameter("folderId", String.valueOf(parentFolderId));
 
 	redirect = portletURL.toString();
 }

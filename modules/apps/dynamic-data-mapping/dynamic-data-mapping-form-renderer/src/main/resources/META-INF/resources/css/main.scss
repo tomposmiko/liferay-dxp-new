@@ -17,8 +17,8 @@
 .ddm-form-builder-app {
 	.lfr-ddm-form-page {
 		> .row {
-			margin-left: 18px;
-			margin-right: 18px;
+			margin-left: 20px;
+			margin-right: 20px;
 		}
 	}
 }
@@ -172,6 +172,12 @@ body .ddm-user-view-content {
 	margin-bottom: 2px;
 }
 
+.liferay-ddm-form-field-document-library {
+	a {
+		display: inline-block;
+	}
+}
+
 .liferay-ddm-form-field-paragraph,
 .liferay-ddm-form-field-tip {
 	color: #869CAD;
@@ -228,17 +234,10 @@ body .ddm-user-view-content {
 }
 
 .portal-popup {
-	$side-spacing: 32px;
 	padding: 0;
 
 	&.open {
 		padding: 0;
-	}
-
-	.lfr-ddm-form-page-description,
-	.lfr-ddm-form-page-title {
-		padding-left: $side-spacing;
-		padding-right: $side-spacing;
 	}
 }
 
@@ -251,6 +250,10 @@ body .ddm-user-view-content {
 .form-builder-select-field {
 	position: relative;
 
+	.option-selected-placeholder {
+		color: #6A6C7D;
+	}
+
 	.dropdown-menu {
 		display: block;
 		max-width: initial;
@@ -259,6 +262,14 @@ body .ddm-user-view-content {
 
 		.dropdown-section, .dropdown-item, .no-results-list {
 			padding: 0.5rem 1rem;
+		}
+
+		.placeholder-dropdown-item {
+			color: #A7A9BC;
+
+			&:hover {
+				color: #A7A9BC;
+			}
 		}
 	}
 
@@ -332,7 +343,7 @@ body .ddm-user-view-content {
 		}
 	}
 
-	.multiple-badge-list {
+	.multiple-label-list {
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
@@ -344,10 +355,13 @@ body .ddm-user-view-content {
 
 		li {
 			overflow: hidden;
-			padding-top: 10px;
 		}
 
-		.multiple-badge {
+		span.label-secondary {
+			max-width: 200px;
+		}
+
+		.multiple-label {
 			@extend %text-ellipsis;
 			margin-bottom: 4px;
 			margin-right: 6px;
@@ -370,6 +384,11 @@ body .ddm-user-view-content {
 			}
 		}
 	}
+}
+
+.lfr-ddm-form-page-description, .lfr-ddm-form-page-title {
+	padding-left: 32px;
+	padding-right: 32px;
 }
 
 .lfr-ddm-form-paginated .pagination {

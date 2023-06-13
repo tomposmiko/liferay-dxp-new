@@ -14,9 +14,6 @@
 
 package com.liferay.poshi.runner.util;
 
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -37,6 +34,22 @@ import org.json.JSONObject;
  * @author Michael Hashimoto
  */
 public class JSONCurlUtil {
+
+	public static String delete(String requestString)
+		throws IOException, TimeoutException {
+
+		Request request = new Request(requestString, "DELETE");
+
+		return request.send();
+	}
+
+	public static String delete(String requestString, String jsonPath)
+		throws IOException, TimeoutException {
+
+		Request request = new Request(requestString, "DELETE");
+
+		return _getParsedResponse(request, jsonPath);
+	}
 
 	public static String get(String requestString)
 		throws IOException, TimeoutException {
@@ -70,6 +83,22 @@ public class JSONCurlUtil {
 		return _getParsedResponse(request, jsonPath);
 	}
 
+	public static String put(String requestString)
+		throws IOException, TimeoutException {
+
+		Request request = new Request(requestString, "PUT");
+
+		return request.send();
+	}
+
+	public static String put(String requestString, String jsonPath)
+		throws IOException, TimeoutException {
+
+		Request request = new Request(requestString, "PUT");
+
+		return _getParsedResponse(request, jsonPath);
+	}
+
 	protected Request getRequest(String requestString, String requestMethod) {
 		return new Request(requestString, requestMethod);
 	}
@@ -79,16 +108,7 @@ public class JSONCurlUtil {
 
 		String response = request.send();
 
-		DocumentContext documentContext = JsonPath.parse(response);
-
-		Object object = documentContext.read(jsonPath);
-
-		if (object == null) {
-			throw new IOException(
-				"Invalid JSON path " + jsonPath + " in " + response);
-		}
-
-		return object.toString();
+		return JSONUtil.getWithJSONPath(response, jsonPath);
 	}
 
 	private static class Request {
@@ -123,23 +143,16 @@ public class JSONCurlUtil {
 
 			InputStream inputStream = process.getInputStream();
 
-			inputStream.mark(Integer.MAX_VALUE);
-
-			String response = ExecUtil.readInputStream(inputStream);
+			String response = ExecUtil.readInputStream(inputStream, true);
 
 			System.out.println("Response: " + response);
-
-			inputStream.reset();
 
 			if (process.exitValue() != 0) {
 				inputStream = process.getErrorStream();
 
-				inputStream.mark(Integer.MAX_VALUE);
-
 				System.out.println(
-					"Error stream: " + ExecUtil.readInputStream(inputStream));
-
-				inputStream.reset();
+					"Error stream: " +
+						ExecUtil.readInputStream(inputStream, true));
 
 				throw new RuntimeException(
 					"Command finished with exit value: " + process.exitValue());

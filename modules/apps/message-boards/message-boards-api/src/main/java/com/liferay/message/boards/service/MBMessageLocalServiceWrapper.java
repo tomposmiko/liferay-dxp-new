@@ -419,6 +419,25 @@ public class MBMessageLocalServiceWrapper implements MBMessageLocalService,
 	}
 
 	@Override
+	public java.util.List<com.liferay.message.boards.model.MBMessage> getChildMessages(
+		long parentMessageId, int status) {
+		return _mbMessageLocalService.getChildMessages(parentMessageId, status);
+	}
+
+	@Override
+	public java.util.List<com.liferay.message.boards.model.MBMessage> getChildMessages(
+		long parentMessageId, int status, int start, int end) {
+		return _mbMessageLocalService.getChildMessages(parentMessageId, status,
+			start, end);
+	}
+
+	@Override
+	public int getChildMessagesCount(long parentMessageId, int status) {
+		return _mbMessageLocalService.getChildMessagesCount(parentMessageId,
+			status);
+	}
+
+	@Override
 	public java.util.List<com.liferay.message.boards.model.MBMessage> getCompanyMessages(
 		long companyId, int status, int start, int end) {
 		return _mbMessageLocalService.getCompanyMessages(companyId, status,
@@ -699,6 +718,27 @@ public class MBMessageLocalServiceWrapper implements MBMessageLocalService,
 	}
 
 	@Override
+	public java.util.List<com.liferay.message.boards.model.MBMessage> getRootMessages(
+		String className, long classPK, int status)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _mbMessageLocalService.getRootMessages(className, classPK, status);
+	}
+
+	@Override
+	public java.util.List<com.liferay.message.boards.model.MBMessage> getRootMessages(
+		String className, long classPK, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _mbMessageLocalService.getRootMessages(className, classPK,
+			status, start, end);
+	}
+
+	@Override
+	public int getRootMessagesCount(String className, long classPK, int status) {
+		return _mbMessageLocalService.getRootMessagesCount(className, classPK,
+			status);
+	}
+
+	@Override
 	public String[] getTempAttachmentNames(long groupId, long userId,
 		String folderName)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -889,6 +929,21 @@ public class MBMessageLocalServiceWrapper implements MBMessageLocalService,
 			serviceContext);
 	}
 
+	@Override
+	public com.liferay.message.boards.model.MBMessage updateMessage(
+		long userId, long messageId, String subject, String body,
+		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<String, java.io.InputStream>> inputStreamOVPs,
+		double priority, boolean allowPingbacks,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _mbMessageLocalService.updateMessage(userId, messageId, subject,
+			body, inputStreamOVPs, priority, allowPingbacks, serviceContext);
+	}
+
+	/**
+	* @deprecated As of 2.0.0, replaced by {@link #updateMessage(long, long, String, String, List, double, boolean, ServiceContext)}
+	*/
+	@Deprecated
 	@Override
 	public com.liferay.message.boards.model.MBMessage updateMessage(
 		long userId, long messageId, String subject, String body,

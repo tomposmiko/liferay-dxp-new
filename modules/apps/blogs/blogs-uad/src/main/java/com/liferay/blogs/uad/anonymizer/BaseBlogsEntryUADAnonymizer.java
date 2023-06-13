@@ -71,6 +71,11 @@ public abstract class BaseBlogsEntryUADAnonymizer
 	}
 
 	@Override
+	public Class<BlogsEntry> getTypeClass() {
+		return BlogsEntry.class;
+	}
+
+	@Override
 	protected ActionableDynamicQuery doGetActionableDynamicQuery() {
 		return blogsEntryLocalService.getActionableDynamicQuery();
 	}

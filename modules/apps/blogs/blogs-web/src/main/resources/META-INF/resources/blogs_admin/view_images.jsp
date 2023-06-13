@@ -47,16 +47,17 @@ BlogImagesDisplayContext blogImagesDisplayContext = new BlogImagesDisplayContext
 
 blogImagesDisplayContext.populateResults(blogImagesSearchContainer);
 
-BlogImagesManagementToolbarDisplayContext blogImagesManagementToolbarDisplayContext = new BlogImagesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, currentURLObj);
+BlogImagesManagementToolbarDisplayContext blogImagesManagementToolbarDisplayContext = new BlogImagesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, currentURLObj);
 
 String displayStyle = blogImagesManagementToolbarDisplayContext.getDisplayStyle();
 %>
 
 <clay:management-toolbar
-	actionItems="<%= blogImagesManagementToolbarDisplayContext.getActionDropdownItems() %>"
+	actionDropdownItems="<%= blogImagesManagementToolbarDisplayContext.getActionDropdownItems() %>"
 	clearResultsURL="<%= blogImagesManagementToolbarDisplayContext.getSearchActionURL() %>"
 	disabled="<%= blogImagesSearchContainer.getTotal() <= 0 %>"
-	filterItems="<%= blogImagesManagementToolbarDisplayContext.getFilterDropdownItems() %>"
+	filterDropdownItems="<%= blogImagesManagementToolbarDisplayContext.getFilterDropdownItems() %>"
+	itemsTotal="<%= blogImagesSearchContainer.getTotal() %>"
 	searchActionURL="<%= blogImagesManagementToolbarDisplayContext.getSearchActionURL() %>"
 	searchContainerId="images"
 	searchFormName="searchFm"
@@ -64,8 +65,7 @@ String displayStyle = blogImagesManagementToolbarDisplayContext.getDisplayStyle(
 	showInfoButton="<%= false %>"
 	sortingOrder="<%= blogImagesManagementToolbarDisplayContext.getOrderByType() %>"
 	sortingURL="<%= String.valueOf(blogImagesManagementToolbarDisplayContext.getSortingURL()) %>"
-	totalItems="<%= blogImagesSearchContainer.getTotal() %>"
-	viewTypes="<%= blogImagesManagementToolbarDisplayContext.getViewTypes() %>"
+	viewTypeItems="<%= blogImagesManagementToolbarDisplayContext.getViewTypes() %>"
 />
 
 <div class="container-fluid-1280 main-content-body">
@@ -103,13 +103,24 @@ String displayStyle = blogImagesManagementToolbarDisplayContext.getDisplayStyle(
 
 <aui:script>
 	function <portlet:namespace />deleteImages() {
-		if (confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-images") %>')) {
-			var form = AUI.$(document.<portlet:namespace />fm);
+		if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-images" />')) {
+			var form = document.querySelector('#<portlet:namespace />fm');
 
-			form.fm('<%= Constants.CMD %>').val('<%= Constants.DELETE %>');
-			form.fm('deleteFileEntryIds').val(Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
+			if (form) {
+				var cmd = form.querySelector('#<portlet:namespace /><%= Constants.CMD %>');
 
-			submitForm(form);
+				if (cmd) {
+					cmd.value = '<%= Constants.DELETE %>';
+				}
+
+				var deleteFileEntryIds = form.querySelector('#<portlet:namespace />deleteFileEntryIds');
+
+				if (deleteFileEntryIds) {
+					deleteFileEntryIds.value = Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds');
+				}
+
+				submitForm(form);
+			}
 		}
 	}
 </aui:script>

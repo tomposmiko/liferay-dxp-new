@@ -14,7 +14,11 @@
 
 package com.liferay.poshi.runner.elements;
 
+import java.util.List;
+
+import org.dom4j.Attribute;
 import org.dom4j.Element;
+import org.dom4j.Node;
 
 /**
  * @author Kenji Heigel
@@ -35,7 +39,7 @@ public class WhilePoshiElement extends IfPoshiElement {
 		PoshiElement parentPoshiElement, String readableSyntax) {
 
 		if (_isElementType(readableSyntax)) {
-			return new WhilePoshiElement(readableSyntax);
+			return new WhilePoshiElement(parentPoshiElement, readableSyntax);
 		}
 
 		return null;
@@ -48,8 +52,14 @@ public class WhilePoshiElement extends IfPoshiElement {
 		super(_ELEMENT_NAME, element);
 	}
 
-	protected WhilePoshiElement(String readableSyntax) {
-		super(_ELEMENT_NAME, readableSyntax);
+	protected WhilePoshiElement(List<Attribute> attributes, List<Node> nodes) {
+		super(_ELEMENT_NAME, attributes, nodes);
+	}
+
+	protected WhilePoshiElement(
+		PoshiElement parentPoshiElement, String readableSyntax) {
+
+		super(_ELEMENT_NAME, parentPoshiElement, readableSyntax);
 	}
 
 	@Override

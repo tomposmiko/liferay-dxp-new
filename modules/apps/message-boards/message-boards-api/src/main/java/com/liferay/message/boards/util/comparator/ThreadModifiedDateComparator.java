@@ -25,16 +25,12 @@ import java.util.Date;
  */
 public class ThreadModifiedDateComparator<T> extends OrderByComparator<T> {
 
-	public static final String ORDER_BY_ASC =
-		"modelCategory ASC, priority DESC, modifiedDate ASC, name ASC, " +
-			"modelId ASC";
+	public static final String ORDER_BY_ASC = "priority DESC, modifiedDate ASC";
 
 	public static final String ORDER_BY_DESC =
-		"modelCategory ASC, priority DESC, modifiedDate DESC, name ASC, " +
-			"modelId ASC";
+		"priority DESC, modifiedDate DESC";
 
-	public static final String[] ORDER_BY_FIELDS =
-		{"modelCategory", "priority", "modifiedDate", "name", "modelId"};
+	public static final String[] ORDER_BY_FIELDS = {"priority", "modifiedDate"};
 
 	public ThreadModifiedDateComparator() {
 		this(false);

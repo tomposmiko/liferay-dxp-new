@@ -70,6 +70,11 @@ public abstract class BaseWikiNodeUADAnonymizer
 	}
 
 	@Override
+	public Class<WikiNode> getTypeClass() {
+		return WikiNode.class;
+	}
+
+	@Override
 	protected ActionableDynamicQuery doGetActionableDynamicQuery() {
 		return wikiNodeLocalService.getActionableDynamicQuery();
 	}

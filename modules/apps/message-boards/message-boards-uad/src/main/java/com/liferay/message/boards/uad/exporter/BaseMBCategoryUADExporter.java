@@ -39,8 +39,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 public abstract class BaseMBCategoryUADExporter extends DynamicQueryUADExporter<MBCategory> {
 	@Override
-	public String getApplicationName() {
-		return MBUADConstants.APPLICATION_NAME;
+	public Class<MBCategory> getTypeClass() {
+		return MBCategory.class;
 	}
 
 	@Override

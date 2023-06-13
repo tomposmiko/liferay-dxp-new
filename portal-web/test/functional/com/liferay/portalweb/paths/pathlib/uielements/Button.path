@@ -140,7 +140,7 @@
 </tr>
 <tr>
 	<td>ANY</td>
-	<td>//a[normalize-space()='${key_text}']</td>
+	<td>//*[contains(@class,'btn')][normalize-space()='${key_text}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -306,6 +306,11 @@
 <tr>
 	<td>DELETE</td>
 	<td>//*[@data-qa-id='deleteButton'] | //button[contains(.,'Delete')] | //button[contains(.,'delete')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DELETE_ENTRY</td>
+	<td>//li[contains(@class,'nav-item')]/a[contains(@href,'deleteEntries')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -680,7 +685,7 @@
 </tr>
 <tr>
 	<td>SELECT_FILE</td>
-	<td>//button[contains(.,'Select File')]</td>
+	<td>//button[contains(.,'Select File')] | //label[contains(.,'Select File')]</td>
 	<td></td>
 </tr>
 <tr>
