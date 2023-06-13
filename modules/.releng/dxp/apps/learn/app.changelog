@@ -162,14 +162,3 @@ app.artifacts-4.0.32=\
 app.change.log-4.0.32=LPS-152394 LPS-153203
 
 app.git.id-4.0.32=3a6d85802029b84bdcad12886ff42acaed4d5704
-
-#
-# Liferay App Version 4.0.33
-#
-
-app.artifacts-4.0.33=\
-	
-
-app.change.log-4.0.33=LPS-152394 LPS-153203
-
-app.git.id-4.0.33=c51c7eb6827d702295e5f6c276987c895cb98cba

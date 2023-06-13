@@ -75,7 +75,33 @@
 							String linkCssClass = "dropdown-item palette-item";
 
 							Locale curLocale = LocaleUtil.fromLanguageId(curLanguageId);
+
+							String translationStatusCssClass = "warning";
+							String translationStatusMessage = LanguageUtil.get(request, "untranslated");
+
+							if (ddmFormValues != null) {
+								Set<Locale> ddmFormValuesAvailableLocales = ddmFormValues.getAvailableLocales();
+
+								if (ddmFormValuesAvailableLocales.contains(curLocale)) {
+									translationStatusCssClass = "success";
+									translationStatusMessage = LanguageUtil.get(request, "translated");
+								}
+							}
+
+							if (curLanguageId.equals(defaultLanguageId)) {
+								linkCssClass += " active";
+								translationStatusCssClass = "info";
+								translationStatusMessage = LanguageUtil.get(request, "default");
+							}
 						%>
+
+						<liferay-util:buffer
+							var="messageBuffer"
+						>
+							<%= StringUtil.replace(curLanguageId, '_', '-') %>
+
+							<span class="label label-<%= translationStatusCssClass %>"><%= translationStatusMessage %></span>
+						</liferay-util:buffer>
 
 							<c:if test="<%= showLanguageSelector %>">
 								<liferay-ui:icon
@@ -93,7 +119,7 @@
 									iconCssClass="inline-item inline-item-before"
 									linkCssClass="<%= linkCssClass %>"
 									markupView="lexicon"
-									message="<%= StringUtil.replace(curLanguageId, '_', '-') %>"
+									message="<%= messageBuffer %>"
 									onClick="event.preventDefault(); fireLocaleChanged(event);"
 									url="javascript:;"
 								>
@@ -176,6 +202,30 @@
 			var onLocaleChange = function (event) {
 				var languageId = event.item.getAttribute('data-value');
 
+				var childrenItems = A.all(
+					'#<portlet:namespace /><%= fieldsNamespace %>PaletteContentBox a'
+				);
+
+				var triggerMenu = A.one('#<portlet:namespace /><%= fieldsNamespace %>Menu');
+
+				var listContainer = triggerMenu.getData('menuListContainer');
+
+				if (childrenItems._nodes && !childrenItems._nodes.length && listContainer) {
+					childrenItems = listContainer.all(childrenItems._query);
+				}
+
+				childrenItems.each(function (item) {
+					if (item.hasClass('active')) {
+						item.removeClass('active');
+					}
+
+					var languageIdActive = item.getAttribute('data-value');
+
+					if (languageId === languageIdActive) {
+						item.addClass('active');
+					}
+				});
+
 				languageId = languageId.replace('_', '-');
 
 				var triggerContent = Lang.sub(
@@ -186,9 +236,8 @@
 					}
 				);
 
-				var trigger = A.one('#<portlet:namespace /><%= fieldsNamespace %>Menu');
-
-				trigger.setHTML(triggerContent);
+				triggerMenu.setData('menuListContainer', listContainer);
+				triggerMenu.setHTML(triggerContent);
 			};
 
 			Liferay.on('inputLocalized:localeChanged', onLocaleChange);

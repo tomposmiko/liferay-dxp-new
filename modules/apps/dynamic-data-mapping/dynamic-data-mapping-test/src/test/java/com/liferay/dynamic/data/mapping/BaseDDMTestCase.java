@@ -725,10 +725,6 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 		whenLanguageGetLanguageId(LocaleUtil.SPAIN, "es_ES");
 		whenLanguageGetLanguageId(LocaleUtil.US, "en_US");
 
-		whenLanguageIsAvailableLocale("en_US");
-		whenLanguageIsAvailableLocale("es_ES");
-		whenLanguageIsAvailableLocale("pt_BR");
-
 		whenLanguageIsAvailableLocale(LocaleUtil.BRAZIL);
 		whenLanguageIsAvailableLocale(LocaleUtil.SPAIN);
 		whenLanguageIsAvailableLocale(LocaleUtil.US);
@@ -736,65 +732,6 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 		LanguageUtil languageUtil = new LanguageUtil();
 
 		languageUtil.setLanguage(language);
-	}
-
-	protected void setUpLocaleUtil() {
-		mockStatic(LocaleUtil.class);
-
-		when(
-			LocaleUtil.fromLanguageId("en_US")
-		).thenReturn(
-			LocaleUtil.US
-		);
-
-		when(
-			LocaleUtil.fromLanguageId("pt_BR")
-		).thenReturn(
-			LocaleUtil.BRAZIL
-		);
-
-		when(
-			LocaleUtil.getDefault()
-		).thenReturn(
-			LocaleUtil.US
-		);
-
-		when(
-			LocaleUtil.toLanguageId(LocaleUtil.US)
-		).thenReturn(
-			"en_US"
-		);
-
-		when(
-			LocaleUtil.toLanguageId(LocaleUtil.BRAZIL)
-		).thenReturn(
-			"pt_BR"
-		);
-
-		when(
-			LocaleUtil.toLanguageIds((Locale[])Matchers.any())
-		).then(
-			new Answer<String[]>() {
-
-				@Override
-				public String[] answer(InvocationOnMock invocationOnMock)
-					throws Throwable {
-
-					Object[] args = invocationOnMock.getArguments();
-
-					Locale[] locales = (Locale[])args[0];
-
-					String[] languageIds = new String[locales.length];
-
-					for (int i = 0; i < locales.length; i++) {
-						languageIds[i] = LocaleUtil.toLanguageId(locales[i]);
-					}
-
-					return languageIds;
-				}
-
-			}
-		);
 	}
 
 	protected void setUpLocalizationUtil() {
@@ -890,11 +827,10 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 		).thenReturn(
 			true
 		);
-	}
 
-	protected void whenLanguageIsAvailableLocale(String languageId) {
 		when(
-			language.isAvailableLocale(Matchers.eq(languageId))
+			language.isAvailableLocale(
+				Matchers.eq(LocaleUtil.toLanguageId(locale)))
 		).thenReturn(
 			true
 		);

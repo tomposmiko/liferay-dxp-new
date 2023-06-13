@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
@@ -30,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -48,6 +50,18 @@ public class LocaleUtilTest extends PowerMockito {
 
 		when(
 			LanguageUtil.isAvailableLocale(Locale.US)
+		).thenReturn(
+			true
+		);
+
+		Mockito.when(
+			LanguageUtil.isAvailableLanguageCode("en")
+		).thenReturn(
+			false
+		);
+
+		Mockito.when(
+			LanguageUtil.isAvailableLanguageCode("fr")
 		).thenReturn(
 			true
 		);
@@ -71,6 +85,11 @@ public class LocaleUtilTest extends PowerMockito {
 
 			Assert.assertEquals(
 				"en is not a valid language id", logRecord.getMessage());
+
+			logRecords.clear();
+
+			Assert.assertEquals(Locale.FRENCH, LocaleUtil.fromLanguageId("fr"));
+			Assert.assertEquals(logRecords.toString(), 0, logRecords.size());
 		}
 	}
 
@@ -104,6 +123,46 @@ public class LocaleUtilTest extends PowerMockito {
 		Assert.assertEquals(
 			Locale.TRADITIONAL_CHINESE,
 			LocaleUtil.fromLanguageId("zh-Hant-TW"));
+	}
+
+	@Test
+	public void testFromLanguageIdLocaleIsCreatedAndRetrievableWhenNoValidationDone() {
+		LanguageUtil languageUtil = new LanguageUtil();
+
+		Language language = Mockito.mock(Language.class);
+
+		languageUtil.setLanguage(language);
+
+		Mockito.when(
+			language.isAvailableLocale(Locale.ITALY)
+		).thenReturn(
+			false
+		);
+
+		Assert.assertNotNull(LocaleUtil.fromLanguageId("it_IT", false));
+
+		Assert.assertSame(
+			LocaleUtil.fromLanguageId("it_IT", false),
+			LocaleUtil.fromLanguageId("it_IT", false));
+	}
+
+	@Test
+	public void testFromLanguageValidation() {
+		LanguageUtil languageUtil = new LanguageUtil();
+
+		Language language = Mockito.mock(Language.class);
+
+		languageUtil.setLanguage(language);
+
+		Mockito.when(
+			language.isAvailableLocale(Locale.GERMANY)
+		).thenReturn(
+			false
+		);
+
+		Assert.assertEquals(
+			Locale.GERMANY, LocaleUtil.fromLanguageId("de_DE", false, false));
+		Assert.assertNull(LocaleUtil.fromLanguageId("de_DE", true, false));
 	}
 
 	@Test

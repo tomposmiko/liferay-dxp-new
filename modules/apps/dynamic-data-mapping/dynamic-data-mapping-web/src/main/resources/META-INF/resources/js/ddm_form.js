@@ -579,6 +579,7 @@ AUI.add(
 					instance.set('displayLocale', displayLocale);
 
 					instance.syncLabel(displayLocale);
+					instance.syncTranslatedLabelsUI(currentLocale);
 					instance.syncValueUI();
 					instance.syncReadOnlyUI();
 				},
@@ -1201,6 +1202,69 @@ AUI.add(
 					container
 						.one('.lfr-ddm-repeatable-delete-button')
 						.toggle(siblings.length > 1);
+				},
+
+				syncTranslatedLabelsUI(locale) {
+					const instance = this;
+
+					const defaultLocale = instance.getDefaultLocale();
+
+					if (locale === defaultLocale) {
+						return;
+					}
+
+					const localizationMap = instance.get('localizationMap');
+
+					const regexpFieldsNamespace = new RegExp(
+						instance.get('name') +
+							INSTANCE_ID_PREFIX +
+							instance.get('instanceId'),
+						'gi'
+					);
+					const fieldsNamespace = instance
+						.getInputName()
+						.replace(regexpFieldsNamespace, '');
+
+					const labelItemSelector =
+						'#' +
+						fieldsNamespace +
+						'PaletteContentBox a[data-value="' +
+						locale +
+						'"] .label';
+
+					let labelItem = A.one(labelItemSelector);
+
+					const triggerMenu = A.one('#' + fieldsNamespace + 'Menu');
+
+					const listContainer = triggerMenu.getData(
+						'menuListContainer'
+					);
+
+					if (!labelItem && listContainer) {
+						labelItem = listContainer.one(labelItemSelector);
+					}
+
+					if (
+						labelItem &&
+						!A.Object.isEmpty(localizationMap) &&
+						Object.prototype.hasOwnProperty.call(
+							localizationMap,
+							locale
+						)
+					) {
+						const translated = Liferay.Language.get('translated');
+						if (labelItem.getContent() !== translated) {
+							labelItem.setContent(translated);
+						}
+						if (labelItem.hasClass('label-warning')) {
+							labelItem.removeClass('label-warning');
+						}
+						if (!labelItem.hasClass('label-success')) {
+							labelItem.addClass('label-success');
+						}
+					}
+
+					triggerMenu.setData('menuListContainer', listContainer);
 				},
 
 				syncValueUI() {

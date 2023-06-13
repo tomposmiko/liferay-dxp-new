@@ -636,6 +636,9 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 			"es_ES"
 		);
 
+		_whenLanguageIsAvailableLocale(LocaleUtil.BRAZIL);
+		_whenLanguageIsAvailableLocale(LocaleUtil.SPAIN);
+
 		LanguageUtil languageUtil = new LanguageUtil();
 
 		languageUtil.setLanguage(_language);
@@ -731,6 +734,21 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		);
 
 		return ddmStructure;
+	}
+
+	private void _whenLanguageIsAvailableLocale(Locale locale) {
+		when(
+			_language.isAvailableLocale(Matchers.eq(locale))
+		).thenReturn(
+			true
+		);
+
+		when(
+			_language.isAvailableLocale(
+				Matchers.eq(LocaleUtil.toLanguageId(locale)))
+		).thenReturn(
+			true
+		);
 	}
 
 	private static final String _DEFAULT_LANGUAGE_ID = "es_ES";

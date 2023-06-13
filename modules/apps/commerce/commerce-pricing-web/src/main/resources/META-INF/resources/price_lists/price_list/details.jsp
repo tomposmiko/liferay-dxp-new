@@ -70,7 +70,7 @@ if ((commercePriceList != null) && (commercePriceList.getExpirationDate() != nul
 					for (CommerceCatalog commerceCatalog : commerceCatalogs) {
 					%>
 
-						<aui:option label="<%= commerceCatalog.getName() %>" selected="<%= (commercePriceList == null) ? (commerceCatalogs.size() == 1) : commercePriceListDisplayContext.isSelectedCatalog(commerceCatalog) %>" value="<%= commerceCatalog.getGroupId() %>" />
+						<aui:option label="<%= HtmlUtil.escape(commerceCatalog.getName()) %>" selected="<%= (commercePriceList == null) ? (commerceCatalogs.size() == 1) : commercePriceListDisplayContext.isSelectedCatalog(commerceCatalog) %>" value="<%= commerceCatalog.getGroupId() %>" />
 
 					<%
 					}
@@ -107,7 +107,7 @@ if ((commercePriceList != null) && (commercePriceList.getExpirationDate() != nul
 						apiUrl:
 							'<%= commercePriceListDisplayContext.getPriceListsApiUrl(portletName) %>',
 						initialLabel:
-							'<%= (parentCommercePriceList == null) ? StringPool.BLANK : parentCommercePriceList.getName() %>',
+							'<%= (parentCommercePriceList == null) ? StringPool.BLANK : HtmlUtil.escapeJS(parentCommercePriceList.getName()) %>',
 						initialValue:
 							'<%= (parentCommercePriceList == null) ? 0 : parentCommercePriceList.getCommercePriceListId() %>',
 						inputId: 'parentCommercePriceListId',
@@ -133,15 +133,15 @@ if ((commercePriceList != null) && (commercePriceList.getExpirationDate() != nul
 				<aui:select label="price-type" name="netPrice">
 
 					<%
-					boolean isNetPrice = true;
+					boolean netPrice = true;
 
 					if (commercePriceList != null) {
-						isNetPrice = commercePriceList.isNetPrice();
+						netPrice = commercePriceList.isNetPrice();
 					}
 					%>
 
-					<aui:option label="net-price" selected="<%= isNetPrice %>" value="true" />
-					<aui:option label="gross-price" selected="<%= !isNetPrice %>" value="false" />
+					<aui:option label="net-price" selected="<%= netPrice %>" value="true" />
+					<aui:option label="gross-price" selected="<%= !netPrice %>" value="false" />
 				</aui:select>
 			</commerce-ui:panel>
 		</div>

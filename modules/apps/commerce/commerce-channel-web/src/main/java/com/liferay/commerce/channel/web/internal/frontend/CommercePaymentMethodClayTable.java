@@ -41,7 +41,6 @@ import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -182,12 +181,9 @@ public class CommercePaymentMethodClayTable
 
 			paymentMethods.add(
 				new PaymentMethod(
-					HtmlUtil.escape(commercePaymentDescription),
-					commercePaymentMethod.getKey(),
-					HtmlUtil.escape(commercePaymentName),
-					HtmlUtil.escape(
-						commercePaymentMethod.getName(
-							themeDisplay.getLocale())),
+					commercePaymentDescription, commercePaymentMethod.getKey(),
+					commercePaymentName,
+					commercePaymentMethod.getName(themeDisplay.getLocale()),
 					CommerceChannelClayTableUtil.getLabelField(
 						_isActive(commercePaymentMethodGroupRel),
 						themeDisplay.getLocale())));

@@ -8681,6 +8681,10 @@ go</echo>
 		</if>
 	</target>
 
+	<target name="create-symbolic-link">
+		<symlink link="${symbolic.link}" resource="${symbolic.link.resource}" />
+	</target>
+
 	<target name="curl-execute">
 		<fail message="Please set the property ${curl.args}." unless="curl.args" />
 
@@ -9401,6 +9405,12 @@ virtualHostname="localhost"
 				<print-file file.name="@{osgi.config}" />
 			</sequential>
 		</for>
+	</target>
+
+	<target name="deploy-osgi-module-to-specific-bundle">
+		<gradle-execute dir="${project.dir}/${module.base.dir}" forcedcacheenabled="false" task="deploy">
+			<arg value="-Pliferay.home=${liferayHome}" />
+		</gradle-execute>
 	</target>
 
 	<target name="deploy-osgi-modules">
@@ -11820,13 +11830,24 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			</then>
 		</if>
 
+		<get-testcase-property property.name="ci.retries.disabled" />
+		<get-testcase-property property.name="test.jvm.max.retries" />
+
 		<if>
-			<isset property="test.jvm.max.retries" />
+			<equals arg1="${ci.retries.disabled}" arg2="true" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
-					test.jvm.max.retries=${test.jvm.max.retries}
+					test.jvm.max.retries=0
 				</echo>
 			</then>
+			<elseif>
+				<isset property="test.jvm.max.retries" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						test.jvm.max.retries=${test.jvm.max.retries}
+					</echo>
+				</then>
+			</elseif>
 		</if>
 
 		<if>
@@ -11847,13 +11868,24 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			</then>
 		</if>
 
+		<get-testcase-property property.name="ci.retries.disabled" />
+		<get-testcase-property property.name="test.testcase.max.retries" />
+
 		<if>
-			<isset property="test.testcase.max.retries" />
+			<equals arg1="${ci.retries.disabled}" arg2="true" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
-					test.testcase.max.retries=${test.testcase.max.retries}
+					test.testcase.max.retries=0
 				</echo>
 			</then>
+			<elseif>
+				<isset property="test.testcase.max.retries" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						test.testcase.max.retries=${test.testcase.max.retries}
+					</echo>
+				</then>
+			</elseif>
 		</if>
 	</target>
 
@@ -14783,6 +14815,10 @@ url=${short.hostname}:8080</echo>
 		/>
 	</target>
 
+	<target name="stop-docker-browser">
+		<stop-docker-browser />
+	</target>
+
 	<target name="stop-docker-containers">
 		<get-database-property property.name="database.docker.image" />
 
@@ -14810,10 +14846,6 @@ url=${short.hostname}:8080</echo>
 				<stop-docker-browser />
 			</then>
 		</if>
-	</target>
-
-	<target name="stop-docker-browser">
-		<stop-docker-browser />
 	</target>
 
 	<target name="stop-docker-database">

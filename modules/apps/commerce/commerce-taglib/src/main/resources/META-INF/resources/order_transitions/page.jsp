@@ -31,8 +31,8 @@ List<ObjectValuePair<Long, String>> commerceOrderTransitionOVPs = (List<ObjectVa
 			String transitionName = transitionOVP.getValue();
 		%>
 
-			<button class="<%= (String)request.getAttribute("liferay-commerce:order-transitions:cssClass") %> transition-link" data-commerceOrderId="<%= commerceOrder.getCommerceOrderId() %>" data-transitionName="<%= transitionOVP.getValue() %>" data-workflowTaskId="<%= transitionOVP.getKey() %>" type="button">
-				<%= LanguageUtil.get(request, transitionName) %>
+			<button class="<%= (String)request.getAttribute("liferay-commerce:order-transitions:cssClass") %> transition-link" data-commerceOrderId="<%= commerceOrder.getCommerceOrderId() %>" data-transitionName="<%= HtmlUtil.escapeAttribute(transitionName) %>" data-workflowTaskId="<%= transitionOVP.getKey() %>" type="button">
+				<%= LanguageUtil.get(request, HtmlUtil.escape(transitionName)) %>
 			</button>
 
 		<%

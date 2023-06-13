@@ -14,6 +14,8 @@
 
 package com.liferay.headless.delivery.internal.resource.v1_0;
 
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializerSerializeRequest;
@@ -66,6 +68,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
@@ -425,12 +428,8 @@ public class StructuredContentResourceImpl
 				localDateTime.getHour(), localDateTime.getMinute(), 0, 0, 0, 0,
 				0, true, 0, 0, 0, 0, 0, true, true, false, null, null, null,
 				null,
-				ServiceContextRequestUtil.createServiceContext(
-					structuredContent.getTaxonomyCategoryIds(),
-					structuredContent.getKeywords(),
-					_getExpandoBridgeAttributes(structuredContent),
-					journalArticle.getGroupId(), contextHttpServletRequest,
-					structuredContent.getViewableByAsString())));
+				_createServiceContext(
+					structuredContentId, structuredContent, 0L)));
 	}
 
 	@Override
@@ -535,12 +534,8 @@ public class StructuredContentResourceImpl
 				localDateTime.getHour(), localDateTime.getMinute(), 0, 0, 0, 0,
 				0, true, 0, 0, 0, 0, 0, true, true, false, null, null, null,
 				null,
-				ServiceContextRequestUtil.createServiceContext(
-					structuredContent.getTaxonomyCategoryIds(),
-					structuredContent.getKeywords(),
-					_getExpandoBridgeAttributes(structuredContent),
-					journalArticle.getGroupId(), contextHttpServletRequest,
-					structuredContent.getViewableByAsString())));
+				_createServiceContext(
+					structuredContentId, structuredContent, 0L)));
 	}
 
 	@Override
@@ -648,13 +643,7 @@ public class StructuredContentResourceImpl
 				localDateTime.getDayOfMonth(), localDateTime.getYear(),
 				localDateTime.getHour(), localDateTime.getMinute(), 0, 0, 0, 0,
 				0, true, 0, 0, 0, 0, 0, true, true, false, null, null, null,
-				null,
-				ServiceContextRequestUtil.createServiceContext(
-					structuredContent.getTaxonomyCategoryIds(),
-					structuredContent.getKeywords(),
-					_getExpandoBridgeAttributes(structuredContent), siteId,
-					contextHttpServletRequest,
-					structuredContent.getViewableByAsString())));
+				null, _createServiceContext(0L, structuredContent, siteId)));
 	}
 
 	private DDMStructure _checkDDMStructurePermission(
@@ -711,6 +700,45 @@ public class StructuredContentResourceImpl
 		finally {
 			LocaleThreadLocal.setSiteDefaultLocale(originalSiteDefaultLocale);
 		}
+	}
+
+	private ServiceContext _createServiceContext(
+			Long structuredContentId, StructuredContent structuredContent,
+			Long siteId)
+		throws Exception {
+
+		ServiceContext serviceContext = null;
+
+		if (structuredContentId > 0L) {
+			JournalArticle journalArticle =
+				_journalArticleService.getLatestArticle(structuredContentId);
+
+			serviceContext = ServiceContextRequestUtil.createServiceContext(
+				structuredContent.getTaxonomyCategoryIds(),
+				structuredContent.getKeywords(),
+				_getExpandoBridgeAttributes(structuredContent),
+				journalArticle.getGroupId(), contextHttpServletRequest,
+				structuredContent.getViewableByAsString());
+
+			ClassName className = _classNameLocalService.fetchClassName(
+				JournalArticle.class.getName());
+
+			AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+				className.getClassNameId(),
+				journalArticle.getResourcePrimKey());
+
+			serviceContext.setAssetPriority(assetEntry.getPriority());
+		}
+		else {
+			serviceContext = ServiceContextRequestUtil.createServiceContext(
+				structuredContent.getTaxonomyCategoryIds(),
+				structuredContent.getKeywords(),
+				_getExpandoBridgeAttributes(structuredContent), siteId,
+				contextHttpServletRequest,
+				structuredContent.getViewableByAsString());
+		}
+
+		return serviceContext;
 	}
 
 	private UnsafeConsumer<BooleanQuery, Exception>
@@ -1089,6 +1117,9 @@ public class StructuredContentResourceImpl
 
 	@Reference
 	private Aggregations _aggregations;
+
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
