@@ -77,14 +77,9 @@ public class FragmentEntryProcessorHelperImpl
 			return value;
 		}
 
-		value = jsonObject.getString(
-			_language.getLanguageId(LocaleUtil.getSiteDefault()));
-
-		if (Validator.isNull(value)) {
-			value = jsonObject.getString("defaultValue");
-		}
-
-		return value;
+		return jsonObject.getString(
+			_language.getLanguageId(LocaleUtil.getSiteDefault()),
+			jsonObject.getString("defaultValue"));
 	}
 
 	@Override

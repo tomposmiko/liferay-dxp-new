@@ -15,7 +15,6 @@
 package com.liferay.commerce.service.impl;
 
 import com.liferay.commerce.exception.CommerceOrderNoteContentException;
-import com.liferay.commerce.exception.DuplicateCommerceOrderNoteException;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderNote;
 import com.liferay.commerce.service.base.CommerceOrderNoteLocalServiceBaseImpl;
@@ -68,9 +67,6 @@ public class CommerceOrderNoteLocalServiceImpl
 			externalReferenceCode = null;
 		}
 
-		_validateExternalReferenceCode(
-			externalReferenceCode, serviceContext.getCompanyId());
-
 		long commerceOrderNoteId = counterLocalService.increment();
 
 		CommerceOrderNote commerceOrderNote =
@@ -106,8 +102,8 @@ public class CommerceOrderNoteLocalServiceImpl
 			commerceOrderNote = getCommerceOrderNote(commerceOrderNoteId);
 		}
 		else {
-			commerceOrderNote = commerceOrderNotePersistence.fetchByC_ERC(
-				serviceContext.getCompanyId(), externalReferenceCode);
+			commerceOrderNote = commerceOrderNotePersistence.fetchByERC_C(
+				externalReferenceCode, serviceContext.getCompanyId());
 		}
 
 		if (commerceOrderNote != null) {
@@ -135,8 +131,8 @@ public class CommerceOrderNoteLocalServiceImpl
 			return null;
 		}
 
-		return commerceOrderNotePersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
+		return commerceOrderNotePersistence.fetchByERC_C(
+			externalReferenceCode, companyId);
 	}
 
 	@Override
@@ -214,25 +210,6 @@ public class CommerceOrderNoteLocalServiceImpl
 	private void _validate(String content) throws PortalException {
 		if (Validator.isNull(content)) {
 			throw new CommerceOrderNoteContentException();
-		}
-	}
-
-	private void _validateExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		if (Validator.isNull(externalReferenceCode)) {
-			return;
-		}
-
-		CommerceOrderNote commerceOrderNote =
-			commerceOrderNotePersistence.fetchByC_ERC(
-				companyId, externalReferenceCode);
-
-		if (commerceOrderNote != null) {
-			throw new DuplicateCommerceOrderNoteException(
-				"There is another commerce order note with external " +
-					"reference code " + externalReferenceCode);
 		}
 	}
 

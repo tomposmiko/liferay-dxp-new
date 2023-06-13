@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
+import com.liferay.commerce.product.exception.DuplicateCPMeasurementUnitExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPMeasurementUnitException;
 import com.liferay.commerce.product.model.CPMeasurementUnit;
 import com.liferay.commerce.product.model.CPMeasurementUnitTable;
@@ -3447,35 +3448,35 @@ public class CPMeasurementUnitPersistenceImpl
 	private static final String _FINDER_COLUMN_C_P_T_TYPE_2 =
 		"cpMeasurementUnit.type = ?";
 
-	private FinderPath _finderPathFetchByC_ERC;
-	private FinderPath _finderPathCountByC_ERC;
+	private FinderPath _finderPathFetchByERC_C;
+	private FinderPath _finderPathCountByERC_C;
 
 	/**
-	 * Returns the cp measurement unit where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchCPMeasurementUnitException</code> if it could not be found.
+	 * Returns the cp measurement unit where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchCPMeasurementUnitException</code> if it could not be found.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the matching cp measurement unit
 	 * @throws NoSuchCPMeasurementUnitException if a matching cp measurement unit could not be found
 	 */
 	@Override
-	public CPMeasurementUnit findByC_ERC(
-			long companyId, String externalReferenceCode)
+	public CPMeasurementUnit findByERC_C(
+			String externalReferenceCode, long companyId)
 		throws NoSuchCPMeasurementUnitException {
 
-		CPMeasurementUnit cpMeasurementUnit = fetchByC_ERC(
-			companyId, externalReferenceCode);
+		CPMeasurementUnit cpMeasurementUnit = fetchByERC_C(
+			externalReferenceCode, companyId);
 
 		if (cpMeasurementUnit == null) {
 			StringBundler sb = new StringBundler(6);
 
 			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			sb.append("companyId=");
-			sb.append(companyId);
-
-			sb.append(", externalReferenceCode=");
+			sb.append("externalReferenceCode=");
 			sb.append(externalReferenceCode);
+
+			sb.append(", companyId=");
+			sb.append(companyId);
 
 			sb.append("}");
 
@@ -3490,30 +3491,30 @@ public class CPMeasurementUnitPersistenceImpl
 	}
 
 	/**
-	 * Returns the cp measurement unit where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the cp measurement unit where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the matching cp measurement unit, or <code>null</code> if a matching cp measurement unit could not be found
 	 */
 	@Override
-	public CPMeasurementUnit fetchByC_ERC(
-		long companyId, String externalReferenceCode) {
+	public CPMeasurementUnit fetchByERC_C(
+		String externalReferenceCode, long companyId) {
 
-		return fetchByC_ERC(companyId, externalReferenceCode, true);
+		return fetchByERC_C(externalReferenceCode, companyId, true);
 	}
 
 	/**
-	 * Returns the cp measurement unit where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the cp measurement unit where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching cp measurement unit, or <code>null</code> if a matching cp measurement unit could not be found
 	 */
 	@Override
-	public CPMeasurementUnit fetchByC_ERC(
-		long companyId, String externalReferenceCode, boolean useFinderCache) {
+	public CPMeasurementUnit fetchByERC_C(
+		String externalReferenceCode, long companyId, boolean useFinderCache) {
 
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
@@ -3523,23 +3524,23 @@ public class CPMeasurementUnitPersistenceImpl
 		Object[] finderArgs = null;
 
 		if (useFinderCache && productionMode) {
-			finderArgs = new Object[] {companyId, externalReferenceCode};
+			finderArgs = new Object[] {externalReferenceCode, companyId};
 		}
 
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByC_ERC, finderArgs, this);
+				_finderPathFetchByERC_C, finderArgs, this);
 		}
 
 		if (result instanceof CPMeasurementUnit) {
 			CPMeasurementUnit cpMeasurementUnit = (CPMeasurementUnit)result;
 
-			if ((companyId != cpMeasurementUnit.getCompanyId()) ||
-				!Objects.equals(
+			if (!Objects.equals(
 					externalReferenceCode,
-					cpMeasurementUnit.getExternalReferenceCode())) {
+					cpMeasurementUnit.getExternalReferenceCode()) ||
+				(companyId != cpMeasurementUnit.getCompanyId())) {
 
 				result = null;
 			}
@@ -3550,18 +3551,18 @@ public class CPMeasurementUnitPersistenceImpl
 
 			sb.append(_SQL_SELECT_CPMEASUREMENTUNIT_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
-
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
 			}
+
+			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -3574,18 +3575,18 @@ public class CPMeasurementUnitPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(companyId);
-
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
+
+				queryPos.add(companyId);
 
 				List<CPMeasurementUnit> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache && productionMode) {
 						finderCache.putResult(
-							_finderPathFetchByC_ERC, finderArgs, list);
+							_finderPathFetchByERC_C, finderArgs, list);
 					}
 				}
 				else {
@@ -3613,32 +3614,32 @@ public class CPMeasurementUnitPersistenceImpl
 	}
 
 	/**
-	 * Removes the cp measurement unit where companyId = &#63; and externalReferenceCode = &#63; from the database.
+	 * Removes the cp measurement unit where externalReferenceCode = &#63; and companyId = &#63; from the database.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the cp measurement unit that was removed
 	 */
 	@Override
-	public CPMeasurementUnit removeByC_ERC(
-			long companyId, String externalReferenceCode)
+	public CPMeasurementUnit removeByERC_C(
+			String externalReferenceCode, long companyId)
 		throws NoSuchCPMeasurementUnitException {
 
-		CPMeasurementUnit cpMeasurementUnit = findByC_ERC(
-			companyId, externalReferenceCode);
+		CPMeasurementUnit cpMeasurementUnit = findByERC_C(
+			externalReferenceCode, companyId);
 
 		return remove(cpMeasurementUnit);
 	}
 
 	/**
-	 * Returns the number of cp measurement units where companyId = &#63; and externalReferenceCode = &#63;.
+	 * Returns the number of cp measurement units where externalReferenceCode = &#63; and companyId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the number of matching cp measurement units
 	 */
 	@Override
-	public int countByC_ERC(long companyId, String externalReferenceCode) {
+	public int countByERC_C(String externalReferenceCode, long companyId) {
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
@@ -3650,9 +3651,9 @@ public class CPMeasurementUnitPersistenceImpl
 		Long count = null;
 
 		if (productionMode) {
-			finderPath = _finderPathCountByC_ERC;
+			finderPath = _finderPathCountByERC_C;
 
-			finderArgs = new Object[] {companyId, externalReferenceCode};
+			finderArgs = new Object[] {externalReferenceCode, companyId};
 
 			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 		}
@@ -3662,18 +3663,18 @@ public class CPMeasurementUnitPersistenceImpl
 
 			sb.append(_SQL_COUNT_CPMEASUREMENTUNIT_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
-
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
 			}
+
+			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -3686,11 +3687,11 @@ public class CPMeasurementUnitPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(companyId);
-
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
+
+				queryPos.add(companyId);
 
 				count = (Long)query.uniqueResult();
 
@@ -3709,14 +3710,14 @@ public class CPMeasurementUnitPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_ERC_COMPANYID_2 =
-		"cpMeasurementUnit.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2 =
+		"cpMeasurementUnit.externalReferenceCode = ? AND ";
 
-	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2 =
-		"cpMeasurementUnit.externalReferenceCode = ?";
+	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3 =
+		"(cpMeasurementUnit.externalReferenceCode IS NULL OR cpMeasurementUnit.externalReferenceCode = '') AND ";
 
-	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3 =
-		"(cpMeasurementUnit.externalReferenceCode IS NULL OR cpMeasurementUnit.externalReferenceCode = '')";
+	private static final String _FINDER_COLUMN_ERC_C_COMPANYID_2 =
+		"cpMeasurementUnit.companyId = ?";
 
 	public CPMeasurementUnitPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
@@ -3766,10 +3767,10 @@ public class CPMeasurementUnitPersistenceImpl
 			cpMeasurementUnit);
 
 		finderCache.putResult(
-			_finderPathFetchByC_ERC,
+			_finderPathFetchByERC_C,
 			new Object[] {
-				cpMeasurementUnit.getCompanyId(),
-				cpMeasurementUnit.getExternalReferenceCode()
+				cpMeasurementUnit.getExternalReferenceCode(),
+				cpMeasurementUnit.getCompanyId()
 			},
 			cpMeasurementUnit);
 	}
@@ -3871,13 +3872,13 @@ public class CPMeasurementUnitPersistenceImpl
 			_finderPathFetchByC_K, args, cpMeasurementUnitModelImpl);
 
 		args = new Object[] {
-			cpMeasurementUnitModelImpl.getCompanyId(),
-			cpMeasurementUnitModelImpl.getExternalReferenceCode()
+			cpMeasurementUnitModelImpl.getExternalReferenceCode(),
+			cpMeasurementUnitModelImpl.getCompanyId()
 		};
 
-		finderCache.putResult(_finderPathCountByC_ERC, args, Long.valueOf(1));
+		finderCache.putResult(_finderPathCountByERC_C, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathFetchByC_ERC, args, cpMeasurementUnitModelImpl);
+			_finderPathFetchByERC_C, args, cpMeasurementUnitModelImpl);
 	}
 
 	/**
@@ -4026,6 +4027,29 @@ public class CPMeasurementUnitPersistenceImpl
 		if (Validator.isNull(cpMeasurementUnit.getExternalReferenceCode())) {
 			cpMeasurementUnit.setExternalReferenceCode(
 				cpMeasurementUnit.getUuid());
+		}
+		else {
+			CPMeasurementUnit ercCPMeasurementUnit = fetchByERC_C(
+				cpMeasurementUnit.getExternalReferenceCode(),
+				cpMeasurementUnit.getCompanyId());
+
+			if (isNew) {
+				if (ercCPMeasurementUnit != null) {
+					throw new DuplicateCPMeasurementUnitExternalReferenceCodeException(
+						"Duplicate cp measurement unit with external reference code " +
+							cpMeasurementUnit.getExternalReferenceCode());
+				}
+			}
+			else {
+				if ((ercCPMeasurementUnit != null) &&
+					(cpMeasurementUnit.getCPMeasurementUnitId() !=
+						ercCPMeasurementUnit.getCPMeasurementUnitId())) {
+
+					throw new DuplicateCPMeasurementUnitExternalReferenceCodeException(
+						"Duplicate cp measurement unit with external reference code " +
+							cpMeasurementUnit.getExternalReferenceCode());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =
@@ -4573,7 +4597,7 @@ public class CPMeasurementUnitPersistenceImpl
 		_uniqueIndexColumnNames.add(new String[] {"companyId", "key_"});
 
 		_uniqueIndexColumnNames.add(
-			new String[] {"companyId", "externalReferenceCode"});
+			new String[] {"externalReferenceCode", "companyId"});
 	}
 
 	/**
@@ -4715,15 +4739,15 @@ public class CPMeasurementUnitPersistenceImpl
 			},
 			new String[] {"companyId", "primary_", "type_"}, false);
 
-		_finderPathFetchByC_ERC = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByC_ERC",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "externalReferenceCode"}, true);
+		_finderPathFetchByERC_C = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByERC_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"externalReferenceCode", "companyId"}, true);
 
-		_finderPathCountByC_ERC = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_ERC",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "externalReferenceCode"}, false);
+		_finderPathCountByERC_C = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByERC_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"externalReferenceCode", "companyId"}, false);
 
 		_setCPMeasurementUnitUtilPersistence(this);
 	}

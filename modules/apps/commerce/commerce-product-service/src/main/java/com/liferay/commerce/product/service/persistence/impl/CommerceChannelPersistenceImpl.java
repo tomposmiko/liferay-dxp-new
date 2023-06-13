@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
+import com.liferay.commerce.product.exception.DuplicateCommerceChannelExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchChannelException;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.model.CommerceChannelTable;
@@ -3247,35 +3248,35 @@ public class CommerceChannelPersistenceImpl
 	private static final String _FINDER_COLUMN_SITEGROUPID_SITEGROUPID_2 =
 		"commerceChannel.siteGroupId = ?";
 
-	private FinderPath _finderPathFetchByC_ERC;
-	private FinderPath _finderPathCountByC_ERC;
+	private FinderPath _finderPathFetchByERC_C;
+	private FinderPath _finderPathCountByERC_C;
 
 	/**
-	 * Returns the commerce channel where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchChannelException</code> if it could not be found.
+	 * Returns the commerce channel where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchChannelException</code> if it could not be found.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the matching commerce channel
 	 * @throws NoSuchChannelException if a matching commerce channel could not be found
 	 */
 	@Override
-	public CommerceChannel findByC_ERC(
-			long companyId, String externalReferenceCode)
+	public CommerceChannel findByERC_C(
+			String externalReferenceCode, long companyId)
 		throws NoSuchChannelException {
 
-		CommerceChannel commerceChannel = fetchByC_ERC(
-			companyId, externalReferenceCode);
+		CommerceChannel commerceChannel = fetchByERC_C(
+			externalReferenceCode, companyId);
 
 		if (commerceChannel == null) {
 			StringBundler sb = new StringBundler(6);
 
 			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			sb.append("companyId=");
-			sb.append(companyId);
-
-			sb.append(", externalReferenceCode=");
+			sb.append("externalReferenceCode=");
 			sb.append(externalReferenceCode);
+
+			sb.append(", companyId=");
+			sb.append(companyId);
 
 			sb.append("}");
 
@@ -3290,30 +3291,30 @@ public class CommerceChannelPersistenceImpl
 	}
 
 	/**
-	 * Returns the commerce channel where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the commerce channel where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the matching commerce channel, or <code>null</code> if a matching commerce channel could not be found
 	 */
 	@Override
-	public CommerceChannel fetchByC_ERC(
-		long companyId, String externalReferenceCode) {
+	public CommerceChannel fetchByERC_C(
+		String externalReferenceCode, long companyId) {
 
-		return fetchByC_ERC(companyId, externalReferenceCode, true);
+		return fetchByERC_C(externalReferenceCode, companyId, true);
 	}
 
 	/**
-	 * Returns the commerce channel where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the commerce channel where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching commerce channel, or <code>null</code> if a matching commerce channel could not be found
 	 */
 	@Override
-	public CommerceChannel fetchByC_ERC(
-		long companyId, String externalReferenceCode, boolean useFinderCache) {
+	public CommerceChannel fetchByERC_C(
+		String externalReferenceCode, long companyId, boolean useFinderCache) {
 
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
@@ -3323,23 +3324,23 @@ public class CommerceChannelPersistenceImpl
 		Object[] finderArgs = null;
 
 		if (useFinderCache && productionMode) {
-			finderArgs = new Object[] {companyId, externalReferenceCode};
+			finderArgs = new Object[] {externalReferenceCode, companyId};
 		}
 
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByC_ERC, finderArgs, this);
+				_finderPathFetchByERC_C, finderArgs, this);
 		}
 
 		if (result instanceof CommerceChannel) {
 			CommerceChannel commerceChannel = (CommerceChannel)result;
 
-			if ((companyId != commerceChannel.getCompanyId()) ||
-				!Objects.equals(
+			if (!Objects.equals(
 					externalReferenceCode,
-					commerceChannel.getExternalReferenceCode())) {
+					commerceChannel.getExternalReferenceCode()) ||
+				(companyId != commerceChannel.getCompanyId())) {
 
 				result = null;
 			}
@@ -3350,18 +3351,18 @@ public class CommerceChannelPersistenceImpl
 
 			sb.append(_SQL_SELECT_COMMERCECHANNEL_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
-
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
 			}
+
+			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -3374,18 +3375,18 @@ public class CommerceChannelPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(companyId);
-
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
+
+				queryPos.add(companyId);
 
 				List<CommerceChannel> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache && productionMode) {
 						finderCache.putResult(
-							_finderPathFetchByC_ERC, finderArgs, list);
+							_finderPathFetchByERC_C, finderArgs, list);
 					}
 				}
 				else {
@@ -3413,32 +3414,32 @@ public class CommerceChannelPersistenceImpl
 	}
 
 	/**
-	 * Removes the commerce channel where companyId = &#63; and externalReferenceCode = &#63; from the database.
+	 * Removes the commerce channel where externalReferenceCode = &#63; and companyId = &#63; from the database.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the commerce channel that was removed
 	 */
 	@Override
-	public CommerceChannel removeByC_ERC(
-			long companyId, String externalReferenceCode)
+	public CommerceChannel removeByERC_C(
+			String externalReferenceCode, long companyId)
 		throws NoSuchChannelException {
 
-		CommerceChannel commerceChannel = findByC_ERC(
-			companyId, externalReferenceCode);
+		CommerceChannel commerceChannel = findByERC_C(
+			externalReferenceCode, companyId);
 
 		return remove(commerceChannel);
 	}
 
 	/**
-	 * Returns the number of commerce channels where companyId = &#63; and externalReferenceCode = &#63;.
+	 * Returns the number of commerce channels where externalReferenceCode = &#63; and companyId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the number of matching commerce channels
 	 */
 	@Override
-	public int countByC_ERC(long companyId, String externalReferenceCode) {
+	public int countByERC_C(String externalReferenceCode, long companyId) {
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
@@ -3450,9 +3451,9 @@ public class CommerceChannelPersistenceImpl
 		Long count = null;
 
 		if (productionMode) {
-			finderPath = _finderPathCountByC_ERC;
+			finderPath = _finderPathCountByERC_C;
 
-			finderArgs = new Object[] {companyId, externalReferenceCode};
+			finderArgs = new Object[] {externalReferenceCode, companyId};
 
 			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 		}
@@ -3462,18 +3463,18 @@ public class CommerceChannelPersistenceImpl
 
 			sb.append(_SQL_COUNT_COMMERCECHANNEL_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
-
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
 			}
+
+			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -3486,11 +3487,11 @@ public class CommerceChannelPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(companyId);
-
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
+
+				queryPos.add(companyId);
 
 				count = (Long)query.uniqueResult();
 
@@ -3509,14 +3510,14 @@ public class CommerceChannelPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_ERC_COMPANYID_2 =
-		"commerceChannel.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2 =
+		"commerceChannel.externalReferenceCode = ? AND ";
 
-	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2 =
-		"commerceChannel.externalReferenceCode = ?";
+	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3 =
+		"(commerceChannel.externalReferenceCode IS NULL OR commerceChannel.externalReferenceCode = '') AND ";
 
-	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3 =
-		"(commerceChannel.externalReferenceCode IS NULL OR commerceChannel.externalReferenceCode = '')";
+	private static final String _FINDER_COLUMN_ERC_C_COMPANYID_2 =
+		"commerceChannel.companyId = ?";
 
 	public CommerceChannelPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
@@ -3554,10 +3555,10 @@ public class CommerceChannelPersistenceImpl
 			new Object[] {commerceChannel.getSiteGroupId()}, commerceChannel);
 
 		finderCache.putResult(
-			_finderPathFetchByC_ERC,
+			_finderPathFetchByERC_C,
 			new Object[] {
-				commerceChannel.getCompanyId(),
-				commerceChannel.getExternalReferenceCode()
+				commerceChannel.getExternalReferenceCode(),
+				commerceChannel.getCompanyId()
 			},
 			commerceChannel);
 	}
@@ -3649,13 +3650,13 @@ public class CommerceChannelPersistenceImpl
 			_finderPathFetchBySiteGroupId, args, commerceChannelModelImpl);
 
 		args = new Object[] {
-			commerceChannelModelImpl.getCompanyId(),
-			commerceChannelModelImpl.getExternalReferenceCode()
+			commerceChannelModelImpl.getExternalReferenceCode(),
+			commerceChannelModelImpl.getCompanyId()
 		};
 
-		finderCache.putResult(_finderPathCountByC_ERC, args, Long.valueOf(1));
+		finderCache.putResult(_finderPathCountByERC_C, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathFetchByC_ERC, args, commerceChannelModelImpl);
+			_finderPathFetchByERC_C, args, commerceChannelModelImpl);
 	}
 
 	/**
@@ -3800,6 +3801,29 @@ public class CommerceChannelPersistenceImpl
 
 		if (Validator.isNull(commerceChannel.getExternalReferenceCode())) {
 			commerceChannel.setExternalReferenceCode(commerceChannel.getUuid());
+		}
+		else {
+			CommerceChannel ercCommerceChannel = fetchByERC_C(
+				commerceChannel.getExternalReferenceCode(),
+				commerceChannel.getCompanyId());
+
+			if (isNew) {
+				if (ercCommerceChannel != null) {
+					throw new DuplicateCommerceChannelExternalReferenceCodeException(
+						"Duplicate commerce channel with external reference code " +
+							commerceChannel.getExternalReferenceCode());
+				}
+			}
+			else {
+				if ((ercCommerceChannel != null) &&
+					(commerceChannel.getCommerceChannelId() !=
+						ercCommerceChannel.getCommerceChannelId())) {
+
+					throw new DuplicateCommerceChannelExternalReferenceCodeException(
+						"Duplicate commerce channel with external reference code " +
+							commerceChannel.getExternalReferenceCode());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =
@@ -4340,7 +4364,7 @@ public class CommerceChannelPersistenceImpl
 			CTColumnResolutionType.STRICT, ctStrictColumnNames);
 
 		_uniqueIndexColumnNames.add(
-			new String[] {"companyId", "externalReferenceCode"});
+			new String[] {"externalReferenceCode", "companyId"});
 	}
 
 	/**
@@ -4428,15 +4452,15 @@ public class CommerceChannelPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"siteGroupId"},
 			false);
 
-		_finderPathFetchByC_ERC = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByC_ERC",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "externalReferenceCode"}, true);
+		_finderPathFetchByERC_C = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByERC_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"externalReferenceCode", "companyId"}, true);
 
-		_finderPathCountByC_ERC = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_ERC",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "externalReferenceCode"}, false);
+		_finderPathCountByERC_C = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByERC_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"externalReferenceCode", "companyId"}, false);
 
 		_setCommerceChannelUtilPersistence(this);
 	}

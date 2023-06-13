@@ -38,6 +38,7 @@ import com.liferay.object.service.base.ObjectRelationshipLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
+import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.petra.sql.dsl.Column;
@@ -787,7 +788,7 @@ public class ObjectRelationshipLocalServiceImpl
 
 		if (nameCharArray.length > 41) {
 			throw new ObjectRelationshipNameException(
-				"Names must be less than 41 characters");
+				"Name must be less than 41 characters");
 		}
 
 		int count = objectRelationshipPersistence.countByODI1_N(
@@ -864,8 +865,12 @@ public class ObjectRelationshipLocalServiceImpl
 						objectDefinition1.getName());
 
 			if (systemObjectDefinitionMetadata != null) {
+				JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
+					systemObjectDefinitionMetadata.
+						getJaxRsApplicationDescriptor();
+
 				restContextPath =
-					systemObjectDefinitionMetadata.getRESTContextPath();
+					jaxRsApplicationDescriptor.getRESTContextPath();
 			}
 		}
 

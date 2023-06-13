@@ -11,6 +11,11 @@
 
 <tbody>
 <tr>
+	<td>OBJECT_ENTRY_ELLIPSIS_BUTTON</td>
+	<td>//*[text()='${key_text}']/parent::*//following-sibling::*[contains(@class, 'item-actions')]//*[@type='button']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CLOSE_BUTTON</td>
 	<td>//button[contains(@aria-label,'close')]</td>
 	<td></td>
@@ -37,7 +42,7 @@
 </tr>
 <tr>
 	<td>SVG_DROPDOWN</td>
-	<td>//div[@class="lfr-tooltip-scope"]//div//*[contains(@class, ' lexicon-icon-caret-bottom')] | //div[@class="lfr-tooltip-scope"]/descendant::span</td>
+	<td>//*[contains(@class, 'cp-layout-header')]/descendant::span</td>
 	<td></td>
 </tr>
 <tr>

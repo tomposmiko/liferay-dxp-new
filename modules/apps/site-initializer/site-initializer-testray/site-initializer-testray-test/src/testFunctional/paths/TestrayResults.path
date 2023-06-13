@@ -17,12 +17,12 @@
 </tr>
 <tr>
 	<td>INPUT_COMMENT</td>
-	<td>//textarea[@id='commentMBMessage']</td>
+	<td>//textarea[@id='comment']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>INPUT_ISSUES</td>
-	<td>//input[@id='issue']</td>
+	<td>//input[@id='issues']</td>
 	<td></td>
 </tr>
 <tr>
@@ -33,6 +33,11 @@
 <tr>
 	<td>STATUS_CASE_RESULTS</td>
 	<td>//span[normalize-space()='${key_status}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TOTAL_TEST_CASE_RESULTS</td>
+	<td>//h5[text()='Total test cases']//following::*[@class='bb-chart-arcs-title']</td>
 	<td></td>
 </tr>
 </tbody>

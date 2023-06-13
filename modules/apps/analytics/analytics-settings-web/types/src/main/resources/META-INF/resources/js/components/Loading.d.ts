@@ -13,7 +13,8 @@
  */
 
 import React from 'react';
-interface ILoadingProps {
+interface ILoadingProps extends React.HTMLAttributes<HTMLSpanElement> {
+	absolute?: boolean;
 	inline?: boolean;
 }
 declare const Loading: React.FC<ILoadingProps>;

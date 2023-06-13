@@ -268,48 +268,21 @@ public abstract class CPOptionLocalServiceBaseImpl
 		return cpOptionPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
-	/**
-	 * Returns the cp option with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the cp option's external reference code
-	 * @return the matching cp option, or <code>null</code> if a matching cp option could not be found
-	 */
 	@Override
 	public CPOption fetchCPOptionByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
-		return cpOptionPersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
+		return cpOptionPersistence.fetchByERC_C(
+			externalReferenceCode, companyId);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionByExternalReferenceCode(long, String)}
-	 */
-	@Deprecated
-	@Override
-	public CPOption fetchCPOptionByReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return fetchCPOptionByExternalReferenceCode(
-			companyId, externalReferenceCode);
-	}
-
-	/**
-	 * Returns the cp option with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the cp option's external reference code
-	 * @return the matching cp option
-	 * @throws PortalException if a matching cp option could not be found
-	 */
 	@Override
 	public CPOption getCPOptionByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException {
 
-		return cpOptionPersistence.findByC_ERC(
-			companyId, externalReferenceCode);
+		return cpOptionPersistence.findByERC_C(
+			externalReferenceCode, companyId);
 	}
 
 	/**

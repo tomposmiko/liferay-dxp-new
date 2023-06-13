@@ -649,8 +649,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			String jobTitle, boolean sendEmail, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userPersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
+		User user = userPersistence.fetchByERC_C(
+			externalReferenceCode, companyId);
 
 		if (user == null) {
 			user = addUserWithWorkflow(

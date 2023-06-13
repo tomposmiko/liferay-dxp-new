@@ -712,7 +712,7 @@ public interface BaseProjectTemplatesTestCase {
 					"liferay.workspace.target.platform.version=7.4.3.36");
 
 				writeGradlePropertiesInWorkspace(
-					workspaceDir, "liferay.workspace.product=portal-7.4-ga16");
+					workspaceDir, "liferay.workspace.product=portal-7.4-ga36");
 			}
 		}
 		else {
@@ -1302,8 +1302,8 @@ public interface BaseProjectTemplatesTestCase {
 	public default void testBuildTemplateNpm(
 			TemporaryFolder temporaryFolder, MavenExecutor mavenExecutor,
 			String template, String name, String packageName, String className,
-			String liferayVersion, String nodePackageManager, String product,
-			URI gradleDistribution)
+			String liferayProduct, String liferayVersion,
+			String nodePackageManager, URI gradleDistribution)
 		throws Exception {
 
 		File gradleWorkspaceDir = buildWorkspace(
@@ -1314,8 +1314,8 @@ public interface BaseProjectTemplatesTestCase {
 			gradleWorkspaceDir, "modules");
 
 		File gradleProjectDir = buildTemplateWithGradle(
-			gradleWorkspaceModulesDir, template, name, "--liferay-version",
-			liferayVersion, "--product", product);
+			gradleWorkspaceModulesDir, template, name, "--liferay-product",
+			liferayProduct, "--liferay-version", liferayVersion);
 
 		if (VersionUtil.getMinorVersion(liferayVersion) < 3) {
 			testContains(
@@ -1344,8 +1344,8 @@ public interface BaseProjectTemplatesTestCase {
 		File mavenProjectDir = buildTemplateWithMaven(
 			mavenModulesDir, mavenModulesDir, template, name, "com.test",
 			mavenExecutor, "-DclassName=" + className,
-			"-DliferayVersion=" + liferayVersion, "-Dpackage=" + packageName,
-			"-Dproduct=" + product);
+			"-DliferayProduct=" + liferayProduct,
+			"-DliferayVersion=" + liferayVersion, "-Dpackage=" + packageName);
 
 		testContains(
 			mavenProjectDir, "package.json",
@@ -1375,7 +1375,7 @@ public interface BaseProjectTemplatesTestCase {
 
 	public default File testBuildTemplatePortlet(
 			TemporaryFolder temporaryFolder, String template, String name,
-			String packageName, String liferayVersion, String product,
+			String packageName, String liferayProduct, String liferayVersion,
 			MavenExecutor mavenExecutor, URI gradleDistribution)
 		throws Exception {
 
@@ -1401,9 +1401,9 @@ public interface BaseProjectTemplatesTestCase {
 			gradleWorkspaceDir, modulesDir);
 
 		File gradleProjectDir = buildTemplateWithGradle(
-			gradleWorkspaceModulesDir, template, name, "--liferay-version",
-			liferayVersion, "--package-name", packageName, "--product",
-			product);
+			gradleWorkspaceModulesDir, template, name, "--liferay-product",
+			liferayProduct, "--liferay-version", liferayVersion,
+			"--package-name", packageName);
 
 		String[] resourceFileNames;
 
@@ -1454,8 +1454,8 @@ public interface BaseProjectTemplatesTestCase {
 		File mavenProjectDir = buildTemplateWithMaven(
 			mavenModulesDir, mavenModulesDir, template, name, "com.test",
 			mavenExecutor, "-DclassName=" + className,
-			"-DliferayVersion=" + liferayVersion, "-Dpackage=" + packageName,
-			"-Dproduct=" + product);
+			"-DliferayProduct=" + liferayProduct,
+			"-DliferayVersion=" + liferayVersion, "-Dpackage=" + packageName);
 
 		if (!liferayVersion.startsWith("7.0") && !template.contains("war")) {
 			testContains(
@@ -1485,28 +1485,28 @@ public interface BaseProjectTemplatesTestCase {
 		File gradleWorkspaceDir = buildWorkspace(
 			temporaryFolder, liferayVersion);
 
-		String product = "portal";
+		String liferayProduct = "portal";
 
 		if (liferayVersion.startsWith("7.0")) {
 			writeGradlePropertiesInWorkspace(
 				gradleWorkspaceDir,
 				"liferay.workspace.target.platform.version=7.0.10.17");
 
-			product = "dxp";
+			liferayProduct = "dxp";
 		}
 		else if (liferayVersion.startsWith("7.1")) {
 			writeGradlePropertiesInWorkspace(
 				gradleWorkspaceDir,
 				"liferay.workspace.target.platform.version=7.1.10.7");
 
-			product = "dxp";
+			liferayProduct = "dxp";
 		}
 		else if (liferayVersion.startsWith("7.2")) {
 			writeGradlePropertiesInWorkspace(
 				gradleWorkspaceDir,
 				"liferay.workspace.target.platform.version=7.2.10.7");
 
-			product = "dxp";
+			liferayProduct = "dxp";
 		}
 		else if (liferayVersion.startsWith("7.3")) {
 			writeGradlePropertiesInWorkspace(
@@ -1523,7 +1523,8 @@ public interface BaseProjectTemplatesTestCase {
 
 		File gradleProjectDir = buildTemplateWithGradle(
 			modulesDir, template, name, "--dependency-management-enabled",
-			"--liferay-version", liferayVersion, "--product", product);
+			"--liferay-product", liferayProduct, "--liferay-version",
+			liferayVersion);
 
 		if (!template.equals("war-hook") && !template.equals("theme")) {
 			testContains(
@@ -1552,8 +1553,9 @@ public interface BaseProjectTemplatesTestCase {
 		File mavenProjectDir = buildTemplateWithMaven(
 			mavenModulesDir, mavenModulesDir, template, name, "com.test",
 			mavenExecutor, "-DclassName=" + name,
+			"-DliferayProduct=" + liferayProduct,
 			"-DliferayVersion=" + liferayVersion,
-			"-Dpackage=" + name.toLowerCase(), "-Dproduct=" + product);
+			"-Dpackage=" + name.toLowerCase());
 
 		if (isBuildProjects()) {
 			File gradleOutputDir = new File(gradleProjectDir, "build/libs");

@@ -275,48 +275,21 @@ public abstract class CommerceChannelLocalServiceBaseImpl
 			uuid, companyId, null);
 	}
 
-	/**
-	 * Returns the commerce channel with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the commerce channel's external reference code
-	 * @return the matching commerce channel, or <code>null</code> if a matching commerce channel could not be found
-	 */
 	@Override
 	public CommerceChannel fetchCommerceChannelByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
-		return commerceChannelPersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
+		return commerceChannelPersistence.fetchByERC_C(
+			externalReferenceCode, companyId);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceChannelByExternalReferenceCode(long, String)}
-	 */
-	@Deprecated
-	@Override
-	public CommerceChannel fetchCommerceChannelByReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return fetchCommerceChannelByExternalReferenceCode(
-			companyId, externalReferenceCode);
-	}
-
-	/**
-	 * Returns the commerce channel with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the commerce channel's external reference code
-	 * @return the matching commerce channel
-	 * @throws PortalException if a matching commerce channel could not be found
-	 */
 	@Override
 	public CommerceChannel getCommerceChannelByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException {
 
-		return commerceChannelPersistence.findByC_ERC(
-			companyId, externalReferenceCode);
+		return commerceChannelPersistence.findByERC_C(
+			externalReferenceCode, companyId);
 	}
 
 	/**

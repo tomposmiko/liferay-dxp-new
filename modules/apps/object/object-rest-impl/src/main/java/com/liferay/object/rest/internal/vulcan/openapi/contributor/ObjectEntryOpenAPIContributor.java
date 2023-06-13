@@ -14,15 +14,23 @@
 
 package com.liferay.object.rest.internal.vulcan.openapi.contributor;
 
+import com.liferay.object.constants.ObjectActionTriggerConstants;
+import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.internal.vulcan.openapi.contributor.util.OpenAPIContributorUtil;
 import com.liferay.object.rest.openapi.v1_0.ObjectEntryOpenAPIResource;
+import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.vulcan.openapi.contributor.OpenAPIContributor;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.resource.OpenAPIResource;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -44,78 +52,130 @@ import java.util.Objects;
 
 import javax.ws.rs.core.UriInfo;
 
+import org.osgi.framework.BundleContext;
+
 /**
  * @author Alejandro Tardín
  */
-public class ObjectEntryOpenAPIContributor implements OpenAPIContributor {
+public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 
 	public ObjectEntryOpenAPIContributor(
+		BundleContext bundleContext, DTOConverterRegistry dtoConverterRegistry,
+		ObjectActionLocalService objectActionLocalService,
 		ObjectDefinition objectDefinition,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryOpenAPIResource objectEntryOpenAPIResource,
-		ObjectRelationshipLocalService objectRelationshipLocalService) {
+		ObjectRelationshipLocalService objectRelationshipLocalService,
+		OpenAPIResource openAPIResource,
+		SystemObjectDefinitionMetadataRegistry
+			systemObjectDefinitionMetadataRegistry) {
 
+		_bundleContext = bundleContext;
+		_objectActionLocalService = objectActionLocalService;
 		_objectDefinition = objectDefinition;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryOpenAPIResource = objectEntryOpenAPIResource;
 		_objectRelationshipLocalService = objectRelationshipLocalService;
+		_openAPIResource = openAPIResource;
+
+		init(dtoConverterRegistry, systemObjectDefinitionMetadataRegistry);
 	}
 
 	@Override
 	public void contribute(OpenAPI openAPI, UriInfo uriInfo) throws Exception {
+		List<ObjectAction> objectActions =
+			_objectActionLocalService.getObjectActions(
+				_objectDefinition.getObjectDefinitionId(),
+				ObjectActionTriggerConstants.KEY_STANDALONE);
 		Map<ObjectRelationship, ObjectDefinition> relatedObjectDefinitionsMap =
 			_getRelatedObjectDefinitionsMap();
 
 		Paths paths = openAPI.getPaths();
 
 		for (String key : new ArrayList<>(paths.keySet())) {
-			if (!key.contains("objectRelationshipName")) {
+			if (!key.contains("objectActionName") &&
+				!key.contains("objectRelationshipName")) {
+
 				continue;
 			}
 
-			for (Map.Entry<ObjectRelationship, ObjectDefinition> entry :
-					relatedObjectDefinitionsMap.entrySet()) {
+			if (key.contains("objectActionName")) {
+				if (GetterUtil.getBoolean(
+						PropsUtil.get("feature.flag.LPS-166918"))) {
 
-				ObjectRelationship objectRelationship = entry.getKey();
-
-				ObjectDefinition relatedObjectDefinition = entry.getValue();
-
-				if (!relatedObjectDefinition.isSystem()) {
-					if (uriInfo != null) {
-						_addSchema(relatedObjectDefinition, openAPI);
-					}
-
-					_addPathItem(
-						key, relatedObjectDefinition, objectRelationship,
-						paths);
+					ListUtil.isNotEmptyForEach(
+						objectActions,
+						objectAction -> _addObjectActionPathItem(
+							key, objectAction, paths));
 				}
+			}
+			else if (key.contains("objectRelationshipName")) {
+				for (Map.Entry<ObjectRelationship, ObjectDefinition> entry :
+						relatedObjectDefinitionsMap.entrySet()) {
 
-				openAPI.getComponents(
-				).getSchemas(
-				).get(
-					_objectDefinition.getShortName()
-				).getProperties(
-				).put(
-					objectRelationship.getName(),
-					new Schema<Object>() {
-						{
-							setDescription(
-								StringBundler.concat(
-									"Information about the relationship ",
-									objectRelationship.getName(),
-									" can be embedded with \"nestedFields\"."));
+					ObjectRelationship objectRelationship = entry.getKey();
+
+					ObjectDefinition relatedObjectDefinition = entry.getValue();
+
+					if (!relatedObjectDefinition.isSystem() ||
+						GetterUtil.getBoolean(
+							PropsUtil.get("feature.flag.LPS-162966"))) {
+
+						String relatedSchemaName = getSchemaName(
+							relatedObjectDefinition);
+
+						if (uriInfo != null) {
+							_addObjectRelationshipSchema(
+								relatedObjectDefinition, openAPI,
+								relatedSchemaName);
 						}
+
+						_addObjectRelationshipPathItem(
+							key, objectRelationship, paths, relatedSchemaName);
 					}
-				);
+
+					openAPI.getComponents(
+					).getSchemas(
+					).get(
+						_objectDefinition.getShortName()
+					).getProperties(
+					).put(
+						objectRelationship.getName(),
+						new Schema<Object>() {
+							{
+								setDescription(
+									StringBundler.concat(
+										"Information about the relationship ",
+										objectRelationship.getName(),
+										" can be embedded with ",
+										"\"nestedFields\"."));
+							}
+						}
+					);
+				}
 			}
 
 			paths.remove(key);
 		}
 	}
 
-	private void _addPathItem(
-		String key, ObjectDefinition objectDefinition,
-		ObjectRelationship objectRelationship, Paths paths) {
+	private void _addObjectActionPathItem(
+		String key, ObjectAction objectAction, Paths paths) {
+
+		paths.addPathItem(
+			StringUtil.replace(
+				key, new String[] {"objectEntry", "{objectActionName}"},
+				new String[] {
+					StringUtil.lowerCaseFirstLetter(
+						_objectDefinition.getShortName()),
+					objectAction.getName()
+				}),
+			_createObjectActionPathItem(objectAction, paths.get(key)));
+	}
+
+	private void _addObjectRelationshipPathItem(
+		String key, ObjectRelationship objectRelationship, Paths paths,
+		String schemaName) {
 
 		paths.addPathItem(
 			StringUtil.replace(
@@ -128,18 +188,16 @@ public class ObjectEntryOpenAPIContributor implements OpenAPIContributor {
 					StringUtil.lowerCaseFirstLetter(
 						_objectDefinition.getShortName()),
 					objectRelationship.getName(),
-					StringUtil.lowerCaseFirstLetter(
-						objectDefinition.getShortName())
+					StringUtil.lowerCaseFirstLetter(schemaName)
 				}),
-			_createPathItem(
-				objectRelationship, paths.get(key), objectDefinition));
+			_createObjectRelationshipPathItem(
+				objectRelationship, paths.get(key), schemaName));
 	}
 
-	private void _addSchema(ObjectDefinition objectDefinition, OpenAPI openAPI)
+	private void _addObjectRelationshipSchema(
+			ObjectDefinition objectDefinition, OpenAPI openAPI,
+			String schemaName)
 		throws Exception {
-
-		String schemaName = OpenAPIContributorUtil.getSchemaName(
-			objectDefinition);
 
 		Components components = openAPI.getComponents();
 
@@ -149,38 +207,56 @@ public class ObjectEntryOpenAPIContributor implements OpenAPIContributor {
 			return;
 		}
 
-		OpenAPI objectEntryOpenAPI =
-			OpenAPIContributorUtil.getObjectEntryOpenAPI(
+		OpenAPI sourceOpenAPI;
+
+		if (objectDefinition.isSystem()) {
+			sourceOpenAPI = OpenAPIContributorUtil.getSystemObjectOpenAPI(
+				_bundleContext, getExternalDTOClassName(objectDefinition),
+				_openAPIResource);
+		}
+		else {
+			sourceOpenAPI = OpenAPIContributorUtil.getObjectEntryOpenAPI(
 				objectDefinition, _objectEntryOpenAPIResource);
+		}
 
 		OpenAPIContributorUtil.copySchemas(
-			objectDefinition, objectEntryOpenAPI, openAPI);
+			schemaName, sourceOpenAPI, objectDefinition.isSystem(), openAPI);
 	}
 
-	private Operation _createOperation(
-		String httpMethod, ObjectRelationship objectRelationship,
-		Operation operation, ObjectDefinition relatedObjectDefinition) {
+	private PathItem _createObjectActionPathItem(
+		ObjectAction objectAction, PathItem pathItem) {
 
-		return new Operation() {
+		Map<PathItem.HttpMethod, Operation> operations =
+			pathItem.readOperationsMap();
+
+		Operation operation = operations.get(PathItem.HttpMethod.PUT);
+
+		if (operation == null) {
+			return new PathItem();
+		}
+
+		return new PathItem() {
 			{
-				operationId(
-					StringBundler.concat(
-						httpMethod, _objectDefinition.getShortName(),
-						StringUtil.upperCaseFirstLetter(
-							objectRelationship.getName()),
-						relatedObjectDefinition.getShortName()));
-				parameters(_getParameters(operation, relatedObjectDefinition));
-				responses(
-					_getApiResponses(
-						httpMethod, operation, relatedObjectDefinition));
-				tags(operation.getTags());
+				put(
+					new Operation() {
+						{
+							operationId(
+								StringBundler.concat(
+									"put", _objectDefinition.getShortName(),
+									StringUtil.upperCaseFirstLetter(
+										objectAction.getName())));
+							parameters(_getParameters(operation, null));
+							responses(operation.getResponses());
+							tags(operation.getTags());
+						}
+					});
 			}
 		};
 	}
 
-	private PathItem _createPathItem(
+	private PathItem _createObjectRelationshipPathItem(
 		ObjectRelationship objectRelationship, PathItem pathItem,
-		ObjectDefinition relatedObjectDefinition) {
+		String schemaName) {
 
 		Map<PathItem.HttpMethod, Operation> operations =
 			pathItem.readOperationsMap();
@@ -191,9 +267,8 @@ public class ObjectEntryOpenAPIContributor implements OpenAPIContributor {
 			return new PathItem() {
 				{
 					get(
-						_createOperation(
-							"get", objectRelationship, pathItem.getGet(),
-							relatedObjectDefinition));
+						_getObjectRelationshipGetOperation(
+							objectRelationship, pathItem.getGet(), schemaName));
 				}
 			};
 		}
@@ -204,52 +279,13 @@ public class ObjectEntryOpenAPIContributor implements OpenAPIContributor {
 			return new PathItem() {
 				{
 					put(
-						_createOperation(
-							"put", objectRelationship, pathItem.getPut(),
-							relatedObjectDefinition));
+						_getObjectRelationshipPutOperation(
+							objectRelationship, pathItem.getPut(), schemaName));
 				}
 			};
 		}
 
 		return new PathItem();
-	}
-
-	private ApiResponses _getApiResponses(
-		String httpMethod, Operation operation,
-		ObjectDefinition relatedObjectDefinition) {
-
-		ApiResponses apiResponses = new ApiResponses();
-
-		String schemaName;
-
-		if (StringUtil.equals(httpMethod, "get")) {
-			schemaName = OpenAPIContributorUtil.getPageSchemaName(
-				relatedObjectDefinition);
-		}
-		else {
-			schemaName = OpenAPIContributorUtil.getSchemaName(
-				relatedObjectDefinition);
-		}
-
-		ApiResponses operationApiResponses = operation.getResponses();
-
-		for (Map.Entry<String, ApiResponse> entry :
-				operationApiResponses.entrySet()) {
-
-			ApiResponse apiResponse = entry.getValue();
-
-			apiResponses.put(
-				entry.getKey(),
-				new ApiResponse() {
-					{
-						setContent(
-							_getContent(apiResponse.getContent(), schemaName));
-						setDescription(apiResponse.getDescription());
-					}
-				});
-		}
-
-		return apiResponses;
 	}
 
 	private Content _getContent(Content originalContent, String schemaName) {
@@ -272,15 +308,85 @@ public class ObjectEntryOpenAPIContributor implements OpenAPIContributor {
 		return content;
 	}
 
+	private ApiResponses _getObjectRelationshipApiResponses(
+		Operation operation, String schemaName) {
+
+		ApiResponses apiResponses = new ApiResponses();
+
+		ApiResponses operationApiResponses = operation.getResponses();
+
+		for (Map.Entry<String, ApiResponse> entry :
+				operationApiResponses.entrySet()) {
+
+			ApiResponse apiResponse = entry.getValue();
+
+			apiResponses.put(
+				entry.getKey(),
+				new ApiResponse() {
+					{
+						setContent(
+							_getContent(apiResponse.getContent(), schemaName));
+						setDescription(apiResponse.getDescription());
+					}
+				});
+		}
+
+		return apiResponses;
+	}
+
+	private Operation _getObjectRelationshipGetOperation(
+		ObjectRelationship objectRelationship, Operation operation,
+		String schemaName) {
+
+		return new Operation() {
+			{
+				operationId(
+					StringBundler.concat(
+						"get", _objectDefinition.getShortName(),
+						StringUtil.upperCaseFirstLetter(
+							objectRelationship.getName()),
+						schemaName, "Page"));
+				parameters(_getParameters(operation, schemaName));
+				responses(
+					_getObjectRelationshipApiResponses(
+						operation,
+						OpenAPIContributorUtil.getPageSchemaName(schemaName)));
+				tags(operation.getTags());
+			}
+		};
+	}
+
+	private Operation _getObjectRelationshipPutOperation(
+		ObjectRelationship objectRelationship, Operation operation,
+		String schemaName) {
+
+		return new Operation() {
+			{
+				operationId(
+					StringBundler.concat(
+						"put", _objectDefinition.getShortName(),
+						StringUtil.upperCaseFirstLetter(
+							objectRelationship.getName()),
+						schemaName));
+				parameters(_getParameters(operation, schemaName));
+				responses(
+					_getObjectRelationshipApiResponses(operation, schemaName));
+				tags(operation.getTags());
+			}
+		};
+	}
+
 	private List<Parameter> _getParameters(
-		Operation operation, ObjectDefinition relatedObjectDefinition) {
+		Operation operation, String schemaName) {
 
 		List<Parameter> parameters = new ArrayList<>();
 
 		for (Parameter parameter : operation.getParameters()) {
 			String parameterName = parameter.getName();
 
-			if (Objects.equals(parameterName, "objectRelationshipName")) {
+			if (Objects.equals(parameterName, "objectActionName") ||
+				Objects.equals(parameterName, "objectRelationshipName")) {
+
 				continue;
 			}
 
@@ -293,8 +399,7 @@ public class ObjectEntryOpenAPIContributor implements OpenAPIContributor {
 			else if (Objects.equals(parameterName, "relatedObjectEntryId")) {
 				parameterName = StringUtil.replace(
 					parameterName, "relatedObjectEntry",
-					StringUtil.lowerCaseFirstLetter(
-						relatedObjectDefinition.getShortName()));
+					StringUtil.lowerCaseFirstLetter(schemaName));
 			}
 
 			String finalParameterName = parameterName;
@@ -335,10 +440,13 @@ public class ObjectEntryOpenAPIContributor implements OpenAPIContributor {
 		return relatedObjectDefinitionsMap;
 	}
 
+	private final BundleContext _bundleContext;
+	private final ObjectActionLocalService _objectActionLocalService;
 	private final ObjectDefinition _objectDefinition;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryOpenAPIResource _objectEntryOpenAPIResource;
 	private final ObjectRelationshipLocalService
 		_objectRelationshipLocalService;
+	private final OpenAPIResource _openAPIResource;
 
 }

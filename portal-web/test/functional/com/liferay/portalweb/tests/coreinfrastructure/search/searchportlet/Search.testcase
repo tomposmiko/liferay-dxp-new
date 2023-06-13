@@ -312,6 +312,53 @@ definition {
 		Portlet.viewCannotAddPG(portletName = "Search Insights");
 	}
 
+	@description = "This is a use case for LPS-117767."
+	@priority = "3"
+	test AssertPaginationResetsAfterSelectingNewFacet {
+		var categoryId1 = JSONCategory.addCategory(
+			groupName = "Global",
+			title = "Category Name 1",
+			vocabularyName = "Topic");
+		var categoryId2 = JSONCategory.addCategory(
+			groupName = "Global",
+			title = "Category Name 2",
+			vocabularyName = "Topic");
+
+		for (var count : list "1,2") {
+			JSONDocument.addFileWithUploadedFile(
+				assetCategoryIds = "${categoryId1}",
+				dmDocumentDescription = "DM Document Description",
+				dmDocumentTitle = "DM Document Title 1_${count}",
+				groupName = "Guest",
+				mimeType = "image/jpg",
+				sourceFileName = "Document_${count}.jpg");
+		}
+
+		for (var count : list "1,2,3") {
+			JSONDocument.addFileWithUploadedFile(
+				assetCategoryIds = "${categoryId2}",
+				dmDocumentDescription = "DM Document Description",
+				dmDocumentTitle = "DM Document Title 2_${count}",
+				groupName = "Guest",
+				mimeType = "text/plain",
+				sourceFileName = "Document_${count}.txt");
+		}
+
+		SearchPortlets.searchEmbedded(searchTerm = "Category Name");
+
+		SearchResultPortlet.configureSearchResults(paginationDelta = "2");
+
+		Refresh();
+
+		SearchFacetPortlet.checkFacet(facetValueName = "Category Name 2");
+
+		Click(locator1 = "Pagination#NEXT_LINK");
+
+		SearchFacetPortlet.checkFacet(facetValueName = "Category Name 1");
+
+		Pagination.viewResults(results = "Showing 1 to 2 of 5 entries.");
+	}
+
 	@description = "This is a use case for LPS-130227."
 	@priority = "4"
 	test AssertPaginationURLforHTTPS {
@@ -575,6 +622,50 @@ definition {
 		AssertElementNotPresent(locator1 = "Portlet#ERROR");
 
 		AssertElementPresent(locator1 = "Search#EMBEDDED_SEARCH_BAR");
+	}
+
+	@description = "This is a use case for LPS-131302."
+	@priority = "3"
+	test CanDownloadDocumentsThroughSearchResultsPreview {
+		task ("Upload a PDF and a DOCX file") {
+			JSONDocument.addFileWithUploadedFile(
+				dmDocumentTitle = "DOCX File",
+				groupName = "Guest",
+				mimeType = "application/docx",
+				sourceFileName = "Document_1.docx");
+
+			JSONDocument.addFileWithUploadedFile(
+				dmDocumentTitle = "PDF File",
+				groupName = "Guest",
+				mimeType = "application/pdf",
+				sourceFileName = "Document_1.pdf");
+		}
+
+		task ("Search for the DOCX and PDF files and Assert 'Download' Button is Present") {
+			SearchPortlets.searchEmbedded(searchTerm = "DOCX File");
+
+			Search.gotoResultAssetViaTitle(searchAssetTitle = "DOCX File");
+
+			Button.click(button = "Info");
+
+			Button.viewPresent(button = "Download");
+
+			Button.click(button = "Download");
+
+			DMDocument.assertFileNameFromTempFolder(fileName = "Document_1.docx");
+
+			SearchPortlets.searchEmbedded(searchTerm = "PDF File");
+
+			Search.gotoResultAssetViaTitle(searchAssetTitle = "PDF File");
+
+			Button.click(button = "Info");
+
+			Button.viewPresent(button = "Download");
+
+			Button.click(button = "Download");
+
+			DMDocument.assertFileNameFromTempFolder(fileName = "Document_1.pdf");
+		}
 	}
 
 	@description = "This is a use case for LPS-151026."

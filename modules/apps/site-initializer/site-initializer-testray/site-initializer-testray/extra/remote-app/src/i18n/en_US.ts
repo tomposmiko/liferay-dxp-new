@@ -213,6 +213,8 @@ export default {
 	'metrics': 'Metrics',
 	'minimum-x-characters': 'Minimum {0} characters.',
 	'modified-date': 'Modified Date',
+	'move-selected-tests-to-a-new-subtask':
+		'Move selected tests to a new subtask.',
 	'name': 'Name',
 	'new-build': 'New Build',
 	'new-case': 'New Case',
@@ -300,6 +302,7 @@ export default {
 	'smart': 'Smart',
 	'smart-suite': 'Smart Suite',
 	'sorry-there-are-no-results-found': 'Sorry, there are no results found',
+	'split-tests': 'Split Tests',
 	'start-date': 'Start Date',
 	'start-test': 'Start Test',
 	'static': 'Static',
@@ -311,7 +314,7 @@ export default {
 	'subtask-details': 'Subtask Details',
 	'subtask-name': 'Subtask Name',
 	'subtask-x-must-be-assigned-to-you-to-be-user-id-a-merge':
-		'Subtask {0} must be assigned to you to be used in a merge.',
+		'Subtask {0} must be assigned to you to be used id a merge.',
 	'subtasks': 'Subtasks',
 	'suite': 'Suite',
 	'suite-name': 'Suite Name',
@@ -373,6 +376,7 @@ export default {
 	'update-x': 'Update {0}',
 	'updated': 'Updated',
 	'upload-csv': 'Upload CSV',
+	'user-group': 'User Group',
 	'user-groups': 'User Groups',
 	'user-information': 'User Information',
 	'users': 'Users',

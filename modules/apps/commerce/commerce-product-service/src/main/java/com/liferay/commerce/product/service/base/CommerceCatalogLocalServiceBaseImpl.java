@@ -275,48 +275,21 @@ public abstract class CommerceCatalogLocalServiceBaseImpl
 			uuid, companyId, null);
 	}
 
-	/**
-	 * Returns the commerce catalog with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the commerce catalog's external reference code
-	 * @return the matching commerce catalog, or <code>null</code> if a matching commerce catalog could not be found
-	 */
 	@Override
 	public CommerceCatalog fetchCommerceCatalogByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
-		return commerceCatalogPersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
+		return commerceCatalogPersistence.fetchByERC_C(
+			externalReferenceCode, companyId);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceCatalogByExternalReferenceCode(long, String)}
-	 */
-	@Deprecated
-	@Override
-	public CommerceCatalog fetchCommerceCatalogByReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return fetchCommerceCatalogByExternalReferenceCode(
-			companyId, externalReferenceCode);
-	}
-
-	/**
-	 * Returns the commerce catalog with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the commerce catalog's external reference code
-	 * @return the matching commerce catalog
-	 * @throws PortalException if a matching commerce catalog could not be found
-	 */
 	@Override
 	public CommerceCatalog getCommerceCatalogByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException {
 
-		return commerceCatalogPersistence.findByC_ERC(
-			companyId, externalReferenceCode);
+		return commerceCatalogPersistence.findByERC_C(
+			externalReferenceCode, companyId);
 	}
 
 	/**

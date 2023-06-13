@@ -420,8 +420,8 @@ public class OrganizationLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		Organization organization = organizationPersistence.fetchByC_ERC(
-			user.getCompanyId(), externalReferenceCode);
+		Organization organization = organizationPersistence.fetchByERC_C(
+			externalReferenceCode, user.getCompanyId());
 
 		if (organization == null) {
 			organization = addOrganization(

@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.inventory.service.persistence.impl;
 
+import com.liferay.commerce.inventory.exception.DuplicateCommerceInventoryWarehouseExternalReferenceCodeException;
 import com.liferay.commerce.inventory.exception.NoSuchInventoryWarehouseException;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseTable;
@@ -6166,35 +6167,35 @@ public class CommerceInventoryWarehousePersistenceImpl
 		_FINDER_COLUMN_C_A_C_COUNTRYTWOLETTERSISOCODE_3 =
 			"(commerceInventoryWarehouse.countryTwoLettersISOCode IS NULL OR commerceInventoryWarehouse.countryTwoLettersISOCode = '')";
 
-	private FinderPath _finderPathFetchByC_ERC;
-	private FinderPath _finderPathCountByC_ERC;
+	private FinderPath _finderPathFetchByERC_C;
+	private FinderPath _finderPathCountByERC_C;
 
 	/**
-	 * Returns the commerce inventory warehouse where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchInventoryWarehouseException</code> if it could not be found.
+	 * Returns the commerce inventory warehouse where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchInventoryWarehouseException</code> if it could not be found.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the matching commerce inventory warehouse
 	 * @throws NoSuchInventoryWarehouseException if a matching commerce inventory warehouse could not be found
 	 */
 	@Override
-	public CommerceInventoryWarehouse findByC_ERC(
-			long companyId, String externalReferenceCode)
+	public CommerceInventoryWarehouse findByERC_C(
+			String externalReferenceCode, long companyId)
 		throws NoSuchInventoryWarehouseException {
 
-		CommerceInventoryWarehouse commerceInventoryWarehouse = fetchByC_ERC(
-			companyId, externalReferenceCode);
+		CommerceInventoryWarehouse commerceInventoryWarehouse = fetchByERC_C(
+			externalReferenceCode, companyId);
 
 		if (commerceInventoryWarehouse == null) {
 			StringBundler sb = new StringBundler(6);
 
 			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			sb.append("companyId=");
-			sb.append(companyId);
-
-			sb.append(", externalReferenceCode=");
+			sb.append("externalReferenceCode=");
 			sb.append(externalReferenceCode);
+
+			sb.append(", companyId=");
+			sb.append(companyId);
 
 			sb.append("}");
 
@@ -6209,54 +6210,54 @@ public class CommerceInventoryWarehousePersistenceImpl
 	}
 
 	/**
-	 * Returns the commerce inventory warehouse where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the commerce inventory warehouse where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
 	 */
 	@Override
-	public CommerceInventoryWarehouse fetchByC_ERC(
-		long companyId, String externalReferenceCode) {
+	public CommerceInventoryWarehouse fetchByERC_C(
+		String externalReferenceCode, long companyId) {
 
-		return fetchByC_ERC(companyId, externalReferenceCode, true);
+		return fetchByERC_C(externalReferenceCode, companyId, true);
 	}
 
 	/**
-	 * Returns the commerce inventory warehouse where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the commerce inventory warehouse where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
 	 */
 	@Override
-	public CommerceInventoryWarehouse fetchByC_ERC(
-		long companyId, String externalReferenceCode, boolean useFinderCache) {
+	public CommerceInventoryWarehouse fetchByERC_C(
+		String externalReferenceCode, long companyId, boolean useFinderCache) {
 
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
 		Object[] finderArgs = null;
 
 		if (useFinderCache) {
-			finderArgs = new Object[] {companyId, externalReferenceCode};
+			finderArgs = new Object[] {externalReferenceCode, companyId};
 		}
 
 		Object result = null;
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByC_ERC, finderArgs, this);
+				_finderPathFetchByERC_C, finderArgs, this);
 		}
 
 		if (result instanceof CommerceInventoryWarehouse) {
 			CommerceInventoryWarehouse commerceInventoryWarehouse =
 				(CommerceInventoryWarehouse)result;
 
-			if ((companyId != commerceInventoryWarehouse.getCompanyId()) ||
-				!Objects.equals(
+			if (!Objects.equals(
 					externalReferenceCode,
-					commerceInventoryWarehouse.getExternalReferenceCode())) {
+					commerceInventoryWarehouse.getExternalReferenceCode()) ||
+				(companyId != commerceInventoryWarehouse.getCompanyId())) {
 
 				result = null;
 			}
@@ -6267,18 +6268,18 @@ public class CommerceInventoryWarehousePersistenceImpl
 
 			sb.append(_SQL_SELECT_COMMERCEINVENTORYWAREHOUSE_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
-
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
 			}
+
+			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -6291,18 +6292,18 @@ public class CommerceInventoryWarehousePersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(companyId);
-
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
+
+				queryPos.add(companyId);
 
 				List<CommerceInventoryWarehouse> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache) {
 						finderCache.putResult(
-							_finderPathFetchByC_ERC, finderArgs, list);
+							_finderPathFetchByERC_C, finderArgs, list);
 					}
 				}
 				else {
@@ -6331,37 +6332,37 @@ public class CommerceInventoryWarehousePersistenceImpl
 	}
 
 	/**
-	 * Removes the commerce inventory warehouse where companyId = &#63; and externalReferenceCode = &#63; from the database.
+	 * Removes the commerce inventory warehouse where externalReferenceCode = &#63; and companyId = &#63; from the database.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the commerce inventory warehouse that was removed
 	 */
 	@Override
-	public CommerceInventoryWarehouse removeByC_ERC(
-			long companyId, String externalReferenceCode)
+	public CommerceInventoryWarehouse removeByERC_C(
+			String externalReferenceCode, long companyId)
 		throws NoSuchInventoryWarehouseException {
 
-		CommerceInventoryWarehouse commerceInventoryWarehouse = findByC_ERC(
-			companyId, externalReferenceCode);
+		CommerceInventoryWarehouse commerceInventoryWarehouse = findByERC_C(
+			externalReferenceCode, companyId);
 
 		return remove(commerceInventoryWarehouse);
 	}
 
 	/**
-	 * Returns the number of commerce inventory warehouses where companyId = &#63; and externalReferenceCode = &#63;.
+	 * Returns the number of commerce inventory warehouses where externalReferenceCode = &#63; and companyId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the number of matching commerce inventory warehouses
 	 */
 	@Override
-	public int countByC_ERC(long companyId, String externalReferenceCode) {
+	public int countByERC_C(String externalReferenceCode, long companyId) {
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
-		FinderPath finderPath = _finderPathCountByC_ERC;
+		FinderPath finderPath = _finderPathCountByERC_C;
 
-		Object[] finderArgs = new Object[] {companyId, externalReferenceCode};
+		Object[] finderArgs = new Object[] {externalReferenceCode, companyId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -6370,18 +6371,18 @@ public class CommerceInventoryWarehousePersistenceImpl
 
 			sb.append(_SQL_COUNT_COMMERCEINVENTORYWAREHOUSE_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
-
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
 			}
+
+			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -6394,11 +6395,11 @@ public class CommerceInventoryWarehousePersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(companyId);
-
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
+
+				queryPos.add(companyId);
 
 				count = (Long)query.uniqueResult();
 
@@ -6415,14 +6416,14 @@ public class CommerceInventoryWarehousePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_ERC_COMPANYID_2 =
-		"commerceInventoryWarehouse.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2 =
+		"commerceInventoryWarehouse.externalReferenceCode = ? AND ";
 
-	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2 =
-		"commerceInventoryWarehouse.externalReferenceCode = ?";
+	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3 =
+		"(commerceInventoryWarehouse.externalReferenceCode IS NULL OR commerceInventoryWarehouse.externalReferenceCode = '') AND ";
 
-	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3 =
-		"(commerceInventoryWarehouse.externalReferenceCode IS NULL OR commerceInventoryWarehouse.externalReferenceCode = '')";
+	private static final String _FINDER_COLUMN_ERC_C_COMPANYID_2 =
+		"commerceInventoryWarehouse.companyId = ?";
 
 	public CommerceInventoryWarehousePersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
@@ -6457,10 +6458,10 @@ public class CommerceInventoryWarehousePersistenceImpl
 			commerceInventoryWarehouse);
 
 		finderCache.putResult(
-			_finderPathFetchByC_ERC,
+			_finderPathFetchByERC_C,
 			new Object[] {
-				commerceInventoryWarehouse.getCompanyId(),
-				commerceInventoryWarehouse.getExternalReferenceCode()
+				commerceInventoryWarehouse.getExternalReferenceCode(),
+				commerceInventoryWarehouse.getCompanyId()
 			},
 			commerceInventoryWarehouse);
 	}
@@ -6553,13 +6554,13 @@ public class CommerceInventoryWarehousePersistenceImpl
 			commerceInventoryWarehouseModelImpl) {
 
 		Object[] args = new Object[] {
-			commerceInventoryWarehouseModelImpl.getCompanyId(),
-			commerceInventoryWarehouseModelImpl.getExternalReferenceCode()
+			commerceInventoryWarehouseModelImpl.getExternalReferenceCode(),
+			commerceInventoryWarehouseModelImpl.getCompanyId()
 		};
 
-		finderCache.putResult(_finderPathCountByC_ERC, args, Long.valueOf(1));
+		finderCache.putResult(_finderPathCountByERC_C, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathFetchByC_ERC, args, commerceInventoryWarehouseModelImpl);
+			_finderPathFetchByERC_C, args, commerceInventoryWarehouseModelImpl);
 	}
 
 	/**
@@ -6718,6 +6719,34 @@ public class CommerceInventoryWarehousePersistenceImpl
 
 			commerceInventoryWarehouse.setExternalReferenceCode(
 				commerceInventoryWarehouse.getUuid());
+		}
+		else {
+			CommerceInventoryWarehouse ercCommerceInventoryWarehouse =
+				fetchByERC_C(
+					commerceInventoryWarehouse.getExternalReferenceCode(),
+					commerceInventoryWarehouse.getCompanyId());
+
+			if (isNew) {
+				if (ercCommerceInventoryWarehouse != null) {
+					throw new DuplicateCommerceInventoryWarehouseExternalReferenceCodeException(
+						"Duplicate commerce inventory warehouse with external reference code " +
+							commerceInventoryWarehouse.
+								getExternalReferenceCode());
+				}
+			}
+			else {
+				if ((ercCommerceInventoryWarehouse != null) &&
+					(commerceInventoryWarehouse.
+						getCommerceInventoryWarehouseId() !=
+							ercCommerceInventoryWarehouse.
+								getCommerceInventoryWarehouseId())) {
+
+					throw new DuplicateCommerceInventoryWarehouseExternalReferenceCodeException(
+						"Duplicate commerce inventory warehouse with external reference code " +
+							commerceInventoryWarehouse.
+								getExternalReferenceCode());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =
@@ -7186,15 +7215,15 @@ public class CommerceInventoryWarehousePersistenceImpl
 			new String[] {"companyId", "active_", "countryTwoLettersISOCode"},
 			false);
 
-		_finderPathFetchByC_ERC = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByC_ERC",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "externalReferenceCode"}, true);
+		_finderPathFetchByERC_C = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByERC_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"externalReferenceCode", "companyId"}, true);
 
-		_finderPathCountByC_ERC = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_ERC",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "externalReferenceCode"}, false);
+		_finderPathCountByERC_C = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByERC_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"externalReferenceCode", "companyId"}, false);
 
 		_setCommerceInventoryWarehouseUtilPersistence(this);
 	}

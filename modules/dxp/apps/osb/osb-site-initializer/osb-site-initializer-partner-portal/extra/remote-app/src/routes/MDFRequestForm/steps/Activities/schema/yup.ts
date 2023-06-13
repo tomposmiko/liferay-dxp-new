@@ -9,10 +9,10 @@
  * distribution rights of the Software.
  */
 
-import {OptionHTMLAttributes} from 'react';
 import {array, date, number, object, string} from 'yup';
 
 import {TypeActivityKey} from '../../../../../common/enums/TypeActivityKey';
+import LiferayPicklist from '../../../../../common/interfaces/liferayPicklist';
 import isObjectEmpty from '../../../../../common/utils/isObjectEmpty';
 
 const activitiesSchema = object({
@@ -20,28 +20,30 @@ const activitiesSchema = object({
 		.of(
 			object({
 				activityPromotion: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) => typeActivity.value === TypeActivityKey.EVENT,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.EVENT,
 					then: (schema) =>
 						schema
+							.trim()
 							.max(255, 'You have exceeded the character limit')
 							.required('Required'),
 				}),
 				assetsLiferayRequired: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) =>
-						typeActivity.value ===
-						TypeActivityKey.DIGITAL_MARKETING,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.DIGITAL_MARKETING,
 					then: (schema) => schema.required('Required'),
 				}),
 				budgets: array()
 					.of(
 						object({
 							cost: number()
+								.max(
+									999999999,
+									'The value cannot be greater than 9,999,999.99'
+								)
 								.moreThan(0, 'Required')
 								.required('Required'),
+
 							expense: object({
 								key: string(),
 								name: string(),
@@ -54,16 +56,17 @@ const activitiesSchema = object({
 					)
 					.min(1, 'Required'),
 				description: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) => typeActivity.value === TypeActivityKey.EVENT,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.EVENT,
 					then: (schema) =>
 						schema
+							.trim()
 							.max(255, 'You have exceeded the character limit')
 							.required('Required'),
 				}),
 				detailsLeadFollowUp: string()
 					.max(255, 'You have exceeded the character limit')
+					.trim()
 					.required('Required'),
 				endDate: date()
 					.test(
@@ -126,61 +129,48 @@ const activitiesSchema = object({
 					)
 					.required('Required'),
 				gatedLandingPage: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) =>
-						typeActivity.value ===
-						TypeActivityKey.CONTENT_MARKETING,
-					then: (schema) => schema.required('Required'),
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.CONTENT_MARKETING,
+					then: (schema) => schema.required('Required').trim(),
 				}),
 				goalOfContent: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) =>
-						typeActivity.value ===
-						TypeActivityKey.CONTENT_MARKETING,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.CONTENT_MARKETING,
 					then: (schema) =>
 						schema
+							.trim()
 							.max(255, 'You have exceeded the character limit')
 							.required('Required'),
 				}),
 				hiringOutsideWriterOrAgency: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) =>
-						typeActivity.value ===
-						TypeActivityKey.CONTENT_MARKETING,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.CONTENT_MARKETING,
 					then: (schema) => schema.required('Required'),
 				}),
 				howLiferayBrandUsed: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) =>
-						typeActivity.value ===
-						TypeActivityKey.DIGITAL_MARKETING,
-					then: (schema) => schema.required('Required'),
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.DIGITAL_MARKETING,
+					then: (schema) => schema.required('Required').trim(),
 				}),
 				leadFollowUpStrategies: array().min(1, 'Required'),
 				leadGenerated: string().required('Required'),
 				liferayBranding: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) => typeActivity.value === TypeActivityKey.EVENT,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.EVENT,
 					then: (schema) =>
 						schema
+							.trim()
 							.max(255, 'You have exceeded the character limit')
 							.required('Required'),
 				}),
 				liferayParticipationRequirements: string().when(
 					'typeActivity',
 					{
-						is: (
-							typeActivity: OptionHTMLAttributes<
-								HTMLOptionElement
-							>
-						) => typeActivity.value === TypeActivityKey.EVENT,
+						is: (typeActivity: LiferayPicklist) =>
+							typeActivity.key === TypeActivityKey.EVENT,
 						then: (schema) =>
 							schema
+								.trim()
 								.max(
 									255,
 									'You have exceeded the character limit'
@@ -189,11 +179,11 @@ const activitiesSchema = object({
 					}
 				),
 				location: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) => typeActivity.value === TypeActivityKey.EVENT,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.EVENT,
 					then: (schema) =>
 						schema
+							.trim()
 							.max(255, 'You have exceeded the character limit')
 							.required('Required'),
 				}),
@@ -215,47 +205,42 @@ const activitiesSchema = object({
 						}
 					),
 				name: string()
+					.trim()
 					.max(255, 'You have exceeded the character limit')
 					.required('Required'),
 				overallMessageContentCTA: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) =>
-						typeActivity.value ===
-						TypeActivityKey.DIGITAL_MARKETING,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.DIGITAL_MARKETING,
 					then: (schema) =>
 						schema
+							.trim()
 							.max(255, 'You have exceeded the character limit')
 							.required('Required'),
 				}),
 				primaryThemeOrMessage: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) =>
-						typeActivity.value ===
-						TypeActivityKey.CONTENT_MARKETING,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.CONTENT_MARKETING,
 					then: (schema) =>
 						schema
+							.trim()
 							.max(255, 'You have exceeded the character limit')
 							.required('Required'),
 				}),
 				sourceAndSizeOfInviteeList: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) => typeActivity.value === TypeActivityKey.EVENT,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.EVENT,
 					then: (schema) =>
 						schema
+							.trim()
 							.max(255, 'You have exceeded the character limit')
 							.required('Required'),
 				}),
 				specificSites: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) =>
-						typeActivity.value ===
-						TypeActivityKey.DIGITAL_MARKETING,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.DIGITAL_MARKETING,
 					then: (schema) =>
 						schema
+							.trim()
 							.max(255, 'You have exceeded the character limit')
 							.required('Required'),
 				}),
@@ -297,6 +282,7 @@ const activitiesSchema = object({
 					(value) => !isObjectEmpty(value)
 				),
 				targetOfLeads: string()
+					.trim()
 					.max(255, 'You have exceeded the character limit')
 					.required('Required'),
 				typeActivity: object({
@@ -309,11 +295,11 @@ const activitiesSchema = object({
 					(value) => !isObjectEmpty(value)
 				),
 				venueName: string().when('typeActivity', {
-					is: (
-						typeActivity: OptionHTMLAttributes<HTMLOptionElement>
-					) => typeActivity.value === TypeActivityKey.EVENT,
+					is: (typeActivity: LiferayPicklist) =>
+						typeActivity.key === TypeActivityKey.EVENT,
 					then: (schema) =>
 						schema
+							.trim()
 							.max(255, 'You have exceeded the character limit')
 							.required('Required'),
 				}),

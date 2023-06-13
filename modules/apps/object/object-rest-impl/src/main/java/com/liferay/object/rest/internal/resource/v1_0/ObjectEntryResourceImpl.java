@@ -14,6 +14,8 @@
 
 package com.liferay.object.rest.internal.resource.v1_0;
 
+import com.liferay.object.action.engine.ObjectActionEngine;
+import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.entry.util.ObjectEntryNameUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
@@ -32,11 +34,16 @@ import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.sql.dsl.expression.Predicate;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
@@ -60,7 +67,8 @@ import javax.ws.rs.core.MultivaluedMap;
 public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 
 	public ObjectEntryResourceImpl(
-		FilterPredicateFactory filterPredicateFactory,
+		FilterPredicateFactory filterPredicateFactory, JSONFactory jsonFactory,
+		ObjectActionEngine objectActionEngine,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectEntryManagerRegistry objectEntryManagerRegistry,
@@ -71,6 +79,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			systemObjectDefinitionMetadataRegistry) {
 
 		_filterPredicateFactory = filterPredicateFactory;
+		_jsonFactory = jsonFactory;
+		_objectActionEngine = objectActionEngine;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
 		_objectEntryManagerRegistry = objectEntryManagerRegistry;
@@ -184,39 +194,6 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		return objectEntryManager.getObjectEntry(
 			_getDTOConverterContext(null), externalReferenceCode,
 			contextCompany.getCompanyId(), _objectDefinition, null);
-	}
-
-	@Override
-	public Page<ObjectEntry> getCurrentObjectEntriesObjectRelationshipNamePage(
-			Long currentObjectEntryId, String objectRelationshipName,
-			Pagination pagination)
-		throws Exception {
-
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		Page<ObjectEntry> page =
-			objectEntryManager.getObjectEntryRelatedObjectEntries(
-				_getDTOConverterContext(currentObjectEntryId),
-				_objectDefinition, currentObjectEntryId, objectRelationshipName,
-				pagination);
-
-		ObjectRelationship objectRelationship =
-			_objectRelationshipService.getObjectRelationship(
-				_objectDefinition.getObjectDefinitionId(),
-				objectRelationshipName);
-
-		ObjectDefinition objectDefinition2 =
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectRelationship.getObjectDefinitionId2());
-
-		return Page.of(
-			page.getActions(),
-			transform(
-				page.getItems(),
-				objectEntry -> _getRelatedObjectEntry(
-					objectDefinition2, objectEntry)));
 	}
 
 	@Override
@@ -364,32 +341,24 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectRelationship.getObjectDefinitionId2()),
 			objectEntryManager.addObjectRelationshipMappingTableValues(
-				_getDTOConverterContext(primaryKey1), _objectDefinition,
-				objectRelationshipName, primaryKey1, primaryKey2));
+				_getDTOConverterContext(primaryKey1), objectRelationship,
+				primaryKey1, primaryKey2));
 	}
 
 	@Override
-	public ObjectEntry putCurrentObjectEntry(
-			Long currentObjectEntryId, String objectRelationshipName,
-			Long relatedObjectEntryId)
+	public void
+			putByExternalReferenceCodeObjectEntryExternalReferenceCodeObjectActionObjectActionName(
+				String objectEntryExternalReferenceCode,
+				String objectActionName)
 		throws Exception {
 
-		ObjectRelationship objectRelationship =
-			_objectRelationshipService.getObjectRelationship(
-				_objectDefinition.getObjectDefinitionId(),
-				objectRelationshipName);
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-166918"))) {
+			throw new UnsupportedOperationException();
+		}
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return _getRelatedObjectEntry(
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectRelationship.getObjectDefinitionId2()),
-			objectEntryManager.addObjectRelationshipMappingTableValues(
-				_getDTOConverterContext(currentObjectEntryId),
-				_objectDefinition, objectRelationshipName, currentObjectEntryId,
-				relatedObjectEntryId));
+		_executeObjectAction(
+			objectActionName,
+			getByExternalReferenceCode(objectEntryExternalReferenceCode));
 	}
 
 	@Override
@@ -404,6 +373,18 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		return objectEntryManager.updateObjectEntry(
 			_getDTOConverterContext(objectEntryId), _objectDefinition,
 			objectEntryId, objectEntry);
+	}
+
+	@Override
+	public void putObjectEntryObjectActionObjectActionName(
+			Long objectEntryId, String objectActionName)
+		throws Exception {
+
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-166918"))) {
+			throw new UnsupportedOperationException();
+		}
+
+		_executeObjectAction(objectActionName, getObjectEntry(objectEntryId));
 	}
 
 	@Override
@@ -474,6 +455,37 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 
 		return ObjectDefinition.class.getName() + "#" +
 			_objectDefinition.getObjectDefinitionId();
+	}
+
+	private void _executeObjectAction(
+			String objectActionName, ObjectEntry objectEntry)
+		throws Exception {
+
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryLocalService.getObjectEntry(objectEntry.getId());
+
+		_objectActionEngine.executeObjectAction(
+			objectActionName, ObjectActionTriggerConstants.KEY_STANDALONE,
+			_objectDefinition.getObjectDefinitionId(),
+			JSONUtil.put(
+				"classPK", serviceBuilderObjectEntry.getObjectEntryId()
+			).put(
+				"objectEntry",
+				HashMapBuilder.putAll(
+					serviceBuilderObjectEntry.getModelAttributes()
+				).put(
+					"values", serviceBuilderObjectEntry.getValues()
+				).build()
+			).put(
+				"objectEntryDTO" + _objectDefinition.getShortName(),
+				() -> {
+					JSONObject jsonObject = _jsonFactory.createJSONObject(
+						_jsonFactory.looseSerializeDeep(objectEntry));
+
+					return jsonObject.toMap();
+				}
+			),
+			contextUser.getUserId());
 	}
 
 	private DefaultDTOConverterContext _getDTOConverterContext(
@@ -581,6 +593,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	private final FilterPredicateFactory _filterPredicateFactory;
+	private final JSONFactory _jsonFactory;
+	private final ObjectActionEngine _objectActionEngine;
 
 	@Context
 	private ObjectDefinition _objectDefinition;

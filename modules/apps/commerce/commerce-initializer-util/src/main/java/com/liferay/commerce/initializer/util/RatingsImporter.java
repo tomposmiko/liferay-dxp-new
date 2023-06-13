@@ -134,8 +134,9 @@ public class RatingsImporter {
 
 		// Retrieve CPDefinition
 
-		CProduct cProduct = _cProductLocalService.fetchCProductByReferenceCode(
-			serviceContext.getCompanyId(), externalReferenceId);
+		CProduct cProduct =
+			_cProductLocalService.fetchCProductByExternalReferenceCode(
+				externalReferenceId, serviceContext.getCompanyId());
 
 		if (cProduct == null) {
 			return;

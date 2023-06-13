@@ -96,7 +96,7 @@ public class NotificationUtil {
 		if (serviceBuilderNotificationTemplate == null) {
 			serviceBuilderNotificationTemplate =
 				NotificationTemplateLocalServiceUtil.createNotificationTemplate(
-					CounterLocalServiceUtil.increment());
+					0L);
 		}
 
 		serviceBuilderNotificationTemplate.setCompanyId(user.getCompanyId());

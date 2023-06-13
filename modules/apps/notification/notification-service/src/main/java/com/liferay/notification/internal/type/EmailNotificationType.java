@@ -16,12 +16,18 @@ package com.liferay.notification.internal.type;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.info.field.InfoField;
+import com.liferay.info.field.InfoFieldValue;
+import com.liferay.info.item.InfoItemFieldValues;
+import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.mail.kernel.model.MailMessage;
 import com.liferay.mail.kernel.service.MailService;
 import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationPortletKeys;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
-import com.liferay.notification.constants.NotificationTermContributorConstants;
+import com.liferay.notification.constants.NotificationTemplateConstants;
+import com.liferay.notification.constants.NotificationTermEvaluatorConstants;
 import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.exception.NotificationTemplateFromException;
 import com.liferay.notification.model.NotificationQueueEntry;
@@ -34,7 +40,6 @@ import com.liferay.notification.service.NotificationQueueEntryAttachmentLocalSer
 import com.liferay.notification.service.NotificationTemplateAttachmentLocalService;
 import com.liferay.notification.type.BaseNotificationType;
 import com.liferay.notification.type.NotificationType;
-import com.liferay.notification.util.LocalizedMapUtil;
 import com.liferay.notification.util.NotificationRecipientSettingUtil;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -50,7 +55,15 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.EmailAddressValidator;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.template.StringTemplateResource;
+import com.liferay.portal.kernel.template.Template;
+import com.liferay.portal.kernel.template.TemplateConstants;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.templateparser.TemplateNode;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -58,13 +71,18 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.EmailAddressValidatorFactory;
+import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.display.template.PortletDisplayTemplate;
+import com.liferay.template.transformer.TemplateNodeFactory;
+
+import java.io.StringWriter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,50 +95,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Feliphe Marinho
  */
-@Component(
-	immediate = true,
-	property = "notification.type.key=" + NotificationConstants.TYPE_EMAIL,
-	service = NotificationType.class
-)
+@Component(immediate = true, service = NotificationType.class)
 public class EmailNotificationType extends BaseNotificationType {
-
-	@Override
-	public List<NotificationRecipientSetting>
-		createNotificationRecipientSettings(
-			long notificationRecipientId, Object[] recipients, User user) {
-
-		List<NotificationRecipientSetting> notificationRecipientSettings =
-			new ArrayList<>();
-
-		Map<String, Object> recipientsMap = (Map<String, Object>)recipients[0];
-
-		for (Map.Entry<String, Object> entry : recipientsMap.entrySet()) {
-			NotificationRecipientSetting notificationRecipientSetting =
-				notificationRecipientSettingLocalService.
-					createNotificationRecipientSetting(0L);
-
-			notificationRecipientSetting.setCompanyId(user.getCompanyId());
-			notificationRecipientSetting.setUserId(user.getUserId());
-			notificationRecipientSetting.setUserName(user.getFullName());
-			notificationRecipientSetting.setNotificationRecipientId(
-				notificationRecipientId);
-			notificationRecipientSetting.setName(entry.getKey());
-
-			if (entry.getValue() instanceof String) {
-				notificationRecipientSetting.setValue(
-					String.valueOf(entry.getValue()));
-			}
-			else {
-				notificationRecipientSetting.setValueMap(
-					LocalizedMapUtil.getLocalizedMap(
-						(LinkedHashMap)entry.getValue()));
-			}
-
-			notificationRecipientSettings.add(notificationRecipientSetting);
-		}
-
-		return notificationRecipientSettings;
-	}
 
 	@Override
 	public String getFromName(NotificationQueueEntry notificationQueueEntry) {
@@ -173,7 +149,7 @@ public class EmailNotificationType extends BaseNotificationType {
 		NotificationTemplate notificationTemplate =
 			notificationContext.getNotificationTemplate();
 
-		String body = formatLocalizedContent(
+		String body = _formatBody(
 			notificationTemplate.getBodyMap(), notificationContext);
 		NotificationRecipient notificationRecipient =
 			notificationTemplate.getNotificationRecipient();
@@ -222,7 +198,7 @@ public class EmailNotificationType extends BaseNotificationType {
 
 					String to = _formatTo(
 						notificationRecipientSetting.getValue(user.getLocale()),
-						user.getLocale(), notificationContext);
+						notificationContext);
 
 					if (Validator.isNotNull(to)) {
 						return to;
@@ -231,8 +207,7 @@ public class EmailNotificationType extends BaseNotificationType {
 					return formatLocalizedContent(
 						notificationRecipientSetting.getValue(
 							siteDefaultLocale),
-						siteDefaultLocale,
-						NotificationTermContributorConstants.RECIPIENT,
+						NotificationTermEvaluatorConstants.RECIPIENT,
 						notificationContext);
 				}
 			).build();
@@ -395,8 +370,75 @@ public class EmailNotificationType extends BaseNotificationType {
 		}
 	}
 
-	private String _formatTo(
-			String to, Locale locale, NotificationContext notificationContext)
+	private String _formatBody(
+			Map<Locale, String> bodyMap,
+			NotificationContext notificationContext)
+		throws PortalException {
+
+		NotificationTemplate notificationTemplate =
+			notificationContext.getNotificationTemplate();
+
+		if (Objects.equals(
+				NotificationTemplateConstants.EDITOR_TYPE_RICH_TEXT,
+				notificationTemplate.getEditorType())) {
+
+			return formatLocalizedContent(bodyMap, notificationContext);
+		}
+
+		String body = notificationTemplate.getBody(userLocale);
+
+		if (Validator.isNull(body)) {
+			body = notificationTemplate.getBody(siteDefaultLocale);
+		}
+
+		Template template = TemplateManagerUtil.getTemplate(
+			TemplateConstants.LANG_TYPE_FTL,
+			new StringTemplateResource(
+				NotificationTemplate.class.getName() + StringPool.POUND +
+					notificationTemplate.getNotificationTemplateId(),
+				body),
+			PropsValues.NOTIFICATION_EMAIL_TEMPLATE_RESTRICTED);
+
+		InfoItemFieldValuesProvider<Object> infoItemFieldValuesProvider =
+			_infoItemServiceRegistry.getFirstInfoItemService(
+				InfoItemFieldValuesProvider.class,
+				notificationContext.getClassName());
+		PersistedModelLocalService persistedModelLocalService =
+			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
+				notificationContext.getClassName());
+
+		InfoItemFieldValues infoItemFieldValues =
+			infoItemFieldValuesProvider.getInfoItemFieldValues(
+				persistedModelLocalService.getPersistedModel(
+					notificationContext.getClassPK()));
+
+		for (InfoFieldValue<Object> infoFieldValue :
+				infoItemFieldValues.getInfoFieldValues()) {
+
+			InfoField<?> infoField = infoFieldValue.getInfoField();
+
+			if (StringUtil.startsWith(
+					infoField.getName(),
+					PortletDisplayTemplate.DISPLAY_STYLE_PREFIX)) {
+
+				continue;
+			}
+
+			TemplateNode templateNode = _templateNodeFactory.createTemplateNode(
+				infoFieldValue, new ThemeDisplay());
+
+			template.put(infoField.getName(), templateNode);
+			template.put(infoField.getUniqueId(), templateNode);
+		}
+
+		StringWriter stringWriter = new StringWriter();
+
+		template.processTemplate(stringWriter);
+
+		return stringWriter.toString();
+	}
+
+	private String _formatTo(String to, NotificationContext notificationContext)
 		throws PortalException {
 
 		if (Validator.isNull(to)) {
@@ -412,9 +454,8 @@ public class EmailNotificationType extends BaseNotificationType {
 		}
 
 		return formatLocalizedContent(
-			StringUtil.merge(emailAddresses), locale,
-			NotificationTermContributorConstants.RECIPIENT,
-			notificationContext);
+			StringUtil.merge(emailAddresses),
+			NotificationTermEvaluatorConstants.RECIPIENT, notificationContext);
 	}
 
 	private List<Long> _getFileEntryIds(
@@ -516,6 +557,9 @@ public class EmailNotificationType extends BaseNotificationType {
 	private GroupLocalService _groupLocalService;
 
 	@Reference
+	private InfoItemServiceRegistry _infoItemServiceRegistry;
+
+	@Reference
 	private MailService _mailService;
 
 	@Reference
@@ -530,6 +574,13 @@ public class EmailNotificationType extends BaseNotificationType {
 	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Reference
+	private PersistedModelLocalServiceRegistry
+		_persistedModelLocalServiceRegistry;
+
+	@Reference
 	private PortletFileRepository _portletFileRepository;
+
+	@Reference
+	private TemplateNodeFactory _templateNodeFactory;
 
 }

@@ -12,27 +12,19 @@
  * details.
  */
 
-import React from 'react';
-export declare type TColumn = {
-	expanded: boolean;
-	label: string;
-	sortable?: boolean;
-	value: string;
-};
-export declare type TItem = {
-	checked: boolean;
-	columns: string[];
-	disabled: boolean;
-	id: string;
-};
-interface ITableProps {
+/// <reference types="react" />
+
+import {TColumn, TFormattedItems, TItem, TTableRequestParams} from './types';
+interface ITableProps<TRawItem> {
 	columns: TColumn[];
 	disabled?: boolean;
 	emptyStateTitle: string;
-	fetchFn: (queryString?: string) => Promise<any>;
-	mapperItems: (items: any) => TItem[];
+	mapperItems: (items: TRawItem[]) => TItem[];
 	noResultsTitle: string;
-	onItemsChange?: (items: TItem[]) => void;
+	onItemsChange?: (items: TFormattedItems) => void;
+	requestFn: (params: TTableRequestParams) => Promise<any>;
 }
-declare const TableWrapper: React.FC<ITableProps>;
+declare function TableWrapper<TRawItem>(
+	props: ITableProps<TRawItem>
+): JSX.Element;
 export default TableWrapper;

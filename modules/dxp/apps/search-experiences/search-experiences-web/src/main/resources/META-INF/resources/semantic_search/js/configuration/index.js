@@ -13,10 +13,11 @@ import ClayForm, {ClayCheckbox} from '@clayui/form';
 import {useFormik} from 'formik';
 import React from 'react';
 
+import {LearnMessageWithoutContext} from '../../../sxp_blueprint_admin/js/shared/LearnMessage';
 import {sub} from '../../../sxp_blueprint_admin/js/utils/language';
 import Input from './Input';
 import TestConfigurationButton from './TestConfigurationButton';
-import {SENTENCE_TRANSFORM_PROVIDER_TYPES} from './constants';
+import {SENTENCE_TRANSFORMER_TYPES} from './constants';
 
 /**
  * Formats the object into an array of label and value, important for inputs
@@ -51,7 +52,7 @@ const transformToLabelValueArray = (items = {}) => {
 };
 
 /**
- * Form within semantic search settings page, configures transform provider and
+ * Form within semantic search settings page, configures sentence transformer and
  * indexing settings.
  * This can be found on: System Settings > Search Experiences > Semantic Search
  */
@@ -60,18 +61,18 @@ export default function ({
 	availableAssetEntryClassNames,
 	availableEmbeddingVectorDimensions,
 	availableLanguageDisplayNames,
-	availableSentenceTransformProviders,
+	availableSentenceTransformers,
 	availableTextTruncationStrategies,
 	cacheTimeout = '',
 	embeddingVectorDimensions,
-	enableGPU,
 	huggingFaceAccessToken,
+	learnMessages,
 	languageIds,
 	maxCharacterCount = '',
 	model,
 	modelTimeout = '',
 	namespace = '',
-	sentenceTransformProvider = SENTENCE_TRANSFORM_PROVIDER_TYPES.HUGGING_FACE_INFERENCE_API,
+	sentenceTransformer = SENTENCE_TRANSFORMER_TYPES.HUGGING_FACE_INFERENCE_API,
 	sentenceTransformerEnabled,
 	textTruncationStrategy,
 	txtaiHostAddress,
@@ -162,8 +163,8 @@ export default function ({
 
 		if (
 			values.modelTimeout === '' &&
-			values.sentenceTransformProvider ===
-				SENTENCE_TRANSFORM_PROVIDER_TYPES.HUGGING_FACE_INFERENCE_API
+			values.sentenceTransformer ===
+				SENTENCE_TRANSFORMER_TYPES.HUGGING_FACE_INFERENCE_API
 		) {
 			errors.modelTimeout = Liferay.Language.get(
 				'this-field-is-required'
@@ -197,13 +198,12 @@ export default function ({
 			assetEntryClassNames,
 			cacheTimeout,
 			embeddingVectorDimensions,
-			enableGPU,
 			huggingFaceAccessToken,
 			languageIds,
 			maxCharacterCount,
 			model,
 			modelTimeout,
-			sentenceTransformProvider,
+			sentenceTransformer,
 			sentenceTransformerEnabled,
 			textTruncationStrategy,
 			txtaiHostAddress,
@@ -230,7 +230,7 @@ export default function ({
 		<div className="semantic-search-settings-root">
 			<div className="sheet-section">
 				<h3 className="sheet-subtitle">
-					{Liferay.Language.get('transform-provider-settings')}
+					{Liferay.Language.get('sentence-transformer-settings')}
 				</h3>
 
 				<ClayForm.Group>
@@ -251,20 +251,37 @@ export default function ({
 				</ClayForm.Group>
 
 				<Input
-					error={formik.errors.sentenceTransformProvider}
+					error={formik.errors.sentenceTransformer}
 					items={transformToLabelValueArray(
-						availableSentenceTransformProviders
+						availableSentenceTransformers
 					)}
-					label={Liferay.Language.get('sentence-transform-provider')}
-					name={`${namespace}sentenceTransformProvider`}
-					onBlur={_handleInputBlur('sentenceTransformProvider')}
-					onChange={_handleInputChange('sentenceTransformProvider')}
+					label={Liferay.Language.get('sentence-transformer')}
+					name={`${namespace}sentenceTransformer`}
+					onBlur={_handleInputBlur('sentenceTransformer')}
+					onChange={_handleInputChange('sentenceTransformer')}
 					type="select"
-					value={formik.values.sentenceTransformProvider}
-				/>
+					value={formik.values.sentenceTransformer}
+				>
+					{formik.values.sentenceTransformer ===
+						SENTENCE_TRANSFORMER_TYPES.HUGGING_FACE_INFERENCE_API && (
+						<ClayForm.FeedbackGroup>
+							<ClayForm.Text>
+								{Liferay.Language.get(
+									'sentence-transformer-hugging-face-help'
+								)}
 
-				{formik.values.sentenceTransformProvider ===
-					SENTENCE_TRANSFORM_PROVIDER_TYPES.TXTAI && (
+								<LearnMessageWithoutContext
+									className="ml-1"
+									learnMessages={learnMessages}
+									resourceKey="semantic-search"
+								/>
+							</ClayForm.Text>
+						</ClayForm.FeedbackGroup>
+					)}
+				</Input>
+
+				{formik.values.sentenceTransformer ===
+					SENTENCE_TRANSFORMER_TYPES.TXTAI && (
 					<>
 						<Input
 							error={formik.errors.txtaiHostAddress}
@@ -305,8 +322,8 @@ export default function ({
 					</>
 				)}
 
-				{formik.values.sentenceTransformProvider ===
-					SENTENCE_TRANSFORM_PROVIDER_TYPES.HUGGING_FACE_INFERENCE_API && (
+				{formik.values.sentenceTransformer ===
+					SENTENCE_TRANSFORMER_TYPES.HUGGING_FACE_INFERENCE_API && (
 					<>
 						<Input
 							error={formik.errors.huggingFaceAccessToken}
@@ -325,9 +342,6 @@ export default function ({
 
 						<Input
 							error={formik.errors.model}
-							formText={Liferay.Language.get(
-								'begin-typing-and-select-a-model'
-							)}
 							helpText={Liferay.Language.get(
 								'sentence-transformer-model-help'
 							)}
@@ -339,7 +353,15 @@ export default function ({
 							touched={formik.touched.model}
 							type="model"
 							value={formik.values.model}
-						/>
+						>
+							<ClayForm.FeedbackGroup>
+								<ClayForm.Text>
+									{Liferay.Language.get(
+										'begin-typing-and-select-a-model'
+									)}
+								</ClayForm.Text>
+							</ClayForm.FeedbackGroup>
+						</Input>
 
 						<Input
 							error={formik.errors.modelTimeout}
@@ -356,25 +378,6 @@ export default function ({
 							type="number"
 							value={formik.values.modelTimeout}
 						/>
-
-						<ClayForm.Group>
-							<ClayCheckbox
-								aria-label={Liferay.Language.get('enable-gpu')}
-								checked={!!formik.values.enableGPU}
-								label={Liferay.Language.get('enable-gpu')}
-								name={`${namespace}enableGPU`}
-								onChange={_handleCheckboxChange('enableGPU')}
-								value={!!formik.values.enableGPU}
-							/>
-
-							<ClayForm.FeedbackGroup>
-								<ClayForm.Text>
-									{Liferay.Language.get(
-										'sentence-transformer-enable-gpu-help'
-									)}
-								</ClayForm.Text>
-							</ClayForm.FeedbackGroup>
-						</ClayForm.Group>
 					</>
 				)}
 
@@ -396,14 +399,13 @@ export default function ({
 
 				<TestConfigurationButton
 					assetEntryClassNames={formik.values.assetEntryClassNames}
-					availableSentenceTransformProviders={
-						availableSentenceTransformProviders
+					availableSentenceTransformers={
+						availableSentenceTransformers
 					}
 					cacheTimeout={formik.values.cacheTimeout}
 					embeddingVectorDimensions={
 						formik.values.embeddingVectorDimensions
 					}
-					enableGPU={formik.values.enableGPU}
 					errors={formik.errors}
 					huggingFaceAccessToken={
 						formik.values.huggingFaceAccessToken
@@ -412,9 +414,7 @@ export default function ({
 					maxCharacterCount={formik.values.maxCharacterCount}
 					model={formik.values.model}
 					modelTimeout={formik.values.modelTimeout}
-					sentenceTransformProvider={
-						formik.values.sentenceTransformProvider
-					}
+					sentenceTransformer={formik.values.sentenceTransformer}
 					sentenceTransformerEnabled={
 						formik.values.sentenceTransformerEnabled
 					}
@@ -422,12 +422,14 @@ export default function ({
 						formik.values.textTruncationStrategy
 					}
 					txtaiHostAddress={formik.values.txtaiHostAddress}
+					txtaiPassword={formik.values.txtaiPassword}
+					txtaiUsername={formik.values.txtaiUsername}
 				/>
 			</div>
 
 			<div className="sheet-section">
 				<h3 className="sheet-subtitle">
-					{Liferay.Language.get('indexing-settings')}
+					{Liferay.Language.get('index-settings')}
 				</h3>
 
 				<Input
@@ -499,21 +501,27 @@ export default function ({
 				/>
 			</div>
 
-			<Input
-				error={formik.errors.cacheTimeout}
-				helpText={Liferay.Language.get(
-					'sentence-transformer-cache-timeout-help'
-				)}
-				label={Liferay.Language.get('cache-timeout')}
-				name={`${namespace}cacheTimeout`}
-				onBlur={_handleInputBlur('cacheTimeout')}
-				onChange={_handleInputChange('cacheTimeout')}
-				options={{min: 0}}
-				required
-				touched={formik.touched.cacheTimeout}
-				type="number"
-				value={formik.values.cacheTimeout}
-			/>
+			<div className="sheet-section">
+				<h3 className="sheet-subtitle">
+					{Liferay.Language.get('search-settings')}
+				</h3>
+
+				<Input
+					error={formik.errors.cacheTimeout}
+					helpText={Liferay.Language.get(
+						'sentence-transformer-cache-timeout-help'
+					)}
+					label={Liferay.Language.get('cache-timeout')}
+					name={`${namespace}cacheTimeout`}
+					onBlur={_handleInputBlur('cacheTimeout')}
+					onChange={_handleInputChange('cacheTimeout')}
+					options={{min: 0}}
+					required
+					touched={formik.touched.cacheTimeout}
+					type="number"
+					value={formik.values.cacheTimeout}
+				/>
+			</div>
 		</div>
 	);
 }

@@ -191,8 +191,8 @@ public class AccountEntryUserRelLocalServiceImpl
 		User user = null;
 
 		if (Validator.isNotNull(userExternalReferenceCode)) {
-			user = _userLocalService.fetchUserByReferenceCode(
-				serviceContext.getCompanyId(), userExternalReferenceCode);
+			user = _userLocalService.fetchUserByExternalReferenceCode(
+				userExternalReferenceCode, serviceContext.getCompanyId());
 		}
 
 		if (user == null) {

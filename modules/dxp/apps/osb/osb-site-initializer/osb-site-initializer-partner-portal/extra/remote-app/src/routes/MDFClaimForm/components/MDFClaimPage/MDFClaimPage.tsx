@@ -50,6 +50,12 @@ const MDFClaimPage = ({
 		)
 	);
 
+	const checkClaimLimit =
+		mdfRequest.mdfRequestToMdfClaims &&
+		mdfRequest?.mdfRequestToMdfClaims?.length >= 2
+			? true
+			: false;
+
 	return (
 		<PRMForm name="New" title="Reimbursement Claim">
 			<PRMForm.Section
@@ -133,7 +139,7 @@ const MDFClaimPage = ({
 					</ClayButton>
 
 					<ClayButton
-						disabled={!isValid || isSubmitting}
+						disabled={!isValid || isSubmitting || checkClaimLimit}
 						type="submit"
 					>
 						Submit

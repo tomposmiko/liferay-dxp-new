@@ -224,9 +224,9 @@ public class ProductGroupResourceImpl extends BaseProductGroupResourceImpl {
 					cProduct =
 						_cProductLocalService.
 							fetchCProductByExternalReferenceCode(
-								contextCompany.getCompanyId(),
 								productGroupProduct.
-									getProductExternalReferenceCode());
+									getProductExternalReferenceCode(),
+								contextCompany.getCompanyId());
 				}
 
 				if (cProduct == null) {

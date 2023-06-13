@@ -6522,8 +6522,17 @@ go</echo>
 						<var name="app.server.tomcat.version" value="9.0.56" />
 					</then>
 				</elseif>
+				<elseif>
+					<or>
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13.u50" />
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13.u51" />
+					</or>
+					<then>
+						<var name="app.server.tomcat.version" value="9.0.65" />
+					</then>
+				</elseif>
 				<else>
-					<var name="app.server.tomcat.version" value="9.0.65" />
+					<var name="app.server.tomcat.version" value="9.0.68" />
 				</else>
 			</if>
 
@@ -6954,17 +6963,29 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			<get-browser-property property.name="browser.docker.image" />
 			<get-browser-property property.name="browser.docker.run.options" />
 			<get-browser-property property.name="browser.host" />
+
+			<propertyregex
+				input="${portal.dir}"
+				property="portal.dir.name"
+				regexp=".*\/(.*)"
+				select="\1"
+			/>
+
+			<get-host-git-dir />
+
 			<get-ip-address />
 
 			<start-docker-container image="${browser.docker.image}" name="${browser.host}" options="${browser.docker.browser.options}">\
 				${browser.docker.run.options} \
 				--add-host ${env.HOSTNAME}:${ip.address} \
+				--add-host ${env.NODE_NAME}:${ip.address} \
 				--add-host www.able.com:${ip.address} \
 				--add-host www.baker.com:${ip.address} \
 				--add-host www.charlie.com:${ip.address} \
 				--add-host www.dog.com:${ip.address} \
 				--add-host www.easy.com:${ip.address} \
 				--add-host www.fox.com:${ip.address} \
+				--mount type=bind,source=${host.git.dir}/${portal.dir.name},target=${portal.dir} \
 			</start-docker-container>
 
 			<echo>Waiting for ${browser.host}:4444 to load</echo>
@@ -11081,15 +11102,6 @@ jdbc.default.url=${database.url}
 jdbc.default.username=${database.username}
 jdbc.default.password=${database.password}
 
-// HikariCP
-
-jdbc.default.connectionTimeout=600000
-jdbc.default.maximumPoolSize=20
-jdbc.default.minimumIdle=0
-
-jdbc.counter.maximumPoolSize=5
-jdbc.counter.minimumIdle=0
-
 enterprise.product.notification.enabled=false
 
 company.security.strangers.verify=false
@@ -11099,10 +11111,6 @@ browser.launcher.url=
 setup.wizard.enabled=false
 
 passwords.default.policy.change.required=false
-
-dependency.manager.sync.timeout=1800
-
-initial.system.check.enabled=true
 
 mail.send.blacklist=
 
@@ -11123,6 +11131,24 @@ admin.email.from.address=test@liferay.com
 announcements.email.to.address=noreply@liferay.com
 
 login.secure.forgot.password=false</echo>
+
+		<if>
+			<isset property="env.JENKINS_HOME" />
+			<then>
+				<echo append="true" file="portal-impl/src/portal-ext.properties">
+
+					// HikariCP
+
+					jdbc.default.connectionTimeout=600000
+					jdbc.default.maximumPoolSize=20
+					jdbc.default.minimumIdle=0
+
+					jdbc.counter.maximumPoolSize=5
+					jdbc.counter.minimumIdle=0
+
+					initial.system.check.enabled=true</echo>
+			</then>
+		</if>
 
 		<if>
 			<equals arg1="${database.type}" arg2="oracle" />

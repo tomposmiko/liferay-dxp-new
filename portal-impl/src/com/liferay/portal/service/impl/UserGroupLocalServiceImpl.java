@@ -183,7 +183,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		throws PortalException {
 
 		UserGroup userGroup = fetchUserGroupByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 
 		if (userGroup != null) {
 			return updateUserGroup(
@@ -1368,7 +1368,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		UserGroup userGroup = getUserGroup(userGroupId);
 
 		userGroup = fetchUserGroupByExternalReferenceCode(
-			userGroup.getCompanyId(), externalReferenceCode);
+			externalReferenceCode, userGroup.getCompanyId());
 
 		if (userGroup == null) {
 			return;

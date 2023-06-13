@@ -105,8 +105,6 @@ public class ObjectFieldLocalServiceTest {
 	public void setUp() throws Exception {
 		PropsUtil.addProperties(
 			UnicodePropertiesBuilder.setProperty(
-				"feature.flag.LPS-164278", "true"
-			).setProperty(
 				"feature.flag.LPS-158776", "true"
 			).build());
 
@@ -128,8 +126,6 @@ public class ObjectFieldLocalServiceTest {
 	public void tearDown() throws Exception {
 		PropsUtil.addProperties(
 			UnicodePropertiesBuilder.setProperty(
-				"feature.flag.LPS-164278", "false"
-			).setProperty(
 				"feature.flag.LPS-158776", "false"
 			).build());
 	}
@@ -482,7 +478,7 @@ public class ObjectFieldLocalServiceTest {
 				objectFieldNameException.getMessage());
 		}
 
-		// Names must be less than 41 characters
+		// Name must be less than 41 characters
 
 		_testAddSystemObjectField(
 			ObjectFieldUtil.createObjectField(
@@ -505,7 +501,7 @@ public class ObjectFieldLocalServiceTest {
 		}
 		catch (ObjectFieldNameException objectFieldNameException) {
 			Assert.assertEquals(
-				"Names must be less than 41 characters",
+				"Name must be less than 41 characters",
 				objectFieldNameException.getMessage());
 		}
 

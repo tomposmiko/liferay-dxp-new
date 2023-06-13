@@ -720,17 +720,16 @@ definition {
 			key_pageName = "Home",
 			locator1 = "Home#PAGE");
 
-		User.logoutPG();
-
 		Navigator.gotoLoginPage();
 
 		AssertTextEquals(
 			locator1 = "TextInput#EMAIL_ADDRESS",
 			value1 = "@newliferay.com");
 
-		User.loginUserPG();
+		User.firstLoginUI(specificURL = "http://www.able.com:8080");
 
 		PortalSettings.gotoConfiguration(
+			baseURL = "http://www.able.com:8080",
 			configurationCategory = "Instance Configuration",
 			configurationName = "General",
 			configurationScope = "Virtual Instance Scope");
@@ -752,6 +751,7 @@ definition {
 		Button.clickSave();
 
 		PortalSettings.gotoConfiguration(
+			baseURL = "http://www.able.com:8080",
 			configurationCategory = "Instance Configuration",
 			configurationName = "General",
 			configurationScope = "Virtual Instance Scope");
@@ -844,11 +844,11 @@ definition {
 				locator1 = "FormFields#REPEATABLE_TEXT_MULTILINE_FIELD",
 				value1 = "'");
 
-			OSGiConfig.assertTextNotInOSGIConfig(
+			OSGiConfig.assertTextNotInOSGiConfig(
 				osgiConfigFileName = "${exportConfigFileName}",
 				text = "companyWebId");
 
-			OSGiConfig.assertTextInOSGIConfig(
+			OSGiConfig.assertTextInOSGiConfig(
 				osgiConfigFileName = "${exportConfigFileName}",
 				text = "companyId");
 		}

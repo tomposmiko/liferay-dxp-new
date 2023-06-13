@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.exception.DuplicateUserGroupExternalReferenceCodeException;
 import com.liferay.portal.kernel.exception.NoSuchUserGroupException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -5843,33 +5844,33 @@ public class UserGroupPersistenceImpl
 	private static final String _FINDER_COLUMN_GTU_C_P_PARENTUSERGROUPID_2 =
 		"userGroup.parentUserGroupId = ?";
 
-	private FinderPath _finderPathFetchByC_ERC;
-	private FinderPath _finderPathCountByC_ERC;
+	private FinderPath _finderPathFetchByERC_C;
+	private FinderPath _finderPathCountByERC_C;
 
 	/**
-	 * Returns the user group where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchUserGroupException</code> if it could not be found.
+	 * Returns the user group where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchUserGroupException</code> if it could not be found.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the matching user group
 	 * @throws NoSuchUserGroupException if a matching user group could not be found
 	 */
 	@Override
-	public UserGroup findByC_ERC(long companyId, String externalReferenceCode)
+	public UserGroup findByERC_C(String externalReferenceCode, long companyId)
 		throws NoSuchUserGroupException {
 
-		UserGroup userGroup = fetchByC_ERC(companyId, externalReferenceCode);
+		UserGroup userGroup = fetchByERC_C(externalReferenceCode, companyId);
 
 		if (userGroup == null) {
 			StringBundler sb = new StringBundler(6);
 
 			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			sb.append("companyId=");
-			sb.append(companyId);
-
-			sb.append(", externalReferenceCode=");
+			sb.append("externalReferenceCode=");
 			sb.append(externalReferenceCode);
+
+			sb.append(", companyId=");
+			sb.append(companyId);
 
 			sb.append("}");
 
@@ -5884,30 +5885,30 @@ public class UserGroupPersistenceImpl
 	}
 
 	/**
-	 * Returns the user group where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the user group where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the matching user group, or <code>null</code> if a matching user group could not be found
 	 */
 	@Override
-	public UserGroup fetchByC_ERC(
-		long companyId, String externalReferenceCode) {
+	public UserGroup fetchByERC_C(
+		String externalReferenceCode, long companyId) {
 
-		return fetchByC_ERC(companyId, externalReferenceCode, true);
+		return fetchByERC_C(externalReferenceCode, companyId, true);
 	}
 
 	/**
-	 * Returns the user group where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the user group where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user group, or <code>null</code> if a matching user group could not be found
 	 */
 	@Override
-	public UserGroup fetchByC_ERC(
-		long companyId, String externalReferenceCode, boolean useFinderCache) {
+	public UserGroup fetchByERC_C(
+		String externalReferenceCode, long companyId, boolean useFinderCache) {
 
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
@@ -5917,23 +5918,23 @@ public class UserGroupPersistenceImpl
 		Object[] finderArgs = null;
 
 		if (useFinderCache && productionMode) {
-			finderArgs = new Object[] {companyId, externalReferenceCode};
+			finderArgs = new Object[] {externalReferenceCode, companyId};
 		}
 
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_ERC, finderArgs, this);
+				_finderPathFetchByERC_C, finderArgs, this);
 		}
 
 		if (result instanceof UserGroup) {
 			UserGroup userGroup = (UserGroup)result;
 
-			if ((companyId != userGroup.getCompanyId()) ||
-				!Objects.equals(
+			if (!Objects.equals(
 					externalReferenceCode,
-					userGroup.getExternalReferenceCode())) {
+					userGroup.getExternalReferenceCode()) ||
+				(companyId != userGroup.getCompanyId())) {
 
 				result = null;
 			}
@@ -5944,18 +5945,18 @@ public class UserGroupPersistenceImpl
 
 			sb.append(_SQL_SELECT_USERGROUP_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
-
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
 			}
+
+			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -5968,18 +5969,18 @@ public class UserGroupPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(companyId);
-
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
+
+				queryPos.add(companyId);
 
 				List<UserGroup> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache && productionMode) {
 						FinderCacheUtil.putResult(
-							_finderPathFetchByC_ERC, finderArgs, list);
+							_finderPathFetchByERC_C, finderArgs, list);
 					}
 				}
 				else {
@@ -6007,30 +6008,30 @@ public class UserGroupPersistenceImpl
 	}
 
 	/**
-	 * Removes the user group where companyId = &#63; and externalReferenceCode = &#63; from the database.
+	 * Removes the user group where externalReferenceCode = &#63; and companyId = &#63; from the database.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the user group that was removed
 	 */
 	@Override
-	public UserGroup removeByC_ERC(long companyId, String externalReferenceCode)
+	public UserGroup removeByERC_C(String externalReferenceCode, long companyId)
 		throws NoSuchUserGroupException {
 
-		UserGroup userGroup = findByC_ERC(companyId, externalReferenceCode);
+		UserGroup userGroup = findByERC_C(externalReferenceCode, companyId);
 
 		return remove(userGroup);
 	}
 
 	/**
-	 * Returns the number of user groups where companyId = &#63; and externalReferenceCode = &#63;.
+	 * Returns the number of user groups where externalReferenceCode = &#63; and companyId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
+	 * @param companyId the company ID
 	 * @return the number of matching user groups
 	 */
 	@Override
-	public int countByC_ERC(long companyId, String externalReferenceCode) {
+	public int countByERC_C(String externalReferenceCode, long companyId) {
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
 		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
@@ -6042,9 +6043,9 @@ public class UserGroupPersistenceImpl
 		Long count = null;
 
 		if (productionMode) {
-			finderPath = _finderPathCountByC_ERC;
+			finderPath = _finderPathCountByERC_C;
 
-			finderArgs = new Object[] {companyId, externalReferenceCode};
+			finderArgs = new Object[] {externalReferenceCode, companyId};
 
 			count = (Long)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
@@ -6055,18 +6056,18 @@ public class UserGroupPersistenceImpl
 
 			sb.append(_SQL_COUNT_USERGROUP_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
-
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
 			}
+
+			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -6079,11 +6080,11 @@ public class UserGroupPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(companyId);
-
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
+
+				queryPos.add(companyId);
 
 				count = (Long)query.uniqueResult();
 
@@ -6102,14 +6103,14 @@ public class UserGroupPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_ERC_COMPANYID_2 =
-		"userGroup.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2 =
+		"userGroup.externalReferenceCode = ? AND ";
 
-	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2 =
-		"userGroup.externalReferenceCode = ?";
+	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3 =
+		"(userGroup.externalReferenceCode IS NULL OR userGroup.externalReferenceCode = '') AND ";
 
-	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3 =
-		"(userGroup.externalReferenceCode IS NULL OR userGroup.externalReferenceCode = '')";
+	private static final String _FINDER_COLUMN_ERC_C_COMPANYID_2 =
+		"userGroup.companyId = ?";
 
 	public UserGroupPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
@@ -6147,9 +6148,9 @@ public class UserGroupPersistenceImpl
 			userGroup);
 
 		FinderCacheUtil.putResult(
-			_finderPathFetchByC_ERC,
+			_finderPathFetchByERC_C,
 			new Object[] {
-				userGroup.getCompanyId(), userGroup.getExternalReferenceCode()
+				userGroup.getExternalReferenceCode(), userGroup.getCompanyId()
 			},
 			userGroup);
 	}
@@ -6237,14 +6238,14 @@ public class UserGroupPersistenceImpl
 			_finderPathFetchByC_N, args, userGroupModelImpl);
 
 		args = new Object[] {
-			userGroupModelImpl.getCompanyId(),
-			userGroupModelImpl.getExternalReferenceCode()
+			userGroupModelImpl.getExternalReferenceCode(),
+			userGroupModelImpl.getCompanyId()
 		};
 
 		FinderCacheUtil.putResult(
-			_finderPathCountByC_ERC, args, Long.valueOf(1));
+			_finderPathCountByERC_C, args, Long.valueOf(1));
 		FinderCacheUtil.putResult(
-			_finderPathFetchByC_ERC, args, userGroupModelImpl);
+			_finderPathFetchByERC_C, args, userGroupModelImpl);
 	}
 
 	/**
@@ -6393,6 +6394,28 @@ public class UserGroupPersistenceImpl
 
 		if (Validator.isNull(userGroup.getExternalReferenceCode())) {
 			userGroup.setExternalReferenceCode(userGroup.getUuid());
+		}
+		else {
+			UserGroup ercUserGroup = fetchByERC_C(
+				userGroup.getExternalReferenceCode(), userGroup.getCompanyId());
+
+			if (isNew) {
+				if (ercUserGroup != null) {
+					throw new DuplicateUserGroupExternalReferenceCodeException(
+						"Duplicate user group with external reference code " +
+							userGroup.getExternalReferenceCode());
+				}
+			}
+			else {
+				if ((ercUserGroup != null) &&
+					(userGroup.getUserGroupId() !=
+						ercUserGroup.getUserGroupId())) {
+
+					throw new DuplicateUserGroupExternalReferenceCodeException(
+						"Duplicate user group with external reference code " +
+							userGroup.getExternalReferenceCode());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =
@@ -7852,7 +7875,7 @@ public class UserGroupPersistenceImpl
 		_uniqueIndexColumnNames.add(new String[] {"companyId", "name"});
 
 		_uniqueIndexColumnNames.add(
-			new String[] {"companyId", "externalReferenceCode"});
+			new String[] {"externalReferenceCode", "companyId"});
 	}
 
 	/**
@@ -8002,15 +8025,15 @@ public class UserGroupPersistenceImpl
 			new String[] {"userGroupId", "companyId", "parentUserGroupId"},
 			false);
 
-		_finderPathFetchByC_ERC = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByC_ERC",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "externalReferenceCode"}, true);
+		_finderPathFetchByERC_C = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByERC_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"externalReferenceCode", "companyId"}, true);
 
-		_finderPathCountByC_ERC = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_ERC",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "externalReferenceCode"}, false);
+		_finderPathCountByERC_C = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByERC_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"externalReferenceCode", "companyId"}, false);
 
 		_setUserGroupUtilPersistence(this);
 	}

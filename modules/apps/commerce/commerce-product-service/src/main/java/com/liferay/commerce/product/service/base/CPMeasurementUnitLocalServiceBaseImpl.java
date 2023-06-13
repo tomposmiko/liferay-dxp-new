@@ -275,48 +275,21 @@ public abstract class CPMeasurementUnitLocalServiceBaseImpl
 		return cpMeasurementUnitPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
-	/**
-	 * Returns the cp measurement unit with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the cp measurement unit's external reference code
-	 * @return the matching cp measurement unit, or <code>null</code> if a matching cp measurement unit could not be found
-	 */
 	@Override
 	public CPMeasurementUnit fetchCPMeasurementUnitByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
-		return cpMeasurementUnitPersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
+		return cpMeasurementUnitPersistence.fetchByERC_C(
+			externalReferenceCode, companyId);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPMeasurementUnitByExternalReferenceCode(long, String)}
-	 */
-	@Deprecated
-	@Override
-	public CPMeasurementUnit fetchCPMeasurementUnitByReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return fetchCPMeasurementUnitByExternalReferenceCode(
-			companyId, externalReferenceCode);
-	}
-
-	/**
-	 * Returns the cp measurement unit with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the cp measurement unit's external reference code
-	 * @return the matching cp measurement unit
-	 * @throws PortalException if a matching cp measurement unit could not be found
-	 */
 	@Override
 	public CPMeasurementUnit getCPMeasurementUnitByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException {
 
-		return cpMeasurementUnitPersistence.findByC_ERC(
-			companyId, externalReferenceCode);
+		return cpMeasurementUnitPersistence.findByERC_C(
+			externalReferenceCode, companyId);
 	}
 
 	/**

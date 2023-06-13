@@ -22,6 +22,7 @@ import {
 import React, {useState} from 'react';
 
 import './EditObjectField.scss';
+import {AdvancedTab} from './Tabs/Advanced/AdvancedTab';
 import {BasicInfo} from './Tabs/BasicInfo/BasicInfo';
 import {useObjectFieldForm} from './useObjectFieldForm';
 
@@ -61,10 +62,7 @@ export default function EditObjectField({
 	const [activeIndex, setActiveIndex] = useState(0);
 
 	const onSubmit = async ({id, ...objectField}: ObjectField) => {
-		if (Liferay.FeatureFlags['LPS-164278']) {
-			delete objectField.listTypeDefinitionId;
-		}
-
+		delete objectField.listTypeDefinitionId;
 		delete objectField.system;
 
 		try {
@@ -143,7 +141,7 @@ export default function EditObjectField({
 
 				{Liferay.FeatureFlags['LPS-159913'] ? (
 					<ClayTabs.TabPane>
-						{/* TODO Advanced TAB Component */}
+						<AdvancedTab setValues={setValues} values={values} />
 					</ClayTabs.TabPane>
 				) : (
 					<></>

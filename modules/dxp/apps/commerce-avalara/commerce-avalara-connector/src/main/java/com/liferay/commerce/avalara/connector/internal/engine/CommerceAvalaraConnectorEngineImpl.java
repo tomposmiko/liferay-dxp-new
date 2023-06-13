@@ -121,9 +121,9 @@ public class CommerceAvalaraConnectorEngineImpl
 		CPTaxCategory tangiblePersonalPropertyCPTaxCategory =
 			_cpTaxCategoryLocalService.
 				fetchCPTaxCategoryByExternalReferenceCode(
-					commerceTaxMethod.getCompanyId(),
 					CommerceAvalaraConstants.
-						CP_TAX_CATEGORY_ERC_TANGIBLE_PERSONAL_PROPERTY);
+						CP_TAX_CATEGORY_ERC_TANGIBLE_PERSONAL_PROPERTY,
+					commerceTaxMethod.getCompanyId());
 
 		if (tangiblePersonalPropertyCPTaxCategory != null) {
 			cpTaxCategoryId =

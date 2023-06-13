@@ -103,7 +103,7 @@ public class AccountEntryServiceImpl extends AccountEntryServiceBaseImpl {
 
 		AccountEntry accountEntry =
 			accountEntryLocalService.fetchAccountEntryByExternalReferenceCode(
-				permissionChecker.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, permissionChecker.getCompanyId());
 
 		long accountEntryId = 0;
 
@@ -183,7 +183,7 @@ public class AccountEntryServiceImpl extends AccountEntryServiceBaseImpl {
 
 		AccountEntry accountEntry =
 			accountEntryLocalService.fetchAccountEntryByExternalReferenceCode(
-				companyId, externalReferenceCode);
+				externalReferenceCode, companyId);
 
 		if (accountEntry != null) {
 			_accountEntryModelResourcePermission.check(

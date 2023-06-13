@@ -33,6 +33,7 @@ class TestraySubtaskImpl extends Rest<SubtaskForm, TestraySubTask> {
 			adapter: ({
 				dueStatus,
 				errors,
+				mergedToSubtaskId: r_mergedToTestraySubtask_c_subtaskId,
 				name,
 				score,
 				taskId: r_taskToSubtasks_c_taskId,
@@ -41,13 +42,15 @@ class TestraySubtaskImpl extends Rest<SubtaskForm, TestraySubTask> {
 				dueStatus,
 				errors,
 				name,
+				r_mergedToTestraySubtask_c_subtaskId,
 				r_taskToSubtasks_c_taskId,
 				r_userToSubtasks_userId,
 				score,
 			}),
-			nestedFields: 'tasks,users',
+			nestedFields: 'tasks,users,subtask',
 			transformData: (subTask) => ({
 				...subTask,
+				mergedToSubtaskId: subTask.r_mergedToTestraySubtask_c_subtaskId,
 				task: subTask.r_taskToSubtasks_c_task,
 				user: subTask.r_userToSubtasks_user,
 			}),
@@ -135,6 +138,42 @@ class TestraySubtaskImpl extends Rest<SubtaskForm, TestraySubTask> {
 		return this.update(subTask.id, {
 			dueStatus: SubTaskStatuses.OPEN,
 			userId: this.UNASSIGNED_USER_ID,
+		});
+	}
+
+	public async mergedToSubtask(subTasks: TestraySubTask[]) {
+		const [parentTestraySubtask, ...childTestraySubtasks] = subTasks.sort(
+			({score: scoreA}, {score: scoreB}) => scoreB - scoreA
+		);
+
+		let sumScore = parentTestraySubtask.score ?? 0;
+
+		for (const testraySubTask of childTestraySubtasks) {
+			await this.update(Number(testraySubTask.id), {
+				dueStatus: SubTaskStatuses.MERGED,
+				mergedToSubtaskId: parentTestraySubtask.id,
+				score: 0,
+			});
+
+			const caseResults = await this.getCaseResultsFromSubtask(
+				testraySubTask.id
+			);
+
+			for (const caseResult of caseResults) {
+				sumScore += caseResult?.caseResult?.case?.priority || 0;
+
+				await testraySubtaskCaseResultImpl.update(
+					Number(caseResult.id),
+					{
+						name: `${parentTestraySubtask.id}`,
+						subtaskId: parentTestraySubtask.id,
+					}
+				);
+			}
+		}
+
+		await this.update(Number(parentTestraySubtask.id), {
+			score: sumScore,
 		});
 	}
 }
