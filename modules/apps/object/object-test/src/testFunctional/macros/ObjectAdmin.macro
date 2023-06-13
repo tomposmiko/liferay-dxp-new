@@ -77,12 +77,14 @@ definition {
 			fieldLabelName = "${fieldLabelName}",
 			fieldName = "${fieldName}",
 			fieldType = "${fieldType}",
+			fileSource = "${fileSource}",
 			indexed = "${indexed}",
 			indexedAsKeyword = "${indexedAsKeyword}",
 			indexedLanguageId = "${indexedLanguageId}",
 			isRequired = "${isRequired}",
 			objectName = "${objectName}",
 			picklistName = "${picklistName}",
+			showFilesInDocumentsAndMedia = "${showFilesInDocumentsAndMedia}",
 			userEmailAddress = "${userEmailAddress}",
 			userPassword = "${userPassword}");
 	}
@@ -983,8 +985,6 @@ definition {
 		ProductMenuHelper.openWorkspace();
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
-
-		Pause(locator1 = "3000");
 
 		Navigator.gotoNavItem(navItem = "My Sites");
 

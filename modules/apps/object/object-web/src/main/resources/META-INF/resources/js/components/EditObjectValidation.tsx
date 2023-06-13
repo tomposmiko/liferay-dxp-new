@@ -16,8 +16,8 @@ import ClayTabs from '@clayui/tabs';
 import {
 	SidePanelForm,
 	SidebarCategory,
-	closeSidePanel,
 	openToast,
+	saveAndReload,
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
@@ -56,8 +56,6 @@ export default function EditObjectValidation({
 	);
 
 	const onSubmit = async (objectValidation: ObjectValidation) => {
-		delete objectValidation.ffUseMetadataAsSystemFields;
-
 		const response = await fetch(
 			`/o/object-admin/v1.0/object-validation-rules/${objectValidation.id}`,
 			{
@@ -68,7 +66,7 @@ export default function EditObjectValidation({
 		);
 
 		if (response.ok) {
-			closeSidePanel();
+			saveAndReload();
 			openToast({
 				message: Liferay.Language.get(
 					'the-object-validation-was-updated-successfully'
@@ -134,9 +132,6 @@ export default function EditObjectValidation({
 									Object.keys(errors).length !== 0
 										? errors
 										: errorMessage
-								}
-								ffUseMetadataAsSystemFields={
-									values.ffUseMetadataAsSystemFields as boolean
 								}
 								handleChange={handleChange}
 								locales={availableLocales}

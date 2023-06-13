@@ -85,20 +85,18 @@ public class ObjectState implements Serializable {
 	protected Long id;
 
 	@Schema
-	public Long getListTypeEntryId() {
-		return listTypeEntryId;
+	public String getKey() {
+		return key;
 	}
 
-	public void setListTypeEntryId(Long listTypeEntryId) {
-		this.listTypeEntryId = listTypeEntryId;
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 	@JsonIgnore
-	public void setListTypeEntryId(
-		UnsafeSupplier<Long, Exception> listTypeEntryIdUnsafeSupplier) {
-
+	public void setKey(UnsafeSupplier<String, Exception> keyUnsafeSupplier) {
 		try {
-			listTypeEntryId = listTypeEntryIdUnsafeSupplier.get();
+			key = keyUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -110,25 +108,27 @@ public class ObjectState implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long listTypeEntryId;
+	protected String key;
 
 	@Schema
 	@Valid
-	public NextObjectState[] getNextObjectStates() {
-		return nextObjectStates;
+	public ObjectStateTransition[] getObjectStateTransitions() {
+		return objectStateTransitions;
 	}
 
-	public void setNextObjectStates(NextObjectState[] nextObjectStates) {
-		this.nextObjectStates = nextObjectStates;
+	public void setObjectStateTransitions(
+		ObjectStateTransition[] objectStateTransitions) {
+
+		this.objectStateTransitions = objectStateTransitions;
 	}
 
 	@JsonIgnore
-	public void setNextObjectStates(
-		UnsafeSupplier<NextObjectState[], Exception>
-			nextObjectStatesUnsafeSupplier) {
+	public void setObjectStateTransitions(
+		UnsafeSupplier<ObjectStateTransition[], Exception>
+			objectStateTransitionsUnsafeSupplier) {
 
 		try {
-			nextObjectStates = nextObjectStatesUnsafeSupplier.get();
+			objectStateTransitions = objectStateTransitionsUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -140,7 +140,7 @@ public class ObjectState implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected NextObjectState[] nextObjectStates;
+	protected ObjectStateTransition[] objectStateTransitions;
 
 	@Override
 	public boolean equals(Object object) {
@@ -179,29 +179,33 @@ public class ObjectState implements Serializable {
 			sb.append(id);
 		}
 
-		if (listTypeEntryId != null) {
+		if (key != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"listTypeEntryId\": ");
+			sb.append("\"key\": ");
 
-			sb.append(listTypeEntryId);
+			sb.append("\"");
+
+			sb.append(_escape(key));
+
+			sb.append("\"");
 		}
 
-		if (nextObjectStates != null) {
+		if (objectStateTransitions != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"nextObjectStates\": ");
+			sb.append("\"objectStateTransitions\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < nextObjectStates.length; i++) {
-				sb.append(String.valueOf(nextObjectStates[i]));
+			for (int i = 0; i < objectStateTransitions.length; i++) {
+				sb.append(String.valueOf(objectStateTransitions[i]));
 
-				if ((i + 1) < nextObjectStates.length) {
+				if ((i + 1) < objectStateTransitions.length) {
 					sb.append(", ");
 				}
 			}

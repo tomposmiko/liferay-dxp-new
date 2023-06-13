@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -170,7 +171,7 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 			themeDisplay.getUserId());
 
 		_clientExtensionEntryRelLocalService.deleteClientExtensionEntryRels(
-			themeDisplay.getCompanyId(), layoutSet.getLayoutSetId(),
+			_portal.getClassNameId(LayoutSet.class), layoutSet.getLayoutSetId(),
 			ClientExtensionEntryConstants.TYPE_GLOBAL_CSS);
 
 		String[] globalCSSCETExternalReferenceCodes = ParamUtil.getStringValues(
@@ -188,7 +189,7 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 		}
 
 		_clientExtensionEntryRelLocalService.deleteClientExtensionEntryRels(
-			themeDisplay.getCompanyId(), layoutSet.getLayoutSetId(),
+			_portal.getClassNameId(LayoutSet.class), layoutSet.getLayoutSetId(),
 			ClientExtensionEntryConstants.TYPE_GLOBAL_JS);
 
 		String[] globalJSCETExternalReferenceCodes = ParamUtil.getStringValues(
@@ -197,11 +198,24 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 		for (String globalJSCETExternalReferenceCode :
 				globalJSCETExternalReferenceCodes) {
 
+			String[] typeSettings = StringUtil.split(
+				globalJSCETExternalReferenceCode, StringPool.UNDERLINE);
+
+			UnicodeProperties typeSettingsUnicodeProperties =
+				UnicodePropertiesBuilder.create(
+					true
+				).put(
+					"loadType", typeSettings[1]
+				).put(
+					"scriptLocation", typeSettings[2]
+				).build();
+
 			_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
 				themeDisplay.getUserId(),
 				_portal.getClassNameId(LayoutSet.class),
-				layoutSet.getLayoutSetId(), globalJSCETExternalReferenceCode,
-				ClientExtensionEntryConstants.TYPE_GLOBAL_JS, StringPool.BLANK);
+				layoutSet.getLayoutSetId(), typeSettings[0],
+				ClientExtensionEntryConstants.TYPE_GLOBAL_JS,
+				typeSettingsUnicodeProperties.toString());
 		}
 
 		String themeCSSCETExternalReferenceCode = ParamUtil.getString(

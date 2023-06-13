@@ -112,19 +112,22 @@ interface ObjectDefinition {
 
 interface ObjectFieldSetting {
 	name: ObjectFieldSettingName;
+	objectFieldId?: number;
 	value: string | number | boolean | ObjectFieldFilterSetting[];
 }
 
 type ObjectFieldFilterSetting = {
 	filterBy?: string;
 	filterType?: string;
-	json?: {
-		[key: string]:
-			| string
-			| string[]
-			| ObjectFieldDateRangeFilterSettings
-			| undefined;
-	};
+	json:
+		| {
+				[key: string]:
+					| string
+					| string[]
+					| ObjectFieldDateRangeFilterSettings
+					| undefined;
+		  }
+		| string;
 };
 
 type ObjectFieldDateRangeFilterSettings = {
@@ -146,7 +149,8 @@ type ObjectFieldSettingName =
 	| 'relationship'
 	| 'function'
 	| 'summarizeField'
-	| 'filters';
+	| 'filters'
+	| 'stateFlow';
 
 interface ObjectValidation {
 	active: boolean;
@@ -154,7 +158,6 @@ interface ObjectValidation {
 	engine: string;
 	engineLabel: string;
 	errorLabel: LocalizedValue<string>;
-	ffUseMetadataAsSystemFields?: boolean;
 	id: number;
 	name: LocalizedValue<string>;
 	script: string;
@@ -214,4 +217,9 @@ interface ObjectDefinitionsRelationship {
 	id: number;
 	label: string;
 	related?: boolean;
+}
+
+interface ObjectState {
+	key: string;
+	objectStateTransitions: {key: string}[];
 }

@@ -13,6 +13,7 @@
  */
 
 import ClayButton from '@clayui/button';
+import {useNavigate} from 'react-router-dom';
 
 import {
 	TestrayCaseResult,
@@ -22,53 +23,117 @@ import useAssignCaseResult from '../../../../../../hooks/useAssignCaseResult';
 import useFormModal from '../../../../../../hooks/useFormModal';
 import i18n from '../../../../../../i18n';
 import {Liferay} from '../../../../../../services/liferay';
+import {TEST_STATUS} from '../../../../../../util/constants';
 import CaseResultAssignModal from './CaseResultAssignModal';
+
+const userId = Number(Liferay.ThemeDisplay.getUserId());
 
 const CaseResultHeaderActions: React.FC<{
 	caseResult: TestrayCaseResult;
 	refetch: () => void;
 }> = ({caseResult, refetch}) => {
 	const {onAssignTo, onAssignToMe, onRemoveAssign} = useAssignCaseResult();
-
 	const {modal} = useFormModal({
 		onSave: (user: UserAccount) =>
 			onAssignTo(caseResult, user.id).then(refetch),
 	});
+	const navigate = useNavigate();
+
+	const assignedUserId = caseResult.user?.id || 0;
+	const isCaseResultAssignedToMe = caseResult.user?.id === userId;
+	const isReopened = ![
+		TEST_STATUS.Blocked,
+		TEST_STATUS.Failed,
+		TEST_STATUS.Passed,
+		TEST_STATUS['Test Fix'],
+	].includes(caseResult.dueStatus);
+
+	const workflowDisabled = assignedUserId <= 0 || assignedUserId !== userId;
+
+	const buttonValidations = {
+		completeTest:
+			workflowDisabled ||
+			caseResult.dueStatus !== TEST_STATUS['In Progress'],
+		editValidation: assignedUserId > 0 && assignedUserId !== userId,
+		reopenTest: workflowDisabled || isReopened,
+		startTest:
+			workflowDisabled || caseResult.dueStatus !== TEST_STATUS.Untested,
+	};
 
 	return (
 		<>
 			<CaseResultAssignModal modal={modal} />
 
 			<ClayButton.Group className="mb-3 ml-3" spaced>
-				<ClayButton onClick={() => modal.open()}>
+				<ClayButton
+					disabled={isCaseResultAssignedToMe}
+					displayType={
+						isCaseResultAssignedToMe ? 'unstyled' : undefined
+					}
+					onClick={() => modal.open()}
+				>
 					{i18n.translate('assign')}
 				</ClayButton>
 
 				<ClayButton
 					displayType="secondary"
-					onClick={() => onAssignToMe(caseResult).then(refetch)}
+					onClick={() => {
+						const assignFN = isCaseResultAssignedToMe
+							? onRemoveAssign
+							: onAssignToMe;
+
+						assignFN(caseResult).then(refetch);
+					}}
 				>
-					{i18n.translate('assign-to-me')}
+					{i18n.translate(
+						isCaseResultAssignedToMe
+							? 'unassign-myself'
+							: 'assign-to-me'
+					)}
 				</ClayButton>
 
-				<ClayButton disabled displayType="unstyled">
+				<ClayButton
+					disabled={buttonValidations.startTest}
+					displayType={
+						buttonValidations.startTest ? 'unstyled' : 'primary'
+					}
+				>
 					{i18n.translate('start-test')}
 				</ClayButton>
 
-				<ClayButton disabled displayType="unstyled">
+				<ClayButton
+					disabled={buttonValidations.completeTest}
+					displayType={
+						buttonValidations.completeTest ? 'unstyled' : undefined
+					}
+					onClick={() => navigate(`edit/${caseResult.dueStatus}`)}
+				>
 					{i18n.translate('complete-test')}
 				</ClayButton>
 
-				<ClayButton disabled displayType="unstyled">
+				<ClayButton
+					disabled={buttonValidations.reopenTest}
+					displayType={
+						buttonValidations.reopenTest ? 'unstyled' : 'primary'
+					}
+					onClick={() => onAssignToMe(caseResult).then(refetch)}
+				>
 					{i18n.translate('reopen-test')}
 				</ClayButton>
 
-				<ClayButton displayType="secondary">
+				<ClayButton
+					disabled={buttonValidations.editValidation}
+					displayType={
+						buttonValidations.editValidation
+							? 'unstyled'
+							: 'secondary'
+					}
+					onClick={() => navigate(`edit/${caseResult.dueStatus}`)}
+				>
 					{i18n.translate('edit')}
 				</ClayButton>
 
-				{caseResult.user?.id?.toString() ===
-					Liferay.ThemeDisplay.getUserId() && (
+				{caseResult.dueStatus === TEST_STATUS['In Progress'] && (
 					<ClayButton
 						displayType="secondary"
 						onClick={() => onRemoveAssign(caseResult).then(refetch)}

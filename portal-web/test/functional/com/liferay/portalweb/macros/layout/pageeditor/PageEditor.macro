@@ -1012,34 +1012,6 @@ definition {
 			locator1 = "Fragment#FRAGMENT_LABEL");
 	}
 
-	macro clickDiscardDraft {
-		WaitForPageLoad();
-
-		PagesAdmin.openPageEllipsisMenu(pageName = "${pageName}");
-
-		MenuItem.clickNoError(menuItem = "Discard Draft");
-
-		AssertConfirm(value1 = "Are you sure you want to discard current draft and apply latest published changes?");
-
-		if (isSet(failure)) {
-			if (IsElementPresent(locator1 = "Message#ERROR_2")) {
-				Alert.viewRequestFailedToComplete();
-
-				AssertTextEquals(
-					locator1 = "Message#ERROR_2",
-					value1 = "${failure}");
-			}
-			else {
-				AssertTextEquals(
-					locator1 = "Message#ERROR",
-					value1 = "${failure}");
-			}
-		}
-		else {
-			Alert.viewSuccessMessage();
-		}
-	}
-
 	macro clickEditableField {
 		if (!(isSet(index))) {
 			var index = "1";
@@ -1173,6 +1145,19 @@ definition {
 						value1 = "${key}");
 				}
 			}
+
+			PageEditor.waitForAutoSave();
+		}
+
+		if (isSet(customCSS)) {
+			Type(
+				key_label = "Custom CSS",
+				locator1 = "TextArea#ANY_LABELED",
+				value1 = "${customCSS}");
+
+			Click(
+				key_sidebarButton = "Browser",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
 
 			PageEditor.waitForAutoSave();
 		}
@@ -2297,6 +2282,112 @@ definition {
 					locator1 = "Select#GENERIC_SELECT_FIELD",
 					value1 = "${subtype}");
 			}
+
+			if ("${successMessage}" == "Embedded") {
+				Select(
+					key_fieldLabel = "Success Message",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "Embedded");
+
+				AssertSelectedLabel(
+					key_fieldLabel = "Success Message",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "Embedded");
+
+				if (isSet(successText)) {
+					Type(
+						key_text = "Success Text",
+						locator1 = "TextInput#ANY",
+						value1 = "${successText}");
+
+					Click(
+						key_sidebarButton = "Browser",
+						locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+				}
+
+				if ("${previewSuccessState}" == "true") {
+					Check.checkNotVisible(
+						checkboxName = "Preview Success State",
+						locator1 = "Checkbox#ANY_CHECKBOX");
+				}
+
+				PageEditor.waitForAutoSave();
+			}
+			else if ("${successMessage}" == "Page") {
+				Select(
+					key_fieldLabel = "Success Message",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "Page");
+
+				AssertSelectedLabel(
+					key_fieldLabel = "Success Message",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "Page");
+
+				if (isSet(pageName)) {
+					if (IsTextEqual(key_fieldLabel = "Page", locator1 = "PageEditor#ITEM_SELECTOR_CONTENT_INPUT", value1 = "")) {
+						Click(
+							key_fieldLabel = "Page",
+							key_text = "plus",
+							locator1 = "Icon#ANY_ITEM_SELECTOR");
+					}
+					else {
+						Click(
+							key_fieldLabel = "Page",
+							key_text = "change",
+							locator1 = "Icon#ANY_ITEM_SELECTOR");
+					}
+
+					SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+					if (isSet(siteName)) {
+						AssertClick(
+							key_breadcrumbName = "Sites and Libraries",
+							locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
+							value1 = "Sites and Libraries");
+
+						LexiconCard.clickCardTitleLink(card = "${siteName}");
+					}
+
+					Portlet.expandTree();
+
+					AssertVisible(
+						key_nodeName = "${pageName}",
+						locator1 = "Treeview#NODE_ITEM");
+
+					Click(
+						key_nodeName = "${pageName}",
+						locator1 = "Treeview#NODE_UNSELECTED");
+
+					SelectFrame(value1 = "relative=top");
+				}
+
+				PageEditor.waitForAutoSave();
+			}
+			else if ("${successMessage}" == "URL") {
+				Select(
+					key_fieldLabel = "Success Message",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "URL");
+
+				AssertSelectedLabel(
+					key_fieldLabel = "Success Message",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "URL");
+
+				if (isSet(url)) {
+					Type(
+						key_text = "URL",
+						locator1 = "TextInput#ANY",
+						value1 = "${url}");
+
+					Click(
+						key_sidebarButton = "Browser",
+						locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+				}
+
+				PageEditor.waitForAutoSave();
+			}
 		}
 	}
 
@@ -2475,7 +2566,13 @@ definition {
 	}
 
 	macro editInput {
-		PageEditor.gotoConfiguration(fragmentName = "${fragmentName}");
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		PageEditor.gotoConfiguration(
+			fragmentName = "${fragmentName}",
+			index = "${index}");
 
 		if (isSet(field)) {
 			Select(
@@ -4879,6 +4976,14 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 				locator1 = "Fragment#INPUT_FIELD",
 				type = "${type}",
 				value1 = "${placeholder}");
+		}
+
+		if (isSet(markAsRequired)) {
+			AssertElementPresent(
+				fieldLabel = "${label}",
+				index = "${position}",
+				locator1 = "Fragment#INPUT_REQUIRED",
+				type = "${type}");
 		}
 	}
 

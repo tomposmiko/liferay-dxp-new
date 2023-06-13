@@ -14,6 +14,7 @@
 
 package com.liferay.document.library.internal.service;
 
+import com.liferay.document.library.internal.util.DLSubscriptionSender;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
@@ -25,7 +26,7 @@ import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.document.library.kernel.util.DLAppHelperThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
@@ -37,7 +38,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.EscapableLocalizableFunction;
-import com.liferay.portal.kernel.util.GroupSubscriptionCheckSubscriptionSender;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.Validator;
@@ -197,9 +197,8 @@ public class SubscriptionDLAppHelperLocalServiceWrapper
 			folder = _dlAppLocalService.getFolder(folderId);
 		}
 
-		SubscriptionSender subscriptionSender =
-			new GroupSubscriptionCheckSubscriptionSender(
-				DLConstants.RESOURCE_NAME);
+		SubscriptionSender subscriptionSender = new DLSubscriptionSender(
+			DLConstants.RESOURCE_NAME, folderId);
 
 		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
 
@@ -219,7 +218,7 @@ public class SubscriptionDLAppHelperLocalServiceWrapper
 			subscriptionSender.setLocalizedContextAttribute(
 				"[$FOLDER_NAME$]",
 				new EscapableLocalizableFunction(
-					locale -> LanguageUtil.get(locale, "home")));
+					locale -> _language.get(locale, "home")));
 		}
 
 		subscriptionSender.setContextAttributes(
@@ -298,6 +297,9 @@ public class SubscriptionDLAppHelperLocalServiceWrapper
 
 	@Reference
 	private DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
+
+	@Reference
+	private Language _language;
 
 	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;

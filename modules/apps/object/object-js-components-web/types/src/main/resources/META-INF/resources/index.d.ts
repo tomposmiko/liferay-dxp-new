@@ -12,7 +12,7 @@
  * details.
  */
 
-export {AutoComplete} from './components/AutoComplete';
+export {default as AutoComplete} from './components/AutoComplete/index';
 export {Card} from './components/Card';
 export {CheckboxItem} from './components/CheckBoxItem';
 export {
@@ -20,7 +20,6 @@ export {
 	CodeMirrorEditor,
 	SidebarCategory,
 } from './components/CodeEditor/index';
-export {CustomSelect} from './components/CustomSelect';
 export {DatePicker} from './components/DatePicker';
 export * from './components/ExpressionBuilder';
 export {FieldBase} from './components/FieldBase';
@@ -36,6 +35,7 @@ export {SelectWithOption} from './components/SelectWithOption';
 export {
 	closeSidePanel,
 	openToast,
+	saveAndReload,
 	SidePanelContent,
 	SidePanelForm,
 } from './components/SidePanelContent';

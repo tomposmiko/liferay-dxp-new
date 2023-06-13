@@ -26,15 +26,17 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -43,6 +45,8 @@ import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsUtil;
@@ -402,6 +406,47 @@ public class LayoutLookAndFeelDisplayContext {
 		return false;
 	}
 
+	private JSONObject _getCETJSONObject(
+		ClientExtensionEntryRel clientExtensionEntryRel, boolean inherited,
+		String inheritedLabel) {
+
+		CETManager cetManager = (CETManager)_httpServletRequest.getAttribute(
+			CETManager.class.getName());
+
+		CET cet = cetManager.getCET(
+			_themeDisplay.getCompanyId(),
+			clientExtensionEntryRel.getCETExternalReferenceCode());
+
+		if (cet == null) {
+			return null;
+		}
+
+		UnicodeProperties typeSettingsUnicodeProperties =
+			UnicodePropertiesBuilder.create(
+				true
+			).fastLoad(
+				clientExtensionEntryRel.getTypeSettings()
+			).build();
+
+		return JSONUtil.put(
+			"cetExternalReferenceCode",
+			clientExtensionEntryRel.getCETExternalReferenceCode()
+		).put(
+			"inherited", inherited
+		).put(
+			"inheritedLabel", inheritedLabel
+		).put(
+			"loadType",
+			() -> typeSettingsUnicodeProperties.getProperty("loadType", null)
+		).put(
+			"name", cet.getName(_themeDisplay.getLocale())
+		).put(
+			"scriptLocation",
+			() -> typeSettingsUnicodeProperties.getProperty(
+				"scriptLocation", null)
+		);
+	}
+
 	private String _getClearFaviconButtonTitle() {
 		Layout selLayout = _layoutsAdminDisplayContext.getSelLayout();
 
@@ -437,35 +482,74 @@ public class LayoutLookAndFeelDisplayContext {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
+		if (Objects.equals(className, Layout.class.getName())) {
+			LayoutSet layoutSet = _layoutsAdminDisplayContext.getSelLayoutSet();
+
+			List<ClientExtensionEntryRel> clientExtensionEntryRels =
+				ClientExtensionEntryRelLocalServiceUtil.
+					getClientExtensionEntryRels(
+						PortalUtil.getClassNameId(LayoutSet.class),
+						layoutSet.getLayoutSetId(), type);
+
+			for (ClientExtensionEntryRel clientExtensionEntryRel :
+					clientExtensionEntryRels) {
+
+				jsonArray.put(
+					() -> _getCETJSONObject(
+						clientExtensionEntryRel, true,
+						LanguageUtil.format(
+							_themeDisplay.getLocale(), "from-x",
+							_getLayoutRootNodeName(), false)));
+			}
+
+			Layout layout = _layoutsAdminDisplayContext.getSelLayout();
+
+			if ((layout != null) && (layout.getMasterLayoutPlid() > 0)) {
+				clientExtensionEntryRels =
+					ClientExtensionEntryRelLocalServiceUtil.
+						getClientExtensionEntryRels(
+							PortalUtil.getClassNameId(Layout.class),
+							layout.getMasterLayoutPlid(), type);
+
+				for (ClientExtensionEntryRel clientExtensionEntryRel :
+						clientExtensionEntryRels) {
+
+					jsonArray.put(
+						() -> _getCETJSONObject(
+							clientExtensionEntryRel, true,
+							LanguageUtil.format(
+								_themeDisplay.getLocale(), "from-x", "master",
+								true)));
+				}
+			}
+		}
+
 		List<ClientExtensionEntryRel> clientExtensionEntryRels =
 			ClientExtensionEntryRelLocalServiceUtil.getClientExtensionEntryRels(
-				PortalUtil.getClassNameId(className), classPK, type,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-		CETManager cetManager = (CETManager)_httpServletRequest.getAttribute(
-			CETManager.class.getName());
+				PortalUtil.getClassNameId(className), classPK, type);
 
 		for (ClientExtensionEntryRel clientExtensionEntryRel :
 				clientExtensionEntryRels) {
 
-			CET cet = cetManager.getCET(
-				_themeDisplay.getCompanyId(),
-				clientExtensionEntryRel.getCETExternalReferenceCode());
-
-			if (cet == null) {
-				continue;
-			}
-
 			jsonArray.put(
-				JSONUtil.put(
-					"cetExternalReferenceCode",
-					clientExtensionEntryRel.getCETExternalReferenceCode()
-				).put(
-					"name", cet.getName(_themeDisplay.getLocale())
-				));
+				() -> _getCETJSONObject(
+					clientExtensionEntryRel, false, StringPool.DASH));
 		}
 
 		return jsonArray;
+	}
+
+	private String _getLayoutRootNodeName() {
+		LayoutSet layoutSet = _layoutsAdminDisplayContext.getSelLayoutSet();
+
+		Group group = GroupLocalServiceUtil.fetchGroup(layoutSet.getGroupId());
+
+		if (group == null) {
+			return StringPool.DASH;
+		}
+
+		return group.getLayoutRootNodeName(
+			layoutSet.isPrivateLayout(), _themeDisplay.getLocale());
 	}
 
 	private final CETManager _cetManager;

@@ -48,7 +48,6 @@ import com.liferay.layout.util.structure.FormStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.FragmentStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
-import com.liferay.layout.util.structure.LayoutStructureItemCSSUtil;
 import com.liferay.layout.util.structure.RowStyledLayoutStructureItem;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -70,6 +69,8 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsUtil;
@@ -175,12 +176,9 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 		jspWriter.write("<div class=\"");
 		jspWriter.write(
-			LayoutStructureItemCSSUtil.getLayoutStructureItemUniqueCssClass(
-				collectionStyledLayoutStructureItem));
+			collectionStyledLayoutStructureItem.getUniqueCssClass());
 		jspWriter.write(StringPool.SPACE);
-		jspWriter.write(
-			LayoutStructureItemCSSUtil.getLayoutStructureItemCssClass(
-				collectionStyledLayoutStructureItem));
+		jspWriter.write(collectionStyledLayoutStructureItem.getCssClass());
 		jspWriter.write("\" style=\"");
 
 		HttpServletRequest httpServletRequest = getRequest();
@@ -515,17 +513,12 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		jspWriter.write(StringPool.LESS_THAN);
 		jspWriter.write(htmlTag);
 		jspWriter.write(" class=\"");
-		jspWriter.write(
-			LayoutStructureItemCSSUtil.getLayoutStructureItemUniqueCssClass(
-				containerStyledLayoutStructureItem));
+		jspWriter.write(containerStyledLayoutStructureItem.getUniqueCssClass());
+		jspWriter.write(StringPool.SPACE);
+		jspWriter.write(containerStyledLayoutStructureItem.getCssClass());
 		jspWriter.write(StringPool.SPACE);
 		jspWriter.write(
-			LayoutStructureItemCSSUtil.getLayoutStructureItemCssClass(
-				containerStyledLayoutStructureItem));
-		jspWriter.write(StringPool.SPACE);
-		jspWriter.write(
-			LayoutStructureItemCSSUtil.getStyledLayoutStructureItemCssClasses(
-				containerStyledLayoutStructureItem));
+			containerStyledLayoutStructureItem.getStyledCssClasses());
 
 		String colorCssClasses =
 			renderLayoutStructureDisplayContext.getColorCssClasses(
@@ -708,17 +701,56 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		jspWriter.write(
 			renderLayoutStructureDisplayContext.getAddInfoItemActionURL());
 		jspWriter.write("\" class=\"");
-		jspWriter.write(
-			LayoutStructureItemCSSUtil.getLayoutStructureItemUniqueCssClass(
-				formStyledLayoutStructureItem));
+		jspWriter.write(formStyledLayoutStructureItem.getUniqueCssClass());
 		jspWriter.write(StringPool.SPACE);
-		jspWriter.write(
-			LayoutStructureItemCSSUtil.getLayoutStructureItemCssClass(
-				formStyledLayoutStructureItem));
+		jspWriter.write(formStyledLayoutStructureItem.getCssClass());
 		jspWriter.write(StringPool.SPACE);
-		jspWriter.write(
-			LayoutStructureItemCSSUtil.getStyledLayoutStructureItemCssClasses(
-				formStyledLayoutStructureItem));
+		jspWriter.write(formStyledLayoutStructureItem.getStyledCssClasses());
+
+		if (Objects.equals(
+				formStyledLayoutStructureItem.getWidthType(), "fixed")) {
+
+			jspWriter.write(" container-fluid container-fluid-max-xl");
+		}
+
+		if (!Objects.equals(
+				formStyledLayoutStructureItem.getDisplay(), "none")) {
+
+			if (Objects.equals(
+					formStyledLayoutStructureItem.getContentDisplay(),
+					"flex-column")) {
+
+				jspWriter.write(" d-flex flex-column");
+			}
+			else if (Objects.equals(
+						formStyledLayoutStructureItem.getContentDisplay(),
+						"flex-row")) {
+
+				jspWriter.write(" d-flex flex-row");
+			}
+
+			String align = formStyledLayoutStructureItem.getAlign();
+
+			if (Validator.isNotNull(align)) {
+				jspWriter.append(StringPool.SPACE);
+				jspWriter.append(align);
+			}
+
+			String flexWrap = formStyledLayoutStructureItem.getFlexWrap();
+
+			if (Validator.isNotNull(flexWrap)) {
+				jspWriter.append(StringPool.SPACE);
+				jspWriter.append(flexWrap);
+			}
+
+			String justify = formStyledLayoutStructureItem.getJustify();
+
+			if (Validator.isNotNull(justify)) {
+				jspWriter.append(StringPool.SPACE);
+				jspWriter.append(justify);
+			}
+		}
+
 		jspWriter.write(
 			"\" enctype=\"multipart/form-data\" method=\"POST\" style=\"");
 		jspWriter.write(
@@ -752,6 +784,11 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		jspWriter.write(formStyledLayoutStructureItem.getItemId());
 		jspWriter.write("\"><input name=\"groupId\" type=\"hidden\" value=\"");
 		jspWriter.write(String.valueOf(themeDisplay.getScopeGroupId()));
+		jspWriter.write("\"><input name=\"p_l_mode\" type=\"hidden\" value=\"");
+		jspWriter.write(
+			ParamUtil.getString(
+				PortalUtil.getOriginalServletRequest(httpServletRequest),
+				"p_l_mode", Constants.VIEW));
 		jspWriter.write("\"><input name=\"plid\" type=\"hidden\" value=\"");
 		jspWriter.write(String.valueOf(themeDisplay.getPlid()));
 		jspWriter.write(
@@ -840,10 +877,6 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				HttpServletResponse httpServletResponse =
 					(HttpServletResponse)pageContext.getResponse();
 
-				String html = fragmentRendererController.render(
-					defaultFragmentRendererContext, httpServletRequest,
-					httpServletResponse);
-
 				if (GetterUtil.getBoolean(
 						httpServletRequest.getAttribute(
 							FragmentWebKeys.
@@ -859,7 +892,10 @@ public class RenderLayoutStructureTag extends IncludeTag {
 					jspWriter.write("<div>");
 				}
 
-				jspWriter.write(html);
+				jspWriter.write(
+					fragmentRendererController.render(
+						defaultFragmentRendererContext, httpServletRequest,
+						httpServletResponse));
 				jspWriter.write("</div>");
 			}
 		}
@@ -1028,17 +1064,11 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		JspWriter jspWriter = pageContext.getOut();
 
 		jspWriter.write("<div class=\"");
-		jspWriter.write(
-			LayoutStructureItemCSSUtil.getLayoutStructureItemUniqueCssClass(
-				rowStyledLayoutStructureItem));
+		jspWriter.write(rowStyledLayoutStructureItem.getUniqueCssClass());
 		jspWriter.write(StringPool.SPACE);
-		jspWriter.write(
-			LayoutStructureItemCSSUtil.getLayoutStructureItemCssClass(
-				rowStyledLayoutStructureItem));
+		jspWriter.write(rowStyledLayoutStructureItem.getCssClass());
 		jspWriter.write(StringPool.SPACE);
-		jspWriter.write(
-			LayoutStructureItemCSSUtil.getStyledLayoutStructureItemCssClasses(
-				rowStyledLayoutStructureItem));
+		jspWriter.write(rowStyledLayoutStructureItem.getStyledCssClasses());
 		jspWriter.write("\" style=\"");
 		jspWriter.write(
 			renderLayoutStructureDisplayContext.getStyle(
@@ -1137,17 +1167,14 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				fragmentEntryLink)) {
 
 			jspWriter.write(
-				LayoutStructureItemCSSUtil.getFragmentEntryLinkCssClass(
+				fragmentStyledLayoutStructureItem.getFragmentEntryLinkCssClass(
 					fragmentEntryLink));
 			jspWriter.write(StringPool.SPACE);
 			jspWriter.write(
-				LayoutStructureItemCSSUtil.getLayoutStructureItemUniqueCssClass(
-					fragmentStyledLayoutStructureItem));
+				fragmentStyledLayoutStructureItem.getUniqueCssClass());
 			jspWriter.write(StringPool.SPACE);
 			jspWriter.write(
-				LayoutStructureItemCSSUtil.
-					getStyledLayoutStructureItemCssClasses(
-						fragmentStyledLayoutStructureItem));
+				fragmentStyledLayoutStructureItem.getStyledCssClasses());
 		}
 
 		String colorCssClasses =

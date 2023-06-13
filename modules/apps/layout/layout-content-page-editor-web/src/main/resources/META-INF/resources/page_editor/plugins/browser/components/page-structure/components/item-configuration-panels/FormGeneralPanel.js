@@ -35,6 +35,7 @@ import CurrentLanguageFlag from '../../../../../../common/components/CurrentLang
 import {LayoutSelector} from '../../../../../../common/components/LayoutSelector';
 import useControlledState from '../../../../../../core/hooks/useControlledState';
 import {CommonStyles} from './CommonStyles';
+import ContainerDisplayOptions from './ContainerDisplayOptions';
 
 export function FormGeneralPanel({item}) {
 	const dispatch = useDispatch();
@@ -84,7 +85,10 @@ function FormOptions({item, onValueSelect}) {
 
 	return (
 		<div className="mb-3">
-			<Collapse label={Liferay.Language.get('form-options')} open>
+			<Collapse
+				label={Liferay.Language.get('form-container-options')}
+				open
+			>
 				{!!formTypes.length && (
 					<SelectField
 						disabled={!formTypes.length}
@@ -140,10 +144,14 @@ function FormOptions({item, onValueSelect}) {
 				)}
 
 				{formIsMapped(item) && (
-					<SuccessMessageOptions
-						item={item}
-						onValueSelect={onValueSelect}
-					/>
+					<>
+						<SuccessMessageOptions
+							item={item}
+							onValueSelect={onValueSelect}
+						/>
+
+						<ContainerDisplayOptions item={item} />
+					</>
 				)}
 			</Collapse>
 		</div>

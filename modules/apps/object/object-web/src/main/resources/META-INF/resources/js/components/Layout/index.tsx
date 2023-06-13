@@ -15,9 +15,9 @@
 import ClayTabs from '@clayui/tabs';
 import {
 	SidePanelContent,
-	closeSidePanel,
 	invalidateRequired,
 	openToast,
+	saveAndReload,
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useContext, useEffect, useState} from 'react';
@@ -110,13 +110,7 @@ const normalizeObjectRelationships: TNormalizeObjectRelationships = ({
 
 const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 	const [
-		{
-			ffUseMetadataAsSystemFields,
-			isViewOnly,
-			objectFields,
-			objectLayout,
-			objectLayoutId,
-		},
+		{isViewOnly, objectFields, objectLayout, objectLayoutId},
 		dispatch,
 	] = useContext(LayoutContext);
 	const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -152,32 +146,19 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				type: TYPES.ADD_OBJECT_LAYOUT,
 			});
 
-			if (ffUseMetadataAsSystemFields) {
-				const filteredObjectFields = objectFields.filter(
-					({system}) => !system
-				);
+			const filteredObjectFields = objectFields.filter(
+				({system}) => !system
+			);
 
-				dispatch({
-					payload: {
-						objectFields: normalizeObjectFields({
-							objectFields: filteredObjectFields,
-							objectLayout,
-						}),
-					},
-					type: TYPES.ADD_OBJECT_FIELDS,
-				});
-			}
-			else {
-				dispatch({
-					payload: {
-						objectFields: normalizeObjectFields({
-							objectFields,
-							objectLayout,
-						}),
-					},
-					type: TYPES.ADD_OBJECT_FIELDS,
-				});
-			}
+			dispatch({
+				payload: {
+					objectFields: normalizeObjectFields({
+						objectFields: filteredObjectFields,
+						objectLayout,
+					}),
+				},
+				type: TYPES.ADD_OBJECT_FIELDS,
+			});
 
 			dispatch({
 				payload: {
@@ -193,7 +174,7 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 		};
 
 		makeFetch();
-	}, [ffUseMetadataAsSystemFields, objectLayoutId, dispatch]);
+	}, [objectLayoutId, dispatch]);
 
 	const saveObjectLayout = async () => {
 		const hasFieldsInLayout = objectFields.some(
@@ -231,7 +212,7 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 			window.location.reload();
 		}
 		else if (response.ok) {
-			closeSidePanel();
+			saveAndReload();
 
 			openToast({
 				message: Liferay.Language.get(
@@ -281,14 +262,12 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 };
 
 interface ILayoutWrapperProps extends React.HTMLAttributes<HTMLElement> {
-	ffUseMetadataAsSystemFields: boolean;
 	isViewOnly: boolean;
 	objectFieldTypes: ObjectFieldType[];
 	objectLayoutId: string;
 }
 
 const LayoutWrapper: React.FC<ILayoutWrapperProps> = ({
-	ffUseMetadataAsSystemFields,
 	isViewOnly,
 	objectFieldTypes,
 	objectLayoutId,
@@ -296,7 +275,6 @@ const LayoutWrapper: React.FC<ILayoutWrapperProps> = ({
 	return (
 		<LayoutContextProvider
 			value={{
-				ffUseMetadataAsSystemFields,
 				isViewOnly,
 				objectFieldTypes,
 				objectLayoutId,

@@ -69,10 +69,10 @@ public class KBArticleGroupSubscriptionPortletConfigurationIcon
 		).setActionName(
 			() -> {
 				if (_isSubscribed(portletRequest)) {
-					return "unsubscribeGroupKBArticles";
+					return "/knowledge_base/unsubscribe_group_kb_articles";
 				}
 
-				return "subscribeGroupKBArticles";
+				return "/knowledge_base/subscribe_group_kb_articles";
 			}
 		).setRedirect(
 			_portal.getCurrentURL(portletRequest)

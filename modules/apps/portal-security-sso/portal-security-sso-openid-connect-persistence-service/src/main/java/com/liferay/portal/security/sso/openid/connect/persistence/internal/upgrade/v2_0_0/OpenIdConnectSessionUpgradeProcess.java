@@ -47,6 +47,12 @@ public class OpenIdConnectSessionUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		alterTableAddColumn(
+			"OpenIdConnectSession", "authServerWellKnownURI",
+			"VARCHAR(256) null");
+		alterTableAddColumn(
+			"OpenIdConnectSession", "clientId", "VARCHAR(256) null");
+
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select openIdConnectSessionId, configurationPid from " +
 					"OpenIdConnectSession");
@@ -74,6 +80,9 @@ public class OpenIdConnectSessionUpgradeProcess extends UpgradeProcess {
 				}
 			}
 		}
+
+		alterTableDropColumn("OpenIdConnectSession", "configurationPid");
+		alterTableDropColumn("OpenIdConnectSession", "providerName");
 	}
 
 	private String _generateLocalWellKnownURI(

@@ -30,9 +30,9 @@ export const CreateRoutine = gql`
 `;
 
 export const DeleteRoutine = gql`
-	mutation deleteRoutine($routineId: Long) {
+	mutation deleteRoutine($id: Long) {
 		c {
-			deleteRoutine(routineId: $routineId)
+			deleteRoutine(routineId: $id)
 		}
 	}
 `;

@@ -361,7 +361,7 @@ definition {
 			PageEditorEditableLink.updateURL(url = "https://liferay.com");
 
 			AssertVisible(
-				key_append = "//img[contains(@src,'Document_1.jpg')]",
+				key_append = "//img[contains(@src,'document_1-jpg')]",
 				key_url = "https://liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
@@ -401,12 +401,12 @@ definition {
 
 		task ("Assert mapped URL work in display page template") {
 			AssertVisible(
-				key_append = "//img[contains(@src,'Document_1.jpg')]",
+				key_append = "//img[contains(@src,'document_1-jpg')]",
 				key_url = "https://liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
 			Click(
-				key_append = "//img[contains(@src,'Document_1.jpg')]",
+				key_append = "//img[contains(@src,'document_1-jpg')]",
 				key_url = "https://liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 

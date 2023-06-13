@@ -25,7 +25,7 @@ import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.base.ObjectValidationRuleLocalServiceBaseImpl;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngine;
-import com.liferay.object.validation.rule.ObjectValidationRuleEngineServicesTracker;
+import com.liferay.object.validation.rule.ObjectValidationRuleEngineTracker;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -211,7 +211,7 @@ public class ObjectValidationRuleLocalServiceImpl
 				objectValidationRules) {
 
 			ObjectValidationRuleEngine objectValidationRuleEngine =
-				_objectValidationRuleEngineServicesTracker.
+				_objectValidationRuleEngineTracker.
 					getObjectValidationRuleEngine(
 						objectValidationRule.getEngine());
 
@@ -237,8 +237,8 @@ public class ObjectValidationRuleLocalServiceImpl
 		}
 
 		ObjectValidationRuleEngine objectValidationRuleEngine =
-			_objectValidationRuleEngineServicesTracker.
-				getObjectValidationRuleEngine(engine);
+			_objectValidationRuleEngineTracker.getObjectValidationRuleEngine(
+				engine);
 
 		if (objectValidationRuleEngine == null) {
 			throw new ObjectValidationRuleEngineException(
@@ -301,8 +301,8 @@ public class ObjectValidationRuleLocalServiceImpl
 	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
-	private ObjectValidationRuleEngineServicesTracker
-		_objectValidationRuleEngineServicesTracker;
+	private ObjectValidationRuleEngineTracker
+		_objectValidationRuleEngineTracker;
 
 	@Reference
 	private UserLocalService _userLocalService;

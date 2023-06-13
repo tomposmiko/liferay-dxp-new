@@ -16,6 +16,7 @@ package com.liferay.portal.upgrade.v6_2_0;
 
 import com.liferay.layout.admin.kernel.model.LayoutTypePortletConstants;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portlet.PortalPreferencesImpl;
-import com.liferay.portlet.PortalPreferencesWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -48,43 +48,53 @@ public class UpgradeCustomizablePortlets extends UpgradeProcess {
 		upgradeCustomizablePreferences();
 	}
 
-	protected PortalPreferencesWrapper getPortalPreferencesInstance(
+	protected PortalPreferencesImpl getPortalPreferencesImpl(
 		long ownerId, int ownerType, String xml) {
 
-		PortalPreferencesImpl portalPreferencesImpl =
-			(PortalPreferencesImpl)PortletPreferencesFactoryUtil.fromXML(
-				ownerId, ownerType, xml);
-
-		return new PortalPreferencesWrapper(portalPreferencesImpl);
+		return (PortalPreferencesImpl)PortletPreferencesFactoryUtil.fromXML(
+			ownerId, ownerType, xml);
 	}
 
 	protected void upgradeCustomizablePreferences() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
-			PreparedStatement preparedStatement = connection.prepareStatement(
-				"select ownerId, ownerType, preferences from " +
-					"PortalPreferences where preferences like " +
+			PreparedStatement preparedStatement1 = connection.prepareStatement(
+				"select portalPreferencesId, ownerId, ownerType, preferences " +
+					"from PortalPreferences where preferences like " +
 						"'%com.liferay.portal.model.CustomizedPages%'");
-			ResultSet resultSet = preparedStatement.executeQuery()) {
+			ResultSet resultSet = preparedStatement1.executeQuery();
+			PreparedStatement preparedStatement2 =
+				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+					connection,
+					"update PortalPreferences set preferences = ? where " +
+						"portalPreferencesId = ?")) {
 
 			while (resultSet.next()) {
+				long portalPreferencesId = resultSet.getLong(
+					"portalPreferencesId");
+
 				long ownerId = resultSet.getLong("ownerId");
 				int ownerType = resultSet.getInt("ownerType");
 				String preferences = resultSet.getString("preferences");
 
-				PortalPreferencesWrapper portalPreferencesWrapper =
-					getPortalPreferencesInstance(
-						ownerId, ownerType, preferences);
+				PortalPreferencesImpl portalPreferencesImpl =
+					getPortalPreferencesImpl(ownerId, ownerType, preferences);
 
 				upgradeCustomizablePreferences(
-					portalPreferencesWrapper, ownerId, ownerType, preferences);
+					portalPreferencesImpl, ownerId, ownerType, preferences);
 
-				portalPreferencesWrapper.store();
+				preparedStatement2.setString(1, portalPreferencesImpl.toXML());
+
+				preparedStatement2.setLong(2, portalPreferencesId);
+
+				preparedStatement2.addBatch();
 			}
+
+			preparedStatement2.executeBatch();
 		}
 	}
 
 	protected void upgradeCustomizablePreferences(
-			PortalPreferencesWrapper portalPreferencesWrapper, long ownerId,
+			PortalPreferencesImpl portalPreferencesImpl, long ownerId,
 			int ownerType, String preferences)
 		throws Exception {
 
@@ -98,9 +108,6 @@ public class UpgradeCustomizablePortlets extends UpgradeProcess {
 		else {
 			return;
 		}
-
-		PortalPreferencesImpl portalPreferencesImpl =
-			portalPreferencesWrapper.getPortalPreferencesImpl();
 
 		while (x != -1) {
 

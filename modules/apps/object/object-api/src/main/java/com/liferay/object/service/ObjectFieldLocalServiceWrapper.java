@@ -343,6 +343,13 @@ public class ObjectFieldLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.petra.sql.dsl.Column<?, ?> getColumn(
+		long objectDefinitionId, String name) {
+
+		return _objectFieldLocalService.getColumn(objectDefinitionId, name);
+	}
+
+	@Override
 	public java.util.List<com.liferay.object.model.ObjectField>
 		getCustomObjectFields(long objectFieldId) {
 
@@ -511,15 +518,14 @@ public class ObjectFieldLocalServiceWrapper
 			java.util.Map<java.util.Locale, String> labelMap, String name,
 			boolean required, boolean state,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
-				objectFieldSettings,
-			com.liferay.object.model.ObjectStateFlow objectStateFlow)
+				objectFieldSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectFieldLocalService.updateCustomObjectField(
 			objectFieldId, externalReferenceCode, listTypeDefinitionId,
 			businessType, dbType, defaultValue, indexed, indexedAsKeyword,
 			indexedLanguageId, labelMap, name, required, state,
-			objectFieldSettings, objectStateFlow);
+			objectFieldSettings);
 	}
 
 	@Override
@@ -532,16 +538,14 @@ public class ObjectFieldLocalServiceWrapper
 			java.util.Map<java.util.Locale, String> labelMap, String name,
 			boolean required, boolean state, boolean system,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
-				objectFieldSettings,
-			com.liferay.object.model.ObjectStateFlow objectStateFlow)
+				objectFieldSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectFieldLocalService.updateObjectField(
 			userId, objectDefinitionId, objectFieldId, externalReferenceCode,
 			listTypeDefinitionId, businessType, dbColumnName, dbTableName,
 			dbType, defaultValue, indexed, indexedAsKeyword, indexedLanguageId,
-			labelMap, name, required, state, system, objectFieldSettings,
-			objectStateFlow);
+			labelMap, name, required, state, system, objectFieldSettings);
 	}
 
 	/**

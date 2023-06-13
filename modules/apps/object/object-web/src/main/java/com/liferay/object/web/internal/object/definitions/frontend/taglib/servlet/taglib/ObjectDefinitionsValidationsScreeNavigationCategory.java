@@ -17,7 +17,7 @@ package com.liferay.object.web.internal.object.definitions.frontend.taglib.servl
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.validation.rule.ObjectValidationRuleEngineServicesTracker;
+import com.liferay.object.validation.rule.ObjectValidationRuleEngineTracker;
 import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
 import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsValidationsDisplayContext;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -92,7 +92,7 @@ public class ObjectDefinitionsValidationsScreeNavigationCategory
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
 			new ObjectDefinitionsValidationsDisplayContext(
 				httpServletRequest, _objectDefinitionModelResourcePermission,
-				_objectValidationRuleEngineServicesTracker));
+				_objectValidationRuleEngineTracker));
 
 		super.render(httpServletRequest, httpServletResponse);
 	}
@@ -104,7 +104,7 @@ public class ObjectDefinitionsValidationsScreeNavigationCategory
 		_objectDefinitionModelResourcePermission;
 
 	@Reference
-	private ObjectValidationRuleEngineServicesTracker
-		_objectValidationRuleEngineServicesTracker;
+	private ObjectValidationRuleEngineTracker
+		_objectValidationRuleEngineTracker;
 
 }

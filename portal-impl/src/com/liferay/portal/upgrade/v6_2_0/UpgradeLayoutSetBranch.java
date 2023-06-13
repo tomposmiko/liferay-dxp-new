@@ -23,8 +23,8 @@ public class UpgradeLayoutSetBranch extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		alterColumnType("LayoutSetBranchTable", "css", "TEXT null");
-		alterColumnType("LayoutSetBranchTable", "settings_", "TEXT null");
+		alterColumnType("LayoutSetBranch", "css", "TEXT null");
+		alterColumnType("LayoutSetBranch", "settings_", "TEXT null");
 	}
 
 }

@@ -672,6 +672,12 @@ public interface PropsKeys {
 	public static final String DEFAULT_USER_PUBLIC_LAYOUTS_LAR =
 		"default.user.public.layouts.lar";
 
+	public static final String DEPENDENCY_MANAGER_SYNC_TIMEOUT =
+		"dependency.manager.sync.timeout";
+
+	public static final String DEPENDENCY_MANAGER_THREAD_POOL_ENABLED =
+		"dependency.manager.thread.pool.enabled";
+
 	public static final String DIRECT_SERVLET_CONTEXT_ENABLED =
 		"direct.servlet.context.enabled";
 
@@ -1173,6 +1179,9 @@ public interface PropsKeys {
 		"index.sortable.text.fields.truncated.length";
 
 	public static final String INDEXER_ENABLED = "indexer.enabled";
+
+	public static final String INITIAL_SYSTEM_CHECK_ENABLED =
+		"initial.system.check.enabled";
 
 	public static final String INVOKER_FILTER_CHAIN_ENABLED =
 		"invoker.filter.chain.cache.enabled";

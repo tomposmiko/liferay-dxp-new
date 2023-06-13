@@ -23,7 +23,7 @@ import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectEntryValues
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectValidationRuleEngineExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.RequiredObjectRelationshipExceptionMapper;
 import com.liferay.object.rest.internal.resource.v1_0.BaseObjectEntryResourceImpl;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerServicesTracker;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -189,7 +189,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				GraphQLDTOContributor.class,
 				ObjectDefinitionGraphQLDTOContributor.of(
 					_filterParserProvider, objectDefinition,
-					_objectEntryManagerServicesTracker.getObjectEntryManager(
+					_objectEntryManagerTracker.getObjectEntryManager(
 						objectDefinition.getStorageType()),
 					_objectFieldLocalService, _objectRelationshipLocalService,
 					objectScopeProvider),
@@ -327,8 +327,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private ComponentFactory _objectEntryApplicationComponentFactory;
 
 	@Reference
-	private ObjectEntryManagerServicesTracker
-		_objectEntryManagerServicesTracker;
+	private ObjectEntryManagerTracker _objectEntryManagerTracker;
 
 	@Reference(
 		target = "(component.factory=com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResource)"

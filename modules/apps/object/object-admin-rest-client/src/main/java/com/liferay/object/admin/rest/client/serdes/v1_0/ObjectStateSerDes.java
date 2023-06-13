@@ -14,8 +14,8 @@
 
 package com.liferay.object.admin.rest.client.serdes.v1_0;
 
-import com.liferay.object.admin.rest.client.dto.v1_0.NextObjectState;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectState;
+import com.liferay.object.admin.rest.client.dto.v1_0.ObjectStateTransition;
 import com.liferay.object.admin.rest.client.json.BaseJSONParser;
 
 import java.util.Iterator;
@@ -67,29 +67,36 @@ public class ObjectStateSerDes {
 			sb.append(objectState.getId());
 		}
 
-		if (objectState.getListTypeEntryId() != null) {
+		if (objectState.getKey() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"listTypeEntryId\": ");
+			sb.append("\"key\": ");
 
-			sb.append(objectState.getListTypeEntryId());
+			sb.append("\"");
+
+			sb.append(_escape(objectState.getKey()));
+
+			sb.append("\"");
 		}
 
-		if (objectState.getNextObjectStates() != null) {
+		if (objectState.getObjectStateTransitions() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"nextObjectStates\": ");
+			sb.append("\"objectStateTransitions\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < objectState.getNextObjectStates().length; i++) {
-				sb.append(String.valueOf(objectState.getNextObjectStates()[i]));
+			for (int i = 0; i < objectState.getObjectStateTransitions().length;
+				 i++) {
 
-				if ((i + 1) < objectState.getNextObjectStates().length) {
+				sb.append(
+					String.valueOf(objectState.getObjectStateTransitions()[i]));
+
+				if ((i + 1) < objectState.getObjectStateTransitions().length) {
 					sb.append(", ");
 				}
 			}
@@ -123,22 +130,20 @@ public class ObjectStateSerDes {
 			map.put("id", String.valueOf(objectState.getId()));
 		}
 
-		if (objectState.getListTypeEntryId() == null) {
-			map.put("listTypeEntryId", null);
+		if (objectState.getKey() == null) {
+			map.put("key", null);
 		}
 		else {
-			map.put(
-				"listTypeEntryId",
-				String.valueOf(objectState.getListTypeEntryId()));
+			map.put("key", String.valueOf(objectState.getKey()));
 		}
 
-		if (objectState.getNextObjectStates() == null) {
-			map.put("nextObjectStates", null);
+		if (objectState.getObjectStateTransitions() == null) {
+			map.put("objectStateTransitions", null);
 		}
 		else {
 			map.put(
-				"nextObjectStates",
-				String.valueOf(objectState.getNextObjectStates()));
+				"objectStateTransitions",
+				String.valueOf(objectState.getObjectStateTransitions()));
 		}
 
 		return map;
@@ -168,22 +173,23 @@ public class ObjectStateSerDes {
 						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "listTypeEntryId")) {
+			else if (Objects.equals(jsonParserFieldName, "key")) {
 				if (jsonParserFieldValue != null) {
-					objectState.setListTypeEntryId(
-						Long.valueOf((String)jsonParserFieldValue));
+					objectState.setKey((String)jsonParserFieldValue);
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "nextObjectStates")) {
+			else if (Objects.equals(
+						jsonParserFieldName, "objectStateTransitions")) {
+
 				if (jsonParserFieldValue != null) {
-					objectState.setNextObjectStates(
+					objectState.setObjectStateTransitions(
 						Stream.of(
 							toStrings((Object[])jsonParserFieldValue)
 						).map(
-							object -> NextObjectStateSerDes.toDTO(
+							object -> ObjectStateTransitionSerDes.toDTO(
 								(String)object)
 						).toArray(
-							size -> new NextObjectState[size]
+							size -> new ObjectStateTransition[size]
 						));
 				}
 			}

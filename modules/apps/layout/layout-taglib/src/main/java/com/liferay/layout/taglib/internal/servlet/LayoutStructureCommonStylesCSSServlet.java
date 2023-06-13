@@ -25,7 +25,6 @@ import com.liferay.layout.util.structure.CommonStylesUtil;
 import com.liferay.layout.util.structure.ContainerStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
-import com.liferay.layout.util.structure.LayoutStructureItemCSSUtil;
 import com.liferay.layout.util.structure.StyledLayoutStructureItem;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONException;
@@ -47,7 +46,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.PropsUtil;
 import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.util.DefaultStyleBookEntryUtil;
 
@@ -124,6 +122,9 @@ public class LayoutStructureCommonStylesCSSServlet extends HttpServlet {
 
 		PrintWriter printWriter = httpServletResponse.getWriter();
 
+		printWriter.write(
+			".lfr-layout-structure-item-row {overflow: hidden;}");
+
 		JSONObject frontendTokensJSONObject = _getFrontendTokensJSONObject(
 			layout.getGroupId(), layout,
 			ParamUtil.getBoolean(httpServletRequest, "styleBookEntryPreview"));
@@ -151,20 +152,14 @@ public class LayoutStructureCommonStylesCSSServlet extends HttpServlet {
 						frontendTokensJSONObject, styledLayoutStructureItem,
 						viewportSize));
 
-				if (GetterUtil.getBoolean(
-						PropsUtil.get("feature.flag.LPS-147511"))) {
+				String customCSS = _getCustomCSS(
+					styledLayoutStructureItem, viewportSize);
 
-					String customCSS = _getCustomCSS(
-						styledLayoutStructureItem, viewportSize);
-
-					if (Validator.isNotNull(customCSS)) {
-						cssSB.append(
-							StringUtil.replace(
-								customCSS, _FRAGMENT_CLASS_PLACEHOLDER,
-								LayoutStructureItemCSSUtil.
-									getLayoutStructureItemUniqueCssClass(
-										styledLayoutStructureItem)));
-					}
+				if (Validator.isNotNull(customCSS)) {
+					cssSB.append(
+						StringUtil.replace(
+							customCSS, _FRAGMENT_CLASS_PLACEHOLDER,
+							styledLayoutStructureItem.getUniqueCssClass()));
 				}
 			}
 

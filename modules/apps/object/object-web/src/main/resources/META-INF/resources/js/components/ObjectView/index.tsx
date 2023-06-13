@@ -15,9 +15,9 @@
 import ClayTabs from '@clayui/tabs';
 import {
 	SidePanelContent,
-	closeSidePanel,
 	invalidateRequired,
 	openToast,
+	saveAndReload,
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useContext, useEffect, useState} from 'react';
@@ -181,7 +181,7 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				window.location.reload();
 			}
 			else if (response.ok) {
-				closeSidePanel();
+				saveAndReload();
 
 				openToast({
 					message: Liferay.Language.get(
@@ -239,14 +239,12 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 	);
 };
 interface ICustomViewWrapperProps extends React.HTMLAttributes<HTMLElement> {
-	ffUseMetadataAsSystemFields: boolean;
 	isViewOnly: boolean;
 	objectViewId: string;
 	workflowStatusJSONArray: TWorkflowStatus[];
 }
 
 const CustomViewWrapper: React.FC<ICustomViewWrapperProps> = ({
-	ffUseMetadataAsSystemFields,
 	isViewOnly,
 	objectViewId,
 	workflowStatusJSONArray,
@@ -254,7 +252,6 @@ const CustomViewWrapper: React.FC<ICustomViewWrapperProps> = ({
 	return (
 		<ViewContextProvider
 			value={{
-				ffUseMetadataAsSystemFields,
 				isViewOnly,
 				objectViewId,
 				workflowStatusJSONArray,

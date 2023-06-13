@@ -18,7 +18,7 @@ import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerServicesTracker;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
 import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
 import com.liferay.object.web.internal.object.definitions.display.context.ViewObjectDefinitionsDisplayContext;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -87,7 +87,7 @@ public class ObjectDefinitionsObjectsScreenNavigationCategory
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
 			new ViewObjectDefinitionsDisplayContext(
 				httpServletRequest, _objectDefinitionModelResourcePermission,
-				_objectEntryManagerServicesTracker));
+				_objectEntryManagerTracker));
 
 		_jspRenderer.renderJSP(
 			httpServletRequest, httpServletResponse,
@@ -104,7 +104,6 @@ public class ObjectDefinitionsObjectsScreenNavigationCategory
 		_objectDefinitionModelResourcePermission;
 
 	@Reference
-	private ObjectEntryManagerServicesTracker
-		_objectEntryManagerServicesTracker;
+	private ObjectEntryManagerTracker _objectEntryManagerTracker;
 
 }

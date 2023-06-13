@@ -22,6 +22,7 @@ import com.liferay.info.field.InfoField;
 import com.liferay.info.field.type.FileInfoFieldType;
 import com.liferay.info.field.type.InfoFieldType;
 import com.liferay.info.field.type.NumberInfoFieldType;
+import com.liferay.info.field.type.RelationshipInfoFieldType;
 import com.liferay.info.field.type.SelectInfoFieldType;
 import com.liferay.info.form.InfoForm;
 import com.liferay.item.selector.ItemSelector;
@@ -269,6 +270,31 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 			minValueOptional.ifPresent(
 				minValue -> inputTemplateNode.addAttribute("min", minValue));
 		}
+		else if (infoField.getInfoFieldType() instanceof
+					RelationshipInfoFieldType) {
+
+			Optional<String> optionsLabelFieldNameOptional =
+				infoField.getAttributeOptional(
+					RelationshipInfoFieldType.LABEL_FIELD_NAME);
+
+			inputTemplateNode.addAttribute(
+				"relationshipLabelFieldName",
+				optionsLabelFieldNameOptional.orElse(null));
+
+			Optional<String> optionsURLOptional =
+				infoField.getAttributeOptional(RelationshipInfoFieldType.URL);
+
+			inputTemplateNode.addAttribute(
+				"relationshipURL", optionsURLOptional.orElse(null));
+
+			Optional<String> optionsValueFieldNameOptional =
+				infoField.getAttributeOptional(
+					RelationshipInfoFieldType.VALUE_FIELD_NAME);
+
+			inputTemplateNode.addAttribute(
+				"relationshipValueFieldName",
+				optionsValueFieldNameOptional.orElse(null));
+		}
 		else if (infoField.getInfoFieldType() instanceof SelectInfoFieldType) {
 			List<InputTemplateNode.Option> options = new ArrayList<>();
 
@@ -284,28 +310,6 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 			}
 
 			inputTemplateNode.addAttribute("options", options);
-
-			Optional<String> optionsLabelFieldNameOptional =
-				infoField.getAttributeOptional(
-					SelectInfoFieldType.OPTIONS_LABEL_FIELD_NAME);
-
-			inputTemplateNode.addAttribute(
-				"optionsLabelFieldName",
-				optionsLabelFieldNameOptional.orElse(null));
-
-			Optional<String> optionsURLOptional =
-				infoField.getAttributeOptional(SelectInfoFieldType.OPTIONS_URL);
-
-			inputTemplateNode.addAttribute(
-				"optionsURL", optionsURLOptional.orElse(null));
-
-			Optional<String> optionsValueFieldNameOptional =
-				infoField.getAttributeOptional(
-					SelectInfoFieldType.OPTIONS_VALUE_FIELD_NAME);
-
-			inputTemplateNode.addAttribute(
-				"optionsValueFieldName",
-				optionsValueFieldNameOptional.orElse(null));
 		}
 
 		return inputTemplateNode;

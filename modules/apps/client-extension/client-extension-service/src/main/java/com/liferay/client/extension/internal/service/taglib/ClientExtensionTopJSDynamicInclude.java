@@ -15,24 +15,23 @@
 package com.liferay.client.extension.internal.service.taglib;
 
 import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
+import com.liferay.client.extension.internal.service.taglib.util.ClientExtensionDynamicIncludeUtil;
 import com.liferay.client.extension.model.ClientExtensionEntryRel;
-import com.liferay.client.extension.service.ClientExtensionEntryRelLocalService;
 import com.liferay.client.extension.type.GlobalJSCET;
 import com.liferay.client.extension.type.manager.CETManager;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutSet;
-import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -58,17 +57,52 @@ public class ClientExtensionTopJSDynamicInclude implements DynamicInclude {
 
 		PrintWriter printWriter = httpServletResponse.getWriter();
 
+		List<ClientExtensionEntryRel> clientExtensionEntryRels =
+			ClientExtensionDynamicIncludeUtil.getClientExtensionEntryRels(
+				themeDisplay.getLayout(),
+				ClientExtensionEntryConstants.TYPE_GLOBAL_JS);
+
 		for (ClientExtensionEntryRel clientExtensionEntryRel :
-				_getClientExtensionEntryRels(themeDisplay.getLayout())) {
+				clientExtensionEntryRels) {
 
 			GlobalJSCET globalJSCET = (GlobalJSCET)_cetManager.getCET(
 				clientExtensionEntryRel.getCompanyId(),
 				clientExtensionEntryRel.getCETExternalReferenceCode());
 
-			printWriter.print(
-				"<script data-senna-track=\"temporary\" src=\"" +
-					globalJSCET.getURL() +
-						"\" type=\"text/javascript\"></script>");
+			if (globalJSCET == null) {
+				continue;
+			}
+
+			UnicodeProperties typeSettingsUnicodeProperties =
+				UnicodePropertiesBuilder.create(
+					true
+				).fastLoad(
+					clientExtensionEntryRel.getTypeSettings()
+				).build();
+
+			if (!Objects.equals(
+					typeSettingsUnicodeProperties.getProperty(
+						"scriptLocation", StringPool.BLANK),
+					"head")) {
+
+				continue;
+			}
+
+			printWriter.print("<script ");
+
+			String loadType = typeSettingsUnicodeProperties.getProperty(
+				"loadType", StringPool.BLANK);
+
+			if (Validator.isNotNull(loadType) &&
+				!Objects.equals(loadType, "default")) {
+
+				printWriter.print(loadType);
+				printWriter.print(StringPool.SPACE);
+			}
+
+			printWriter.print("data-senna-track=\"temporary\" src=\"");
+			printWriter.print(globalJSCET.getURL());
+			printWriter.print("\" type=\"text/javascript\"></script>");
 		}
 	}
 
@@ -78,53 +112,7 @@ public class ClientExtensionTopJSDynamicInclude implements DynamicInclude {
 			"/html/common/themes/top_js.jspf#resources");
 	}
 
-	private List<ClientExtensionEntryRel> _getClientExtensionEntryRels(
-		Layout layout) {
-
-		List<ClientExtensionEntryRel> clientExtensionEntryRels =
-			new ArrayList<>(
-				_clientExtensionEntryRelLocalService.
-					getClientExtensionEntryRels(
-						_portal.getClassNameId(Layout.class), layout.getPlid(),
-						ClientExtensionEntryConstants.TYPE_GLOBAL_JS,
-						QueryUtil.ALL_POS, QueryUtil.ALL_POS));
-
-		Layout masterLayout = _layoutLocalService.fetchLayout(
-			layout.getMasterLayoutPlid());
-
-		if (masterLayout != null) {
-			clientExtensionEntryRels.addAll(
-				_clientExtensionEntryRelLocalService.
-					getClientExtensionEntryRels(
-						_portal.getClassNameId(Layout.class),
-						masterLayout.getPlid(),
-						ClientExtensionEntryConstants.TYPE_GLOBAL_JS,
-						QueryUtil.ALL_POS, QueryUtil.ALL_POS));
-		}
-
-		LayoutSet layoutSet = layout.getLayoutSet();
-
-		clientExtensionEntryRels.addAll(
-			_clientExtensionEntryRelLocalService.getClientExtensionEntryRels(
-				_portal.getClassNameId(LayoutSet.class),
-				layoutSet.getLayoutSetId(),
-				ClientExtensionEntryConstants.TYPE_GLOBAL_JS, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS));
-
-		return clientExtensionEntryRels;
-	}
-
 	@Reference
 	private CETManager _cetManager;
-
-	@Reference
-	private ClientExtensionEntryRelLocalService
-		_clientExtensionEntryRelLocalService;
-
-	@Reference
-	private LayoutLocalService _layoutLocalService;
-
-	@Reference
-	private Portal _portal;
 
 }

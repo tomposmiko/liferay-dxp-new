@@ -48,7 +48,7 @@ public class UpgradeGroup extends UpgradeProcess {
 
 		alterColumnType("Group_", "name", "STRING null");
 
-		try (SafeCloseable safeCloseable = addTempIndex(
+		try (SafeCloseable safeCloseable = addTemporaryIndex(
 				"Group_", false, "classNameId", "classPK")) {
 
 			updateGlobalGroupName();

@@ -26,11 +26,10 @@ import {filters} from '../../../schema/filter';
 import {BUILD_STATUS} from '../../../util/constants';
 import dayjs from '../../../util/date';
 import {searchUtil} from '../../../util/search';
-import RoutineBuildModal from './RoutineBuildModal';
-import useRoutineActions from './useRoutineActions';
+import useBuildActions from './Builds/useBuildActions';
 
 const Routine = () => {
-	const {actionsRoutine, formModal} = useRoutineActions();
+	const {actions, formModal} = useBuildActions();
 	const {barChart, colors} = useBuildHistory();
 	const {routineId} = useParams();
 	const navigate = useNavigate();
@@ -48,13 +47,13 @@ const Routine = () => {
 					},
 				}}
 				managementToolbarProps={{
-					addButton: () => navigate('update'),
+					addButton: () => navigate('create'),
 					filterFields: filters.build.index as any,
 					title: i18n.translate('build-history'),
 				}}
 				query={getBuilds}
 				tableProps={{
-					actions: actionsRoutine,
+					actions,
 					columns: [
 						{
 							key: 'status',
@@ -242,8 +241,6 @@ const Routine = () => {
 					</div>
 				)}
 			</ListView>
-
-			<RoutineBuildModal modal={formModal.modal} />
 		</Container>
 	);
 };
