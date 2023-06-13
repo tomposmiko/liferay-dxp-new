@@ -54,7 +54,15 @@ definition {
 		}
 
 		task ("Delete the deployed collection") {
-			Collection.deleteCollection(collectionName = "Imported");
+			LexiconEntry.gotoEllipsisMenuItem(menuItem = "Delete");
+
+			AssertTextEquals(
+				locator1 = "Modal#BODY",
+				value1 = "Deleting a fragment set is an action impossible to revert. All the fragments in the set will be removed and it will not be possible to recover them.");
+
+			Click(
+				key_text = "Delete",
+				locator1 = "Modal#MODAL_FOOTER_BUTTON");
 		}
 
 		task ("Assert the deployed collection is not present") {
@@ -91,7 +99,15 @@ definition {
 		}
 
 		task ("Delete the deployed collection") {
-			Collection.deleteCollection(collectionName = "Imported");
+			LexiconEntry.gotoEllipsisMenuItem(menuItem = "Delete");
+
+			AssertTextEquals(
+				locator1 = "Modal#BODY",
+				value1 = "Deleting a fragment set is an action impossible to revert. All the fragments in the set will be removed and it will not be possible to recover them.");
+
+			Click(
+				key_text = "Delete",
+				locator1 = "Modal#MODAL_FOOTER_BUTTON");
 		}
 
 		task ("Assert the deployed collection is not present") {
@@ -128,7 +144,15 @@ definition {
 		}
 
 		task ("Delete the deployed collection") {
-			Collection.deleteCollection(collectionName = "Imported");
+			LexiconEntry.gotoEllipsisMenuItem(menuItem = "Delete");
+
+			AssertTextEquals(
+				locator1 = "Modal#BODY",
+				value1 = "Deleting a fragment set is an action impossible to revert. All the fragments in the set will be removed and it will not be possible to recover them.");
+
+			Click(
+				key_text = "Delete",
+				locator1 = "Modal#MODAL_FOOTER_BUTTON");
 		}
 
 		task ("Assert the deployed collection is not present") {
@@ -161,10 +185,9 @@ definition {
 
 			FragmentsAdmin.viewEntryPresent(entry = "Link");
 
-			Click(
-				key_index = "4",
-				key_text = "Link",
-				locator1 = "Icon#VERTICAL_ELLIPSIS_INDEXED");
+			Click.waitForMenuToggleJSClick(
+				key_card = "Link",
+				locator1 = "Card#CARD_ELLIPSIS");
 
 			MenuItem.viewNotPresent(menuItem = "Delete");
 
@@ -172,10 +195,7 @@ definition {
 				collectionName = "Imported",
 				scope = "Global");
 
-			Click(
-				key_index = "4",
-				key_text = "Link",
-				locator1 = "Icon#VERTICAL_ELLIPSIS_INDEXED");
+			Click.waitForMenuToggleJSClick(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
 
 			MenuItem.viewNotPresent(menuItem = "Delete");
 		}
@@ -187,10 +207,9 @@ definition {
 
 			FragmentsAdmin.viewEntryPresent(entry = "Image");
 
-			Click(
-				key_index = "4",
-				key_text = "Image",
-				locator1 = "Icon#VERTICAL_ELLIPSIS_INDEXED");
+			Click.waitForMenuToggleJSClick(
+				key_card = "Image",
+				locator1 = "Card#CARD_ELLIPSIS");
 
 			MenuItem.viewNotPresent(menuItem = "Delete");
 
@@ -198,10 +217,7 @@ definition {
 				collectionName = "Imported",
 				scope = "Default");
 
-			Click(
-				key_index = "4",
-				key_text = "Image",
-				locator1 = "Icon#VERTICAL_ELLIPSIS_INDEXED");
+			Click.waitForMenuToggleJSClick(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
 
 			MenuItem.viewNotPresent(menuItem = "Delete");
 		}
@@ -247,10 +263,9 @@ definition {
 
 			FragmentsAdmin.viewEntryPresent(entry = "Image");
 
-			Click(
-				key_index = "4",
-				key_text = "Image",
-				locator1 = "Icon#VERTICAL_ELLIPSIS_INDEXED");
+			Click.waitForMenuToggleJSClick(
+				key_card = "Image",
+				locator1 = "Card#CARD_ELLIPSIS");
 
 			MenuItem.viewNotPresent(menuItem = "Delete");
 
@@ -258,10 +273,7 @@ definition {
 				collectionName = "Imported",
 				scope = "Default");
 
-			Click(
-				key_index = "4",
-				key_text = "Image",
-				locator1 = "Icon#VERTICAL_ELLIPSIS_INDEXED");
+			Click.waitForMenuToggleJSClick(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
 
 			MenuItem.viewNotPresent(menuItem = "Delete");
 		}

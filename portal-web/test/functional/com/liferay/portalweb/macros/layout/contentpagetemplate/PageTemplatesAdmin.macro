@@ -105,7 +105,7 @@ definition {
 
 	macro deletePageTemplate {
 		PageTemplatesAdmin.gotoPageTemplateEllipsisItem(
-			menuItem = "Delete",
+			item = "Delete",
 			pageTemplateName = "${pageTemplateName}");
 
 		AssertTextEquals(
@@ -120,12 +120,7 @@ definition {
 	macro deletePageTemplateSet {
 		Navigator.gotoNavNested(navNested = "${setName}");
 
-		Click(
-			key_index = "3",
-			key_text = "${setName}",
-			locator1 = "Icon#VERTICAL_ELLIPSIS_INDEXED");
-
-		MenuItem.click(menuItem = "Delete");
+		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Delete");
 
 		AssertTextEquals(
 			locator1 = "Modal#BODY",
@@ -141,12 +136,11 @@ definition {
 	}
 
 	macro gotoPageTemplateEllipsisItem {
-		Click(
-			key_index = "4",
-			key_text = "${pageTemplateName}",
-			locator1 = "Icon#VERTICAL_ELLIPSIS_INDEXED");
+		Click.waitForMenuToggleJSClick(
+			key_card = "${pageTemplateName}",
+			locator1 = "Card#CARD_ELLIPSIS");
 
-		MenuItem.click(menuItem = "${menuItem}");
+		MenuItem.click(menuItem = "${item}");
 	}
 
 	macro importPageTemplatesFromTempFolder {
@@ -179,7 +173,7 @@ definition {
 
 	macro renamePageTemplate {
 		PageTemplatesAdmin.gotoPageTemplateEllipsisItem(
-			menuItem = "Rename",
+			item = "Rename",
 			pageTemplateName = "${pageTemplateName}");
 
 		PortletEntry.inputName(name = "${newPageTemplateName}");

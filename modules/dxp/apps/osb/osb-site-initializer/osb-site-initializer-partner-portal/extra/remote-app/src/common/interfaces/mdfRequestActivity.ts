@@ -11,16 +11,20 @@
 
 import LiferayObject from './liferayObject';
 import MDFRequestBudget from './mdfRequestBudget';
+import Tactic from './tactic';
+import TypeActivity from './typeActivity';
 
 export default interface MDFRequestActivity extends Partial<LiferayObject> {
 	activityPromotion: string;
 	ad: string;
-	assetsLiferayRequired: boolean;
+	assetsLiferayRequired: string;
 	budgets: MDFRequestBudget[];
 	description: string;
-	endDate: Date;
-	gatedLandingPage: boolean;
+	detailsLeadFollowUp: string;
+	endDate?: Date;
+	gatedLandingPage: string;
 	goalOfContent: string;
+	hiringOutsideWriterOrAgency: string;
 	howLiferayBrandUsed: string;
 	keywordsForPPCCampaigns: string;
 	leadFollowUpStrategies: string[];
@@ -29,15 +33,16 @@ export default interface MDFRequestActivity extends Partial<LiferayObject> {
 	liferayParticipationRequirements: string;
 	location: string;
 	marketingActivity: string;
-	mdfRequestAmount: string;
+	mdfRequestAmount: number;
 	name: string;
 	overallMessageContentCTA: string;
 	primaryThemeOrMessage: string;
-	r_tacticToActivities_c_tacticId: string;
-	r_typeActivityToActivities_c_typeActivityId: string;
 	sourceAndSizeOfInviteeList: string;
 	specificSites: string;
-	startDate: Date;
-	targetofLeads: string;
-	totalCostOfExpense: string;
+	startDate?: Date;
+	tactic: Tactic;
+	targetOfLeads: string;
+	totalCostOfExpense: number;
+	typeActivity: TypeActivity;
+	venueName: string;
 }

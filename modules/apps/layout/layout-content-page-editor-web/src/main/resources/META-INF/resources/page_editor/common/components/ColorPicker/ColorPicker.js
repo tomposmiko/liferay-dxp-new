@@ -225,7 +225,6 @@ export function ColorPicker({
 				className={classNames('page-editor__color-picker', {
 					'custom': !tokenLabel,
 					'has-error': error.value,
-					'has-value': value,
 					'hovered': activeColorPicker || activeDropdownColorPicker,
 				})}
 			>
@@ -308,7 +307,7 @@ export function ColorPicker({
 						{tokenLabel ? (
 							canDetachTokenValues && (
 								<ClayButtonWithIcon
-									className="border-0 mb-0 page-editor__color-picker__action-button"
+									className="border-0 mb-0 ml-2 page-editor__color-picker__action-button"
 									displayType="secondary"
 									onClick={() => {
 										setCustomColors([
@@ -352,12 +351,13 @@ export function ColorPicker({
 						)}
 
 						<ClayButtonWithIcon
-							className="border-0 page-editor__color-picker__action-button"
+							className="border-0 ml-2 page-editor__color-picker__action-button"
 							displayType="secondary"
 							onClick={() => {
 								if (
 									value.toLowerCase() ===
-									field.defaultValue?.toLowerCase()
+										field.defaultValue?.toLowerCase() &&
+									!error.value
 								) {
 									return;
 								}

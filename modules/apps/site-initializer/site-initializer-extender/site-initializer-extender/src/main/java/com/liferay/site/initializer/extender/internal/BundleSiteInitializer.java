@@ -137,7 +137,7 @@ import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
@@ -185,6 +185,7 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -691,7 +692,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 					StringBundler.concat(
 						"[$CLIENT_EXTENSION_ENTRY_ID:",
 						jsonObject.getString("clientExtensionEntryKey"), "$]"),
-					jsonObject.getString("externalReferenceCode")));
+					serviceContext.getCompanyId() + StringPool.UNDERLINE +
+						jsonObject.getString("externalReferenceCode")));
 		}
 
 		return clientExtensionEntryIdsStringUtilReplaceValues;
@@ -3106,14 +3108,22 @@ public class BundleSiteInitializer implements SiteInitializer {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
+			Dictionary<String, Object> properties = new HashMapDictionary<>();
+
 			JSONObject propertiesJSONObject = jsonObject.getJSONObject(
 				"properties");
 
+			Iterator<String> iterator = propertiesJSONObject.keys();
+
+			while (iterator.hasNext()) {
+				String key = iterator.next();
+
+				properties.put(key, propertiesJSONObject.getString(key));
+			}
+
 			_configurationProvider.saveGroupConfiguration(
 				serviceContext.getScopeGroupId(), jsonObject.getString("pid"),
-				HashMapDictionaryBuilder.<String, Object>create(
-					propertiesJSONObject.toMap()
-				).build());
+				properties);
 		}
 	}
 

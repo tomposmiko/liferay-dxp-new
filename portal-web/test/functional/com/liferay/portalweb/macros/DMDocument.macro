@@ -987,7 +987,9 @@ definition {
 				value1 = "You now have a lock on this document. No one else can edit this document until you unlock it. This lock will automatically expire in 1 day.");
 		}
 
-		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Checkin");
+		Click(locator1 = "Icon#TOOLBAR_ELLIPSIS");
+
+		MenuItem.click(menuItem = "Checkin");
 
 		if (IsElementPresent(locator1 = "DocumentsAndMedia#CHECKIN_DIALOG_TITLE")) {
 			if ("${revision}" == "Major") {
@@ -1842,7 +1844,11 @@ definition {
 	}
 
 	macro editPGViaMG {
-		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Edit");
+		Click.waitForMenuToggleJSClick(
+			key_card = "${mgDocumentTitle}",
+			locator1 = "Card#CARD_ELLIPSIS");
+
+		MenuItem.click(menuItem = "Edit");
 
 		PortletEntry.inputTitle(title = "${mgDocumentTitleEdit}");
 
@@ -2025,7 +2031,7 @@ definition {
 	macro gotoMenuItemViaInfoPanel {
 		DMDocument.expandInfo();
 
-		Click(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
+		Click(locator1 = "Icon#SIDEBAR_HEADER_ACTION_VERTICAL_ELLIPSIS_BUTTON");
 
 		if (isSet(menuItem)) {
 			Click(
@@ -3583,10 +3589,6 @@ definition {
 	}
 
 	macro viewNoPermission {
-		Click(
-			key_rowEntry = "${rowEntry}",
-			locator1 = "Icon#ROW_VERTICAL_ELLIPSIS");
-
 		MenuItem.viewNotPresent(menuItem = "${menuItem}");
 	}
 

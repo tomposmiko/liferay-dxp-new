@@ -11,27 +11,20 @@
 
 import {Liferay} from '../..';
 import MDFRequestActivity from '../../../../interfaces/mdfRequestActivity';
+import getDTOFromMDFRequestActivity from '../../../../utils/dto/mdf-request-activity/getDTOFromMDFRequestActivity';
 import {LiferayAPIs} from '../../common/enums/apis';
 import liferayFetcher from '../../common/utils/fetcher';
 
 export default async function createMDFRequestActivities(
-	mdfRequestId: string | undefined,
+	mdfRequestId: number,
 	mdfRequestActivities: MDFRequestActivity[]
 ) {
-	const dtoMDFRequestActivities = mdfRequestActivities.map((activity) => {
-		return {
-			...activity,
-			leadFollowUpStrategies: activity.leadFollowUpStrategies.join(', '),
-			r_mdfRequestToActivities_c_mdfRequestId: mdfRequestId,
-		};
-	});
-
 	return await Promise.all(
-		dtoMDFRequestActivities.map((activity) =>
-			liferayFetcher.post<typeof activity>(
+		mdfRequestActivities.map((activity) =>
+			liferayFetcher.post(
 				`/o/${LiferayAPIs.OBJECT}/activities`,
 				Liferay.authToken,
-				activity
+				getDTOFromMDFRequestActivity(activity, mdfRequestId)
 			)
 		)
 	);
