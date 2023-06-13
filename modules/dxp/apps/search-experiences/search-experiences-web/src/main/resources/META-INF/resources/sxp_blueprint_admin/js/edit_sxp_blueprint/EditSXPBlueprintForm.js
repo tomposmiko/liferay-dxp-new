@@ -81,7 +81,7 @@ function EditSXPBlueprintForm({
 	initialTitle = {},
 	sxpBlueprintId,
 }) {
-	const {locale, redirectURL} = useContext(ThemeContext);
+	const {isCompanyAdmin, locale, redirectURL} = useContext(ThemeContext);
 
 	const formRef = useRef();
 	const sxpElementIdCounterRef = useRef(
@@ -100,6 +100,7 @@ function EditSXPBlueprintForm({
 	const [tab, setTab] = useState('query-builder');
 
 	const [indexFields, setIndexFields] = useState(null);
+	const [searchIndexes, setSearchIndexes] = useState(null);
 
 	const {
 		data: searchableTypes,
@@ -391,6 +392,7 @@ function EditSXPBlueprintForm({
 				null,
 				'\t'
 			),
+			indexConfig: initialConfiguration.indexConfiguration || '',
 			parameterConfig: JSON.stringify(
 				initialConfiguration.parameterConfiguration,
 				null,
@@ -414,6 +416,28 @@ function EditSXPBlueprintForm({
 			.then((responseContent) => setIndexFields(responseContent.items))
 			.catch(() => setIndexFields([]));
 
+		if (isCompanyAdmin) {
+
+			// TODO: Create API for search indexes (LPS-163750). The list should not
+			// include the company index, in order to avoid confusion with the
+			// "Default Company Index" selection.
+
+			setSearchIndexes([]);
+
+			/*
+			fetchData(`/o/search-experiences-rest/v1.0/search-indexes`)
+				.then((responseContent) =>
+					setSearchIndexes(
+						responseContent?.items.map(({fullName}) => fullName)
+					)
+				)
+				.catch(() => setSearchIndexes([]));
+			*/
+		}
+		else {
+			setSearchIndexes([]);
+		}
+
 		setStorageAddSXPElementSidebar('open');
 	}, []); //eslint-disable-line
 
@@ -429,25 +453,36 @@ function EditSXPBlueprintForm({
 		applyIndexerClauses,
 		frameworkConfig,
 		highlightConfig,
+		indexConfig,
 		parameterConfig,
 		sortConfig,
-	}) => ({
-		advancedConfiguration: advancedConfig ? JSON.parse(advancedConfig) : {},
-		aggregationConfiguration: aggregationConfig
-			? JSON.parse(aggregationConfig)
-			: {},
-		generalConfiguration: frameworkConfig,
-		highlightConfiguration: highlightConfig
-			? JSON.parse(highlightConfig)
-			: {},
-		parameterConfiguration: parameterConfig
-			? JSON.parse(parameterConfig)
-			: {},
-		queryConfiguration: {
-			applyIndexerClauses,
-		},
-		sortConfiguration: sortConfig ? JSON.parse(sortConfig) : {},
-	});
+	}) => {
+		const configuration = {
+			advancedConfiguration: advancedConfig
+				? JSON.parse(advancedConfig)
+				: {},
+			aggregationConfiguration: aggregationConfig
+				? JSON.parse(aggregationConfig)
+				: {},
+			generalConfiguration: frameworkConfig,
+			highlightConfiguration: highlightConfig
+				? JSON.parse(highlightConfig)
+				: {},
+			parameterConfiguration: parameterConfig
+				? JSON.parse(parameterConfig)
+				: {},
+			queryConfiguration: {
+				applyIndexerClauses,
+			},
+			sortConfiguration: sortConfig ? JSON.parse(sortConfig) : {},
+		};
+
+		if (indexConfig) {
+			configuration.indexConfiguration = indexConfig;
+		}
+
+		return configuration;
+	};
 
 	const _getElementInstances = (values) =>
 		values.elementInstances.map(
@@ -784,7 +819,9 @@ function EditSXPBlueprintForm({
 						aggregationConfig={formik.values.aggregationConfig}
 						errors={formik.errors}
 						highlightConfig={formik.values.highlightConfig}
+						indexConfig={formik.values.indexConfig}
 						parameterConfig={formik.values.parameterConfig}
+						searchIndexes={searchIndexes}
 						setFieldTouched={formik.setFieldTouched}
 						setFieldValue={formik.setFieldValue}
 						sortConfig={formik.values.sortConfig}
@@ -795,6 +832,7 @@ function EditSXPBlueprintForm({
 				return (
 					<>
 						<AddSXPElementSidebar
+							isIndexCompany={!formik.values.indexConfig}
 							onAddSXPElement={_handleAddSXPElement}
 							onClose={_handleCloseSidebar}
 							visible={openSidebar === SIDEBARS.ADD_SXP_ELEMENT}
@@ -876,6 +914,7 @@ function EditSXPBlueprintForm({
 								errors={formik.errors.elementInstances}
 								frameworkConfig={formik.values.frameworkConfig}
 								indexFields={indexFields}
+								isIndexCompany={!formik.values.indexConfig}
 								isSubmitting={
 									formik.isSubmitting || previewInfo.loading
 								}
@@ -902,7 +941,7 @@ function EditSXPBlueprintForm({
 		}
 	};
 
-	if (!indexFields) {
+	if (!indexFields || !searchIndexes) {
 		return null;
 	}
 

@@ -19,9 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.search.experiences.constants.SXPActionKeys;
 import com.liferay.search.experiences.constants.SXPConstants;
 import com.liferay.search.experiences.model.SXPBlueprint;
@@ -122,9 +120,6 @@ public class SXPBlueprintServiceImpl extends SXPBlueprintServiceBaseImpl {
 			elementInstancesJSON, schemaVersion, titleMap, serviceContext);
 	}
 
-	@Reference
-	private CompanyLocalService _companyLocalService;
-
 	@Reference(target = "(resource.name=" + SXPConstants.RESOURCE_NAME + ")")
 	private volatile PortletResourcePermission _portletResourcePermission;
 
@@ -136,8 +131,5 @@ public class SXPBlueprintServiceImpl extends SXPBlueprintServiceBaseImpl {
 	)
 	private volatile ModelResourcePermission<SXPBlueprint>
 		_sxpBlueprintModelResourcePermission;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

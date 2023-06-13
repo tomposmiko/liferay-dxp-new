@@ -64,7 +64,7 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		validate(groupId, name);
+		_validate(groupId, name);
 
 		long layoutPageTemplateId = counterLocalService.increment();
 
@@ -222,7 +222,7 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 				layoutPageTemplateCollectionId);
 
 		if (!Objects.equals(layoutPageTemplateCollection.getName(), name)) {
-			validate(layoutPageTemplateCollection.getGroupId(), name);
+			_validate(layoutPageTemplateCollection.getGroupId(), name);
 		}
 
 		layoutPageTemplateCollection.setModifiedDate(new Date());
@@ -231,28 +231,6 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 
 		return layoutPageTemplateCollectionPersistence.update(
 			layoutPageTemplateCollection);
-	}
-
-	protected void validate(long groupId, String name) throws PortalException {
-		if (Validator.isNull(name)) {
-			throw new LayoutPageTemplateCollectionNameException(
-				"Name must not be null for group " + groupId);
-		}
-
-		int nameMaxLength = ModelHintsUtil.getMaxLength(
-			LayoutPageTemplateEntry.class.getName(), "name");
-
-		if (name.length() > nameMaxLength) {
-			throw new LayoutPageTemplateCollectionNameException(
-				"Maximum length of name exceeded");
-		}
-
-		LayoutPageTemplateCollection layoutPageTemplateCollection =
-			layoutPageTemplateCollectionPersistence.fetchByG_N(groupId, name);
-
-		if (layoutPageTemplateCollection != null) {
-			throw new DuplicateLayoutPageTemplateCollectionException(name);
-		}
 	}
 
 	private String _generateLayoutPageTemplateCollectionKey(
@@ -279,6 +257,28 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 
 			curLayoutPageTemplateCollectionKey =
 				curLayoutPageTemplateCollectionKey + CharPool.DASH + count++;
+		}
+	}
+
+	private void _validate(long groupId, String name) throws PortalException {
+		if (Validator.isNull(name)) {
+			throw new LayoutPageTemplateCollectionNameException(
+				"Name must not be null for group " + groupId);
+		}
+
+		int nameMaxLength = ModelHintsUtil.getMaxLength(
+			LayoutPageTemplateEntry.class.getName(), "name");
+
+		if (name.length() > nameMaxLength) {
+			throw new LayoutPageTemplateCollectionNameException(
+				"Maximum length of name exceeded");
+		}
+
+		LayoutPageTemplateCollection layoutPageTemplateCollection =
+			layoutPageTemplateCollectionPersistence.fetchByG_N(groupId, name);
+
+		if (layoutPageTemplateCollection != null) {
+			throw new DuplicateLayoutPageTemplateCollectionException(name);
 		}
 	}
 

@@ -108,7 +108,8 @@ public class DDMFormValuesToMapConverterImpl
 		if (ddmFormField.isLocalizable()) {
 			values.put(
 				"value",
-				_toLocalizedMap(ddmFormField.getType(), (LocalizedValue)value));
+				_toLocalizedMap(
+					ddmFormField.getType(), _getLocalizedValue(value)));
 		}
 		else {
 			values.put("value", value.getString(value.getDefaultLocale()));
@@ -158,6 +159,25 @@ public class DDMFormValuesToMapConverterImpl
 		return StringBundler.concat(
 			ddmFormFieldValue.getName(), "_INSTANCE_",
 			ddmFormFieldValue.getInstanceId());
+	}
+
+	private LocalizedValue _getLocalizedValue(Value value) {
+		if (value == null) {
+			return null;
+		}
+
+		if (value.isLocalized()) {
+			return (LocalizedValue)value;
+		}
+
+		LocalizedValue localizedValue = new LocalizedValue(
+			value.getDefaultLocale());
+
+		Map<Locale, String> values = localizedValue.getValues();
+
+		values.putAll(value.getValues());
+
+		return localizedValue;
 	}
 
 	private Map<String, Object> _toLocalizedMap(

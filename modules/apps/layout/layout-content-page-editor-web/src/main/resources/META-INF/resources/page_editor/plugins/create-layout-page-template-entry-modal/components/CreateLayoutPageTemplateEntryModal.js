@@ -173,6 +173,7 @@ const CreateLayoutPageTemplateEntryModal = ({observer, onClose}) => {
 							id={`${config.portletNamespace}name`}
 							onChange={() => setError({...error, name: null})}
 							ref={nameInputRef}
+							required
 						/>
 					</FormField>
 
@@ -188,6 +189,7 @@ const CreateLayoutPageTemplateEntryModal = ({observer, onClose}) => {
 								className="form-control"
 								id={`${config.portletNamespace}layoutPageTemplateCollectionId`}
 								ref={layoutPageTemplateCollectionInputRef}
+								required
 							>
 								<option value="">
 									{`-- ${Liferay.Language.get(

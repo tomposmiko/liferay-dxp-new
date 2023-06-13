@@ -18,7 +18,11 @@ import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayLink from '@clayui/link';
 import {useModal} from '@clayui/modal';
-import {ReactPortal, useIsMounted} from '@liferay/frontend-js-react-web';
+import {
+	ReactPortal,
+	useEventListener,
+	useIsMounted,
+} from '@liferay/frontend-js-react-web';
 import {navigate, openToast} from 'frontend-js-web';
 import React, {useEffect, useRef, useState} from 'react';
 
@@ -26,6 +30,8 @@ import {config} from '../../../app/config/index';
 import {useDispatch, useSelector} from '../../../app/contexts/StoreContext';
 import selectCanUpdateExperiences from '../../../app/selectors/selectCanUpdateExperiences';
 import selectCanUpdateSegments from '../../../app/selectors/selectCanUpdateSegments';
+import getKeyboardFocusableElements from '../../../app/utils/getKeyboardFocusableElements';
+import {useId} from '../../../core/hooks/useId';
 import {useSessionState} from '../../../core/hooks/useSessionState';
 import createExperience from '../thunks/createExperience';
 import duplicateExperience from '../thunks/duplicateExperience';
@@ -79,6 +85,7 @@ const ExperienceSelector = ({
 	const canUpdateSegments = useSelector(selectCanUpdateSegments);
 
 	const buttonRef = useRef();
+	const selectorRef = useRef();
 	const [buttonBoundingClientRect, setButtonBoundingClientRect] = useState({
 		bottom: 0,
 		left: 0,
@@ -111,6 +118,8 @@ const ExperienceSelector = ({
 			setOpen(value);
 		}
 	}, 100);
+
+	const experienceSelectorContentId = useId();
 
 	const handleDropdownButtonClick = () => debouncedSetOpen(!open);
 	const handleDropdownButtonBlur = () => debouncedSetOpen(false);
@@ -183,6 +192,17 @@ const ExperienceSelector = ({
 
 		experiences.length,
 	]);
+
+	useEventListener(
+		'keydown',
+		(event) => {
+			if (event.key === 'Escape' && open) {
+				debouncedSetOpen(false);
+			}
+		},
+		true,
+		window
+	);
 
 	const handleExperienceCreation = ({
 		name,
@@ -336,12 +356,26 @@ const ExperienceSelector = ({
 	return (
 		<>
 			<ClayButton
+				aria-controls={experienceSelectorContentId}
+				aria-expanded={open}
+				aria-haspopup="true"
 				className="form-control-select pr-4 text-left text-truncate"
 				disabled={!canUpdateExperiences}
 				displayType="secondary"
 				id={selectId}
 				onBlur={handleDropdownButtonBlur}
 				onClick={handleDropdownButtonClick}
+				onKeyDown={(event) => {
+					if (event.key === 'Tab' && !event.shiftKey && open) {
+						event.preventDefault();
+
+						const focusableElements = getKeyboardFocusableElements(
+							selectorRef.current
+						);
+
+						focusableElements[0]?.focus();
+					}
+				}}
 				ref={buttonRef}
 				small
 				type="button"
@@ -365,8 +399,49 @@ const ExperienceSelector = ({
 				<ReactPortal className="cadmin">
 					<div
 						className="dropdown-menu p-4 page-editor__toolbar-experience__dropdown-menu toggled"
+						id={experienceSelectorContentId}
 						onBlur={handleDropdownBlur}
 						onFocus={handleDropdownFocus}
+						onKeyDown={(event) => {
+							if (event.key === 'Escape') {
+								buttonRef.current?.focus();
+							}
+							else if (event.key === 'Tab') {
+								const focusableElements = getKeyboardFocusableElements(
+									selectorRef.current
+								);
+
+								if (
+									event.shiftKey &&
+									focusableElements.indexOf(event.target) ===
+										0
+								) {
+									event.preventDefault();
+
+									buttonRef.current?.focus();
+
+									return;
+								}
+
+								if (
+									focusableElements.indexOf(event.target) ===
+									focusableElements.length - 1
+								) {
+									event.preventDefault();
+
+									const allFocusableElements = getKeyboardFocusableElements(
+										document
+									);
+
+									const index = allFocusableElements.indexOf(
+										buttonRef.current
+									);
+
+									allFocusableElements[index + 1]?.focus();
+								}
+							}
+						}}
+						ref={selectorRef}
 						style={{
 							left: buttonBoundingClientRect.left,
 							top: buttonBoundingClientRect.bottom,

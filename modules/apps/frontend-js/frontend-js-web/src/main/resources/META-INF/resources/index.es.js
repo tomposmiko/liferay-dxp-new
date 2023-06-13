@@ -57,12 +57,10 @@ export {default as PortletBase} from './liferay/PortletBase.es';
 
 // Modal API
 
-export {
-	openModal,
-	openAlertModal,
-	openConfirmModal,
-	openSelectionModal,
-} from './liferay/modal/Modal';
+export {openModal, openSelectionModal} from './liferay/modal/Modal';
+
+export {default as openAlertModal} from './liferay/modal/commands/open_alert_modal';
+export {default as openConfirmModal} from './liferay/modal/commands/open_confirm_modal';
 
 export {default as openSimpleInputModal} from './liferay/modal/commands/OpenSimpleInputModal.es';
 
@@ -124,6 +122,7 @@ export {default as isObject} from './liferay/util/is_object';
 export {default as isPhone} from './liferay/util/is_phone';
 export {default as isTablet} from './liferay/util/is_tablet';
 export {default as getSelectedOptionValues} from './liferay/util/get_selected_option_values';
+export {default as memoize} from './liferay/util/memoize';
 export {default as navigate} from './liferay/util/navigate.es';
 export {default as normalizeFriendlyURL} from './liferay/util/normalize_friendly_url';
 export {default as openWindow} from './liferay/util/open_window';

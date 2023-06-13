@@ -18,8 +18,9 @@ import useGetCompanyExtenderByAccountEntryId from '../../../../../common/service
 export default function useCompanyOptions(
 	companyOptions: React.OptionHTMLAttributes<HTMLOptionElement>[],
 	handleSelected: (
+		country: LiferayPicklist,
 		company: LiferayAccountBrief,
-		country: LiferayPicklist
+		accountExternalReferenceCodeSF?: string
 	) => void
 ) {
 	const [selectedAccountBrief, setSelectedAccountBrief] = useState<
@@ -34,7 +35,8 @@ export default function useCompanyOptions(
 		if (selectedAccountBrief) {
 			handleSelected(
 				companyExtender?.country || {},
-				selectedAccountBrief
+				selectedAccountBrief,
+				companyExtender?.accountExternalReferenceCodeSF
 			);
 		}
 	}, [companyExtender, handleSelected, selectedAccountBrief]);

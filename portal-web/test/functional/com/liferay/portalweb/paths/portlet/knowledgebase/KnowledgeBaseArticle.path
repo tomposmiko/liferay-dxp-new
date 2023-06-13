@@ -12,17 +12,17 @@
 <tbody>
 <tr>
 	<td>TITLE</td>
-	<td>//div[contains(@class,'panel-body')]/h1</td>
+	<td>//div[contains(@class,'kb-article-title')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>CONTENT</td>
-	<td>//div[contains(@class,'panel-body')]//p</td>
+	<td>//div[contains(@class,'kb-entity-body')]//p</td>
 	<td></td>
 </tr>
 <tr>
 	<td>HTML_BOLD_CONTENT</td>
-	<td>//div[contains(@class,'panel-body')]//b</td>
+	<td>//div[contains(@class,'kb-entity-body')]//b</td>
 	<td></td>
 </tr>
 <tr>
@@ -58,11 +58,6 @@
 <tr>
 	<td>NEXT</td>
 	<td>//div[@class='kb-article-container']//div/span[@class='kb-article-next']/a/span</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DO_YOU_HAVE_ANY_SUGGESTIONS</td>
-	<td>//div[contains(.,'Do you have any suggestions?')]/h5</td>
 	<td></td>
 </tr>
 <tr>
@@ -162,7 +157,7 @@
 </tr>
 <tr>
 	<td>INFO_VERSION_TITLE</td>
-	<td>//li[contains(.,'${key_entryVersion}')]//div[@class='list-group-title']</td>
+	<td>//div[contains(.,'${key_entryVersion}') and contains(@class,'list-group-title')]</td>
 	<td></td>
 </tr>
 <tr>

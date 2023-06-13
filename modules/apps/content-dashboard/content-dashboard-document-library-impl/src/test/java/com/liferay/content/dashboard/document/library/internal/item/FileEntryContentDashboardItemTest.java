@@ -16,10 +16,16 @@ package com.liferay.content.dashboard.document.library.internal.item;
 
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetTag;
+import com.liferay.content.dashboard.item.ContentDashboardItemVersion;
 import com.liferay.content.dashboard.item.action.ContentDashboardItemAction;
 import com.liferay.content.dashboard.item.action.ContentDashboardItemActionProviderTracker;
+import com.liferay.content.dashboard.item.action.ContentDashboardItemVersionAction;
+import com.liferay.content.dashboard.item.action.ContentDashboardItemVersionActionProviderTracker;
 import com.liferay.content.dashboard.item.action.provider.ContentDashboardItemActionProvider;
+import com.liferay.content.dashboard.item.action.provider.ContentDashboardItemVersionActionProvider;
 import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtype;
+import com.liferay.document.library.display.context.DLDisplayContextProvider;
+import com.liferay.document.library.display.context.DLEditFileEntryDisplayContext;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.field.type.DateInfoFieldType;
@@ -30,10 +36,13 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -44,6 +53,7 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -93,7 +103,7 @@ public class FileEntryContentDashboardItemTest {
 		FileEntryContentDashboardItem fileEntryContentDashboardItem =
 			new FileEntryContentDashboardItem(
 				Collections.singletonList(assetCategory), null, null, null,
-				null, null, fileEntry, null, null, null, null);
+				null, null, null, fileEntry, null, null, null, null);
 
 		Assert.assertEquals(
 			Collections.singletonList(assetCategory),
@@ -115,7 +125,7 @@ public class FileEntryContentDashboardItemTest {
 		FileEntryContentDashboardItem fileEntryContentDashboardItem =
 			new FileEntryContentDashboardItem(
 				Collections.singletonList(assetCategory), null, null, null,
-				null, null, fileEntry, null, null, null, null);
+				null, null, null, fileEntry, null, null, null, null);
 
 		Assert.assertEquals(
 			Collections.singletonList(assetCategory),
@@ -129,8 +139,8 @@ public class FileEntryContentDashboardItemTest {
 
 		FileEntryContentDashboardItem fileEntryContentDashboardItem =
 			new FileEntryContentDashboardItem(
-				null, null, null, null, null, null, fileEntry, null, null, null,
-				null);
+				null, null, null, null, null, null, null, fileEntry, null, null,
+				null, null);
 
 		Assert.assertEquals(
 			Collections.emptyList(),
@@ -152,7 +162,7 @@ public class FileEntryContentDashboardItemTest {
 		FileEntryContentDashboardItem fileEntryContentDashboardItem =
 			new FileEntryContentDashboardItem(
 				Collections.singletonList(assetCategory), null, null, null,
-				null, null, fileEntry, null, null, null, null);
+				null, null, null, fileEntry, null, null, null, null);
 
 		Assert.assertEquals(
 			Collections.emptyList(),
@@ -169,11 +179,96 @@ public class FileEntryContentDashboardItemTest {
 		FileEntryContentDashboardItem fileEntryContentDashboardItem =
 			new FileEntryContentDashboardItem(
 				null, Collections.singletonList(assetTag), null, null, null,
-				null, fileEntry, null, null, null, null);
+				null, null, fileEntry, null, null, null, null);
 
 		Assert.assertEquals(
 			Collections.singletonList(assetTag),
 			fileEntryContentDashboardItem.getAssetTags());
+	}
+
+	@Test
+	public void testGetContentDashboardItemVersionActions() throws Exception {
+		FileEntry fileEntry = _getFileEntry(Mockito.mock(FileVersion.class));
+
+		ContentDashboardItemVersionAction contentDashboardItemVersionAction1 =
+			_getContentDashboardItemVersionAction(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString());
+		ContentDashboardItemVersionAction contentDashboardItemVersionAction2 =
+			_getContentDashboardItemVersionAction(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString());
+
+		FileEntryContentDashboardItem fileEntryContentDashboardItem =
+			new FileEntryContentDashboardItem(
+				null, null, null,
+				_getContentDashboardItemVersionActionProviderTracker(
+					_getContentDashboardItemVersionActionProvider(
+						contentDashboardItemVersionAction1, true),
+					_getContentDashboardItemVersionActionProvider(
+						contentDashboardItemVersionAction2, true)),
+				null, null, null, fileEntry, null, null, _getLanguage(), null);
+
+		List<ContentDashboardItemVersion> contentDashboardItemVersions =
+			fileEntryContentDashboardItem.getAllContentDashboardItemVersions(
+				_getHttpServletRequest(RandomTestUtil.randomLong()));
+
+		Assert.assertEquals(
+			contentDashboardItemVersions.toString(), 1,
+			contentDashboardItemVersions.size());
+
+		ContentDashboardItemVersion contentDashboardItemVersion =
+			contentDashboardItemVersions.get(0);
+
+		List<ContentDashboardItemVersionAction>
+			contentDashboardItemVersionActions =
+				contentDashboardItemVersion.
+					getContentDashboardItemVersionActions();
+
+		Assert.assertNotNull(contentDashboardItemVersionActions);
+
+		Assert.assertEquals(
+			contentDashboardItemVersionActions.toString(), 2,
+			contentDashboardItemVersionActions.size());
+		Assert.assertEquals(
+			contentDashboardItemVersionAction1,
+			contentDashboardItemVersionActions.get(0));
+		Assert.assertEquals(
+			contentDashboardItemVersionAction2,
+			contentDashboardItemVersionActions.get(1));
+	}
+
+	@Test
+	public void testGetContentDashboardItemVersionWithNoActions()
+		throws Exception {
+
+		FileEntry fileEntry = _getFileEntry(Mockito.mock(FileVersion.class));
+
+		FileEntryContentDashboardItem fileEntryContentDashboardItem =
+			new FileEntryContentDashboardItem(
+				null, null, null,
+				_getContentDashboardItemVersionActionProviderTracker(), null,
+				null, null, fileEntry, null, null, _getLanguage(), null);
+
+		List<ContentDashboardItemVersion> contentDashboardItemVersions =
+			fileEntryContentDashboardItem.getAllContentDashboardItemVersions(
+				_getHttpServletRequest(RandomTestUtil.randomLong()));
+
+		Assert.assertEquals(
+			contentDashboardItemVersions.toString(), 1,
+			contentDashboardItemVersions.size());
+
+		ContentDashboardItemVersion contentDashboardItemVersion =
+			contentDashboardItemVersions.get(0);
+
+		List<ContentDashboardItemVersionAction>
+			contentDashboardItemVersionActions =
+				contentDashboardItemVersion.
+					getContentDashboardItemVersionActions();
+
+		Assert.assertEquals(
+			contentDashboardItemVersionActions.toString(), 0,
+			contentDashboardItemVersionActions.size());
 	}
 
 	@Test
@@ -211,7 +306,7 @@ public class FileEntryContentDashboardItemTest {
 
 		FileEntryContentDashboardItem fileEntryContentDashboardItem =
 			new FileEntryContentDashboardItem(
-				null, null, null, null, null, null, fileEntry, null,
+				null, null, null, null, null, null, null, fileEntry, null,
 				infoItemFieldValuesProvider, null, null);
 
 		Assert.assertEquals(
@@ -225,8 +320,8 @@ public class FileEntryContentDashboardItemTest {
 
 		FileEntryContentDashboardItem fileEntryContentDashboardItem =
 			new FileEntryContentDashboardItem(
-				null, null, null, null, null, null, fileEntry, null, null, null,
-				null);
+				null, null, null, null, null, null, null, fileEntry, null, null,
+				null, null);
 
 		Assert.assertEquals(
 			fileEntry.getModifiedDate(),
@@ -247,8 +342,8 @@ public class FileEntryContentDashboardItemTest {
 
 		FileEntryContentDashboardItem fileEntryContentDashboardItem =
 			new FileEntryContentDashboardItem(
-				null, null, null, null, null, null, fileEntry, group, null,
-				null, null);
+				null, null, null, null, null, null, null, fileEntry, group,
+				null, null, null);
 
 		Assert.assertEquals(
 			"scopeName",
@@ -285,7 +380,7 @@ public class FileEntryContentDashboardItemTest {
 					}
 
 				},
-				null, fileEntry, null, null, null, null);
+				null, null, fileEntry, null, null, null, null);
 
 		ContentDashboardItemSubtype contentDashboardItemType =
 			fileEntryContentDashboardItem.getContentDashboardItemSubtype();
@@ -300,8 +395,8 @@ public class FileEntryContentDashboardItemTest {
 
 		FileEntryContentDashboardItem fileEntryContentDashboardItem =
 			new FileEntryContentDashboardItem(
-				null, null, null, null, null, null, fileEntry, null, null, null,
-				null);
+				null, null, null, null, null, null, null, fileEntry, null, null,
+				null, null);
 
 		Assert.assertEquals(
 			fileEntry.getTitle(),
@@ -320,8 +415,8 @@ public class FileEntryContentDashboardItemTest {
 
 		FileEntryContentDashboardItem fileEntryContentDashboardItem =
 			new FileEntryContentDashboardItem(
-				null, null, null, null, null, null, fileEntry, null, null, null,
-				null);
+				null, null, null, null, null, null, null, fileEntry, null, null,
+				null, null);
 
 		Assert.assertEquals(
 			fileEntry.getUserId(), fileEntryContentDashboardItem.getUserId());
@@ -339,11 +434,79 @@ public class FileEntryContentDashboardItemTest {
 
 		FileEntryContentDashboardItem fileEntryContentDashboardItem =
 			new FileEntryContentDashboardItem(
-				null, null, null, null, null, null, fileEntry, null, null, null,
-				null);
+				null, null, null, null, null, null, null, fileEntry, null, null,
+				null, null);
 
 		Assert.assertEquals(
 			fileEntry.getUserId(), fileEntryContentDashboardItem.getUserId());
+	}
+
+	@Test
+	public void testGetVisibleContentDashboardItemVersionActions()
+		throws Exception {
+
+		FileEntry fileEntry = _getFileEntry(Mockito.mock(FileVersion.class));
+
+		ContentDashboardItemVersionAction contentDashboardItemVersionAction =
+			_getContentDashboardItemVersionAction(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString());
+
+		FileEntryContentDashboardItem fileEntryContentDashboardItem =
+			new FileEntryContentDashboardItem(
+				null, null, null,
+				_getContentDashboardItemVersionActionProviderTracker(
+					_getContentDashboardItemVersionActionProvider(null, false),
+					_getContentDashboardItemVersionActionProvider(
+						contentDashboardItemVersionAction, true),
+					_getContentDashboardItemVersionActionProvider(null, false)),
+				null, null, null, fileEntry, null, null, _getLanguage(), null);
+
+		List<ContentDashboardItemVersion> contentDashboardItemVersions =
+			fileEntryContentDashboardItem.getAllContentDashboardItemVersions(
+				_getHttpServletRequest(RandomTestUtil.randomLong()));
+
+		Assert.assertEquals(
+			contentDashboardItemVersions.toString(), 1,
+			contentDashboardItemVersions.size());
+
+		ContentDashboardItemVersion contentDashboardItemVersion =
+			contentDashboardItemVersions.get(0);
+
+		List<ContentDashboardItemVersionAction>
+			contentDashboardItemVersionActions =
+				contentDashboardItemVersion.
+					getContentDashboardItemVersionActions();
+
+		Assert.assertNotNull(contentDashboardItemVersionActions);
+		Assert.assertEquals(
+			contentDashboardItemVersionActions.toString(), 1,
+			contentDashboardItemVersionActions.size());
+		Assert.assertEquals(
+			contentDashboardItemVersionAction,
+			contentDashboardItemVersionActions.get(0));
+	}
+
+	@Test
+	public void testIsShowContentDashboardItemVersions() throws Exception {
+		FileEntryContentDashboardItem fileEntryContentDashboardItem =
+			_getFileEntryContentDashboardItemWithDLDisplayContext(true);
+
+		Assert.assertTrue(
+			fileEntryContentDashboardItem.isShowContentDashboardItemVersions(
+				Mockito.mock(HttpServletRequest.class)));
+	}
+
+	@Test
+	public void testIsShowContentDashboardItemVersionsForUnsupportedFileEntry()
+		throws Exception {
+
+		FileEntryContentDashboardItem fileEntryContentDashboardItem =
+			_getFileEntryContentDashboardItemWithDLDisplayContext(false);
+
+		Assert.assertFalse(
+			fileEntryContentDashboardItem.isShowContentDashboardItemVersions(
+				Mockito.mock(HttpServletRequest.class)));
 	}
 
 	@Test
@@ -368,7 +531,8 @@ public class FileEntryContentDashboardItemTest {
 					_getContentDashboardItemActionProvider(
 						ContentDashboardItemAction.Type.VIEW,
 						"http://localhost:8080/view")),
-				null, null, null, fileEntry, null, null, _getLanguage(), null);
+				null, null, null, null, fileEntry, null, null, _getLanguage(),
+				null);
 
 		Assert.assertTrue(
 			fileEntryContentDashboardItem.isViewable(
@@ -469,7 +633,105 @@ public class FileEntryContentDashboardItemTest {
 		return contentDashboardItemActionProviderTracker;
 	}
 
-	private FileEntry _getFileEntry() {
+	private ContentDashboardItemVersionAction
+		_getContentDashboardItemVersionAction(
+			String icon, String label, String name, String url) {
+
+		ContentDashboardItemVersionAction contentDashboardItemVersionAction =
+			Mockito.mock(ContentDashboardItemVersionAction.class);
+
+		Mockito.when(
+			contentDashboardItemVersionAction.getIcon()
+		).thenReturn(
+			icon
+		);
+
+		Mockito.when(
+			contentDashboardItemVersionAction.getLabel(
+				Mockito.any(Locale.class))
+		).thenReturn(
+			label
+		);
+
+		Mockito.when(
+			contentDashboardItemVersionAction.getName()
+		).thenReturn(
+			name
+		);
+
+		Mockito.when(
+			contentDashboardItemVersionAction.getURL()
+		).thenReturn(
+			url
+		);
+
+		return contentDashboardItemVersionAction;
+	}
+
+	private ContentDashboardItemVersionActionProvider
+			_getContentDashboardItemVersionActionProvider(
+				ContentDashboardItemVersionAction
+					contentDashboardItemVersionAction,
+				boolean showContentDashboardItemVersionActionProvider)
+		throws Exception {
+
+		ContentDashboardItemVersionActionProvider
+			contentDashboardItemVersionActionProvider = Mockito.mock(
+				ContentDashboardItemVersionActionProvider.class);
+
+		Mockito.when(
+			contentDashboardItemVersionActionProvider.
+				getContentDashboardItemVersionAction(
+					Mockito.any(FileVersion.class),
+					Mockito.any(HttpServletRequest.class))
+		).thenReturn(
+			contentDashboardItemVersionAction
+		);
+
+		Mockito.when(
+			contentDashboardItemVersionActionProvider.isShow(
+				Mockito.any(FileVersion.class),
+				Mockito.any(HttpServletRequest.class))
+		).thenReturn(
+			showContentDashboardItemVersionActionProvider
+		);
+
+		return contentDashboardItemVersionActionProvider;
+	}
+
+	private ContentDashboardItemVersionActionProviderTracker
+		_getContentDashboardItemVersionActionProviderTracker(
+			ContentDashboardItemVersionActionProvider...
+				contentDashboardItemVersionActionProviders) {
+
+		ContentDashboardItemVersionActionProviderTracker
+			contentDashboardItemVersionActionProviderTracker = Mockito.mock(
+				ContentDashboardItemVersionActionProviderTracker.class);
+
+		if (contentDashboardItemVersionActionProviders == null) {
+			Mockito.when(
+				contentDashboardItemVersionActionProviderTracker.
+					getContentDashboardItemVersionActionProviders(
+						Mockito.anyString())
+			).thenReturn(
+				null
+			);
+
+			return contentDashboardItemVersionActionProviderTracker;
+		}
+
+		Mockito.when(
+			contentDashboardItemVersionActionProviderTracker.
+				getContentDashboardItemVersionActionProviders(
+					FileVersion.class.getName())
+		).thenReturn(
+			ListUtil.fromArray(contentDashboardItemVersionActionProviders)
+		);
+
+		return contentDashboardItemVersionActionProviderTracker;
+	}
+
+	private FileEntry _getFileEntry(FileVersion... fileVersions) {
 		FileEntry fileEntry = Mockito.mock(FileEntry.class);
 
 		Mockito.when(
@@ -488,6 +750,12 @@ public class FileEntryContentDashboardItemTest {
 			fileEntry.getExtension()
 		).thenReturn(
 			RandomTestUtil.randomString()
+		);
+
+		Mockito.when(
+			fileEntry.getFileVersions(Mockito.anyInt())
+		).thenReturn(
+			ListUtil.fromArray(fileVersions)
 		);
 
 		Mockito.when(
@@ -517,13 +785,40 @@ public class FileEntryContentDashboardItemTest {
 		return fileEntry;
 	}
 
+	private FileEntryContentDashboardItem
+			_getFileEntryContentDashboardItemWithDLDisplayContext(
+				boolean showVersionInfoVisible)
+		throws Exception {
+
+		DLDisplayContextProvider dlDisplayContextProvider = Mockito.mock(
+			DLDisplayContextProvider.class);
+
+		DLEditFileEntryDisplayContext dlEditFileEntryDisplayContext =
+			Mockito.mock(DLEditFileEntryDisplayContext.class);
+
+		Mockito.when(
+			dlEditFileEntryDisplayContext.isVersionInfoVisible()
+		).thenReturn(
+			showVersionInfoVisible
+		);
+
+		Mockito.when(
+			dlDisplayContextProvider.getDLEditFileEntryDisplayContext(
+				Mockito.any(), Mockito.any(), Mockito.any(FileEntry.class))
+		).thenReturn(
+			dlEditFileEntryDisplayContext
+		);
+
+		return new FileEntryContentDashboardItem(
+			null, null, null, null, null, dlDisplayContextProvider, null,
+			_getFileEntry(), null, null, null, null);
+	}
+
 	private HttpServletRequest _getHttpServletRequest(long userId)
 		throws Exception {
 
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest();
-
-		mockHttpServletRequest.setAttribute(WebKeys.USER_ID, userId);
 
 		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
 
@@ -539,8 +834,40 @@ public class FileEntryContentDashboardItemTest {
 			LocaleUtil.US
 		);
 
+		PermissionChecker permissionChecker = Mockito.mock(
+			PermissionChecker.class);
+
+		Mockito.when(
+			permissionChecker.isContentReviewer(
+				Mockito.anyLong(), Mockito.anyLong())
+		).thenReturn(
+			true
+		);
+
+		Mockito.when(
+			themeDisplay.getPermissionChecker()
+		).thenReturn(
+			permissionChecker
+		);
+
+		User user = Mockito.mock(User.class);
+
+		Mockito.when(
+			user.getUserId()
+		).thenReturn(
+			userId
+		);
+
+		Mockito.when(
+			themeDisplay.getUser()
+		).thenReturn(
+			user
+		);
+
 		mockHttpServletRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, themeDisplay);
+
+		mockHttpServletRequest.setAttribute(WebKeys.USER_ID, userId);
 
 		return mockHttpServletRequest;
 	}

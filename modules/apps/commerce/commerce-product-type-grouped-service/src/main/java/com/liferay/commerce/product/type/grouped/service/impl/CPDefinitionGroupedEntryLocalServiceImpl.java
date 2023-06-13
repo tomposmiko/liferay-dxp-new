@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.uuid.PortalUUID;
 
@@ -108,9 +109,9 @@ public class CPDefinitionGroupedEntryLocalServiceImpl
 		throws PortalException {
 
 		CPDefinition cpDefinition = null;
-		User user = userLocalService.getUser(serviceContext.getUserId());
+		User user = _userLocalService.getUser(serviceContext.getUserId());
 
-		validate(cpDefinitionId, entryCProductId, quantity);
+		_validate(cpDefinitionId, entryCProductId, quantity);
 
 		long cpDefinitionGroupedEntryId = counterLocalService.increment();
 
@@ -264,7 +265,7 @@ public class CPDefinitionGroupedEntryLocalServiceImpl
 					cpDefinitionGroupedEntry.getEntryCProductId());
 		}
 
-		validate(
+		_validate(
 			cpDefinitionGroupedEntry.getCPDefinitionId(),
 			cpDefinitionGroupedEntry.getEntryCProductId(), quantity);
 
@@ -275,7 +276,7 @@ public class CPDefinitionGroupedEntryLocalServiceImpl
 			cpDefinitionGroupedEntry);
 	}
 
-	protected void validate(
+	private void _validate(
 			long cpDefinitionId, long entryCProductId, int quantity)
 		throws PortalException {
 
@@ -306,5 +307,8 @@ public class CPDefinitionGroupedEntryLocalServiceImpl
 
 	@Reference
 	private PortalUUID _portalUUID;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

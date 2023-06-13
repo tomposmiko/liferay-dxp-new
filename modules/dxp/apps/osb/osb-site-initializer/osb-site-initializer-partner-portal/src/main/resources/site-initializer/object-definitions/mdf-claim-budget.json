@@ -15,6 +15,18 @@
 			"name": "claimAmount",
 			"required": false,
 			"type": "String"
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"label": {
+				"en_US": "Expense Name"
+			},
+			"name": "expenseName",
+			"required": false,
+			"type": "String"
 		}
 	],
 	"pluralLabel": {

@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useState} from 'react';
 
 import {getResetLabelByViewport} from '../../../app/utils/getResetLabelByViewport';
-import {LengthField} from '../../../common/components/LengthField';
+import {LengthInput} from '../../../common/components/LengthField';
 import useControlledState from '../../../core/hooks/useControlledState';
 import {useId} from '../../../core/hooks/useId';
 import {ConfigurationFieldPropTypes} from '../../../prop-types/index';
@@ -110,9 +110,12 @@ export function AdvancedSelectField({
 
 	useEffect(() => {
 		setIsTokenValueOrInherited(
-			!isNullOrUndefined(tokenValues[value]) || !value
+			Liferay.FeatureFlags['LPS-163362']
+				? !isNullOrUndefined(tokenValues[value]) ||
+						(!value && field.inherited)
+				: !isNullOrUndefined(tokenValues[value]) || !value
 		);
-	}, [selectedViewportSize, tokenValues, value]);
+	}, [selectedViewportSize, tokenValues, value, field.inherited]);
 
 	useEffect(() => {
 		if (!field.cssProperty) {
@@ -151,7 +154,8 @@ export function AdvancedSelectField({
 					value={nextValue}
 				/>
 			) : field.typeOptions?.showLengthField ? (
-				<LengthField
+				<LengthInput
+					className="mb-0"
 					field={field}
 					onValueSelect={onValueSelect}
 					showLabel={!field.icon}
@@ -244,7 +248,7 @@ export function AdvancedSelectField({
 
 			{value ? (
 				<ClayButtonWithIcon
-					className="border-0 mb-0 ml-2 page-editor__select-field__action-button"
+					className="border-0 flex-shrink-0 mb-0 ml-2 page-editor__select-field__action-button"
 					displayType="secondary"
 					onClick={() =>
 						onSetValue({isTokenValue: true, value: null})
@@ -285,7 +289,8 @@ const SingleSelectWithIcon = ({
 
 	const defaultOptionLabel = useMemo(
 		() =>
-			options.find((option) => option.value === field.defaultValue).label,
+			options.find((option) => option.value === field.defaultValue)
+				?.label,
 		[field.defaultValue, options]
 	);
 

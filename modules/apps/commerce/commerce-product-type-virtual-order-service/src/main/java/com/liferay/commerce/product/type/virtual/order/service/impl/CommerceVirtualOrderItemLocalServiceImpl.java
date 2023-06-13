@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
@@ -77,7 +78,7 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userLocalService.getUser(serviceContext.getUserId());
+		User user = _userLocalService.getUser(serviceContext.getUserId());
 		long groupId = serviceContext.getScopeGroupId();
 
 		CommerceOrderItem commerceOrderItem =
@@ -93,7 +94,7 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 			url = null;
 		}
 
-		validate(fileEntryId, url);
+		_validate(fileEntryId, url);
 
 		long commerceVirtualOrderItemId = counterLocalService.increment();
 
@@ -119,7 +120,7 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 
 			commerceVirtualOrderItem.setActive(true);
 
-			commerceVirtualOrderItem = setDurationDates(
+			commerceVirtualOrderItem = _setDurationDates(
 				commerceVirtualOrderItem);
 		}
 
@@ -321,7 +322,7 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 			url = null;
 		}
 
-		validate(fileEntryId, url);
+		_validate(fileEntryId, url);
 
 		commerceVirtualOrderItem.setFileEntryId(fileEntryId);
 		commerceVirtualOrderItem.setUrl(url);
@@ -343,7 +344,7 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 				commerceVirtualOrderItem.getActivationStatus(),
 				commerceOrder.getOrderStatus())) {
 
-			commerceVirtualOrderItem = setDurationDates(
+			commerceVirtualOrderItem = _setDurationDates(
 				commerceVirtualOrderItem);
 		}
 
@@ -360,13 +361,13 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 			commerceVirtualOrderItemPersistence.fetchByPrimaryKey(
 				commerceVirtualOrderItemId);
 
-		commerceVirtualOrderItem = setDurationDates(commerceVirtualOrderItem);
+		commerceVirtualOrderItem = _setDurationDates(commerceVirtualOrderItem);
 
 		return commerceVirtualOrderItemPersistence.update(
 			commerceVirtualOrderItem);
 	}
 
-	protected Date calculateCommerceVirtualOrderItemEndDate(
+	private Date _calculateCommerceVirtualOrderItemEndDate(
 			CommerceVirtualOrderItem commerceVirtualOrderItem)
 		throws PortalException {
 
@@ -376,7 +377,7 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 			return new Date(Long.MIN_VALUE);
 		}
 
-		User defaultUser = userLocalService.getDefaultUser(
+		User defaultUser = _userLocalService.getDefaultUser(
 			commerceVirtualOrderItem.getCompanyId());
 
 		Calendar calendar = CalendarFactoryUtil.getCalendar(
@@ -387,7 +388,7 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 		return calendar.getTime();
 	}
 
-	protected CommerceSubscriptionEntry getCommerceSubscriptionEntry(
+	private CommerceSubscriptionEntry _getCommerceSubscriptionEntry(
 		long commerceOrderItemId) {
 
 		CommerceOrderItem commerceOrderItem =
@@ -403,7 +404,7 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 				commerceOrderItemId);
 	}
 
-	protected CommerceVirtualOrderItem setDurationDates(
+	private CommerceVirtualOrderItem _setDurationDates(
 			CommerceVirtualOrderItem commerceVirtualOrderItem)
 		throws PortalException {
 
@@ -411,11 +412,11 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 		Date endDate;
 
 		CommerceSubscriptionEntry commerceSubscriptionEntry =
-			getCommerceSubscriptionEntry(
+			_getCommerceSubscriptionEntry(
 				commerceVirtualOrderItem.getCommerceOrderItemId());
 
 		if (commerceSubscriptionEntry == null) {
-			endDate = calculateCommerceVirtualOrderItemEndDate(
+			endDate = _calculateCommerceVirtualOrderItemEndDate(
 				commerceVirtualOrderItem);
 		}
 		else {
@@ -432,7 +433,7 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 		return commerceVirtualOrderItem;
 	}
 
-	protected void validate(long fileEntryId, String url)
+	private void _validate(long fileEntryId, String url)
 		throws PortalException {
 
 		if (fileEntryId > 0) {
@@ -465,5 +466,8 @@ public class CommerceVirtualOrderItemLocalServiceImpl
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

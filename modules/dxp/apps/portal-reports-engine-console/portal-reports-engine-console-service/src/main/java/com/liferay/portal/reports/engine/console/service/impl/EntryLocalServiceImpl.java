@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.scheduler.StorageType;
@@ -111,7 +110,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		User user = _userLocalService.getUser(userId);
 		Date date = new Date();
 
-		validate(emailNotifications, emailDelivery, reportName);
+		_validate(emailNotifications, emailDelivery, reportName);
 
 		long entryId = counterLocalService.increment();
 
@@ -151,7 +150,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		// Scheduler
 
 		if (schedulerRequest) {
-			scheduleEntry(entry, reportName);
+			_scheduleEntry(entry, reportName);
 		}
 
 		// Report
@@ -346,7 +345,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		Entry entry = entryLocalService.getEntry(entryId);
 
 		try {
-			notifySubscribers(entry, emailAddresses, fileName, notification);
+			_notifySubscribers(entry, emailAddresses, fileName, notification);
 		}
 		catch (IOException ioException) {
 			throw new PortalException(ioException.getMessage());
@@ -434,9 +433,9 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		entryPersistence.update(entry);
 	}
 
-	protected ReportsGroupServiceEmailConfiguration
-			getReportsGroupServiceEmailConfiguration(long groupId)
-		throws ConfigurationException {
+	private ReportsGroupServiceEmailConfiguration
+			_getReportsGroupServiceEmailConfiguration(long groupId)
+		throws Exception {
 
 		return _configurationProvider.getConfiguration(
 			ReportsGroupServiceEmailConfiguration.class,
@@ -444,9 +443,9 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 				groupId, ReportsEngineConsoleConstants.SERVICE_NAME));
 	}
 
-	protected File getTemporaryReportFile(
+	private File _getTemporaryReportFile(
 			Entry entry, String fileName, boolean notification)
-		throws IOException, PortalException {
+		throws Exception {
 
 		if (notification) {
 			return null;
@@ -463,7 +462,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		}
 	}
 
-	protected void notifySubscribers(
+	private void _notifySubscribers(
 			Entry entry, String[] emailAddresses, String fileName,
 			boolean notification)
 		throws Exception {
@@ -476,7 +475,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 
 		ReportsGroupServiceEmailConfiguration
 			reportsGroupServiceEmailConfiguration =
-				getReportsGroupServiceEmailConfiguration(entry.getGroupId());
+				_getReportsGroupServiceEmailConfiguration(entry.getGroupId());
 
 		String fromName = reportsGroupServiceEmailConfiguration.emailFromName();
 
@@ -509,7 +508,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 			fileName, StringPool.FORWARD_SLASH);
 
 		if (!notification) {
-			File file = getTemporaryReportFile(entry, fileName, notification);
+			File file = _getTemporaryReportFile(entry, fileName, notification);
 
 			FinalizeManager.register(
 				subscriptionSender,
@@ -551,7 +550,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		subscriptionSender.flushNotificationsAsync();
 	}
 
-	protected void scheduleEntry(Entry entry, String reportName)
+	private void _scheduleEntry(Entry entry, String reportName)
 		throws PortalException {
 
 		Trigger trigger = TriggerFactoryUtil.createTrigger(
@@ -569,7 +568,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 			"liferay/reports_scheduler_event", message, 0);
 	}
 
-	protected void validate(
+	private void _validate(
 			String emailNotifications, String emailDelivery, String reportName)
 		throws PortalException {
 

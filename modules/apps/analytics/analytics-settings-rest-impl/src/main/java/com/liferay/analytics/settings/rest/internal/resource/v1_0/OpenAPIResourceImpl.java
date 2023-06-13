@@ -98,7 +98,13 @@ public class OpenAPIResourceImpl {
 
 	private final Set<Class<?>> _resourceClasses = new HashSet<Class<?>>() {
 		{
+			add(ChannelResourceImpl.class);
+
+			add(CommerceChannelResourceImpl.class);
+
 			add(DataSourceResourceImpl.class);
+
+			add(SiteResourceImpl.class);
 
 			add(OpenAPIResourceImpl.class);
 		}

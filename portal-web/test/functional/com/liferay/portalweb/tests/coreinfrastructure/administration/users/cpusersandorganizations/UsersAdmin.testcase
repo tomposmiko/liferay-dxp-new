@@ -1605,7 +1605,7 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		User.gotoEditCP(userScreenName = "usersn");
+		UserNavigator.gotoUser(userScreenName = "usersn");
 
 		User.viewMemberships(
 			assetType = "Sites",
@@ -2403,6 +2403,10 @@ definition {
 			portlet = "Users and Organizations");
 
 		UserNavigator.gotoUser(userScreenName = "test");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Portlet#HEADER",
+			value1 = "Edit User");
 
 		User.editUserInformation(
 			userEmailAddressEdit = "testadmin@liferay.com",

@@ -31,13 +31,14 @@ import java.nio.file.Path;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.json.JSONObject;
@@ -118,6 +119,23 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 		return testClasses;
 	}
 
+	public static class TestClassDurationComparator
+		implements Comparator<TestClass> {
+
+		@Override
+		public int compare(TestClass testClass1, TestClass testClass2) {
+			Long duration1 =
+				testClass1.getAverageDuration() +
+					testClass1.getAverageOverheadDuration();
+			Long duration2 =
+				testClass2.getAverageDuration() +
+					testClass2.getAverageOverheadDuration();
+
+			return duration2.compareTo(duration1);
+		}
+
+	}
+
 	protected FunctionalBatchTestClassGroup(
 		JSONObject jsonObject, PortalTestClassJob portalTestClassJob) {
 
@@ -181,7 +199,7 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 		return jobProperty.getValue();
 	}
 
-	protected List<List<String>> getPoshiTestClassGroups(File testBaseDir) {
+	protected List<List<TestClass>> getPoshiTestClassGroups(File testBaseDir) {
 		String query = getTestBatchRunPropertyQuery(testBaseDir);
 
 		if (JenkinsResultsParserUtil.isNullOrEmpty(query)) {
@@ -233,12 +251,36 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 
 				PoshiContext.readFiles();
 
-				return PoshiContext.getTestBatchGroups(query, getAxisMaxSize());
+				return getTestClassGroups(
+					PoshiContext.getTestBatchGroups(query, getAxisMaxSize()));
 			}
 			catch (Exception exception) {
 				throw new RuntimeException(exception);
 			}
 		}
+	}
+
+	protected List<List<TestClass>> getTestClassGroups(
+		List<List<String>> testBatchGroups) {
+
+		List<List<TestClass>> testClassGroups = new ArrayList<>();
+
+		if (testBatchGroups.isEmpty()) {
+			return testClassGroups;
+		}
+
+		for (List<String> testBatchGroup : testBatchGroups) {
+			List<TestClass> testClassGroup = new ArrayList<>();
+
+			for (String testClassMethodName : testBatchGroup) {
+				testClassGroup.add(
+					TestClassFactory.newTestClass(this, testClassMethodName));
+			}
+
+			testClassGroups.add(testClassGroup);
+		}
+
+		return testClassGroups;
 	}
 
 	@Override
@@ -254,49 +296,63 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 				continue;
 			}
 
-			List<List<String>> poshiTestClassGroups = getPoshiTestClassGroups(
-				testBaseDir);
+			List<List<TestClass>> poshiTestClassGroups =
+				getPoshiTestClassGroups(testBaseDir);
 
 			long targetAxisDuration = getTargetAxisDuration();
 
-			for (List<String> poshiTestClassGroup : poshiTestClassGroups) {
+			for (List<TestClass> poshiTestClassGroup : poshiTestClassGroups) {
 				if (poshiTestClassGroup.isEmpty()) {
 					continue;
 				}
 
 				if (targetAxisDuration > 0) {
-					AxisTestClassGroup axisTestClassGroup =
-						TestClassGroupFactory.newAxisTestClassGroup(
-							this, testBaseDir);
+					Collections.sort(
+						poshiTestClassGroup, new TestClassDurationComparator());
 
-					axisTestClassGroups.add(axisTestClassGroup);
+					while (!poshiTestClassGroup.isEmpty()) {
+						List<TestClass> axisTestClasses = new ArrayList<>();
 
-					for (String testClassMethodName : poshiTestClassGroup) {
-						TestClass testClass = TestClassFactory.newTestClass(
-							this, testClassMethodName);
+						for (TestClass poshiTestClass : poshiTestClassGroup) {
+							if (axisTestClasses.isEmpty()) {
+								axisTestClasses.add(poshiTestClass);
 
-						if (!axisTestClassGroup.hasTestClasses()) {
-							axisTestClassGroup.addTestClass(testClass);
+								continue;
+							}
 
-							continue;
+							long duration = 0L;
+							long totalOverheadDuration = 0L;
+
+							for (TestClass axisTestClass : axisTestClasses) {
+								duration += axisTestClass.getAverageDuration();
+								totalOverheadDuration +=
+									axisTestClass.getAverageOverheadDuration();
+							}
+
+							duration += poshiTestClass.getAverageDuration();
+							totalOverheadDuration +=
+								poshiTestClass.getAverageOverheadDuration();
+
+							duration +=
+								totalOverheadDuration /
+									(axisTestClasses.size() + 1);
+
+							if (duration >= targetAxisDuration) {
+								continue;
+							}
+
+							axisTestClasses.add(poshiTestClass);
 						}
 
-						long estimatedAxisDuration =
-							axisTestClassGroup.getAverageDuration() +
-								testClass.getAverageDuration() +
-									testClass.getAverageOverheadDuration();
+						poshiTestClassGroup.removeAll(axisTestClasses);
 
-						if (estimatedAxisDuration < targetAxisDuration) {
-							axisTestClassGroup.addTestClass(testClass);
-
-							continue;
-						}
-
-						axisTestClassGroup =
+						AxisTestClassGroup axisTestClassGroup =
 							TestClassGroupFactory.newAxisTestClassGroup(
 								this, testBaseDir);
 
-						axisTestClassGroup.addTestClass(testClass);
+						for (TestClass axisTestClass : axisTestClasses) {
+							axisTestClassGroup.addTestClass(axisTestClass);
+						}
 
 						axisTestClassGroups.add(axisTestClassGroup);
 					}
@@ -306,19 +362,8 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 						TestClassGroupFactory.newAxisTestClassGroup(
 							this, testBaseDir);
 
-					for (String testClassMethodName : poshiTestClassGroup) {
-						Matcher matcher = _poshiTestCasePattern.matcher(
-							testClassMethodName);
-
-						if (!matcher.find()) {
-							throw new RuntimeException(
-								"Invalid test class method name " +
-									testClassMethodName);
-						}
-
-						axisTestClassGroup.addTestClass(
-							TestClassFactory.newTestClass(
-								this, testClassMethodName));
+					for (TestClass testClass : poshiTestClassGroup) {
+						axisTestClassGroup.addTestClass(testClass);
 					}
 
 					axisTestClassGroups.add(axisTestClassGroup);

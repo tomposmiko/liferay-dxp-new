@@ -84,7 +84,7 @@ definition {
 		task ("View user information roles CP") {
 			User.openUsersAdmin();
 
-			User.gotoEditCP(userScreenName = "test");
+			UserNavigator.gotoUser(userScreenName = "test");
 
 			User.viewUserInfomationRolesCP(
 				roleTitle = "TestSiteRole",
@@ -116,7 +116,6 @@ definition {
 	@description = "This is a use case for LRQA-57574 TC-1: Combines SAML.CreateAndSyncUserAfterSAMLSetupWithMatchingScreenNameAttribute and OAuth2.AuthorizeExternalApplication to verify that the portal works when OAuth 2 and SAML are both enabled with a synced user on SP."
 	@priority = "4"
 	test AssertAuthorizationOnOAuth2WithSAMLConnectionWithExistingUser {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SAML#AssertAuthorizationOnOAuth2WithSAMLConnectionWithExistingUser";
 
 		task ("Logout") {
@@ -2235,7 +2234,7 @@ definition {
 
 			User.openUsersAdmin(baseURL = "http://www.able.com:8080");
 
-			User.gotoEditCP(userScreenName = "usera");
+			UserNavigator.gotoUser(userScreenName = "usera");
 
 			User.viewUserCustomFieldsCP(
 				customFieldName = "inputfield",
@@ -2534,7 +2533,7 @@ definition {
 
 			User.openUsersAdmin(baseURL = "http://www.able.com:8080");
 
-			User.gotoEditCP(userScreenName = "usera");
+			UserNavigator.gotoUser(userScreenName = "usera");
 
 			User.viewUserCustomFieldsCP(
 				customFieldName = "inputfield",
@@ -2664,7 +2663,7 @@ definition {
 
 			User.openUsersAdmin();
 
-			User.gotoEditCP(userScreenName = "usera");
+			UserNavigator.gotoUser(userScreenName = "usera");
 
 			User.editUserInformation(
 				userCustomField = "textChanged",
@@ -2694,7 +2693,7 @@ definition {
 
 			User.openUsersAdmin(baseURL = "http://www.able.com:8080");
 
-			User.gotoEditCP(userScreenName = "usera");
+			UserNavigator.gotoUser(userScreenName = "usera");
 
 			User.viewUserCustomFieldsCP(
 				customFieldName = "inputfield",
@@ -4299,8 +4298,6 @@ definition {
 	test ViewSPInitiatedSSO {
 		property app.server.types = "jboss,tcserver,tomcat,wildfly";
 		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property environment.acceptance = "true";
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSO";
 
 		task ("Configure samlidp as IdP and samlsp as SP") {

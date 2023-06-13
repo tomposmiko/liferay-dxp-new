@@ -651,6 +651,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ELIGIBILITY_CARD_TITLE</td>
+	<td>//div/h4[contains(.,'${key_eligibilityCardTitle}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TABLE_ENTRY_ROW_NUMBER</td>
 	<td>//div[@class='dnd-tbody']/div[contains(@class,'dnd-tr')][${key_rowNumber}]//a</td>
 	<td></td>
@@ -1207,6 +1212,11 @@
 <tr>
 	<td>SPECIFIC_MENU_ITEM</td>
 	<td>//a[contains(text(),'${key_itemName}')]//..//..//*[name()='svg'][contains(@class,'lexicon-icon lexicon-icon-ellipsis-v')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WAREHOUSE_ACTIVE_STATUS</td>
+	<td>//div/a[contains(.,'${key_warehouseName}')]//..//..//..//div[(@class='dnd-td') and contains (.,'${key_activeStatus}')]</td>
 	<td></td>
 </tr>
 

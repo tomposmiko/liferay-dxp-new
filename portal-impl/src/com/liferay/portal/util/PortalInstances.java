@@ -220,6 +220,19 @@ public class PortalInstances {
 	}
 
 	public static long getDefaultCompanyId() {
+		if (_companyIds.isEmpty()) {
+			try {
+				return getDefaultCompanyIdBySQL();
+			}
+			catch (SQLException sqlException) {
+				_log.error(
+					"Unable to get the default company ID by SQL",
+					sqlException);
+
+				throw new RuntimeException(sqlException);
+			}
+		}
+
 		return _companyIds.get(0);
 	}
 

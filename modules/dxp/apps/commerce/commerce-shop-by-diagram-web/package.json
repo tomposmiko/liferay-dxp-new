@@ -1,5 +1,15 @@
 {
 	"dependencies": {
+		"@liferay/frontend-js-react-web": "*",
+		"@liferay/frontend-js-state-web": "*",
+		"commerce-frontend-js": "*",
+		"d3": "5.9.3",
+		"fetch-mock": "^5.13.1",
+		"frontend-js-web": "*",
+		"html-webpack-plugin": "5.5.0",
+		"item-selector-taglib": "*",
+		"react": "16.12.0",
+		"webpack": "5.70.0"
 	},
 	"jest": {
 		"moduleNameMapper": {
@@ -20,5 +30,5 @@
 		"test": "liferay-npm-scripts test --passWithNoTests",
 		"watch": "liferay-npm-scripts webpack --watch"
 	},
-	"version": "1.0.53"
+	"version": "1.0.55"
 }

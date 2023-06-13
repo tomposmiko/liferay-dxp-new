@@ -1880,11 +1880,13 @@ definition {
 		}
 
 		if (isSet(styleDisplay)) {
-			AssertElementPresent(
-				key_fieldLabel = "Style Display",
-				key_groupLabel = "Templates",
-				key_value = "${styleDisplay}",
-				locator1 = "Select#GROUPED_SELECT_VALUE");
+			if (("${styleDisplay}" != "Grid") && ("${styleDisplay}" != "Flex Row") && ("${styleDisplay}" != "Flex Column")) {
+				AssertElementPresent(
+					key_fieldLabel = "Style Display",
+					key_groupLabel = "Templates",
+					key_value = "${styleDisplay}",
+					locator1 = "Select#GROUPED_SELECT_VALUE");
+			}
 
 			Select(
 				key_fieldLabel = "Style Display",
@@ -1911,6 +1913,33 @@ definition {
 					locator1 = "Select#GENERIC_SELECT_FIELD",
 					value1 = "${listItemStyle}");
 			}
+		}
+
+		if (isSet(flexWrap)) {
+			Select(
+				key_fieldLabel = "Flex Wrap",
+				locator1 = "Select#GENERIC_SELECT_FIELD",
+				value1 = "${flexWrap}");
+
+			PageEditor.waitForAutoSave();
+		}
+
+		if (isSet(alignItems)) {
+			Select(
+				key_fieldLabel = "Align Items",
+				locator1 = "Select#GENERIC_SELECT_FIELD",
+				value1 = "${alignItems}");
+
+			PageEditor.waitForAutoSave();
+		}
+
+		if (isSet(justifyContent)) {
+			Select(
+				key_fieldLabel = "Justify Content",
+				locator1 = "Select#GENERIC_SELECT_FIELD",
+				value1 = "${justifyContent}");
+
+			PageEditor.waitForAutoSave();
 		}
 
 		if (isSet(layout)) {
@@ -3096,26 +3125,33 @@ definition {
 					value1 = "${contentDisplay}");
 
 				PageEditor.waitForAutoSave();
+			}
 
-				if ("${contentDisplay}" != "Block") {
-					if (isSet(alignItems)) {
-						Select(
-							key_fieldLabel = "Align Items",
-							locator1 = "Select#GENERIC_SELECT_FIELD",
-							value1 = "${alignItems}");
+			if (isSet(flexWrap)) {
+				Select(
+					key_fieldLabel = "Flex Wrap",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "${flexWrap}");
 
-						PageEditor.waitForAutoSave();
-					}
+				PageEditor.waitForAutoSave();
+			}
 
-					if (isSet(justifyContent)) {
-						Select(
-							key_fieldLabel = "Justify Content",
-							locator1 = "Select#GENERIC_SELECT_FIELD",
-							value1 = "${justifyContent}");
+			if (isSet(alignItems)) {
+				Select(
+					key_fieldLabel = "Align Items",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "${alignItems}");
 
-						PageEditor.waitForAutoSave();
-					}
-				}
+				PageEditor.waitForAutoSave();
+			}
+
+			if (isSet(justifyContent)) {
+				Select(
+					key_fieldLabel = "Justify Content",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "${justifyContent}");
+
+				PageEditor.waitForAutoSave();
 			}
 
 			if (isSet(height)) {
@@ -3124,6 +3160,20 @@ definition {
 					key_fieldLabel = "Height",
 					locator1 = "TextInput#BORDER_BOTTOM_INPUT_FIELD",
 					value1 = "${height}");
+
+				Click(
+					key_sidebarButton = "Browser",
+					locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+
+				PageEditor.waitForAutoSave();
+			}
+
+			if (isSet(maxHeight)) {
+				Type(
+					key_borderBottom = "Frame",
+					key_fieldLabel = "Max Height",
+					locator1 = "TextInput#BORDER_BOTTOM_INPUT_FIELD",
+					value1 = "${maxHeight}");
 
 				Click(
 					key_sidebarButton = "Browser",
@@ -3948,6 +3998,35 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 			value1 = "${contentType}");
 	}
 
+	macro markFavorite {
+		if (isSet(displayStyle)) {
+			var displayStyle = "list";
+		}
+
+		Type.sendKeysApplicationSearch(
+			locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_SEARCH_FIELD",
+			value1 = "${fragmentName}");
+
+		if ("${displayStyle}" == "card") {
+			Click.clickAtNotVisible(
+				ariaLabel = "Mark Favorite",
+				key_collectionName = "${collectionName}",
+				key_fragmentName = "${fragmentName}",
+				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT_CARD_ITEM_FAVORITE");
+		}
+		else {
+			Click.clickAtNotVisible(
+				ariaLabel = "Mark Favorite",
+				key_collectionName = "${collectionName}",
+				key_fragmentName = "${fragmentName}",
+				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT_FAVORITE");
+		}
+
+		PageEditor.waitForAutoSave();
+
+		Click(locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_SEARCH_CLEAR_BUTTON");
+	}
+
 	macro openExperienceMenu {
 		if (IsElementNotPresent(locator1 = "PageEditor#EXPERIENCE_MENU")) {
 			Click(locator1 = "PageEditor#EXPERIENCE_MENU_BUTTON");
@@ -4128,6 +4207,18 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 		PageEditor.waitForAutoSave();
 	}
 
+	macro restoreSpacing {
+		Click(
+			ariaLabel = "${fieldLabel}",
+			locator1 = "Button#ANY_WITH_ARIA_LABEL");
+
+		Click(
+			key_text = "restore",
+			locator1 = "MenuItem#ANY_ICON");
+
+		PageEditor.waitForAutoSave();
+	}
+
 	macro searchFragmentViaSidebar {
 		WaitForPageLoad();
 
@@ -4254,6 +4345,29 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 		PageEditor.configureFragment(hideFragment = "false");
 	}
 
+	macro unmarkFavorite {
+		if (isSet(displayStyle)) {
+			var displayStyle = "list";
+		}
+
+		if ("${displayStyle}" == "card") {
+			Click.clickAtNotVisible(
+				ariaLabel = "Unmark Favorite",
+				key_collectionName = "${collectionName}",
+				key_fragmentName = "${fragmentName}",
+				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT_CARD_ITEM_FAVORITE");
+		}
+		else {
+			Click.clickAtNotVisible(
+				ariaLabel = "Unmark Favorite",
+				key_collectionName = "${collectionName}",
+				key_fragmentName = "${fragmentName}",
+				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT_FAVORITE");
+		}
+
+		PageEditor.waitForAutoSave();
+	}
+
 	macro viewCannotAddFragmentToOutsideOfDropZone {
 		WaitForPageLoad();
 
@@ -4296,6 +4410,27 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 				key_position = "${position}",
 				key_rowNumber = "${rowNumer}",
 				locator1 = "PageEditor#COLLECTION_DISPLAY_COLUMN");
+		}
+
+		if (isSet(alignItems)) {
+			AssertElementPresent(
+				key_alignItems = "${alignItems}",
+				key_position = "${position}",
+				locator1 = "PageEditor#COLLECTION_DISPLAY_CONFIGURATION_ALIGN_ITEMS");
+		}
+
+		if (isSet(flexWrap)) {
+			AssertElementPresent(
+				key_flexWrap = "${flexWrap}",
+				key_position = "${position}",
+				locator1 = "PageEditor#COLLECTION_DISPLAY_CONFIGURATION_FLEX_WRAP");
+		}
+
+		if (isSet(justifyContent)) {
+			AssertElementPresent(
+				key_justifyContent = "${justifyContent}",
+				key_position = "${position}",
+				locator1 = "PageEditor#COLLECTION_DISPLAY_CONFIGURATION_JUSTIFY_CONTENT");
 		}
 
 		if (isSet(layout)) {
@@ -4501,6 +4636,13 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 				key_contentDisplay = "${contentDisplay}",
 				key_position = "${position}",
 				locator1 = "PageEditor#CONTAINER_CONFIGURATION_CONTENT_DISPLAY");
+		}
+
+		if (isSet(flexWrap)) {
+			AssertElementPresent(
+				key_flexWrap = "${flexWrap}",
+				key_position = "${position}",
+				locator1 = "PageEditor#CONTAINER_CONFIGURATION_FLEX_WRAP");
 		}
 
 		if (isSet(justifyContent)) {
