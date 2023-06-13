@@ -12,7 +12,7 @@
  * details.
  */
 
-const pagePreviewEnabled = false;
+const TYPES = {};
 
 export const Liferay = window.Liferay || {
 	BREAKPOINTS: {
@@ -25,6 +25,10 @@ export const Liferay = window.Liferay || {
 		getPathThemeImages: () => null,
 		getScopeGroupId: () => 0,
 		getSiteGroupId: () => 0,
+	},
+	Util: {
+		LocalStorage: Object.assign(localStorage, {TYPES}),
+		SessionStorage: Object.assign(sessionStorage, {TYPES}),
 	},
 	authToken: '',
 };
@@ -41,6 +45,8 @@ export function getLiferaySiteName() {
 }
 
 export function redirectTo(url = '', currentSiteName = getLiferaySiteName()) {
+	const pagePreviewEnabled = false;
+
 	const queryParams = pagePreviewEnabled ? '?p_l_mode=preview' : '';
 
 	window.location.href = `${currentSiteName}/${url}${queryParams}`;

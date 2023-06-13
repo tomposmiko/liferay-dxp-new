@@ -40,6 +40,8 @@ NotificationsManagementToolbarDisplayContext notificationsManagementToolbarDispl
 NotificationsUtil.populateResults(themeDisplay.getUserId(), actionRequired, navigation, notificationsManagementToolbarDisplayContext.getOrderByType(), notificationsSearchContainer);
 %>
 
+<%@ include file="/notifications/view-ext-pre.jsp" %>
+
 <clay:navigation-bar
 	inverted="<%= layout.isTypeControlPanel() %>"
 	navigationItems='<%=
@@ -186,3 +188,5 @@ NotificationsUtil.populateResults(themeDisplay.getUserId(), actionRequired, navi
 		'.user-notification-action'
 	);
 </aui:script>
+
+<%@ include file="/notifications/view-ext-post.jsp" %>

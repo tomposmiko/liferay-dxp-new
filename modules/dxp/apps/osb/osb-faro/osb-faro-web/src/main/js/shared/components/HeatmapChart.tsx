@@ -1,3 +1,5 @@
+// @ts-nocheck - Fix it at this LRAC-13388
+
 import * as d3 from 'd3';
 import getCN from 'classnames';
 import PropTypes from 'prop-types';
@@ -134,12 +136,13 @@ const updateChart = (chartElement, props) => {
 
 			tooltip.html(renderTooltip(d));
 
-			const {width: widthRect, x: pageXRect} =
-				nodes[i].getBoundingClientRect();
+			const {width: widthRect, x: pageXRect} = nodes[
+				i
+			].getBoundingClientRect();
 
-			const {width: widthTooltip} = tooltip
-				.node()
-				.getBoundingClientRect();
+			const {
+				width: widthTooltip
+			} = tooltip.node().getBoundingClientRect();
 
 			tooltip
 				.style(

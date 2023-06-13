@@ -69,13 +69,11 @@ import com.liferay.site.navigation.type.SiteNavigationMenuItemType;
 import com.liferay.site.navigation.type.SiteNavigationMenuItemTypeRegistry;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -166,11 +164,11 @@ public class LayoutsTreeDisplayContext {
 		).build();
 	}
 
-	private PortletURL _getAddCollectionLayoutURL() {
+	private String _getAddCollectionLayoutURL() {
 		Group scopeGroup = _themeDisplay.getScopeGroup();
 
 		if (scopeGroup.isStaged() && !scopeGroup.isStagingGroup()) {
-			return null;
+			return StringPool.BLANK;
 		}
 
 		return PortletURLBuilder.create(
@@ -187,14 +185,16 @@ public class LayoutsTreeDisplayContext {
 			"groupId", _themeDisplay.getSiteGroupId()
 		).setParameter(
 			"privateLayout", _isPrivateLayout()
-		).buildPortletURL();
+		).setParameter(
+			"selPlid", LayoutConstants.DEFAULT_PLID
+		).buildString();
 	}
 
-	private PortletURL _getAddLayoutURL() {
+	private String _getAddLayoutURL() {
 		Group scopeGroup = _themeDisplay.getScopeGroup();
 
 		if (scopeGroup.isStaged() && !scopeGroup.isStagingGroup()) {
-			return null;
+			return StringPool.BLANK;
 		}
 
 		return PortletURLBuilder.create(
@@ -211,7 +211,9 @@ public class LayoutsTreeDisplayContext {
 			"groupId", _themeDisplay.getSiteGroupId()
 		).setParameter(
 			"privateLayout", _isPrivateLayout()
-		).buildPortletURL();
+		).setParameter(
+			"selPlid", LayoutConstants.DEFAULT_PLID
+		).buildString();
 	}
 
 	private String _getAdministrationPortletURL() {
@@ -266,23 +268,16 @@ public class LayoutsTreeDisplayContext {
 
 	private Map<String, Object> _getConfigData() {
 		Map<String, Object> configData = HashMapBuilder.<String, Object>put(
-			"addCollectionLayoutURL", _setSelPlid(_getAddCollectionLayoutURL())
+			"addCollectionLayoutURL", _getAddCollectionLayoutURL()
 		).put(
-			"addLayoutURL", _setSelPlid(_getAddLayoutURL())
+			"addLayoutURL", _getAddLayoutURL()
 		).put(
 			"administrationPortletNamespace",
 			PortalUtil.getPortletNamespace(LayoutAdminPortletKeys.GROUP_PAGES)
 		).put(
 			"administrationPortletURL", _getAdministrationPortletURL()
 		).put(
-			"configureLayoutSetURL",
-			() -> {
-				if (!_isShowConfigureLayout()) {
-					return StringPool.BLANK;
-				}
-
-				return _setSelPlid(_getConfigureLayoutSetURL());
-			}
+			"configureLayoutSetURL", this::_getConfigureLayoutSetURL
 		).put(
 			"findLayoutsURL",
 			() -> {
@@ -353,7 +348,11 @@ public class LayoutsTreeDisplayContext {
 		return configData;
 	}
 
-	private PortletURL _getConfigureLayoutSetURL() {
+	private String _getConfigureLayoutSetURL() throws PortalException {
+		if (!_isShowConfigureLayout()) {
+			return StringPool.BLANK;
+		}
+
 		return PortletURLBuilder.create(
 			PortalUtil.getControlPanelPortletURL(
 				_liferayPortletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
@@ -368,7 +367,9 @@ public class LayoutsTreeDisplayContext {
 			"groupId", _themeDisplay.getScopeGroupId()
 		).setParameter(
 			"privateLayout", _isPrivateLayout()
-		).buildPortletURL();
+		).setParameter(
+			"selPlid", LayoutConstants.DEFAULT_PLID
+		).buildString();
 	}
 
 	private long _getGroupId() {
@@ -602,8 +603,7 @@ public class LayoutsTreeDisplayContext {
 
 		selectedLayoutPath.addAll(
 			ListUtil.toList(
-				_layoutService.getAncestorLayouts(selPlid),
-				layout -> layout.getPlid()));
+				_layoutService.getAncestorLayouts(selPlid), Layout::getPlid));
 
 		return selectedLayoutPath;
 	}
@@ -657,7 +657,8 @@ public class LayoutsTreeDisplayContext {
 		SiteNavigationMenuItem siteNavigationMenuItem) {
 
 		SiteNavigationMenuItemType siteNavigationMenuItemType =
-			_getSiteNavigationMenuItemType(siteNavigationMenuItem.getType());
+			_siteNavigationMenuItemTypeRegistry.getSiteNavigationMenuItemType(
+				siteNavigationMenuItem.getType());
 
 		return JSONUtil.put(
 			"children",
@@ -705,19 +706,6 @@ public class LayoutsTreeDisplayContext {
 		}
 
 		return _siteNavigationMenuItemsJSONArray;
-	}
-
-	private SiteNavigationMenuItemType _getSiteNavigationMenuItemType(
-		String type) {
-
-		if (!_siteNavigationMenuItemTypesMap.containsKey(type)) {
-			_siteNavigationMenuItemTypesMap.put(
-				type,
-				_siteNavigationMenuItemTypeRegistry.
-					getSiteNavigationMenuItemType(type));
-		}
-
-		return _siteNavigationMenuItemTypesMap.get(type);
 	}
 
 	private String _getSiteNavigationMenuItemURL(
@@ -853,9 +841,17 @@ public class LayoutsTreeDisplayContext {
 	}
 
 	private boolean _isPrivateLayout() {
-		return Objects.equals(
-			ProductNavigationProductMenuWebKeys.PRIVATE_LAYOUT,
-			_getPageTypeSelectedOption());
+		Group group = _themeDisplay.getScopeGroup();
+
+		if (group.isLayoutSetPrototype() ||
+			Objects.equals(
+				ProductNavigationProductMenuWebKeys.PRIVATE_LAYOUT,
+				_getPageTypeSelectedOption())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean _isPrivateLayoutsEnabled() {
@@ -931,17 +927,6 @@ public class LayoutsTreeDisplayContext {
 		return false;
 	}
 
-	private String _setSelPlid(PortletURL portletURL) {
-		if (portletURL == null) {
-			return StringPool.BLANK;
-		}
-
-		portletURL.setParameter(
-			"selPlid", String.valueOf(LayoutConstants.DEFAULT_PLID));
-
-		return portletURL.toString();
-	}
-
 	private static final String _PRIVATE_PAGES_KEY = "private-pages";
 
 	private static final String _PUBLIC_PAGES_KEY = "public-pages";
@@ -975,8 +960,6 @@ public class LayoutsTreeDisplayContext {
 	private JSONArray _siteNavigationMenuItemsJSONArray;
 	private final SiteNavigationMenuItemTypeRegistry
 		_siteNavigationMenuItemTypeRegistry;
-	private final Map<String, SiteNavigationMenuItemType>
-		_siteNavigationMenuItemTypesMap = new HashMap<>();
 	private JSONArray _siteNavigationMenuJSONArray;
 	private final SiteNavigationMenuLocalService
 		_siteNavigationMenuLocalService;

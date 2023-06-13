@@ -796,7 +796,6 @@ const filterSchema = {
 				label: i18n.translate('build-name'),
 				name: 'buildToTasks/name',
 				operator: 'contains',
-				removeQuoteMark: false,
 				type: 'text',
 			},
 			overrides(baseFilters.dueStatus, {
@@ -816,7 +815,7 @@ const filterSchema = {
 				],
 			}),
 			overrides(baseFilters.assignee, {
-				operator: 'contains',
+				name: 'taskToTasksUsers/r_userToTasksUsers_userId',
 				type: 'select',
 			}),
 		] as RendererFields[],

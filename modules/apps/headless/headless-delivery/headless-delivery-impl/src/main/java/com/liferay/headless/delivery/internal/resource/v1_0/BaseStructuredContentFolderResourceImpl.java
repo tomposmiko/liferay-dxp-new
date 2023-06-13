@@ -1671,25 +1671,8 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		StructuredContentFolder existingStructuredContentFolder =
 			getStructuredContentFolder(structuredContentFolderId);
 
-		if (structuredContentFolder.getActions() != null) {
-			existingStructuredContentFolder.setActions(
-				structuredContentFolder.getActions());
-		}
-
-		if (structuredContentFolder.getAssetLibraryKey() != null) {
-			existingStructuredContentFolder.setAssetLibraryKey(
-				structuredContentFolder.getAssetLibraryKey());
-		}
-
-		if (structuredContentFolder.getDateCreated() != null) {
-			existingStructuredContentFolder.setDateCreated(
-				structuredContentFolder.getDateCreated());
-		}
-
-		if (structuredContentFolder.getDateModified() != null) {
-			existingStructuredContentFolder.setDateModified(
-				structuredContentFolder.getDateModified());
-		}
+		existingStructuredContentFolder.setCustomFields(
+			structuredContentFolder.getCustomFields());
 
 		if (structuredContentFolder.getDescription() != null) {
 			existingStructuredContentFolder.setDescription(
@@ -1706,33 +1689,11 @@ public abstract class BaseStructuredContentFolderResourceImpl
 				structuredContentFolder.getName());
 		}
 
-		if (structuredContentFolder.getNumberOfStructuredContentFolders() !=
-				null) {
-
-			existingStructuredContentFolder.setNumberOfStructuredContentFolders(
-				structuredContentFolder.getNumberOfStructuredContentFolders());
-		}
-
-		if (structuredContentFolder.getNumberOfStructuredContents() != null) {
-			existingStructuredContentFolder.setNumberOfStructuredContents(
-				structuredContentFolder.getNumberOfStructuredContents());
-		}
-
 		if (structuredContentFolder.getParentStructuredContentFolderId() !=
 				null) {
 
 			existingStructuredContentFolder.setParentStructuredContentFolderId(
 				structuredContentFolder.getParentStructuredContentFolderId());
-		}
-
-		if (structuredContentFolder.getSiteId() != null) {
-			existingStructuredContentFolder.setSiteId(
-				structuredContentFolder.getSiteId());
-		}
-
-		if (structuredContentFolder.getSubscribed() != null) {
-			existingStructuredContentFolder.setSubscribed(
-				structuredContentFolder.getSubscribed());
 		}
 
 		if (structuredContentFolder.getViewableBy() != null) {

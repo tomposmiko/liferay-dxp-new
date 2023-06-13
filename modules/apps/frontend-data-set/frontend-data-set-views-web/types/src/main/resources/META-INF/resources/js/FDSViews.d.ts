@@ -16,9 +16,12 @@
 
 import '../css/FDSEntries.scss';
 export declare type TFDSView = {
+	defaultItemsPerPage: number;
 	description: string;
+	externalReferenceCode: string;
 	id: string;
 	label: string;
+	listOfItemsPerPage: string;
 };
 interface IFDSViewsProps {
 	fdsEntryId: string;

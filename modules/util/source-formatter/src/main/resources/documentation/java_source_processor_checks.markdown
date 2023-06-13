@@ -18,6 +18,7 @@ AssignAsUsedCheck | [Performance](performance_checks.markdown#performance-checks
 [CompanyIterationCheck](check/company_iteration_check.markdown#companyiterationcheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Checks that `CompanyLocalService.forEachCompany` or `CompanyLocalService.forEachCompanyId` is used when iterating over companies |
 CompatClassImportsCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Checks that classes are imported from `compat` modules, when possible. |
 ComponentAnnotationCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Performs several checks on classes with @Component annotation. |
+[ComponentExposureCheck](check/component_exposure_check.markdown#componentexposurecheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Avoid exposing static component. |
 ConcatCheck | [Performance](performance_checks.markdown#performance-checks) | Checks for correct use of `StringBundler.concat`. |
 ConstantNameCheck | [Naming Conventions](naming_conventions_checks.markdown#naming-conventions-checks) | Checks that variable names of constants follow correct naming rules. |
 ConstructorGlobalVariableDeclarationCheck | [Performance](performance_checks.markdown#performance-checks) | Checks that initial values of global variables are not set in the constructor. |
@@ -116,6 +117,7 @@ JavaModuleServiceReferenceCheck | [Bug Prevention](bug_prevention_checks.markdow
 [JavaModuleTestCheck](check/java_module_test_check.markdown#javamoduletestcheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Checks package names in tests. |
 JavaModuleUniqueVerifyProcessCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Checks that a module can not have more than 1 verify process class (class extends VerifyProcess). |
 [JavaMultiPlusConcatCheck](check/java_multi_plus_concat_check.markdown#javamultiplusconcatcheck) | [Performance](performance_checks.markdown#performance-checks) | Checks that we do not concatenate more than 3 String objects. |
+JavaNewProblemInstantiationParametersCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Finds cases where `new Problem` can be simplified. |
 [JavaOSGiReferenceCheck](check/java_osgi_reference_check.markdown#javaosgireferencecheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Performs several checks on classes with `@Component` annotation. |
 [JavaPackagePathCheck](check/java_package_path_check.markdown#javapackagepathcheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Checks that the package name matches the file location. |
 [JavaProcessCallableCheck](check/java_process_callable_check.markdown#javaprocesscallablecheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Checks that a class implementing `ProcessCallable` assigns a `serialVersionUID`. |

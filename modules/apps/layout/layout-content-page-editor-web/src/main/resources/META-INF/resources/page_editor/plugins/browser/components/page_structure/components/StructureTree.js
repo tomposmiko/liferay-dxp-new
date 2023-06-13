@@ -17,7 +17,7 @@ import {TreeView as ClayTreeView} from '@clayui/core';
 import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
 import {Treeview} from 'frontend-js-components-web';
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import getAllEditables from '../../../../../app/components/fragment_content/getAllEditables';
 import {fromControlsId} from '../../../../../app/components/layout_data_items/Collection';
@@ -126,6 +126,7 @@ export default function PageStructureSidebar() {
 	);
 
 	const [editingNodeId, setEditingNodeId] = useState(null);
+	const [expandedKeys, setExpandedKeys] = useState([]);
 
 	const isMasterPage = config.layoutType === LAYOUT_TYPES.master;
 
@@ -146,7 +147,6 @@ export default function PageStructureSidebar() {
 				dragAndDropHoveredItemId,
 				editingNodeId,
 				fragmentEntryLinks,
-				hoveredItemId,
 				isMasterPage,
 				keyboardMovementTargetId,
 				layoutData,
@@ -158,6 +158,7 @@ export default function PageStructureSidebar() {
 				restrictedItemIds,
 				selectedViewportSize,
 			}).children,
+
 		[
 			activeItemId,
 			canUpdateEditables,
@@ -167,7 +168,6 @@ export default function PageStructureSidebar() {
 			dragAndDropHoveredItemId,
 			editingNodeId,
 			fragmentEntryLinks,
-			hoveredItemId,
 			isMasterPage,
 			keyboardMovementTargetId,
 			layoutData,
@@ -180,6 +180,10 @@ export default function PageStructureSidebar() {
 			selectedViewportSize,
 		]
 	);
+
+	const setExpandedNodes = (expandedNodes) => {
+		setExpandedKeys(Array.from(expandedNodes));
+	};
 
 	const handleNodeFocus = () => {
 		const focusedItem = document.activeElement?.querySelector(
@@ -258,6 +262,34 @@ export default function PageStructureSidebar() {
 		);
 	};
 
+	useEffect(() => {
+		const getAncestorsIds = (layoutDataItem) => {
+			if (!layoutDataItem.parentId) {
+				return [layoutDataItem.itemId];
+			}
+
+			return [
+				...[layoutDataItem.itemId],
+				...getAncestorsIds(layoutData.items[layoutDataItem.parentId]),
+			];
+		};
+
+		if (Liferay.FeatureFlags['LPS-151678'] && activeItemId) {
+			const layoutDataActiveItem = layoutData.items[activeItemId];
+
+			if (!layoutDataActiveItem) {
+				return;
+			}
+
+			setExpandedKeys((previousExpanedKeys) => [
+				...new Set([
+					...previousExpanedKeys,
+					...getAncestorsIds(layoutDataActiveItem),
+				]),
+			]);
+		}
+	}, [activeItemId, layoutData.items]);
+
 	return (
 		<div
 			className="overflow-auto page-editor__page-structure__structure-tree pt-4"
@@ -285,17 +317,20 @@ export default function PageStructureSidebar() {
 						<ClayTreeView
 							displayType="light"
 							expandDoubleClick={false}
+							expandedKeys={new Set(expandedKeys)}
 							expanderIcons={{
 								close: <ClayIcon symbol="hr" />,
 								open: <ClayIcon symbol="plus" />,
 							}}
 							items={nodes}
+							onExpandedChange={setExpandedNodes}
 							onItemsChange={() => {}}
 							showExpanderOnHover={false}
 						>
 							{(item) => (
 								<ClayTreeView.Item
 									actions={<ItemActions item={item} />}
+									active={item.active && item.activable}
 								>
 									<ClayTreeView.ItemStack
 										className={classNames(
@@ -305,7 +340,8 @@ export default function PageStructureSidebar() {
 													item.active &&
 													item.activable,
 												'page-editor__page-structure__clay-tree-node--hovered':
-													item.hovered,
+													item.itemId ===
+													hoveredItemId,
 												'page-editor__page-structure__clay-tree-node--mapped':
 													item.mapped,
 												'page-editor__page-structure__clay-tree-node--master-item':
@@ -552,7 +588,6 @@ function visit(
 		editingNodeId,
 		fragmentEntryLinks,
 		hasHiddenAncestor,
-		hoveredItemId,
 		isMasterPage,
 		keyboardMovementTargetId,
 		layoutData,
@@ -631,6 +666,7 @@ function visit(
 					activable:
 						canUpdateEditables &&
 						canActivateEditable(selectedViewportSize, type),
+					active: childId === activeItemId,
 					children: [],
 					dragAndDropHoveredItemId,
 					draggable: false,
@@ -662,7 +698,6 @@ function visit(
 						editingNodeId,
 						fragmentEntryLinks,
 						hasHiddenAncestor: hasHiddenAncestor || hidden,
-						hoveredItemId,
 						isMasterPage,
 						layoutData,
 						layoutDataRef,
@@ -712,7 +747,6 @@ function visit(
 						editingNodeId,
 						fragmentEntryLinks,
 						hasHiddenAncestor: hasHiddenAncestor || hidden,
-						hoveredItemId,
 						isMasterPage,
 						keyboardMovementTargetId,
 						layoutData,
@@ -737,7 +771,6 @@ function visit(
 					editingNodeId,
 					fragmentEntryLinks,
 					hasHiddenAncestor: hasHiddenAncestor || hidden,
-					hoveredItemId,
 					isMasterPage,
 					keyboardMovementTargetId,
 					layoutData,
@@ -775,7 +808,6 @@ function visit(
 			isHidable(item, fragmentEntryLinks, layoutData),
 		hidden,
 		hiddenAncestor: hasHiddenAncestor,
-		hovered: item.itemId === hoveredItemId,
 		icon,
 		id: item.itemId,
 		isMasterItem: !isMasterPage && itemInMasterLayout,

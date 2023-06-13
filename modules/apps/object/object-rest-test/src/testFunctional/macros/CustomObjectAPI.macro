@@ -40,12 +40,14 @@ definition {
 			externalReferenceCode = ${externalReferenceCode},
 			fieldName = ${fieldName},
 			fieldValue = ${fieldValue},
+			keywords = ${keywords},
 			nestedField = ${nestedField},
 			numberOfRelatedObjectEntries = ${numberOfRelatedObjectEntries},
 			objectEntryId = ${objectEntryId},
 			relatedEntryExternalReferenceCode = ${relatedEntryExternalReferenceCode},
 			relatedEntryFieldName = ${relatedEntryFieldName},
-			secondFieldValue = ${secondFieldValue});
+			secondFieldValue = ${secondFieldValue},
+			taxonomyCategoryIds = ${taxonomyCategoryIds});
 
 		var curl = StringUtil.add(${curlWithoutBody}, "-d {${body}}", " ");
 
@@ -84,6 +86,14 @@ definition {
 
 		if (isSet(externalReferenceCode)) {
 			var body = StringUtil.add("${body},", "\"externalReferenceCode\": \"${externalReferenceCode}\"", "");
+		}
+
+		if (isSet(keywords)) {
+			var body = StringUtil.add("${body},", "\"keywords\": [\"${keywords}\"]", "");
+		}
+
+		if (isSet(taxonomyCategoryIds)) {
+			var body = StringUtil.add("${body},", "\"taxonomyCategoryIds\": [${taxonomyCategoryIds}]", "");
 		}
 
 		if (isSet(nestedField)) {
@@ -169,14 +179,41 @@ definition {
 			externalReferenceCode = ${externalReferenceCode},
 			fieldName = ${fieldName},
 			fieldValue = ${fieldValue},
+			keywords = ${keywords},
 			scopeKey = ${scopeKey},
 			secondFieldValue = ${secondFieldValue},
+			taxonomyCategoryIds = ${taxonomyCategoryIds},
 			token = ${token},
 			virtualHost = ${virtualHost});
 
 		var response = JSONCurlUtil.post(${curl});
 
 		return ${response};
+	}
+
+	macro getObjectEntryIdByName {
+		Variables.assertDefined(parameterList = "${name},${en_US_plural_label}");
+
+		if (isSet(virtualHost)) {
+			if (!(isSet(port))) {
+				var port = 8080;
+			}
+
+			var portalURL = "http://${virtualHost}:${port}";
+		}
+		else {
+			var portalURL = JSONCompany.getPortalURL();
+		}
+
+		var curl = '''
+			${portalURL}/o/c/${en_US_plural_label}?filter=name%20eq%20%27${name}%27 \
+				-H Content-Type: application/json \
+				-u test@liferay.com:test
+		''';
+
+		var objectEntryId = JSONCurlUtil.get(${curl}, "$.items[?(@['name'] == '${name}')]['id']");
+
+		return ${objectEntryId};
 	}
 
 	macro getObjectPermissions {

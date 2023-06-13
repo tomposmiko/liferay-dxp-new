@@ -1,10 +1,15 @@
 @import 'atlas-variables';
 
 .site_navigation_menu_editor_MenuItem {
+	box-sizing: content-box;
+	padding-left: calc(
+		var(--nesting-margin) * (var(--nesting-level) - 1) * 1px
+	);
 	width: 40ch;
 
 	&:focus,
 	&:focus-within,
+	&:hover,
 	&.active {
 		outline: none;
 
@@ -65,16 +70,36 @@
 		}
 	}
 
-	&:hover {
-		.delete-item-button,
-		.menu-item-options-button,
-		.site_navigation_menu_editor_MenuItem-add-button {
-			opacity: 1;
-		}
-	}
-
 	&.dragging {
 		opacity: 0.4;
+	}
+
+	&.is-over {
+		&::after {
+			border-top: 4px solid $primary-l1;
+			content: '';
+			display: block;
+			margin-top: 8px;
+			padding-bottom: 16px;
+			transform: translateX(
+				calc(
+					var(--nesting-margin) *
+						(var(--nesting-level) - var(--over-nesting-level)) *
+						-1px
+				)
+			);
+			width: 100%;
+
+			[dir='rtl'] & {
+				transform: translateX(
+					calc(
+						var(--nesting-margin) *
+							(var(--nesting-level) - var(--over-nesting-level)) *
+							1px
+					)
+				);
+			}
+		}
 	}
 
 	.card-row {

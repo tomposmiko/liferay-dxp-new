@@ -197,6 +197,26 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
+	public void testFeatureFlagsAnnotationTest() throws Exception {
+		test(
+			SourceProcessorTestParameters.create(
+				"FeatureFlagsAnnotationTest.testjava"
+			).addExpectedMessage(
+				"Use annotation '@FeatureFlags' instead of 'PropsUtil." +
+					"addProperties' for feature flag",
+				31
+			).addExpectedMessage(
+				"Use annotation '@FeatureFlags' instead of 'PropsUtil." +
+					"addProperties' for feature flag",
+				41
+			).addExpectedMessage(
+				"Use annotation '@FeatureFlags' instead of 'PropsUtil." +
+					"addProperties' for feature flag",
+				51
+			));
+	}
+
+	@Test
 	public void testFormatAnnotations() throws Exception {
 		test("FormatAnnotations1.testjava");
 		test("FormatAnnotations2.testjava");
@@ -388,6 +408,11 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 			).addExpectedMessage(
 				"Use StringUtil.toUpperCase", 31
 			));
+	}
+
+	@Test
+	public void testJavaNewProblemInstantiationParameters() throws Exception {
+		test("JavaNewProblemInstantiationParameters.testjava");
 	}
 
 	@Test

@@ -188,24 +188,20 @@ export async function getAccountGroup(accountId: number) {
 
 export async function getAccountInfo({accountId}: {accountId: number}) {
 	const response = await fetch(
-		`/o/headless-admin-user/v1.0/accounts/${accountId}`,
+		`/o/headless-admin-user/v1.0/accounts/${accountId}?nestedFields=accountUserAccounts`,
 		{headers, method: 'GET'}
 	);
 
 	return response.json();
 }
 
-export async function getAccountInfoFromCommerce({
-	accountId,
-}: {
-	accountId: number;
-}) {
+export async function getAccountInfoFromCommerce(accountId: number) {
 	const response = await fetch(
 		`/o/headless-commerce-admin-account/v1.0/accounts/${accountId}`,
 		{headers, method: 'GET'}
 	);
 
-	return response.json();
+	return (await response.json()) as CommerceAccount;
 }
 
 export async function getAccounts() {
@@ -214,7 +210,43 @@ export async function getAccounts() {
 		method: 'GET',
 	});
 
-	return response.json();
+	return (await response.json()) as {items: Account[]};
+}
+
+export async function getAccountPostalAddressesByAccountId(accountId: number) {
+	const response = await fetch(
+		`/o/headless-admin-user/v1.0/accounts/${accountId}/postal-addresses`,
+		{
+			headers,
+			method: 'GET',
+		}
+	);
+
+	return (await response.json()) as {items: AccountPostalAddresses[]};
+}
+
+export async function getCart(cartId: number) {
+	const cartResponse = await fetch(
+		`/o/headless-commerce-delivery-cart/v1.0/carts/${cartId}`,
+		{
+			headers,
+			method: 'GET',
+		}
+	);
+
+	return await cartResponse.json();
+}
+
+export async function getCartItems(cartId: number) {
+	const cartResponse = await fetch(
+		`/o/headless-commerce-delivery-cart/v1.0/carts/${cartId}/items`,
+		{
+			headers,
+			method: 'GET',
+		}
+	);
+
+	return await cartResponse.json();
 }
 
 export async function getCatalogs() {
@@ -274,14 +306,16 @@ export async function getChannels() {
 }
 
 export async function getDeliveryProduct({
+	accountId,
 	appId,
 	channelId,
 }: {
+	accountId: number;
 	appId: number;
 	channelId: number;
 }) {
 	const response = await fetch(
-		`/o/headless-commerce-delivery-catalog/v1.0/channels/${channelId}/products/${appId}?nestedFields=skus`,
+		`/o/headless-commerce-delivery-catalog/v1.0/channels/${channelId}/products/${appId}?accountId=${accountId}`,
 		{
 			headers,
 			method: 'GET',
@@ -303,6 +337,21 @@ export async function getMyUserAccount() {
 	return await response.json();
 }
 
+export async function getPaymentMethodURL(
+	orderId: number,
+	callbackURL: string
+) {
+	const paymentResponse = await fetch(
+		`/o/headless-commerce-delivery-cart/v1.0/carts/${orderId}/payment-url?callbackURL=${callbackURL}`,
+		{
+			headers,
+			method: 'GET',
+		}
+	);
+
+	return await paymentResponse.text();
+}
+
 export async function getOptions() {
 	const response = await fetch(
 		`/o/headless-commerce-admin-catalog/v1.0/options`,
@@ -315,6 +364,18 @@ export async function getOptions() {
 	const {items} = await response.json();
 
 	return items as CommerceOption[];
+}
+
+export async function getOrderbyERC(erc: string) {
+	const orderResponse = await fetch(
+		`/o/headless-commerce-admin-order/v1.0/orders/by-externalReferenceCode/${erc}`,
+		{
+			headers,
+			method: 'GET',
+		}
+	);
+
+	return await orderResponse.json();
 }
 
 export async function getOrders(
@@ -437,7 +498,6 @@ export async function getSKUCustomFieldExpandoValue({
 	skuId: number;
 }) {
 	let response = '';
-
 	await Liferay.Service(
 		'/expandovalue/get-data',
 		{

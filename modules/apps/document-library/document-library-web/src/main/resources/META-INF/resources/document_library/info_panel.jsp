@@ -100,7 +100,16 @@ List<Folder> folders = dlInfoPanelDisplayContext.getFolders();
 							DLPortletInstanceSettings dlPortletInstanceSettings = dlRequestHelper.getDLPortletInstanceSettings();
 							%>
 
-							<c:if test="<%= dlPortletInstanceSettings.isEnableRatings() %>">
+							<c:if test="<%= dlPortletInstanceSettings.isEnableRatings() && folder.isSupportsSocial() %>">
+
+								<%
+								RatingsType ratingsType = PortletRatingsDefinitionUtil.getRatingsType(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), DLFileEntry.class.getName());
+
+								if (ratingsType == null) {
+									ratingsType = RatingsType.STARS;
+								}
+								%>
+
 								<dt class="sidebar-dt">
 									<liferay-ui:message key="ratings" />
 								</dt>
@@ -108,6 +117,7 @@ List<Folder> folders = dlInfoPanelDisplayContext.getFolders();
 									<liferay-ratings:ratings
 										className="<%= DLFolderConstants.getClassName() %>"
 										classPK="<%= folder.getFolderId() %>"
+										type="<%= ratingsType.toString() %>"
 									/>
 								</dd>
 							</c:if>

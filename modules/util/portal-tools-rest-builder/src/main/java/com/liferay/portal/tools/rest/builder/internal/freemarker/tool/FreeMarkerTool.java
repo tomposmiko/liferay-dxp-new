@@ -811,6 +811,13 @@ public class FreeMarkerTool {
 			getVulcanBatchImplementationUpdateStrategies(javaMethodSignatures);
 	}
 
+	public Map<String, String> getWritableDTOProperties(
+		ConfigYAML configYAML, OpenAPIYAML openAPIYAML, Schema schema) {
+
+		return DTOOpenAPIParser.getProperties(
+			configYAML, true, openAPIYAML, schema);
+	}
+
 	public boolean hasHTTPMethod(
 		JavaMethodSignature javaMethodSignature, String... httpMethods) {
 

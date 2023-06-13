@@ -16,21 +16,23 @@ package com.liferay.jethr0;
 
 import com.liferay.client.extension.util.spring.boot.ClientExtensionUtilSpringBootComponentScan;
 import com.liferay.client.extension.util.spring.boot.LiferayOAuth2Util;
-import com.liferay.jethr0.build.Build;
 import com.liferay.jethr0.build.queue.BuildQueue;
-import com.liferay.jethr0.project.Project;
-import com.liferay.jethr0.project.comparator.ProjectComparator;
-import com.liferay.jethr0.project.prioritizer.ProjectPrioritizer;
+import com.liferay.jethr0.jenkins.JenkinsQueue;
 import com.liferay.jethr0.project.queue.ProjectQueue;
-import com.liferay.jethr0.project.repository.ProjectComparatorRepository;
-import com.liferay.jethr0.project.repository.ProjectPrioritizerRepository;
-import com.liferay.jethr0.project.repository.ProjectRepository;
+
+import javax.jms.ConnectionFactory;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.config.JmsListenerContainerFactory;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
@@ -42,16 +44,58 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 public class Jethr0SpringBootApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Jethr0SpringBootApplication.class, args);
+		ConfigurableApplicationContext configurableApplicationContext =
+			SpringApplication.run(Jethr0SpringBootApplication.class, args);
+
+		ProjectQueue projectQueue = configurableApplicationContext.getBean(
+			ProjectQueue.class);
+
+		projectQueue.initialize();
+
+		BuildQueue buildQueue = configurableApplicationContext.getBean(
+			BuildQueue.class);
+
+		buildQueue.initialize();
+
+		JenkinsQueue jenkinsQueue = configurableApplicationContext.getBean(
+			JenkinsQueue.class);
+
+		jenkinsQueue.initialize();
 	}
 
 	@Bean
-	public BuildQueue getBuildQueue(ProjectQueue projectQueue) {
-		BuildQueue buildQueue = new BuildQueue();
+	public ActiveMQConnectionFactory getActiveMQConnectionFactory() {
+		ActiveMQConnectionFactory activeMQConnectionFactory =
+			new ActiveMQConnectionFactory();
 
-		buildQueue.setProjectQueue(projectQueue);
+		activeMQConnectionFactory.setBrokerURL(_jmsBrokerURL);
+		activeMQConnectionFactory.setPassword(_jmsUserPassword);
+		activeMQConnectionFactory.setUserName(_jmsUserName);
 
-		return buildQueue;
+		return activeMQConnectionFactory;
+	}
+
+	@Bean
+	public JmsListenerContainerFactory getJmsListenerContainerFactory(
+		ActiveMQConnectionFactory activeMQConnectionFactory) {
+
+		DefaultJmsListenerContainerFactory defaultJmsListenerContainerFactory =
+			new DefaultJmsListenerContainerFactory();
+
+		defaultJmsListenerContainerFactory.setConnectionFactory(
+			activeMQConnectionFactory);
+
+		return defaultJmsListenerContainerFactory;
+	}
+
+	@Bean
+	public JmsTemplate getJmsTemplate(ConnectionFactory connectionFactory) {
+		JmsTemplate jmsTemplate = new JmsTemplate();
+
+		jmsTemplate.setConnectionFactory(connectionFactory);
+		jmsTemplate.setDefaultDestinationName(_jmsJenkinsBuildQueue);
+
+		return jmsTemplate;
 	}
 
 	@Bean
@@ -64,60 +108,19 @@ public class Jethr0SpringBootApplication {
 			_liferayOAuthApplicationExternalReferenceCodes);
 	}
 
-	@Bean
-	public ProjectQueue getProjectQueue(
-		ProjectComparatorRepository projectComparatorRepository,
-		ProjectPrioritizerRepository projectPrioritizerRepository,
-		ProjectRepository projectRepository) {
+	@Value("${jms.broker.url}")
+	private String _jmsBrokerURL;
 
-		ProjectQueue projectQueue = new ProjectQueue();
+	@Value("${jms.jenkins.build.queue}")
+	private String _jmsJenkinsBuildQueue;
 
-		projectQueue.setProjectPrioritizer(
-			_getDefaultProjectPrioritizer(
-				projectComparatorRepository, projectPrioritizerRepository));
+	@Value("${jms.user.name}")
+	private String _jmsUserName;
 
-		projectQueue.addProjects(
-			projectRepository.getByStates(
-				Project.State.QUEUED, Project.State.RUNNING));
-
-		for (Project project : projectQueue.getProjects()) {
-			System.out.println(project);
-
-			for (Build build : project.getBuilds()) {
-				System.out.println("> " + build);
-			}
-		}
-
-		return projectQueue;
-	}
-
-	private ProjectPrioritizer _getDefaultProjectPrioritizer(
-		ProjectComparatorRepository projectComparatorRepository,
-		ProjectPrioritizerRepository projectPrioritizerRepository) {
-
-		ProjectPrioritizer projectPrioritizer =
-			projectPrioritizerRepository.getByName(_liferayProjectPrioritizer);
-
-		if (projectPrioritizer != null) {
-			return projectPrioritizer;
-		}
-
-		projectPrioritizer = projectPrioritizerRepository.add(
-			_liferayProjectPrioritizer);
-
-		projectComparatorRepository.add(
-			projectPrioritizer, 1, ProjectComparator.Type.PROJECT_PRIORITY,
-			null);
-		projectComparatorRepository.add(
-			projectPrioritizer, 2, ProjectComparator.Type.FIFO, null);
-
-		return projectPrioritizer;
-	}
+	@Value("${jms.user.password}")
+	private String _jmsUserPassword;
 
 	@Value("${liferay.oauth.application.external.reference.codes}")
 	private String _liferayOAuthApplicationExternalReferenceCodes;
-
-	@Value("${liferay.jethr0.project.prioritizer}")
-	private String _liferayProjectPrioritizer;
 
 }

@@ -16,7 +16,7 @@ package com.liferay.object.service.impl;
 
 import com.liferay.object.constants.ObjectLayoutBoxConstants;
 import com.liferay.object.exception.DefaultObjectLayoutException;
-import com.liferay.object.exception.NoSuchObjectDefinitionException;
+import com.liferay.object.exception.ObjectDefinitionModifiableException;
 import com.liferay.object.exception.ObjectLayoutBoxCategorizationTypeException;
 import com.liferay.object.exception.ObjectLayoutColumnSizeException;
 import com.liferay.object.model.ObjectDefinition;
@@ -79,12 +79,7 @@ public class ObjectLayoutLocalServiceImpl
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
 		if (objectDefinition.isUnmodifiableSystemObject()) {
-
-			// TODO Add test
-
-			throw new NoSuchObjectDefinitionException(
-				"Object layouts require a custom object definition or a " +
-					"modifiable system object definition");
+			throw new ObjectDefinitionModifiableException.MustBeModifiable();
 		}
 
 		_validate(0, objectDefinitionId, defaultObjectLayout, objectLayoutTabs);

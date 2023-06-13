@@ -1,7 +1,17 @@
 type Account = {
-	customFields?: {[key: string]: number};
+	customFields?: AccountCustomField[];
+	description: string;
 	externalReferenceCode: string;
 	id: number;
+	name: string;
+	type: string;
+};
+
+type AccountCustomField = {
+	customValue: {
+		data: string;
+	};
+	dataType: string;
 	name: string;
 };
 
@@ -14,6 +24,34 @@ type AccountBrief = {
 	roleBriefs: RoleBrief[];
 };
 
+type AccountPostalAddresses = {
+	addressCountry: string;
+	addressLocality: string;
+	addressRegion: string;
+	addressType: string;
+	id: number;
+	name: string;
+	postalCode: number;
+	primary: boolean;
+	streetAddressLine1: string;
+	streetAddressLine2: string;
+	streetAddressLine3: string;
+};
+
+type AccountPostalAddresses = {
+	addressCountry: string;
+	addressLocality: string;
+	addressRegion: string;
+	addressType: string;
+	id: number;
+	name: string;
+	postalCode: number;
+	primary: boolean;
+	streetAddressLine1: string;
+	streetAddressLine2: string;
+	streetAddressLine3: string;
+};
+
 type AccountGroup = {
 	customFields: {};
 	externalReferenceCode: string;
@@ -21,10 +59,27 @@ type AccountGroup = {
 	name: string;
 };
 
+type BillingAddress = {
+	city?: string;
+	country?: string;
+	countryISOCode: string;
+	name?: string;
+	phoneNumber?: string;
+	region?: string;
+	street1?: string;
+	street2?: string;
+	zip?: string;
+};
+
 type Cart = {
 	accountId: number;
+	author?: string;
+	billingAddress: BillingAddress;
 	cartItems: CartItem[];
 	currencyCode: string;
+	paymentMethod: string;
+	purchaseOrderNumber?: string;
+	shippingAddress: BillingAddress;
 };
 
 type CartItem = {
@@ -51,11 +106,20 @@ type Channel = {
 	type: string;
 };
 
+interface CommerceAccount extends Omit<Account, 'description'> {
+	taxId: string;
+	logoURL: string;
+}
+
 type CommerceOption = {
 	id: number;
 	key: string;
 	name: string;
 };
+
+type PaymentMethodMode = 'PayPal';
+
+type PaymentMethodSelector = 'order' | 'pay' | 'trial' | null;
 
 interface PlacedOrder {
 	account: string;
@@ -74,6 +138,18 @@ interface PlacedOrderItems {
 	subscription: boolean;
 	thumbnail: string;
 	version: string;
+}
+
+interface PostalAddressResponse {
+	addressCountry: string;
+	addressLocality: string;
+	addressRegion: string;
+	addressType: string;
+	id: number;
+	name: string;
+	postalCode: string;
+	streetAddressLine1: string;
+	streetAddressLine2: string;
 }
 
 interface PostCartResponse {
@@ -126,7 +202,7 @@ type SKU = {
 	id: number;
 	price: number;
 	sku: string;
-	skuOptions: [];
+	skuOptions: {key: string; value: string}[];
 };
 
 type Specification = {

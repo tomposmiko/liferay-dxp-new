@@ -59,13 +59,14 @@ renderResponse.setTitle(selGroup.getLayoutRootNodeName(privateLayout, locale));
 	<aui:input name="layoutSetId" type="hidden" value="<%= selLayoutSet.getLayoutSetId() %>" />
 	<aui:input name="<%= PortletDataHandlerKeys.SELECTED_LAYOUTS %>" type="hidden" />
 
-	<h2 class="sheet-title"><liferay-ui:message key="design" /></h2>
+	<h2 class="mb-4 text-7"><liferay-ui:message key="design" /></h2>
 
 	<liferay-frontend:edit-form-body>
 		<liferay-frontend:form-navigator
 			formModelBean="<%= selLayoutSet %>"
 			id="<%= FormNavigatorConstants.FORM_NAVIGATOR_ID_LAYOUT_SET %>"
 			showButtons="<%= false %>"
+			type="<%= FormNavigatorConstants.FormNavigatorType.SHEET_SECTIONS %>"
 		/>
 	</liferay-frontend:edit-form-body>
 

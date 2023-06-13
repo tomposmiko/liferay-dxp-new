@@ -3258,6 +3258,18 @@ components:
                     # @review
                     description:
                         The Open Graph's image.
+                imageAlt:
+                    # @review
+                    description:
+                        The Open Graph's image alt.
+                    type: string
+                imageAlt_i18n:
+                    additionalProperties:
+                        type: string
+                    # @review
+                    description:
+                        The localized Open Graph's image alts.
+                    type: object
                 title:
                     # @review
                     description:
@@ -4633,6 +4645,26 @@ components:
                         Optional field with the structure of all the elements of the page. Can be embedded with
                         nestedFields when retrieving the collection of site pages. When retrieving a single site page,
                         it will automatically be included.
+                pagePermissions:
+                    # @review
+                    description:
+                        The page's permissions.
+                    items:
+                        properties:
+                            actionKeys:
+                                # @review
+                                description:
+                                    The keys of the actions the role has permission for.
+                                items:
+                                    type: string
+                                type: array
+                            roleKey:
+                                # @review
+                                description:
+                                    The role's key.
+                                type: string
+                        type: object
+                    type: array
                 pageSettings:
                     allOf:
                         - $ref: "#/components/schemas/PageSettings"
@@ -4644,6 +4676,17 @@ components:
                     description:
                         The type of the page.
                     type: string
+                parentSitePage:
+                    # @review
+                    description:
+                        The parent page or null if it is a top level page.
+                    properties:
+                        friendlyUrlPath:
+                            # @review
+                            description:
+                                The relative URL of the parent page.
+                            type: string
+                    type: object
                 renderedPage:
                     allOf:
                         - $ref: "#/components/schemas/RenderedPage"
@@ -5409,7 +5452,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.delivery.client', and version '4.0.53'."
+        'com.liferay.headless.delivery.client', and version '4.0.54'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
