@@ -14,10 +14,17 @@
 
 package com.liferay.jethr0.project;
 
+import com.liferay.jethr0.builds.Build;
+import com.liferay.jethr0.gitbranch.GitBranch;
+import com.liferay.jethr0.testsuite.TestSuite;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.json.JSONObject;
 
@@ -27,8 +34,66 @@ import org.json.JSONObject;
 public abstract class BaseProject implements Project {
 
 	@Override
+	public void addBuild(Build build) {
+		addBuilds(Arrays.asList(build));
+	}
+
+	@Override
+	public void addBuilds(List<Build> builds) {
+		for (Build build : builds) {
+			if (_builds.contains(build)) {
+				continue;
+			}
+
+			_builds.add(build);
+		}
+	}
+
+	@Override
+	public void addGitBranch(GitBranch gitBranch) {
+		addGitBranches(Arrays.asList(gitBranch));
+	}
+
+	@Override
+	public void addGitBranches(List<GitBranch> gitBranches) {
+		for (GitBranch gitBranch : gitBranches) {
+			if (_gitBranches.contains(gitBranch)) {
+				continue;
+			}
+
+			_gitBranches.add(gitBranch);
+		}
+	}
+
+	@Override
+	public void addTestSuite(TestSuite testSuite) {
+		addTestSuites(Arrays.asList(testSuite));
+	}
+
+	@Override
+	public void addTestSuites(List<TestSuite> testSuites) {
+		for (TestSuite testSuite : testSuites) {
+			if (_testSuites.contains(testSuite)) {
+				continue;
+			}
+
+			_testSuites.add(testSuite);
+		}
+	}
+
+	@Override
+	public List<Build> getBuilds() {
+		return _builds;
+	}
+
+	@Override
 	public Date getCreatedDate() {
 		return _createdDate;
+	}
+
+	@Override
+	public List<GitBranch> getGitBranches() {
+		return _gitBranches;
 	}
 
 	@Override
@@ -76,8 +141,43 @@ public abstract class BaseProject implements Project {
 	}
 
 	@Override
+	public List<TestSuite> getTestSuites() {
+		return _testSuites;
+	}
+
+	@Override
 	public Type getType() {
 		return _type;
+	}
+
+	@Override
+	public void removeBuild(Build build) {
+		_builds.remove(build);
+	}
+
+	@Override
+	public void removeBuilds(List<Build> builds) {
+		_builds.remove(builds);
+	}
+
+	@Override
+	public void removeGitBranch(GitBranch gitBranch) {
+		_gitBranches.remove(gitBranch);
+	}
+
+	@Override
+	public void removeGitBranches(List<GitBranch> gitBranches) {
+		_gitBranches.remove(gitBranches);
+	}
+
+	@Override
+	public void removeTestSuite(TestSuite testSuite) {
+		_testSuites.remove(testSuite);
+	}
+
+	@Override
+	public void removeTestSuites(List<TestSuite> testSuites) {
+		_testSuites.removeAll(testSuites);
 	}
 
 	@Override
@@ -119,11 +219,14 @@ public abstract class BaseProject implements Project {
 	private static final SimpleDateFormat _simpleDateFormat =
 		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+	private final List<Build> _builds = new ArrayList<>();
 	private final Date _createdDate;
+	private final List<GitBranch> _gitBranches = new ArrayList<>();
 	private final long _id;
 	private String _name;
 	private int _priority;
 	private State _state;
+	private final List<TestSuite> _testSuites = new ArrayList<>();
 	private final Type _type;
 
 }

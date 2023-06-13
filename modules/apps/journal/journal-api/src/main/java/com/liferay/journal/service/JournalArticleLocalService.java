@@ -133,9 +133,9 @@ public interface JournalArticleLocalService
 	 * @param friendlyURLMap the web content article's locales and localized
 	 friendly URLs
 	 * @param content the HTML content wrapped in XML
-	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 * @param ddmStructureId the primary key of the web content article's DDM
 	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
+	 <code>0</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -193,7 +193,7 @@ public interface JournalArticleLocalService
 			boolean autoArticleId, double version, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap,
 			Map<Locale, String> friendlyURLMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
+			long ddmStructureId, String ddmTemplateKey, String layoutUuid,
 			int displayDateMonth, int displayDateDay, int displayDateYear,
 			int displayDateHour, int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
@@ -224,9 +224,9 @@ public interface JournalArticleLocalService
 	 int, int, int, int, boolean, int, int, int, int, int, boolean,
 	 boolean, boolean, String, File, Map, String, ServiceContext)}
 	 description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 * @param ddmStructureId the primary key of the web content article's DDM
 	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
+	 <code>0</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param serviceContext the service context to be applied. Can set the
@@ -242,14 +242,14 @@ public interface JournalArticleLocalService
 			String externalReferenceCode, long userId, long groupId,
 			long folderId, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, String content,
-			String ddmStructureKey, String ddmTemplateKey,
+			long ddmStructureId, String ddmTemplateKey,
 			ServiceContext serviceContext)
 		throws PortalException;
 
 	public JournalArticle addArticleDefaultValues(
 			long userId, long groupId, long classNameId, long classPK,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
+			String content, long ddmStructureId, String ddmTemplateKey,
 			String layoutUuid, int displayDateMonth, int displayDateDay,
 			int displayDateYear, int displayDateHour, int displayDateMinute,
 			int expirationDateMonth, int expirationDateDay,
@@ -3039,9 +3039,6 @@ public interface JournalArticleLocalService
 	 int, int, int, int, boolean, int, int, int, int, int, boolean,
 	 boolean, boolean, String, File, Map, String, ServiceContext)}
 	 description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
-	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -3108,9 +3105,9 @@ public interface JournalArticleLocalService
 			double version, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap,
 			Map<Locale, String> friendlyURLMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			String ddmTemplateKey, String layoutUuid, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
 			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
@@ -3183,9 +3180,6 @@ public interface JournalArticleLocalService
 	 int, int, int, int, boolean, int, int, int, int, int, boolean,
 	 boolean, boolean, String, File, Map, String, ServiceContext)}
 	 description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
-	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -3251,9 +3245,9 @@ public interface JournalArticleLocalService
 			long userId, long groupId, long folderId, String articleId,
 			double version, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			String ddmTemplateKey, String layoutUuid, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
 			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
@@ -3313,15 +3307,15 @@ public interface JournalArticleLocalService
 	public JournalArticle updateArticleDefaultValues(
 			long userId, long groupId, String articleId,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
-			String layoutUuid, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
-			int reviewDateDay, int reviewDateYear, int reviewDateHour,
-			int reviewDateMinute, boolean neverReview, boolean indexable,
-			boolean smallImage, String smallImageURL, File smallImageFile,
+			String content, String ddmTemplateKey, String layoutUuid,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
+			int reviewDateYear, int reviewDateHour, int reviewDateMinute,
+			boolean neverReview, boolean indexable, boolean smallImage,
+			String smallImageURL, File smallImageFile,
 			ServiceContext serviceContext)
 		throws PortalException;
 

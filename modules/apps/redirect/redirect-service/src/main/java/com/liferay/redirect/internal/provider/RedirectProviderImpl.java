@@ -20,12 +20,14 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.redirect.internal.configuration.RedirectPatternConfiguration;
 import com.liferay.redirect.internal.util.PatternUtil;
 import com.liferay.redirect.model.RedirectEntry;
+import com.liferay.redirect.model.RedirectPatternEntry;
 import com.liferay.redirect.provider.RedirectProvider;
 import com.liferay.redirect.service.RedirectEntryLocalService;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -59,17 +61,6 @@ public class RedirectProviderImpl
 	}
 
 	@Override
-	public Map<Pattern, String> getPatternStrings(long groupId) {
-		Map<Pattern, String> patternStrings = _patternStrings.get(groupId);
-
-		if (patternStrings != null) {
-			return patternStrings;
-		}
-
-		return new LinkedHashMap<>();
-	}
-
-	@Override
 	public Redirect getRedirect(
 		long groupId, String friendlyURL, String fullURL) {
 
@@ -91,21 +82,38 @@ public class RedirectProviderImpl
 				redirectEntry.getDestinationURL(), redirectEntry.isPermanent());
 		}
 
-		Map<Pattern, String> patternStrings = _patternStrings.getOrDefault(
-			groupId, Collections.emptyMap());
+		List<RedirectPatternEntry> redirectPatternEntries =
+			_redirectPatternEntries.getOrDefault(
+				groupId, Collections.emptyList());
 
-		for (Map.Entry<Pattern, String> entry : patternStrings.entrySet()) {
-			Pattern pattern = entry.getKey();
+		for (RedirectPatternEntry redirectPatternEntry :
+				redirectPatternEntries) {
+
+			Pattern pattern = redirectPatternEntry.getPattern();
 
 			Matcher matcher = pattern.matcher(friendlyURL);
 
 			if (matcher.matches()) {
 				return new RedirectImpl(
-					matcher.replaceFirst(entry.getValue()), false);
+					matcher.replaceFirst(
+						redirectPatternEntry.getDestinationURL()),
+					false);
 			}
 		}
 
 		return null;
+	}
+
+	@Override
+	public List<RedirectPatternEntry> getRedirectPatternEntries(long groupId) {
+		List<RedirectPatternEntry> redirectPatternEntries =
+			_redirectPatternEntries.get(groupId);
+
+		if (redirectPatternEntries != null) {
+			return redirectPatternEntries;
+		}
+
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -127,15 +135,9 @@ public class RedirectProviderImpl
 			ConfigurableUtil.createConfigurable(
 				RedirectPatternConfiguration.class, dictionary);
 
-		_patternStrings.put(
+		_redirectPatternEntries.put(
 			groupId,
 			PatternUtil.parse(redirectPatternConfiguration.patternStrings()));
-	}
-
-	protected void setPatternStrings(
-		Map<Long, Map<Pattern, String>> patternStrings) {
-
-		_patternStrings = patternStrings;
 	}
 
 	protected void setRedirectEntryLocalService(
@@ -144,20 +146,27 @@ public class RedirectProviderImpl
 		_redirectEntryLocalService = redirectEntryLocalService;
 	}
 
+	protected void setRedirectPatternEntries(
+		Map<Long, List<RedirectPatternEntry>> redirectPatternEntries) {
+
+		_redirectPatternEntries = redirectPatternEntries;
+	}
+
 	private void _unmapPid(String pid) {
 		if (_groupIds.containsKey(pid)) {
 			Long groupId = _groupIds.remove(pid);
 
-			_patternStrings.remove(groupId);
+			_redirectPatternEntries.remove(groupId);
 		}
 	}
 
 	private final Map<String, Long> _groupIds = new ConcurrentHashMap<>();
-	private Map<Long, Map<Pattern, String>> _patternStrings =
-		new ConcurrentHashMap<>();
 
 	@Reference
 	private RedirectEntryLocalService _redirectEntryLocalService;
+
+	private Map<Long, List<RedirectPatternEntry>> _redirectPatternEntries =
+		new ConcurrentHashMap<>();
 
 	private static class RedirectImpl implements Redirect {
 

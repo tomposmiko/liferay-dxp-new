@@ -26,6 +26,7 @@ import {
 	UserAccount,
 } from '../services/rest';
 import {
+	BuildStatuses,
 	CaseResultStatuses,
 	SubTaskStatuses,
 	TaskStatuses,
@@ -427,26 +428,36 @@ const filterSchema = {
 		fields: [
 			{
 				label: i18n.translate('template-name'),
-				name: 'template-name',
+				name: 'name',
+				operator: 'contains',
 				type: 'text',
 			},
-			{
-				label: i18n.translate('status'),
-				name: 'status',
+			overrides(baseFilters.dueStatus, {
+				options: [
+					{
+						label: i18n.translate('activated'),
+						value: BuildStatuses.ACTIVATED,
+					},
+					{
+						label: i18n.translate('deactivated'),
+						value: BuildStatuses.DEACTIVATED,
+					},
+				],
 				type: 'select',
-			},
+			}),
 		] as RendererFields[],
 	},
 	builds: {
 		fields: [
 			overrides(baseFilters.priority, {
 				disabled: true,
+				type: 'select',
 			}),
 			overrides(baseFilters.productVersion, {
 				name: 'productVersionToBuilds/id',
 				type: 'select',
 			}),
-			overrides(baseFilters.caseType, {disabled: true}),
+			overrides(baseFilters.caseType, {disabled: true, type: 'select'}),
 			{
 				label: i18n.translate('build-name'),
 				name: 'name',

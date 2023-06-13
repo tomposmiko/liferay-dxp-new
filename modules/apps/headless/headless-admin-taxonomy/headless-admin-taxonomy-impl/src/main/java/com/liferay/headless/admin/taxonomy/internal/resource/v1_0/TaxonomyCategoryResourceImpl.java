@@ -546,6 +546,7 @@ public class TaxonomyCategoryResourceImpl
 		projectionList.add(ProjectionFactoryUtil.property("groupId"));
 		projectionList.add(ProjectionFactoryUtil.property("modifiedDate"));
 		projectionList.add(ProjectionFactoryUtil.property("name"));
+		projectionList.add(ProjectionFactoryUtil.property("parentCategoryId"));
 		projectionList.add(ProjectionFactoryUtil.property("userId"));
 		projectionList.add(ProjectionFactoryUtil.property("vocabularyId"));
 
@@ -617,8 +618,9 @@ public class TaxonomyCategoryResourceImpl
 				setGroupId((long)assetCategory[6]);
 				setModifiedDate(_toDate((Timestamp)assetCategory[7]));
 				setName((String)assetCategory[8]);
-				setUserId((long)assetCategory[9]);
-				setVocabularyId((long)assetCategory[10]);
+				setParentCategoryId((long)assetCategory[9]);
+				setUserId((long)assetCategory[10]);
+				setVocabularyId((long)assetCategory[11]);
 			}
 		};
 	}

@@ -192,6 +192,118 @@ definition {
 			actionLabel = "Action Label");
 	}
 
+	@description = "LPS-175200 - Verify if actions works with oldValue function when trigger is On After Update (Add an Object Entry) using Picklist field."
+	@priority = 5
+	test CanCreateActionAddAnObjectEntryUsingOldValueWithOnAfterUpdateTrigger {
+		property portal.acceptance = "true";
+
+		task ("Given: A Picklist is added via API") {
+			Picklist.addPicklistViaAPI(picklistName = "Status");
+
+			Picklist.addPicklistItemViaAPI(
+				itemKey = "open",
+				itemName = "Open",
+				picklistName = "Status");
+
+			Picklist.addPicklistItemViaAPI(
+				itemKey = "inProgress",
+				itemName = "In Progress",
+				picklistName = "Status");
+		}
+
+		task ("And given: A Object is created") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 175200",
+				objectName = "CustomObject175200",
+				pluralLabelName = "Custom Objects 175200");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Text",
+				fieldLabelName = "Custom Text Field",
+				fieldName = "customTextField",
+				fieldType = "String",
+				isRequired = "true",
+				objectName = "CustomObject175200");
+
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 175200");
+
+			ObjectAdmin.goToFieldsTab();
+
+			ObjectAdmin.addObjectFieldViaUI(
+				fieldLabel = "customPicklistField",
+				fieldPicklist = "Status",
+				fieldType = "Picklist");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject175200");
+		}
+
+		task ("And given: An action with oldValue function is created") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 175200");
+
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.addObjectActionViaUI(
+				actionLabel = "Custom Action",
+				actionName = "CustomAction",
+				active = "true",
+				fieldName = "Custom Text Field",
+				inputExpression = "oldValue('customPicklistField') == 'open'",
+				inputMethod = "true",
+				inputValue = "Object entry added",
+				objectLabel = "Custom Object 175200",
+				thenAction = "Add an Object Entry",
+				whenAction = "On After Update");
+		}
+
+		task ("When: The entry is added with picklist value Open") {
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customTextField",
+				objectName = "CustomObject175200",
+				value = "Entry Test");
+
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject175200");
+
+			ObjectPortlet.viewEntryDetails(entry = "Entry Test");
+
+			ObjectAdmin.changePicklistFieldEntry(
+				entrySelected = "",
+				newPicklistOption = "Open");
+		}
+
+		task ("And when: The picklist value is edited") {
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject175200");
+
+			ObjectPortlet.viewEntryDetails(entry = "Open");
+
+			ObjectAdmin.changePicklistFieldEntry(
+				entrySelected = "Open",
+				newPicklistOption = "In Progress");
+		}
+
+		task ("Then: The action runs with oldValue function") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject175200");
+
+			ObjectPortlet.viewEntry(entry = "Object entry added");
+
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 175200");
+
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.assertObjectActions(
+				actionActive = "Yes",
+				actionLabel = "Custom Action",
+				status = "Success");
+		}
+	}
+
 	@description = "LPS-145665 - Verify it's possible to add an object entry with the trigger On Order Status Update"
 	@priority = 4
 	test CanCreateActionAddObjectEntryWithOnOrderStatusUpdate {
@@ -632,6 +744,156 @@ definition {
 			ObjectAdmin.assertObjectActions(
 				actionActive = "Yes",
 				actionLabel = "Notification action when entry is updated",
+				status = "Success");
+		}
+	}
+
+	@description = "LPS-178410 - Verify if actions works with oldValue function when trigger is On After Update (Notification) in Account System"
+	@priority = 4
+	test CanCreateActionNotificationUsingOldValueWithOnAfterUpdateTriggerOnAccountObject {
+		task ("Given: A notification template is created") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Notifications",
+				panel = "Control Panel",
+				portlet = "Templates");
+
+			ObjectNotifications.addNewNotificationTemplate(
+				entryTo = "test@liferay.com",
+				fromAddress = "test@liferay.com",
+				fromName = "Test Test",
+				name = "Email Template",
+				notificationType = "Email",
+				subject = "Subject Test");
+
+			PortletEntry.save();
+		}
+
+		task ("And given: A Notification action with the trigger (On After Update) is created and the oldValue function is used for the Account Name") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Account");
+
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.addObjectActionViaUI(
+				actionLabel = "Notification action when account is updated",
+				active = "true",
+				inputExpression = '''oldValue("name") ==  "Accounts Name Test"''',
+				notificationName = "Email Template",
+				objectLabel = "Account",
+				thenAction = "Notification",
+				whenAction = "On After Update");
+
+			WaitForElementPresent(
+				key_actionLabel = "Notification action when account is updated",
+				locator1 = "ObjectAdmin#VIEW_ACTIONS_LABEL");
+		}
+
+		task ("When: An account is added and then edited") {
+			JSONAccountEntry.addAccountEntry(
+				accountEntryName = "Accounts Name Test",
+				accountEntryType = "Person");
+
+			Account.openAccountsAdmin();
+
+			Account.editCP(
+				accountName = "Accounts Name Test",
+				accountNameEdit = "Accounts Name Test Edited");
+		}
+
+		task ("Then: The action is triggered and the notification is sent") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Notifications",
+				panel = "Control Panel",
+				portlet = "Queue");
+
+			AssertElementPresent(
+				key_objectName = "AccountEntry",
+				locator1 = "ObjectNotifications#OBJECT_QUEUE_NAME");
+
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Account");
+
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.assertObjectActions(
+				actionActive = "Yes",
+				actionLabel = "Notification action when account is updated",
+				status = "Success");
+		}
+	}
+
+	@description = "LPS-178415 - Verify if actions works with oldValue function when trigger is On After Update (Notification) in User System Object"
+	@priority = 4
+	test CanCreateActionNotificationUsingOldValueWithOnAfterUpdateTriggerOnUserObject {
+		task ("Given: A notification template is created") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Notifications",
+				panel = "Control Panel",
+				portlet = "Templates");
+
+			ObjectNotifications.addNewNotificationTemplate(
+				entryTo = "test@liferay.com",
+				fromAddress = "test@liferay.com",
+				fromName = "Test Test",
+				name = "Email Template",
+				notificationType = "Email",
+				subject = "Subject Test");
+
+			PortletEntry.save();
+		}
+
+		task ("And given: A Notification action with trigger (On After Update) and oldValue function is used in the condition tab for first name") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "User");
+
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.addObjectActionViaUI(
+				actionLabel = "Notification action when first name is edited",
+				active = "true",
+				inputExpression = '''oldValue("givenName") ==  "userfn"''',
+				notificationName = "Email Template",
+				objectLabel = "User",
+				thenAction = "Notification",
+				whenAction = "On After Update");
+		}
+
+		task ("When: A user is added and then the first name is edited") {
+			JSONUser.addUser(
+				userEmailAddress = "userea1@liferay.com",
+				userFirstName = "userfn",
+				userLastName = "userln",
+				userScreenName = "usersn");
+
+			User.openUsersAdmin();
+
+			UserNavigator.gotoUser(userScreenName = "usersn");
+
+			User.editUserInformation(userFirstNameEdit = "edituserfn");
+		}
+
+		task ("Then: The action is triggered and the notification is sent") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Notifications",
+				panel = "Control Panel",
+				portlet = "Queue");
+
+			AssertElementPresent(
+				key_objectName = "User",
+				locator1 = "ObjectNotifications#OBJECT_QUEUE_NAME");
+
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "User");
+
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.assertObjectActions(
+				actionActive = "Yes",
+				actionLabel = "Notification action when first name is edited",
 				status = "Success");
 		}
 	}
@@ -1449,7 +1711,6 @@ definition {
 				addressName = "Name Test 2",
 				addressPostalCode = 91765,
 				addressRegion = "California",
-				addressStreet1 = "1400 Montefino Ave",
 				addressStreet1 = "1400 Montefino Ave",
 				addressType = "Billing");
 

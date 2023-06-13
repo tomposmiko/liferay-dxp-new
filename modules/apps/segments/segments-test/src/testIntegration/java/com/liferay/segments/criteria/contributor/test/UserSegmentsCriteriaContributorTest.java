@@ -21,6 +21,7 @@ import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.model.ExpandoValue;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.layout.test.util.LayoutTestUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -55,13 +56,11 @@ import com.liferay.segments.field.Field;
 import java.io.Serializable;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -194,15 +193,15 @@ public class UserSegmentsCriteriaContributorTest {
 		List<Field> fields = segmentsCriteriaContributor.getFields(
 			_getMockPortletRequest());
 
-		Stream<Field> stream = fields.stream();
+		Set<String> complexEntityFieldNames = new HashSet<>();
 
-		Set<String> complexEntityFieldNames = stream.filter(
-			field -> StringUtil.startsWith(field.getName(), "customField/")
-		).map(
-			field -> StringUtil.removeSubstring(field.getName(), "customField/")
-		).collect(
-			Collectors.toSet()
-		);
+		for (Field field : fields) {
+			if (StringUtil.startsWith(field.getName(), "customField/")) {
+				complexEntityFieldNames.add(
+					StringUtil.removeSubstring(
+						field.getName(), "customField/"));
+			}
+		}
 
 		Assert.assertFalse(complexEntityFieldNames.isEmpty());
 
@@ -225,51 +224,47 @@ public class UserSegmentsCriteriaContributorTest {
 		SegmentsCriteriaContributor segmentsCriteriaContributor =
 			_getSegmentsCriteriaContributor();
 
-		List<Field> fields = segmentsCriteriaContributor.getFields(
-			_getMockPortletRequest());
+		Field field = null;
 
-		Stream<Field> fieldsStream = fields.stream();
+		for (Field curField :
+				segmentsCriteriaContributor.getFields(
+					_getMockPortletRequest())) {
 
-		Optional<Field> fieldOptional = fieldsStream.filter(
-			field -> StringUtil.endsWith(
-				field.getName(),
-				Normalizer.normalizeIdentifier(expandoColumn.getName()))
-		).findFirst();
+			if (StringUtil.endsWith(
+					curField.getName(),
+					Normalizer.normalizeIdentifier(expandoColumn.getName()))) {
 
-		Assert.assertTrue(fieldOptional.isPresent());
+				field = curField;
 
-		Field field = fieldOptional.get();
+				break;
+			}
+		}
 
-		List<Field.Option> options = field.getOptions();
-
-		Stream<Field.Option> optionsStream = options.stream();
+		Assert.assertNotNull(field);
 
 		Assert.assertEquals(
 			Arrays.asList(defaultValue),
-			optionsStream.map(
-				Field.Option::getValue
-			).collect(
-				Collectors.toList()
-			));
+			TransformUtil.transform(
+				field.getOptions(), Field.Option::getValue));
 	}
 
 	@Test
 	public void testGetFieldsWithSelectEntity() throws Exception {
+		Field field = null;
+
 		SegmentsCriteriaContributor segmentsCriteriaContributor =
 			_getSegmentsCriteriaContributor();
 
-		List<Field> fields = segmentsCriteriaContributor.getFields(
-			_getMockPortletRequest());
+		for (Field curField :
+				segmentsCriteriaContributor.getFields(
+					_getMockPortletRequest())) {
 
-		Stream<Field> fieldsStream = fields.stream();
+			if (Objects.equals(curField.getName(), "groupIds")) {
+				field = curField;
+			}
+		}
 
-		Optional<Field> fieldOptional = fieldsStream.filter(
-			field -> Objects.equals(field.getName(), "groupIds")
-		).findFirst();
-
-		Assert.assertTrue(fieldOptional.isPresent());
-
-		Field field = fieldOptional.get();
+		Assert.assertNotNull(field);
 
 		Assert.assertEquals("id", field.getType());
 

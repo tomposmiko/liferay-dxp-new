@@ -70,9 +70,9 @@ public class JournalArticleServiceUtil {
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 * @param ddmStructureId the primary key of the web content article's DDM
 	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
+	 <code>0</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -129,7 +129,7 @@ public class JournalArticleServiceUtil {
 			boolean autoArticleId, Map<java.util.Locale, String> titleMap,
 			Map<java.util.Locale, String> descriptionMap,
 			Map<java.util.Locale, String> friendlyURLMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
+			long ddmStructureId, String ddmTemplateKey, String layoutUuid,
 			int displayDateMonth, int displayDateDay, int displayDateYear,
 			int displayDateHour, int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
@@ -145,7 +145,7 @@ public class JournalArticleServiceUtil {
 		return getService().addArticle(
 			externalReferenceCode, groupId, folderId, classNameId, classPK,
 			articleId, autoArticleId, titleMap, descriptionMap, friendlyURLMap,
-			content, ddmStructureKey, ddmTemplateKey, layoutUuid,
+			content, ddmStructureId, ddmTemplateKey, layoutUuid,
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, expirationDateMonth, expirationDateDay,
 			expirationDateYear, expirationDateHour, expirationDateMinute,
@@ -168,9 +168,9 @@ public class JournalArticleServiceUtil {
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 * @param ddmStructureId the primary key of the web content article's DDM
 	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
+	 <code>0</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param serviceContext the service context to be applied. Can set the
@@ -186,20 +186,20 @@ public class JournalArticleServiceUtil {
 			String externalReferenceCode, long groupId, long folderId,
 			Map<java.util.Locale, String> titleMap,
 			Map<java.util.Locale, String> descriptionMap, String content,
-			String ddmStructureKey, String ddmTemplateKey,
+			long ddmStructureId, String ddmTemplateKey,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addArticle(
 			externalReferenceCode, groupId, folderId, titleMap, descriptionMap,
-			content, ddmStructureKey, ddmTemplateKey, serviceContext);
+			content, ddmStructureId, ddmTemplateKey, serviceContext);
 	}
 
 	public static JournalArticle addArticleDefaultValues(
 			long groupId, long classNameId, long classPK,
 			Map<java.util.Locale, String> titleMap,
 			Map<java.util.Locale, String> descriptionMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
+			long ddmStructureId, String ddmTemplateKey, String layoutUuid,
 			int displayDateMonth, int displayDateDay, int displayDateYear,
 			int displayDateHour, int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
@@ -213,7 +213,7 @@ public class JournalArticleServiceUtil {
 
 		return getService().addArticleDefaultValues(
 			groupId, classNameId, classPK, titleMap, descriptionMap, content,
-			ddmStructureKey, ddmTemplateKey, layoutUuid, displayDateMonth,
+			ddmStructureId, ddmTemplateKey, layoutUuid, displayDateMonth,
 			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
 			expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, neverExpire,
@@ -2038,9 +2038,6 @@ public class JournalArticleServiceUtil {
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
-	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -2106,9 +2103,9 @@ public class JournalArticleServiceUtil {
 			Map<java.util.Locale, String> titleMap,
 			Map<java.util.Locale, String> descriptionMap,
 			Map<java.util.Locale, String> friendlyURLMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			String ddmTemplateKey, String layoutUuid, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
 			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
@@ -2121,13 +2118,13 @@ public class JournalArticleServiceUtil {
 
 		return getService().updateArticle(
 			groupId, folderId, articleId, version, titleMap, descriptionMap,
-			friendlyURLMap, content, ddmStructureKey, ddmTemplateKey,
-			layoutUuid, displayDateMonth, displayDateDay, displayDateYear,
-			displayDateHour, displayDateMinute, expirationDateMonth,
-			expirationDateDay, expirationDateYear, expirationDateHour,
-			expirationDateMinute, neverExpire, reviewDateMonth, reviewDateDay,
-			reviewDateYear, reviewDateHour, reviewDateMinute, neverReview,
-			indexable, smallImage, smallImageURL, smallFile, images, articleURL,
+			friendlyURLMap, content, ddmTemplateKey, layoutUuid,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute,
+			neverExpire, reviewDateMonth, reviewDateDay, reviewDateYear,
+			reviewDateHour, reviewDateMinute, neverReview, indexable,
+			smallImage, smallImageURL, smallFile, images, articleURL,
 			serviceContext);
 	}
 
@@ -2146,9 +2143,6 @@ public class JournalArticleServiceUtil {
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
-	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -2213,9 +2207,9 @@ public class JournalArticleServiceUtil {
 			long groupId, long folderId, String articleId, double version,
 			Map<java.util.Locale, String> titleMap,
 			Map<java.util.Locale, String> descriptionMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			String ddmTemplateKey, String layoutUuid, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
 			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
@@ -2228,14 +2222,13 @@ public class JournalArticleServiceUtil {
 
 		return getService().updateArticle(
 			groupId, folderId, articleId, version, titleMap, descriptionMap,
-			content, ddmStructureKey, ddmTemplateKey, layoutUuid,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			neverExpire, reviewDateMonth, reviewDateDay, reviewDateYear,
-			reviewDateHour, reviewDateMinute, neverReview, indexable,
-			smallImage, smallImageURL, smallFile, images, articleURL,
-			serviceContext);
+			content, ddmTemplateKey, layoutUuid, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			expirationDateHour, expirationDateMinute, neverExpire,
+			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
+			reviewDateMinute, neverReview, indexable, smallImage, smallImageURL,
+			smallFile, images, articleURL, serviceContext);
 	}
 
 	/**
@@ -2291,9 +2284,9 @@ public class JournalArticleServiceUtil {
 			long groupId, String articleId,
 			Map<java.util.Locale, String> titleMap,
 			Map<java.util.Locale, String> descriptionMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			String ddmTemplateKey, String layoutUuid, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
 			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
@@ -2305,8 +2298,8 @@ public class JournalArticleServiceUtil {
 
 		return getService().updateArticleDefaultValues(
 			groupId, articleId, titleMap, descriptionMap, content,
-			ddmStructureKey, ddmTemplateKey, layoutUuid, displayDateMonth,
-			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			ddmTemplateKey, layoutUuid, displayDateMonth, displayDateDay,
+			displayDateYear, displayDateHour, displayDateMinute,
 			expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, neverExpire,
 			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,

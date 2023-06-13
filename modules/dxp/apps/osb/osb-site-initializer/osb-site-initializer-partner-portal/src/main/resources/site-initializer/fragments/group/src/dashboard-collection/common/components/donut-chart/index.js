@@ -9,6 +9,7 @@
  * distribution rights of the Software.
  */
 
+import ClayAlert from '@clayui/alert';
 import ClayChart from '@clayui/charts';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import React, {useCallback, useMemo} from 'react';
@@ -16,7 +17,8 @@ import React, {useCallback, useMemo} from 'react';
 import {currencyFormat} from '../../utils';
 
 const DonutChart = ({
-	chartData,
+	chartDataColumns,
+	dataCurrency,
 	hasLegend = false,
 	height = 400,
 	isLoading,
@@ -36,13 +38,13 @@ const DonutChart = ({
 	}, []);
 
 	const hasChartData = useMemo(
-		() => chartData.columns.filter((column) => column[1]).length,
-		[chartData.columns]
+		() => chartDataColumns.columns.filter((column) => column[1]).length,
+		[chartDataColumns.columns]
 	);
 
 	const legendItems = legendTransformData(
-		chartData.columns,
-		chartData.colors
+		chartDataColumns.columns,
+		chartDataColumns.colors
 	);
 
 	const buildChart = () => {
@@ -52,7 +54,13 @@ const DonutChart = ({
 
 		if (!hasChartData && !isLoading) {
 			return (
-				<h2 className="mb-10 mt-9 text-center">No Data Available</h2>
+				<ClayAlert
+					className="mb-10 mt-9 text-center w-50"
+					displayType="info"
+					title="Info:"
+				>
+					No Data Available
+				</ClayAlert>
 			);
 		}
 
@@ -66,8 +74,7 @@ const DonutChart = ({
 					<div className="d-flex flex-column flex-sm-row justify-content-start">
 						<>
 							<ClayChart
-								className="dashboard-donut-chart"
-								data={chartData}
+								data={chartDataColumns}
 								donut={{
 									label: {show: showLabel},
 									title: ' ',
@@ -77,12 +84,32 @@ const DonutChart = ({
 								size={{height, width}}
 								tooltip={{
 									contents: (data) => {
-										const title = data[0].id;
-										const value = data[0].value;
+										const chartColumnsData = chartDataColumns.columns.find(
+											([key]) => key === data[0].id
+										);
 
-										return `<div class="bg-neutral-0 d-flex font-weight-bold rounded-sm text-capitalize"><span class="d-flex mr-2 w-100 text-capitalize">${title}</span> $${currencyFormat(
-											value
-										)}</div>`;
+										if (titleChart === 'Total MDF') {
+											return `<div class="bg-neutral-0 d-flex flex-column rounded-sm">
+											<span class="font-weight-light w-100 text-primary">
+											${chartColumnsData[0]}</span>
+											<span class="font-weight-light text-primary ">${
+												chartColumnsData[2]
+											} Activities</span>
+											<span class="text-weight-bold text-primary">Total ${currencyFormat(
+												chartColumnsData[1],
+												dataCurrency
+											)}</span>
+											</div>`;
+										}
+
+										return `<div class="bg-neutral-0 d-flex flex-column rounded-sm">
+											<span class="font-weight-light w-100 text-primary">
+											${chartColumnsData[0]}</span>
+											<span class="text-weight-bold text-primary">Total ${currencyFormat(
+												chartColumnsData[1],
+												dataCurrency
+											)}</span>
+											</div>`;
 									},
 								}}
 							/>
@@ -110,8 +137,9 @@ const DonutChart = ({
 															</div>
 
 															<div className="font-weight-semi-bold">
-																{`$${currencyFormat(
-																	item.value
+																{`${currencyFormat(
+																	item.value,
+																	dataCurrency
 																)}`}
 															</div>
 														</div>
@@ -130,7 +158,7 @@ const DonutChart = ({
 	};
 
 	return (
-		<div className="align-items-stretch d-flex flex-column">
+		<div className="align-items-center d-flex flex-column justify-content-center">
 			{buildChart()}
 		</div>
 	);

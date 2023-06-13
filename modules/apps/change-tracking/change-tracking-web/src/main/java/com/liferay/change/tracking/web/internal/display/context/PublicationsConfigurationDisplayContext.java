@@ -36,9 +36,10 @@ public class PublicationsConfigurationDisplayContext {
 		HttpServletRequest httpServletRequest, RenderResponse renderResponse) {
 
 		_httpServletRequest = httpServletRequest;
+		_renderResponse = renderResponse;
 
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
+			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
 		CTSettingsConfiguration ctSettingsConfiguration =
@@ -49,8 +50,6 @@ public class PublicationsConfigurationDisplayContext {
 		_sandboxOnlyEnabled = ctSettingsConfiguration.sandboxEnabled();
 		_unapprovedChangesAllowed =
 			ctSettingsConfiguration.unapprovedChangesAllowed();
-
-		_renderResponse = renderResponse;
 	}
 
 	public String getActionURL() {

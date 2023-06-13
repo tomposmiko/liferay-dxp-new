@@ -93,9 +93,9 @@ public interface JournalArticleService extends BaseService {
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 * @param ddmStructureId the primary key of the web content article's DDM
 	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
+	 <code>0</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -152,7 +152,7 @@ public interface JournalArticleService extends BaseService {
 			boolean autoArticleId, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap,
 			Map<Locale, String> friendlyURLMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
+			long ddmStructureId, String ddmTemplateKey, String layoutUuid,
 			int displayDateMonth, int displayDateDay, int displayDateYear,
 			int displayDateHour, int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
@@ -177,9 +177,9 @@ public interface JournalArticleService extends BaseService {
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 * @param ddmStructureId the primary key of the web content article's DDM
 	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
+	 <code>0</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param serviceContext the service context to be applied. Can set the
@@ -194,14 +194,14 @@ public interface JournalArticleService extends BaseService {
 	public JournalArticle addArticle(
 			String externalReferenceCode, long groupId, long folderId,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
+			String content, long ddmStructureId, String ddmTemplateKey,
 			ServiceContext serviceContext)
 		throws PortalException;
 
 	public JournalArticle addArticleDefaultValues(
 			long groupId, long classNameId, long classPK,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
+			String content, long ddmStructureId, String ddmTemplateKey,
 			String layoutUuid, int displayDateMonth, int displayDateDay,
 			int displayDateYear, int displayDateHour, int displayDateMinute,
 			int expirationDateMonth, int expirationDateDay,
@@ -1785,9 +1785,6 @@ public interface JournalArticleService extends BaseService {
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
-	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -1852,9 +1849,9 @@ public interface JournalArticleService extends BaseService {
 			long groupId, long folderId, String articleId, double version,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
 			Map<Locale, String> friendlyURLMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			String ddmTemplateKey, String layoutUuid, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
 			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
@@ -1879,9 +1876,6 @@ public interface JournalArticleService extends BaseService {
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
-	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -1945,17 +1939,16 @@ public interface JournalArticleService extends BaseService {
 	public JournalArticle updateArticle(
 			long groupId, long folderId, String articleId, double version,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
-			String layoutUuid, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
-			int reviewDateDay, int reviewDateYear, int reviewDateHour,
-			int reviewDateMinute, boolean neverReview, boolean indexable,
-			boolean smallImage, String smallImageURL, File smallFile,
-			Map<String, byte[]> images, String articleURL,
-			ServiceContext serviceContext)
+			String content, String ddmTemplateKey, String layoutUuid,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
+			int reviewDateYear, int reviewDateHour, int reviewDateMinute,
+			boolean neverReview, boolean indexable, boolean smallImage,
+			String smallImageURL, File smallFile, Map<String, byte[]> images,
+			String articleURL, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -2005,9 +1998,9 @@ public interface JournalArticleService extends BaseService {
 	public JournalArticle updateArticleDefaultValues(
 			long groupId, String articleId, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			String ddmTemplateKey, String layoutUuid, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
 			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire, int reviewDateMonth, int reviewDateDay,

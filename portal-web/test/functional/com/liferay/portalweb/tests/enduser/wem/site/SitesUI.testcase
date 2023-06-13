@@ -30,7 +30,7 @@ definition {
 		property testray.component.names = "Training";
 
 		task ("Add a site via JSON") {
-			JSONGroup.addGroup(groupName = "Site Name");
+			HeadlessSite.addSite(siteName = "Site Name");
 		}
 
 		task ("Add a child site") {
@@ -73,17 +73,12 @@ definition {
 		}
 
 		task ("Add a site tempalte and add a site basing on site template") {
-			Site.openSitesAdmin();
-
 			SiteTemplates.addCP(siteTemplateName = "Site Template Name");
 
-			Site.openSitesAdmin();
-
-			Site.addCP(
+			HeadlessSite.addSite(
 				siteName = "Site2 Name",
-				siteTemplateName = "Site Template Name",
-				siteTemplateTab = "Custom Site Templates",
-				siteType = "Site Template");
+				templateName = "Site Template Name",
+				templateType = "Site Template");
 		}
 
 		task ("View site added") {

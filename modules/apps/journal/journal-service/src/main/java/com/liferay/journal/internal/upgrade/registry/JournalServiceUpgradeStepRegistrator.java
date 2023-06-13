@@ -19,7 +19,7 @@ import com.liferay.asset.entry.rel.service.AssetEntryAssetCategoryRelLocalServic
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
-import com.liferay.comment.upgrade.UpgradeDiscussionSubscriptionClassName;
+import com.liferay.comment.upgrade.DiscussionSubscriptionClassNameUpgradeProcess;
 import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.document.library.kernel.store.Store;
 import com.liferay.dynamic.data.mapping.service.DDMFieldLocalService;
@@ -67,6 +67,7 @@ import com.liferay.journal.internal.upgrade.v4_4_0.GlobalJournalArticleUrlTitleU
 import com.liferay.journal.internal.upgrade.v4_4_3.JournalArticleLayoutClassedModelUsageUpgradeProcess;
 import com.liferay.journal.internal.upgrade.v4_4_4.JournalFeedTypeUpgradeProcess;
 import com.liferay.journal.internal.upgrade.v5_1_0.JournalArticleDDMStructureIdUpgradeProcess;
+import com.liferay.journal.internal.upgrade.v5_1_1.JournalArticleAssetEntryClassTypeIdUpgradeProcess;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
@@ -223,10 +224,11 @@ public class JournalServiceUpgradeStepRegistrator
 
 		registry.register(
 			"1.1.6", "1.1.7",
-			new UpgradeDiscussionSubscriptionClassName(
+			new DiscussionSubscriptionClassNameUpgradeProcess(
 				_classNameLocalService, _subscriptionLocalService,
 				JournalArticle.class.getName(),
-				UpgradeDiscussionSubscriptionClassName.DeletionMode.UPDATE));
+				DiscussionSubscriptionClassNameUpgradeProcess.DeletionMode.
+					UPDATE));
 
 		registry.register(
 			"1.1.7", "1.1.8",
@@ -379,6 +381,11 @@ public class JournalServiceUpgradeStepRegistrator
 			"5.0.0", "5.1.0",
 			new JournalArticleDDMStructureIdUpgradeProcess(
 				_classNameLocalService, _ddmStructureLocalService, _portal));
+
+		registry.register(
+			"5.1.0", "5.1.1",
+			new JournalArticleAssetEntryClassTypeIdUpgradeProcess(
+				_classNameLocalService));
 	}
 
 	private void _deleteTempImages() throws Exception {

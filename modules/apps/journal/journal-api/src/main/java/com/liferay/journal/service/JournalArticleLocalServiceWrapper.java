@@ -87,9 +87,9 @@ public class JournalArticleLocalServiceWrapper
 	 * @param friendlyURLMap the web content article's locales and localized
 	 friendly URLs
 	 * @param content the HTML content wrapped in XML
-	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 * @param ddmStructureId the primary key of the web content article's DDM
 	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
+	 <code>0</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -148,7 +148,7 @@ public class JournalArticleLocalServiceWrapper
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			java.util.Map<java.util.Locale, String> friendlyURLMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
+			String content, long ddmStructureId, String ddmTemplateKey,
 			String layoutUuid, int displayDateMonth, int displayDateDay,
 			int displayDateYear, int displayDateHour, int displayDateMinute,
 			int expirationDateMonth, int expirationDateDay,
@@ -165,7 +165,7 @@ public class JournalArticleLocalServiceWrapper
 		return _journalArticleLocalService.addArticle(
 			externalReferenceCode, userId, groupId, folderId, classNameId,
 			classPK, articleId, autoArticleId, version, titleMap,
-			descriptionMap, friendlyURLMap, content, ddmStructureKey,
+			descriptionMap, friendlyURLMap, content, ddmStructureId,
 			ddmTemplateKey, layoutUuid, displayDateMonth, displayDateDay,
 			displayDateYear, displayDateHour, displayDateMinute,
 			expirationDateMonth, expirationDateDay, expirationDateYear,
@@ -193,9 +193,9 @@ public class JournalArticleLocalServiceWrapper
 	 int, int, int, int, boolean, int, int, int, int, int, boolean,
 	 boolean, boolean, String, File, Map, String, ServiceContext)}
 	 description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 * @param ddmStructureId the primary key of the web content article's DDM
 	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
+	 <code>0</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param serviceContext the service context to be applied. Can set the
@@ -212,13 +212,13 @@ public class JournalArticleLocalServiceWrapper
 			String externalReferenceCode, long userId, long groupId,
 			long folderId, java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
+			String content, long ddmStructureId, String ddmTemplateKey,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleLocalService.addArticle(
 			externalReferenceCode, userId, groupId, folderId, titleMap,
-			descriptionMap, content, ddmStructureKey, ddmTemplateKey,
+			descriptionMap, content, ddmStructureId, ddmTemplateKey,
 			serviceContext);
 	}
 
@@ -227,7 +227,7 @@ public class JournalArticleLocalServiceWrapper
 			long userId, long groupId, long classNameId, long classPK,
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
+			String content, long ddmStructureId, String ddmTemplateKey,
 			String layoutUuid, int displayDateMonth, int displayDateDay,
 			int displayDateYear, int displayDateHour, int displayDateMinute,
 			int expirationDateMonth, int expirationDateDay,
@@ -242,7 +242,7 @@ public class JournalArticleLocalServiceWrapper
 
 		return _journalArticleLocalService.addArticleDefaultValues(
 			userId, groupId, classNameId, classPK, titleMap, descriptionMap,
-			content, ddmStructureKey, ddmTemplateKey, layoutUuid,
+			content, ddmStructureId, ddmTemplateKey, layoutUuid,
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, expirationDateMonth, expirationDateDay,
 			expirationDateYear, expirationDateHour, expirationDateMinute,
@@ -3753,9 +3753,6 @@ public class JournalArticleLocalServiceWrapper
 	 int, int, int, int, boolean, int, int, int, int, int, boolean,
 	 boolean, boolean, String, File, Map, String, ServiceContext)}
 	 description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
-	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -3822,30 +3819,29 @@ public class JournalArticleLocalServiceWrapper
 			double version, java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			java.util.Map<java.util.Locale, String> friendlyURLMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
-			String layoutUuid, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
-			int reviewDateDay, int reviewDateYear, int reviewDateHour,
-			int reviewDateMinute, boolean neverReview, boolean indexable,
-			boolean smallImage, String smallImageURL,
-			java.io.File smallImageFile, java.util.Map<String, byte[]> images,
-			String articleURL,
+			String content, String ddmTemplateKey, String layoutUuid,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
+			int reviewDateYear, int reviewDateHour, int reviewDateMinute,
+			boolean neverReview, boolean indexable, boolean smallImage,
+			String smallImageURL, java.io.File smallImageFile,
+			java.util.Map<String, byte[]> images, String articleURL,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleLocalService.updateArticle(
 			userId, groupId, folderId, articleId, version, titleMap,
-			descriptionMap, friendlyURLMap, content, ddmStructureKey,
-			ddmTemplateKey, layoutUuid, displayDateMonth, displayDateDay,
-			displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, neverExpire,
-			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
-			reviewDateMinute, neverReview, indexable, smallImage, smallImageURL,
-			smallImageFile, images, articleURL, serviceContext);
+			descriptionMap, friendlyURLMap, content, ddmTemplateKey, layoutUuid,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute,
+			neverExpire, reviewDateMonth, reviewDateDay, reviewDateYear,
+			reviewDateHour, reviewDateMinute, neverReview, indexable,
+			smallImage, smallImageURL, smallImageFile, images, articleURL,
+			serviceContext);
 	}
 
 	/**
@@ -3917,9 +3913,6 @@ public class JournalArticleLocalServiceWrapper
 	 int, int, int, int, boolean, int, int, int, int, int, boolean,
 	 boolean, boolean, String, File, Map, String, ServiceContext)}
 	 description.
-	 * @param ddmStructureKey the primary key of the web content article's DDM
-	 structure, if the article is related to a DDM structure, or
-	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -3985,30 +3978,29 @@ public class JournalArticleLocalServiceWrapper
 			long userId, long groupId, long folderId, String articleId,
 			double version, java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
-			String layoutUuid, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
-			int reviewDateDay, int reviewDateYear, int reviewDateHour,
-			int reviewDateMinute, boolean neverReview, boolean indexable,
-			boolean smallImage, String smallImageURL,
-			java.io.File smallImageFile, java.util.Map<String, byte[]> images,
-			String articleURL,
+			String content, String ddmTemplateKey, String layoutUuid,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
+			int reviewDateYear, int reviewDateHour, int reviewDateMinute,
+			boolean neverReview, boolean indexable, boolean smallImage,
+			String smallImageURL, java.io.File smallImageFile,
+			java.util.Map<String, byte[]> images, String articleURL,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleLocalService.updateArticle(
 			userId, groupId, folderId, articleId, version, titleMap,
-			descriptionMap, content, ddmStructureKey, ddmTemplateKey,
-			layoutUuid, displayDateMonth, displayDateDay, displayDateYear,
-			displayDateHour, displayDateMinute, expirationDateMonth,
-			expirationDateDay, expirationDateYear, expirationDateHour,
-			expirationDateMinute, neverExpire, reviewDateMonth, reviewDateDay,
-			reviewDateYear, reviewDateHour, reviewDateMinute, neverReview,
-			indexable, smallImage, smallImageURL, smallImageFile, images,
-			articleURL, serviceContext);
+			descriptionMap, content, ddmTemplateKey, layoutUuid,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute,
+			neverExpire, reviewDateMonth, reviewDateDay, reviewDateYear,
+			reviewDateHour, reviewDateMinute, neverReview, indexable,
+			smallImage, smallImageURL, smallImageFile, images, articleURL,
+			serviceContext);
 	}
 
 	/**
@@ -4072,23 +4064,22 @@ public class JournalArticleLocalServiceWrapper
 			long userId, long groupId, String articleId,
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
-			String layoutUuid, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
-			int reviewDateDay, int reviewDateYear, int reviewDateHour,
-			int reviewDateMinute, boolean neverReview, boolean indexable,
-			boolean smallImage, String smallImageURL,
-			java.io.File smallImageFile,
+			String content, String ddmTemplateKey, String layoutUuid,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
+			int reviewDateYear, int reviewDateHour, int reviewDateMinute,
+			boolean neverReview, boolean indexable, boolean smallImage,
+			String smallImageURL, java.io.File smallImageFile,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleLocalService.updateArticleDefaultValues(
 			userId, groupId, articleId, titleMap, descriptionMap, content,
-			ddmStructureKey, ddmTemplateKey, layoutUuid, displayDateMonth,
-			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			ddmTemplateKey, layoutUuid, displayDateMonth, displayDateDay,
+			displayDateYear, displayDateHour, displayDateMinute,
 			expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, neverExpire,
 			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,

@@ -221,12 +221,9 @@ public abstract class BaseBuild implements Build {
 
 			});
 
-		synchronized (downstreamBuilds) {
-			if ((downstreamBuilds != null) && !downstreamBuilds.isEmpty()) {
-				for (Build downstreamBuild : downstreamBuilds) {
-					archiveCallables.addAll(
-						downstreamBuild.getArchiveCallables());
-				}
+		if ((downstreamBuilds != null) && !downstreamBuilds.isEmpty()) {
+			for (Build downstreamBuild : downstreamBuilds) {
+				archiveCallables.addAll(downstreamBuild.getArchiveCallables());
 			}
 		}
 
@@ -833,23 +830,22 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public List<Build> getDownstreamBuilds(String result, String status) {
-		List<Build> filteredDownstreamBuilds = new ArrayList<>();
+		List<Build> filteredDownstreamBuilds = Collections.synchronizedList(
+			new ArrayList<Build>());
 
-		synchronized (downstreamBuilds) {
-			if ((result == null) && (status == null)) {
-				filteredDownstreamBuilds.addAll(downstreamBuilds);
+		if ((result == null) && (status == null)) {
+			filteredDownstreamBuilds.addAll(downstreamBuilds);
 
-				return filteredDownstreamBuilds;
-			}
+			return filteredDownstreamBuilds;
+		}
 
-			for (Build downstreamBuild : downstreamBuilds) {
-				if (((status == null) ||
-					 status.equals(downstreamBuild.getStatus())) &&
-					((result == null) ||
-					 result.equals(downstreamBuild.getResult()))) {
+		for (Build downstreamBuild : downstreamBuilds) {
+			if (((status == null) ||
+				 status.equals(downstreamBuild.getStatus())) &&
+				((result == null) ||
+				 result.equals(downstreamBuild.getResult()))) {
 
-					filteredDownstreamBuilds.add(downstreamBuild);
-				}
+				filteredDownstreamBuilds.add(downstreamBuild);
 			}
 		}
 
@@ -1280,13 +1276,11 @@ public abstract class BaseBuild implements Build {
 	public List<Build> getModifiedDownstreamBuildsByStatus(String status) {
 		List<Build> modifiedDownstreamBuilds = new ArrayList<>();
 
-		synchronized (downstreamBuilds) {
-			for (Build downstreamBuild : downstreamBuilds) {
-				if (downstreamBuild.isBuildModified() ||
-					downstreamBuild.hasModifiedDownstreamBuilds()) {
+		for (Build downstreamBuild : downstreamBuilds) {
+			if (downstreamBuild.isBuildModified() ||
+				downstreamBuild.hasModifiedDownstreamBuilds()) {
 
-					modifiedDownstreamBuilds.add(downstreamBuild);
-				}
+				modifiedDownstreamBuilds.add(downstreamBuild);
 			}
 		}
 
@@ -1798,11 +1792,9 @@ public abstract class BaseBuild implements Build {
 			}
 		}
 
-		synchronized (downstreamBuilds) {
-			for (Build downstreamBuild : downstreamBuilds) {
-				if (downstreamBuild.hasBuildURL(buildURL)) {
-					return true;
-				}
+		for (Build downstreamBuild : downstreamBuilds) {
+			if (downstreamBuild.hasBuildURL(buildURL)) {
+				return true;
 			}
 		}
 
@@ -2126,8 +2118,17 @@ public abstract class BaseBuild implements Build {
 						setBuildNumber(runningBuildJSONObject.getInt("number"));
 					}
 					else {
-						JSONObject queueItemJSONObject =
-							getQueueItemJSONObject();
+						JSONObject queueItemJSONObject = null;
+
+						try {
+							queueItemJSONObject = getQueueItemJSONObject();
+						}
+						catch (IOException ioException) {
+							ioException.printStackTrace();
+
+							throw new RuntimeException(
+								"Unable to get queue item JSON", ioException);
+						}
 
 						if (queueItemJSONObject != null) {
 							setStatus("queued");
@@ -2144,13 +2145,20 @@ public abstract class BaseBuild implements Build {
 								return;
 							}
 
+							String invocationURL =
+								JenkinsResultsParserUtil.getLocalURL(
+									getInvocationURL());
+
 							try {
 								JenkinsResultsParserUtil.toString(
-									JenkinsResultsParserUtil.getLocalURL(
-										getInvocationURL()));
+									invocationURL);
 							}
 							catch (IOException ioException) {
-								throw new RuntimeException(ioException);
+								ioException.printStackTrace();
+
+								throw new RuntimeException(
+									"Unable to invoke build " + invocationURL,
+									ioException);
 							}
 
 							setStatus("starting");
@@ -2163,36 +2171,33 @@ public abstract class BaseBuild implements Build {
 				if (downstreamBuilds != null) {
 					List<Callable<Object>> callables = new ArrayList<>();
 
-					synchronized (downstreamBuilds) {
-						for (final Build downstreamBuild : downstreamBuilds) {
-							Callable<Object> callable = new Callable<Object>() {
+					for (final Build downstreamBuild : downstreamBuilds) {
+						Callable<Object> callable = new Callable<Object>() {
 
-								@Override
-								public Object call() {
-									downstreamBuild.update();
+							@Override
+							public Object call() {
+								downstreamBuild.update();
 
-									return null;
-								}
+								return null;
+							}
 
-							};
+						};
 
-							callables.add(callable);
-						}
+						callables.add(callable);
+					}
 
-						ParallelExecutor<Object> parallelExecutor =
-							new ParallelExecutor<>(
-								callables, getExecutorService());
+					ParallelExecutor<Object> parallelExecutor =
+						new ParallelExecutor<>(callables, getExecutorService());
 
-						parallelExecutor.execute();
+					parallelExecutor.execute();
 
-						String result = getResult();
+					String result = getResult();
 
-						if ((downstreamBuilds.size() == getDownstreamBuildCount(
-								"completed")) &&
-							(result != null)) {
+					if ((downstreamBuilds.size() == getDownstreamBuildCount(
+							"completed")) &&
+						(result != null)) {
 
-							setResult(result);
-						}
+						setResult(result);
 					}
 
 					findDownstreamBuilds();
@@ -3886,12 +3891,10 @@ public abstract class BaseBuild implements Build {
 	protected static final SimpleDateFormat stopWatchTimestampSimpleDateFormat =
 		new SimpleDateFormat("MM-dd-yyyy HH:mm:ss:SSS z");
 
-	protected final List<Integer> badBuildNumbers =
-		Collections.synchronizedList(new ArrayList<Integer>());
+	protected List<Integer> badBuildNumbers = new ArrayList<>();
 	protected String branchName;
 	protected int consoleReadCursor;
-	protected final List<Build> downstreamBuilds = Collections.synchronizedList(
-		new ArrayList<Build>());
+	protected List<Build> downstreamBuilds = new ArrayList<>();
 	protected boolean fromArchive;
 	protected boolean fromCompletedBuild;
 	protected String gitRepositoryName;
@@ -3903,8 +3906,7 @@ public abstract class BaseBuild implements Build {
 	protected List<SlaveOfflineRule> slaveOfflineRules =
 		SlaveOfflineRule.getSlaveOfflineRules();
 	protected Long startTime;
-	protected final Map<String, Long> statusDurations =
-		Collections.synchronizedMap(new HashMap<String, Long>());
+	protected Map<String, Long> statusDurations = new HashMap<>();
 	protected long statusModifiedTime;
 	protected Element upstreamJobFailureMessageElement;
 
