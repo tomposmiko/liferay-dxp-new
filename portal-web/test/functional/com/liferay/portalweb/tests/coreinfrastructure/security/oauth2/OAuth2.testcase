@@ -517,8 +517,11 @@ definition {
 		property custom.properties = "virtual.hosts.default.site.name=Guest";
 		property osgi.module.configuration.file.names = "com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHandlerFactoryConfiguration~default.config";
 		property osgi.module.configurations = "include.bundle.symbolic.name=&quot;false&quot;${line.separator}osgi.jaxrs.name=&quot;Default&quot;${line.separator}separator=&quot;&quot;${line.separator}service.properties=&quot;&quot;";
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "OAuth2#AuthPromptInRequestScopeShouldNotBeVisible";
+
+		task ("Deploy simple OAuth2 provider app") {
+			FileInstall.deployFileOnServer(jarFile = "com.liferay.oauth2.provider.sample.jar");
+		}
 
 		task ("Go to OAuth 2 administration") {
 			OAuth2.openOAuth2Admin();
@@ -541,8 +544,6 @@ definition {
 			OAuth2.editScopes(
 				applicationName = "Analytics Cloud",
 				checkGlobalScope = "Everything");
-
-			FileInstall.deployFileOnServer(jarFile = "com.liferay.oauth2.provider.sample.jar");
 		}
 
 		task ("Verify everything.read is checked in sample-app resource panel") {
@@ -804,7 +805,7 @@ definition {
 
 			Navigator.gotoNavUnderline(navUnderline = "Resource scopes");
 
-			OAuth2.viewResourcePanelCollapsed(scopeList = "Analytics,Liferay.Bulk.REST,Liferay.Data.Engine.REST,Liferay.Frontend.View.State.REST,Liferay.Headless.Admin.Content");
+			OAuth2.viewResourcePanelCollapsed(scopeList = "Analytics,Liferay.Bulk.REST,Liferay.Data.Engine.REST,Liferay.Headless.Admin.Content");
 		}
 
 		task ("Edit OAuth application scopes and check the permission to read the userprofile") {

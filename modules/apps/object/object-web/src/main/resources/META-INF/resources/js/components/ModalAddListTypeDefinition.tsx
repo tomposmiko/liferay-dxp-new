@@ -16,11 +16,11 @@ import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
 import ClayModal, {ClayModalProvider, useModal} from '@clayui/modal';
-import {Input} from '@liferay/object-js-components-web';
+import {Input, useForm} from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
-import useForm from '../hooks/useForm';
+import {HEADERS} from '../utils/constants';
 import {defaultLanguageId} from '../utils/locale';
 import {TName} from './Layout/types';
 
@@ -39,10 +39,7 @@ const ModalAddListTypeDefinition: React.FC<IProps> = ({
 			body: JSON.stringify({
 				name_i18n,
 			}),
-			headers: new Headers({
-				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-			}),
+			headers: HEADERS,
 			method: 'POST',
 		});
 

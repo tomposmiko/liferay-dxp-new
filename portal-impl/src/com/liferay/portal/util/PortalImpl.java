@@ -1371,9 +1371,16 @@ public class PortalImpl implements Portal {
 				pos = completeURL.indexOf(urlSeparator);
 
 				if (pos != -1) {
-					includeParametersURL = true;
+					if (StringUtil.contains(
+							layout.getFriendlyURL(), urlSeparator)) {
 
-					break;
+						pos = -1;
+					}
+					else {
+						includeParametersURL = true;
+
+						break;
+					}
 				}
 			}
 
@@ -5736,9 +5743,9 @@ public class PortalImpl implements Portal {
 
 		String userName = defaultUserName;
 
-		try {
-			User user = UserLocalServiceUtil.getUserById(userId);
+		User user = UserLocalServiceUtil.fetchUserById(userId);
 
+		if (user != null) {
 			if (userAttribute.equals(UserAttributes.USER_NAME_FULL)) {
 				userName = user.getFullName();
 			}
@@ -5766,11 +5773,6 @@ public class PortalImpl implements Portal {
 						WindowState.MAXIMIZED
 					).buildString(),
 					"\">", HtmlUtil.escape(userName), "</a>");
-			}
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
 			}
 		}
 
@@ -8801,7 +8803,7 @@ public class PortalImpl implements Portal {
 			if (groupFriendlyURL.contains(
 					StringBundler.concat(
 						_PUBLIC_GROUP_SERVLET_MAPPING, siteGroupFriendlyURL,
-						layoutFriendlyURL))) {
+						StringUtil.toLowerCase(layoutFriendlyURL)))) {
 
 				return true;
 			}

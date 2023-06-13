@@ -42,6 +42,20 @@ definition {
 		Click(locator1 = "CP2NavigationMenu#INVITE_MEMBERS_CANCEL_BUTTON");
 	}
 
+	macro clickOnHideButton {
+		Click(locator1 = "CP2NavigationMenu#HIDE_BUTTON");
+	}
+
+	macro clickOnProductButton {
+		Click(
+			locator1 = "CP2NavigationMenu#PRODUCT",
+			product = "${product}");
+	}
+
+	macro clickOnShowButton {
+		Click(locator1 = "CP2NavigationMenu#SHOW_BUTTON");
+	}
+
 	macro clickOnStatusButton {
 		Click(
 			locator1 = "CP2NavigationMenu#STATUS_BUTTON",
@@ -64,6 +78,10 @@ definition {
 		Click(
 			key_site = "${site}",
 			locator1 = "ApplicationsMenu#SITE_LINK");
+	}
+
+	macro goToProductActivation {
+		Click(locator1 = "CP2NavigationMenu#PRODUCT_ACTIVATION");
 	}
 
 	macro goToTeamMembers {

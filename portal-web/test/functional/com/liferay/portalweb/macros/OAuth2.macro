@@ -95,7 +95,7 @@ definition {
 		Button.clickAdd();
 
 		FormFields.editTextMultiline(
-			fieldName = "osgi.jaxrs.name",
+			fieldName = "osgiJaxrsName",
 			fieldValue = "${osgiJaxrsName}");
 
 		if ("${symbolicName}" == "false") {
@@ -103,11 +103,11 @@ definition {
 		}
 
 		FormFields.editTextMultiline(
-			fieldName = "excluded.scopes",
+			fieldName = "excludedScopes",
 			fieldValue = "${excludedScopesName}");
 
 		FormFields.editTextMultiline(
-			fieldName = "service.properties",
+			fieldName = "serviceProperties",
 			fieldValue = "${serviceProperties}");
 
 		FormFields.editTextMultiline(
@@ -174,8 +174,6 @@ definition {
 	macro authorizeMyApplication {
 		if ("${newTab}" == "true") {
 			Open.openInTheNewTab(locator1 = "http://martamedio.com/oauth2-tester/");
-
-			SelectWindow.selectPopUp(locator1 = "null");
 		}
 		else {
 			Navigator.openSpecificURL(url = "http://martamedio.com/oauth2-tester/");
@@ -879,7 +877,7 @@ definition {
 
 	macro viewAuthorizationRequestResourceName {
 		AssertElementPresent(
-			key_resourceName = "resourceName",
+			key_resourceName = "${resourceName}",
 			locator1 = "OAuth2#AUTHORIZATION_REQUEST_RESOURCE_NAME");
 	}
 

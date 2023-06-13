@@ -19,12 +19,9 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useContext} from 'react';
 
-import {
-	handleAction,
-	isLink,
-} from '../../data_renderers/ActionsDropdownRenderer';
+import {handleAction, isLink} from '../../actions/Actions';
 
-function Cards({dataLoading, dataSetContext, items, schema}) {
+function Cards({dataLoading, frontendDataSetContext, items, schema}) {
 	const {
 		executeAsyncItemAction,
 		highlightItems,
@@ -35,7 +32,7 @@ function Cards({dataLoading, dataSetContext, items, schema}) {
 		selectedItemsKey,
 		selectedItemsValue,
 		style,
-	} = useContext(dataSetContext);
+	} = useContext(frontendDataSetContext);
 
 	if (dataLoading) {
 		return <ClayLoadingIndicator className="mt-7" />;

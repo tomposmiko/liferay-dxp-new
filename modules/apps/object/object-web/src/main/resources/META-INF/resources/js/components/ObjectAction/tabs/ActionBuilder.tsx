@@ -15,15 +15,15 @@
 import ClayForm, {ClayToggle} from '@clayui/form';
 import {
 	Card,
+	CodeMirrorEditor,
 	CustomItem,
+	ExpressionBuilder,
 	FormCustomSelect,
+	FormError,
 	Input,
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
-
-import {FormError} from '../../../hooks/useForm';
-import CodeMirrorEditor from '../../CodeEditor/CodeMirrorEditor';
 
 import './ActionBuilder.scss';
 
@@ -91,6 +91,10 @@ export default function ActionBuilder({
 		}
 	}, [values]);
 
+	const handleSave = (conditionExpression?: string) => {
+		setValues({conditionExpression});
+	};
+
 	return (
 		<>
 			<Card title={Liferay.Language.get('trigger')}>
@@ -101,7 +105,10 @@ export default function ActionBuilder({
 					<FormCustomSelect
 						error={errors.objectActionTriggerKey}
 						onChange={({value}) =>
-							setValues({objectActionTriggerKey: value})
+							setValues({
+								conditionExpression: undefined,
+								objectActionTriggerKey: value,
+							})
 						}
 						options={objectActionTriggers}
 						placeholder={Liferay.Language.get('choose-a-trigger')}
@@ -112,43 +119,60 @@ export default function ActionBuilder({
 				</Card>
 			</Card>
 
-			{Liferay.FeatureFlags['LPS-152181'] && (
-				<Card title={Liferay.Language.get('condition')}>
-					<ClayForm.Group>
-						<ClayToggle
-							label={Liferay.Language.get('enable-condition')}
-							name="condition"
-							onToggle={(enable) =>
-								setValues({
-									conditionExpression: enable
-										? ''
-										: undefined,
-								})
-							}
-							toggled={
-								!(values.conditionExpression === undefined)
-							}
-						/>
-					</ClayForm.Group>
+			{Liferay.FeatureFlags['LPS-152181'] &&
+				['onAfterAdd', 'onAfterDelete', 'onAfterUpdate'].some(
+					(key) => key === values.objectActionTriggerKey
+				) && (
+					<Card title={Liferay.Language.get('condition')}>
+						<ClayForm.Group>
+							<ClayToggle
+								label={Liferay.Language.get('enable-condition')}
+								name="condition"
+								onToggle={(enable) =>
+									setValues({
+										conditionExpression: enable
+											? ''
+											: undefined,
+									})
+								}
+								toggled={
+									!(values.conditionExpression === undefined)
+								}
+							/>
+						</ClayForm.Group>
 
-					{values.conditionExpression !== undefined && (
-						<Input
-							feedbackMessage={Liferay.Language.get(
-								'use-expressions-to-create-a-condition'
-							)}
-							label={Liferay.Language.get('expression-builder')}
-							name="conditionExpression"
-							onChange={({target: {value}}) =>
-								setValues({conditionExpression: value})
-							}
-							placeholder={Liferay.Language.get(
-								'create-an-expression'
-							)}
-							value={values.conditionExpression as string}
-						/>
-					)}
-				</Card>
-			)}
+						{values.conditionExpression !== undefined && (
+							<ExpressionBuilder
+								error={errors.conditionExpression}
+								feedbackMessage={Liferay.Language.get(
+									'use-expressions-to-create-a-condition'
+								)}
+								label={Liferay.Language.get(
+									'expression-builder'
+								)}
+								name="conditionExpression"
+								onChange={({target: {value}}: any) =>
+									setValues({conditionExpression: value})
+								}
+								onOpenModal={() => {
+									const parentWindow = Liferay.Util.getOpener();
+
+									parentWindow.Liferay.fire(
+										'openExpressionBuilderModal',
+										{
+											onSave: handleSave,
+											source: values.conditionExpression,
+										}
+									);
+								}}
+								placeholder={Liferay.Language.get(
+									'create-an-expression'
+								)}
+								value={values.conditionExpression as string}
+							/>
+						)}
+					</Card>
+				)}
 
 			<Card title={Liferay.Language.get('action')}>
 				<Card

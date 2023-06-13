@@ -78,9 +78,11 @@ public class EditClientExtensionEntryMVCActionCommand
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
 
-			SessionErrors.add(actionRequest, exception.getClass());
+			SessionErrors.add(actionRequest, exception.getClass(), exception);
 
 			actionRequest.setAttribute(
 				ClientExtensionAdminWebKeys.

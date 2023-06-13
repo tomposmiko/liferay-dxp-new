@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -51,6 +52,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -331,23 +333,23 @@ public abstract class Base${schemaName}ResourceImpl
 	</#list>
 
 	<#if generateBatch>
+		<#assign
+			properties = freeMarkerTool.getDTOProperties(configYAML, openAPIYAML, schema)
+
+			createStrategies = freeMarkerTool.getVulcanBatchImplementationCreateStrategies(javaMethodSignatures, properties)
+			updateStrategies = freeMarkerTool.getVulcanBatchImplementationUpdateStrategies(javaMethodSignatures)
+		/>
 		@Override
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		public void create(java.util.Collection<${javaDataType}> ${schemaVarNames}, Map<String, Serializable> parameters) throws Exception {
-			<#assign
-				properties = freeMarkerTool.getDTOProperties(configYAML, openAPIYAML, schema)
 
-				generateInsertStrategy = postAssetLibraryBatchJavaMethodSignature?? || postSiteBatchJavaMethodSignature?? || postBatchJavaMethodSignature??
-				generateUpsertStrategy = putByERCBatchJavaMethodSignature?? && properties?keys?seq_contains("externalReferenceCode")
-			/>
-
-			<#if generateInsertStrategy || generateUpsertStrategy>
+			<#if createStrategies?has_content>
 				UnsafeConsumer<${javaDataType}, Exception> ${schemaVarName}UnsafeConsumer = null;
 
 				String createStrategy = (String) parameters.getOrDefault("createStrategy", "INSERT");
 			</#if>
 
-			<#if generateInsertStrategy>
+			<#if createStrategies?seq_contains("INSERT")>
 				if ("INSERT".equalsIgnoreCase(createStrategy)) {
 					${schemaVarName}UnsafeConsumer =
 
@@ -390,7 +392,7 @@ public abstract class Base${schemaName}ResourceImpl
 				}
 			</#if>
 
-			<#if generateUpsertStrategy>
+			<#if createStrategies?seq_contains("UPSERT")>
 				if ("UPSERT".equalsIgnoreCase(createStrategy)) {
 					${schemaVarName}UnsafeConsumer = ${schemaVarName} -> ${putByERCBatchJavaMethodSignature.methodName}(
 
@@ -420,7 +422,7 @@ public abstract class Base${schemaName}ResourceImpl
 				}
 			</#if>
 
-			<#if generateInsertStrategy || generateUpsertStrategy>
+			<#if createStrategies?has_content>
 				if (${schemaVarName}UnsafeConsumer == null) {
 					throw new NotSupportedException("Create strategy \"" + createStrategy + "\" is not supported for ${schemaVarName?cap_first}");
 				}
@@ -438,8 +440,6 @@ public abstract class Base${schemaName}ResourceImpl
 
 		@Override
 		public void delete(java.util.Collection<${javaDataType}> ${schemaVarNames}, Map<String, Serializable> parameters) throws Exception {
-			<#assign properties = freeMarkerTool.getDTOProperties(configYAML, openAPIYAML, schema) />
-
 			<#if deleteBatchJavaMethodSignature?? && properties?keys?seq_contains("id")>
 				for (${javaDataType} ${schemaVarName} : ${schemaVarNames}) {
 					delete${schemaName}(${schemaVarName}.getId());
@@ -449,6 +449,22 @@ public abstract class Base${schemaName}ResourceImpl
 					delete${schemaName}(${schemaVarName}.get${schemaName}Id());
 				}
 			</#if>
+		}
+
+		public Set<String> getAvailableCreateStrategies() {
+			return SetUtil.fromArray(
+				<#if createStrategies?has_content>
+					"${createStrategies?join("\", \"")}"
+				</#if>
+			);
+		}
+
+		public Set<String> getAvailableUpdateStrategies() {
+			return SetUtil.fromArray(
+				<#if updateStrategies?has_content>
+					"${updateStrategies?join("\", \"")}"
+				</#if>
+			);
 		}
 
 		@Override
@@ -467,7 +483,7 @@ public abstract class Base${schemaName}ResourceImpl
 
 		@Override
 		public Page<${javaDataType}> read(Filter filter, Pagination pagination, Sort[] sorts, Map<String, Serializable> parameters, String search) throws Exception {
-			<#if getAssetLibraryBatchJavaMethodSignature?? || getBatchJavaMethodSignature?? || getSiteBatchJavaMethodSignature??>
+			<#if freeMarkerTool.hasReadVulcanBatchImplementation(javaMethodSignatures)>
 				<#if getAssetLibraryBatchJavaMethodSignature??>
 					if (parameters.containsKey("assetLibraryId")) {
 						return ${getAssetLibraryBatchJavaMethodSignature.methodName}(
@@ -532,20 +548,13 @@ public abstract class Base${schemaName}ResourceImpl
 
 		@Override
 		public void update(java.util.Collection<${javaDataType}> ${schemaVarNames}, Map<String, Serializable> parameters) throws Exception {
-			<#assign
-				properties = freeMarkerTool.getDTOProperties(configYAML, openAPIYAML, schema)
-
-				generatePartialUpdateStrategy = patchBatchJavaMethodSignature??
-				generateUpdateStrategy = putBatchJavaMethodSignature??
-			/>
-
-			<#if generatePartialUpdateStrategy || generateUpdateStrategy>
+			<#if updateStrategies?has_content>
 				UnsafeConsumer<${javaDataType}, Exception> ${schemaVarName}UnsafeConsumer = null;
 
 				String updateStrategy = (String) parameters.getOrDefault("updateStrategy", "UPDATE");
 			</#if>
 
-			<#if generatePartialUpdateStrategy>
+			<#if updateStrategies?seq_contains("PARTIAL_UPDATE")>
 				if ("PARTIAL_UPDATE".equalsIgnoreCase(updateStrategy)) {
 					${schemaVarName}UnsafeConsumer = ${schemaVarName} -> patch${schemaName}(
 
@@ -576,7 +585,7 @@ public abstract class Base${schemaName}ResourceImpl
 				}
 			</#if>
 
-			<#if generateUpdateStrategy>
+			<#if updateStrategies?seq_contains("UPDATE")>
 				if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
 					${schemaVarName}UnsafeConsumer = ${schemaVarName} -> put${schemaName}(
 
@@ -614,7 +623,7 @@ public abstract class Base${schemaName}ResourceImpl
 				}
 			</#if>
 
-			<#if generatePartialUpdateStrategy || generateUpdateStrategy>
+			<#if updateStrategies?has_content>
 				if (${schemaVarName}UnsafeConsumer == null) {
 					throw new NotSupportedException("Update strategy \"" + updateStrategy + "\" is not supported for ${schemaVarName?cap_first}");
 				}

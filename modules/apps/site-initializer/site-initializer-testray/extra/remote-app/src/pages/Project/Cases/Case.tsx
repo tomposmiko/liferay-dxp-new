@@ -77,21 +77,20 @@ const Case = () => {
 				/>
 			</Container>
 
-			<Container className="mt-3" title={i18n.translate('test-history')}>
+			<Container className="mt-3">
 				<ListView
 					forceRefetch={formModal.forceRefetch}
 					initialContext={{
-						filters: {
-							columns: {
-								caseType: false,
-								dateCreated: false,
-								dateModified: false,
-								issues: false,
-								team: false,
-							},
+						columns: {
+							caseType: false,
+							dateCreated: false,
+							dateModified: false,
+							issues: false,
+							team: false,
 						},
 					}}
 					managementToolbarProps={{
+						title: i18n.translate('test-history'),
 						visible: true,
 					}}
 					query={getCaseResults}

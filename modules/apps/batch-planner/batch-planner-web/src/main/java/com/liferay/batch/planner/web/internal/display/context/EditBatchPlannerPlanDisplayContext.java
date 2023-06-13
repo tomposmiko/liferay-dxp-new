@@ -20,14 +20,15 @@ import com.liferay.batch.planner.model.BatchPlannerPlan;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.SelectOption;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Igor Beslic
@@ -37,12 +38,13 @@ public class EditBatchPlannerPlanDisplayContext {
 
 	public EditBatchPlannerPlanDisplayContext(
 			List<BatchPlannerPlan> batchPlannerPlans,
-			Set<String> internalClassNames,
-			BatchPlannerPlan selectedBatchPlannerPlan)
+			Map<String, String> internalClassNameCategories,
+			BatchPlannerPlan selectedBatchPlannerPlan, List<Group> siteGroups)
 		throws PortalException {
 
 		_internalClassNameSelectOptions = _getInternalClassNameSelectOptions(
-			internalClassNames);
+			internalClassNameCategories);
+		_scopeSiteSelectOptions = _getScopeSiteSelectOptions(siteGroups);
 
 		if (selectedBatchPlannerPlan == null) {
 			_selectedBatchPlannerMappings = new HashMap<>();
@@ -92,6 +94,10 @@ public class EditBatchPlannerPlanDisplayContext {
 		return _internalClassNameSelectOptions;
 	}
 
+	public List<SelectOption> getScopeSiteSelectOptions() {
+		return _scopeSiteSelectOptions;
+	}
+
 	public long getSelectedBatchPlannerPlanId() {
 		return _selectedBatchPlannerPlanId;
 	}
@@ -117,25 +123,30 @@ public class EditBatchPlannerPlanDisplayContext {
 	}
 
 	private List<SelectOption> _getInternalClassNameSelectOptions(
-		Set<String> internalClassNames) {
+		Map<String, String> internalClassNameCategories) {
 
 		List<SelectOption> internalClassNameSelectOptions = new ArrayList<>();
 
 		internalClassNameSelectOptions.add(
 			new SelectOption(StringPool.BLANK, StringPool.BLANK));
 
-		for (String internalClassName : internalClassNames) {
+		for (Map.Entry<String, String> entry :
+				internalClassNameCategories.entrySet()) {
+
+			String internalClassName = entry.getKey();
+
 			String[] internalClassNameParts = StringUtil.split(
 				internalClassName, StringPool.PERIOD);
 
 			internalClassNameSelectOptions.add(
 				new SelectOption(
 					String.format(
-						"%s (%s)",
+						"%s (%s - %s)",
 						internalClassNameParts
 							[internalClassNameParts.length - 1],
 						internalClassNameParts
-							[internalClassNameParts.length - 2]),
+							[internalClassNameParts.length - 2],
+						entry.getValue()),
 					internalClassName));
 		}
 
@@ -143,6 +154,24 @@ public class EditBatchPlannerPlanDisplayContext {
 			Comparator.comparing(SelectOption::getLabel));
 
 		return internalClassNameSelectOptions;
+	}
+
+	private List<SelectOption> _getScopeSiteSelectOptions(
+		List<Group> siteGroups) {
+
+		if (siteGroups.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<SelectOption> selectOptions = new ArrayList<>();
+
+		for (Group group : siteGroups) {
+			selectOptions.add(
+				new SelectOption(
+					group.getName(), String.valueOf(group.getGroupId())));
+		}
+
+		return selectOptions;
 	}
 
 	private Map<String, String> _getSelectedBatchPlannerMappings(
@@ -186,6 +215,7 @@ public class EditBatchPlannerPlanDisplayContext {
 	}
 
 	private final List<SelectOption> _internalClassNameSelectOptions;
+	private final List<SelectOption> _scopeSiteSelectOptions;
 	private final Map<String, String> _selectedBatchPlannerMappings;
 	private final long _selectedBatchPlannerPlanId;
 	private final String _selectedBatchPlannerPlanName;

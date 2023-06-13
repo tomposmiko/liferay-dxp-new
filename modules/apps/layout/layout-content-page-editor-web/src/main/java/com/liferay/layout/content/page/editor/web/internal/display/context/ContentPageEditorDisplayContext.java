@@ -361,15 +361,20 @@ public class ContentPageEditorDisplayContext {
 						_getDefaultStyleBookEntry());
 				}
 			).put(
+				"getAvailableDisplayPageInfoItemFormProvidersURL",
+				_getResourceURL(
+					"/layout_content_page_editor" +
+						"/get_available_display_page_info_item_form_providers")
+			).put(
+				"getAvailableEditPageInfoItemFormProvidersURL",
+				_getResourceURL(
+					"/layout_content_page_editor" +
+						"/get_available_edit_page_info_item_form_providers")
+			).put(
 				"getAvailableImageConfigurationsURL",
 				_getResourceURL(
 					"/layout_content_page_editor" +
 						"/get_available_image_configurations")
-			).put(
-				"getAvailableInfoItemFormProviders",
-				_getResourceURL(
-					"/layout_content_page_editor" +
-						"/get_available_info_item_form_providers")
 			).put(
 				"getAvailableListItemRenderersURL",
 				_getResourceURL(
@@ -419,6 +424,11 @@ public class ContentPageEditorDisplayContext {
 			).put(
 				"getFormFieldsURL",
 				_getResourceURL("/layout_content_page_editor/get_form_fields")
+			).put(
+				"getFragmentEntryInputFieldTypesURL",
+				_getResourceURL(
+					"/layout_content_page_editor" +
+						"/get_fragment_entry_input_field_types")
 			).put(
 				"getIframeContentCssURL",
 				PortalUtil.getStaticResourceURL(
@@ -1434,13 +1444,17 @@ public class ContentPageEditorDisplayContext {
 					fetchLayoutPageTemplateEntryByPlid(
 						layout.getMasterLayoutPlid());
 
-			fragmentEntryLinks =
-				FragmentEntryLinkLocalServiceUtil.getFragmentEntryLinksByPlid(
-					getGroupId(), masterLayoutPageTemplateEntry.getPlid());
+			if (masterLayoutPageTemplateEntry != null) {
+				fragmentEntryLinks =
+					FragmentEntryLinkLocalServiceUtil.
+						getFragmentEntryLinksByPlid(
+							getGroupId(),
+							masterLayoutPageTemplateEntry.getPlid());
 
-			fragmentEntryLinksMap.putAll(
-				_getFragmentEntryLinksMap(
-					fragmentEntryLinks, true, _getMasterLayoutStructure()));
+				fragmentEntryLinksMap.putAll(
+					_getFragmentEntryLinksMap(
+						fragmentEntryLinks, true, _getMasterLayoutStructure()));
+			}
 		}
 
 		Map<Long, LayoutStructureItem> fragmentLayoutStructureItems =

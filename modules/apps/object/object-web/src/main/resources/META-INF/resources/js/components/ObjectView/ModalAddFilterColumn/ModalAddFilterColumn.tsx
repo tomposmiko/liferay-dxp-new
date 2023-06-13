@@ -13,13 +13,10 @@
  */
 
 import ClayButton from '@clayui/button';
-import ClayDropDown from '@clayui/drop-down';
 import ClayModal from '@clayui/modal';
 import {
 	AutoComplete,
-	CheckboxItem,
 	FormCustomSelect,
-	Input,
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {
@@ -31,6 +28,7 @@ import React, {
 	useState,
 } from 'react';
 
+import {HEADERS} from '../../../utils/constants';
 import {defaultLanguageId, locale} from '../../../utils/locale';
 import ViewContext, {TYPES} from '../context';
 import {
@@ -40,11 +38,7 @@ import {
 	TWorkflowStatus,
 } from '../types';
 
-const headers = new Headers({
-	'Accept': 'application/json',
-	'Accept-Language': locale!.symbol,
-	'Content-Type': 'application/json',
-});
+HEADERS.append('Accept-Language', locale!.symbol);
 
 const PICKLIST_OPERATORS: TLabelValueObject[] = [
 	{
@@ -89,8 +83,6 @@ export function ModalAddFilterColumn({
 
 	const [query, setQuery] = useState<string>('');
 
-	const [active, setActive] = useState(false);
-
 	const filteredAvailableFields = useMemo(() => {
 		return availableFields.filter(({label}) => {
 			return label[defaultLanguageId]
@@ -99,7 +91,7 @@ export function ModalAddFilterColumn({
 		});
 	}, [availableFields, query]);
 
-	const getCheckedWokflowStatusItems = (
+	const getCheckedWorkflowStatusItems = (
 		itemValues: TWorkflowStatus[]
 	): IItem[] => {
 		let newItemsValues: IItem[] = [];
@@ -198,7 +190,7 @@ export function ModalAddFilterColumn({
 					const response = await fetch(
 						`/o/headless-admin-list-type/v1.0/list-type-definitions/${objectField.listTypeDefinitionId}/list-type-entries`,
 						{
-							headers,
+							headers: HEADERS,
 							method: 'GET',
 						}
 					);
@@ -228,15 +220,15 @@ export function ModalAddFilterColumn({
 				let newItems: IItem[] = [];
 
 				if (editingFilter) {
-					newItems = getCheckedWokflowStatusItems(
+					newItems = getCheckedWorkflowStatusItems(
 						workflowStatusJSONArray
 					);
 				}
 				else {
-					newItems = workflowStatusJSONArray.map((worflowStatus) => {
+					newItems = workflowStatusJSONArray.map((workflowStatus) => {
 						return {
-							label: worflowStatus.label,
-							value: worflowStatus.value,
+							label: workflowStatus.label,
+							value: workflowStatus.value,
 						};
 					});
 				}
@@ -362,50 +354,13 @@ export function ModalAddFilterColumn({
 					value={selectedFilterType?.label}
 				/>
 
-				<ClayDropDown
-					active={active}
-					onActiveChange={setActive}
-					trigger={
-						<Input
-							disabled={!selectedFilterType?.value}
-							label={Liferay.Language.get('value')}
-							placeholder={Liferay.Language.get(
-								'choose-an-option'
-							)}
-							value={items
-								.reduce<string[]>((acc, value) => {
-									if (value.checked) {
-										acc.push(value.label);
-									}
-
-									return acc;
-								}, [])
-								.join(', ')}
-						/>
-					}
-				>
-					<ClayDropDown.ItemList>
-						{items.map(({checked, label, value}) => (
-							<CheckboxItem
-								checked={checked}
-								key={value}
-								label={label}
-								onChange={({target: {checked}}) => {
-									setItems(
-										items.map((item) =>
-											item.label === label
-												? {
-														...item,
-														checked,
-												  }
-												: item
-										)
-									);
-								}}
-							/>
-						))}
-					</ClayDropDown.ItemList>
-				</ClayDropDown>
+				<FormCustomSelect
+					disabled={!selectedFilterType?.value}
+					label={Liferay.Language.get('value')}
+					multipleChoice
+					options={items}
+					setOptions={setItems}
+				/>
 			</ClayModal.Body>
 
 			<ClayModal.Footer

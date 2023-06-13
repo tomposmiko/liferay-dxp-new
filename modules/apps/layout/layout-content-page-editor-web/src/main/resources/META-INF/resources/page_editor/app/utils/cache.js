@@ -15,6 +15,7 @@
 const cache = {};
 
 export const CACHE_KEYS = {
+	allowedInputTypes: 'allowedInputTypes',
 	formFields: 'formFields',
 	itemTypes: 'itemTypes',
 };
@@ -36,10 +37,14 @@ export function getCacheItem(key) {
 	return cache[key] || {};
 }
 
+export function deleteCacheItem(key) {
+	delete cache[key];
+}
+
 export function setCacheItem({data, key, loadPromise, status}) {
 	cache[key] = {
-		data,
-		loadPromise,
+		...(data && {data}),
+		...(loadPromise && {loadPromise}),
 		status,
 	};
 }

@@ -16,6 +16,7 @@ import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
+import classNames from 'classnames';
 import {navigate} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
@@ -30,6 +31,7 @@ function SelectCategory({
 	namespace,
 	nodes,
 	selectedCategoryIds,
+	showSelectedCounter = false,
 }) {
 	const [items, setItems] = useState(() => {
 		if (nodes.length === 1 && nodes[0].vocabulary && nodes[0].id !== '0') {
@@ -40,6 +42,9 @@ function SelectCategory({
 	});
 
 	const [filterQuery, setFilterQuery] = useState('');
+	const [selectedItems, setSelectedItems] = useState(
+		new Set(selectedCategoryIds)
+	);
 
 	return (
 		<div className="select-category">
@@ -52,7 +57,9 @@ function SelectCategory({
 			)}
 
 			<form
-				className="select-category-filter"
+				className={classNames('select-category-filter', {
+					'select-category-filter--with-count-feedback': showSelectedCounter,
+				})}
 				onSubmit={(event) => event.preventDefault()}
 				role="search"
 			>
@@ -88,6 +95,34 @@ function SelectCategory({
 				</ClayLayout.ContainerFluid>
 			</form>
 
+			{showSelectedCounter && selectedItems.size > 0 && (
+				<ClayLayout.Container
+					className="mb-3 px-4 select-category-count-feedback"
+					containerElement="section"
+					fluid
+				>
+					<div className="align-items-center container-fluid d-flex justify-content-between p-0">
+						<p className="m-0 text-2">
+							{selectedItems.size + ' '}
+
+							{selectedItems.size > 1
+								? Liferay.Language.get('items-selected')
+								: Liferay.Language.get('item-selected')}
+						</p>
+
+						<ClayButton
+							className="select-category-clear-selected text-3 text-weight-semi-bold"
+							displayType="link"
+							onClick={() => {
+								setSelectedItems(new Set([]));
+							}}
+						>
+							{Liferay.Language.get('clear-all')}
+						</ClayButton>
+					</div>
+				</ClayLayout.Container>
+			)}
+
 			<form name={`${namespace}selectCategoryFm`}>
 				<ClayLayout.ContainerFluid containerElement="fieldset">
 					<div
@@ -102,7 +137,8 @@ function SelectCategory({
 								items={items}
 								multiSelection={multiSelection}
 								onItems={setItems}
-								selectedCategoryIds={selectedCategoryIds}
+								onSelectionChange={setSelectedItems}
+								selectedCategoryIds={selectedItems}
 							/>
 						) : (
 							<div className="border-0 pt-0 sheet taglib-empty-result-message">
@@ -125,6 +161,7 @@ function SelectCategory({
 SelectCategory.propTypes = {
 	addCategoryURL: PropTypes.string,
 	moveCategory: PropTypes.bool,
+	showSelectedCounter: PropTypes.bool,
 };
 
 export default SelectCategory;

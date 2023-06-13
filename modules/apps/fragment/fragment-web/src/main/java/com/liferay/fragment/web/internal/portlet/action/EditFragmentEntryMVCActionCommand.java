@@ -14,12 +14,14 @@
 
 package com.liferay.fragment.web.internal.portlet.action;
 
+import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.exception.NoSuchEntryException;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentEntryService;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -99,6 +101,22 @@ public class EditFragmentEntryMVCActionCommand
 		draftFragmentEntry.setJs(js);
 		draftFragmentEntry.setCacheable(cacheable);
 		draftFragmentEntry.setConfiguration(configuration);
+
+		if (draftFragmentEntry.getType() == FragmentConstants.TYPE_INPUT) {
+			String[] fieldTypes = ParamUtil.getStringValues(
+				actionRequest, "fieldTypes");
+
+			JSONArray fieldTypesJSONArray = JSONFactoryUtil.createJSONArray(
+				fieldTypes);
+
+			JSONObject typeOptionsJSONObject = JSONFactoryUtil.createJSONObject(
+				draftFragmentEntry.getTypeOptions());
+
+			typeOptionsJSONObject.put("fieldTypes", fieldTypesJSONArray);
+
+			draftFragmentEntry.setTypeOptions(typeOptionsJSONObject.toString());
+		}
+
 		draftFragmentEntry.setStatus(status);
 
 		try {

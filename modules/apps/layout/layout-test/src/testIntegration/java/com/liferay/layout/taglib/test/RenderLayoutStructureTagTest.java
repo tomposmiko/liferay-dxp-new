@@ -145,6 +145,7 @@ public class RenderLayoutStructureTagTest {
 		themeDisplay.setLocale(LocaleUtil.getSiteDefault());
 		themeDisplay.setLookAndFeel(
 			layoutSet.getTheme(), layoutSet.getColorScheme());
+		themeDisplay.setRequest(mockHttpServletRequest);
 		themeDisplay.setScopeGroupId(_group.getGroupId());
 		themeDisplay.setSiteGroupId(_group.getGroupId());
 
@@ -177,6 +178,7 @@ public class RenderLayoutStructureTagTest {
 		themeDisplay.setLookAndFeel(
 			layoutSet.getTheme(), layoutSet.getColorScheme());
 		themeDisplay.setRealUser(TestPropsValues.getUser());
+		themeDisplay.setRequest(mockHttpServletRequest);
 		themeDisplay.setUser(TestPropsValues.getUser());
 
 		mockHttpServletRequest.setAttribute(

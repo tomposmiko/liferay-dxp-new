@@ -74,12 +74,8 @@
 		</finder>
 	</entity>
 	<exceptions>
-		<exception>ClientExtensionEntryCustomElementCSSURLs</exception>
-		<exception>ClientExtensionEntryCustomElementHTMLElementName</exception>
-		<exception>ClientExtensionEntryCustomElementURLs</exception>
-		<exception>ClientExtensionEntryFriendlyURLMapping</exception>
-		<exception>ClientExtensionEntryIFrameURL</exception>
 		<exception>ClientExtensionEntryType</exception>
+		<exception>ClientExtensionEntryTypeSettings</exception>
 		<exception>DuplicateClientExtensionEntryExternalReferenceCode</exception>
 	</exceptions>
 </service-builder>

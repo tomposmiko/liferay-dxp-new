@@ -22,12 +22,12 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useContext} from 'react';
 
-import ActionsDropdownRenderer from '../../data_renderers/ActionsDropdownRenderer';
+import Actions from '../../actions/Actions';
 import ImageRenderer from '../../data_renderers/ImageRenderer';
 
 function List({
 	dataLoading,
-	dataSetContext,
+	frontendDataSetContext,
 	items,
 	schema: {description, image, sticker, symbol, title},
 }) {
@@ -37,7 +37,7 @@ function List({
 		selectedItemsKey,
 		selectedItemsValue,
 		selectionType,
-	} = useContext(dataSetContext);
+	} = useContext(frontendDataSetContext);
 
 	if (dataLoading) {
 		return <ClayLoadingIndicator className="mt-7" />;
@@ -128,7 +128,7 @@ function List({
 
 					<ClayList.ItemField>
 						{(itemActions || item.actionDropdownItems) && (
-							<ActionsDropdownRenderer
+							<Actions
 								actions={
 									itemActions || item.actionDropdownItems
 								}

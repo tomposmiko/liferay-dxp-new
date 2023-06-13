@@ -815,7 +815,7 @@ definition {
 			CommerceNavigator.gotoMiniumSidebarItem(menuItem = "Placed Orders");
 		}
 
-		task ("Then the button 'Re-try payment' and 'Reorder' is present because PayPal is active") {
+		task ("Then the button 'Retry Payment' and 'Reorder' is present because PayPal is active") {
 			Click(
 				key_orderAuthor = "Commerce Account",
 				locator1 = "CommerceAccelerators#ORDERS_ENTRY_VIEW_BUTTON");
@@ -825,7 +825,7 @@ definition {
 				locator1 = "CommerceOrders#PENDING_ORDERS_ORDER_STATUS");
 
 			AssertElementPresent(
-				key_text = "Re-try payment",
+				key_text = "Retry Payment",
 				locator1 = "Button#ANY");
 
 			AssertElementPresent(
@@ -861,7 +861,7 @@ definition {
 			CommerceNavigator.gotoMiniumSidebarItem(menuItem = "Placed Orders");
 		}
 
-		task ("Then the button 'Re-try payment' is not present because PayPal is disabled") {
+		task ("Then the button 'Retry Payment' is not present because PayPal is disabled") {
 			Click(
 				key_orderAuthor = "Commerce Account",
 				locator1 = "CommerceAccelerators#ORDERS_ENTRY_VIEW_BUTTON");
@@ -871,7 +871,7 @@ definition {
 				locator1 = "CommerceOrders#PENDING_ORDERS_ORDER_STATUS");
 
 			AssertElementNotPresent(
-				key_text = "Re-try payment",
+				key_text = "Retry Payment",
 				locator1 = "Button#ANY");
 		}
 
@@ -985,13 +985,13 @@ definition {
 			CommerceNavigator.gotoMiniumSidebarItem(menuItem = "Placed Orders");
 		}
 
-		task ("Then the 'Re-try payment' is not present because the payment status is 'Failed'") {
+		task ("Then the 'Retry Payment' is not present because the payment status is 'Failed'") {
 			Click(
 				key_orderAuthor = "Commerce Account",
 				locator1 = "CommerceAccelerators#ORDERS_ENTRY_VIEW_BUTTON");
 
 			AssertElementNotPresent(
-				key_text = "Re-try payment",
+				key_text = "Retry Payment",
 				locator1 = "Button#ANY");
 		}
 
@@ -1118,7 +1118,7 @@ definition {
 			CommerceNavigator.gotoMiniumSidebarItem(menuItem = "Placed Orders");
 		}
 
-		task ("Then the Order Status is 'In Progress' and the button 'Re-try payment' is present to continue the checkout Options") {
+		task ("Then the Order Status is 'In Progress' and the button 'Retry Payment' is present to continue the checkout Options") {
 			Click(
 				key_orderAuthor = "Commerce Account",
 				locator1 = "CommerceAccelerators#ORDERS_ENTRY_VIEW_BUTTON");
@@ -1128,7 +1128,7 @@ definition {
 				locator1 = "CommerceOrders#PENDING_ORDERS_ORDER_STATUS");
 
 			AssertElementPresent(
-				key_text = "Re-try payment",
+				key_text = "Retry Payment",
 				locator1 = "Button#ANY");
 		}
 	}
@@ -1214,13 +1214,13 @@ definition {
 			CommerceNavigator.gotoMiniumSidebarItem(menuItem = "Pending Orders");
 		}
 
-		task ("Then the 'Re-try payment' is not present because the order is still on open") {
+		task ("Then the 'Retry Payment' is not present because the order is still on open") {
 			Click(
 				key_orderAuthor = "Commerce Account",
 				locator1 = "CommerceAccelerators#ORDERS_ENTRY_VIEW_BUTTON");
 
 			AssertElementNotPresent(
-				key_text = "Re-try payment",
+				key_text = "Retry Payment",
 				locator1 = "Button#ANY");
 		}
 	}

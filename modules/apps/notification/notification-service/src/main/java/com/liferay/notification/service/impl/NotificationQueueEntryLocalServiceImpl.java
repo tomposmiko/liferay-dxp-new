@@ -14,14 +14,27 @@
 
 package com.liferay.notification.service.impl;
 
+import com.liferay.mail.kernel.model.MailMessage;
+import com.liferay.mail.kernel.service.MailService;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.service.base.NotificationQueueEntryLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.mail.internet.InternetAddress;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -73,6 +86,13 @@ public class NotificationQueueEntryLocalServiceImpl
 	}
 
 	@Override
+	public void deleteNotificationQueueEntries(Date sentDate)
+		throws PortalException {
+
+		notificationQueueEntryPersistence.removeByLtSentDate(sentDate);
+	}
+
+	@Override
 	public NotificationQueueEntry deleteNotificationQueueEntry(
 			long notificationQueueEntryId)
 		throws PortalException {
@@ -94,6 +114,85 @@ public class NotificationQueueEntryLocalServiceImpl
 
 		return notificationQueueEntry;
 	}
+
+	@Override
+	public void sendNotificationQueueEntries() throws PortalException {
+		try {
+			for (NotificationQueueEntry notificationQueueEntry :
+					notificationQueueEntryPersistence.findBySent(false)) {
+
+				MailMessage mailMessage = new MailMessage(
+					new InternetAddress(
+						notificationQueueEntry.getFrom(),
+						notificationQueueEntry.getFromName()),
+					new InternetAddress(
+						notificationQueueEntry.getTo(),
+						notificationQueueEntry.getToName()),
+					notificationQueueEntry.getSubject(),
+					notificationQueueEntry.getBody(), true);
+
+				mailMessage.setBCC(
+					_toInternetAddresses(notificationQueueEntry.getBcc()));
+				mailMessage.setCC(
+					_toInternetAddresses(notificationQueueEntry.getCc()));
+
+				_mailService.sendEmail(mailMessage);
+
+				notificationQueueEntryLocalService.updateSent(
+					notificationQueueEntry.getNotificationQueueEntryId(), true);
+			}
+		}
+		catch (PortalException portalException) {
+			throw portalException;
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+
+			throw new PortalException(exception);
+		}
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public NotificationQueueEntry updateSent(
+			long notificationQueueEntryId, boolean sent)
+		throws PortalException {
+
+		NotificationQueueEntry notificationQueueEntry =
+			notificationQueueEntryPersistence.findByPrimaryKey(
+				notificationQueueEntryId);
+
+		notificationQueueEntry.setSent(sent);
+
+		if (sent) {
+			notificationQueueEntry.setSentDate(new Date());
+		}
+		else {
+			notificationQueueEntry.setSentDate(null);
+		}
+
+		return notificationQueueEntryPersistence.update(notificationQueueEntry);
+	}
+
+	private InternetAddress[] _toInternetAddresses(String string)
+		throws Exception {
+
+		List<InternetAddress> internetAddresses = new ArrayList<>();
+
+		for (String internetAddressString : StringUtil.split(string)) {
+			internetAddresses.add(new InternetAddress(internetAddressString));
+		}
+
+		return internetAddresses.toArray(new InternetAddress[0]);
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		NotificationQueueEntryLocalServiceImpl.class);
+
+	@Reference
+	private MailService _mailService;
 
 	@Reference
 	private UserLocalService _userLocalService;

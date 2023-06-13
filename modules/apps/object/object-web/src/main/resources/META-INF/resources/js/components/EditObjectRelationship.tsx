@@ -20,12 +20,14 @@ import {
 	InputLocalized,
 	SidePanelForm,
 	closeSidePanel,
+	invalidateRequired,
 	openToast,
+	useForm,
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useState} from 'react';
 
-import useForm, {invalidateRequired} from '../hooks/useForm';
+import {HEADERS} from '../utils/constants';
 import {
 	availableLocales,
 	defaultLanguageId,
@@ -33,11 +35,6 @@ import {
 } from '../utils/locale';
 import {objectRelationshipTypes} from '../utils/objectRelationshipTypes';
 import {firstLetterUppercase} from '../utils/string';
-
-const HEADERS = new Headers({
-	'Accept': 'application/json',
-	'Content-Type': 'application/json',
-});
 
 export default function EditObjectRelationship({
 	deletionTypes,

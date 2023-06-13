@@ -16,9 +16,14 @@ package com.liferay.object.internal.deployer;
 
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
+import com.liferay.notification.constants.NotificationTermContributorConstants;
+import com.liferay.notification.term.contributor.NotificationTermContributor;
+import com.liferay.notification.type.NotificationType;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.internal.info.collection.provider.ObjectEntrySingleFormVariationInfoCollectionProvider;
 import com.liferay.object.internal.language.ObjectResourceBundle;
+import com.liferay.object.internal.notification.term.contributor.ObjectDefinitionNotificationTermContributor;
+import com.liferay.object.internal.notification.type.ObjectDefinitionNotificationType;
 import com.liferay.object.internal.related.models.ObjectEntry1to1ObjectRelatedModelsProviderImpl;
 import com.liferay.object.internal.related.models.ObjectEntry1toMObjectRelatedModelsProviderImpl;
 import com.liferay.object.internal.related.models.ObjectEntryMtoMObjectRelatedModelsProviderImpl;
@@ -47,6 +52,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -87,7 +93,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
 		ObjectViewLocalService objectViewLocalService,
 		PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry,
-		ResourceActions resourceActions,
+		ResourceActions resourceActions, UserLocalService userLocalService,
 		ModelPreFilterContributor workflowStatusModelPreFilterContributor) {
 
 		_bundleContext = bundleContext;
@@ -104,6 +110,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		_persistedModelLocalServiceRegistry =
 			persistedModelLocalServiceRegistry;
 		_resourceActions = resourceActions;
+		_userLocalService = userLocalService;
 		_workflowStatusModelPreFilterContributor =
 			workflowStatusModelPreFilterContributor;
 	}
@@ -186,6 +193,30 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					"com.liferay.object", "true"
 				).put(
 					"model.class.name", objectDefinition.getClassName()
+				).build()),
+			_bundleContext.registerService(
+				NotificationTermContributor.class,
+				new ObjectDefinitionNotificationTermContributor(
+					objectDefinition, _objectFieldLocalService,
+					_userLocalService),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"notification.term.contributor.key",
+					NotificationTermContributorConstants.BODY_AND_SUBJECT
+				).put(
+					"notification.type.key", objectDefinition.getClassName()
+				).build()),
+			_bundleContext.registerService(
+				NotificationType.class,
+				new ObjectDefinitionNotificationType(
+					objectDefinition.getClassName(),
+					objectDefinition.getShortName()),
+				HashMapDictionaryBuilder.<String, Object>put(
+
+					// TODO Will commerce order need more than one notification
+					// type? Should we rename "notification.type.key" to
+					// "object.definition.class.name"?
+
+					"notification.type.key", objectDefinition.getClassName()
 				).build()),
 			_bundleContext.registerService(
 				ObjectRelatedModelsProvider.class,
@@ -291,6 +322,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private final PersistedModelLocalServiceRegistry
 		_persistedModelLocalServiceRegistry;
 	private final ResourceActions _resourceActions;
+	private final UserLocalService _userLocalService;
 	private final ModelPreFilterContributor
 		_workflowStatusModelPreFilterContributor;
 

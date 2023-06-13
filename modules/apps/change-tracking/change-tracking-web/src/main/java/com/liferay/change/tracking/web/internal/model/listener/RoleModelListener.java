@@ -14,12 +14,13 @@
 
 package com.liferay.change.tracking.web.internal.model.listener;
 
+import com.liferay.change.tracking.constants.CTActionKeys;
 import com.liferay.change.tracking.constants.CTPortletKeys;
-import com.liferay.change.tracking.web.internal.upgrade.v1_0_2.PublicationsUserRoleUpgradeProcess;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.role.RoleConstants;
@@ -47,10 +48,13 @@ public class RoleModelListener extends BaseModelListener<Role> {
 		}
 
 		try {
-			_resourceActions.populatePortletResources(
-				PublicationsUserRoleUpgradeProcess.class.getClassLoader(),
-				"resource-actions/default.xml");
-
+			_resourcePermissionLocalService.addResourcePermission(
+				role.getCompanyId(),
+				_resourceActions.getPortletRootModelResource(
+					CTPortletKeys.PUBLICATIONS),
+				ResourceConstants.SCOPE_COMPANY,
+				String.valueOf(role.getCompanyId()), role.getRoleId(),
+				CTActionKeys.ADD_PUBLICATION);
 			_resourcePermissionLocalService.addResourcePermission(
 				role.getCompanyId(), CTPortletKeys.PUBLICATIONS,
 				ResourceConstants.SCOPE_COMPANY,
@@ -66,6 +70,11 @@ public class RoleModelListener extends BaseModelListener<Role> {
 			throw new ModelListenerException(portalException);
 		}
 	}
+
+	@Reference(
+		target = "(javax.portlet.name=" + CTPortletKeys.PUBLICATIONS + ")"
+	)
+	private Portlet _portlet;
 
 	@Reference
 	private ResourceActions _resourceActions;

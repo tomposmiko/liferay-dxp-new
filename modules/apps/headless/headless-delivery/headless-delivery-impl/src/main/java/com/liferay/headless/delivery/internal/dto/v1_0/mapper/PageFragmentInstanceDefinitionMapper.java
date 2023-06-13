@@ -69,6 +69,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,6 +129,10 @@ public class PageFragmentInstanceDefinitionMapper {
 	private List<FragmentField> _getBackgroundImageFragmentFields(
 		JSONObject jsonObject, boolean saveMapping) {
 
+		if (jsonObject == null) {
+			return Collections.emptyList();
+		}
+
 		List<FragmentField> fragmentFields = new ArrayList<>();
 
 		Set<String> backgroundImageIds = jsonObject.keySet();
@@ -156,19 +161,40 @@ public class PageFragmentInstanceDefinitionMapper {
 		FragmentEntryLink fragmentEntryLink) {
 
 		try {
+			JSONObject editableValuesJSONObject =
+				JSONFactoryUtil.createJSONObject(
+					fragmentEntryLink.getEditableValues());
+
+			JSONObject configJSONObject =
+				editableValuesJSONObject.getJSONObject(
+					"com.liferay.fragment.entry.processor.freemarker." +
+						"FreeMarkerFragmentEntryProcessor");
+
+			if (configJSONObject == null) {
+				configJSONObject =
+					_fragmentEntryConfigurationParser.
+						getConfigurationDefaultValuesJSONObject(
+							fragmentEntryLink.getConfiguration());
+
+				if (configJSONObject == null) {
+					return Collections.emptyMap();
+				}
+			}
+
+			JSONObject jsonObject = configJSONObject;
+
 			return new HashMap<String, Object>() {
 				{
-					JSONObject jsonObject =
-						_fragmentEntryConfigurationParser.
-							getConfigurationJSONObject(
+					for (String key : jsonObject.keySet()) {
+						Object value =
+							_fragmentEntryConfigurationParser.getFieldValue(
 								fragmentEntryLink.getConfiguration(),
 								fragmentEntryLink.getEditableValues(),
-								LocaleUtil.getMostRelevantLocale());
+								LocaleUtil.getMostRelevantLocale(), key);
 
-					Set<String> keys = jsonObject.keySet();
-
-					for (String key : keys) {
-						Object value = jsonObject.get(key);
+						if (value == null) {
+							value = jsonObject.get(key);
+						}
 
 						if (value instanceof JSONObject) {
 							JSONObject valueJSONObject = (JSONObject)value;

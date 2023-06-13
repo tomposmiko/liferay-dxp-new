@@ -19,8 +19,8 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useContext, useMemo} from 'react';
 
-import DataSetContext from '../../DataSetContext';
-import ActionsDropdownRenderer from '../../data_renderers/ActionsDropdownRenderer';
+import FrontendDataSetContext from '../../FrontendDataSetContext';
+import Actions from '../../actions/Actions';
 import {getValueDetailsFromItem} from '../../utils/index';
 import ViewsContext from '../ViewsContext';
 import TableCell from './TableCell';
@@ -84,12 +84,19 @@ function Table({dataLoading, items, itemsActions, schema, style}) {
 		selectionType,
 		sorting,
 		updateSorting,
-	} = useContext(DataSetContext);
-	const [{visibleFieldNames}] = useContext(ViewsContext);
+	} = useContext(FrontendDataSetContext);
+	const [
+		{
+			activeView: {options},
+			visibleFieldNames,
+		},
+	] = useContext(ViewsContext);
+
+	const {quickActionsEnabled} = options || {};
 
 	const visibleFields = getVisibleFields(schema.fields, visibleFieldNames);
 
-	const showActionItems = useMemo(() => {
+	const showItemActions = useMemo(() => {
 		return Boolean(
 			itemsActions?.length ||
 				items?.find((item) => item.actions || item.actionDropdownItems)
@@ -111,7 +118,9 @@ function Table({dataLoading, items, itemsActions, schema, style}) {
 					(!inlineAddingSettings && !!items.length)) && (
 					<DndTable.Table
 						borderless
-						className={`table-style-${style}`}
+						className={classNames(`table-style-${style}`, {
+							'with-quick-actions': quickActionsEnabled,
+						})}
 						hover={false}
 						responsive
 						striped
@@ -149,11 +158,14 @@ function Table({dataLoading, items, itemsActions, schema, style}) {
 									return (
 										<React.Fragment key={itemId}>
 											<DndTable.Row
-												className={classNames(
-													highlightedItemsValue.includes(
+												className={classNames({
+													active: highlightedItemsValue.includes(
 														itemId
-													) && 'active'
-												)}
+													),
+													selected: selectedItemsValue.includes(
+														itemId
+													),
+												})}
 											>
 												{selectable && (
 													<DndTable.Cell
@@ -194,9 +206,9 @@ function Table({dataLoading, items, itemsActions, schema, style}) {
 													className="item-actions"
 													columnName="item-actions"
 												>
-													{(showActionItems ||
+													{(showItemActions ||
 														item.actions) && (
-														<ActionsDropdownRenderer
+														<Actions
 															actions={
 																itemsActions ||
 																item.actions ||
@@ -234,7 +246,7 @@ function Table({dataLoading, items, itemsActions, schema, style}) {
 																selectable && 1
 															}
 															paddingRightCells={
-																showActionItems &&
+																showItemActions &&
 																1
 															}
 														>

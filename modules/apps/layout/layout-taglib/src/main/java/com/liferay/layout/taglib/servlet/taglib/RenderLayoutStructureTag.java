@@ -59,6 +59,8 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.layoutconfiguration.util.RuntimePageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTemplate;
@@ -172,14 +174,19 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	private InfoForm _getInfoForm(
 		FormStyledLayoutStructureItem formStyledLayoutStructureItem) {
 
+		long classNameId = formStyledLayoutStructureItem.getClassNameId();
+
+		if (classNameId <= 0) {
+			return null;
+		}
+
 		InfoItemServiceTracker infoItemServiceTracker =
 			ServletContextUtil.getInfoItemServiceTracker();
 
 		InfoItemFormProvider<Object> infoItemFormProvider =
 			infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFormProvider.class,
-				PortalUtil.getClassName(
-					formStyledLayoutStructureItem.getClassNameId()));
+				PortalUtil.getClassName(classNameId));
 
 		if (infoItemFormProvider != null) {
 			try {
@@ -188,6 +195,10 @@ public class RenderLayoutStructureTag extends IncludeTag {
 						formStyledLayoutStructureItem.getClassTypeId()));
 			}
 			catch (NoSuchFormVariationException noSuchFormVariationException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(noSuchFormVariationException);
+				}
+
 				return null;
 			}
 		}
@@ -746,7 +757,10 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 		JspWriter jspWriter = pageContext.getOut();
 
-		jspWriter.write("<form class=\"");
+		jspWriter.write("<form action=\"/c/info/info-item/create\" class=\"");
+
+		FormStyledLayoutStructureItem formStyledLayoutStructureItem =
+			(FormStyledLayoutStructureItem)layoutStructureItem;
 
 		if (renderLayoutStructureDisplayContext.isCommonStylesFFEnabled()) {
 			jspWriter.write(
@@ -760,13 +774,23 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		else {
 			jspWriter.write(
 				renderLayoutStructureDisplayContext.getCssClass(
-					(FormStyledLayoutStructureItem)layoutStructureItem));
+					formStyledLayoutStructureItem));
 		}
 
-		jspWriter.write("\" style=\"");
+		jspWriter.write("\" method=\"POST=\" style=\"");
 		jspWriter.write(
 			renderLayoutStructureDisplayContext.getStyle(
-				(FormStyledLayoutStructureItem)layoutStructureItem));
+				formStyledLayoutStructureItem));
+		jspWriter.write("\">");
+
+		jspWriter.write("<input name=\"classNameId\" type=\"hidden\" value=\"");
+		jspWriter.write(
+			String.valueOf(formStyledLayoutStructureItem.getClassNameId()));
+		jspWriter.write("\">");
+
+		jspWriter.write("<input name=\"classTypeId\" type=\"hidden\" value=\"");
+		jspWriter.write(
+			String.valueOf(formStyledLayoutStructureItem.getClassTypeId()));
 		jspWriter.write("\">");
 
 		_renderLayoutStructure(
@@ -1166,6 +1190,9 @@ public class RenderLayoutStructureTag extends IncludeTag {
 			"StylesFragmentEntryProcessor";
 
 	private static final String _PAGE = "/render_layout_structure/page.jsp";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		RenderLayoutStructureTag.class);
 
 	private LayoutStructure _layoutStructure;
 	private String _mainItemId;

@@ -48,6 +48,7 @@ export function SelectTree({
 	items,
 	multiSelection,
 	onItems,
+	onSelectionChange,
 	selectedCategoryIds,
 }) {
 	const [selectedKeys, setSelectionChange] = useState(
@@ -71,6 +72,10 @@ export function SelectTree({
 
 		return flattenItems;
 	}, [items]);
+
+	useEffect(() => {
+		setSelectionChange(new Set(selectedCategoryIds));
+	}, [selectedCategoryIds]);
 
 	useEffect(() => {
 		const selectedItems = {};
@@ -119,11 +124,16 @@ export function SelectTree({
 		}
 	};
 
+	const handleSelectionChange = (keys) => {
+		setSelectionChange(keys);
+		onSelectionChange(keys);
+	};
+
 	return filteredItems.length > 0 ? (
 		<ClayTreeView
 			items={filteredItems}
 			onItemsChange={(items) => onItems(items)}
-			onSelectionChange={(keys) => setSelectionChange(keys)}
+			onSelectionChange={handleSelectionChange}
 			selectedKeys={selectedKeys}
 			selectionMode={
 				inheritSelection

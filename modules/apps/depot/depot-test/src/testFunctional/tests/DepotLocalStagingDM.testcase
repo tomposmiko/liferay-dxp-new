@@ -3375,13 +3375,78 @@ definition {
 
 	}
 
-	@description = "This test covers LPS-154419."
-	@ignore = "Test Stub"
+	@description = "This test covers LPS-154419. It validates that an external video with a custom friendlyURL can be correctly rendered in the Blog content field on a site after its friendlyURL is edited and published from an asset library"
 	@priority = "5"
 	test CanViewExternalVideoFromBlogsContentFieldAfterFriendlyURLIsUpdated {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
 
-		// TODO LPS-154419
+		DepotNavigator.openDepotDocumentsAndMediaAdminStaging(depotName = "Test Depot Name");
 
+		VideoShortcut.addCP(
+			videoShortcutTitle = "Test YouTube Video",
+			videoURL = "https://www.youtube.com/watch?v=HOdbzGCI5ME");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdminStaging(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive();
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name (Staging)",
+			layoutName = "Test Page",
+			site = "false",
+			widgetName = "Blogs");
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Blogs.addEntry(
+			depotName = "Test Depot Name",
+			embedVideo = "true",
+			entryContent = "video",
+			entryTitle = "Blogs Entry Title",
+			navTab = "Documents and Media",
+			videoShortcutTitle = "Test YouTube Video");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		DepotNavigator.openToEditDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "Test YouTube Video",
+			staging = "true");
+
+		DMDocument.editFriendlyURL(
+			dmDocumentTitle = "Test YouTube Video",
+			friendlyURLEdit = "document_1_edit");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdminStaging(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive();
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		BlogsNavigator.openToBlogEntry(
+			entryTitle = "Blogs Entry Title",
+			layoutName = "Test Page",
+			siteURLKey = "site-name");
+
+		BlogsEntry.viewEntryPG(
+			embedVideo = "true",
+			entryContent = "video",
+			entryTitle = "Blogs Entry Title");
 	}
 
 	@description = "This test covers LPS-154426."
@@ -3477,13 +3542,78 @@ definition {
 			navTab = "Documents and Media");
 	}
 
-	@description = "This test covers LPS-154418."
-	@ignore = "Test Stub"
+	@description = "This test covers LPS-154418. It validates that an image with a custom friendlyURL can be correctly rendered in the Blog content field on a site after its friendlyURL is edited and published from an asset library"
 	@priority = "5"
 	test CanViewImageFromBlogsContentFieldAfterFriendlyURLIsUpdated {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
 
-		// TODO LPS-154418
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name-staging",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
 
+		DepotNavigator.openDepotDocumentsAndMediaAdminStaging(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive();
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name (Staging)",
+			layoutName = "Test Page",
+			site = "false",
+			widgetName = "Blogs");
+
+		BlogsNavigator.openToAddEntry(siteURLKey = "site-name-staging");
+
+		BlogsEntry.addTitle(entryTitle = "Blogs Entry Title");
+
+		BlogsEntry.addContentWithInlineImage(
+			depotName = "Test Depot Name",
+			entryContent = "Blogs Entry Content",
+			imageFileName = "DM Document Title",
+			navTab = "Documents and Media");
+
+		PortletEntry.publish();
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		DepotNavigator.openToEditDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "DM Document Title",
+			staging = "true");
+
+		DMDocument.editFriendlyURL(friendlyURLEdit = "document_1_edit");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdminStaging(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive();
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		BlogsNavigator.openToBlogEntry(
+			entryTitle = "Blogs Entry Title",
+			layoutName = "Test Page",
+			siteURLKey = "site-name");
+
+		BlogsEntry.viewInlineImage(uploadFileName = "dm-document-title");
 	}
 
 	@description = "This test covers LPS-154422."

@@ -15,6 +15,7 @@
 package com.liferay.client.extension.type.validator;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -24,11 +25,9 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface CETValidator {
 
-	public void validate(String newTypeSettings, String type)
-		throws PortalException;
-
 	public void validate(
-			String newTypeSettings, String oldTypeSettings, String type)
+			UnicodeProperties newTypeSettingsUnicodeProperties,
+			UnicodeProperties oldTypeSettingsUnicodeProperties)
 		throws PortalException;
 
 }

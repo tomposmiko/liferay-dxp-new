@@ -460,6 +460,16 @@ public class StructuredContentResourceTest
 		assertValid(postStructuredContent2);
 	}
 
+	@Override
+	@Test
+	public void testPutAssetLibraryStructuredContentByExternalReferenceCode()
+		throws Exception {
+
+		_useDepotDDMStructureStructureId = true;
+
+		super.testPutAssetLibraryStructuredContentByExternalReferenceCode();
+	}
+
 	public static class ExtensionContextResolver
 		implements ContextResolver<ExtensionContext> {
 
@@ -541,9 +551,37 @@ public class StructuredContentResourceTest
 					}
 				}
 			});
-		structuredContent.setContentStructureId(_ddmStructure.getStructureId());
+		structuredContent.setContentStructureId(
+			_useDepotDDMStructureStructureId ?
+				_depotDDMStructure.getStructureId() :
+					_ddmStructure.getStructureId());
 
 		return structuredContent;
+	}
+
+	@Override
+	protected Long
+			testDeleteAssetLibraryStructuredContentByExternalReferenceCode_getAssetLibraryId()
+		throws Exception {
+
+		return testDepotEntry.getDepotEntryId();
+	}
+
+	@Override
+	protected StructuredContent
+			testGetAssetLibraryStructuredContentByExternalReferenceCode_addStructuredContent()
+		throws Exception {
+
+		return testPostAssetLibraryStructuredContent_addStructuredContent(
+			randomStructuredContent());
+	}
+
+	@Override
+	protected Long
+			testGetAssetLibraryStructuredContentByExternalReferenceCode_getAssetLibraryId()
+		throws Exception {
+
+		return testDepotEntry.getDepotEntryId();
 	}
 
 	@Override
@@ -592,6 +630,25 @@ public class StructuredContentResourceTest
 
 	@Override
 	protected StructuredContent
+			testGraphQLGetAssetLibraryStructuredContentByExternalReferenceCode_addStructuredContent()
+		throws Exception {
+
+		_useDepotDDMStructureStructureId = true;
+
+		return testPostAssetLibraryStructuredContent_addStructuredContent(
+			randomStructuredContent());
+	}
+
+	@Override
+	protected Long
+			testGraphQLGetAssetLibraryStructuredContentByExternalReferenceCode_getAssetLibraryId()
+		throws Exception {
+
+		return testDepotEntry.getDepotEntryId();
+	}
+
+	@Override
+	protected StructuredContent
 			testGraphQLStructuredContent_addStructuredContent()
 		throws Exception {
 
@@ -610,6 +667,23 @@ public class StructuredContentResourceTest
 
 		return super.testPostAssetLibraryStructuredContent_addStructuredContent(
 			structuredContent);
+	}
+
+	@Override
+	protected StructuredContent
+			testPutAssetLibraryStructuredContentByExternalReferenceCode_addStructuredContent()
+		throws Exception {
+
+		return testPostAssetLibraryStructuredContent_addStructuredContent(
+			randomStructuredContent());
+	}
+
+	@Override
+	protected Long
+			testPutAssetLibraryStructuredContentByExternalReferenceCode_getAssetLibraryId()
+		throws Exception {
+
+		return testDepotEntry.getDepotEntryId();
 	}
 
 	@Override
@@ -1039,6 +1113,8 @@ public class StructuredContentResourceTest
 
 	@Inject
 	private RoleLocalService _roleLocalService;
+
+	private boolean _useDepotDDMStructureStructureId;
 
 	@Inject
 	private UserLocalService _userLocalService;

@@ -60,6 +60,8 @@ public class FDSViewSerializerImpl implements FDSViewSerializer {
 			).put(
 				"name", fdsView.getName()
 			).put(
+				"options", fdsView.getOptions()
+			).put(
 				"thumbnail", fdsView.getThumbnail()
 			);
 

@@ -15,10 +15,6 @@
 package com.liferay.client.extension.web.internal.display.context;
 
 import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
-import com.liferay.client.extension.exception.ClientExtensionEntryCustomElementCSSURLsException;
-import com.liferay.client.extension.exception.ClientExtensionEntryCustomElementHTMLElementNameException;
-import com.liferay.client.extension.exception.ClientExtensionEntryCustomElementURLsException;
-import com.liferay.client.extension.exception.ClientExtensionEntryIFrameURLException;
 import com.liferay.client.extension.model.ClientExtensionEntry;
 import com.liferay.client.extension.type.CETCustomElement;
 import com.liferay.client.extension.type.CETGlobalCSS;
@@ -33,7 +29,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.PortletCategory;
-import com.liferay.portal.kernel.servlet.MultiSessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -161,19 +156,22 @@ public class EditClientExtensionEntryDisplayContext {
 	public String getGlobalCSSURL() {
 		CETGlobalCSS cetGlobalCSS = _getCETGlobalCSS();
 
-		return cetGlobalCSS.getURL();
+		return ParamUtil.getString(
+			_portletRequest, "globalCSSURL", cetGlobalCSS.getURL());
 	}
 
 	public String getGlobalJSURL() {
 		CETGlobalJS cetGlobalJS = _getCETGlobalJS();
 
-		return cetGlobalJS.getURL();
+		return ParamUtil.getString(
+			_portletRequest, "globalJSURL", cetGlobalJS.getURL());
 	}
 
 	public String getIFrameURL() {
 		CETIFrame cetIFrame = _getCETIFrame();
 
-		return cetIFrame.getURL();
+		return ParamUtil.getString(
+			_portletRequest, "iFrameURL", cetIFrame.getURL());
 	}
 
 	public String getName() {
@@ -276,19 +274,22 @@ public class EditClientExtensionEntryDisplayContext {
 	public String getThemeCSSClayURL() {
 		CETThemeCSS cetThemeCSS = _getCETThemeCSS();
 
-		return cetThemeCSS.getClayURL();
+		return ParamUtil.getString(
+			_portletRequest, "themeCSSClayURL", cetThemeCSS.getClayURL());
 	}
 
 	public String getThemeCSSMainURL() {
 		CETThemeCSS cetThemeCSS = _getCETThemeCSS();
 
-		return cetThemeCSS.getMainURL();
+		return ParamUtil.getString(
+			_portletRequest, "themeCSSMainURL", cetThemeCSS.getMainURL());
 	}
 
 	public String getThemeFaviconURL() {
 		CETThemeFavicon cetThemeFavicon = _getCETThemeFavicon();
 
-		return cetThemeFavicon.getURL();
+		return ParamUtil.getString(
+			_portletRequest, "themeFaviconURL", cetThemeFavicon.getURL());
 	}
 
 	public String getThemeJSURL() {
@@ -318,21 +319,6 @@ public class EditClientExtensionEntryDisplayContext {
 		HttpServletRequest httpServletRequest = _getHttpServletRequest();
 
 		String type = getType();
-
-		if (true) {
-			return Arrays.asList(
-				new SelectOption(
-					LanguageUtil.get(httpServletRequest, "custom-element"),
-					ClientExtensionEntryConstants.TYPE_CUSTOM_ELEMENT,
-					Objects.equals(
-						ClientExtensionEntryConstants.TYPE_CUSTOM_ELEMENT,
-						type)),
-				new SelectOption(
-					LanguageUtil.get(httpServletRequest, "iframe"),
-					ClientExtensionEntryConstants.TYPE_IFRAME,
-					Objects.equals(
-						ClientExtensionEntryConstants.TYPE_IFRAME, type)));
-		}
 
 		return Arrays.asList(
 			new SelectOption(
@@ -382,7 +368,7 @@ public class EditClientExtensionEntryDisplayContext {
 
 	public boolean isEditingClientExtensionEntryType(String... types) {
 		for (String type : types) {
-			if (Objects.equals(type, _getClientExtensionEntryType())) {
+			if (Objects.equals(getType(), type)) {
 				return true;
 			}
 		}
@@ -486,43 +472,6 @@ public class EditClientExtensionEntryDisplayContext {
 		}
 
 		return _cetThemeJS;
-	}
-
-	private String _getClientExtensionEntryType() {
-		String errorSection = _getErrorSection();
-
-		if (errorSection != null) {
-			return errorSection;
-		}
-
-		return getType();
-	}
-
-	private String _getErrorSection() {
-		if (MultiSessionErrors.contains(
-				_portletRequest,
-				ClientExtensionEntryIFrameURLException.class.getName())) {
-
-			return ClientExtensionEntryConstants.TYPE_IFRAME;
-		}
-
-		if (MultiSessionErrors.contains(
-				_portletRequest,
-				ClientExtensionEntryCustomElementCSSURLsException.class.
-					getName()) ||
-			MultiSessionErrors.contains(
-				_portletRequest,
-				ClientExtensionEntryCustomElementHTMLElementNameException.class.
-					getName()) ||
-			MultiSessionErrors.contains(
-				_portletRequest,
-				ClientExtensionEntryCustomElementURLsException.class.
-					getName())) {
-
-			return ClientExtensionEntryConstants.TYPE_CUSTOM_ELEMENT;
-		}
-
-		return null;
 	}
 
 	private HttpServletRequest _getHttpServletRequest() {
