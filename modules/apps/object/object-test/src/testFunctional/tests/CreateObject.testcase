@@ -142,7 +142,7 @@ definition {
 			fieldLabelName = "Custom Field",
 			tabName = "Field Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject2");
 
@@ -382,31 +382,17 @@ definition {
 			roleKey = "Regular Role",
 			roleTitle = "Regular Role");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
-
-		Role.definePermissionCP(
-			permissionDefinitionKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS_APPLICATION_PERMISSION_ACCESS_CONTROL_PANEL_CHECKBOX",
-			permissionDefinitionValue = "",
-			permissionNavigationKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS",
-			permissionNavigationValue = "Objects",
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "ACCESS_IN_CONTROL_PANEL",
+			resourceName = "com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet",
 			roleTitle = "Regular Role",
-			roleType = "Regular");
+			roleType = "regular");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
-
-		Role.definePermissionCP(
-			permissionDefinitionKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS_RESOURCE_PERMISSION_ADD_OBJECT_DEFINITION",
-			permissionDefinitionValue = "",
-			permissionNavigationKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS",
-			permissionNavigationValue = "Objects",
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "ADD_OBJECT_DEFINITION",
+			resourceName = "com.liferay.object",
 			roleTitle = "Regular Role",
-			roleType = "Regular");
+			roleType = "regular");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -502,7 +488,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Custom Field");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.goToLayoutsTab();
 
@@ -522,7 +508,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.openObjectAdmin();
 
@@ -530,7 +516,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Custom Field");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -617,7 +603,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -847,7 +833,7 @@ definition {
 			isCollapsible = "Yes",
 			tabName = "Field Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -857,7 +843,9 @@ definition {
 
 		LexiconEntry.gotoAdd();
 
-		CreateObject.assertCanCollapseAndExpandEntryField();
+		AssertVisible(
+			key_entryLabel = "Custom Field",
+			locator1 = "ObjectPortlet#VIEW_ENTRY_DETAILS_LABEL");
 	}
 
 	@description = "LPS-135549 - Verify it is possible to create a BigDecimal field"
@@ -1311,44 +1299,19 @@ definition {
 			roleKey = "Regular Role",
 			roleTitle = "Regular Role");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
-
-		Role.definePermissionCP(
-			permissionDefinitionKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS_APPLICATION_PERMISSION_ACCESS_CONTROL_PANEL_CHECKBOX",
-			permissionDefinitionValue = "Access in Control Panel",
-			permissionNavigationKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS",
-			permissionNavigationValue = "Object",
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "ACCESS_IN_CONTROL_PANEL",
+			resourceName = "com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet",
 			roleTitle = "Regular Role",
-			roleType = "Regular");
+			roleType = "regular");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
-
-		Role.definePermissionCP(
-			permissionDefinitionKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS_RESOURCE_PERMISSION_VIEW_OBJECT_DEFINITION_CHECKBOX",
-			permissionDefinitionValue = "View",
-			permissionNavigationKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS",
-			permissionNavigationValue = "Object",
-			roleTitle = "Regular Role",
-			roleType = "Regular");
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
-
-		Role.definePermissionCP(
-			permissionDefinitionKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS_RESOURCE_PERMISSIONS_DELETE_CHECKBOX",
-			permissionDefinitionValue = "Delete",
-			permissionNavigationKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS",
-			permissionNavigationValue = "Object",
-			roleTitle = "Regular Role",
-			roleType = "Regular");
+		for (var resourceActionIndex : list "DELETE,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceActionIndex}",
+				resourceName = "com.liferay.object.model.ObjectDefinition",
+				roleTitle = "Regular Role",
+				roleType = "regular");
+		}
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -1412,7 +1375,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Custom Field");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.goToLayoutsTab();
 
@@ -1434,7 +1397,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -1565,18 +1528,11 @@ definition {
 			roleKey = "Regular Role",
 			roleTitle = "Regular Role");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
-
-		Role.definePermissionCP(
-			permissionDefinitionKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS_APPLICATION_PERMISSION_ACCESS_CONTROL_PANEL_CHECKBOX",
-			permissionDefinitionValue = "",
-			permissionNavigationKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS",
-			permissionNavigationValue = "Objects",
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "ACCESS_IN_CONTROL_PANEL",
+			resourceName = "com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet",
 			roleTitle = "Regular Role",
-			roleType = "Regular");
+			roleType = "regular");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -1740,13 +1696,12 @@ definition {
 		ObjectAdmin.gotoRelationshipsTab();
 
 		ObjectAdmin.addObjectRelationshipViaUI(
+			invalidEntry = "true",
 			label = "Relationship",
 			object = "Custom Object 41",
 			type = "One to Many");
 
-		AssertTextEquals(
-			locator1 = "Message#ERROR",
-			value1 = "An error occurred.");
+		Alert.viewErrorMessage(errorMessage = "Internal Server Error");
 	}
 
 	@description = "LPS-135390 - Verify it is not possible to delete an Object without the Delete permission"
@@ -1895,7 +1850,7 @@ definition {
 			fieldLabel = "Custom Field",
 			fieldType = "Picklist");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		FieldBase.assertRequiredFieldErrorPresent(fieldLabel = "Picklist");
 	}
@@ -1989,6 +1944,8 @@ definition {
 	@description = "LPS-135390 - Verify it is not possible to publish an Object without the Publish Object Definition permission"
 	@priority = "4"
 	test CannotPublishObjectWithouPublishPermission {
+		property test.name.skip.portal.instance = "CreateObject#CannotPublishObjectWithouPublishPermission";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 53",
 			objectName = "CustomObject53",
@@ -1998,31 +1955,17 @@ definition {
 			roleKey = "Regular Role",
 			roleTitle = "Regular Role");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
-
-		Role.definePermissionCP(
-			permissionDefinitionKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS_APPLICATION_PERMISSION_ACCESS_CONTROL_PANEL_CHECKBOX",
-			permissionDefinitionValue = "",
-			permissionNavigationKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS",
-			permissionNavigationValue = "Objects",
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "ACCESS_IN_CONTROL_PANEL",
+			resourceName = "com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet",
 			roleTitle = "Regular Role",
-			roleType = "Regular");
+			roleType = "regular");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
-
-		Role.definePermissionCP(
-			permissionDefinitionKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS_RESOURCE_PERMISSION_VIEW_OBJECT_DEFINITION_CHECKBOX",
-			permissionDefinitionValue = "",
-			permissionNavigationKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS",
-			permissionNavigationValue = "Objects",
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "VIEW",
+			resourceName = "com.liferay.object.model.ObjectDefinition",
 			roleTitle = "Regular Role",
-			roleType = "Regular");
+			roleType = "regular");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -2261,9 +2204,7 @@ definition {
 			fieldName = "Text",
 			fieldValue = "Entry 1");
 
-		Button.clickSubmitForPublication();
-
-		AssertElementNotPresent(locator1 = "Message#SUCCESS_DISMISSIBLE");
+		PortletEntry.submitForPublication();
 	}
 
 	@description = "LPS-135400 - Verify it is not possible to submit an entry with a invalid value on the Relationship field"
@@ -2302,7 +2243,7 @@ definition {
 
 		ObjectPortlet.searchEntryRelationshipField(entryValue = "!@#$%");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		CreateObject.viewErrorValueInvalid(
 			className = "feedback",
@@ -2666,7 +2607,7 @@ definition {
 
 			CreateObject.selectAccountRestrictedField(accountRestrictedField = "RelationshipAccount");
 
-			Button.clickPublish();
+			PortletEntry.publish();
 		}
 
 		task ("Define Regular Role for new User") {
@@ -2682,35 +2623,25 @@ definition {
 				roleTitle = "Regular Role",
 				userEmailAddress = "userea2@liferay.com");
 
-			Role.openRolesAdmin();
+			var objectId = JSONObject.getObjectId(objectName = "CustomObject");
 
-			Role.definePermissionCP(
-				permissionDefinitionKey = "CONTROL_PANEL_CUSTOM_OBJECTS_PERMISSIONS_APPLICATION_PERMISSION_ACCESS_CONTROL_PANEL_CHECKBOX",
-				permissionDefinitionValue = "",
-				permissionNavigationKey = "CONTROL_PANEL_CUSTOM_OBJECTS_PERMISSIONS",
-				permissionNavigationValue = "Custom Objects",
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "ACCESS_IN_CONTROL_PANEL",
+				resourceName = "com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_${objectId}",
 				roleTitle = "Regular Role",
-				roleType = "Regular");
+				roleType = "regular");
 
-			Role.openRolesAdmin();
-
-			Role.definePermissionCP(
-				permissionDefinitionKey = "CONTROL_PANEL_CUSTOM_OBJECTS_PERMISSIONS_RESOURCE_PERMISSIONS_VIEW_CHECKBOX",
-				permissionDefinitionValue = "",
-				permissionNavigationKey = "CONTROL_PANEL_CUSTOM_OBJECTS_PERMISSIONS",
-				permissionNavigationValue = "Custom Objects",
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "VIEW",
+				resourceName = "com.liferay.object.model.ObjectDefinition#${objectId}",
 				roleTitle = "Regular Role",
-				roleType = "Regular");
+				roleType = "regular");
 
-			Role.openRolesAdmin();
-
-			Role.definePermissionCP(
-				permissionDefinitionKey = "CONTROL_PANEL_CUSTOM_OBJECTS_PERMISSIONS_RESOURCE_PERMISSION_ADD_ENTRY_CHECKBOX",
-				permissionDefinitionValue = "",
-				permissionNavigationKey = "CONTROL_PANEL_CUSTOM_OBJECTS_PERMISSIONS",
-				permissionNavigationValue = "Custom Objects",
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "ADD_OBJECT_ENTRY",
+				resourceName = "com.liferay.object#${objectId}",
 				roleTitle = "Regular Role",
-				roleType = "Regular");
+				roleType = "regular");
 		}
 
 		task ("Logout and go to another User") {
@@ -2730,7 +2661,7 @@ definition {
 
 			ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "Public Account");
 
-			Button.clickSave();
+			PortletEntry.save();
 
 			ObjectAdmin.goToCustomObject(objectName = "CustomObject");
 
@@ -2754,7 +2685,7 @@ definition {
 
 			ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "Private Account");
 
-			Button.clickSave();
+			PortletEntry.save();
 
 			ObjectAdmin.goToCustomObject(objectName = "CustomObject");
 
@@ -2859,7 +2790,7 @@ definition {
 
 		ObjectPortlet.selectCustomObject(label = "Custom Object 73");
 
-		Button.clickPublish();
+		PortletEntry.publish();
 
 		Navigator.openURL();
 
@@ -2910,7 +2841,7 @@ definition {
 
 			CreateObject.selectTitleField(fieldLabel = "Custom Field ${letter}");
 
-			Button.clickSave();
+			PortletEntry.save();
 
 			ObjectAdmin.goToLayoutsTab();
 
@@ -2932,7 +2863,7 @@ definition {
 				relationshipsLabelName = "Relationship",
 				tabName = "Relationship Tab");
 
-			Button.clickSave();
+			PortletEntry.save();
 
 			Navigator.openURL();
 		}
@@ -3024,9 +2955,7 @@ definition {
 
 			CreateObject.selectAccountRestrictedField(accountRestrictedField = "RelationshipAccount");
 
-			Button.clickSave();
-
-			Alert.viewSuccessMessage();
+			PortletEntry.save();
 		}
 	}
 
@@ -3292,7 +3221,7 @@ definition {
 
 		CreateObject.editLabel(labelName = "Campo Customizado");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject81");
 
@@ -3473,7 +3402,7 @@ definition {
 			fieldName = "Text",
 			fieldValue = "Entry 1");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -3526,7 +3455,7 @@ definition {
 			locator1 = "ObjectAdmin#LAYOUT_BASIC_INFO_NAME_FIELD",
 			value1 = "Layout Updated");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Refresh();
 
@@ -3945,7 +3874,7 @@ definition {
 
 		ObjectAdmin.selectObjectScope(fieldOption = "Site");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.gotoBack();
 
@@ -4066,7 +3995,7 @@ definition {
 
 		CreateObject.editLabel(labelName = "Relationship Updated");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Refresh();
 
@@ -4196,7 +4125,7 @@ definition {
 
 		Click.clickAtNotVisible(locator1 = "ObjectAdmin#ENTRY_BOOLEAN_CHECKBOX");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject104");
 
@@ -4270,7 +4199,7 @@ definition {
 			fieldLabelName = "Custom Field",
 			tabName = "Field Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -4327,7 +4256,7 @@ definition {
 
 		Click.clickAtNotVisible(locator1 = "ObjectAdmin#ENTRY_BOOLEAN_CHECKBOX");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject106");
 
@@ -4394,7 +4323,7 @@ definition {
 
 		Click.clickAtNotVisible(locator1 = "ObjectAdmin#ENTRY_BOOLEAN_CHECKBOX");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject107");
 
@@ -4572,7 +4501,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Boolean");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.addObjectBooleanFieldEntryViaUI(
 			objectName = "CustomObject112",
@@ -4657,7 +4586,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Double");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		WaitForPageLoad();
 
@@ -4704,7 +4633,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Integer");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		WaitForPageLoad();
 
@@ -4751,7 +4680,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Long");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject141616");
 
@@ -4870,7 +4799,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -5283,7 +5212,7 @@ definition {
 
 		Click.clickAtNotVisible(locator1 = "ObjectAdmin#ENTRY_BOOLEAN_CHECKBOX");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject121");
 
@@ -5365,7 +5294,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -5443,7 +5372,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Custom Field A");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.addObjectLayoutViaAPI(
 			layoutName = "Layout Name",
@@ -5467,7 +5396,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -5477,7 +5406,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Custom Field B");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObjectA123");
 
@@ -5551,7 +5480,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Custom Field A");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -5572,7 +5501,7 @@ definition {
 
 		ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "Entry A");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		WaitForSPARefresh();
 
@@ -5651,7 +5580,7 @@ definition {
 				relationshipsLabelName = "Relationship",
 				tabName = "Relationship Tab");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		Navigator.openURL();
@@ -5820,7 +5749,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Custom Field A");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.goToLayoutsTab();
 
@@ -5840,7 +5769,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -5850,7 +5779,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Custom Field B");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObjectA127");
 
@@ -5948,7 +5877,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -5979,7 +5908,7 @@ definition {
 
 		ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "Entry A");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -6038,7 +5967,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Custom Field A");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObjectA129");
 
@@ -6059,7 +5988,7 @@ definition {
 
 		ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "Entry A");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -6500,6 +6429,8 @@ definition {
 	@description = "LPS-139005 - Verify that the Object is no longer displayed on the Workflow Process Builder page when inactivated"
 	@priority = "4"
 	test ObjectDisappearsProcessBuilderWhenInactivated {
+		property test.name.skip.portal.instance = "CreateObject#ObjectDisappearsProcessBuilderWhenInactivated";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 143",
 			objectName = "CustomObject143",
@@ -6527,6 +6458,8 @@ definition {
 	@description = "LPS-139005 - Verify that the Object is no longer displayed on the Workflow Site Menu page when inactivated"
 	@priority = "4"
 	test ObjectDisappearsWorkflowSiteMenuWhenInactivated {
+		property test.name.skip.portal.instance = "CreateObject#ObjectDisappearsWorkflowSiteMenuWhenInactivated";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 144",
 			objectName = "CustomObject144",
@@ -7719,7 +7652,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.openObjectAdmin();
 
@@ -7820,7 +7753,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -7851,7 +7784,7 @@ definition {
 
 		ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "Entry A");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -7905,7 +7838,7 @@ definition {
 
 		CreateObject.selectTitleField(fieldLabel = "Custom Field A");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObjectA165");
 
@@ -7926,7 +7859,7 @@ definition {
 
 		ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "Entry A");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObjectA165");
 
@@ -8092,7 +8025,7 @@ definition {
 
 		ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "Entry A");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.openObjectAdmin();
 
@@ -8415,7 +8348,7 @@ definition {
 				relationshipsLabelName = "Relationship",
 				tabName = "Relationship Tab");
 
-			Button.clickSave();
+			PortletEntry.save();
 
 			Navigator.openURL();
 		}
@@ -8523,7 +8456,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -8603,7 +8536,7 @@ definition {
 				relationshipsLabelName = "Relationship",
 				tabName = "Relationship Tab");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject140875A");
@@ -8703,7 +8636,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject140873A");
 
@@ -8788,7 +8721,7 @@ definition {
 
 		CreateObject.selectPanelCategoryKey(panelCategoryKey = "Site Administration > Site Builder");
 
-		Button.clickPublish();
+		PortletEntry.publish();
 
 		Navigator.openURL();
 
@@ -8847,7 +8780,7 @@ definition {
 
 			CreateObject.selectAccountRestrictedField(accountRestrictedField = "RelationshipAccount");
 
-			Button.clickPublish();
+			PortletEntry.publish();
 		}
 
 		task ("Go to Custom Object entries and assert that the relationship is mandatory") {
@@ -8976,7 +8909,7 @@ definition {
 			fieldName = "Text",
 			fieldValue = "Entry Test");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 

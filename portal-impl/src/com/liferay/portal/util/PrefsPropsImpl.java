@@ -14,8 +14,20 @@
 
 package com.liferay.portal.util;
 
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.PortalPreferencesLocalService;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PrefsProps;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
+import java.io.IOException;
+
+import java.util.Enumeration;
 import java.util.Properties;
 
 import javax.portlet.PortletPreferences;
@@ -27,300 +39,369 @@ public class PrefsPropsImpl implements PrefsProps {
 
 	@Override
 	public boolean getBoolean(long companyId, String name) {
-		return PrefsPropsUtil.getBoolean(companyId, name);
+		return getBoolean(getPreferences(companyId), name);
 	}
 
 	@Override
 	public boolean getBoolean(
 		long companyId, String name, boolean defaultValue) {
 
-		return PrefsPropsUtil.getBoolean(companyId, name, defaultValue);
+		return getBoolean(getPreferences(companyId), name, defaultValue);
 	}
 
 	@Override
 	public boolean getBoolean(PortletPreferences preferences, String name) {
-		return PrefsPropsUtil.getBoolean(preferences, name);
+		return GetterUtil.getBoolean(getString(preferences, name));
 	}
 
 	@Override
 	public boolean getBoolean(
 		PortletPreferences preferences, String name, boolean defaultValue) {
 
-		return PrefsPropsUtil.getBoolean(preferences, name, defaultValue);
+		return GetterUtil.getBoolean(
+			getString(preferences, name, defaultValue));
 	}
 
 	@Override
 	public boolean getBoolean(String name) {
-		return PrefsPropsUtil.getBoolean(name);
+		return getBoolean(getPreferences(), name);
 	}
 
 	@Override
 	public boolean getBoolean(String name, boolean defaultValue) {
-		return PrefsPropsUtil.getBoolean(name, defaultValue);
+		return getBoolean(getPreferences(), name, defaultValue);
 	}
 
 	@Override
 	public String getContent(long companyId, String name) {
-		return PrefsPropsUtil.getContent(companyId, name);
+		return getContent(getPreferences(companyId), name);
 	}
 
 	@Override
 	public String getContent(PortletPreferences preferences, String name) {
-		return PrefsPropsUtil.getContent(preferences, name);
+		String value = preferences.getValue(name, StringPool.BLANK);
+
+		if (Validator.isNotNull(value)) {
+			return value;
+		}
+
+		try {
+			return StringUtil.read(
+				PrefsPropsImpl.class.getClassLoader(), PropsUtil.get(name));
+		}
+		catch (IOException ioException) {
+			_log.error(
+				"Unable to read the content for " + PropsUtil.get(name),
+				ioException);
+
+			return null;
+		}
 	}
 
 	@Override
 	public String getContent(String name) {
-		return PrefsPropsUtil.getContent(name);
+		return getContent(getPreferences(), name);
 	}
 
 	@Override
 	public double getDouble(long companyId, String name) {
-		return PrefsPropsUtil.getDouble(companyId, name);
+		return getDouble(getPreferences(companyId), name);
 	}
 
 	@Override
 	public double getDouble(long companyId, String name, double defaultValue) {
-		return PrefsPropsUtil.getDouble(companyId, name, defaultValue);
+		return getDouble(getPreferences(companyId), name, defaultValue);
 	}
 
 	@Override
 	public double getDouble(PortletPreferences preferences, String name) {
-		return PrefsPropsUtil.getDouble(preferences, name);
+		return GetterUtil.getDouble(getString(preferences, name));
 	}
 
 	@Override
 	public double getDouble(
 		PortletPreferences preferences, String name, double defaultValue) {
 
-		return PrefsPropsUtil.getDouble(preferences, name, defaultValue);
+		return GetterUtil.getDouble(getString(preferences, name, defaultValue));
 	}
 
 	@Override
 	public double getDouble(String name) {
-		return PrefsPropsUtil.getDouble(name);
+		return getDouble(getPreferences(), name);
 	}
 
 	@Override
 	public double getDouble(String name, double defaultValue) {
-		return PrefsPropsUtil.getDouble(name, defaultValue);
+		return getDouble(getPreferences(), name, defaultValue);
 	}
 
 	@Override
 	public int getInteger(long companyId, String name) {
-		return PrefsPropsUtil.getInteger(companyId, name);
+		return getInteger(getPreferences(companyId), name);
 	}
 
 	@Override
 	public int getInteger(long companyId, String name, int defaultValue) {
-		return PrefsPropsUtil.getInteger(companyId, name, defaultValue);
+		return getInteger(getPreferences(companyId), name, defaultValue);
 	}
 
 	@Override
 	public int getInteger(PortletPreferences preferences, String name) {
-		return PrefsPropsUtil.getInteger(preferences, name);
+		return GetterUtil.getInteger(getString(preferences, name));
 	}
 
 	@Override
 	public int getInteger(
 		PortletPreferences preferences, String name, int defaultValue) {
 
-		return PrefsPropsUtil.getInteger(preferences, name, defaultValue);
+		return GetterUtil.getInteger(
+			getString(preferences, name, defaultValue));
 	}
 
 	@Override
 	public int getInteger(String name) {
-		return PrefsPropsUtil.getInteger(name);
+		return getInteger(getPreferences(), name);
 	}
 
 	@Override
 	public int getInteger(String name, int defaultValue) {
-		return PrefsPropsUtil.getInteger(name, defaultValue);
+		return getInteger(getPreferences(), name, defaultValue);
 	}
 
 	@Override
 	public long getLong(long companyId, String name) {
-		return PrefsPropsUtil.getLong(companyId, name);
+		return getLong(getPreferences(companyId), name);
 	}
 
 	@Override
 	public long getLong(long companyId, String name, long defaultValue) {
-		return PrefsPropsUtil.getLong(companyId, name, defaultValue);
+		return getLong(getPreferences(companyId), name, defaultValue);
 	}
 
 	@Override
 	public long getLong(PortletPreferences preferences, String name) {
-		return PrefsPropsUtil.getLong(preferences, name);
+		return GetterUtil.getLong(getString(preferences, name));
 	}
 
 	@Override
 	public long getLong(
 		PortletPreferences preferences, String name, long defaultValue) {
 
-		return PrefsPropsUtil.getLong(preferences, name, defaultValue);
+		return GetterUtil.getLong(getString(preferences, name, defaultValue));
 	}
 
 	@Override
 	public long getLong(String name) {
-		return PrefsPropsUtil.getLong(name);
+		return getLong(getPreferences(), name);
 	}
 
 	@Override
 	public long getLong(String name, long defaultValue) {
-		return PrefsPropsUtil.getLong(name, defaultValue);
+		return getLong(getPreferences(), name, defaultValue);
 	}
 
 	@Override
 	public PortletPreferences getPreferences() {
-		return PrefsPropsUtil.getPreferences();
-	}
-
-	@Override
-	public PortletPreferences getPreferences(boolean readOnly) {
-		return PrefsPropsUtil.getPreferences(readOnly);
+		return _portalPreferencesLocalService.getPreferences(
+			PortletKeys.PREFS_OWNER_ID_DEFAULT,
+			PortletKeys.PREFS_OWNER_TYPE_COMPANY);
 	}
 
 	@Override
 	public PortletPreferences getPreferences(long companyId) {
-		return PrefsPropsUtil.getPreferences(companyId);
-	}
-
-	@Override
-	public PortletPreferences getPreferences(long companyId, boolean readOnly) {
-		return PrefsPropsUtil.getPreferences(companyId, readOnly);
+		return _portalPreferencesLocalService.getPreferences(
+			companyId, PortletKeys.PREFS_OWNER_TYPE_COMPANY);
 	}
 
 	@Override
 	public Properties getProperties(
 		PortletPreferences preferences, String prefix, boolean removePrefix) {
 
-		return PrefsPropsUtil.getProperties(preferences, prefix, removePrefix);
+		Properties newProperties = new Properties();
+
+		Enumeration<String> enumeration = preferences.getNames();
+
+		while (enumeration.hasMoreElements()) {
+			String key = enumeration.nextElement();
+
+			if (key.startsWith(prefix)) {
+				String value = preferences.getValue(key, StringPool.BLANK);
+
+				if (removePrefix) {
+					key = key.substring(prefix.length());
+				}
+
+				newProperties.setProperty(key, value);
+			}
+		}
+
+		return newProperties;
 	}
 
 	@Override
 	public Properties getProperties(String prefix, boolean removePrefix) {
-		return PrefsPropsUtil.getProperties(prefix, removePrefix);
+		return getProperties(getPreferences(), prefix, removePrefix);
 	}
 
 	@Override
 	public short getShort(long companyId, String name) {
-		return PrefsPropsUtil.getShort(companyId, name);
+		return getShort(getPreferences(companyId), name);
 	}
 
 	@Override
 	public short getShort(long companyId, String name, short defaultValue) {
-		return PrefsPropsUtil.getShort(companyId, name, defaultValue);
+		return getShort(getPreferences(companyId), name, defaultValue);
 	}
 
 	@Override
 	public short getShort(PortletPreferences preferences, String name) {
-		return PrefsPropsUtil.getShort(preferences, name);
+		return GetterUtil.getShort(getString(preferences, name));
 	}
 
 	@Override
 	public short getShort(
 		PortletPreferences preferences, String name, short defaultValue) {
 
-		return PrefsPropsUtil.getShort(preferences, name, defaultValue);
+		return GetterUtil.getShort(getString(preferences, name, defaultValue));
 	}
 
 	@Override
 	public short getShort(String name) {
-		return PrefsPropsUtil.getShort(name);
+		return getShort(getPreferences(), name);
 	}
 
 	@Override
 	public short getShort(String name, short defaultValue) {
-		return PrefsPropsUtil.getShort(name, defaultValue);
+		return getShort(getPreferences(), name, defaultValue);
 	}
 
 	@Override
 	public String getString(long companyId, String name) {
-		return PrefsPropsUtil.getString(companyId, name);
+		return getString(getPreferences(companyId), name);
 	}
 
 	@Override
 	public String getString(long companyId, String name, String defaultValue) {
-		return PrefsPropsUtil.getString(companyId, name, defaultValue);
+		return getString(getPreferences(companyId), name, defaultValue);
 	}
 
 	@Override
 	public String getString(PortletPreferences preferences, String name) {
-		return PrefsPropsUtil.getString(preferences, name);
+		String value = PropsUtil.get(name);
+
+		return preferences.getValue(name, value);
 	}
 
 	@Override
 	public String getString(
 		PortletPreferences preferences, String name, boolean defaultValue) {
 
-		return PrefsPropsUtil.getString(preferences, name, defaultValue);
+		String value = getString(preferences, name);
+
+		if (value != null) {
+			return value;
+		}
+
+		return String.valueOf(defaultValue);
 	}
 
 	@Override
 	public String getString(
 		PortletPreferences preferences, String name, double defaultValue) {
 
-		return PrefsPropsUtil.getString(preferences, name, defaultValue);
+		String value = getString(preferences, name);
+
+		if (value != null) {
+			return value;
+		}
+
+		return String.valueOf(defaultValue);
 	}
 
 	@Override
 	public String getString(
 		PortletPreferences preferences, String name, int defaultValue) {
 
-		return PrefsPropsUtil.getString(preferences, name, defaultValue);
+		String value = getString(preferences, name);
+
+		if (value != null) {
+			return value;
+		}
+
+		return String.valueOf(defaultValue);
 	}
 
 	@Override
 	public String getString(
 		PortletPreferences preferences, String name, long defaultValue) {
 
-		return PrefsPropsUtil.getString(preferences, name, defaultValue);
+		String value = getString(preferences, name);
+
+		if (value != null) {
+			return value;
+		}
+
+		return String.valueOf(defaultValue);
 	}
 
 	@Override
 	public String getString(
 		PortletPreferences preferences, String name, short defaultValue) {
 
-		return PrefsPropsUtil.getString(preferences, name, defaultValue);
+		String value = getString(preferences, name);
+
+		if (value != null) {
+			return value;
+		}
+
+		return String.valueOf(defaultValue);
 	}
 
 	@Override
 	public String getString(
 		PortletPreferences preferences, String name, String defaultValue) {
 
-		return PrefsPropsUtil.getString(preferences, name, defaultValue);
+		String value = getString(preferences, name);
+
+		if (value != null) {
+			return value;
+		}
+
+		return defaultValue;
 	}
 
 	@Override
 	public String getString(String name) {
-		return PrefsPropsUtil.getString(name);
+		return getString(getPreferences(), name);
 	}
 
 	@Override
 	public String getString(String name, String defaultValue) {
-		return PrefsPropsUtil.getString(name, defaultValue);
+		return getString(getPreferences(), name, defaultValue);
 	}
 
 	@Override
 	public String[] getStringArray(
 		long companyId, String name, String delimiter) {
 
-		return PrefsPropsUtil.getStringArray(companyId, name, delimiter);
+		return getStringArray(getPreferences(companyId), name, delimiter);
 	}
 
 	@Override
 	public String[] getStringArray(
 		long companyId, String name, String delimiter, String[] defaultValue) {
 
-		return PrefsPropsUtil.getStringArray(
-			companyId, name, delimiter, defaultValue);
+		return getStringArray(
+			getPreferences(companyId), name, delimiter, defaultValue);
 	}
 
 	@Override
 	public String[] getStringArray(
 		PortletPreferences preferences, String name, String delimiter) {
 
-		return PrefsPropsUtil.getStringArray(preferences, name, delimiter);
+		String value = PropsUtil.get(name);
+
+		return StringUtil.split(preferences.getValue(name, value), delimiter);
 	}
 
 	@Override
@@ -328,25 +409,43 @@ public class PrefsPropsImpl implements PrefsProps {
 		PortletPreferences preferences, String name, String delimiter,
 		String[] defaultValue) {
 
-		return PrefsPropsUtil.getStringArray(
-			preferences, name, delimiter, defaultValue);
+		String value = preferences.getValue(name, null);
+
+		if (value == null) {
+			return defaultValue;
+		}
+
+		return StringUtil.split(value, delimiter);
 	}
 
 	@Override
 	public String[] getStringArray(String name, String delimiter) {
-		return PrefsPropsUtil.getStringArray(name, delimiter);
+		return getStringArray(getPreferences(), name, delimiter);
 	}
 
 	@Override
 	public String[] getStringArray(
 		String name, String delimiter, String[] defaultValue) {
 
-		return PrefsPropsUtil.getStringArray(name, delimiter, defaultValue);
+		return getStringArray(getPreferences(), name, delimiter, defaultValue);
 	}
 
 	@Override
 	public String getStringFromNames(long companyId, String... names) {
-		return PrefsPropsUtil.getStringFromNames(companyId, names);
+		for (String name : names) {
+			String value = getString(companyId, name);
+
+			if (Validator.isNotNull(value)) {
+				return value;
+			}
+		}
+
+		return null;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(PrefsPropsImpl.class);
+
+	@BeanReference(type = PortalPreferencesLocalService.class)
+	private PortalPreferencesLocalService _portalPreferencesLocalService;
 
 }

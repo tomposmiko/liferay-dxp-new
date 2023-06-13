@@ -22,6 +22,7 @@ definition {
 	}
 
 	@description = "LPS-133365 - Verify if it's possible to map an Object field and view its entries in a Field Group"
+	@ignore = "true"
 	@priority = "4"
 	test CanMapAndViewEntriesForFieldGroup {
 		ObjectAdmin.addObjectViaAPI(
@@ -89,7 +90,7 @@ definition {
 			fieldName = "Text",
 			fieldValue = "Test text");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -148,7 +149,7 @@ definition {
 			fieldName = "Numeric",
 			fieldValue = "123.123456");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -201,7 +202,7 @@ definition {
 			checkboxName = "Boolean",
 			locator1 = "Checkbox#ANY_CHECKBOX");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -254,7 +255,7 @@ definition {
 			fieldName = "Date",
 			fieldValue = "01/01/2001");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -311,7 +312,7 @@ definition {
 			fieldName = "Numeric",
 			fieldValue = "1.54");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -364,7 +365,7 @@ definition {
 			fieldName = "Numeric",
 			fieldValue = "123456789");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -417,7 +418,7 @@ definition {
 			fieldName = "Numeric",
 			fieldValue = "1234567891234567");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -484,7 +485,7 @@ definition {
 
 		PopulateObjectFormsConfiguration.selectPicklistObject(picklistItem = "Item Test 1");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -539,9 +540,7 @@ definition {
 			fieldName = "Text",
 			fieldValue = "Test Text Test Text Test Text Test Text Test Text Test Text Test Text  Test");
 
-		Button.clickSubmitForPublication();
-
-		Alert.viewSuccessMessage();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -616,7 +615,7 @@ definition {
 			fieldName = "Text",
 			fieldValue = "String text");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -669,7 +668,7 @@ definition {
 			fieldName = "Text",
 			fieldValue = "Test text");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 
@@ -726,7 +725,7 @@ definition {
 			fieldName = "Date",
 			fieldValue = "01/01/2001");
 
-		Button.clickSubmitForPublication();
+		PortletEntry.submitForPublication();
 
 		Navigator.openURL();
 

@@ -112,6 +112,16 @@ public class KBNavigationDisplayContext {
 		return kbFolder.getUrlTitle();
 	}
 
+	public String getLabel() {
+		if (KBFolderConstants.DEFAULT_PARENT_FOLDER_ID !=
+				getResourcePrimKey()) {
+
+			return "the-selected-knowledge-base-is-empty";
+		}
+
+		return "please-configure-this-portlet-to-make-it-visible-to-all-users";
+	}
+
 	public String getPageTitle() throws PortalException {
 		long rootResourcePrimKey = getRootResourcePrimKey();
 

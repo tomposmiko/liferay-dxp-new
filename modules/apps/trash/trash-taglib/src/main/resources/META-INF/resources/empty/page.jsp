@@ -17,7 +17,6 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String confirmMessage = (String)request.getAttribute("liferay-trash:empty:confirmMessage");
 String infoMessage = (String)request.getAttribute("liferay-trash:empty:infoMessage");
 int totalEntries = GetterUtil.getInteger(request.getAttribute("liferay-trash:empty:totalEntries"));
 %>
@@ -35,9 +34,9 @@ int totalEntries = GetterUtil.getInteger(request.getAttribute("liferay-trash:emp
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
 			<clay:button
-				cssClass="trash-empty-button"
+				cssClass="align-baseline p-0"
 				displayType="link"
-				id='<%= liferayPortletResponse.getNamespace() + "empty" %>'
+				id='<%= namespace + "empty" %>'
 				label='<%= (String)request.getAttribute("liferay-trash:empty:emptyMessage") %>'
 				small="<%= true %>"
 				type="submit"
@@ -58,7 +57,8 @@ int totalEntries = GetterUtil.getInteger(request.getAttribute("liferay-trash:emp
 			event.preventDefault();
 
 			Liferay.Util.openConfirmModal({
-				message: '<%= UnicodeLanguageUtil.get(request, confirmMessage) %>',
+				message:
+					'<liferay-ui:message key='<%= (String)request.getAttribute("liferay-trash:empty:confirmMessage") %>' />',
 				onConfirm: (isConfirmed) => {
 					if (isConfirmed) {
 						var form = document.getElementById(

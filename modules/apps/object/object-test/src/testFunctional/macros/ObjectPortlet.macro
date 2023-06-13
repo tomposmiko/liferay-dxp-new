@@ -8,11 +8,12 @@ definition {
 			locator1 = "ObjectPortlet#ENTRY_FIELD_GENERIC",
 			value1 = "${entry}");
 
-		Button.clickSave();
-
-		WaitForSPARefresh();
-
-		WaitForPageLoad();
+		if ("${invalidEntry}" == "true") {
+			Button.clickSave();
+		}
+		else {
+			PortletEntry.save();
+		}
 	}
 
 	macro addSingleFieldEntryViaUI {
@@ -22,11 +23,12 @@ definition {
 			locator1 = "ObjectPortlet#ADD_OBJECT_ENTRY",
 			value1 = "${entry}");
 
-		Button.clickSave();
-
-		WaitForSPARefresh();
-
-		WaitForPageLoad();
+		if ("${invalidEntry}" == "true") {
+			Button.clickSave();
+		}
+		else {
+			PortletEntry.save();
+		}
 	}
 
 	macro assertAuthorColumnDisplaysUserName {
@@ -276,6 +278,12 @@ definition {
 		Click(
 			key_picklistOption = "${entryOption}",
 			locator1 = "ObjectAdmin#ENTRY_PICKLIST_OPTION");
+
+		if (IsElementPresent(key_feedbackMessage = "The field value is invalid.", locator1 = "Form#FEEDBACK_MESSAGE")) {
+			WaitForElementNotPresent(
+				key_feedbackMessage = "The field value is invalid.",
+				locator1 = "Form#FEEDBACK_MESSAGE");
+		}
 	}
 
 	macro chooseEntryOnRelationshipFieldSpecific {
@@ -292,9 +300,15 @@ definition {
 			key_picklistOption = "${entryOption}",
 			locator1 = "ObjectAdmin#ENTRY_PICKLIST_OPTION");
 
-		Button.clickSave();
+		if (IsElementPresent(key_feedbackMessage = "The field value is invalid.", locator1 = "Form#FEEDBACK_MESSAGE")) {
+			WaitForElementNotPresent(
+				key_feedbackMessage = "The field value is invalid.",
+				locator1 = "Form#FEEDBACK_MESSAGE");
+		}
 
-		WaitForSPARefresh();
+		PortletEntry.save();
+
+		Navigator.gotoBack();
 	}
 
 	macro deleteEntry {
@@ -374,11 +388,7 @@ definition {
 			key_entry = "${newEntry}",
 			locator1 = "CreateObject#ENTRY_RELATIONSHIP_FIELD_OPTION");
 
-		Button.clickSave();
-
-		WaitForSPARefresh();
-
-		WaitForPageLoad();
+		PortletEntry.save();
 	}
 
 	macro selectSystemObject {
@@ -406,9 +416,7 @@ definition {
 
 		Check.checkNotVisible(locator1 = "//input[@type='checkbox']");
 
-		Button.clickSave();
-
-		WaitForSPARefresh();
+		PortletEntry.save();
 	}
 
 	macro updateEntry {
@@ -418,9 +426,12 @@ definition {
 			locator1 = "ObjectPortlet#ADD_OBJECT_ENTRY",
 			value1 = "${updateEntry}");
 
-		Button.clickSave();
-
-		WaitForSPARefresh();
+		if ("${invalidEntry}" == "true") {
+			Button.clickSave();
+		}
+		else {
+			PortletEntry.save();
+		}
 	}
 
 	macro viewClobEntryDetails {
@@ -455,9 +466,9 @@ definition {
 	macro viewEntryDetails {
 		var key_entry = "${entry}";
 
-		SelectFrameTop();
+		Refresh();
 
-		WaitForVisible(locator1 = "CommerceEntry#PAGINATION_RESULTS");
+		WaitForVisible(locator1 = "ObjectPortlet#ENTRY_VALUE");
 
 		if (IsElementPresent(locator1 = "ObjectPortlet#ENTRY_KEBAB_MENU")) {
 			Click(locator1 = "ObjectPortlet#ENTRY_KEBAB_MENU");

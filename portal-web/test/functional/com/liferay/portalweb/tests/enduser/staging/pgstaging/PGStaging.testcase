@@ -34,6 +34,7 @@ definition {
 		property custom.properties = "tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
+		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 
 		Staging.remoteStagingSetUp(siteName = "Site Name");
@@ -234,12 +235,6 @@ definition {
 			pageName = "Staging Test Page",
 			siteName = "Site Name");
 
-		Portlet.addPG(portletName = "Asset Publisher");
-
-		Navigator.gotoSitePage(
-			pageName = "Staging Test Page",
-			siteName = "Site Name");
-
 		Portlet.addPG(portletName = "Web Content Display");
 
 		WebContentDisplayPortlet.add(
@@ -254,6 +249,15 @@ definition {
 			menuItemList = "Edit Web Content",
 			webContentTitle = "Web Content Title");
 
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Asset Publisher Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Asset Publisher Page",
+			widgetName = "Asset Publisher");
+
 		JSONStaging.enableLocalStaging(
 			branchingPrivate = "true",
 			branchingPublic = "true",
@@ -265,21 +269,17 @@ definition {
 
 		WebContentDisplayPortlet.viewCannotEditWC(webContentTitle = "Web Content Title");
 
+		Navigator.gotoSitePage(
+			pageName = "Asset Publisher Page",
+			siteName = "Site Name");
+
 		WebContent.viewNoEditWCViaAP(assetTitle = "Web Content Title");
 
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		WebContent.viewNoEditWCCP(webContentTitle = "Web Content Title");
 
-		Navigator.openSiteURL(siteName = "Site Name");
-
-		Navigator.gotoStagedView();
-
-		ProductMenu.gotoPortlet(
-			category = "Publishing",
-			portlet = "Staging");
+		Staging.openStagingAdmin(siteURLKey = "site-name-staging");
 
 		Staging.deactivateStagingCP(siteName = "Site Name");
 

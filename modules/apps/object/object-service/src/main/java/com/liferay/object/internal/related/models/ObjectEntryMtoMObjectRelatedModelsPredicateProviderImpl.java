@@ -15,17 +15,16 @@
 package com.liferay.object.internal.related.models;
 
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectRelationshipMappingTable;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectRelationship;
-import com.liferay.object.related.models.ObjectRelatedModelsPredicateProvider;
 import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
-import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.exception.PortalException;
 
@@ -35,19 +34,13 @@ import java.util.Map;
  * @author Luis Miguel Barcos
  */
 public class ObjectEntryMtoMObjectRelatedModelsPredicateProviderImpl
-	implements ObjectRelatedModelsPredicateProvider {
+	extends BaseObjectEntryObjectRelatedModelsPredicateProviderImpl {
 
 	public ObjectEntryMtoMObjectRelatedModelsPredicateProviderImpl(
 		ObjectDefinition objectDefinition,
 		ObjectFieldLocalService objectFieldLocalService) {
 
-		_objectDefinition = objectDefinition;
-		_objectFieldLocalService = objectFieldLocalService;
-	}
-
-	@Override
-	public String getClassName() {
-		return _objectDefinition.getClassName();
+		super(objectDefinition, objectFieldLocalService);
 	}
 
 	@Override
@@ -60,27 +53,20 @@ public class ObjectEntryMtoMObjectRelatedModelsPredicateProviderImpl
 			ObjectRelationship objectRelationship, Predicate predicate)
 		throws PortalException {
 
+		Column<?, ?> dynamicObjectDefinitionTableColumn =
+			getPKObjectFieldColumn(
+				getDynamicObjectDefinitionTable(objectDefinition),
+				objectDefinition);
+
 		ObjectDefinition relatedObjectDefinition =
 			ObjectDefinitionLocalServiceUtil.getObjectDefinition(
 				_getRelatedObjectDefinitionId(
-					_objectDefinition.getObjectDefinitionId(),
+					objectDefinition.getObjectDefinitionId(),
 					objectRelationship));
-
-		ObjectField relatedObjectDefinitionObjectField =
-			_objectFieldLocalService.getObjectField(
-				relatedObjectDefinition.getTitleObjectFieldId());
-
-		Table<?> relatedObjectTable = _objectFieldLocalService.getTable(
-			relatedObjectDefinition.getObjectDefinitionId(),
-			relatedObjectDefinitionObjectField.getName());
-
-		Column<?, ?> relatedObjectDefinitionTableColumn =
-			relatedObjectTable.getColumn(
-				relatedObjectDefinition.getPKObjectFieldName() + "_");
 
 		Map<String, String> pkObjectFieldDBColumnNames =
 			ObjectRelationshipUtil.getPKObjectFieldDBColumnNames(
-				_objectDefinition, relatedObjectDefinition,
+				objectDefinition, relatedObjectDefinition,
 				objectRelationship.isReverse());
 
 		DynamicObjectRelationshipMappingTable
@@ -92,36 +78,44 @@ public class ObjectEntryMtoMObjectRelatedModelsPredicateProviderImpl
 						"pkObjectFieldDBColumnName2"),
 					objectRelationship.getDBTableName());
 
-		ObjectField objectDefinitionField =
-			_objectFieldLocalService.getObjectField(
-				_objectDefinition.getTitleObjectFieldId());
+		Column<DynamicObjectRelationshipMappingTable, ?>
+			dynamicObjectRelationshipMappingTableColumn =
+				(Column<DynamicObjectRelationshipMappingTable, ?>)
+					getPKObjectFieldColumn(
+						dynamicObjectRelationshipMappingTable,
+						relatedObjectDefinition);
 
-		Table<?> objectTable = _objectFieldLocalService.getTable(
-			_objectDefinition.getObjectDefinitionId(),
-			objectDefinitionField.getName());
+		DynamicObjectDefinitionTable relatedDynamicObjectDefinitionTable =
+			getDynamicObjectDefinitionTable(relatedObjectDefinition);
+		DynamicObjectDefinitionTable relatedObjectDefinitionExtensionTable =
+			getExtensionDynamicObjectDefinitionTable(relatedObjectDefinition);
 
-		Column<?, ?> objectTableColumn = objectTable.getColumn(
-			_objectDefinition.getPKObjectFieldName() + "_");
-
-		Column<DynamicObjectRelationshipMappingTable, ?> relatedObjectColumn =
-			dynamicObjectRelationshipMappingTable.getColumn(
-				relatedObjectDefinition.getPKObjectFieldName() + "_");
-
-		Column<DynamicObjectRelationshipMappingTable, ?> objectColumn =
-			dynamicObjectRelationshipMappingTable.getColumn(
-				_objectDefinition.getPKObjectFieldName() + "_");
-
-		return objectTableColumn.in(
+		return dynamicObjectDefinitionTableColumn.in(
 			DSLQueryFactoryUtil.select(
-				objectColumn
+				getPKObjectFieldColumn(
+					dynamicObjectRelationshipMappingTable, objectDefinition)
 			).from(
 				dynamicObjectRelationshipMappingTable
 			).where(
-				relatedObjectColumn.in(
+				dynamicObjectRelationshipMappingTableColumn.in(
 					DSLQueryFactoryUtil.select(
-						relatedObjectDefinitionTableColumn
+						getPKObjectFieldColumn(
+							relatedDynamicObjectDefinitionTable,
+							relatedObjectDefinition)
 					).from(
-						relatedObjectTable
+						relatedDynamicObjectDefinitionTable
+					).innerJoinON(
+						ObjectEntryTable.INSTANCE,
+						ObjectEntryTable.INSTANCE.objectEntryId.eq(
+							relatedDynamicObjectDefinitionTable.
+								getPrimaryKeyColumn())
+					).innerJoinON(
+						relatedObjectDefinitionExtensionTable,
+						relatedDynamicObjectDefinitionTable.getPrimaryKeyColumn(
+						).eq(
+							relatedObjectDefinitionExtensionTable.
+								getPrimaryKeyColumn()
+						)
 					).where(
 						predicate
 					))
@@ -137,8 +131,5 @@ public class ObjectEntryMtoMObjectRelatedModelsPredicateProviderImpl
 
 		return objectRelationship.getObjectDefinitionId2();
 	}
-
-	private final ObjectDefinition _objectDefinition;
-	private final ObjectFieldLocalService _objectFieldLocalService;
 
 }

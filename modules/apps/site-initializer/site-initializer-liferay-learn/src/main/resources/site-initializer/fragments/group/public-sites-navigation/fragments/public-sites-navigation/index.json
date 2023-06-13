@@ -43,6 +43,24 @@
 					"type": "checkbox"
 				},
 				{
+					"dataType": "string",
+					"defaultValue": "NAVIGATION_PRIMARY",
+					"description": "Navigation DDM Template Key",
+					"label": "Navigation DDM Template Key",
+					"name": "navigationDDMTemplateKey",
+					"type": "select",
+					"typeOptions": {
+						"validValues": [
+							{
+								"value": "NAVIGATION_BASIC"
+							},
+							{
+								"value": "NAVIGATION_PRIMARY"
+							}
+						]
+					}
+				},
+				{
 					"dataType": "int",
 					"defaultValue": "0",
 					"description": "site-navigation-menu-id",

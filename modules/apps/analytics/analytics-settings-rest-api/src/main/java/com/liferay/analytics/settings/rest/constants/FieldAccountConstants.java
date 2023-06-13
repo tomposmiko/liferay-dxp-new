@@ -19,6 +19,15 @@ package com.liferay.analytics.settings.rest.constants;
  */
 public class FieldAccountConstants {
 
+	public static final String[] FIELD_ACCOUNT_DEFAULTS = {
+		"accountEntryId", "companyId", "userId", "userName", "createDate",
+		"modifiedDate", "defaultBillingAddressId", "defaultCPaymentMethodKey",
+		"defaultShippingAddressId", "parentAccountEntryId", "description",
+		"domains", "emailAddress", "logoId", "name", "restrictMembership",
+		"taxExemptionCode", "taxIdNumber", "type_", "status", "statusByUserId",
+		"statusByUserName", "statusDate"
+	};
+
 	public static final String[] FIELD_ACCOUNT_EXAMPLES = {
 		"asd-yrty", "12346-A", "12345", "12345", "12345", "johndoe",
 		"31st Oct 2008", "31st Oct 2008", "12345", "cash", "12345", "12345",

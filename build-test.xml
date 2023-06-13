@@ -754,6 +754,18 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 		</sequential>
 	</macrodef>
 
+	<macrodef name="get-docker-container-ip-address">
+		<attribute name="container.name" />
+		<attribute name="property.name" />
+
+		<sequential>
+			<exec executable="/bin/bash" outputproperty="@{property.name}">
+				<arg value="-c" />
+				<arg value="docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' @{container.name}" />
+			</exec>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="get-dxp-license-product-name">
 		<sequential>
 			<get-testcase-property property.name="dxp.license.file" />
@@ -2809,8 +2821,33 @@ server.detector.server.id=wildfly</echo>
 			<get-database-property property.name="database.url" />
 			<get-database-property property.name="database.username" />
 
+			<if>
+				<or>
+					<equals arg1="${database.type}" arg2="mariadb" />
+					<equals arg1="${database.type}" arg2="mysql" />
+				</or>
+				<then>
+					<property name="database.url.upgrade" value="${database.url}&amp;rewriteBatchedStatements=true" />
+				</then>
+				<elseif>
+					<equals arg1="${database.type}" arg2="postgresql" />
+					<then>
+						<property name="database.url.upgrade" value="${database.url}?reWriteBatchedInserts=true" />
+					</then>
+				</elseif>
+				<elseif>
+					<equals arg1="${database.type}" arg2="sqlserver" />
+					<then>
+						<property name="database.url.upgrade" value="${database.url};useBulkCopyForBatchInsert=true" />
+					</then>
+				</elseif>
+				<else>
+					<property name="database.url.upgrade" value="${database.url}" />
+				</else>
+			</if>
+
 			<echo file="${liferay.home}/tools/portal-tools-db-upgrade-client/portal-upgrade-database.properties">jdbc.default.driverClassName=${database.driver}
-jdbc.default.url=${database.url}
+jdbc.default.url=${database.url.upgrade}
 jdbc.default.username=${database.username}
 jdbc.default.password=${database.password}</echo>
 
@@ -6565,6 +6602,7 @@ go</echo>
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.3.21" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13.u1" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13.u33" />
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13.u43" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13.u44" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13.u45" />
 					</or>
@@ -7020,10 +7058,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 				<else>
 					<get-operating-system-property property.name="operating.system.host" />
 
-					<exec executable="/bin/bash" outputproperty="ip.address">
-						<arg value="-c" />
-						<arg value="docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${operating.system.host}" />
-					</exec>
+					<get-docker-container-ip-address container.name="${operating.system.host}" property.name="ip.address" />
 				</else>
 			</if>
 
@@ -7056,6 +7091,13 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 			<wait-for-docker-browser shell.condition="(: &lt;/dev/tcp/127.0.0.1/4444) &amp;> /dev/null &amp;&amp; (: &lt;/dev/tcp/127.0.0.1/22) &amp;> /dev/null" />
 
+			<if>
+				<isset property="env.JENKINS_HOME" />
+				<then>
+					<docker-copy dest.path="${browser.host}:/root/.ssh" src.path="/root/.ssh/." />
+				</then>
+			</if>
+
 			<docker-execute container="${browser.host}">
 				ssh -fN -4 -L 8080:${ip.address}:8080 ${browser.host}
 				ssh -fN -4 -L 8282:${ip.address}:8282 ${browser.host}
@@ -7066,6 +7108,8 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 				ssh -fN -4 -L 9202:${ip.address}:9202 ${browser.host}
 				ssh -fN -4 -L 10080:${ip.address}:10080 ${browser.host}
 				ssh -fN -4 -L 12080:${ip.address}:12080 ${browser.host}
+				ssh -fN -4 -L 18080:${ip.address}:18080 ${browser.host}
+				ssh -fN -4 -L 18443:${ip.address}:18443 ${browser.host}
 			</docker-execute>
 		</sequential>
 	</macrodef>
@@ -7128,9 +7172,12 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			</exec>
 
 			<if>
-				<not>
-					<equals arg1="${docker.start.result}" arg2="0" />
-				</not>
+				<or>
+					<contains string="${docker.start.error}" substring="Error" />
+					<not>
+						<equals arg1="${docker.start.result}" arg2="0" />
+					</not>
+				</or>
 				<then>
 					<fail>Unable to start docker container:
 ${docker.start.error}</fail>
@@ -7830,6 +7877,22 @@ ${docker.start.error}</fail>
 					<ant antfile="build-test-solr.xml" target="stop-solr-core" />
 				</then>
 			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="stop-test-smtp-server">
+		<sequential>
+			<exec executable="/bin/bash" outputproperty="java.pid">
+				<arg value="-c" />
+				<arg value="netstat -nlp | grep 8282 | cut -d/ -f1 | awk '{print $7}'" />
+			</exec>
+
+			<echo>java.pid is${java.pid}</echo>
+
+			<exec executable="/bin/bash">
+				<arg value="-c" />
+				<arg value="kill -9 ${java.pid}" />
+			</exec>
 		</sequential>
 	</macrodef>
 
@@ -8752,6 +8815,33 @@ go</echo>
 
 	<target name="check-config">
 		<check-config />
+	</target>
+
+	<target name="check-folder-in-lar">
+		<unzip
+			dest="${app.server.tomcat.temp.dir}"
+		>
+			<fileset
+				dir="${app.server.tomcat.temp.dir}"
+				includes="*.lar"
+			/>
+		</unzip>
+
+		<available file="${app.server.tomcat.temp.dir}/adaptive-media" property="folder.exists" type="dir" />
+
+		<if>
+			<equals arg1="${folder.exists}" arg2="true" />
+			<then>
+				<echo file="${liferay.home}/result.txt">
+				Folder found in lar file
+				</echo>
+			</then>
+			<else>
+				<echo file="${liferay.home}/result.txt">
+				Folder not found in lar file
+				</echo>
+			</else>
+		</if>
 	</target>
 
 	<target name="check-inet-address">
@@ -11979,6 +12069,7 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			liferay.app.server.shielded.container.lib.portal.dir=${app.server.shielded-container-lib.portal.dir}
 			liferay.app.server.portal.web.dir=${app.server.portal.dir}
 			logger.resources.url=${test.poshi.logger.resources.url}
+			operating.system.type=${operating.system.type}
 			output.dir.name=${selenium.output.dir.name}
 			product.names=${product.names}
 			project.dir=${project.dir}
@@ -12448,6 +12539,26 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		<prepare-selenium-site-initializer-raylife-d2c-paypal-properties />
 		<prepare-selenium-testcase-properties />
 
+		<get-browser-property property.name="browser.docker.image" />
+
+		<if>
+			<isset property="browser.docker.image" />
+			<then>
+				<get-browser-property property.name="browser.host" />
+
+				<get-docker-container-ip-address container.name="${browser.host}" property.name="browser.ip.address" />
+
+				<echo append="true" file="${test.ext.properties.file}">
+					browser.ip.address=${browser.ip.address}
+				</echo>
+			</then>
+			<else>
+				<echo append="true" file="${test.ext.properties.file}">
+					browser.ip.address=127.0.0.1
+				</echo>
+			</else>
+		</if>
+
 		<get-operating-system-property property.name="operating.system.docker.image" />
 
 		<if>
@@ -12606,13 +12717,24 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			</then>
 		</if>
 
+		<get-testcase-property property.name="ci.retries.disabled" />
+		<get-testcase-property property.name="test.jvm.max.retries" />
+
 		<if>
-			<isset property="test.jvm.max.retries" />
+			<equals arg1="${ci.retries.disabled}" arg2="true" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
-					test.jvm.max.retries=${test.jvm.max.retries}
+					test.jvm.max.retries=0
 				</echo>
 			</then>
+			<elseif>
+				<isset property="test.jvm.max.retries" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						test.jvm.max.retries=${test.jvm.max.retries}
+					</echo>
+				</then>
+			</elseif>
 		</if>
 
 		<if>
@@ -12633,13 +12755,24 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			</then>
 		</if>
 
+		<get-testcase-property property.name="ci.retries.disabled" />
+		<get-testcase-property property.name="test.testcase.max.retries" />
+
 		<if>
-			<isset property="test.testcase.max.retries" />
+			<equals arg1="${ci.retries.disabled}" arg2="true" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
-					test.testcase.max.retries=${test.testcase.max.retries}
+					test.testcase.max.retries=0
 				</echo>
 			</then>
+			<elseif>
+				<isset property="test.testcase.max.retries" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						test.testcase.max.retries=${test.testcase.max.retries}
+					</echo>
+				</then>
+			</elseif>
 		</if>
 	</target>
 
@@ -13736,7 +13869,24 @@ go</echo>
 						docker exec ${database.host} /bin/bash /tmp/import-database.sh
 					]]>
 				</execute>
+
+				<get-testcase-property property.name="custom.mysql.sql.statement" />
+
+				<if>
+					<and>
+						<equals arg1="${database.type}" arg2="mysql" />
+						<isset property="custom.mysql.sql.statement" />
+					</and>
+					<then>
+						<sql classpath="${app.server.shielded-container-lib.portal.dir}/${jdbc.mysql.driver}" driver="${database.mysql.driver}" onerror="continue" output="output.txt" password="${database.mysql.password}" print="true" url="${database.mysql.url}" userid="${database.mysql.username}">
+							<![CDATA[
+								${custom.mysql.sql.statement}
+							]]>
+						</sql>
+					</then>
+				</if>
 			</then>
+
 			<else>
 				<if>
 					<equals arg1="${database.type}" arg2="db2" />
@@ -13823,6 +13973,22 @@ go</echo>
 							</retry>
 
 							<exec executable="mysql_upgrade" />
+
+							<get-testcase-property property.name="custom.mysql.sql.statement" />
+
+							<if>
+								<and>
+									<equals arg1="${database.type}" arg2="mysql" />
+									<isset property="custom.mysql.sql.statement" />
+								</and>
+								<then>
+									<sql classpath="${app.server.shielded-container-lib.portal.dir}/${jdbc.mysql.driver}" driver="${database.mysql.driver}" onerror="continue" output="output.txt" password="${database.mysql.password}" print="true" url="${database.mysql.url}" userid="${database.mysql.username}">
+										<![CDATA[
+											${custom.mysql.sql.statement}
+										]]>
+									</sql>
+								</then>
+							</if>
 						</then>
 					</elseif>
 					<elseif>
@@ -14813,6 +14979,7 @@ mail.send.blacklist=</echo>
 		</if>
 
 		<get-testcase-property property.name="portal.version" />
+		<get-testcase-property property.name="rebuild.staging.database" />
 		<get-testcase-property property.name="skip.upgrade-legacy-database" />
 
 		<if>
@@ -14829,6 +14996,12 @@ mail.send.blacklist=</echo>
 					</then>
 				</if>
 			</then>
+			<elseif>
+				<equals arg1="${rebuild.staging.database}" arg2="true" />
+				<then>
+					<ant antfile="build-test-staging-mysql.xml" target="rebuild-staging-database" />
+				</then>
+			</elseif>
 			<else>
 				<antcall inheritAll="false" target="rebuild-database" />
 			</else>
@@ -15091,6 +15264,15 @@ mail.send.blacklist=</echo>
 			</and>
 			<then>
 				<antcall target="deploy-osgi-module-configurations" />
+			</then>
+		</if>
+
+		<get-browser-property property.name="browser.docker.image" />
+
+		<if>
+			<isset property="browser.docker.image" />
+			<then>
+				<echo append="true" file="${liferay.home}/osgi/configs/com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration.config">${line.separator}additionalConfigurations="http.host:\ _local_,_site_"</echo>
 			</then>
 		</if>
 
@@ -16107,7 +16289,23 @@ url=${short.hostname}:8080</echo>
 	</target>
 
 	<target name="start-test-smtp-server">
-		<start-test-smtp-server />
+		<exec executable="/bin/bash" outputproperty="output">
+			<arg value="-c" />
+			<arg value="netstat -nlp | grep 8282" />
+		</exec>
+		<echo>output is${output}</echo>
+		<if>
+			<not>
+				<equals arg1="${output}" arg2="" />
+			</not>
+			<then>
+				<stop-test-smtp-server />
+				<start-test-smtp-server />
+			</then>
+			<else>
+				<start-test-smtp-server />
+			</else>
+		</if>
 	</target>
 
 	<target name="stop-app-server">
@@ -16259,6 +16457,24 @@ url=${short.hostname}:8080</echo>
 
 		<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
 
+		<get-testcase-property property.name="custom.startup.timeout" />
+
+		<if>
+			<isset property="custom.startup.timeout" />
+			<then>
+				<math
+					datatype="int"
+					operand1="${custom.startup.timeout}"
+					operand2="1000"
+					operation="*"
+					result="upgrade.client.timeout"
+				/>
+			</then>
+			<else>
+				<property name="upgrade.client.timeout" value="900000" />
+			</else>
+		</if>
+
 		<trycatch property="upgrade.error">
 			<try>
 				<if>
@@ -16269,7 +16485,7 @@ url=${short.hostname}:8080</echo>
 							failonerror="true"
 							fork="true"
 							jar="${liferay.home}/tools/portal-tools-db-upgrade-client/com.liferay.portal.tools.db.upgrade.client.jar"
-							timeout="900000"
+							timeout="${upgrade.client.timeout}"
 						>
 							<env key="JAVA_HOME" value="${java.jdk.home}" />
 							<env key="WAS_HOME" value="${app.server.dir}" />
@@ -16281,7 +16497,7 @@ url=${short.hostname}:8080</echo>
 							failonerror="true"
 							fork="true"
 							jar="${liferay.home}/tools/portal-tools-db-upgrade-client/com.liferay.portal.tools.db.upgrade.client.jar"
-							timeout="900000"
+							timeout="${upgrade.client.timeout}"
 						>
 							<env key="JAVA_HOME" value="${java.jdk.home}" />
 						</java>
@@ -16293,7 +16509,15 @@ url=${short.hostname}:8080</echo>
 					<param name="process.name" value="DBUpgrader" />
 				</antcall>
 
-				<fail message="${upgrade.error}" />
+				<if>
+					<isset property="custom.startup.timeout" />
+					<then>
+						<fail message="${upgrade.error}. Failed to complete the upgrade in ${custom.startup.timeout} seconds." />
+					</then>
+					<else>
+						<fail message="${upgrade.error}" />
+					</else>
+				</if>
 			</catch>
 		</trycatch>
 	</target>

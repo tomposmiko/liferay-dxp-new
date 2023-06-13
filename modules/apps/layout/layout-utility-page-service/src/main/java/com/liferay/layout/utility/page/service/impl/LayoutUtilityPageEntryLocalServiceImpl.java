@@ -15,7 +15,6 @@
 package com.liferay.layout.utility.page.service.impl;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
-import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.layout.utility.page.exception.LayoutUtilityPageEntryNameException;
 import com.liferay.layout.utility.page.model.LayoutUtilityPageEntry;
@@ -33,8 +32,6 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
-import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
-import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
@@ -139,14 +136,23 @@ public class LayoutUtilityPageEntryLocalServiceImpl
 			groupId, sourceLayoutUtilityPageEntry.getName(),
 			sourceLayoutUtilityPageEntry.getType(), serviceContext.getLocale());
 
+		LayoutUtilityPageEntry layoutUtilityPageEntry =
+			addLayoutUtilityPageEntry(
+				null, userId, serviceContext.getScopeGroupId(), 0, 0, false,
+				name, sourceLayoutUtilityPageEntry.getType(), 0);
+
 		long previewFileEntryId = _copyPreviewFileEntryId(
-			userId, sourceLayoutUtilityPageEntry.getPreviewFileEntryId(), name,
+			userId, layoutUtilityPageEntry.getLayoutUtilityPageEntryId(),
+			sourceLayoutUtilityPageEntry.getPreviewFileEntryId(),
 			serviceContext);
 
-		return addLayoutUtilityPageEntry(
-			null, userId, serviceContext.getScopeGroupId(), 0,
-			previewFileEntryId, false, name,
-			sourceLayoutUtilityPageEntry.getType(), 0);
+		if (previewFileEntryId > 0) {
+			layoutUtilityPageEntry = updateLayoutUtilityPageEntry(
+				layoutUtilityPageEntry.getLayoutUtilityPageEntryId(),
+				previewFileEntryId);
+		}
+
+		return layoutUtilityPageEntry;
 	}
 
 	@Override
@@ -182,11 +188,24 @@ public class LayoutUtilityPageEntryLocalServiceImpl
 		// Portlet file entry
 
 		if (layoutUtilityPageEntry.getPreviewFileEntryId() > 0) {
-			PortletFileRepositoryUtil.deletePortletFileEntry(
+			_portletFileRepository.deletePortletFileEntry(
 				layoutUtilityPageEntry.getPreviewFileEntryId());
 		}
 
 		return layoutUtilityPageEntry;
+	}
+
+	@Override
+	public LayoutUtilityPageEntry deleteLayoutUtilityPageEntry(
+			long layoutUtilityPageEntryId)
+		throws PortalException {
+
+		LayoutUtilityPageEntry layoutUtilityPageEntry =
+			layoutUtilityPageEntryLocalService.fetchLayoutUtilityPageEntry(
+				layoutUtilityPageEntryId);
+
+		return layoutUtilityPageEntryLocalService.deleteLayoutUtilityPageEntry(
+			layoutUtilityPageEntry);
 	}
 
 	@Override
@@ -355,7 +374,7 @@ public class LayoutUtilityPageEntryLocalServiceImpl
 	}
 
 	private long _copyPreviewFileEntryId(
-			long userId, long previewFileEntryId, String name,
+			long userId, long layoutUtilityPageEntryId, long previewFileEntryId,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -366,13 +385,10 @@ public class LayoutUtilityPageEntryLocalServiceImpl
 		DLFileEntry dlFileEntry = _dlFileEntryLocalService.getFileEntry(
 			previewFileEntryId);
 
-		Folder folder = _portletFileRepository.addPortletFolder(
-			userId, dlFileEntry.getRepositoryId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, name, serviceContext);
-
 		DLFileEntry copyDLFileEntry = _dlFileEntryLocalService.copyFileEntry(
 			userId, dlFileEntry.getGroupId(), dlFileEntry.getRepositoryId(),
-			previewFileEntryId, folder.getFolderId(), serviceContext);
+			previewFileEntryId, dlFileEntry.getFolderId(),
+			layoutUtilityPageEntryId + "_preview", serviceContext);
 
 		return copyDLFileEntry.getFileEntryId();
 	}

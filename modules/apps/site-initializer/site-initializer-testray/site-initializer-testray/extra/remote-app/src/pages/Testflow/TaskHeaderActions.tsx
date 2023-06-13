@@ -19,49 +19,81 @@ import {KeyedMutator} from 'swr';
 
 import useFormModal from '../../hooks/useFormModal';
 import i18n from '../../i18n';
+import {Liferay} from '../../services/liferay';
 import {
+	APIResponse,
+	TestraySubTask,
 	TestrayTask,
 	TestrayTaskUser,
 	testrayTaskImpl,
+	testrayTaskUsersImpl,
 } from '../../services/rest';
-import TestflowAssignUserModal from './modal';
+import {TaskStatuses} from '../../util/statuses';
+import TestflowAssignUserModal, {TestflowAssigUserType} from './modal';
 
 type OutletContext = {
-	mutateTask: KeyedMutator<any>;
-	mutateTaskUsers: KeyedMutator<TestrayTaskUser>;
-	taskUser: number[];
-	testrayTask: TestrayTask;
+	data: {
+		testraySubtasks: APIResponse<TestraySubTask>;
+		testrayTask: TestrayTask & {
+			actions: {
+				[key: string]: string;
+			};
+		};
+		testrayTaskUser: TestrayTaskUser[];
+	};
+	mutate: {
+		mutateTask: KeyedMutator<TestrayTask>;
+		mutateTaskUser: KeyedMutator<APIResponse<TestrayTaskUser>>;
+	};
+	revalidate: {revalidateTaskUser: () => void};
 };
 
 const TaskHeaderActions = () => {
 	const {
-		mutateTask,
-		mutateTaskUsers,
-		taskUser,
-		testrayTask,
+		data: {testraySubtasks, testrayTask, testrayTaskUser},
+		mutate: {mutateTask},
+		revalidate: {revalidateTaskUser},
 	} = useOutletContext<OutletContext>();
 
-	const [modalType, setModalType] = useState('assign-users');
-	const [users, setUsers] = useState<number[]>([]);
-	const {modal} = useFormModal({
-		onSave: (userIds: number[]) =>
-			testrayTaskImpl
-				.assignTo(testrayTask, userIds)
-				.then(mutateTask)
-				.then(mutateTaskUsers),
+	const subTaskAllCompleted = testraySubtasks?.totalCount === 0;
+
+	const [modalType, setModalType] = useState<TestflowAssigUserType>(
+		'select-users'
+	);
+	const [userIds, setUsersId] = useState<number[]>([]);
+	const {modal} = useFormModal<number[]>({
+		onBeforeSave: (newUserIds, act) => {
+			if (!newUserIds.length) {
+				return Liferay.Util.openToast({
+					message: i18n.translate(
+						'mark-at-least-one-user-for-assignment'
+					),
+					type: 'danger',
+				});
+			}
+
+			act();
+		},
+		onSave: async (newUserIds) => {
+			await testrayTaskUsersImpl.assign(testrayTask.id, newUserIds);
+
+			revalidateTaskUser();
+		},
 	});
 
 	const navigate = useNavigate();
 
-	const onOpenModal = (option: 'select-users') => {
-		setModalType(option);
+	const onOpenModal = (type: TestflowAssigUserType) => {
+		setModalType(type);
 
-		modal.open(users);
+		modal.open(userIds);
 	};
 
 	useEffect(() => {
-		setUsers(taskUser);
-	}, [setUsers, taskUser]);
+		if (testrayTaskUser) {
+			setUsersId(testrayTaskUser.map(({user}) => user?.id as number));
+		}
+	}, [setUsersId, testrayTaskUser]);
 
 	return (
 		<>
@@ -81,17 +113,83 @@ const TaskHeaderActions = () => {
 					{i18n.sub('edit-x', 'task')}
 				</ClayButton>
 
-				<ClayButton
-					displayType="secondary"
-					onClick={() =>
-						testrayTaskImpl.abandon(testrayTask).then(mutateTask)
-					}
-				>
-					{i18n.translate('abandon')}
-				</ClayButton>
+				{[TaskStatuses.ABANDONED, TaskStatuses.COMPLETE].includes(
+					testrayTask.dueStatus.key as TaskStatuses
+				) ? (
+					<ClayButton.Group spaced>
+						<ClayButton
+							displayType="secondary"
+							onClick={async () => {
+								const response = await testrayTaskImpl.reanalyze(
+									testrayTask
+								);
+
+								mutateTask(response);
+
+								await testrayTaskUsersImpl.assign(
+									response.id,
+									Number(Liferay.ThemeDisplay.getUserId())
+								);
+
+								revalidateTaskUser();
+							}}
+						>
+							{i18n.translate('reanalyze')}
+						</ClayButton>
+
+						{testrayTask.actions?.delete && (
+							<ClayButton
+								displayType="secondary"
+								onClick={async () => {
+									if (
+										!confirm(
+											i18n.translate(
+												'are-you-sure-you-want-to-delete-this-item'
+											)
+										)
+									) {
+										return;
+									}
+
+									await testrayTaskImpl.remove(
+										testrayTask.id
+									);
+
+									navigate('/testflow');
+
+									Liferay.Util.openToast({
+										message: i18n.translate(
+											'your-request-completed-successfully'
+										),
+										type: 'success',
+									});
+								}}
+							>
+								{i18n.translate('delete')}
+							</ClayButton>
+						)}
+					</ClayButton.Group>
+				) : (
+					<ClayButton
+						displayType="secondary"
+						onClick={() => {
+							const fn = subTaskAllCompleted
+								? (task: TestrayTask) =>
+										testrayTaskImpl.complete(task)
+								: (task: TestrayTask) =>
+										testrayTaskImpl.abandon(task);
+
+							fn(testrayTask).then(mutateTask);
+						}}
+					>
+						{i18n.translate(
+							subTaskAllCompleted ? 'complete' : 'abandon'
+						)}
+					</ClayButton>
+				)}
 			</ClayButton.Group>
 
-			<TestflowAssignUserModal modal={modal} type={modalType as any} />
+			<TestflowAssignUserModal modal={modal} type={modalType} />
 		</>
 	);
 };

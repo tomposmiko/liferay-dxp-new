@@ -39,6 +39,7 @@ import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
@@ -54,6 +55,7 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
@@ -237,8 +239,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		return new ObjectEntryResourceImpl(
 			_filterPredicateFactory, _jsonFactory, _objectActionEngine,
 			_objectDefinitionLocalService, _objectEntryLocalService,
-			_objectEntryManagerRegistry, _objectFieldLocalService,
-			_objectRelationshipService, _objectScopeProviderRegistry,
+			_objectEntryManagerRegistry, _objectEntryService,
+			_objectFieldLocalService, _objectRelationshipService,
+			_objectScopeProviderRegistry,
 			_systemObjectDefinitionMetadataRegistry);
 	}
 
@@ -428,7 +431,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 								_objectDefinitionLocalService,
 								_objectEntryManagerRegistry,
 								_objectRelatedModelsProviderRegistry,
-								_objectRelationshipService);
+								_objectRelationshipService,
+								_persistedModelLocalServiceRegistry);
 						}
 
 						@Override
@@ -601,6 +605,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private ObjectEntryOpenAPIResource _objectEntryOpenAPIResource;
 
 	@Reference
+	private ObjectEntryService _objectEntryService;
+
+	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Reference
@@ -615,6 +622,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 	@Reference
 	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
+
+	@Reference
+	private PersistedModelLocalServiceRegistry
+		_persistedModelLocalServiceRegistry;
 
 	@Reference
 	private Portal _portal;

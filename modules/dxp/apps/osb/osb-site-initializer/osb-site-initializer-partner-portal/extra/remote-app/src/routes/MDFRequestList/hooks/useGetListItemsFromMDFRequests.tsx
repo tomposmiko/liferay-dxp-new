@@ -28,16 +28,15 @@ export default function useGetListItemsFromMDFRequests(
 	const listItems = useMemo(
 		() =>
 			swrResponse.data?.items.map((item) => ({
-				...getSummaryMDFClaims(item.mdfRequestToMdfClaims),
+				...getSummaryMDFClaims(item.mdfReqToMDFClms),
 				[MDFColumnKey.ID]: String(item.id),
 				[MDFColumnKey.NAME]: item.overallCampaignName,
 				...getMDFActivityPeriod(
 					item.minDateActivity,
 					item.maxDateActivity
 				),
-				[MDFColumnKey.STATUS]: item.requestStatus,
-				[MDFColumnKey.PARTNER]:
-					item.r_accountToMDFRequests_accountEntry?.name,
+				[MDFColumnKey.STATUS]: item.mdfRequestStatus?.name,
+				[MDFColumnKey.PARTNER]: item.companyName,
 				...getMDFDates(item.dateCreated, item.dateModified),
 				...getMDFBudgetInfos(
 					item.totalCostOfExpense,

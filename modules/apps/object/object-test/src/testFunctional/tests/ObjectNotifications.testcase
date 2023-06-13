@@ -49,13 +49,14 @@ definition {
 			ObjectNotifications.addNewNotificationTemplate(
 				fromAddress = "test@liferay",
 				fromName = "Test Test",
-				name = "Notification Template");
+				name = "Notification Template",
+				notificationType = "Email");
 		}
 
 		task ("When an attachment is added to the notification template") {
 			ObjectNotifications.addNotificationTemplateAttachment(objectLabel = "Custom Object 161924");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		task ("Then the attachment should be present in the notification template") {
@@ -92,9 +93,10 @@ definition {
 				fromAddress = "Liferay",
 				fromName = "Test Test",
 				name = "Notification Template",
+				notificationType = "Email",
 				subject = "Subject");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		task ("Then the Notification Template is saved with the correct values") {
@@ -140,13 +142,14 @@ definition {
 			ObjectNotifications.addNewNotificationTemplate(
 				fromAddress = "test@liferay",
 				fromName = "Test Test",
-				name = "Notification Template");
+				name = "Notification Template",
+				notificationType = "Email");
 		}
 
 		task ("And given an attachment is added to the notification template") {
 			ObjectNotifications.addNotificationTemplateAttachment(objectLabel = "Custom Object 161928");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		task ("When the attachment is deleted from the notification template") {
@@ -179,9 +182,10 @@ definition {
 				fromAddress = "Liferay",
 				fromName = "Test Test",
 				name = "Notification Template",
+				notificationType = "Email",
 				subject = "Subject");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		task ("Delete the Notification Template") {
@@ -212,9 +216,10 @@ definition {
 				fromAddress = "Liferay",
 				fromName = "Test Test",
 				name = "Notification Template",
+				notificationType = "Email",
 				subject = "Subject");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		task ("And given an object with an attachment field is created") {
@@ -244,7 +249,8 @@ definition {
 			ObjectAdmin.goToActionsTab();
 
 			ObjectAdmin.addObjectActionViaUI(
-				actionName = "Custom Action",
+				actionLabel = "Custom Action",
+				actionName = "CustomAction",
 				active = "true",
 				inputMethod = "true",
 				inputValue = "Action shot on add",
@@ -294,9 +300,10 @@ definition {
 				fromAddress = "Liferay",
 				fromName = "Test Test",
 				name = "Notification Template",
+				notificationType = "Email",
 				subject = "Subject");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		task ("Edit the created notification Template") {
@@ -304,7 +311,7 @@ definition {
 				name = "New Notification Edited",
 				notificationTemplateName = "Notification Template");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		task ("Assert only the edited Notification Template is present") {
@@ -336,9 +343,10 @@ definition {
 					fromAddress = "Liferay",
 					fromName = "Test Test",
 					name = "Notification ${templateName}",
+					notificationType = "Email",
 					subject = "Subject");
 
-				Button.clickSave();
+				PortletEntry.save();
 			}
 		}
 
@@ -384,9 +392,10 @@ definition {
 				fromAddress = "Liferay",
 				fromName = "Test Test",
 				name = "Notification Template",
+				notificationType = "Email",
 				subject = "Subject");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		task ("Create a Custom Object and add a field") {
@@ -416,12 +425,13 @@ definition {
 			ObjectAdmin.gotoAddObjectAction();
 
 			ObjectAdmin.fillObjectAction(
-				actionName = "Action Name",
+				actionLabel = "Action Label",
+				actionName = "ActionName",
 				notificationName = "Notification Template",
 				thenAction = "Notification",
 				whenAction = "On After Add");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		task ("Go to the created Object and add an Entry") {

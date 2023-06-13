@@ -15,6 +15,8 @@
 package com.liferay.portal.bootstrap;
 
 import com.liferay.petra.io.BigEndianCodec;
+import com.liferay.petra.process.ProcessExecutor;
+import com.liferay.petra.process.local.LocalProcessExecutor;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
@@ -314,8 +316,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			ReflectionUtil.throwException(frameworkEvent.getThrowable());
 		}
 
-		_framework.stop();
-
 		BundleContext bundleContext = _framework.getBundleContext();
 
 		ServiceReference<LogReaderService> serviceReference =
@@ -329,6 +329,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		}
 
 		bundleContext.removeBundleListener(_bundleListener);
+
+		_framework.stop();
 
 		frameworkEvent = _framework.waitForStop(timeout);
 
@@ -1594,18 +1596,13 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			_log.debug("Setting up required service");
 		}
 
+		bundleContext.registerService(
+			ProcessExecutor.class, new LocalProcessExecutor(), null);
+
 		Props props = PropsUtil.getProps();
 
-		ServiceRegistration<Props> serviceRegistration =
-			bundleContext.registerService(
-				Props.class, props,
-				_getProperties(props, Props.class.getName()));
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"Registered required service as " +
-					serviceRegistration.getReference());
-		}
+		bundleContext.registerService(
+			Props.class, props, _getProperties(props, Props.class.getName()));
 	}
 
 	private void _startConfigurationBundles(Collection<Bundle> bundles)

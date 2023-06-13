@@ -218,7 +218,7 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static void cancelQueuedItem(
-		int itemID, JenkinsMaster jenkinsMaster) {
+		long itemID, JenkinsMaster jenkinsMaster) {
 
 		StringBuilder sb = new StringBuilder();
 
@@ -1252,7 +1252,7 @@ public class JenkinsResultsParserUtil {
 		Properties buildProperties = null;
 
 		try {
-			buildProperties = getBuildProperties();
+			buildProperties = getBuildProperties(false);
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(
@@ -3556,7 +3556,7 @@ public class JenkinsResultsParserUtil {
 
 			toString(sb.toString());
 
-			cancelQueuedItem(itemJSONObject.getInt("id"), jenkinsMaster);
+			cancelQueuedItem(itemJSONObject.getLong("id"), jenkinsMaster);
 		}
 	}
 
@@ -4202,24 +4202,28 @@ public class JenkinsResultsParserUtil {
 						buildProperties.getProperty("spira.admin.user.name"));
 				}
 
-				if (url.matches("https://test-\\d+-\\d+.liferay.com/.+")) {
+				if ((httpAuthorizationHeader == null) &&
+					url.matches(
+						"https?:\\/\\/test-[135]-\\d+(?:\\.liferay\\.com)?.*?" +
+							"|http:\\/\\/localhost:8081.*?")) {
+
 					if (isCINode()) {
 						url = getLocalURL(url);
-
-						httpAuthorizationHeader = null;
 					}
-					else {
-						if (httpAuthorizationHeader == null) {
-							Properties buildProperties = getBuildProperties();
 
-							httpAuthorizationHeader =
-								new BasicHTTPAuthorization(
-									buildProperties.getProperty(
-										"jenkins.admin.user.password"),
-									buildProperties.getProperty(
-										"jenkins.admin.user.name"));
-						}
+					Properties buildProperties = getBuildProperties();
+
+					String jenkinsAdminUserToken = buildProperties.getProperty(
+						"jenkins.admin.user.token");
+
+					if (url.matches("https?:\\/\\/test-1-0.*")) {
+						jenkinsAdminUserToken = buildProperties.getProperty(
+							"jenkins.admin.user.token[test-1-0]");
 					}
+
+					httpAuthorizationHeader = new BasicHTTPAuthorization(
+						jenkinsAdminUserToken,
+						buildProperties.getProperty("jenkins.admin.user.name"));
 				}
 
 				boolean testrayRequest = false;
@@ -5918,6 +5922,11 @@ public class JenkinsResultsParserUtil {
 				else {
 					if (!redactToken.isEmpty()) {
 						_redactTokens.add(redactToken);
+
+						if (redactToken.contains("\\")) {
+							_redactTokens.add(
+								redactToken.replace("\\", "\\\\"));
+						}
 					}
 				}
 			}

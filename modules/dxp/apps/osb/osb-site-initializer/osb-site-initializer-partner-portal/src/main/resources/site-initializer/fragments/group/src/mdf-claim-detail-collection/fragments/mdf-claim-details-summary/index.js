@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -9,9 +8,16 @@
  * permissions and limitations under the License, including but not limited to
  * distribution rights of the Software.
  */
+/* eslint-disable no-undef */
+
+const findRequestIdUrl = (paramsUrl) => {
+	const splitParamsUrl = paramsUrl.split('?');
+
+	return splitParamsUrl[0];
+};
 
 const currentPath = Liferay.currentURL.split('/');
-const mdfClaimId = +currentPath.at(-1);
+const mdfClaimId = findRequestIdUrl(currentPath.at(-1));
 
 const getMDFClaimSummary = async () => {
 	// eslint-disable-next-line @liferay/portal/no-global-fetch
@@ -32,9 +38,7 @@ const getMDFClaimSummary = async () => {
 		const paymentReceived = formatCurrency(
 			Liferay.Util.escape(data.paymentReceived)
 		);
-		const type = Liferay.Util.escape(
-			data.partial === 'true' ? 'Partial' : 'Full'
-		);
+		const type = Liferay.Util.escape(data.partial ? 'Partial' : 'Full');
 
 		fragmentElement.querySelector('#mdf-claim-type').innerHTML = type;
 		fragmentElement.querySelector(
@@ -60,6 +64,6 @@ const formatCurrency = (value) =>
 		style: 'currency',
 	}).format(value);
 
-if (layoutMode !== 'edit') {
+if (layoutMode !== 'edit' && !isNaN(mdfClaimId)) {
 	getMDFClaimSummary();
 }

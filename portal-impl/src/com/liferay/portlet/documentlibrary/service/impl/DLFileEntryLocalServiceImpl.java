@@ -571,12 +571,16 @@ public class DLFileEntryLocalServiceImpl
 	@Override
 	public DLFileEntry copyFileEntry(
 			long userId, long groupId, long repositoryId, long fileEntryId,
-			long destFolderId, ServiceContext serviceContext)
+			long destFolderId, String fileName, ServiceContext serviceContext)
 		throws PortalException {
 
 		DLFileEntry dlFileEntry = getFileEntry(fileEntryId);
 
 		String sourceFileName = "A";
+
+		if (!Validator.isBlank(fileName)) {
+			sourceFileName = fileName;
+		}
 
 		String extension = dlFileEntry.getExtension();
 
@@ -585,14 +589,20 @@ public class DLFileEntryLocalServiceImpl
 				sourceFileName, StringPool.PERIOD, extension);
 		}
 
+		String title = dlFileEntry.getTitle();
+
+		if (!Validator.isBlank(fileName)) {
+			title = fileName;
+		}
+
 		InputStream inputStream = DLStoreUtil.getFileAsStream(
 			dlFileEntry.getCompanyId(), dlFileEntry.getDataRepositoryId(),
 			dlFileEntry.getName());
 
 		DLFileEntry newDLFileEntry = addFileEntry(
 			null, userId, groupId, repositoryId, destFolderId, sourceFileName,
-			dlFileEntry.getMimeType(), dlFileEntry.getTitle(),
-			dlFileEntry.getTitle(), dlFileEntry.getDescription(), null,
+			dlFileEntry.getMimeType(), title, title,
+			dlFileEntry.getDescription(), null,
 			dlFileEntry.getFileEntryTypeId(), null, null, inputStream,
 			dlFileEntry.getSize(), dlFileEntry.getExpirationDate(),
 			dlFileEntry.getReviewDate(), serviceContext);
@@ -1181,6 +1191,13 @@ public class DLFileEntryLocalServiceImpl
 	@Override
 	public List<DLFileEntry> getFileEntries(long folderId, String name) {
 		return dlFileEntryPersistence.findByF_N(folderId, name);
+	}
+
+	@Override
+	public List<DLFileEntry> getFileEntriesByClassNameIdAndTreePath(
+		long classNameId, String treePath) {
+
+		return dlFileEntryFinder.findByC_T(classNameId, treePath);
 	}
 
 	@Override

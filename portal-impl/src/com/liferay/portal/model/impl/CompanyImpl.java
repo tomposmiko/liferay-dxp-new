@@ -40,10 +40,10 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.service.VirtualHostLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -413,7 +413,7 @@ public class CompanyImpl extends CompanyBaseImpl {
 
 		private CompanySecurityBag(Company company) {
 			PortletPreferences preferences = PrefsPropsUtil.getPreferences(
-				company.getCompanyId(), true);
+				company.getCompanyId());
 
 			_authType = _getPrefsPropsString(
 				preferences, company, PropsKeys.COMPANY_SECURITY_AUTH_TYPE,

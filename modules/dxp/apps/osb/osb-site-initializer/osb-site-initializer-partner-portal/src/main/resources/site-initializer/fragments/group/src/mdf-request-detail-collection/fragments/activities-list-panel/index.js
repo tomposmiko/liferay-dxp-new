@@ -22,12 +22,12 @@ const getIntlNumberFormat = () =>
 
 const getBooleanValue = (value) => (value ? 'Yes' : 'No');
 
-const BudgetBreakdownTable = ({activityToBudgets}) => {
+const BudgetBreakdownTable = ({actToBgts}) => {
 	return (
 		<div>
-			{!!activityToBudgets.length && (
+			{!!actToBgts.length && (
 				<Table
-					items={activityToBudgets.map((budget) => ({
+					items={actToBgts.map((budget) => ({
 						title: budget.expense.name,
 						value: getIntlNumberFormat().format(budget.cost),
 					}))}
@@ -284,14 +284,20 @@ export default function () {
 
 	const [loading, setLoading] = useState(true);
 
+	const findRequestIdUrl = (paramsUrl) => {
+		const splitParamsUrl = paramsUrl.split('?');
+
+		return splitParamsUrl[0];
+	};
+
 	const currentPath = Liferay.currentURL.split('/');
-	const mdfRequestId = +currentPath.at(-1);
+	const mdfRequestId = findRequestIdUrl(currentPath.at(-1));
 
 	useEffect(() => {
 		const getActivities = async () => {
 			// eslint-disable-next-line @liferay/portal/no-global-fetch
 			const response = await fetch(
-				`/o/c/mdfrequests/${mdfRequestId}/mdfRequestToActivities?nestedFields=activityToBudgets`,
+				`/o/c/mdfrequests/${mdfRequestId}/mdfReqToActs?nestedFields=actToBgts`,
 				{
 					headers: {
 						'accept': 'application/json',
@@ -314,7 +320,7 @@ export default function () {
 			});
 		};
 
-		if (mdfRequestId) {
+		if (!isNaN(mdfRequestId)) {
 			getActivities();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -338,9 +344,7 @@ export default function () {
 						/>
 
 						<BudgetBreakdownTable
-							activityToBudgets={
-								mdfRequestActivity.activityToBudgets
-							}
+							actToBgts={mdfRequestActivity.actToBgts}
 						/>
 
 						<LeadListTable

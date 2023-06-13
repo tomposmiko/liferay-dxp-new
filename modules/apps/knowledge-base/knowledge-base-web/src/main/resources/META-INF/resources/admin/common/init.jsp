@@ -18,6 +18,7 @@
 
 <%@ page import="com.liferay.document.library.configuration.DLConfiguration" %><%@
 page import="com.liferay.knowledge.base.web.internal.display.context.EditKBArticleDisplayContext" %><%@
+page import="com.liferay.knowledge.base.web.internal.display.context.ViewKBArticleDisplayContext" %><%@
 page import="com.liferay.knowledge.base.web.internal.display.context.ViewKBSuggestionDisplayContext" %>
 
 <%

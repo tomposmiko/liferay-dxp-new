@@ -56,20 +56,50 @@ if (portletTitleBasedNavigation) {
 
 	<%
 	KBDropdownItemsProvider kbDropdownItemsProvider = new KBDropdownItemsProvider(liferayPortletRequest, liferayPortletResponse);
+
+	ViewKBArticleDisplayContext viewKBArticleDisplayContext = new ViewKBArticleDisplayContext(liferayPortletRequest, liferayPortletResponse);
 	%>
 
 	<div class="management-bar management-bar-light navbar navbar-expand-md">
 		<clay:container-fluid>
-			<ul class="navbar-nav navbar-nav-expand">
-				<li class="m-auto nav-item">
-					<aui:workflow-status markupView="lexicon" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= kbArticle.getStatus() %>" version="<%= String.valueOf(kbArticle.getVersion()) %>" />
-				</li>
+			<ul class="<%= GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-166643")) ? "justify-content-end" : "" %> navbar-nav navbar-nav-expand">
+				<c:choose>
+					<c:when test='<%= GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-166643")) %>'>
+						<li class="nav-item">
+							<clay:link
+								aria-label='<%= LanguageUtil.get(request, "edit") %>'
+								cssClass="btn-monospaced btn-secondary btn-sm"
+								href="<%= viewKBArticleDisplayContext.getEditArticleURL(kbArticle) %>"
+								icon="pencil"
+								title='<%= LanguageUtil.get(request, "edit") %>'
+							/>
+						</li>
+					</c:when>
+					<c:otherwise>
+						<li class="m-auto nav-item">
+							<aui:workflow-status markupView="lexicon" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= kbArticle.getStatus() %>" version="<%= String.valueOf(kbArticle.getVersion()) %>" />
+						</li>
+					</c:otherwise>
+				</c:choose>
+
 				<li class="nav-item">
 					<liferay-frontend:sidebar-toggler-button
-						cssClass="btn btn-monospaced btn-sm btn-unstyled"
+						cssClass="btn btn-monospaced btn-secondary btn-sm btn-unstyled"
 						icon="info-circle-open"
 					/>
 				</li>
+
+				<c:if test='<%= viewKBArticleDisplayContext.isSubscriptionEnabled(kbArticle) && GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-166643")) %>'>
+					<li class="nav-item">
+						<clay:link
+							aria-label="<%= viewKBArticleDisplayContext.getSubscriptionLabel(kbArticle) %>"
+							cssClass="btn-primary btn-sm"
+							href="<%= viewKBArticleDisplayContext.getSubscriptionURL(kbArticle).toString() %>"
+							label="<%= viewKBArticleDisplayContext.getSubscriptionLabel(kbArticle) %>"
+						/>
+					</li>
+				</c:if>
+
 				<li class="nav-item">
 					<clay:dropdown-actions
 						aria-label='<%= LanguageUtil.get(request, "show-actions") %>'

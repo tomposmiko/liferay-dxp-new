@@ -29,7 +29,6 @@ import com.liferay.segments.model.SegmentsExperiment;
 import com.liferay.segments.model.SegmentsExperimentRel;
 
 import java.util.Locale;
-import java.util.Optional;
 
 /**
  * @author David Arques
@@ -161,24 +160,21 @@ public class SegmentsExperimentUtil {
 	}
 
 	public static JSONObject toStatusJSONObject(Locale locale, int status) {
-		Optional<SegmentsExperimentConstants.Status> statusObjectOptional =
+		SegmentsExperimentConstants.Status segmentsExperimentConstantsStatus =
 			SegmentsExperimentConstants.Status.parse(status);
 
-		if (!statusObjectOptional.isPresent()) {
+		if (segmentsExperimentConstantsStatus == null) {
 			return null;
 		}
-
-		SegmentsExperimentConstants.Status statusObject =
-			statusObjectOptional.get();
 
 		return JSONUtil.put(
 			"label",
 			LanguageUtil.get(
 				ResourceBundleUtil.getBundle(
 					"content.Language", locale, SegmentsExperimentUtil.class),
-				statusObject.getLabel())
+				segmentsExperimentConstantsStatus.getLabel())
 		).put(
-			"value", statusObject.getValue()
+			"value", segmentsExperimentConstantsStatus.getValue()
 		);
 	}
 

@@ -60,6 +60,8 @@ export default {
 	'attachments': 'Attachments',
 	'attachments-x': 'Attachments ({0})',
 	'auto-fill-x': 'Auto Fill {0}',
+	'auto-fill-x-is-scheduled-to-be-processed':
+		'Auto Fill {0} is Scheduled to be Processed.',
 	'autoanalyze': 'Autoanalyze',
 	'automated-functional-test': 'Automate Funcional Test',
 	'available': 'Available',
@@ -120,6 +122,7 @@ export default {
 	'create-x': 'Create {0}',
 	'created': 'Created',
 	'created-by': 'Created By',
+	'creator': 'Creator',
 	'current': 'Current',
 	'current-case-types': 'Current Case Types',
 	'current-main-components': 'Current Main Components',
@@ -213,6 +216,8 @@ export default {
 	'mark-at-least-one-case-to-export': 'Mark at least one case to export.',
 	'mark-at-least-one-case-type-for-processing':
 		'Mark at least one case type for processing.',
+	'mark-at-least-one-user-for-assignment':
+		'Mark at least one user for assignment.',
 	'merge-selected-subtasks-into-the-highest-scoring-subtask':
 		'Merge selected subtasks into the highest scoring subtask.',
 	'merge-subtasks': 'Merge Subtasks',
@@ -245,6 +250,8 @@ export default {
 	'no-permissions': 'No Permissions',
 	'no-results-found': 'No results found',
 	'no-x': 'No {0}',
+	'notifications': 'Notifications',
+	'open': 'Open',
 	'operating-system': 'Operating System',
 	'option': 'Option',
 	'options': 'Options',
@@ -259,6 +266,7 @@ export default {
 		'Please select at least two subtasks to merge.',
 	'please-select-one-or-more-roles': 'Please, select one or more roles.',
 	'priority': 'Priority',
+	'processing': 'Processing',
 	'product-version': 'Product Version',
 	'progress': 'Progress',
 	'progress-score': 'Progress (Score)',
@@ -301,6 +309,8 @@ export default {
 	'select-environment-factors': 'Select Environment Factors',
 	'select-options': 'Select Options',
 	'select-requirements': 'Select Requirements',
+	'select-run-a': 'Select Run A',
+	'select-run-b': 'Select Run B',
 	'select-stacks': 'Select Stacks',
 	'select-suites': 'Select Suites',
 	'select-user-groups': 'Select User Groups',
@@ -373,6 +383,9 @@ export default {
 	'this-build-has-been-analyzed': 'This build has been analyzed.',
 	'this-build-is-currently-in-analysis':
 		'This build is currently in analysis.',
+	'this-build-is-currently-in-open': 'This build is currently in open.',
+	'this-build-is-currently-in-processing':
+		'This build is currently in processing.',
 	'this-builds-task-has-been-abandoned':
 		"This build's task has been abandoned.",
 	'this-field-is-required': 'This field is required.',
@@ -396,6 +409,7 @@ export default {
 	'user-groups': 'User Groups',
 	'user-information': 'User Information',
 	'users': 'Users',
+	'view-associete-build': 'View Associete Build',
 	'view-case': 'View Case',
 	'view-page': 'View Page',
 	'view-task': 'View Task',
@@ -405,6 +419,7 @@ export default {
 	'x-is-a-required-field': '{0} is a required field.',
 	'x-items': '{0} Items',
 	'x-items-cannot-be-deleted': '{0} items cannot be deleted',
+	'x-jobs-in-progress': '{0} Jobs in Progress',
 	'x-minutes': '{0} Minutes',
 	'x-results-for-x': '{0} Results for {1}',
 	'x-tests-were-split-into-x-successfully-view-x':

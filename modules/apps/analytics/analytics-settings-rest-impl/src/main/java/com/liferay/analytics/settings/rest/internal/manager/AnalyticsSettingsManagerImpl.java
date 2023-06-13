@@ -68,7 +68,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(immediate = true, service = AnalyticsSettingsManager.class)
+@Component(service = AnalyticsSettingsManager.class)
 public class AnalyticsSettingsManagerImpl implements AnalyticsSettingsManager {
 
 	public void deleteCompanyConfiguration(long companyId)
@@ -403,11 +403,11 @@ public class AnalyticsSettingsManagerImpl implements AnalyticsSettingsManager {
 		AnalyticsSettingsManagerImpl.class);
 
 	private static final Map<String, String[]> _defaults = HashMapBuilder.put(
-		"syncedAccountFieldNames", FieldAccountConstants.FIELD_ACCOUNT_NAMES
+		"syncedAccountFieldNames", FieldAccountConstants.FIELD_ACCOUNT_DEFAULTS
 	).put(
 		"syncedCategoryFieldNames", FieldProductConstants.FIELD_CATEGORY_NAMES
 	).put(
-		"syncedContactFieldNames", FieldPeopleConstants.FIELD_CONTACT_NAMES
+		"syncedContactFieldNames", FieldPeopleConstants.FIELD_CONTACT_DEFAULTS
 	).put(
 		"syncedOrderFieldNames", FieldOrderConstants.FIELD_ORDER_NAMES
 	).put(
@@ -418,7 +418,7 @@ public class AnalyticsSettingsManagerImpl implements AnalyticsSettingsManager {
 	).put(
 		"syncedProductFieldNames", FieldProductConstants.FIELD_PRODUCT_NAMES
 	).put(
-		"syncedUserFieldNames", FieldPeopleConstants.FIELD_USER_NAMES
+		"syncedUserFieldNames", FieldPeopleConstants.FIELD_USER_DEFAULTS
 	).build();
 
 	private long _commerceChannelClassNameId;

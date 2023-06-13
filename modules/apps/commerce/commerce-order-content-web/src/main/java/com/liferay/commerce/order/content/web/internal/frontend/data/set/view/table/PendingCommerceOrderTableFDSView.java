@@ -41,7 +41,8 @@ public class PendingCommerceOrderTableFDSView extends BaseTableFDSView {
 			_fdsTableSchemaBuilderFactory.create();
 
 		return fdsTableSchemaBuilder.add(
-			"date", "create-date"
+			"date", "create-date",
+			fdsTableSchemaField -> fdsTableSchemaField.setSortable(true)
 		).add(
 			"orderId", "order-id"
 		).add(

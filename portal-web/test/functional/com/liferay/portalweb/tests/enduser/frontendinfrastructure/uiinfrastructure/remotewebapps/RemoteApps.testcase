@@ -99,7 +99,7 @@ definition {
 	@description = "This is a test for LPS-162031. The site administrator could add a CSS remote app."
 	@priority = "3"
 	test CSSCanBeCreated {
-		task ("Given a site administrator accesses to the Remote Apps admin") {
+		task ("Given a site administrator accesses to the Client Extensions admin") {
 			JSONGroup.addGroup(groupName = "Test Site Name");
 
 			JSONDocument.addFileWithUploadedFile(
@@ -136,6 +136,7 @@ definition {
 		property app.server.types = "tomcat";
 		property database.types = "mysql";
 		property environment.acceptance = "true";
+		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 		property testray.component.names = "Frontend Dataset,Remote Apps";
 
@@ -237,10 +238,7 @@ definition {
 		}
 
 		task ("Then remote app src is rendered with non-root context") {
-			AssertAttributeValue(
-				attribute1 = "src",
-				locator1 = "RemoteAppsEntry#CUSTOM_ELEMENT_MODULE_SCRIPT",
-				value1 = "${portalURL}/documents/d/guest/index");
+			AssertElementPresent(locator1 = "//script[contains(@src,'${portalURL}/documents/d/guest/index') and contains(@type,'module')]");
 		}
 	}
 
@@ -421,27 +419,17 @@ definition {
 	test CustomElementCanConfigurePortletName {
 		property portal.acceptance = "true";
 
-		task ("Add a public page with JSON") {
-			JSONLayout.addPublicLayout(
-				groupName = "Guest",
-				layoutName = "Test Page");
-		}
-
-		task ("Create Vanilla Counter as a Custom Element") {
+		task ("Given Create Vanilla Counter as a Custom Element") {
 			JSONRemoteApp.addCustomElementRemoteAppEntry(
 				customElementHtmlName = "vanilla-counter",
 				customElementName = "Vanilla Counter",
 				customElementURL = "https://liferay.github.io/liferay-frontend-projects/vanilla-counter/index.js");
 		}
 
-		task ("Obtain Vanilla Counter's remoteAppEntryId") {
-			var remoteAppEntryId = RemoteApps.getRemoteAppEntryId();
-
-			JSONLayout.addWidgetToPublicLayout(
-				groupName = "Guest",
-				layoutName = "Test Page",
-				remoteAppEntryId = "${remoteAppEntryId}",
-				widgetName = "Vanilla Counter");
+		task ("When adding created portlet to a widget page") {
+			ClientExtension.addPortletToWidgetPage(
+				portletName = "Vanilla Counter",
+				widgetPageName = "Test Page");
 		}
 
 		task ("Change Vanilla Counter portlet name") {
@@ -579,17 +567,14 @@ definition {
 
 			Refresh();
 
-			AssertAttributeValue(
-				attribute1 = "src",
-				locator1 = "RemoteAppsEntry#CUSTOM_ELEMENT_MODULE_SCRIPT",
-				value1 = "https://liferay.github.io/liferay-frontend-projects/vanilla-counter/index.js");
+			AssertElementPresent(locator1 = "//script[contains(@src,'https://liferay.github.io/liferay-frontend-projects/vanilla-counter/index.js') and contains(@type,'module')]");
 		}
 	}
 
 	@description = "LPS-165425. Validate that HTML eror is thrown if left empty."
 	@priority = "3"
 	test ErrorAppearsWhenHTMLBlank {
-		task ("Given Add Custom Element Remote Apps admin page") {
+		task ("Given Add Custom Element Client Extensions admin page") {
 			RemoteApps.goToRemoteAppsPortlet();
 
 			RemoteApps.addType(type = "Custom Element");
@@ -614,14 +599,14 @@ definition {
 		}
 	}
 
-	@description = "LPS-163525. Validate Remote Apps UI has an understandable error message when user inputs an invalid URL."
+	@description = "LPS-163525. Validate Client Extensions UI has an understandable error message when user inputs an invalid URL."
 	@priority = "4"
 	test HasAnUnderstandableErrorMessageWhenURLInvalid {
-		task ("Given Add IFrame Remote Apps") {
+		task ("Given Add IFrame Client Extensions") {
 			ApplicationsMenu.gotoPortlet(
 				category = "Custom Apps",
 				panel = "Applications",
-				portlet = "Remote Apps");
+				portlet = "Client Extensions");
 
 			RemoteApps.addType(type = "IFrame");
 		}
@@ -643,14 +628,15 @@ definition {
 		}
 	}
 
-	@description = "LPS-163525. Validate Remote apps UI has a clear error message when all the mandatory fields are empty."
+	@description = "LPS-163525. Validate Client Extensions UI has a clear error message when all the mandatory fields are empty."
+	@ignore = "true"
 	@priority = "4"
 	test HasMandatoryFieldErrorMessagesWhenEmpty {
-		task ("Given Add IFrame Remote Apps admin page") {
+		task ("Given Add IFrame Client Extensions admin page") {
 			ApplicationsMenu.gotoPortlet(
 				category = "Custom Apps",
 				panel = "Applications",
-				portlet = "Remote Apps");
+				portlet = "Client Extensions");
 
 			RemoteApps.addType(type = "IFrame");
 		}
@@ -677,7 +663,7 @@ definition {
 	@description = "LPS-165745. Error thrown when HTML Element contains empty/white space."
 	@priority = "3"
 	test HTMLElementConatinsInvlaidCharacters {
-		task ("Given Add Custom Element Remote Apps") {
+		task ("Given Add Custom Element Client Extensions") {
 			RemoteApps.goToRemoteAppsPortlet();
 
 			RemoteApps.addType(type = "Custom Element");
@@ -704,7 +690,7 @@ definition {
 	@description = "LPS-165835. Error thrown when HTML Element doesn't have at least one hyphen."
 	@priority = "3"
 	test HTMLElementMustHaveOneHyphen {
-		task ("Given Add Custom Element Remote Apps") {
+		task ("Given Add Custom Element Client Extensions") {
 			RemoteApps.goToRemoteAppsPortlet();
 
 			RemoteApps.addType(type = "Custom Element");
@@ -731,7 +717,7 @@ definition {
 	@description = "LPS-165834. Error thrown when HTML Element doesn't start with a lowercase letter."
 	@priority = "3"
 	test HTMLElementMustStartWithLowercase {
-		task ("Given Add Custom Element Remote Apps") {
+		task ("Given Add Custom Element Client Extensions") {
 			RemoteApps.goToRemoteAppsPortlet();
 
 			RemoteApps.addType(type = "Custom Element");

@@ -68,10 +68,6 @@
 		<Logger level="ERROR" name="com.liferay.portal.deploy.hot.ThemeLoaderHotDeployListener" />
 		<Logger level="ERROR" name="com.liferay.portal.deploy.hot.messaging.HotDeployMessageListener" />
 		<Logger level="ERROR" name="com.liferay.portal.editor" />
-		<Logger level="INFO" name="com.liferay.portal.events.ChannelHubAppShutdownAction" />
-		<Logger level="INFO" name="com.liferay.portal.events.ChannelHubAppStartupAction" />
-		<Logger level="INFO" name="com.liferay.portal.events.ChannelLoginPostAction" />
-		<Logger level="INFO" name="com.liferay.portal.events.ChannelSessionDestroyAction" />
 		<Logger level="ERROR" name="com.liferay.portal.events.EventsProcessor" />
 		<Logger level="INFO" name="com.liferay.portal.events.FixOracleAction" />
 		<Logger level="ERROR" name="com.liferay.portal.events.GarbageCollectorAction" />
@@ -87,7 +83,6 @@
 		<Logger level="ERROR" name="com.liferay.portal.events.ShutdownHook" />
 		<Logger level="INFO" name="com.liferay.portal.events.StartupAction" />
 		<Logger level="INFO" name="com.liferay.portal.events.StartupHelperUtil" />
-		<Logger level="ERROR" name="com.liferay.portal.image.HookFactory" />
 		<Logger level="ERROR" name="com.liferay.portal.image.ImageToolImpl" />
 		<Logger level="INFO" name="com.liferay.portal.internal.servlet.MainServlet" />
 		<Logger level="WARN" name="com.liferay.portal.json.jabsorb.serializer.LiferayJSONDeserializationWhitelist" />
@@ -102,7 +97,6 @@
 		<Logger level="ERROR" name="com.liferay.portal.kernel.portlet.InvokerPortlet" />
 		<Logger level="ERROR" name="com.liferay.portal.kernel.portlet.RestrictPortletServletRequest" />
 		<Logger level="WARN" name="com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet" />
-		<Logger level="INFO" name="com.liferay.portal.kernel.process" />
 		<Logger level="WARN" name="com.liferay.portal.kernel.search.HitsOpenSearchImpl" />
 		<Logger level="WARN" name="com.liferay.portal.kernel.security.auth.CompanyThreadLocal" />
 		<Logger level="ERROR" name="com.liferay.portal.kernel.servlet.PipingServletResponse" />

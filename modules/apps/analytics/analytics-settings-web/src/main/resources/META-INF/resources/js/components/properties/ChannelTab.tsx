@@ -32,13 +32,11 @@ const columns: TColumn[] = [
 		label: Liferay.Language.get('channel-name'),
 	},
 	{
-		expanded: true,
 		id: EColumn.SiteName,
 		label: Liferay.Language.get('related-site'),
 		sortable: false,
 	},
 	{
-		expanded: true,
 		id: EColumn.ChannelName,
 		label: Liferay.Language.get('assigned-property'),
 		sortable: false,
@@ -58,9 +56,7 @@ const ChannelTab: React.FC<IChannelTabProps> = ({
 }) => (
 	<Tab
 		columns={columns.map(({id}) => id) as Array<keyof TRawItem>}
-		description={Liferay.Language.get(
-			'analytics-cloud-assign-commerce-channel-help'
-		)}
+		description={Liferay.Language.get('channels-tab-description')}
 		emptyState={{
 			noResultsTitle: Liferay.Language.get('no-channels-were-found'),
 			title: Liferay.Language.get('there-are-no-channels'),

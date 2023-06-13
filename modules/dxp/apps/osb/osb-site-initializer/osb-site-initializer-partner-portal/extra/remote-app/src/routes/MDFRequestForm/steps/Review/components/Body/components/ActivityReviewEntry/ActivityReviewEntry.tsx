@@ -30,7 +30,6 @@ interface Item {
 type TypeOfActivityComponent = {
 	[key in TypeActivityKey]: Item[];
 };
-
 const ActivityReviewEntry = ({mdfRequestActivity}: IProps) => {
 	const fieldsByTypeActivity: TypeOfActivityComponent = {
 		[TypeActivityKey.DIGITAL_MARKETING]: getDigitalMarketFields(
@@ -44,6 +43,8 @@ const ActivityReviewEntry = ({mdfRequestActivity}: IProps) => {
 			mdfRequestActivity
 		),
 	};
+
+	const options = {timeZone: 'UTC'};
 
 	return (
 		<>
@@ -83,7 +84,8 @@ const ActivityReviewEntry = ({mdfRequestActivity}: IProps) => {
 							new Date(
 								mdfRequestActivity.startDate
 							).toLocaleDateString(
-								Liferay.ThemeDisplay.getBCP47LanguageId()
+								Liferay.ThemeDisplay.getBCP47LanguageId(),
+								options
 							),
 					},
 					{
@@ -93,7 +95,8 @@ const ActivityReviewEntry = ({mdfRequestActivity}: IProps) => {
 							new Date(
 								mdfRequestActivity.endDate
 							).toLocaleDateString(
-								Liferay.ThemeDisplay.getBCP47LanguageId()
+								Liferay.ThemeDisplay.getBCP47LanguageId(),
+								options
 							),
 					},
 				]}

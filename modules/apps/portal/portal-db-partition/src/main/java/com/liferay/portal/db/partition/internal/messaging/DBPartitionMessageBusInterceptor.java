@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.util.PortalInstances;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,10 @@ public class DBPartitionMessageBusInterceptor implements MessageBusInterceptor {
 
 			_companyLocalService.forEachCompany(
 				company -> {
-					if (!company.isActive()) {
+					if (!company.isActive() ||
+						PortalInstances.isCompanyInDeletionProcess(
+							company.getCompanyId())) {
+
 						return;
 					}
 

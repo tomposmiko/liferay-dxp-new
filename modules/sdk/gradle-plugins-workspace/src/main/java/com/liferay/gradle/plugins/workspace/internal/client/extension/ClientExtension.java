@@ -42,6 +42,14 @@ public class ClientExtension {
 	}
 
 	public Map<String, Object> toJSONMap() throws Exception {
+		Properties clientExtensionProperties = _getClientExtensionProperties();
+
+		String pid = clientExtensionProperties.getProperty(type);
+
+		if (pid == null) {
+			throw new Exception("Unable to find PID for type: " + type);
+		}
+
 		Map<String, Object> jsonMap = new HashMap<>();
 
 		Map<String, Object> configMap = new HashMap<>();
@@ -54,22 +62,6 @@ public class ClientExtension {
 		configMap.put("sourceCodeURL", sourceCodeURL);
 		configMap.put("type", type);
 
-		Properties clientExtensionProperties = _getClientExtensionProperties();
-
-		String pid = clientExtensionProperties.getProperty(type);
-
-		if ((pid != null) &&
-			(type.equals("notificationType") ||
-			 type.equals("oAuthApplicationHeadlessServer") ||
-			 type.equals("oAuthApplicationUserAgent") ||
-			 type.equals("workflowAction")) &&
-			(_typeSettings.get("homePageURL") == null)) {
-
-			_typeSettings.put(
-				"homePageURL",
-				"https://$[conf:ext.lxc.liferay.com.mainDomain]");
-		}
-
 		Set<Map.Entry<String, Object>> set = _typeSettings.entrySet();
 
 		set.forEach(
@@ -78,6 +70,16 @@ public class ClientExtension {
 					configMap.put(entry.getKey(), entry.getValue());
 				}
 			});
+
+		if (type.equals("oAuthApplicationHeadlessServer") ||
+			type.equals("oAuthApplicationUserAgent")) {
+
+			configMap.put(
+				"homePageURL",
+				_typeSettings.getOrDefault(
+					"homePageURL",
+					"https://$[conf:ext.lxc.liferay.com.mainDomain]"));
+		}
 
 		configMap.put("typeSettings", _encode(_typeSettings));
 

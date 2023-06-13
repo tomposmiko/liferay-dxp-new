@@ -82,8 +82,8 @@ import org.quartz.spi.OperableTrigger;
  * @author Edward C. Han
  */
 @Component(
-	enabled = false, immediate = true,
-	property = "scheduler.engine.proxy=false", service = SchedulerEngine.class
+	enabled = false, property = "scheduler.engine.proxy=false",
+	service = SchedulerEngine.class
 )
 public class QuartzSchedulerEngine implements SchedulerEngine {
 
@@ -340,6 +340,24 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 					groupName, "}"),
 				exception);
 		}
+	}
+
+	public void run(String jobName, String groupName, StorageType storageType)
+		throws SchedulerException {
+
+		SchedulerResponse schedulerResponse = getScheduledJob(
+			jobName, groupName, storageType);
+
+		Message message = schedulerResponse.getMessage();
+
+		message.put(
+			SchedulerEngine.DESTINATION_NAME,
+			schedulerResponse.getDestinationName());
+		message.put(SchedulerEngine.GROUP_NAME, groupName);
+		message.put(SchedulerEngine.JOB_NAME, jobName);
+
+		_messageBus.sendMessage(
+			schedulerResponse.getDestinationName(), message);
 	}
 
 	@Override

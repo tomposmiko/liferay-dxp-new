@@ -17,5 +17,13 @@ export const INITIAL_FILTER = {
 		},
 	},
 	hasValue: false,
+	partner: {
+		name: 'Partner',
+		value: [] as string[],
+	},
 	searchTerm: '',
+	status: {
+		name: 'Status',
+		value: [] as string[],
+	},
 };

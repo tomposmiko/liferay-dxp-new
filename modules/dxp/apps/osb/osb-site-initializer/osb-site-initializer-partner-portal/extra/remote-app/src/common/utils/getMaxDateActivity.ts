@@ -9,10 +9,10 @@
  * distribution rights of the Software.
  */
 
-export default function getMaxDateActivity(dates: Date[]) {
+export default function getMaxDateActivity(dates: string[]) {
 	if (dates.length) {
 		const startDate = dates.reduce((dateAccumulator, startDate) =>
-			dateAccumulator < startDate ? dateAccumulator : startDate
+			dateAccumulator > startDate ? dateAccumulator : startDate
 		);
 
 		return startDate;

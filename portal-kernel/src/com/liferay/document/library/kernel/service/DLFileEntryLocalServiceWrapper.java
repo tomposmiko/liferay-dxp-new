@@ -167,12 +167,12 @@ public class DLFileEntryLocalServiceWrapper
 	@Override
 	public DLFileEntry copyFileEntry(
 			long userId, long groupId, long repositoryId, long fileEntryId,
-			long destFolderId,
+			long destFolderId, String fileName,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _dlFileEntryLocalService.copyFileEntry(
-			userId, groupId, repositoryId, fileEntryId, destFolderId,
+			userId, groupId, repositoryId, fileEntryId, destFolderId, fileName,
 			serviceContext);
 	}
 
@@ -727,6 +727,14 @@ public class DLFileEntryLocalServiceWrapper
 		long folderId, String name) {
 
 		return _dlFileEntryLocalService.getFileEntries(folderId, name);
+	}
+
+	@Override
+	public java.util.List<DLFileEntry> getFileEntriesByClassNameIdAndTreePath(
+		long classNameId, String treePath) {
+
+		return _dlFileEntryLocalService.getFileEntriesByClassNameIdAndTreePath(
+			classNameId, treePath);
 	}
 
 	@Override

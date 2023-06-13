@@ -16,6 +16,7 @@ package com.liferay.portal.service.impl;
 
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.LayoutBranchNameException;
 import com.liferay.portal.kernel.exception.NoSuchLayoutBranchException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -44,6 +45,7 @@ import java.util.List;
 /**
  * @author Julio Camarero
  */
+@CTAware
 public class LayoutBranchLocalServiceImpl
 	extends LayoutBranchLocalServiceBaseImpl {
 
@@ -144,6 +146,16 @@ public class LayoutBranchLocalServiceImpl
 			layoutBranch.getLayoutBranchId());
 
 		return deleteLayoutBranch(layoutBranch);
+	}
+
+	@Override
+	public void deleteLayoutBranchesByPlid(long plid) throws PortalException {
+		List<LayoutBranch> layoutBranches = layoutBranchPersistence.findByPlid(
+			plid);
+
+		for (LayoutBranch layoutBranch : layoutBranches) {
+			deleteLayoutBranch(layoutBranch.getLayoutBranchId());
+		}
 	}
 
 	@Override

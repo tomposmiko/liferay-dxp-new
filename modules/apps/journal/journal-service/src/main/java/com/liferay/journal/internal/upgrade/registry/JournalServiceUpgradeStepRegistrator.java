@@ -108,7 +108,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
-	immediate = true,
 	service = {
 		JournalServiceUpgradeStepRegistrator.class, UpgradeStepRegistrator.class
 	}
@@ -337,6 +336,11 @@ public class JournalServiceUpgradeStepRegistrator
 			new GlobalJournalArticleUrlTitleUpgradeProcess(
 				_classNameLocalService, _companyLocalService,
 				_groupLocalService));
+
+		registry.register(
+			"4.4.0", "4.4.1",
+			UpgradeProcessFactory.alterColumnType(
+				"JournalArticleLocalization", "title", "VARCHAR(800) null"));
 	}
 
 	private void _deleteTempImages() throws Exception {

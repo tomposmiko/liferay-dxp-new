@@ -3,6 +3,8 @@ definition {
 
 	property custom.properties = "jsonws.web.service.paths.excludes=";
 	property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver";
+	property osgi.module.configuration.file.names = "com.liferay.change.tracking.configuration.CTSettingsConfiguration.config";
+	property osgi.module.configurations = "enabled=B\"true\"";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Publications";
@@ -51,8 +53,6 @@ definition {
 		JSONRole.assignRoleToUser(
 			roleTitle = "Publications User",
 			userEmailAddress = "userea@liferay.com");
-
-		Publications.enablePublications();
 
 		JSONPublications.addPublication(publicationName = "Publication Name 1");
 
@@ -120,11 +120,66 @@ definition {
 		PublicationsPermissions.assertEditorPermissions(publicationName = "Publication Name 2");
 	}
 
+	@description = "This is a use case for LPS-168508. Switching Publications invitee between roles shouldn't remove it from the invitee list."
+	@priority = "3"
+	test CanSwitchInviteeRoles {
+		task ("Create User and add Publication") {
+			JSONUser.addUser(
+				userEmailAddress = "userea@liferay.com",
+				userFirstName = "userfn",
+				userLastName = "userln",
+				userScreenName = "usersn");
+
+			JSONPublications.addPublication(publicationName = "Test Publication");
+		}
+
+		PublicationsNavigator.openPublicationsAdmin();
+
+		PublicationsNavigator._gotoPublicationEllipsisItem(
+			menuItem = "Invite Users",
+			publicationName = "Test Publication");
+
+		Click(
+			key_title = "Viewers can view. Viewers cannot edit, publish, or invite other users.",
+			locator1 = "Button#ANY_TITLE");
+
+		Click(
+			key_publicationRole = "Viewer",
+			locator1 = "Publications#PUBLICATION_ROLE_BUTTON");
+
+		Type(
+			locator1 = "Publications#KEYWORD_TEXTFIELD",
+			value1 = "userea@liferay.com");
+
+		KeyPress(
+			locator1 = "Publications#KEYWORD_TEXTFIELD",
+			value1 = "\ENTER");
+
+		Click(
+			key_title = "Viewers can view. Viewers cannot edit, publish, or invite other users.",
+			locator1 = "Publications#PUBLICATION_ROLE_BUTTON_BODY_TITLE");
+
+		Click(
+			key_publicationRole = "Editor",
+			locator1 = "Publications#PUBLICATION_ROLE_BUTTON_BODY");
+
+		Click(
+			key_title = "Editors can view and edit. Editors cannot publish or invite other users.",
+			locator1 = "Publications#PUBLICATION_ROLE_BUTTON_BODY_TITLE");
+
+		Click(
+			key_publicationRole = "Viewer",
+			locator1 = "Publications#PUBLICATION_ROLE_BUTTON_BODY");
+
+		Button.clickNoError(button = "Send");
+
+		AssertConfirm(value1 = "You are inviting user userea@liferay.com who does not have access to Publications. This user will be assigned the Publications User role to gain access to Publications.");
+
+		Alert.viewSuccessMessage();
+	}
+
 	@priority = "3"
 	test ExplainEachRoleInInviteUsers {
-		property osgi.module.configuration.file.names = "com.liferay.change.tracking.configuration.CTSettingsConfiguration.config";
-		property osgi.module.configurations = "enabled=B\"true\"";
-
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
 		PublicationsNavigator.gotoReviewChanges(
@@ -188,8 +243,6 @@ definition {
 			resourceAction = "PUBLISH",
 			resourceName = "com.liferay.change.tracking.model.CTCollection",
 			roleTitle = "Publications User");
-
-		Publications.enablePublications();
 
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
@@ -255,8 +308,6 @@ definition {
 		JSONRole.assignRoleToUser(
 			roleTitle = "Publications User",
 			userEmailAddress = "userea@liferay.com");
-
-		Publications.enablePublications();
 
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
@@ -328,8 +379,6 @@ definition {
 			resourceName = "com.liferay.change.tracking.model.CTCollection",
 			roleTitle = "Publications User");
 
-		Publications.enablePublications();
-
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
 		PublicationsNavigator.openPublicationsAdmin();
@@ -390,8 +439,6 @@ definition {
 			groupName = "Guest",
 			roleTitle = "Site Administrator",
 			userEmailAddress = "userea@liferay.com");
-
-		Publications.enablePublications();
 
 		JSONPublications.addPublication(publicationName = "Publication Name");
 

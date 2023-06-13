@@ -15,6 +15,12 @@ definition {
 	macro addRelationshipAndSelectEntry {
 		LexiconEntry.gotoAdd();
 
+		var menuItem = "Select Existing One";
+
+		if (IsElementPresent(key_menuItem = "${menuItem}", locator1 = "MenuItem#ANY_MENU_ITEM")) {
+			MenuItem.click(menuItem = "${menuItem}");
+		}
+
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		ClickNoError(
@@ -42,32 +48,6 @@ definition {
 		AssertElementPresent(
 			key_entry = "${entry}",
 			locator1 = "CreateObject#ENTRY_RELATIONSHIP_FIELD_OPTION");
-	}
-
-	macro assertCanCollapseAndExpandEntryField {
-		WaitForSPARefresh();
-
-		if (IsElementPresent(key_closedOrOpen = "open", locator1 = "CreateObject#VIEW_COLLAPSE_ICON")) {
-			Click(locator1 = "CreateObject#COLLAPSE_EXPAND_OBJECT_PORTLET_ENTRY_FIELD");
-
-			WaitForSPARefresh();
-
-			AssertNotVisible(
-				key_entryLabel = "Custom Field",
-				locator1 = "ObjectPortlet#VIEW_ENTRY_DETAILS_LABEL");
-		}
-
-		WaitForSPARefresh();
-
-		if (IsElementPresent(key_closedOrOpen = "closed", locator1 = "CreateObject#VIEW_COLLAPSE_ICON")) {
-			Click(locator1 = "CreateObject#COLLAPSE_EXPAND_OBJECT_PORTLET_ENTRY_FIELD");
-
-			WaitForSPARefresh();
-
-			AssertVisible(
-				key_entryLabel = "Custom Field",
-				locator1 = "ObjectPortlet#VIEW_ENTRY_DETAILS_LABEL");
-		}
 	}
 
 	macro assertCannotAddRelationshipTabFirst {
@@ -233,8 +213,6 @@ definition {
 
 	macro assertRelationshipNotPresent {
 		LexiconEntry.gotoAdd();
-
-		MenuItem.clickNoError(menuItem = "Select Existing One");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
@@ -404,7 +382,7 @@ definition {
 			locator1 = "CreateObject#SELECT_DELETION_TYPE",
 			value1 = "${deletionType}");
 
-		Button.clickSave();
+		PortletEntry.save();
 	}
 
 	macro selectPanelCategoryKey {

@@ -10,8 +10,20 @@
  * distribution rights of the Software.
  */
 
+/* eslint-disable no-undef */
+const findRequestIdUrl = (paramsUrl) => {
+	const splitParamsUrl = paramsUrl.split('?');
+
+	return splitParamsUrl[0];
+};
+
+const siteURL = Liferay.ThemeDisplay.getLayoutRelativeURL()
+	.split('/')
+	.slice(0, 3)
+	.join('/');
+
 const currentPath = Liferay.currentURL.split('/');
-const mdfRequestId = +currentPath.at(-1);
+const mdfRequestId = findRequestIdUrl(currentPath.at(-1));
 
 const updateStatusToApproved = fragmentElement.querySelector(
 	'#status-approved'
@@ -19,26 +31,128 @@ const updateStatusToApproved = fragmentElement.querySelector(
 const updateStatusToRequestMoreInfo = fragmentElement.querySelector(
 	'#status-request'
 );
+const updateStatusToMarketingDirectorReview = fragmentElement.querySelector(
+	'#status-marketing-director-review'
+);
 const updateStatusToReject = fragmentElement.querySelector('#status-reject');
+
+const updateStatusToCanceled = fragmentElement.querySelector('#status-cancel');
+
+const editButtonManager = fragmentElement.querySelector('.edit-button-manager');
+
+const editButton = fragmentElement.querySelector('.edit-button-user');
 
 const updateStatus = async (status) => {
 	// eslint-disable-next-line @liferay/portal/no-global-fetch
 	const statusManagerResponse = await fetch(
 		`/o/c/mdfrequests/${mdfRequestId}`,
 		{
-			body: `{"requestStatus": "${status}"}`,
+			body: `{"mdfRequestStatus": "${status}"}`,
 			headers: {
 				'content-type': 'application/json',
 				'x-csrf-token': Liferay.authToken,
 			},
-			method: 'PATCH',
+			method: 'PUT',
 		}
 	);
 	if (statusManagerResponse.ok) {
 		const data = await statusManagerResponse.json();
 		document.getElementById(
 			'mdf-request-status-display'
-		).innerHTML = `Status:${Liferay.Util.escape(data.requestStatus)}`;
+		).innerHTML = `Status: ${Liferay.Util.escape(
+			data.mdfRequestStatus.name
+		)}`;
+
+		updateButtons(data.mdfRequestStatus.key);
+
+		return;
+	}
+
+	Liferay.Util.openToast({
+		message: 'The MDF Request Status cannot be changed.',
+		type: 'danger',
+	});
+};
+
+if (updateStatusToApproved) {
+	updateStatusToApproved.onclick = () =>
+		Liferay.Util.openConfirmModal({
+			message: 'Do you want to Approve this MDF?',
+			onConfirm: (isConfirmed) => {
+				if (isConfirmed) {
+					updateStatus('approved');
+				}
+			},
+		});
+}
+
+if (updateStatusToRequestMoreInfo) {
+	updateStatusToRequestMoreInfo.onclick = () =>
+		Liferay.Util.openConfirmModal({
+			message: 'Do you want to Request more info for this MDF?',
+			onConfirm: (isConfirmed) => {
+				if (isConfirmed) {
+					updateStatus('moreInfoRequested');
+				}
+			},
+		});
+}
+
+if (updateStatusToMarketingDirectorReview) {
+	updateStatusToMarketingDirectorReview.onclick = () =>
+		Liferay.Util.openConfirmModal({
+			message: 'Do you want Marketing Director Review in this MDF?',
+			onConfirm: (isConfirmed) => {
+				if (isConfirmed) {
+					updateStatus('marketingDirectorReview');
+				}
+			},
+		});
+}
+
+if (updateStatusToReject) {
+	updateStatusToReject.onclick = () =>
+		Liferay.Util.openConfirmModal({
+			message: 'Do you want to Reject this MDF?',
+			onConfirm: (isConfirmed) => {
+				if (isConfirmed) {
+					updateStatus('rejected');
+				}
+			},
+		});
+}
+
+if (updateStatusToCanceled) {
+	updateStatusToCanceled.onclick = () =>
+		Liferay.Util.openConfirmModal({
+			message: 'Do you want to Cancel this MDF?',
+			onConfirm: (isConfirmed) => {
+				if (isConfirmed) {
+					updateStatus('canceled');
+				}
+			},
+		});
+}
+
+const getMDFRequestStatus = async () => {
+	// eslint-disable-next-line @liferay/portal/no-global-fetch
+	const statusResponse = await fetch(`/o/c/mdfrequests/${mdfRequestId}`, {
+		headers: {
+			'accept': 'application/json',
+			'x-csrf-token': Liferay.authToken,
+		},
+	});
+
+	if (statusResponse.ok) {
+		const data = await statusResponse.json();
+
+		fragmentElement.querySelector(
+			'#mdf-request-status-display'
+		).innerHTML = `Status: ${Liferay.Util.escape(
+			data.mdfRequestStatus.name
+		)}`;
+
+		updateButtons(data.mdfRequestStatus.key);
 
 		return;
 	}
@@ -49,32 +163,30 @@ const updateStatus = async (status) => {
 	});
 };
 
-updateStatusToApproved.onclick = () =>
-	Liferay.Util.openConfirmModal({
-		message: 'Do you want to Approve this MDF?',
-		onConfirm: (isConfirmed) => {
-			if (isConfirmed) {
-				updateStatus('Approved');
-			}
-		},
-	});
+const updateButtons = (mdfRequestStatusKey) => {
+	if (
+		!editButtonManager &&
+		(mdfRequestStatusKey === 'draft' ||
+			mdfRequestStatusKey === 'moreInfoRequested')
+	) {
+		editButton.classList.toggle('d-flex');
+	}
 
-updateStatusToRequestMoreInfo.onclick = () =>
-	Liferay.Util.openConfirmModal({
-		message: 'Do you want to Request more info for this MDF?',
-		onConfirm: (isConfirmed) => {
-			if (isConfirmed) {
-				updateStatus('Request More Info');
-			}
-		},
-	});
+	if (editButton) {
+		editButton.onclick = () =>
+			Liferay.Util.navigate(
+				`${siteURL}/marketing/mdf-requests/new/#/${mdfRequestId}`
+			);
+	}
 
-updateStatusToReject.onclick = () =>
-	Liferay.Util.openConfirmModal({
-		message: 'Do you want to Reject this MDF?',
-		onConfirm: (isConfirmed) => {
-			if (isConfirmed) {
-				updateStatus('Reject');
-			}
-		},
-	});
+	if (editButtonManager) {
+		editButtonManager.onclick = () =>
+			Liferay.Util.navigate(
+				`${siteURL}/marketing/mdf-requests/new/#/${mdfRequestId}`
+			);
+	}
+};
+
+if (layoutMode !== 'edit') {
+	getMDFRequestStatus();
+}

@@ -39,4 +39,12 @@ public interface DispatchTaskExecutor {
 	@Deprecated
 	public String getName();
 
+	public default boolean isClusterModeSingle() {
+		return false;
+	}
+
+	public default boolean isHiddenInUI() {
+		return false;
+	}
+
 }

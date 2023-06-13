@@ -19,7 +19,7 @@ import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
 import {debounce} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useRef, useState} from 'react';
+import React, {useMemo, useRef, useState} from 'react';
 
 import {useActiveItemId} from '../../../app/contexts/ControlsContext';
 import {
@@ -214,6 +214,14 @@ export function ColorPicker({
 		}
 	};
 
+	const resetButtonLabel = useMemo(
+		() =>
+			selectedViewportSize
+				? getResetLabelByViewport(selectedViewportSize)
+				: Liferay.Language.get('clear-selection'),
+		[selectedViewportSize]
+	);
+
 	return (
 		<ClayForm.Group small>
 			<label className={classNames({'sr-only': !showLabel})} id={labelId}>
@@ -306,6 +314,7 @@ export function ColorPicker({
 				{tokenLabel ? (
 					canDetachTokenValues && (
 						<ClayButtonWithIcon
+							aria-label={Liferay.Language.get('detach-style')}
 							className="border-0 flex-shrink-0 mb-0 ml-2 page-editor__color-picker__action-button"
 							displayType="secondary"
 							onClick={() => {
@@ -325,7 +334,7 @@ export function ColorPicker({
 									onSetValue(defaultTokenValue, null);
 								}
 							}}
-							small
+							size="sm"
 							symbol="chain-broken"
 							title={Liferay.Language.get('detach-style')}
 						/>
@@ -355,6 +364,7 @@ export function ColorPicker({
 
 				{value ? (
 					<ClayButtonWithIcon
+						aria-label={resetButtonLabel}
 						className="border-0 flex-shrink-0 ml-2 page-editor__color-picker__action-button"
 						displayType="secondary"
 						onClick={() => {
@@ -373,13 +383,9 @@ export function ColorPicker({
 								field.defaultValue ? null : defaultTokenValue
 							);
 						}}
-						small
+						size="sm"
 						symbol="restore"
-						title={
-							selectedViewportSize
-								? getResetLabelByViewport(selectedViewportSize)
-								: Liferay.Language.get('clear-selection')
-						}
+						title={resetButtonLabel}
 					/>
 				) : null}
 			</div>

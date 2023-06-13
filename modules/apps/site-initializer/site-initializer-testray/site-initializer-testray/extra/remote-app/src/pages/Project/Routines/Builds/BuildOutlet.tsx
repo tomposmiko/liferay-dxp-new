@@ -12,7 +12,7 @@
  * details.
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {
 	Outlet,
 	useLocation,
@@ -49,13 +49,13 @@ const BuildOutlet: React.FC<BuildOutletProps> = ({ignorePaths}) => {
 	const {buildId, projectId, routineId, ...otherParams} = useParams();
 	const {pathname} = useLocation();
 	const {testrayProject, testrayRoutine}: OutletContext = useOutletContext();
-	const [runId, setRunId] = useState<Number>();
 
-	const {
-		data: testrayBuild,
-		mutate: mutateBuild,
-	} = useFetch(testrayBuildImpl.getResource(buildId as string), (response) =>
-		testrayBuildImpl.transformData(response)
+	const {data: testrayBuild, mutate: mutateBuild} = useFetch(
+		testrayBuildImpl.getResource(buildId as string),
+		{
+			transformData: (response) =>
+				testrayBuildImpl.transformData(response),
+		}
 	);
 
 	const hasOtherParams = !!Object.values(otherParams).length;
@@ -67,7 +67,10 @@ const BuildOutlet: React.FC<BuildOutletProps> = ({ignorePaths}) => {
 
 	const {data: testrayTasksData} = useFetch<APIResponse<TestrayTask>>(
 		testrayTaskImpl.resource,
-		(response) => testrayTaskImpl.transformDataFromList(response)
+		{
+			transformData: (response) =>
+				testrayTaskImpl.transformDataFromList(response),
+		}
 	);
 
 	const testrayTasks = testrayTasksData?.items || [];
@@ -159,8 +162,6 @@ const BuildOutlet: React.FC<BuildOutletProps> = ({ignorePaths}) => {
 				<Outlet
 					context={{
 						mutateBuild,
-						runId,
-						setRunId,
 						testrayBuild,
 						testrayProject,
 						testrayRoutine,

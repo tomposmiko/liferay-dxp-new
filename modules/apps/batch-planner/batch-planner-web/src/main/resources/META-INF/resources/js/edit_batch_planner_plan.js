@@ -29,18 +29,16 @@ const HEADERS = new Headers({
 });
 
 function handleOverrideExistingRecordsCheckbox(namespace) {
-	const overrideExistingRecordsCheckbox = document.querySelector(
-		`#${namespace}allowUpdate`
+	const createStrategySelect = document.querySelector(
+		`#${namespace}createStrategy`
 	);
 
-	const ignoreBlankFieldCheckbox = document.querySelector(
-		`#${namespace}onUpdateDoPatch`
+	const updateStrategySelect = document.querySelector(
+		`#${namespace}updateStrategy`
 	);
 
-	overrideExistingRecordsCheckbox.addEventListener('change', ({target}) => {
-		ignoreBlankFieldCheckbox.disabled = !target.checked;
-
-		ignoreBlankFieldCheckbox.checked = false;
+	createStrategySelect.addEventListener('change', ({target}) => {
+		updateStrategySelect.disabled = target.value === 'INSERT';
 	});
 }
 

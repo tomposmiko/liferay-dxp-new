@@ -10,13 +10,19 @@
  */
 
 import Button from '@clayui/button';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
 import classNames from 'classnames';
 import {ArrayHelpers, useFormikContext} from 'formik';
-import {useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import PRMForm from '../../../../common/components/PRMForm';
 import PRMFormikPageProps from '../../../../common/components/PRMFormik/interfaces/prmFormikPageProps';
 import MDFRequest from '../../../../common/interfaces/mdfRequest';
+import deleteMDFRequestActivities from '../../../../common/services/liferay/object/activity/deleteMDFRequestActivities';
+import {ResourceName} from '../../../../common/services/liferay/object/enum/resourceName';
+import {Status} from '../../../../common/utils/constants/status';
+import handleError from '../../../../common/utils/handleError';
+import isObjectEmpty from '../../../../common/utils/isObjectEmpty';
 import {StepType} from '../../enums/stepType';
 import MDFRequestStepProps from '../../interfaces/mdfRequestStepProps';
 import Form from './components/Form';
@@ -24,16 +30,19 @@ import Listing from './components/Listing';
 
 interface IProps {
 	arrayHelpers: ArrayHelpers;
+	isEdit: boolean;
 }
 
 const Activities = ({
 	arrayHelpers,
+	isEdit,
 	onCancel,
 	onContinue,
 	onPrevious,
 	onSaveAsDraft,
 }: PRMFormikPageProps & MDFRequestStepProps & IProps) => {
 	const {
+		errors,
 		isSubmitting,
 		isValid,
 		setFieldValue,
@@ -41,51 +50,107 @@ const Activities = ({
 		...formikHelpers
 	} = useFormikContext<MDFRequest>();
 
-	const [isForm, setIsForm] = useState<boolean>(false);
-	const [currentActivityIndex, setCurrentActivityIndex] = useState<number>(
-		values.activities.length
-	);
-	const [fromOnEdit, setFromOnEdit] = useState(false);
+	const [currentActivityIndex, setCurrentActivityIndex] = useState<
+		number | undefined
+	>();
+	const [currentActivityIndexEdit, setCurrentActivityIndexEdit] = useState<
+		number
+	>();
 
-	const [activityFormEmpty, setActivityFormEmpty] = useState(false);
+	const [isDraft, setIsDraft] = useState(false);
 
-	const onAdd = () => {
-		setCurrentActivityIndex(values.activities.length);
-		setIsForm(true);
-		setFromOnEdit(false);
+	const activityErrors =
+		currentActivityIndex !== undefined &&
+		errors.activities?.[currentActivityIndex];
 
-		if (activityFormEmpty) {
+	const updateEditableActivity = () => {
+		if (
+			currentActivityIndexEdit !== undefined &&
+			currentActivityIndex !== undefined
+		) {
+			arrayHelpers.swap(currentActivityIndex, currentActivityIndexEdit);
+
 			arrayHelpers.remove(currentActivityIndex);
-			setActivityFormEmpty(true);
 		}
+
+		setCurrentActivityIndexEdit(undefined);
+		setCurrentActivityIndex(undefined);
 	};
+
+	const onAdd = () => setCurrentActivityIndex(values.activities.length);
 
 	const onEdit = (index: number) => {
-		setCurrentActivityIndex(index);
-		setFromOnEdit(true);
+		arrayHelpers.push(values.activities[index]);
 
-		setIsForm(true);
+		setCurrentActivityIndex(values.activities.length);
+		setCurrentActivityIndexEdit(index);
 	};
 
-	const onPreviousForm = () => {
-		!fromOnEdit
-			? arrayHelpers.remove(currentActivityIndex)
-			: currentActivityIndex;
+	const onPreviousForm = useCallback(() => {
+		if (currentActivityIndex !== undefined) {
+			arrayHelpers.remove(currentActivityIndex);
 
-		setIsForm(false);
+			setCurrentActivityIndex(undefined);
+		}
+
+		setCurrentActivityIndexEdit(undefined);
+	}, [arrayHelpers, currentActivityIndex]);
+
+	const onContinueForm = () => {
+		if (currentActivityIndex === undefined) {
+			onContinue?.(formikHelpers, StepType.REVIEW);
+
+			return;
+		}
+
+		updateEditableActivity();
 	};
+
+	const onRemove = async (index: number) => {
+		if (isEdit) {
+			try {
+				await deleteMDFRequestActivities(
+					ResourceName.ACTIVITY_DXP,
+					values.activities[index].id as number
+				);
+			}
+			catch (error: any) {
+				handleError(error.message);
+
+				return;
+			}
+		}
+
+		arrayHelpers.remove(index);
+	};
+
+	const hasActivityErrorsByIndex = (index: number): boolean =>
+		Boolean(errors.activities?.[index]);
+
+	const onSaveAsDraftForm = () => {
+		updateEditableActivity();
+		setIsDraft(true);
+	};
+
+	useEffect(() => {
+		if (isDraft) {
+			onSaveAsDraft?.(values, formikHelpers);
+			setIsDraft(false);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isDraft]);
 
 	return (
 		<PRMForm
 			className={classNames({
-				'mb-3': !isForm,
-				'mb-4': isForm,
+				'mb-3': !currentActivityIndex,
+				'mb-4': currentActivityIndex,
 			})}
 			description="Choose the activities that best match your Campaign MDF request"
 			name="Activities"
 			title={values.overallCampaignName}
 		>
-			{isForm ? (
+			{currentActivityIndex !== undefined ? (
 				<Form
 					currentActivity={values.activities[currentActivityIndex]}
 					currentActivityIndex={currentActivityIndex}
@@ -95,8 +160,10 @@ const Activities = ({
 				<Listing
 					{...arrayHelpers}
 					activities={values.activities}
+					hasActivityErrorsByIndex={hasActivityErrorsByIndex}
 					onAdd={onAdd}
 					onEdit={onEdit}
+					onRemove={onRemove}
 					overallCampaignName={values.overallCampaignName}
 				/>
 			)}
@@ -106,7 +173,7 @@ const Activities = ({
 					<Button
 						displayType={null}
 						onClick={() =>
-							isForm
+							currentActivityIndex !== undefined
 								? onPreviousForm()
 								: onPrevious?.(StepType.GOALS)
 						}
@@ -115,11 +182,16 @@ const Activities = ({
 					</Button>
 
 					<Button
+						className="inline-item inline-item-after"
 						disabled={isSubmitting}
 						displayType={null}
-						onClick={() => onSaveAsDraft?.(values, formikHelpers)}
+						onClick={onSaveAsDraftForm}
 					>
 						Save as Draft
+						{isSubmitting &&
+							values.mdfRequestStatus === Status.DRAFT && (
+								<ClayLoadingIndicator className="inline-item inline-item-after ml-2" />
+							)}
 					</Button>
 				</div>
 
@@ -133,12 +205,12 @@ const Activities = ({
 					</Button>
 
 					<Button
-						disabled={!isValid}
-						onClick={() =>
-							isForm
-								? setIsForm(false)
-								: onContinue?.(formikHelpers, StepType.REVIEW)
+						disabled={
+							currentActivityIndex !== undefined
+								? !isObjectEmpty(activityErrors as Object)
+								: !isValid
 						}
+						onClick={onContinueForm}
 					>
 						Continue
 					</Button>

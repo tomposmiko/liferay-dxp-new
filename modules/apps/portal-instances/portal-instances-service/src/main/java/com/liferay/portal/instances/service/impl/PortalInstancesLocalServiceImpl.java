@@ -51,7 +51,6 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.ThemeLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.DummyHttpServletResponse;
-import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ColorSchemeFactory;
@@ -60,11 +59,11 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.PrefsProps;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PortalInstances;
-import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portlet.RenderRequestFactory;
 import com.liferay.portlet.RenderResponseFactory;
 import com.liferay.site.initializer.SiteInitializer;
@@ -79,7 +78,6 @@ import javax.portlet.PortletMode;
 import javax.portlet.PortletRequest;
 import javax.portlet.WindowState;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -127,13 +125,12 @@ public class PortalInstancesLocalServiceImpl
 
 	@Override
 	public void initializePortalInstance(
-			long companyId, String siteInitializerKey,
-			ServletContext servletContext)
+			long companyId, String siteInitializerKey)
 		throws PortalException {
 
 		Company company = _companyLocalService.getCompany(companyId);
 
-		PortalInstances.initCompany(servletContext, company.getWebId());
+		PortalInstances.initCompany(company.getWebId());
 
 		if (Validator.isNull(siteInitializerKey)) {
 			return;
@@ -219,8 +216,8 @@ public class PortalInstancesLocalServiceImpl
 	}
 
 	@Override
-	public void reload(ServletContext servletContext) {
-		PortalInstances.reload(servletContext);
+	public void reload() {
+		PortalInstances.reload();
 	}
 
 	@Override
@@ -247,11 +244,7 @@ public class PortalInstancesLocalServiceImpl
 						return;
 					}
 
-					ServletContext portalContext = ServletContextPool.get(
-						_portal.getPathContext());
-
-					PortalInstances.initCompany(
-						portalContext, company.getWebId());
+					PortalInstances.initCompany(company.getWebId());
 				});
 
 			_companyLocalService.forEachCompanyId(
@@ -311,7 +304,7 @@ public class PortalInstancesLocalServiceImpl
 			(LayoutTypePortlet)controlPanelLayout.getLayoutType());
 		themeDisplay.setLocale(LocaleUtil.getSiteDefault());
 
-		String themeId = PrefsPropsUtil.getString(
+		String themeId = _prefsProps.getString(
 			company.getCompanyId(),
 			PropsKeys.CONTROL_PANEL_LAYOUT_REGULAR_THEME_ID);
 
@@ -394,6 +387,9 @@ public class PortalInstancesLocalServiceImpl
 
 	@Reference
 	private PortletLocalService _portletLocalService;
+
+	@Reference
+	private PrefsProps _prefsProps;
 
 	@Reference
 	private RoleLocalService _roleLocalService;

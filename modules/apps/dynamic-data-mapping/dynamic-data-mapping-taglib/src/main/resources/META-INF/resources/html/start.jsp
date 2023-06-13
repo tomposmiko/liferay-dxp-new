@@ -89,9 +89,9 @@
 							}
 
 							if (curLanguageId.equals(defaultLanguageId)) {
+								linkCssClass += " active";
 								translationStatusCssClass = "info";
 								translationStatusMessage = LanguageUtil.get(request, "default");
-								linkCssClass += " active";
 							}
 						%>
 
@@ -186,6 +186,7 @@
 					doAsGroupId: <%= scopeGroupId %>,
 					fieldsNamespace: '<%= HtmlUtil.escapeJS(fieldsNamespace) %>',
 					imageSelectorURL: '<%= imageSelectorURL %>',
+					layoutSelectorURL: '<%= layoutSelectorURL %>',
 					isPrivateLayoutsEnabled: <%= group.isPrivateLayoutsEnabled() %>,
 					mode: '<%= HtmlUtil.escapeJS(mode) %>',
 					p_l_id: <%= themeDisplay.getPlid() %>,
@@ -241,8 +242,8 @@
 					}
 				);
 
-				triggerMenu.setHTML(triggerContent);
 				triggerMenu.setData('menuListContainer', listContainer);
+				triggerMenu.setHTML(triggerContent);
 			};
 
 			Liferay.on('inputLocalized:localeChanged', onLocaleChange);

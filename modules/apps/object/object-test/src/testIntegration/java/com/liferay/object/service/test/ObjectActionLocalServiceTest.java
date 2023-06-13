@@ -58,7 +58,6 @@ import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.util.PropsUtil;
 
 import java.io.Serializable;
 
@@ -73,10 +72,8 @@ import java.util.Queue;
 import jodd.util.StringUtil;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -92,22 +89,6 @@ public class ObjectActionLocalServiceTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		PropsUtil.addProperties(
-			UnicodePropertiesBuilder.setProperty(
-				"feature.flag.LPS-166918", "true"
-			).build());
-	}
-
-	@AfterClass
-	public static void tearDownClass() throws Exception {
-		PropsUtil.addProperties(
-			UnicodePropertiesBuilder.setProperty(
-				"feature.flag.LPS-166918", "false"
-			).build());
-	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -146,7 +127,7 @@ public class ObjectActionLocalServiceTest {
 		try {
 			_addObjectAction(
 				StringPool.BLANK, RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				ObjectActionTriggerConstants.KEY_STANDALONE);
 
 			Assert.fail();
@@ -162,8 +143,8 @@ public class ObjectActionLocalServiceTest {
 
 		try {
 			_addObjectAction(
-				StringPool.BLANK, StringPool.BLANK,
-				RandomTestUtil.randomString(),
+				StringPool.BLANK, RandomTestUtil.randomString(),
+				StringPool.BLANK, RandomTestUtil.randomString(),
 				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD);
 
 			Assert.fail();
@@ -177,7 +158,7 @@ public class ObjectActionLocalServiceTest {
 		try {
 			_addObjectAction(
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				StringPool.BLANK,
+				RandomTestUtil.randomString(), StringPool.BLANK,
 				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE);
 
 			Assert.fail();
@@ -190,7 +171,7 @@ public class ObjectActionLocalServiceTest {
 		try {
 			_addObjectAction(
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(42),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(42),
 				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE);
 
 			Assert.fail();
@@ -204,7 +185,8 @@ public class ObjectActionLocalServiceTest {
 		try {
 			_addObjectAction(
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				"Abl e", ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE);
+				RandomTestUtil.randomString(), "Abl e",
+				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE);
 
 			Assert.fail();
 		}
@@ -217,7 +199,8 @@ public class ObjectActionLocalServiceTest {
 		try {
 			_addObjectAction(
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				"Abl-e", ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE);
+				RandomTestUtil.randomString(), "Abl-e",
+				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE);
 
 			Assert.fail();
 		}
@@ -230,7 +213,7 @@ public class ObjectActionLocalServiceTest {
 		String name = RandomTestUtil.randomString();
 
 		ObjectAction objectAction1 = _objectActionLocalService.addObjectAction(
-			TestPropsValues.getUserId(),
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
 			RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -246,7 +229,8 @@ public class ObjectActionLocalServiceTest {
 		try {
 			_addObjectAction(
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				name, ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE);
+				RandomTestUtil.randomString(), name,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE);
 
 			Assert.fail();
 		}
@@ -257,7 +241,7 @@ public class ObjectActionLocalServiceTest {
 		}
 
 		ObjectAction objectAction2 = _objectActionLocalService.addObjectAction(
-			TestPropsValues.getUserId(),
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
 			RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -271,7 +255,7 @@ public class ObjectActionLocalServiceTest {
 				"url", "https://onafterdelete.com"
 			).build());
 		ObjectAction objectAction3 = _objectActionLocalService.addObjectAction(
-			TestPropsValues.getUserId(),
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
 			RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -285,7 +269,7 @@ public class ObjectActionLocalServiceTest {
 				"url", "https://onafterupdate.com"
 			).build());
 		ObjectAction objectAction4 = _objectActionLocalService.addObjectAction(
-			TestPropsValues.getUserId(),
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
 			RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -376,7 +360,7 @@ public class ObjectActionLocalServiceTest {
 		_publishCustomObjectDefinition();
 
 		ObjectAction objectAction = _objectActionLocalService.addObjectAction(
-			TestPropsValues.getUserId(),
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true,
 			"equals(firstName, \"João\")", RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -426,7 +410,7 @@ public class ObjectActionLocalServiceTest {
 		_publishCustomObjectDefinition();
 
 		ObjectAction objectAction = _objectActionLocalService.addObjectAction(
-			TestPropsValues.getUserId(),
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
 			RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -471,8 +455,10 @@ public class ObjectActionLocalServiceTest {
 
 	@Test
 	public void testUpdateObjectAction() throws Exception {
+		String externalReferenceCode = RandomTestUtil.randomString();
+
 		ObjectAction objectAction = _objectActionLocalService.addObjectAction(
-			TestPropsValues.getUserId(),
+			externalReferenceCode, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true,
 			"equals(firstName, \"John\")", "Able Description",
 			LocalizedMapUtil.getLocalizedMap("Able Error Message"),
@@ -499,7 +485,7 @@ public class ObjectActionLocalServiceTest {
 			ObjectActionConstants.STATUS_NEVER_RAN);
 
 		objectAction = _objectActionLocalService.updateObjectAction(
-			objectAction.getObjectActionId(), false,
+			externalReferenceCode, objectAction.getObjectActionId(), false,
 			"equals(firstName, \"João\")", "Baker Description",
 			LocalizedMapUtil.getLocalizedMap("Baker Error Message"),
 			LocalizedMapUtil.getLocalizedMap("Baker Label"), "Baker",
@@ -527,7 +513,7 @@ public class ObjectActionLocalServiceTest {
 		_publishCustomObjectDefinition();
 
 		objectAction = _objectActionLocalService.updateObjectAction(
-			objectAction.getObjectActionId(), true,
+			externalReferenceCode, objectAction.getObjectActionId(), true,
 			"equals(firstName, \"John\")", "Charlie Description",
 			LocalizedMapUtil.getLocalizedMap("Charlie Error Message"),
 			LocalizedMapUtil.getLocalizedMap("Charlie Label"), "Charlie",
@@ -554,12 +540,12 @@ public class ObjectActionLocalServiceTest {
 	}
 
 	private void _addObjectAction(
-			String errorMessage, String label, String name,
-			String objectActionTriggerKey)
+			String errorMessage, String externalReferenceCode, String label,
+			String name, String objectActionTriggerKey)
 		throws Exception {
 
 		_objectActionLocalService.addObjectAction(
-			TestPropsValues.getUserId(),
+			externalReferenceCode, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
 			RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(errorMessage),

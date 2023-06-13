@@ -38,6 +38,13 @@ definition {
 			locator1 = "CP2TeamMembers#TEAM_MEMBERS_TABLE");
 	}
 
+	macro assertThatFunctionIsDisabled {
+		AssertElementPresent(
+			key_index = "${positionNumber}",
+			locator1 = "CP2TeamMembers#ROLE_DISABLED",
+			role = "${role}");
+	}
+
 	macro assertThatUserGuestIsVisible {
 		var key_email = "${email}";
 
@@ -49,10 +56,6 @@ definition {
 			key_name = "${name}",
 			key_status = "${status}",
 			locator1 = "CP2TeamMembers#TEAM_MEMBERS_TABLE");
-	}
-
-	macro clickInviteMembers {
-		Click(locator1 = "CP2TeamMembers#INVITE_BUTTON");
 	}
 
 	macro clickTeamMembersSendInvitation {
@@ -81,8 +84,18 @@ definition {
 			value1 = "${search}");
 	}
 
+	macro tableChangeRole {
+		Click(
+			key_text = "${roleDefault}",
+			locator1 = "CP2TeamMembers#TABLE_ROLE_FIELD");
+
+		Click(
+			key_text = "${changeRole}",
+			locator1 = "CP2TeamMembers#ROLE_CHANGE");
+	}
+
 	macro teamMembersFlow {
-		CustomerPortal.enterOnProject(title = "Test Account DXP");
+		CustomerPortal.enterOnProject(title = "${testAccount}");
 
 		CustomerPortal.clickOnStartProjectSetup();
 

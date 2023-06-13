@@ -12,20 +12,24 @@
  * details.
  */
 
+import {StatusBadgeType} from '../../components/StatusBadge/StatusBadge';
 import {DescriptionType} from '../../types';
 
-export type FacetAggregation = {
-	facets: {
-		facetCriteria: string;
-		facetValues: {
-			numberOfOccurrences: number;
-			term: string;
-		}[];
+type Facets = {
+	facetCriteria: string;
+	facetValues: {
+		numberOfOccurrences: number;
+		term: string;
 	}[];
+};
+
+export type FacetAggregation = {
+	facets: Facets[];
 };
 
 export type APIResponse<Query = any> = {
 	actions: Object;
+	facets: Facets[];
 	items: Query[];
 	lastPage: number;
 	page: number;
@@ -166,6 +170,15 @@ export type TestrayCaseType = {
 	status: string;
 };
 
+export type TestrayDyspatchTrigger = {
+	creator: {
+		name: string;
+		urlImage?: string;
+	};
+	status: StatusBadgeType;
+	type: string;
+};
+
 export type TestrayFactorOption = {
 	dateCreated: string;
 	dateModified: string;
@@ -304,6 +317,7 @@ export type TestraySuiteCase = {
 export type TestrayTask = {
 	build?: TestrayBuild;
 	dateCreated: string;
+	dispatchTriggerId: number;
 	dueStatus: PickList;
 	id: number;
 	name: string;
@@ -388,6 +402,21 @@ export type TestrayAttachment = {
 	name: string;
 	url: string;
 	value: string;
+};
+
+export type TestrayDispatchTrigger = {
+	creator: {
+		image: string;
+		name: string;
+	};
+	dateCreated: string;
+	dispatchTriggerId: number;
+	dueStatus: PickList;
+	externalReferenceCode: string;
+	id: number;
+	name: string;
+	output: string;
+	type: string;
 };
 
 export type MessageBoardMessage = {

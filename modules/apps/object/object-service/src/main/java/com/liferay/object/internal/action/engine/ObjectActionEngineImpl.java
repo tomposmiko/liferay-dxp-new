@@ -23,6 +23,7 @@ import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.internal.action.util.ObjectActionThreadLocal;
 import com.liferay.object.internal.action.util.ObjectEntryVariablesUtil;
+import com.liferay.object.internal.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectActionLocalService;
@@ -37,8 +38,6 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
@@ -60,10 +59,6 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			String objectActionName, String objectActionTriggerKey,
 			long objectDefinitionId, JSONObject payloadJSONObject, long userId)
 		throws Exception {
-
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-166918"))) {
-			throw new UnsupportedOperationException();
-		}
 
 		ObjectAction objectAction = _objectActionLocalService.getObjectAction(
 			objectDefinitionId, objectActionName, objectActionTriggerKey);
@@ -106,16 +101,13 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			return;
 		}
 
-		long principalThreadLocalUserId = PrincipalThreadLocal.getUserId();
-
+		String name = PrincipalThreadLocal.getName();
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
 		try {
-			if (principalThreadLocalUserId != userId) {
-				PrincipalThreadLocal.setName(userId);
-			}
-
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(true);
+			PrincipalThreadLocal.setName(userId);
 			PermissionThreadLocal.setPermissionChecker(
 				_permissionCheckerFactory.create(user));
 
@@ -142,10 +134,8 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			}
 		}
 		finally {
-			if (principalThreadLocalUserId != userId) {
-				PrincipalThreadLocal.setName(principalThreadLocalUserId);
-			}
-
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(false);
+			PrincipalThreadLocal.setName(name);
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}

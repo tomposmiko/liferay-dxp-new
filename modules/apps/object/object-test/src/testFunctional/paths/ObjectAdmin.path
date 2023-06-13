@@ -271,6 +271,11 @@
 		<td></td>
 	</tr>
 	<tr>
+		<td>OBJECT_ANY_TAB</td>
+		<td>//*[contains(@class,'nav-link')]//span[contains(text(),'${key_tabName}')]</td>
+		<td></td>
+	</tr>
+	<tr>
 		<td>RELATIONSHIPS_TYPE_DESCRIPTION</td>
 		<td>//div[text() = '${key_type}']/..//span[@class = 'text-small']</td>
 		<td></td>
@@ -443,6 +448,11 @@
 	<tr>
 		<td>OBJECT_ACTIONS_TAB</td>
 		<td>//*[contains(@class,'nav-link')]//span[contains(text(),'Actions')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>ACTION_LABEL_FIELD</td>
+		<td>//input[@name='label']</td>
 		<td></td>
 	</tr>
 	<tr>

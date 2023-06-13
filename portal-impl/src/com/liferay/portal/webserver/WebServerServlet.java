@@ -121,7 +121,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.impl.ImageImpl;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.trash.kernel.model.TrashEntry;
 import com.liferay.users.admin.kernel.file.uploads.UserFileUploadsSettings;
 
 import java.awt.image.RenderedImage;
@@ -1798,7 +1797,8 @@ public class WebServerServlet extends HttpServlet {
 			}
 
 			return PortletProviderUtil.getPortletId(
-				TrashEntry.class.getName(), PortletProvider.Action.VIEW);
+				"com.liferay.trash.model.TrashEntry",
+				PortletProvider.Action.VIEW);
 		}
 
 		Group group = GroupLocalServiceUtil.getGroup(fileEntry.getGroupId());

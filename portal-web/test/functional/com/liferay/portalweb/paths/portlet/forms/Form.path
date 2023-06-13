@@ -176,6 +176,21 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SOURCE_FORM_BUTTON</td>
+	<td>//span[@id='cke_29_label']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SOURCE_FORM_EDITOR</td>
+	<td>//div[contains(@class,'CodeMirror cm-s-default')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SOURCE_FORM_EDITOR_PUBLISHED</td>
+	<td>//strong[contains(text(),'${key_richText}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -742,6 +757,21 @@
 <tr>
 	<td>LANGUAGE_ICON_SELECTED</td>
 	<td>//div[contains(@class, 'dropdown-menu')]//button[contains(@class, 'dropdown-item') and contains(text(), '${key_language}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW_EXISTING_SUBMISSIONS</td>
+	<td>//button[contains(text(), 'Preview Existing Submissions')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FORM_ANSWER</td>
+	<td>//li[contains(text(),'${key_reportData}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FORM_ANSWER_SINGLE_SELECTION</td>
+	<td>//div[contains(@class, 'card-header') and contains(., 'Single Selection')]/..//following-sibling::div/div[@class='legend-list' and contains(., '${optionValue}')]</td>
 	<td></td>
 </tr>
 

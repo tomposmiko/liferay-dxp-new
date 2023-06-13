@@ -18,7 +18,6 @@ import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.layoutconfiguration.util.RuntimePage;
-import com.liferay.portal.kernel.layoutconfiguration.util.xml.RuntimeLogic;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.LayoutTemplate;
@@ -28,29 +27,20 @@ import com.liferay.portal.kernel.service.LayoutTemplateLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.servlet.PluginContextListener;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
+import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateManager;
 import com.liferay.portal.kernel.template.TemplateManagerUtil;
-import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.layoutconfiguration.util.velocity.TemplateProcessor;
-import com.liferay.portal.layoutconfiguration.util.xml.ActionURLLogic;
-import com.liferay.portal.layoutconfiguration.util.xml.PortletLogic;
-import com.liferay.portal.layoutconfiguration.util.xml.RenderURLLogic;
 import com.liferay.portlet.internal.PortletBagUtil;
 import com.liferay.portlet.internal.PortletTypeUtil;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.portlet.PortletResponse;
-import javax.portlet.RenderResponse;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -110,24 +100,24 @@ public class RuntimePageImpl implements RuntimePage {
 	public StringBundler getProcessedTemplate(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String portletId,
-			TemplateResource templateResource)
+			String templateId, String content)
 		throws Exception {
 
 		return doDispatch(
-			httpServletRequest, httpServletResponse, portletId,
-			templateResource, TemplateConstants.LANG_TYPE_VM);
+			httpServletRequest, httpServletResponse, portletId, templateId,
+			content, TemplateConstants.LANG_TYPE_VM);
 	}
 
 	@Override
 	public void processTemplate(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String portletId,
-			TemplateResource templateResource)
+			String templateId, String content)
 		throws Exception {
 
 		StringBundler sb = doDispatch(
-			httpServletRequest, httpServletResponse, portletId,
-			templateResource, TemplateConstants.LANG_TYPE_VM);
+			httpServletRequest, httpServletResponse, portletId, templateId,
+			content, TemplateConstants.LANG_TYPE_VM);
 
 		sb.writeTo(httpServletResponse.getWriter());
 	}
@@ -136,180 +126,25 @@ public class RuntimePageImpl implements RuntimePage {
 	public void processTemplate(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String portletId,
-			TemplateResource templateResource, String langType)
+			String templateId, String content, String langType)
 		throws Exception {
 
 		StringBundler sb = doDispatch(
-			httpServletRequest, httpServletResponse, portletId,
-			templateResource, langType);
+			httpServletRequest, httpServletResponse, portletId, templateId,
+			content, langType);
 
 		sb.writeTo(httpServletResponse.getWriter());
-	}
-
-	@Override
-	public void processTemplate(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse,
-			TemplateResource templateResource)
-		throws Exception {
-
-		processTemplate(
-			httpServletRequest, httpServletResponse, null, templateResource);
-	}
-
-	@Override
-	public void processTemplate(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse,
-			TemplateResource templateResource, String langType)
-		throws Exception {
-
-		processTemplate(
-			httpServletRequest, httpServletResponse, null, templateResource,
-			langType);
-	}
-
-	@Override
-	public String processXML(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse, String content)
-		throws Exception {
-
-		PortletResponse portletResponse =
-			(PortletResponse)httpServletRequest.getAttribute(
-				JavaConstants.JAVAX_PORTLET_RESPONSE);
-
-		if ((portletResponse != null) &&
-			!(portletResponse instanceof RenderResponse)) {
-
-			throw new IllegalArgumentException(
-				"processXML can only be invoked in the render phase");
-		}
-
-		RuntimeLogic portletLogic = new PortletLogic(
-			httpServletRequest, httpServletResponse);
-
-		content = processXML(httpServletRequest, content, portletLogic);
-
-		if (portletResponse == null) {
-			return content;
-		}
-
-		RenderResponse renderResponse = (RenderResponse)portletResponse;
-
-		RuntimeLogic actionURLLogic = new ActionURLLogic(renderResponse);
-		RuntimeLogic renderURLLogic = new RenderURLLogic(renderResponse);
-
-		content = processXML(httpServletRequest, content, actionURLLogic);
-		content = processXML(httpServletRequest, content, renderURLLogic);
-
-		return content;
-	}
-
-	@Override
-	public String processXML(
-			HttpServletRequest httpServletRequest, String content,
-			RuntimeLogic runtimeLogic)
-		throws Exception {
-
-		if (Validator.isNull(content)) {
-			return StringPool.BLANK;
-		}
-
-		int index = content.indexOf(runtimeLogic.getOpenTag());
-
-		if (index == -1) {
-			return content;
-		}
-
-		Portlet renderPortlet = (Portlet)httpServletRequest.getAttribute(
-			WebKeys.RENDER_PORTLET);
-
-		Boolean renderPortletResource =
-			(Boolean)httpServletRequest.getAttribute(
-				WebKeys.RENDER_PORTLET_RESOURCE);
-
-		String outerPortletId = (String)httpServletRequest.getAttribute(
-			WebKeys.OUTER_PORTLET_ID);
-
-		if (outerPortletId == null) {
-			httpServletRequest.setAttribute(
-				WebKeys.OUTER_PORTLET_ID, renderPortlet.getPortletId());
-		}
-
-		try {
-			httpServletRequest.setAttribute(
-				WebKeys.RENDER_PORTLET_RESOURCE, Boolean.TRUE);
-
-			StringBundler sb = new StringBundler();
-
-			int x = 0;
-			int y = index;
-
-			while (y != -1) {
-				sb.append(content.substring(x, y));
-
-				String close1Tag = runtimeLogic.getClose1Tag();
-				String close2Tag = runtimeLogic.getClose2Tag();
-
-				int close1 = content.indexOf(close1Tag, y);
-				int close2 = content.indexOf(close2Tag, y);
-
-				if ((close2 == -1) || ((close1 != -1) && (close1 < close2))) {
-					x = close1 + close1Tag.length();
-				}
-				else {
-					x = close2 + close2Tag.length();
-				}
-
-				String runtimePortletTag = content.substring(y, x);
-
-				if ((renderPortlet != null) &&
-					runtimePortletTag.contains(renderPortlet.getPortletId())) {
-
-					return StringPool.BLANK;
-				}
-
-				sb.append(runtimeLogic.processXML(runtimePortletTag));
-
-				y = content.indexOf(runtimeLogic.getOpenTag(), x);
-			}
-
-			if (y == -1) {
-				sb.append(content.substring(x));
-			}
-
-			return sb.toString();
-		}
-		finally {
-			if (outerPortletId == null) {
-				httpServletRequest.removeAttribute(WebKeys.OUTER_PORTLET_ID);
-			}
-
-			httpServletRequest.setAttribute(
-				WebKeys.RENDER_PORTLET, renderPortlet);
-
-			if (renderPortletResource == null) {
-				httpServletRequest.removeAttribute(
-					WebKeys.RENDER_PORTLET_RESOURCE);
-			}
-			else {
-				httpServletRequest.setAttribute(
-					WebKeys.RENDER_PORTLET_RESOURCE, renderPortletResource);
-			}
-		}
 	}
 
 	protected StringBundler doDispatch(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String portletId,
-			TemplateResource templateResource, String langType)
+			String templateId, String content, String langType)
 		throws Exception {
 
 		ClassLoader pluginClassLoader = null;
 
-		LayoutTemplate layoutTemplate = getLayoutTemplate(
-			templateResource.getTemplateId());
+		LayoutTemplate layoutTemplate = getLayoutTemplate(templateId);
 
 		if (layoutTemplate != null) {
 			String pluginServletContextName = GetterUtil.getString(
@@ -337,8 +172,8 @@ public class RuntimePageImpl implements RuntimePage {
 			}
 
 			return doProcessTemplate(
-				httpServletRequest, httpServletResponse, portletId,
-				templateResource, langType, false);
+				httpServletRequest, httpServletResponse, portletId, templateId,
+				content, langType, false);
 		}
 		finally {
 			if ((pluginClassLoader != null) &&
@@ -352,7 +187,7 @@ public class RuntimePageImpl implements RuntimePage {
 	protected StringBundler doProcessTemplate(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String portletId,
-			TemplateResource templateResource, String langType,
+			String templateId, String content, String langType,
 			boolean restricted)
 		throws Exception {
 
@@ -363,7 +198,7 @@ public class RuntimePageImpl implements RuntimePage {
 			TemplateManagerUtil.getTemplateManager(langType);
 
 		Template template = templateManager.getTemplate(
-			templateResource, restricted);
+			new StringTemplateResource(templateId, content), restricted);
 
 		template.put("processor", processor);
 

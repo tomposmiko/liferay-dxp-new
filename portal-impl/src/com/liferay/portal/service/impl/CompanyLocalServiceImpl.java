@@ -110,6 +110,7 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
@@ -121,7 +122,6 @@ import com.liferay.portal.liveusers.LiveUsers;
 import com.liferay.portal.security.auth.EmailAddressValidatorFactory;
 import com.liferay.portal.service.base.CompanyLocalServiceBaseImpl;
 import com.liferay.portal.util.PortalInstances;
-import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -394,11 +394,13 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		}
 
 		Long companyThreadLocalCompanyId = CompanyThreadLocal.getCompanyId();
-		boolean deleteInProcess = CompanyThreadLocal.isDeleteInProcess();
 
-		try {
-			CompanyThreadLocal.setCompanyId(companyId);
-			CompanyThreadLocal.setDeleteInProcess(true);
+		try (SafeCloseable safeCloseable1 =
+				CompanyThreadLocal.setWithSafeCloseable(
+					companyThreadLocalCompanyId);
+			SafeCloseable safeCloseable2 =
+				PortalInstances.setCompanyInDeletionProcess(
+					companyThreadLocalCompanyId)) {
 
 			return doDeleteCompany(companyId);
 		}
@@ -408,10 +410,6 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			}
 
 			throw portalException;
-		}
-		finally {
-			CompanyThreadLocal.setCompanyId(companyThreadLocalCompanyId);
-			CompanyThreadLocal.setDeleteInProcess(deleteInProcess);
 		}
 	}
 

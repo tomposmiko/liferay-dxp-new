@@ -32,12 +32,10 @@ const columns: TColumn[] = [
 		label: Liferay.Language.get('site-name'),
 	},
 	{
-		expanded: true,
 		id: EColumn.FriendlyURL,
 		label: Liferay.Language.get('friendly-url'),
 	},
 	{
-		expanded: true,
 		id: EColumn.ChannelName,
 		label: Liferay.Language.get('assigned-property'),
 		sortable: false,
@@ -57,6 +55,7 @@ const SitesTab: React.FC<ISiteTabProps> = ({
 }) => (
 	<Tab
 		columns={columns.map(({id}) => id) as Array<keyof TRawItem>}
+		description={Liferay.Language.get('sites-tab-description')}
 		emptyState={{
 			noResultsTitle: Liferay.Language.get('no-sites-were-found'),
 			title: Liferay.Language.get('there-are-no-sites'),

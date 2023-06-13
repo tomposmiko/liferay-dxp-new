@@ -75,6 +75,11 @@ export function LengthField({field, onEnter, onValueSelect, value}) {
 		RESTORABLE_FIELDS.has(field.name) && value !== field.defaultValue
 	);
 
+	const resetButtonLabel = useMemo(
+		() => getResetLabelByViewport(selectedViewportSize),
+		[selectedViewportSize]
+	);
+
 	return (
 		<div className="align-items-center d-flex page-editor__length-field">
 			<LengthInput
@@ -95,6 +100,7 @@ export function LengthField({field, onEnter, onValueSelect, value}) {
 
 			{showRestoreButton ? (
 				<ClayButtonWithIcon
+					aria-label={resetButtonLabel}
 					className="border-0 flex-shrink-0 mb-0 ml-2"
 					displayType="secondary"
 					onClick={() => {
@@ -103,9 +109,9 @@ export function LengthField({field, onEnter, onValueSelect, value}) {
 						);
 						onValueSelect(field.name, null);
 					}}
-					small
+					size="sm"
 					symbol="restore"
-					title={getResetLabelByViewport(selectedViewportSize)}
+					title={resetButtonLabel}
 				/>
 			) : null}
 		</div>
@@ -313,7 +319,7 @@ export function LengthInput({
 								disabled={defaultUnit}
 								displayType="secondary"
 								id={triggerId}
-								small
+								size="sm"
 								title={Liferay.Language.get('select-units')}
 							>
 								{defaultUnit ||

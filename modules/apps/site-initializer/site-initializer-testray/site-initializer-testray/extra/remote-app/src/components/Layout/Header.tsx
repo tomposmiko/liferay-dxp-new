@@ -25,6 +25,7 @@ import BreadcrumbFinder from '../BreadcrumbFinder';
 import DropDown from '../DropDown';
 import DropDownWithActions from '../DropDown/DropDown';
 import TestrayIcons from '../Icons/TestrayIcon';
+import NotificationPopover from '../NotificationPopover';
 
 const Divider = () => <p className="mx-2 text-paragraph-lg">/</p>;
 
@@ -33,16 +34,22 @@ type BreadCrumbTriggerProps = {
 };
 
 const Header = () => {
-	const [{dropdown, headerActions, heading, symbol, tabs}] = useContext(
-		HeaderContext
-	);
+	const [
+		{
+			dropdown,
+			headerActions,
+			heading,
+			symbol,
+			tabs,
+			testrayDispatchTriggers,
+		},
+	] = useContext(HeaderContext);
+	const navigate = useNavigate();
 
 	const filteredHeaderActions = Permission.filterActions(
 		headerActions.actions,
 		headerActions.item?.actions
 	);
-
-	const navigate = useNavigate();
 
 	const BreadCrumbTrigger: React.FC<BreadCrumbTriggerProps> = ({
 		displayCarret,
@@ -133,14 +140,20 @@ const Header = () => {
 						})}
 					</div>
 
-					{!!filteredHeaderActions.length && (
-						<DropDownWithActions
-							actions={filteredHeaderActions}
-							item={headerActions.item}
-							mutate={headerActions.mutate}
-							position={Align.BottomLeft}
+					<div className="align-items-center d-flex justify-content-center">
+						{!!filteredHeaderActions.length && (
+							<DropDownWithActions
+								actions={filteredHeaderActions}
+								item={headerActions.item}
+								mutate={headerActions.mutate}
+								position={Align.BottomLeft}
+							/>
+						)}
+
+						<NotificationPopover
+							testrayDispatchTriggers={testrayDispatchTriggers}
 						/>
-					)}
+					</div>
 				</div>
 			</div>
 

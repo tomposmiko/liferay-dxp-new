@@ -11,8 +11,8 @@
 
 import {FormikHelpers} from 'formik';
 
-import {Status} from '../../../common/enums/status';
 import MDFRequestDTO from '../../../common/interfaces/dto/mdfRequestDTO';
+import LiferayPicklist from '../../../common/interfaces/liferayPicklist';
 import MDFClaim from '../../../common/interfaces/mdfClaim';
 import {Liferay} from '../../../common/services/liferay';
 import createDocumentFolder from '../../../common/services/liferay/headless-delivery/createDocumentFolder';
@@ -22,6 +22,7 @@ import createMDFClaimActivityBudgets from '../../../common/services/liferay/obje
 import {ResourceName} from '../../../common/services/liferay/object/enum/resourceName';
 import createMDFClaimDocuments from '../../../common/services/liferay/object/mdf-claim-documents/createMDFClaimDocuments';
 import createMDFClaim from '../../../common/services/liferay/object/mdf-claim/createMDFClaim';
+import {Status} from '../../../common/utils/constants/status';
 import renameFileKeepingExtention from './RenameFile';
 import createMDFClaimProxyAPI from './createMDFClaimProxyAPI';
 
@@ -31,10 +32,10 @@ export default async function submitForm(
 	mdfRequest: MDFRequestDTO,
 	claimParentFolderId: number,
 	siteURL: string,
-	currentClaimStatus?: Status
+	currentClaimStatus?: LiferayPicklist
 ) {
 	if (currentClaimStatus) {
-		values.claimStatus = currentClaimStatus;
+		values.mdfClaimStatus = currentClaimStatus;
 	}
 
 	formikHelpers.setSubmitting(true);
@@ -43,9 +44,15 @@ export default async function submitForm(
 		Boolean(activity.budgets?.some((budget) => !budget.selected))
 	);
 
-	const dtoMDFClaim = Liferay.FeatureFlags['LPS-164528']
-		? await createMDFClaimProxyAPI(values, mdfRequest)
-		: await createMDFClaim(ResourceName.MDF_CLAIM_DXP, values, mdfRequest);
+	const dtoMDFClaim =
+		Liferay.FeatureFlags['LPS-164528'] &&
+		values.mdfClaimStatus !== Status.DRAFT
+			? await createMDFClaimProxyAPI(values, mdfRequest)
+			: await createMDFClaim(
+					ResourceName.MDF_CLAIM_DXP,
+					values,
+					mdfRequest
+			  );
 
 	if (dtoMDFClaim?.id) {
 		const claimFolder = await createDocumentFolder(

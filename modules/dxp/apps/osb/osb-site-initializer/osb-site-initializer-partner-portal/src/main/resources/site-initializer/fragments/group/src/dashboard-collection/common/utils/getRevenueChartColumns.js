@@ -14,6 +14,7 @@ import {currencyFormat} from '.';
 export default function getRevenueChartColumns(
 	revenueData,
 	setTitleChart,
+	setValueChart,
 	setColumnsRevenueChart
 ) {
 	const chartColumns = [];
@@ -23,14 +24,15 @@ export default function getRevenueChartColumns(
 			accumulator + currentValue.netSubscriptionArr || 0,
 		0
 	);
-	setTitleChart(`$${currencyFormat(totalRevenueAmount)} Total Revenue`);
+	setValueChart(currencyFormat(totalRevenueAmount));
+	setTitleChart(` Total Revenue`);
 
 	const totalNewBusiness = revenueData?.items?.reduce(
 		(accumulator, currentValue) =>
 			accumulator + currentValue.growthArr || 0,
 		0
 	);
-	chartColumns.push(['New Business', totalNewBusiness]);
+	chartColumns.push(['Growth Revenue', totalNewBusiness]);
 
 	const totalRenewal = revenueData?.items?.reduce(
 		(accumulator, currentValue) =>
@@ -38,7 +40,7 @@ export default function getRevenueChartColumns(
 		0
 	);
 
-	chartColumns.push(['Project Revenue', totalRenewal]);
+	chartColumns.push(['Renewal Revenue', totalRenewal]);
 
 	setColumnsRevenueChart(chartColumns);
 }

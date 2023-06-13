@@ -23,6 +23,7 @@ import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.ButtonTag;
 import com.liferay.frontend.taglib.clay.servlet.taglib.ColTag;
 import com.liferay.frontend.taglib.clay.servlet.taglib.ContainerTag;
+import com.liferay.frontend.taglib.clay.servlet.taglib.IconTag;
 import com.liferay.frontend.taglib.clay.servlet.taglib.PaginationBarTag;
 import com.liferay.frontend.taglib.clay.servlet.taglib.RowTag;
 import com.liferay.frontend.taglib.servlet.taglib.ComponentTag;
@@ -34,6 +35,7 @@ import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.item.provider.InfoItemDetailsProvider;
 import com.liferay.info.list.renderer.DefaultInfoListRendererContext;
 import com.liferay.info.list.renderer.InfoListRenderer;
+import com.liferay.info.permission.provider.InfoPermissionProvider;
 import com.liferay.layout.constants.LayoutWebKeys;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
 import com.liferay.layout.display.page.constants.LayoutDisplayPageWebKeys;
@@ -70,13 +72,13 @@ import com.liferay.portal.kernel.service.LayoutTemplateLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
@@ -217,6 +219,63 @@ public class RenderLayoutStructureTag extends IncludeTag {
 			layout.getUserId(), PropsValues.DEFAULT_LAYOUT_TEMPLATE_ID);
 
 		return layoutTypePortlet;
+	}
+
+	private boolean _hasAddPermission(String className) {
+		InfoItemServiceRegistry infoItemServiceRegistry =
+			ServletContextUtil.getInfoItemServiceRegistry();
+
+		InfoPermissionProvider infoPermissionProvider =
+			infoItemServiceRegistry.getFirstInfoItemService(
+				InfoPermissionProvider.class, className);
+
+		if (infoPermissionProvider == null) {
+			return true;
+		}
+
+		HttpServletRequest httpServletRequest = getRequest();
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		if ((themeDisplay != null) &&
+			infoPermissionProvider.hasAddPermission(
+				themeDisplay.getScopeGroupId(),
+				themeDisplay.getPermissionChecker())) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _hasViewPermission(String className) {
+		InfoItemServiceRegistry infoItemServiceRegistry =
+			ServletContextUtil.getInfoItemServiceRegistry();
+
+		InfoPermissionProvider infoPermissionProvider =
+			infoItemServiceRegistry.getFirstInfoItemService(
+				InfoPermissionProvider.class, className);
+
+		if (infoPermissionProvider == null) {
+			return true;
+		}
+
+		HttpServletRequest httpServletRequest = getRequest();
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		if ((themeDisplay != null) &&
+			infoPermissionProvider.hasViewPermission(
+				themeDisplay.getPermissionChecker())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private void _renderCollectionStyledLayoutStructureItem(
@@ -751,8 +810,8 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 				RuntimePageUtil.processTemplate(
 					originalHttpServletRequest,
-					(HttpServletResponse)pageContext.getResponse(),
-					new StringTemplateResource(templateId, templateContent),
+					(HttpServletResponse)pageContext.getResponse(), null,
+					templateId, templateContent,
 					LayoutTemplateLocalServiceUtil.getLangType(
 						layoutTypePortlet.getLayoutTemplateId(), false,
 						themeDisplay.getThemeId()));
@@ -814,6 +873,48 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		throws Exception {
 
 		if (infoForm == null) {
+			return;
+		}
+
+		HttpServletRequest httpServletRequest = getRequest();
+
+		String mode = ParamUtil.getString(
+			PortalUtil.getOriginalServletRequest(httpServletRequest),
+			"p_l_mode", Constants.VIEW);
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-169923")) &&
+			((!Objects.equals(mode, Constants.VIEW) &&
+			  !_hasViewPermission(
+				  PortalUtil.getClassName(
+					  formStyledLayoutStructureItem.getClassNameId()))) ||
+			 (Objects.equals(mode, Constants.VIEW) &&
+			  !_hasAddPermission(
+				  PortalUtil.getClassName(
+					  formStyledLayoutStructureItem.getClassNameId()))))) {
+
+			JspWriter jspWriter = pageContext.getOut();
+
+			jspWriter.write(
+				"<div class=\"p-3 bg-light text-secondary rounded\" style=" +
+					"\"border: 1px solid #d3d6e0;\">" +
+						"<span class=\"mr-2 alert-indicator\">");
+
+			IconTag iconTag = new IconTag();
+
+			iconTag.setCssClass("lexicon-icon lexicon-icon-password-policies");
+
+			iconTag.setSymbol("password-policies");
+
+			iconTag.doTag(pageContext);
+
+			jspWriter.write("</span>");
+			jspWriter.write(
+				LanguageUtil.get(
+					getRequest(),
+					"this-content-cannot-be-displayed-due-to-permission-" +
+						"restrictions"));
+			jspWriter.write("</div>");
+
 			return;
 		}
 
@@ -885,8 +986,6 @@ public class RenderLayoutStructureTag extends IncludeTag {
 					formStyledLayoutStructureItem));
 		jspWriter.write("\"><input name=\"backURL\" type=\"hidden\" value=\"");
 
-		HttpServletRequest httpServletRequest = getRequest();
-
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -907,10 +1006,7 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		jspWriter.write("\"><input name=\"groupId\" type=\"hidden\" value=\"");
 		jspWriter.write(String.valueOf(themeDisplay.getScopeGroupId()));
 		jspWriter.write("\"><input name=\"p_l_mode\" type=\"hidden\" value=\"");
-		jspWriter.write(
-			ParamUtil.getString(
-				PortalUtil.getOriginalServletRequest(httpServletRequest),
-				"p_l_mode", Constants.VIEW));
+		jspWriter.write(mode);
 		jspWriter.write("\"><input name=\"plid\" type=\"hidden\" value=\"");
 		jspWriter.write(String.valueOf(themeDisplay.getPlid()));
 		jspWriter.write(

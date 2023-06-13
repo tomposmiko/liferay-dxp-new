@@ -12,7 +12,12 @@
 <tbody>
 <tr>
 	<td>REMOTE_APPS_HEADER</td>
-	<td>//h1[contains(@data-qa-id,'headerTitle') and contains(@value,'Remote Apps')]</td>
+	<td>//h1[contains(@data-qa-id,'headerTitle') and contains(@value,'Client Extensions')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REMOTE_APPS_FIELDS</td>
+	<td>//div[label[contains(.,'${key_text}')]]//input[not(contains(@type,'checkbox'))] | //textarea[contains(@name,'${key_text}') or contains(@title,'${key_text}')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -15,6 +15,7 @@
 package com.liferay.portal.tools;
 
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
+import com.liferay.document.library.kernel.store.Store;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.db.index.IndexUpdaterUtil;
@@ -35,7 +36,8 @@ import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
-import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.version.Version;
@@ -43,16 +45,18 @@ import com.liferay.portal.transaction.TransactionsUtil;
 import com.liferay.portal.upgrade.PortalUpgradeProcess;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PortalClassPathUtil;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.verify.VerifyProcessSuite;
 import com.liferay.portal.verify.VerifyProperties;
-import com.liferay.portlet.documentlibrary.store.StoreFactory;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
+import java.util.Collection;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.logging.log4j.core.Appender;
@@ -132,7 +136,15 @@ public class DBUpgrader {
 
 			PortalClassPathUtil.initializeClassPaths(null);
 
-			InitUtil.initWithSpring(true, false);
+			InitUtil.initWithSpring(
+				ListUtil.fromArray(
+					PropsUtil.getArray(PropsKeys.SPRING_CONFIGS)),
+				true, false,
+				() -> {
+					if (PropsValues.UPGRADE_REPORT_ENABLED) {
+						_startUpgradeReportLogAppender();
+					}
+				});
 
 			StartupHelperUtil.printPatchLevel();
 
@@ -148,7 +160,14 @@ public class DBUpgrader {
 
 			upgradeModules();
 
-			StoreFactory.getStore();
+			BundleContext bundleContext = SystemBundleUtil.getBundleContext();
+
+			Collection<?> collection = bundleContext.getServiceReferences(
+				Store.class, "(default=true)");
+
+			if (collection.isEmpty()) {
+				throw new IllegalStateException("Missing default Store");
+			}
 		}
 		catch (Exception exception) {
 			_log.error(exception);

@@ -65,6 +65,41 @@ definition {
 		}
 	}
 
+	@description = "This is a test for LPS-166203. The site designer could add fragment set during copy OOTB fragment when the site doesn't have fragment set."
+	@priority = "5"
+	test AddFirstFragmentSetWhenCopyContributedFragment {
+		task ("Given a site designer navigates to the Fragments admin of a new site") {
+			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
+		}
+
+		task ("When the site designer copies the Button fragment from Basic Components fragment set") {
+			FragmentsAdminNavigator.gotoCollection(collectionName = "Basic Components");
+
+			FragmentsAdminNavigator.gotoEntryEllipsisItem(
+				entry = "Button",
+				item = "Copy To");
+		}
+
+		task ("Then the site designer could add a fragment set") {
+			AssertTextEquals(
+				locator1 = "Modal#HEADER",
+				value1 = "Add Fragment Set");
+
+			AssertTextEquals(
+				key_text = "Name",
+				locator1 = "TextInput#ANY",
+				value1 = "Untitled Set");
+
+			Modal.save();
+
+			Alert.viewSuccessMessageText(successMessage = "The fragment has been copied successfully.");
+
+			MenuBar.viewActive(menuBar = "Untitled Set");
+
+			FragmentsAdmin.viewEntryPresent(entry = "Button (Copy)");
+		}
+	}
+
 	@description = "This is a test for LPS-159235. Add folders to fragment resource and check hints."
 	@priority = "4"
 	test AddFoldersToResourceAndCheckHints {
@@ -118,7 +153,7 @@ definition {
 					folderName = "Folder 1",
 					resourceFile = "Document_1.png");
 
-				FragmentsAdmin.viewEntryPresent(entry = "Document_1.png");
+				FragmentsAdmin.viewEntryPresent(entry = "Document_1");
 			}
 
 			task ("Add a fragment and type to invoke hint") {
@@ -139,7 +174,7 @@ definition {
 
 			task ("Assert there is a hint for resources with path") {
 				AssertElementPresent(
-					autocompleteField = "Folder 1/Document_1.png",
+					autocompleteField = "Folder 1/Document_1",
 					locator1 = "FragmentEditor#AUTOCOMPLETE_FIELD");
 			}
 
@@ -171,7 +206,7 @@ definition {
 
 			task ("Assert there is a hint for resources with path") {
 				AssertElementPresent(
-					autocompleteField = "Folder 1/Subfolder 1/Document_2.png",
+					autocompleteField = "Folder 1/Subfolder 1/Document_2",
 					locator1 = "FragmentEditor#AUTOCOMPLETE_FIELD");
 			}
 		}
@@ -184,6 +219,7 @@ definition {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
+		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 
 		task ("Navigate to fragments admin") {
@@ -220,6 +256,53 @@ definition {
 
 		task ("Assert the fragment appears in Fragments Admin") {
 			FragmentsAdmin.viewEntryPresent(entry = "Fragment Name");
+		}
+	}
+
+	@description = "This is a test for LPS-166203. The site designer could save in new set during copy OOTB fragment when the site has fragment sets."
+	@priority = "5"
+	test AddNewFragmentSetWhenCopyContributedFragment {
+		task ("Given a site designer has a fragment set") {
+			JSONFragment.addFragmentCollection(
+				groupName = "Test Site Name",
+				name = "Fragment Set Name");
+
+			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
+		}
+
+		task ("When the site designer copies the Button fragment from Basic Components fragment set") {
+			FragmentsAdminNavigator.gotoCollection(collectionName = "Basic Components");
+
+			FragmentsAdminNavigator.gotoEntryEllipsisItem(
+				entry = "Button",
+				item = "Copy To");
+		}
+
+		task ("Then the site designer could add a new fragment set") {
+			AssertTextEquals(
+				locator1 = "Modal#HEADER",
+				value1 = "Select Fragment Set");
+
+			Click(
+				key_text = "Save In New Set",
+				locator1 = "Modal#MODAL_FOOTER_BUTTON");
+
+			AssertTextEquals(
+				locator1 = "Modal#HEADER",
+				value1 = "Add Fragment Set");
+
+			AssertTextEquals(
+				key_text = "Name",
+				locator1 = "TextInput#ANY",
+				value1 = "Untitled Set");
+
+			Modal.save();
+
+			Alert.viewSuccessMessageText(successMessage = "The fragment has been copied successfully.");
+
+			MenuBar.viewActive(menuBar = "Untitled Set");
+
+			FragmentsAdmin.viewEntryPresent(entry = "Button (Copy)");
 		}
 	}
 
@@ -278,7 +361,7 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-101354 and for LPS-89115. The contributed fragments can be copied."
+	@description = "This is a test for LPS-101354, LPS-89115 and LPS-166203. The contributed fragments can be copied."
 	@priority = "5"
 	@uitest
 	test CopyContributedFragment {
@@ -287,7 +370,7 @@ definition {
 		task ("Add a fragment collection") {
 			JSONFragment.addFragmentCollection(
 				groupName = "Test Site Name",
-				name = "Collection Name");
+				name = "Fragment Set Name");
 		}
 
 		task ("Navigate to the Fragments admin") {
@@ -301,16 +384,12 @@ definition {
 				entry = "Button",
 				item = "Copy To");
 
-			FragmentsAdmin.selectCollection(collectionName = "Collection Name");
-		}
-
-		task ("Navigate to the fragment collection") {
-			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
-
-			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
+			FragmentsAdmin.selectCollection(collectionName = "Fragment Set Name");
 		}
 
 		task ("View the copied fragment") {
+			MenuBar.viewActive(menuBar = "Fragment Set Name");
+
 			FragmentsAdmin.viewEntryPresent(entry = "Button (Copy)");
 		}
 	}
@@ -832,6 +911,8 @@ definition {
 	@description = "This is a test for LPS-168163. The fragment developer could see the usages of basic fragment."
 	@priority = "5"
 	test ViewUsagesOfBasicFragment {
+		property portal.acceptance = "true";
+
 		task ("Given a fragment developer has a fragment set") {
 			JSONFragment.addFragmentCollection(
 				groupName = "Test Site Name",
@@ -923,6 +1004,8 @@ definition {
 	@description = "This is a test for LPS-168163. The fragment developer could see the usages of form fragment."
 	@priority = "5"
 	test ViewUsagesOfFormFragment {
+		property portal.acceptance = "true";
+
 		task ("Given a fragment developer has a custom object with Text field") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Purchase Order",

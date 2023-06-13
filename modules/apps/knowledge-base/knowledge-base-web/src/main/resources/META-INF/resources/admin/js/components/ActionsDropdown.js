@@ -23,8 +23,10 @@ export default function ActionsDropdown({actions}) {
 	return actions?.length ? (
 		<ClayDropDownWithItems
 			items={normalizeDropdownItems(actions)}
+			renderMenuOnClick
 			trigger={
 				<ClayButtonWithIcon
+					aria-label={Liferay.Language.get('actions')}
 					displayType="unstyled"
 					small
 					symbol="ellipsis-v"

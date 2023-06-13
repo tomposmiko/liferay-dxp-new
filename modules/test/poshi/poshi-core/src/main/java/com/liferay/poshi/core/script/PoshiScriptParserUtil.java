@@ -64,14 +64,25 @@ public class PoshiScriptParserUtil {
 			if ((c1 == ',') && expectedComma &&
 				_patternIsNullOrMatches(pattern, methodParameterValue)) {
 
-				methodParameterValues.add(methodParameterValue);
+				methodParameterValues.add(methodParameterValue.trim());
 
 				sb.setLength(0);
 			}
 			else {
-				sb.append(c1);
+				if ((c1 == ',') && stack.isEmpty() &&
+					_patternIsNullOrMatches(pattern, methodParameterValue)) {
 
-				methodParameterValue = sb.toString();
+					expectedComma = true;
+
+					methodParameterValues.add(methodParameterValue.trim());
+
+					sb.setLength(0);
+				}
+				else {
+					sb.append(c1);
+
+					methodParameterValue = sb.toString();
+				}
 			}
 
 			if (c1 == '`') {
@@ -152,7 +163,7 @@ public class PoshiScriptParserUtil {
 				"Invalid Poshi Script parameter syntax", poshiNode);
 		}
 
-		methodParameterValues.add(methodParameterValue);
+		methodParameterValues.add(methodParameterValue.trim());
 
 		return methodParameterValues;
 	}

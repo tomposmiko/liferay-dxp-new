@@ -24,13 +24,13 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.PrefsProps;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.test.mail.MailServiceTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.SynchronousMailTestRule;
-import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 
 import java.util.Objects;
@@ -207,8 +207,8 @@ public class UserServiceWhenPortalSendsPasswordEmailTest {
 	protected PortletPreferences givenThatCompanySendsResetPasswordLink()
 		throws Exception {
 
-		PortletPreferences portletPreferences = PrefsPropsUtil.getPreferences(
-			_user.getCompanyId(), false);
+		PortletPreferences portletPreferences = _prefsProps.getPreferences(
+			_user.getCompanyId());
 
 		portletPreferences.setValue(
 			PropsKeys.COMPANY_SECURITY_SEND_PASSWORD_RESET_LINK,
@@ -235,6 +235,9 @@ public class UserServiceWhenPortalSendsPasswordEmailTest {
 
 	@Inject
 	private static LocalizationUtil _localizationUtil;
+
+	@Inject
+	private PrefsProps _prefsProps;
 
 	@DeleteAfterTestRun
 	private User _user;

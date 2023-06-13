@@ -46,7 +46,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 /**
  * @author Cristina González
@@ -223,6 +222,16 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 			return _getOperationJSONObject(
 				String.valueOf(type), expressions.get(0), expressions.get(1));
 		}
+		else if (type == MethodExpression.Type.NOW) {
+			if (!expressions.isEmpty()) {
+				throw new UnsupportedOperationException(
+					StringBundler.concat(
+						"Unsupported method visitMethodExpression with method ",
+						"type ", type, " and ", expressions.size(), "params"));
+			}
+
+			return String.valueOf(type);
+		}
 
 		throw new UnsupportedOperationException(
 			"Unsupported method visitMethodExpression with method type " +
@@ -303,15 +312,10 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 	private JSONObject _getOperationJSONObject(
 		String operatorName, Object object, List<Object> fieldValues) {
 
-		Stream<Object> stream = fieldValues.stream();
-
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
-		stream.map(
-			String::valueOf
-		).forEach(
-			value -> jsonArray.put(value)
-		);
+		fieldValues.forEach(
+			fieldValue -> jsonArray.put(String.valueOf(fieldValue)));
 
 		return JSONUtil.put(
 			"operatorName", StringUtil.lowerCase(operatorName)

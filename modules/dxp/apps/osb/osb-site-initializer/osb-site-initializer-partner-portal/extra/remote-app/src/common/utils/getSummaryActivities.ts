@@ -16,14 +16,14 @@ import getTotalBudget from './getTotalBudget';
 import getTotalMDFRequest from './getTotalMDFRequest';
 
 interface DateActivities {
-	endDates: Date[];
-	startDates: Date[];
+	endDates: string[];
+	startDates: string[];
 }
 
 export default function getSummaryActivities(
-	mdfRequestActivities: MDFRequestActivity[]
+	mdfRequestActivities?: MDFRequestActivity[]
 ) {
-	if (mdfRequestActivities.length) {
+	if (mdfRequestActivities?.length) {
 		const datesActivities = mdfRequestActivities.reduce<DateActivities>(
 			(previousValue, currentValue) => {
 				const endDateAccumulator = previousValue.endDates;
@@ -42,7 +42,7 @@ export default function getSummaryActivities(
 					startDates: startDateAccumulator,
 				};
 			},
-			{endDates: [] as Date[], startDates: [] as Date[]}
+			{endDates: [], startDates: []}
 		);
 
 		return {

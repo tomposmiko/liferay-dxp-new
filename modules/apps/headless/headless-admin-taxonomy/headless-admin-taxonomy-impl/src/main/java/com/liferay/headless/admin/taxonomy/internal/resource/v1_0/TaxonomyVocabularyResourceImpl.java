@@ -15,6 +15,7 @@
 package com.liferay.headless.admin.taxonomy.internal.resource.v1_0;
 
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
@@ -67,8 +68,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
@@ -534,26 +533,27 @@ public class TaxonomyVocabularyResourceImpl
 			return AssetCategoryConstants.ALL_CLASS_NAME_ID;
 		}
 
+		String className = null;
+
 		List<AssetRendererFactory<?>> categorizableAssetRenderFactories =
 			ListUtil.filter(
 				AssetRendererFactoryRegistryUtil.getAssetRendererFactories(
 					contextCompany.getCompanyId()),
 				AssetRendererFactory::isCategorizable);
 
-		Stream<AssetRendererFactory<?>> stream =
-			categorizableAssetRenderFactories.stream();
+		for (AssetRendererFactory<?> assetRendererFactory :
+				categorizableAssetRenderFactories) {
 
-		Optional<AssetRendererFactory<?>> assetRendererFactoryOptional =
-			stream.filter(
-				assetRendererFactory -> assetTypeType.equals(
-					_getModelResource(assetRendererFactory))
-			).findFirst();
+			if (assetTypeType.equals(_getModelResource(assetRendererFactory))) {
+				className = assetRendererFactory.getClassName();
 
-		String className = assetRendererFactoryOptional.map(
-			AssetRendererFactory::getClassName
-		).orElse(
-			_assetTypeTypeToClassNames.get(assetTypeType)
-		);
+				break;
+			}
+		}
+
+		if (className == null) {
+			className = _assetTypeTypeToClassNames.get(assetTypeType);
+		}
 
 		if (className == null) {
 			throw new BadRequestException(
@@ -723,14 +723,19 @@ public class TaxonomyVocabularyResourceImpl
 				name_i18n = LocalizedMapUtil.getI18nMap(
 					contextAcceptLanguage.isAcceptAllLanguages(),
 					assetVocabulary.getTitleMap());
-				numberOfTaxonomyCategories = Optional.ofNullable(
-					assetVocabulary.getCategories()
-				).map(
-					List::size
-				).orElse(
-					0
-				);
 				siteId = GroupUtil.getSiteId(group);
+
+				setNumberOfTaxonomyCategories(
+					() -> {
+						List<AssetCategory> assetCategories =
+							assetVocabulary.getCategories();
+
+						if (assetCategories != null) {
+							return assetCategories.size();
+						}
+
+						return 0;
+					});
 			}
 		};
 	}
