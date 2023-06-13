@@ -60,9 +60,7 @@ definition {
 
 		DMDocument.viewCP(dmDocumentTitle = "DM Document Title");
 
-		AutoTagging.assertAutoTagPresent(tagName = "adventures");
-
-		AutoTagging.assertAutoTagPresent(tagName = "alice");
+		DMDocument.viewTagInfo(tagName = "adventures,alice");
 
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
@@ -78,9 +76,7 @@ definition {
 
 		DMDocument.viewCP(dmDocumentTitle = "DM Document Title");
 
-		AutoTagging.assertAutoTagPresent(tagName = "adventures");
-
-		AutoTagging.assertAutoTagPresent(tagName = "newtag");
+		DMDocument.viewTagInfo(tagName = "adventures,newtag");
 	}
 
 	@description = "This test asserts that an auto-tagged web content can be deleted in a depot when OpenNLP Auto-Tagging is enabled."
@@ -185,7 +181,7 @@ definition {
 
 		DMDocument.viewCP(dmDocumentTitle = "DM Document JPG");
 
-		AutoTagging.assertNoAutoTag(tagName = "carton");
+		DMDocument.viewNoTagInfo(tagName = "carton");
 	}
 
 	@description = "This test asserts that no auto-tag is generated when a text document is uploaded to a depot that has auto-tagging disabled."
@@ -215,7 +211,7 @@ definition {
 
 		DMDocument.viewCP(dmDocumentTitle = "DM Document PDF");
 
-		AutoTagging.assertNoAutoTag(tagName = "alice");
+		DMDocument.viewNoTagInfo(tagName = "alice");
 	}
 
 	@description = "This test asserts that no auto-tag is generated when a web content article is uploaded to a depot that has auto-tagging disabled."
@@ -244,7 +240,7 @@ definition {
 
 		Panel.expandPanel(panel = "Categorization");
 
-		AutoTagging.assertNoAutoTag(tagName = "dxp");
+		DMDocument.viewNoTagInfo(tagName = "dxp");
 	}
 
 	@description = "This test asserts that an image is auto-tagged in a depot."
@@ -279,7 +275,7 @@ definition {
 
 		DMDocument.viewCP(dmDocumentTitle = "DM Document JPG");
 
-		AutoTagging.assertAutoTagPresent(tagName = "carton");
+		DMDocument.viewTagInfo(tagName = "carton");
 	}
 
 	@description = "This test asserts that a text document is auto-tagged in a depot."
@@ -305,7 +301,7 @@ definition {
 
 		DMDocument.viewCP(dmDocumentTitle = "DM Document PDF");
 
-		AutoTagging.assertAutoTagPresent(tagName = "alice");
+		DMDocument.viewTagInfo(tagName = "alice");
 	}
 
 	@description = "This test asserts that a web content article is auto-tagged in a depot."

@@ -1,68 +1,136 @@
-import {useQuery} from '@apollo/client';
 import {useEffect, useState} from 'react';
-import {useCustomEvent} from '../../../../common/hooks/useCustomEvent';
-import {usePageGuard} from '../../../../common/hooks/usePageGuard';
-import {getAccountSubscriptionGroups} from '../../../../common/services/liferay/graphql/queries';
-import {Storage} from '../../../../common/services/liferay/storage';
-import Subscriptions from '../../components/Subscriptions';
+import client from '../../../../apolloClient';
+import {getAccountSubscriptions} from '../../../../common/services/liferay/graphql/queries';
+import CardSubscription from '../../components/CardSubscription';
+import SubscriptionsFilterByStatus from '../../components/SubscriptionsFilterByStatus';
+import SubscriptionsNavbar from '../../components/SubscriptionsNavbar';
 import {useCustomerPortal} from '../../context';
 import {actionTypes} from '../../context/reducer';
-import {CUSTOM_EVENTS} from '../../utils/constants';
+import {SUBSCRIPTIONS_STATUS} from '../../utils/constants';
 import {getWebContents} from '../../utils/webContentsGenerator';
+import OverviewSkeleton from './Skeleton';
 
-const Overview = ({project, userAccount}) => {
+const Overview = ({project, subscriptionGroups}) => {
 	const [, dispatch] = useCustomerPortal();
-	const [
-		slaCurrentVersionAndProducts,
-		setSLACurrentVersionAndProducts,
-	] = useState([]);
-	const dispatchEvent = useCustomEvent(CUSTOM_EVENTS.PROJECT);
-	const {loading} = usePageGuard(userAccount, project.accountKey, 'overview');
+	const [accountSubscriptions, setAccountSubscriptions] = useState([]);
+	const [selectedSubscriptionGroup, setSelectedSubscriptionGroup] = useState(
+		''
+	);
+	const [selectedStatus, setSelectedStatus] = useState([
+		SUBSCRIPTIONS_STATUS.active,
+		SUBSCRIPTIONS_STATUS.expired,
+		SUBSCRIPTIONS_STATUS.future,
+	]);
+
+	const parseAccountSubscriptionGroupERC = (subscriptionName) => {
+		return subscriptionName.toLowerCase().replace(' ', '-');
+	};
+
+	const getAccountSubscriptionFilterQueryString = (
+		previousValue,
+		currentValue,
+		currentIndex,
+		array
+	) => {
+		if (currentIndex === array.length - 1) {
+			return previousValue + ` subscriptionStatus eq '${currentValue}'`;
+		}
+
+		return (
+			previousValue +
+			` subscriptionStatus eq '${currentValue}' or accountSubscriptionGroupERC eq '${
+				project.accountKey
+			}_${parseAccountSubscriptionGroupERC(
+				selectedSubscriptionGroup
+			)}' and`
+		);
+	};
 
 	useEffect(() => {
-		setSLACurrentVersionAndProducts((prevSlaCurrentVersionAndProducts) => [
-			...prevSlaCurrentVersionAndProducts,
-			project.slaCurrent,
-			project.dxpVersion,
-		]);
-
-		dispatchEvent(project);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [project]);
-
-	const {
-		data: dataSubscriptionGroups,
-		loading: isLoadingSubscritionsGroups,
-	} = useQuery(getAccountSubscriptionGroups, {
-		variables: {
-			filter: `accountKey eq '${project.accountKey}'`,
-		},
-	});
-
-	useEffect(() => {
-		if (dataSubscriptionGroups) {
-			const subscriptionGroupsItems =
-				dataSubscriptionGroups.c?.accountSubscriptionGroups?.items;
-			dispatch({
-				payload: subscriptionGroupsItems,
-				type: actionTypes.UPDATE_SUBSCRIPTION_GROUPS,
+		const getSubscriptions = async (
+			accountKey,
+			subscriptionGroup,
+			status
+		) => {
+			const {data: dataAccountSubscriptions} = await client.query({
+				query: getAccountSubscriptions,
+				variables: {
+					filter: `accountSubscriptionGroupERC eq '${accountKey}_${parseAccountSubscriptionGroupERC(
+						subscriptionGroup
+					)}'${
+						status.length ===
+						Object.keys(SUBSCRIPTIONS_STATUS).length
+							? ''
+							: `${status.reduce(
+									getAccountSubscriptionFilterQueryString,
+									' and'
+							  )}`
+					}`,
+				},
 			});
-			setSLACurrentVersionAndProducts(
-				...slaCurrentVersionAndProducts,
-				...subscriptionGroupsItems.map((group) => group.name)
+
+			if (dataAccountSubscriptions) {
+				setAccountSubscriptions(
+					dataAccountSubscriptions?.c?.accountSubscriptions?.items
+				);
+			}
+		};
+
+		if (selectedSubscriptionGroup) {
+			getSubscriptions(
+				project.accountKey,
+				selectedSubscriptionGroup,
+				selectedStatus
 			);
 		}
-		Storage.setItem(
-			'cp-tip-container-primary',
-			JSON.stringify(getWebContents(slaCurrentVersionAndProducts))
-		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dataSubscriptionGroups, slaCurrentVersionAndProducts]);
+	}, [project, selectedStatus, selectedSubscriptionGroup]);
 
-	if (loading || isLoadingSubscritionsGroups) {
-		return <div>Overview Skeleton</div>;
-	}
+	useEffect(() => {
+		dispatch({
+			payload: getWebContents({
+				dxpVersion: project.dxpVersion,
+				slaCurrent: project.slaCurrent,
+				subscriptionGroups,
+			}),
+			type: actionTypes.UPDATE_QUICK_LINKS,
+		});
+	}, [dispatch, project, subscriptionGroups]);
 
-	return <Subscriptions accountKey={project.accountKey} />;
+	return (
+		<div className="d-flex flex-column">
+			<h3>Subscriptions</h3>
+
+			<SubscriptionsNavbar
+				setSelectedSubscriptionGroup={setSelectedSubscriptionGroup}
+				subscriptionGroups={subscriptionGroups}
+			/>
+
+			<SubscriptionsFilterByStatus
+				selectedStatus={selectedStatus}
+				setSelectedStatus={setSelectedStatus}
+			/>
+
+			<div className="d-flex flex-wrap mt-4">
+				{accountSubscriptions.length ? (
+					accountSubscriptions.map((accountSubscription, index) => (
+						<CardSubscription
+							cardSubscriptionData={accountSubscription}
+							key={index}
+							selectedSubscriptionGroup={
+								selectedSubscriptionGroup
+							}
+						/>
+					))
+				) : (
+					<p className="mx-auto pt-5">
+						No subscriptions match these criteria.
+					</p>
+				)}
+			</div>
+		</div>
+	);
 };
+
+Overview.Skeleton = OverviewSkeleton;
 export default Overview;

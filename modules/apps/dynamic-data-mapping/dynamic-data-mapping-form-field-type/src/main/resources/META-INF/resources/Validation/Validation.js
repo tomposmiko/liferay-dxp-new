@@ -50,6 +50,7 @@ const Validation = ({
 	validation,
 	validations,
 	visible,
+	...otherProps
 }) => {
 	const {focusedField} = useFormState();
 
@@ -110,6 +111,7 @@ const Validation = ({
 
 			{enableValidation && (
 				<ValidationComponent
+					{...otherProps}
 					dataType={dataType}
 					dispatch={dispatch}
 					errorMessage={errorMessage}
@@ -118,6 +120,7 @@ const Validation = ({
 					name={name}
 					onBlur={onBlur}
 					parameter={parameter}
+					parentFieldName={validation.fieldName}
 					readOnly={readOnly}
 					selectedValidation={selectedValidation}
 					transformSelectedValidation={transformSelectedValidation}
@@ -141,6 +144,7 @@ const ValidationWrapper = ({
 	validation,
 	value,
 	visible,
+	...otherProps
 }) => {
 	const {validations} = useFormState();
 	const data = transformData({
@@ -154,6 +158,7 @@ const ValidationWrapper = ({
 
 	return (
 		<Validation
+			{...otherProps}
 			{...data}
 			defaultLanguageId={defaultLanguageId}
 			editingLanguageId={editingLanguageId}
@@ -163,7 +168,6 @@ const ValidationWrapper = ({
 			onChange={(value) => onChange({target: {value}})}
 			readOnly={readOnly}
 			validation={validation}
-			value={value}
 			visible={visible}
 		/>
 	);

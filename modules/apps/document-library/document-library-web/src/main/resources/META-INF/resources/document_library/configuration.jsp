@@ -104,10 +104,10 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 					<aui:button name="selectFolderButton" value="select" />
 
 					<%
-					String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('rootFolderId', 'rootFolderName', this, '" + liferayPortletResponse.getNamespace() + "');";
+					String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('rootFolderId', 'rootFolderName', this, '" + liferayPortletResponse.getNamespace() + "'); Liferay.Util.removeEntitySelection('selectedRepositoryId', '', this, '" + liferayPortletResponse.getNamespace() + "');";
 					%>
 
-					<aui:button disabled="<%= dlAdminDisplayContext.getRootFolderId() <= 0 %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
+					<aui:button disabled="<%= (dlAdminDisplayContext.getRootFolderId() == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) && (dlAdminDisplayContext.getSelectedRepositoryId() == scopeGroupId) %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
 				</div>
 			</liferay-frontend:fieldset>
 
@@ -192,15 +192,15 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 							FolderItemSelectorCriterion folderItemSelectorCriterion = new FolderItemSelectorCriterion();
 
 							folderItemSelectorCriterion.setDesiredItemSelectorReturnTypes(new FolderItemSelectorReturnType());
-							folderItemSelectorCriterion.setFolderId(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+							folderItemSelectorCriterion.setFolderId(dlAdminDisplayContext.getRootFolderId());
 							folderItemSelectorCriterion.setIgnoreRootFolder(true);
-							folderItemSelectorCriterion.setRepositoryId(0);
+							folderItemSelectorCriterion.setRepositoryId(dlAdminDisplayContext.getSelectedRepositoryId());
 							folderItemSelectorCriterion.setSelectedFolderId(dlAdminDisplayContext.getRootFolderId());
-							folderItemSelectorCriterion.setSelectedRepositoryId(dlAdminDisplayContext.getRepositoryId());
+							folderItemSelectorCriterion.setSelectedRepositoryId(dlAdminDisplayContext.getSelectedRepositoryId());
 							folderItemSelectorCriterion.setShowGroupSelector(true);
 							folderItemSelectorCriterion.setShowMountFolder(false);
 
-							PortletURL selectFolderURL = itemSelector.getItemSelectorURL(RequestBackedPortletURLFactoryUtil.create(request), portletDisplay.getNamespace() + "folderSelected", folderItemSelectorCriterion);
+							PortletURL selectFolderURL = itemSelector.getItemSelectorURL(RequestBackedPortletURLFactoryUtil.create(request), GroupLocalServiceUtil.getGroup(GetterUtil.getLong(dlAdminDisplayContext.getSelectedRepositoryId(), themeDisplay.getScopeGroupId())), themeDisplay.getScopeGroupId(), portletDisplay.getNamespace() + "folderSelected", folderItemSelectorCriterion);
 							%>
 
 							url: '<%= HtmlUtil.escapeJS(selectFolderURL.toString()) %>',

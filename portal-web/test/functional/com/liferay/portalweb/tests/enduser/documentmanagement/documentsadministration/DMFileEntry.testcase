@@ -1043,7 +1043,7 @@ definition {
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
 
-		DMDocument.viewTag(tagName = "tag name");
+		DMDocument.viewTagInfo(tagName = "tag name");
 	}
 
 	@description = "This test ensures that only the last two versions of a file are kept when the max version limit is set."
@@ -1387,16 +1387,6 @@ definition {
 		property test.name.skip.portal.instance = "DMFileEntry#CannotViewExpiredDocumentAsGuest";
 
 		var portalURL = PropsUtil.get("portal.url");
-
-		JSONLayout.addPublicLayout(
-			groupName = "Guest",
-			layoutName = "Documents and Media Page");
-
-		JSONLayout.addWidgetToPublicLayout(
-			column = "1",
-			groupName = "Guest",
-			layoutName = "Documents and Media Page",
-			widgetName = "Documents and Media");
 
 		DMDocument.updateCheckInterval(fieldValue = "2");
 

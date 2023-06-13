@@ -567,7 +567,7 @@ definition {
 				AssertElementPresent(locator1 = "Button#SELECT_FILES");
 
 				if ("${uploadTempFile}" == "true") {
-					SikuliUploadTempFile(
+					UploadTempFile(
 						locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
 						value1 = "${dmDocumentFile}");
 				}
@@ -1771,6 +1771,10 @@ definition {
 
 		if ("${dmFolderName}" == "Home") {
 			if (IsElementPresent(key_breadcrumbName = "Home", locator1 = "BreadcrumbPortlet#BREADCRUMB_FOLDER")) {
+				AssertVisible(
+					key_text = "Select This Folder",
+					locator1 = "Button#ANY_DISABLED");
+
 				AssertClick(
 					key_breadcrumbName = "Home",
 					locator1 = "BreadcrumbPortlet#BREADCRUMB_FOLDER",
@@ -3036,15 +3040,8 @@ definition {
 		}
 	}
 
-	macro viewNoTag {
-		if (isSet(tagNameList)) {
-			for (var tagName : list "${tagNameList}") {
-				AssertElementNotPresent(
-					key_tagName = StringUtil.lowerCase("${tagName}"),
-					locator1 = "DocumentsAndMedia#TAG");
-			}
-		}
-		else {
+	macro viewNoTagInfo {
+		for (var tagName : list "${tagName}") {
 			AssertElementNotPresent(
 				key_tagName = StringUtil.lowerCase("${tagName}"),
 				locator1 = "DocumentsAndMedia#TAG");
@@ -3518,22 +3515,12 @@ definition {
 		}
 	}
 
-	macro viewTag {
+	macro viewTagInfo {
 		DMDocument.expandInfo();
 
-		if (isSet(tagNameList)) {
-			for (var tagName : list "${tagNameList}") {
-				var tagName = StringUtil.lowerCase("${tagName}");
-				var key_tagName = "${tagName}";
-
-				AssertTextEquals(
-					locator1 = "DocumentsAndMedia#TAG",
-					value1 = "${tagName}");
-			}
-		}
-		else {
+		for (var tagName : list "${tagName}") {
+			var tagName = StringUtil.lowerCase("${tagName}");
 			var key_tagName = "${tagName}";
-			var tagName = StringUtil.upperCase("${tagName}");
 
 			AssertTextEquals(
 				locator1 = "DocumentsAndMedia#TAG",

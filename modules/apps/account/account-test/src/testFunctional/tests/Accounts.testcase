@@ -1660,6 +1660,8 @@ definition {
 			menuItem = "Delete",
 			rowEntry = "Liferay Dalian Software Co., Ltd.");
 
+		AssertConsoleTextNotPresent(value1 = "javax.servlet.ServletException");
+
 		Accounts.openAccountsAdmin();
 
 		LexiconEntry.gotoEntry(rowEntry = "Account Delete Address");
@@ -2610,6 +2612,8 @@ definition {
 			addressStreet2 = "High-Tech Zone",
 			addressStreet3 = "1005",
 			phoneNumber = "+86 (0)411 88120855");
+
+		LexiconEntry.viewEntryName(rowEntry = "Liferay Dalian Software Co., Ltd.");
 
 		Accounts.addAddress(
 			addressCity = "Diamond Bar",

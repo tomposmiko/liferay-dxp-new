@@ -247,7 +247,7 @@ definition {
 			value1 = "Test Test");
 
 		if (isSet(disableAutoExpire)) {
-			var unbanDate = DateUtil.getFormattedCurrentDate("MM/d/yy");
+			var unbanDate = DateUtil.getFormattedCurrentDate("M/d/yy");
 
 			echo("## * unbanDate: ${unbanDate}");
 
@@ -277,7 +277,7 @@ definition {
 
 		ProductMenuHelper.openProductMenu();
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			key_siteName = "${userScreenName}",
 			locator1 = "ProductMenu#SITE_NAME",
 			value1 = "${userScreenName}");

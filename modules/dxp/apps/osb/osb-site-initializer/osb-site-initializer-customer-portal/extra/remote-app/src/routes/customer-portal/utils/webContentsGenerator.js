@@ -1,49 +1,62 @@
 import {
 	PRODUCTS,
 	SLA_NAMES,
-	WEB_CONTENTS,
 	WEB_CONTENTS_BY_LIFERAY_VERSION,
 } from './constants';
-const getDXPVersionWebContent = (dxpVersion) =>
-	WEB_CONTENTS_BY_LIFERAY_VERSION[dxpVersion];
-export function getWebContents(slaCurrentVersionAndProducts) {
-	const [slaCurrent, dxpVersion, ...products] = slaCurrentVersionAndProducts;
+
+export function getWebContents({dxpVersion, slaCurrent, subscriptionGroups}) {
 	const webContents = [];
+
 	if (
-		products.includes(PRODUCTS.dxp) ||
-		products.includes(PRODUCTS.portal) ||
-		products.includes(PRODUCTS.commerce) ||
-		(!products.includes(PRODUCTS.partnership) &&
-			!products.includes(PRODUCTS.dxp_cloud))
+		subscriptionGroups.some(
+			({name}) =>
+				name === PRODUCTS.dxp ||
+				name === PRODUCTS.portal ||
+				name === PRODUCTS.commerce
+		) ||
+		!subscriptionGroups.some(
+			({name}) =>
+				name === PRODUCTS.partnership || name === PRODUCTS.dxp_cloud
+		)
 	) {
-		webContents.push(WEB_CONTENTS['WEB-CONTENT-ACTION-01']);
+		webContents.push('WEB-CONTENT-ACTION-01');
 	}
 	if (
-		!products.includes(PRODUCTS.partnership) &&
+		!subscriptionGroups.some(({name}) => name === PRODUCTS.partnership) &&
 		slaCurrent !== SLA_NAMES.limited_subscription
 	) {
-		webContents.push(WEB_CONTENTS['WEB-CONTENT-ACTION-02']);
+		webContents.push('WEB-CONTENT-ACTION-02');
 	}
 	if (
-		products.includes(PRODUCTS.dxp) ||
-		products.includes(PRODUCTS.dxp_cloud)
+		subscriptionGroups.some(
+			({name}) => name === PRODUCTS.dxp || name === PRODUCTS.dxp_cloud
+		)
 	) {
-		webContents.push(WEB_CONTENTS['WEB-CONTENT-ACTION-03']);
+		webContents.push('WEB-CONTENT-ACTION-03');
 	}
 	if (
-		(products.includes(PRODUCTS.dxp) ||
-			products.includes(PRODUCTS.dxp_cloud)) &&
-		dxpVersion
+		subscriptionGroups.some(
+			({name}) => name === PRODUCTS.dxp || name === PRODUCTS.dxp_cloud
+		)
 	) {
-		webContents.push(getDXPVersionWebContent(dxpVersion));
+		webContents.push(
+			dxpVersion
+				? WEB_CONTENTS_BY_LIFERAY_VERSION[dxpVersion]
+				: WEB_CONTENTS_BY_LIFERAY_VERSION['7.4']
+		);
 	}
 	if (
-		!products.includes(PRODUCTS.analytics_cloud) &&
-		(!products.includes(PRODUCTS.portal) ||
-			products.includes(PRODUCTS.dxp) ||
-			products.includes(PRODUCTS.dxp_cloud))
+		!subscriptionGroups.some(
+			({name}) => name === PRODUCTS.analytics_cloud
+		) &&
+		(!subscriptionGroups.some(({name}) => name === PRODUCTS.portal) ||
+			(subscriptionGroups.some(({name}) => name === PRODUCTS.portal) &&
+				subscriptionGroups.some(
+					({name}) =>
+						name === PRODUCTS.dxp || name === PRODUCTS.dxp_cloud
+				)))
 	) {
-		webContents.push(WEB_CONTENTS['WEB-CONTENT-ACTION-09']);
+		webContents.push('WEB-CONTENT-ACTION-09');
 	}
 
 	return webContents;
