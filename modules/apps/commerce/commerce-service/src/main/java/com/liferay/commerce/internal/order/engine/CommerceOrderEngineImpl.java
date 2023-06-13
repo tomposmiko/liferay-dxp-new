@@ -42,6 +42,7 @@ import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.model.CommerceShippingMethod;
+import com.liferay.commerce.model.attributes.provider.CommerceModelAttributesProvider;
 import com.liferay.commerce.notification.util.CommerceNotificationHelper;
 import com.liferay.commerce.order.CommerceOrderValidatorRegistry;
 import com.liferay.commerce.order.engine.CommerceOrderEngine;
@@ -469,12 +470,10 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 		}
 	}
 
-	private JSONObject _getCommerceOrderJSONObject(CommerceOrder commerceOrder)
+	private JSONObject _getCommerceOrderJSONObject(
+			CommerceOrder commerceOrder,
+			DTOConverter<?, ?> commerceOrderDTOConverter)
 		throws Exception {
-
-		DTOConverter<?, ?> commerceOrderDTOConverter =
-			_dtoConverterRegistry.getDTOConverter(
-				CommerceOrder.class.getName());
 
 		Object commerceOrderObject = commerceOrderDTOConverter.toDTO(
 			new DefaultDTOConverterContext(
@@ -503,7 +502,7 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 
 			JSONObject commerceOrderItemJSONObject =
 				_jsonFactory.createJSONObject(
-					commerceOrderItemObject.toString());
+					_jsonFactory.looseSerializeDeep(commerceOrderItemObject));
 
 			commerceOrderItemsJSONArray.put(commerceOrderItemJSONObject);
 		}
@@ -544,12 +543,25 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 
 				Message message = new Message();
 
+				DTOConverter<?, ?> commerceOrderDTOConverter =
+					_dtoConverterRegistry.getDTOConverter(
+						CommerceOrder.class.getName());
+
 				message.setPayload(
 					JSONUtil.put(
 						"commerceOrder",
-						_getCommerceOrderJSONObject(commerceOrder)
+						_getCommerceOrderJSONObject(
+							commerceOrder, commerceOrderDTOConverter)
 					).put(
 						"commerceOrderId", commerceOrder.getCommerceOrderId()
+					).put(
+						"model" + CommerceOrder.class.getSimpleName(),
+						commerceOrder.getModelAttributes()
+					).put(
+						"modelDTO" + commerceOrderDTOConverter.getContentType(),
+						_commerceModelAttributesProvider.getModelAttributes(
+							commerceOrder, commerceOrderDTOConverter,
+							commerceOrder.getUserId())
 					).put(
 						"orderStatus", commerceOrder.getOrderStatus()
 					));
@@ -693,6 +705,9 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 	@Reference
 	private CommerceInventoryBookedQuantityLocalService
 		_commerceInventoryBookedQuantityLocalService;
+
+	@Reference
+	private CommerceModelAttributesProvider _commerceModelAttributesProvider;
 
 	@Reference
 	private CommerceNotificationHelper _commerceNotificationHelper;

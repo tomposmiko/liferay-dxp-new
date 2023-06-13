@@ -43,6 +43,7 @@ import com.liferay.commerce.model.CommerceOrderType;
 import com.liferay.commerce.model.CommerceShippingEngine;
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.model.CommerceShippingOption;
+import com.liferay.commerce.model.attributes.provider.CommerceModelAttributesProvider;
 import com.liferay.commerce.price.CommerceOrderPrice;
 import com.liferay.commerce.price.CommerceOrderPriceCalculation;
 import com.liferay.commerce.product.model.CommerceChannel;
@@ -1867,25 +1868,33 @@ public class CommerceOrderLocalServiceImpl
 			() -> {
 				Message message = new Message();
 
+				DTOConverter<?, ?> commerceOrderDTOConverter =
+					_dtoConverterRegistry.getDTOConverter(
+						CommerceOrder.class.getName());
+
 				message.setPayload(
 					JSONUtil.put(
 						"commerceOrder",
 						() -> {
-							DTOConverter<?, ?> dtoConverter =
-								_dtoConverterRegistry.getDTOConverter(
-									CommerceOrder.class.getName());
-
-							Object object = dtoConverter.toDTO(
+							Object object = commerceOrderDTOConverter.toDTO(
 								new DefaultDTOConverterContext(
 									_dtoConverterRegistry,
 									commerceOrder.getCommerceOrderId(),
 									LocaleUtil.getSiteDefault(), null, null));
 
 							return _jsonFactory.createJSONObject(
-								object.toString());
+								_jsonFactory.looseSerializeDeep(object));
 						}
 					).put(
 						"commerceOrderId", commerceOrder.getCommerceOrderId()
+					).put(
+						"model" + CommerceOrder.class.getSimpleName(),
+						commerceOrder.getModelAttributes()
+					).put(
+						"modelDTO" + commerceOrderDTOConverter.getContentType(),
+						_commerceModelAttributesProvider.getModelAttributes(
+							commerceOrder, commerceOrderDTOConverter,
+							commerceOrder.getUserId())
 					).put(
 						"paymentStatus", commerceOrder.getPaymentStatus()
 					).put(
@@ -2258,6 +2267,9 @@ public class CommerceOrderLocalServiceImpl
 
 	@Reference
 	private CommerceDiscountValidatorHelper _commerceDiscountValidatorHelper;
+
+	@Reference
+	private CommerceModelAttributesProvider _commerceModelAttributesProvider;
 
 	@Reference
 	private CommerceOrderConfiguration _commerceOrderConfiguration;
