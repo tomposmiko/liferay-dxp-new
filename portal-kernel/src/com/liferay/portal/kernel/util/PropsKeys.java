@@ -884,9 +884,6 @@ public interface PropsKeys {
 	public static final String DL_FILE_INDEXING_IGNORE_EXTENSIONS =
 		"dl.file.indexing.ignore.extensions";
 
-	public static final String DL_FILE_INDEXING_INTERVAL =
-		"dl.file.indexing.interval";
-
 	public static final String DL_FILE_INDEXING_MAX_SIZE =
 		"dl.file.indexing.max.size";
 
@@ -1217,9 +1214,6 @@ public interface PropsKeys {
 
 	public static final String JDBC_DEFAULT_JNDI_NAME =
 		"jdbc.default.jndi.name";
-
-	public static final String JDBC_DEFAULT_LIFERAY_POOL_PROVIDER =
-		"jdbc.default.liferay.pool.provider";
 
 	public static final String JDBC_DEFAULT_PASSWORD = "jdbc.default.password";
 

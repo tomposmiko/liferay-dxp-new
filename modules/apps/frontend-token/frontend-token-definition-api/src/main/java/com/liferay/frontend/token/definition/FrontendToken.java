@@ -20,9 +20,12 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * @author Iván Zaera
  */
+@ProviderType
 public interface FrontendToken {
 
 	public <T> T getDefaultValue();
@@ -35,6 +38,8 @@ public interface FrontendToken {
 	public FrontendTokenSet getFrontendTokenSet();
 
 	public JSONObject getJSONObject(Locale locale);
+
+	public String getName();
 
 	public Type getType();
 

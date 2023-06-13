@@ -740,9 +740,6 @@ public class PropsValues {
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.DL_FILE_EXTENSIONS_STRICT_CHECK));
 
-	public static final int DL_FILE_INDEXING_INTERVAL = GetterUtil.getInteger(
-		PropsUtil.get(PropsKeys.DL_FILE_INDEXING_INTERVAL));
-
 	public static final int DL_FILE_INDEXING_MAX_SIZE = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.DL_FILE_INDEXING_MAX_SIZE));
 
@@ -1004,9 +1001,6 @@ public class PropsValues {
 
 	public static final String JDBC_DEFAULT_JNDI_NAME = PropsUtil.get(
 		PropsKeys.JDBC_DEFAULT_JNDI_NAME);
-
-	public static final String JDBC_DEFAULT_LIFERAY_POOL_PROVIDER =
-		PropsUtil.get(PropsKeys.JDBC_DEFAULT_LIFERAY_POOL_PROVIDER);
 
 	public static final String JDBC_DEFAULT_PASSWORD = PropsUtil.get(
 		PropsKeys.JDBC_DEFAULT_PASSWORD);

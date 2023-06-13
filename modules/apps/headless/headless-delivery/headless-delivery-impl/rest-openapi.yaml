@@ -308,6 +308,31 @@ components:
                 - className
                 - classPK
             type: object
+        CollectionViewport:
+            # @review
+            description:
+                Represents a collection viewport.
+            properties:
+                collectionViewportDefinition:
+                    # @review
+                    description:
+                        The definition of the collection viewport.
+                    properties:
+                        numberOfColumns:
+                            # @review
+                            description:
+                                The number of columns of the collection viewport.
+                            type: integer
+                    type: object
+                id:
+                    # @review
+                    description:
+                        The collection viewport's ID.
+                    type: string
+            required:
+                - id
+                - collectionViewportDefinition
+            type: object
         ColumnViewport:
             properties:
                 columnViewportDefinition:
@@ -3088,6 +3113,13 @@ components:
                         - collectionReference
                         - collectionType
                     type: object
+                collectionViewports:
+                    # @review
+                    description:
+                        A list of viewports of the page collection.
+                    items:
+                        $ref: "#/components/schemas/CollectionViewport"
+                    type: array
                 displayAllItems:
                     # @review
                     description:
@@ -3488,6 +3520,15 @@ components:
                     items:
                         $ref: "#/components/schemas/FragmentViewport"
                     type: array
+                htmlProperties:
+                    # @review
+                    description:
+                        The page section's html properties
+                    properties:
+                        htmlTag:
+                            enum: [Article, Aside, Div, Footer, Header, Main, Nav, Section]
+                            type: string
+                    type: object
                 indexed:
                     # @review
                     description:
@@ -3524,9 +3565,6 @@ components:
                             type: string
                         flexWrap:
                             enum: [NoWrap, Wrap, WrapReverse]
-                            type: string
-                        htmlTag:
-                            enum: [Article, Aside, Div, Footer, Header, Main, Nav, Section]
                             type: string
                         justify:
                             deprecated: true
@@ -3919,12 +3957,12 @@ components:
                 id:
                     # @review
                     description:
-                        The row vieport's ID.
+                        The row viewport's ID.
                     type: string
                 rowViewportDefinition:
                     # @review
                     description:
-                        The definition of the row vieport.
+                        The definition of the row viewport.
                     properties:
                         modulesPerRow:
                             # @review
@@ -4865,7 +4903,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.delivery.client', and version '4.0.23'."
+        'com.liferay.headless.delivery.client', and version '4.0.24'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"

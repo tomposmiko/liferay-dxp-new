@@ -12,94 +12,52 @@
  * details.
  */
 
-import {useMutation} from '@apollo/client';
 import ClayButton from '@clayui/button';
 import {ClayCheckbox} from '@clayui/form';
-import React, {useEffect, useState} from 'react';
+import {useForm} from 'react-hook-form';
 
 import Input from '../../../components/Input';
 import Modal from '../../../components/Modal';
 import {CreateRoutine, UpdateRoutine} from '../../../graphql/mutations';
-import {FormModalOptions} from '../../../hooks/useFormModal';
+import {withVisibleContent} from '../../../hoc/withVisibleContent';
+import {FormModalComponent} from '../../../hooks/useFormModal';
 import i18n from '../../../i18n';
+import yupSchema, {yupResolver} from '../../../schema/yup';
 
-const routineFormData = {
-	autoanalyze: false,
-	id: 0,
-	name: '',
+type RoutineForm = {
+	autoanalyze: boolean;
+	id: number;
+	name: string;
 };
 
-type RoutineModalProps = {
-	modal: FormModalOptions;
-};
-
-type RoutineFormData = typeof routineFormData;
-
-type RoutineFormProps = {
-	form: RoutineFormData;
-	onChange: (event: any) => void;
-};
-
-const RoutineForm: React.FC<RoutineFormProps> = ({form, onChange}) => {
-	return (
-		<div>
-			<Input
-				label={i18n.translate('name')}
-				name="name"
-				onChange={onChange}
-				required
-				value={form.name}
-			/>
-
-			<div className="mt-2">
-				<ClayCheckbox
-					checked={form.autoanalyze}
-					label={i18n.translate('autoanalyze')}
-					name="autoanalyze"
-					onChange={onChange}
-				/>
-			</div>
-		</div>
-	);
-};
-
-const RoutineModal: React.FC<RoutineModalProps> = ({
-	modal: {modalState, observer, onChange, onClose, onError, onSave, visible},
+const RoutineModal: React.FC<FormModalComponent & {projectId: number}> = ({
+	modal: {modalState, observer, onClose, onSubmit},
+	projectId,
 }) => {
-	const [onCreateRoutine] = useMutation(CreateRoutine);
-	const [onUpdateRoutine] = useMutation(UpdateRoutine);
+	const {
+		formState: {errors},
+		handleSubmit,
+		register,
+		setValue,
+		watch,
+	} = useForm<RoutineForm>({
+		defaultValues: {autoanalyze: false, ...modalState},
+		resolver: yupResolver(yupSchema.routine),
+	});
 
-	const [form, setForm] = useState<RoutineFormData>(routineFormData);
+	const autoanalyze = watch('autoanalyze');
 
-	useEffect(() => {
-		if (visible && modalState) {
-			setForm(modalState);
-		}
-	}, [visible, modalState]);
-
-	const onSubmit = async () => {
-		const variables: any = {
-			Routine: {
-				autoanalyze: form.autoanalyze,
-				name: form.name,
+	const _onSubmit = (form: RoutineForm) => {
+		onSubmit(
+			{
+				...form,
+				projectId,
 			},
-		};
-
-		try {
-			if (form.id) {
-				variables.routineId = form.id;
-
-				await onUpdateRoutine({variables});
+			{
+				createMutation: CreateRoutine,
+				updateMutation: UpdateRoutine,
 			}
-			else {
-				await onCreateRoutine({variables});
-			}
-
-			onSave();
-		}
-		catch (error) {
-			onError(error);
-		}
+		);
 	};
 
 	return (
@@ -110,19 +68,36 @@ const RoutineModal: React.FC<RoutineModalProps> = ({
 						{i18n.translate('close')}
 					</ClayButton>
 
-					<ClayButton displayType="primary" onClick={onSubmit}>
+					<ClayButton
+						displayType="primary"
+						onClick={handleSubmit(_onSubmit)}
+					>
 						{i18n.translate('save')}
 					</ClayButton>
 				</ClayButton.Group>
 			}
 			observer={observer}
 			size="lg"
-			title={i18n.translate(form.id ? 'edit-routine' : 'new-routine')}
-			visible={visible}
+			title={i18n.translate(
+				modalState?.id ? 'edit-routine' : 'new-routine'
+			)}
+			visible
 		>
-			<RoutineForm form={form} onChange={onChange({form, setForm})} />
+			<Input
+				errors={errors}
+				label={i18n.translate('name')}
+				name="name"
+				register={register}
+				required
+			/>
+
+			<ClayCheckbox
+				checked={autoanalyze}
+				label={i18n.translate('autoanalyze')}
+				onChange={() => setValue('autoanalyze', !autoanalyze)}
+			/>
 		</Modal>
 	);
 };
 
-export default RoutineModal;
+export default withVisibleContent(RoutineModal);

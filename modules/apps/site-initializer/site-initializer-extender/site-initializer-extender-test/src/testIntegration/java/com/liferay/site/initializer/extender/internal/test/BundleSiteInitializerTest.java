@@ -53,8 +53,10 @@ import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeDefinition;
 import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeEntry;
 import com.liferay.headless.admin.list.type.resource.v1_0.ListTypeDefinitionResource;
 import com.liferay.headless.admin.user.dto.v1_0.Account;
+import com.liferay.headless.admin.user.dto.v1_0.Organization;
 import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.resource.v1_0.AccountResource;
+import com.liferay.headless.admin.user.resource.v1_0.OrganizationResource;
 import com.liferay.headless.admin.user.resource.v1_0.UserAccountResource;
 import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowDefinition;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowDefinitionResource;
@@ -212,6 +214,7 @@ public class BundleSiteInitializerTest {
 			_assertLayoutSets(group);
 			_assertListTypeDefinitions(serviceContext);
 			_assertObjectDefinitions(group, serviceContext);
+			_assertOrganizations(serviceContext);
 			_assertPermissions(group);
 			_assertPortletSettings(group);
 			_assertRemoteApp(group);
@@ -926,6 +929,48 @@ public class BundleSiteInitializerTest {
 		Assert.assertEquals("manyToMany", objectRelationshipType2.toString());
 	}
 
+	private void _assertOrganizations(ServiceContext serviceContext)
+		throws Exception {
+
+		OrganizationResource.Builder organizationResourceBuilder =
+			_organizationResourceFactory.create();
+
+		OrganizationResource organizationResource =
+			organizationResourceBuilder.user(
+				serviceContext.fetchUser()
+			).build();
+
+		Page<Organization> organizationsPage1 =
+			organizationResource.getOrganizationsPage(
+				null, null,
+				organizationResource.toFilter("name eq 'Test Organization 1'"),
+				null, null);
+
+		Organization organization1 = organizationsPage1.fetchFirstItem();
+
+		Assert.assertNotNull(organization1);
+
+		Page<Organization> organizationsPage2 =
+			organizationResource.getOrganizationsPage(
+				null, null,
+				organizationResource.toFilter("name eq 'Test Organization 2'"),
+				null, null);
+
+		Organization organization2 = organizationsPage2.fetchFirstItem();
+
+		Assert.assertNotNull(organization2);
+		Assert.assertTrue(organization2.getNumberOfOrganizations() == 1);
+
+		Page<Organization> organizationsPage3 =
+			organizationResource.getOrganizationChildOrganizationsPage(
+				organization2.getId(), null, null, null, null, null);
+
+		Organization organization3 = organizationsPage3.fetchFirstItem();
+
+		Assert.assertNotNull(organization3);
+		Assert.assertEquals("Test Organization 3", organization3.getName());
+	}
+
 	private void _assertPermissions(Group group) throws Exception {
 		_assertRoles(group);
 
@@ -1324,6 +1369,9 @@ public class BundleSiteInitializerTest {
 	@Inject
 	private ObjectRelationshipResource.Factory
 		_objectRelationshipResourceFactory;
+
+	@Inject
+	private OrganizationResource.Factory _organizationResourceFactory;
 
 	@Inject
 	private Portal _portal;

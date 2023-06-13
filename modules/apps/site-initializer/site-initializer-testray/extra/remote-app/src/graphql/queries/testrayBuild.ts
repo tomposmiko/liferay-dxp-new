@@ -19,6 +19,9 @@ import {TestrayProject} from './testrayProject';
 import {TestrayRoutine} from './testrayRoutine';
 
 export type TestrayBuild = {
+	creator: {
+		name: string;
+	};
 	dateCreated: string;
 	description: string;
 	dueStatus: number;
@@ -36,7 +39,7 @@ export const getBuilds = gql`
 		builds(filter: $filter, page: $page, pageSize: $pageSize)
 			@rest(
 				type: "C_Build"
-				path: "builds?page={args.page}&pageSize={args.pageSize}&nestedFields=productVersion"
+				path: "builds?page={args.page}&pageSize={args.pageSize}&nestedFields=productVersion&filter={args.filter}&nestedFieldsDepth=2"
 			) {
 			items {
 				dateCreated
@@ -65,6 +68,9 @@ export const getBuild = gql`
 				type: "C_Build"
 				path: "builds/{args.buildId}?nestedFields=productVersion"
 			) {
+			creator {
+				name
+			}
 			dateCreated
 			description
 			dueStatus

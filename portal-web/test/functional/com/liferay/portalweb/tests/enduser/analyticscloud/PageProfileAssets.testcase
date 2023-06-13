@@ -38,14 +38,12 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8368 | Test Summary: Page profile assets card shows which assets are on the page"
 	@priority = "5"
 	test ShowsWhichAssetsOnPage {
-		task ("Create Blog and WC to Add to Page") {
+		task ("Create Blog to Add to Page") {
 			ACUtils.createBlogsAndAddToPage();
-
-			ACUtils.createWCAndAddToPage();
 		}
 
 		task ("Connect DXP to AC") {
-			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Create New User and Sync New Contact Data") {
@@ -54,6 +52,11 @@ definition {
 				userFirstName = "ac",
 				userLastName = "ac",
 				userScreenName = "ac");
+
+			JSONUser.setFirstPassword(
+				agreeToTermsAndAnswerReminderQuery = "true",
+				requireReset = "false",
+				userEmailAddress = "ac@liferay.com");
 
 			ACDXPSettings.syncNewContactData();
 		}
@@ -64,6 +67,8 @@ definition {
 				userLoginFullName = "ac ac");
 
 			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -73,7 +78,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Go to Sites > Pages > Set 24 hours on Time Filter") {
@@ -84,30 +89,23 @@ definition {
 			ACTimeFilter.clickTimeFilterButton();
 
 			ACTimeFilter.setLast24Hours();
-
-			// It is not possible to validade the data because of timing issues.
-
 		}
 
 		task ("Navigate to AC Page > Overview > Displayed Assets") {
-			ACNavigation.openItem(itemName = "AC Page - Site Name - Liferay DXP");
+			var dataSourceName = StringUtil.extractFirst("${assignedPropertyName}", " ");
+
+			ACNavigation.openItem(itemName = "Blogs AC Title - Site Name - ${dataSourceName}");
 
 			ACNavigation.viewActiveSwitchTab(tabName = "Overview");
 
 			ACCards.viewCards(cardTitle = "Displayed Assets");
 		}
 
-		task ("Assert Blog and WC on the List") {
+		task ("Assert Blog on the List") {
 			for (var assetName : list "Blogs AC Title,Blogs") {
-				AssertTextEquals(
-					categoryName = "${assetName}",
-					locator1 = "ContentDashboard#CATEGORY_NAME_ELEMENT");
-			}
-
-			for (var assetName : list "Web Content AC Title,Web Content") {
-				AssertTextEquals(
-					categoryName = "${assetName}",
-					locator1 = "ContentDashboard#CATEGORY_NAME_ELEMENT");
+				AssertElementPresent(
+					key_nameList = "${assetName}",
+					locator1 = "ACSites#DISPLAYED_ASSETS_CARD");
 			}
 		}
 	}

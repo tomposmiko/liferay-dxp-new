@@ -39,7 +39,7 @@ export const getCases = gql`
 		cases(filter: $filter, page: $page, pageSize: $pageSize)
 			@rest(
 				type: "C_Case"
-				path: "cases?page={args.page}&pageSize={args.pageSize}&nestedFields=component.team,caseType"
+				path: "cases?page={args.page}&pageSize={args.pageSize}&nestedFields=component.team,caseType&nestedFieldsDepth=2"
 			) {
 			items {
 				caseNumber
@@ -60,7 +60,6 @@ export const getCases = gql`
 				estimatedDuration
 				id
 				name
-				originationKey
 				priority
 				steps
 				stepsType
@@ -78,7 +77,7 @@ export const getCase = gql`
 		case(caseId: $caseId)
 			@rest(
 				type: "C_Case"
-				path: "cases/{args.caseId}?nestedFields=Component.Team,CaseType"
+				path: "cases/{args.caseId}?nestedFields=Component.Team,CaseType&nestedFieldsDepth=2"
 			) {
 			caseNumber
 			caseResult
@@ -98,7 +97,6 @@ export const getCase = gql`
 			estimatedDuration
 			id
 			name
-			originationKey
 			priority
 			steps
 			stepsType

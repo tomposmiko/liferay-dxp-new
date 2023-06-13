@@ -24,7 +24,6 @@ export const testrayCaseFragment = gql`
 		estimatedDuration
 		id: caseId
 		name
-		originationKey
 		priority
 		steps
 		stepsType

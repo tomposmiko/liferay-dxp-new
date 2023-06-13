@@ -29,6 +29,8 @@ ObjectField objectField = (ObjectField)request.getAttribute(ObjectWebKeys.OBJECT
 		module="js/components/EditObjectField"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
+				"allowMaxLength", GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-146889"))
+			).put(
 				"isApproved", objectDefinition.isApproved()
 			).put(
 				"objectField", objectDefinitionsFieldsDisplayContext.getObjectFieldJSONObject(objectField)
@@ -36,6 +38,8 @@ ObjectField objectField = (ObjectField)request.getAttribute(ObjectWebKeys.OBJECT
 				"objectFieldTypes", objectDefinitionsFieldsDisplayContext.getObjectFieldBusinessTypeMaps(Validator.isNotNull(objectField.getRelationshipType()), locale)
 			).put(
 				"readOnly", !objectDefinitionsFieldsDisplayContext.hasUpdateObjectDefinitionPermission()
+			).put(
+				"showDocumentsAndMediaOption", GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-146523"))
 			).build()
 		%>'
 	/>

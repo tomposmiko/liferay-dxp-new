@@ -33,8 +33,9 @@ function JSONSXPElement({
 	isSubmitting,
 	onDeleteSXPElement,
 	prefixedId,
-	setFieldTouched,
-	setFieldValue,
+	readOnly,
+	setFieldTouched = () => {},
+	setFieldValue = () => {},
 	touched = {},
 	uiConfigurationValues = {},
 }) {
@@ -86,32 +87,34 @@ function JSONSXPElement({
 						)}
 					</ClayList.ItemField>
 
-					<ClayDropDown
-						active={active}
-						alignmentPosition={3}
-						onActiveChange={setActive}
-						trigger={
-							<ClayList.ItemField>
-								<ClayButton
-									aria-label={Liferay.Language.get(
-										'dropdown'
-									)}
-									className="component-action"
-									displayType="unstyled"
+					{onDeleteSXPElement && (
+						<ClayDropDown
+							active={active}
+							alignmentPosition={3}
+							onActiveChange={setActive}
+							trigger={
+								<ClayList.ItemField>
+									<ClayButton
+										aria-label={Liferay.Language.get(
+											'dropdown'
+										)}
+										className="component-action"
+										displayType="unstyled"
+									>
+										<ClayIcon symbol="ellipsis-v" />
+									</ClayButton>
+								</ClayList.ItemField>
+							}
+						>
+							<ClayDropDown.ItemList>
+								<ClayDropDown.Item
+									onClick={() => onDeleteSXPElement(id)}
 								>
-									<ClayIcon symbol="ellipsis-v" />
-								</ClayButton>
-							</ClayList.ItemField>
-						}
-					>
-						<ClayDropDown.ItemList>
-							<ClayDropDown.Item
-								onClick={() => onDeleteSXPElement(id)}
-							>
-								{Liferay.Language.get('remove')}
-							</ClayDropDown.Item>
-						</ClayDropDown.ItemList>
-					</ClayDropDown>
+									{Liferay.Language.get('remove')}
+								</ClayDropDown.Item>
+							</ClayDropDown.ItemList>
+						</ClayDropDown>
+					)}
 
 					<ClayList.ItemField>
 						<ClayButton
@@ -145,6 +148,7 @@ function JSONSXPElement({
 					<JSONInput
 						disabled={isSubmitting}
 						name={_inputName(index)}
+						readOnly={readOnly}
 						setFieldTouched={setFieldTouched}
 						setFieldValue={setFieldValue}
 						value={
@@ -176,6 +180,7 @@ JSONSXPElement.propTypes = {
 	isSubmitting: PropTypes.bool,
 	onDeleteSXPElement: PropTypes.func,
 	prefixedId: PropTypes.string,
+	readOnly: PropTypes.bool,
 	setFieldTouched: PropTypes.func,
 	setFieldValue: PropTypes.func,
 	sxpElement: PropTypes.object,

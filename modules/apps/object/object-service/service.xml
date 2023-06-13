@@ -466,8 +466,9 @@
 
 		<column name="objectDefinitionId" type="long" />
 		<column name="active" type="boolean" />
-		<column localized="true" name="errorLabel" type="String" />
 		<column name="engine" type="String" />
+		<column localized="true" name="errorLabel" type="String" />
+		<column localized="true" name="name" type="String" />
 		<column name="script" type="String" />
 
 		<!-- Finder methods -->
@@ -598,7 +599,9 @@
 		<exception>ObjectRelationshipName</exception>
 		<exception>ObjectRelationshipReverse</exception>
 		<exception>ObjectRelationshipType</exception>
-		<exception>ObjectValidation</exception>
+		<exception>ObjectValidationRuleEngine</exception>
+		<exception>ObjectValidationRuleName</exception>
+		<exception>ObjectValidationRuleScript</exception>
 		<exception>ObjectViewSortColumn</exception>
 		<exception>RequiredObjectDefinition</exception>
 		<exception>RequiredObjectField</exception>

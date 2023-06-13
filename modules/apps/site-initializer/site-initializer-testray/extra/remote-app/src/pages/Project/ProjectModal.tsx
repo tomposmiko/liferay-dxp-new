@@ -12,10 +12,8 @@
  * details.
  */
 
-import {useMutation} from '@apollo/client';
 import ClayButton from '@clayui/button';
-import ClayForm from '@clayui/form';
-import {useEffect, useState} from 'react';
+import {useForm} from 'react-hook-form';
 
 import Input from '../../components/Input';
 import Modal from '../../components/Modal';
@@ -23,95 +21,42 @@ import {
 	CreateProject,
 	UpdateProject,
 } from '../../graphql/mutations/testrayProject';
-import {FormModalOptions} from '../../hooks/useFormModal';
+import {withVisibleContent} from '../../hoc/withVisibleContent';
+import {FormModalComponent} from '../../hooks/useFormModal';
 import i18n from '../../i18n';
+import yupSchema, {yupResolver} from '../../schema/yup';
 
-type NewProjectForm = {
+type ProjectForm = {
 	description: string;
-	id?: number;
+	id?: string;
 	name: string;
 };
 
-type NewProjectFormProps = {
-	form: NewProjectForm;
-	onChange: (event: any) => void;
-	onSubmit: (event: any) => void;
-};
-
-const FormNewProject: React.FC<NewProjectFormProps> = ({
-	form,
-	onChange,
-	onSubmit,
+const ProjectModal: React.FC<FormModalComponent> = ({
+	modal: {modalState, observer, onClose, onSubmit},
 }) => {
-	return (
-		<ClayForm onSubmit={onSubmit}>
-			<ClayForm.Group>
-				<Input
-					label="Name"
-					name="name"
-					onChange={onChange}
-					required
-					value={form.name}
-				/>
-			</ClayForm.Group>
-
-			<ClayForm.Group>
-				<Input
-					label="Description"
-					name="description"
-					onChange={onChange}
-					required
-					type="textarea"
-					value={form.description}
-				/>
-			</ClayForm.Group>
-		</ClayForm>
-	);
-};
-
-type NewProjectProps = {
-	modal: FormModalOptions;
-};
-const ProjectModal: React.FC<NewProjectProps> = ({
-	modal: {modalState, observer, onChange, onClose, onError, onSave, visible},
-}) => {
-	const [form, setForm] = useState<NewProjectForm>({
-		description: '',
-		name: '',
+	const {
+		formState: {errors},
+		handleSubmit,
+		register,
+	} = useForm<ProjectForm>({
+		defaultValues: modalState,
+		resolver: yupResolver(yupSchema.project),
 	});
 
-	const [onCreateProject] = useMutation(CreateProject);
-	const [onUpdateProject] = useMutation(UpdateProject);
-
-	useEffect(() => {
-		if (visible && modalState) {
-			setForm(modalState);
-		}
-	}, [visible, modalState]);
-
-	const onSubmit = async () => {
-		const variables: any = {
-			Project: {
-				description: form.description,
-				name: form.name,
-			},
-		};
-
-		try {
-			if (form.id) {
-				variables.projectId = form.id;
-
-				await onUpdateProject({variables});
+	const _onSubmit = (form: ProjectForm) =>
+		onSubmit(
+			{description: form.description, id: form.id, name: form.name},
+			{
+				createMutation: CreateProject,
+				updateMutation: UpdateProject,
 			}
-			else {
-				await onCreateProject({variables});
-			}
+		);
 
-			onSave();
-		}
-		catch (error) {
-			onError(error);
-		}
+	const inputProps = {
+		errors,
+		register,
+		required: true,
 	};
 
 	return (
@@ -122,23 +67,30 @@ const ProjectModal: React.FC<NewProjectProps> = ({
 						{i18n.translate('close')}
 					</ClayButton>
 
-					<ClayButton displayType="primary" onClick={onSubmit}>
+					<ClayButton
+						displayType="primary"
+						onClick={handleSubmit(_onSubmit)}
+					>
 						{i18n.translate('save')}
 					</ClayButton>
 				</ClayButton.Group>
 			}
 			observer={observer}
 			size="lg"
-			title={i18n.translate(form.id ? 'edit-project' : 'new-project')}
-			visible={visible}
+			title={i18n.translate(
+				modalState?.id ? 'edit-project' : 'new-project'
+			)}
+			visible
 		>
-			<FormNewProject
-				form={form}
-				onChange={onChange({form, setForm})}
-				onSubmit={onSubmit}
+			<Input label={i18n.translate('name')} name="name" {...inputProps} />
+
+			<Input
+				label={i18n.translate('description')}
+				name="description"
+				{...inputProps}
 			/>
 		</Modal>
 	);
 };
 
-export default ProjectModal;
+export default withVisibleContent(ProjectModal);

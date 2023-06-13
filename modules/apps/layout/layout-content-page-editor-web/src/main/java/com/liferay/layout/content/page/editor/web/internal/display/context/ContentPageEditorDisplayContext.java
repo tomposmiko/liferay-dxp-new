@@ -77,11 +77,11 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUt
 import com.liferay.layout.page.template.util.PaddingConverter;
 import com.liferay.layout.page.template.util.comparator.LayoutPageTemplateEntryNameComparator;
 import com.liferay.layout.responsive.ViewportSize;
-import com.liferay.layout.util.constants.LayoutConverterTypeConstants;
 import com.liferay.layout.util.structure.CommonStylesUtil;
 import com.liferay.layout.util.structure.DropZoneLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
+import com.liferay.layout.util.structure.LayoutStructureItemCSSUtil;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.comment.Comment;
@@ -357,6 +357,9 @@ public class ContentPageEditorDisplayContext {
 				"featureFlagLps119551",
 				GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-119551"))
 			).put(
+				"featureFlagLps132571",
+				GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-132571"))
+			).put(
 				"fragmentAdvancedOptionsEnabled",
 				_ffLayoutContentPageEditorConfiguration.
 					fragmentAdvancedOptionsEnabled()
@@ -475,6 +478,8 @@ public class ContentPageEditorDisplayContext {
 				"infoItemSelectorURL", _getInfoItemSelectorURL()
 			).put(
 				"infoListSelectorURL", _getInfoListSelectorURL()
+			).put(
+				"isConversionDraft", _isConversionDraft()
 			).put(
 				"isPrivateLayoutsEnabled",
 				() -> {
@@ -700,14 +705,6 @@ public class ContentPageEditorDisplayContext {
 
 	public boolean isContentLayout() {
 		if (_getLayoutType() == -1) {
-			return true;
-		}
-
-		return false;
-	}
-
-	public boolean isConversionDraft() {
-		if (_getLayoutType() == LayoutConverterTypeConstants.TYPE_CONVERSION) {
 			return true;
 		}
 
@@ -1591,6 +1588,10 @@ public class ContentPageEditorDisplayContext {
 					).put(
 						"content", content
 					).put(
+						"cssClass",
+						LayoutStructureItemCSSUtil.getFragmentEntryLinkCssClass(
+							fragmentEntryLink)
+					).put(
 						"defaultConfigurationValues",
 						_fragmentEntryConfigurationParser.
 							getConfigurationDefaultValuesJSONObject(
@@ -1800,16 +1801,6 @@ public class ContentPageEditorDisplayContext {
 
 	private int _getLayoutType() {
 		if (_layoutType != null) {
-			return _layoutType;
-		}
-
-		Layout publishedLayout = _getPublishedLayout();
-
-		if (Objects.equals(
-				publishedLayout.getType(), LayoutConstants.TYPE_PORTLET)) {
-
-			_layoutType = LayoutConverterTypeConstants.TYPE_CONVERSION;
-
 			return _layoutType;
 		}
 
@@ -2250,6 +2241,19 @@ public class ContentPageEditorDisplayContext {
 			dropZoneLayoutStructureItem.isAllowNewFragmentEntries();
 
 		return _allowNewFragmentEntries;
+	}
+
+	private boolean _isConversionDraft() {
+		Layout publishedLayout = _getPublishedLayout();
+
+		if ((publishedLayout != null) &&
+			Objects.equals(
+				publishedLayout.getType(), LayoutConstants.TYPE_PORTLET)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean _isMasterUsed() {

@@ -19,6 +19,7 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectViewColumn;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectViewSortColumn;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectViewUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectViewResource;
+import com.liferay.object.admin.rest.resource.v1_0.util.NameMapUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectViewService;
 import com.liferay.object.service.persistence.ObjectViewColumnPersistence;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -109,6 +111,19 @@ public class ObjectViewResourceImpl extends BaseObjectViewResourceImpl {
 	}
 
 	@Override
+	public ObjectView postObjectViewCopy(Long objectViewId) throws Exception {
+		com.liferay.object.model.ObjectView objectView =
+			_objectViewService.getObjectView(objectViewId);
+
+		return _toObjectView(
+			_objectViewService.addObjectView(
+				objectView.getObjectDefinitionId(), false,
+				NameMapUtil.copy(objectView.getNameMap()),
+				objectView.getObjectViewColumns(),
+				objectView.getObjectViewSortColumns()));
+	}
+
+	@Override
 	public ObjectView putObjectView(Long objectViewId, ObjectView objectView)
 		throws Exception {
 
@@ -129,6 +144,12 @@ public class ObjectViewResourceImpl extends BaseObjectViewResourceImpl {
 
 		return ObjectViewUtil.toObjectView(
 			HashMapBuilder.put(
+				"copy",
+				addAction(
+					ActionKeys.UPDATE, "postObjectViewCopy",
+					ObjectDefinition.class.getName(),
+					serviceBuilderObjectView.getObjectDefinitionId())
+			).put(
 				"delete",
 				addAction(
 					ActionKeys.DELETE, "deleteObjectView",
@@ -156,6 +177,11 @@ public class ObjectViewResourceImpl extends BaseObjectViewResourceImpl {
 		com.liferay.object.model.ObjectViewColumn
 			serviceBuilderObjectViewColumn =
 				_objectViewColumnPersistence.create(0L);
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-149119"))) {
+			serviceBuilderObjectViewColumn.setLabelMap(
+				LocalizedMapUtil.getLocalizedMap(objectViewColumn.getLabel()));
+		}
 
 		serviceBuilderObjectViewColumn.setObjectFieldName(
 			objectViewColumn.getObjectFieldName());

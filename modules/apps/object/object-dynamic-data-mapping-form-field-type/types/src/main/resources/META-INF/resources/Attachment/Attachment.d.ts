@@ -18,19 +18,21 @@ import {FieldChangeEventHandler} from 'dynamic-data-mapping-form-field-type';
 import './Attachment.scss';
 export default function Attachment({
 	acceptedFileExtensions,
+	fileSource,
 	maximumFileSize,
 	objectEntryId, // "0" means that there is no previews
 	onChange,
-	uploadURL,
+	url,
 	value,
 	...otherProps
 }: IProps): JSX.Element;
 interface IProps {
 	acceptedFileExtensions: string;
+	fileSource: string;
 	maximumFileSize: string;
 	objectEntryId: string;
 	onChange: FieldChangeEventHandler;
-	uploadURL: string;
+	url: string;
 	value: string;
 }
 export {};

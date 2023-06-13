@@ -22,6 +22,7 @@ import com.liferay.oauth2.provider.internal.test.TestAuthorizationGrant;
 import com.liferay.oauth2.provider.internal.test.TestClientAuthentication;
 import com.liferay.oauth2.provider.internal.test.TestClientPasswordClientAuthentication;
 import com.liferay.oauth2.provider.internal.test.TestJWTAssertionAuthorizationGrant;
+import com.liferay.oauth2.provider.internal.test.TestJWTAssertionClientAuthentication;
 import com.liferay.oauth2.provider.internal.test.util.JWTAssertionUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -64,8 +65,18 @@ public class JWTAssertAuthorizationGrantTest extends BaseClientTestCase {
 		Assert.assertTrue(
 			Validator.isNotNull(
 				_getToken(
-					_getTestAuthorizationGrant(),
-					_TEST_CLIENT_PASSWORD_CLIENT_AUTHENTICATION)));
+					_getDefaultAuthorizationGrant(),
+					_testClientPasswordClientAuthentication)));
+		Assert.assertTrue(
+			Validator.isNotNull(
+				_getToken(
+					_getDefaultAuthorizationGrant(),
+					_testJWTAssertionClientAuthentication1)));
+		Assert.assertTrue(
+			Validator.isNotNull(
+				_getToken(
+					_getDefaultAuthorizationGrant(),
+					_testJWTAssertionClientAuthentication2)));
 	}
 
 	@Test
@@ -74,7 +85,7 @@ public class JWTAssertAuthorizationGrantTest extends BaseClientTestCase {
 
 		TestJWTAssertionAuthorizationGrant testJWTAssertionAuthorizationGrant =
 			new TestJWTAssertionAuthorizationGrant(
-				_TEST_CLIENT_ID_01, null, user.getUuid(), getTokenWebTarget());
+				_TEST_CLIENT_ID_1, null, user.getUuid(), getTokenWebTarget());
 
 		Assert.assertTrue(
 			Validator.isNotNull(_getToken(testJWTAssertionAuthorizationGrant)));
@@ -86,7 +97,7 @@ public class JWTAssertAuthorizationGrantTest extends BaseClientTestCase {
 
 		TestJWTAssertionAuthorizationGrant testJWTAssertionAuthorizationGrant =
 			new TestJWTAssertionAuthorizationGrant(
-				_TEST_CLIENT_ID_01, null, user.getUuid(),
+				_TEST_CLIENT_ID_1, null, user.getUuid(),
 				getJsonWebTarget("wrongPath"));
 
 		Assert.assertTrue(
@@ -103,14 +114,14 @@ public class JWTAssertAuthorizationGrantTest extends BaseClientTestCase {
 			null, getTokenWebTarget(), Function.identity());
 	}
 
-	private TestAuthorizationGrant _getTestAuthorizationGrant() {
+	private TestAuthorizationGrant _getDefaultAuthorizationGrant() {
 		User user = null;
 
 		try {
 			user = UserTestUtil.getAdminUser(PortalUtil.getDefaultCompanyId());
 
 			return new TestJWTAssertionAuthorizationGrant(
-				_TEST_CLIENT_ID_01, null, user.getUuid(), getTokenWebTarget());
+				_TEST_CLIENT_ID_1, null, user.getUuid(), getTokenWebTarget());
 		}
 		catch (Exception exception) {
 			throw new RuntimeException(exception);
@@ -119,8 +130,7 @@ public class JWTAssertAuthorizationGrantTest extends BaseClientTestCase {
 
 	private String _getToken(TestAuthorizationGrant testAuthorizationGrant) {
 		return _getToken(
-			testAuthorizationGrant,
-			_TEST_CLIENT_PASSWORD_CLIENT_AUTHENTICATION);
+			testAuthorizationGrant, _testClientPasswordClientAuthentication);
 	}
 
 	private String _getToken(
@@ -147,19 +157,29 @@ public class JWTAssertAuthorizationGrantTest extends BaseClientTestCase {
 		return _invocationBuilder.post(Entity.form(multivaluedMap));
 	}
 
-	private static final String _TEST_CLIENT_ID_01 = "test_client_id_01";
-
-	private static final TestClientPasswordClientAuthentication
-		_TEST_CLIENT_PASSWORD_CLIENT_AUTHENTICATION =
-			new TestClientPasswordClientAuthentication(
-				_TEST_CLIENT_ID_01,
-				JWTAssertAuthorizationGrantTest._TEST_CLIENT_SECRET);
+	private static final String _TEST_CLIENT_ID_1 = "test_client_id_1";
 
 	private static final String _TEST_CLIENT_SECRET =
 		"oauthTestApplicationSecret";
 
 	private static final Invocation.Builder _invocationBuilder =
 		_getInvocationBuilder();
+
+	private final TestClientPasswordClientAuthentication
+		_testClientPasswordClientAuthentication =
+			new TestClientPasswordClientAuthentication(
+				_TEST_CLIENT_ID_1,
+				JWTAssertAuthorizationGrantTest._TEST_CLIENT_SECRET);
+	private final TestJWTAssertionClientAuthentication
+		_testJWTAssertionClientAuthentication1 =
+			new TestJWTAssertionClientAuthentication(
+				getTokenWebTarget(), _TEST_CLIENT_ID_1, false,
+				_TEST_CLIENT_ID_1);
+	private final TestJWTAssertionClientAuthentication
+		_testJWTAssertionClientAuthentication2 =
+			new TestJWTAssertionClientAuthentication(
+				getTokenWebTarget(), _TEST_CLIENT_ID_1, true,
+				_TEST_CLIENT_ID_1);
 
 	private static class JWTBearerGrantTestPreparatorBundleActivator
 		extends BaseTestPreparatorBundleActivator {
@@ -170,7 +190,7 @@ public class JWTAssertAuthorizationGrantTest extends BaseClientTestCase {
 				"com.liferay.oauth2.provider.rest.internal.configuration." +
 					"OAuth2InAssertionConfiguration",
 				HashMapDictionaryBuilder.<String, Object>put(
-					"oauth2.in.assertion.issuer", _TEST_CLIENT_ID_01
+					"oauth2.in.assertion.issuer", _TEST_CLIENT_ID_1
 				).put(
 					"oauth2.in.assertion.signature.json.web.key.set",
 					JWTAssertionUtil.JWKS
@@ -182,7 +202,7 @@ public class JWTAssertAuthorizationGrantTest extends BaseClientTestCase {
 				PortalUtil.getDefaultCompanyId());
 
 			createOAuth2Application(
-				user.getCompanyId(), user, _TEST_CLIENT_ID_01,
+				user.getCompanyId(), user, _TEST_CLIENT_ID_1,
 				Arrays.asList(GrantType.JWT_BEARER),
 				Arrays.asList(
 					"everything", "everything.read", "everything.write"));

@@ -15,10 +15,14 @@
 package com.liferay.layout.util.structure;
 
 import com.liferay.layout.helper.CollectionPaginationHelper;
+import com.liferay.layout.responsive.ViewportSize;
 import com.liferay.layout.util.constants.LayoutDataItemTypeConstants;
 import com.liferay.petra.lang.HashUtil;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -55,6 +59,8 @@ public class CollectionStyledLayoutStructureItem
 				_displayAllPages,
 				collectionStyledLayoutStructureItem._displayAllPages) ||
 			!Objects.equals(
+				_gutters, collectionStyledLayoutStructureItem._gutters) ||
+			!Objects.equals(
 				_listStyle, collectionStyledLayoutStructureItem._listStyle) ||
 			!Objects.equals(
 				_numberOfColumns,
@@ -73,7 +79,10 @@ public class CollectionStyledLayoutStructureItem
 				collectionStyledLayoutStructureItem._paginationType) ||
 			!Objects.equals(
 				_showAllItems,
-				collectionStyledLayoutStructureItem._showAllItems)) {
+				collectionStyledLayoutStructureItem._showAllItems) ||
+			!Objects.equals(
+				_verticalAlignment,
+				collectionStyledLayoutStructureItem._verticalAlignment)) {
 
 			return false;
 		}
@@ -89,12 +98,14 @@ public class CollectionStyledLayoutStructureItem
 	public JSONObject getItemConfigJSONObject() {
 		JSONObject jsonObject = super.getItemConfigJSONObject();
 
-		return jsonObject.put(
+		jsonObject = jsonObject.put(
 			"collection", _collectionJSONObject
 		).put(
 			"displayAllItems", _displayAllItems
 		).put(
 			"displayAllPages", _displayAllPages
+		).put(
+			"gutters", _gutters
 		).put(
 			"listItemStyle", _listItemStyle
 		).put(
@@ -113,7 +124,38 @@ public class CollectionStyledLayoutStructureItem
 			"showAllItems", _showAllItems
 		).put(
 			"templateKey", _templateKey
+		).put(
+			"verticalAlignment", _verticalAlignment
 		);
+
+		for (ViewportSize viewportSize : _viewportSizes) {
+			if (viewportSize.equals(ViewportSize.DESKTOP)) {
+				continue;
+			}
+
+			JSONObject currentViewportConfigurationJSONObject =
+				JSONFactoryUtil.createJSONObject();
+
+			if (jsonObject.has(viewportSize.getViewportSizeId())) {
+				currentViewportConfigurationJSONObject =
+					jsonObject.getJSONObject(viewportSize.getViewportSizeId());
+			}
+
+			JSONObject viewportConfigurationJSONObject =
+				_viewportConfigurations.getOrDefault(
+					viewportSize.getViewportSizeId(),
+					JSONFactoryUtil.createJSONObject());
+
+			currentViewportConfigurationJSONObject.put(
+				"numberOfColumns",
+				viewportConfigurationJSONObject.get("numberOfColumns"));
+
+			jsonObject.put(
+				viewportSize.getViewportSizeId(),
+				currentViewportConfigurationJSONObject);
+		}
+
+		return jsonObject;
 	}
 
 	@Override
@@ -153,6 +195,14 @@ public class CollectionStyledLayoutStructureItem
 		return _templateKey;
 	}
 
+	public String getVerticalAlignment() {
+		return _verticalAlignment;
+	}
+
+	public Map<String, JSONObject> getViewportConfigurations() {
+		return _viewportConfigurations;
+	}
+
 	@Override
 	public int hashCode() {
 		return HashUtil.hash(0, getItemId());
@@ -164,6 +214,10 @@ public class CollectionStyledLayoutStructureItem
 
 	public boolean isDisplayAllPages() {
 		return _displayAllPages;
+	}
+
+	public boolean isGutters() {
+		return _gutters;
 	}
 
 	/**
@@ -195,6 +249,10 @@ public class CollectionStyledLayoutStructureItem
 		else {
 			_displayAllPages = displayAllPages;
 		}
+	}
+
+	public void setGutters(boolean gutters) {
+		_gutters = gutters;
 	}
 
 	public void setListItemStyle(String listItemStyle) {
@@ -243,6 +301,30 @@ public class CollectionStyledLayoutStructureItem
 		_templateKey = templateKey;
 	}
 
+	public void setVerticalAlignment(String verticalAlignment) {
+		_verticalAlignment = verticalAlignment;
+	}
+
+	public void setViewportConfiguration(
+		String viewportSizeId, JSONObject configurationJSONObject) {
+
+		_viewportConfigurations.put(
+			viewportSizeId,
+			_viewportConfigurations.getOrDefault(
+				viewportSizeId, JSONFactoryUtil.createJSONObject()
+			).put(
+				"numberOfColumns",
+				() -> {
+					if (configurationJSONObject.has("numberOfColumns")) {
+						return configurationJSONObject.getInt(
+							"numberOfColumns");
+					}
+
+					return null;
+				}
+			));
+	}
+
 	@Override
 	public void updateItemConfig(JSONObject itemConfigJSONObject) {
 		super.updateItemConfig(itemConfigJSONObject);
@@ -260,6 +342,10 @@ public class CollectionStyledLayoutStructureItem
 		if (itemConfigJSONObject.has("displayAllPages")) {
 			setDisplayAllPages(
 				itemConfigJSONObject.getBoolean("displayAllPages"));
+		}
+
+		if (itemConfigJSONObject.has("gutters")) {
+			setGutters(itemConfigJSONObject.getBoolean("gutters"));
 		}
 
 		if (itemConfigJSONObject.has("showAllItems")) {
@@ -298,11 +384,32 @@ public class CollectionStyledLayoutStructureItem
 		if (itemConfigJSONObject.has("templateKey")) {
 			setTemplateKey(itemConfigJSONObject.getString("templateKey"));
 		}
+
+		if (itemConfigJSONObject.has("verticalAlignment")) {
+			setVerticalAlignment(
+				itemConfigJSONObject.getString("verticalAlignment"));
+		}
+
+		for (ViewportSize viewportSize : _viewportSizes) {
+			if (viewportSize.equals(ViewportSize.DESKTOP)) {
+				continue;
+			}
+
+			if (itemConfigJSONObject.has(viewportSize.getViewportSizeId())) {
+				setViewportConfiguration(
+					viewportSize.getViewportSizeId(),
+					itemConfigJSONObject.getJSONObject(
+						viewportSize.getViewportSizeId()));
+			}
+		}
 	}
+
+	private static final ViewportSize[] _viewportSizes = ViewportSize.values();
 
 	private JSONObject _collectionJSONObject;
 	private boolean _displayAllItems;
 	private boolean _displayAllPages = true;
+	private boolean _gutters = true;
 	private String _listItemStyle;
 	private String _listStyle;
 	private int _numberOfColumns = 1;
@@ -313,5 +420,8 @@ public class CollectionStyledLayoutStructureItem
 		CollectionPaginationHelper.PAGINATION_TYPE_NUMERIC;
 	private boolean _showAllItems;
 	private String _templateKey;
+	private String _verticalAlignment = "start";
+	private final Map<String, JSONObject> _viewportConfigurations =
+		new HashMap<>();
 
 }

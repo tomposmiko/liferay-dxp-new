@@ -17,6 +17,10 @@ import {fetch} from 'frontend-js-web';
 import React, {ChangeEventHandler, ReactNode, useMemo, useState} from 'react';
 
 import useForm, {FormError, invalidateRequired} from '../hooks/useForm';
+import {
+	normalizeFieldSettings,
+	updateFieldSettings,
+} from '../utils/fieldSettings';
 import {toCamelCase} from '../utils/string';
 import CustomSelect from './Form/CustomSelect/CustomSelect';
 import Input from './Form/Input';
@@ -24,14 +28,23 @@ import Select from './Form/Select';
 
 const REQUIRED_MSG = Liferay.Language.get('required');
 
+const documentsAndMedia = {
+	description: Liferay.Language.get(
+		'users-can-upload-or-select-existing-files-from-documents-and-media'
+	),
+	label: Liferay.Language.get(
+		'upload-or-select-from-documents-and-media-item-selector'
+	),
+	value: 'documentsAndMedia',
+};
+
 const userComputer = {
 	description: Liferay.Language.get(
 		'files-can-be-stored-in-an-object-entry-or-in-a-specific-folder-in-documents-and-media'
 	),
 	label: Liferay.Language.get('upload-directly-from-users-computer'),
+	value: 'userComputer',
 };
-
-const attachmentSources = [userComputer];
 
 const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId() as Liferay.Language.Locale;
 
@@ -57,6 +70,7 @@ async function fetchPickList() {
 }
 
 export default function ObjectFieldFormBase({
+	allowMaxLength,
 	children,
 	disabled,
 	errors,
@@ -64,6 +78,7 @@ export default function ObjectFieldFormBase({
 	objectField: values,
 	objectFieldTypes,
 	setValues,
+	showDocumentsAndMediaOption,
 }: IProps) {
 	const businessTypeMap = useMemo(() => {
 		const businessTypeMap = new Map<string, ObjectFieldType>();
@@ -77,28 +92,56 @@ export default function ObjectFieldFormBase({
 
 	const [pickList, setPickList] = useState<IPickList[]>([]);
 
+	const handleSettingsChange = ({name, value}: ObjectFieldSetting) =>
+		setValues({
+			objectFieldSettings: updateFieldSettings(
+				values.objectFieldSettings,
+				{name, value}
+			),
+		});
+
 	const handleTypeChange = async (option: ObjectFieldType) => {
 		if (option.businessType === 'Picklist') {
 			setPickList(await fetchPickList());
 		}
 
-		const objectFieldSettings: ObjectFieldSetting[] | undefined =
-			option.businessType === 'Attachment'
-				? [
+		let objectFieldSettings: ObjectFieldSetting[] | undefined;
+
+		switch (option.businessType) {
+			case 'Attachment':
+				objectFieldSettings = [
+					{
+						name: 'acceptedFileExtensions',
+						value: 'jpeg, jpg, pdf, png',
+					},
+					{
+						name: 'fileSource',
+						value: showDocumentsAndMediaOption
+							? ''
+							: 'userComputer',
+					},
+					{
+						name: 'maximumFileSize',
+						value: 100,
+					},
+				];
+				break;
+
+			case 'LongText':
+			case 'Text':
+				if (allowMaxLength) {
+					objectFieldSettings = [
 						{
-							name: 'acceptedFileExtensions',
-							value: 'jpeg, jpg, pdf, png',
+							name: 'showCounter',
+							value: false,
 						},
-						{
-							name: 'fileSource',
-							value: 'userComputer',
-						},
-						{
-							name: 'maximumFileSize',
-							value: 100,
-						},
-				  ]
-				: undefined;
+					];
+				}
+				break;
+
+			default:
+				break;
+		}
 
 		const isSearchableByText =
 			option.businessType === 'Attachment' || option.dbType === 'String';
@@ -145,12 +188,14 @@ export default function ObjectFieldFormBase({
 			/>
 
 			{values.businessType === 'Attachment' && (
-				<CustomSelect
+				<AttachmentSourceProperty
 					disabled={disabled}
-					label={Liferay.Language.get('request-files')}
-					options={attachmentSources}
-					required
-					value={userComputer.label}
+					error={errors.fileSource}
+					objectFieldSettings={
+						values.objectFieldSettings as ObjectFieldSetting[]
+					}
+					onSettingsChange={handleSettingsChange}
+					showDocumentsAndMediaOption={showDocumentsAndMediaOption}
 				/>
 			)}
 
@@ -189,6 +234,8 @@ export function useObjectFieldForm({
 
 		const label = field.label?.[defaultLanguageId];
 
+		const settings = normalizeFieldSettings(field.objectFieldSettings);
+
 		if (invalidateRequired(label)) {
 			errors.label = REQUIRED_MSG;
 		}
@@ -201,14 +248,6 @@ export function useObjectFieldForm({
 			errors.businessType = REQUIRED_MSG;
 		}
 		else if (field.businessType === 'Attachment') {
-			const settings: {
-				[key in ObjectFieldSettingName]?: string | number;
-			} = {};
-
-			field.objectFieldSettings?.forEach(({name, value}) => {
-				settings[name] = value;
-			});
-
 			if (
 				invalidateRequired(
 					settings.acceptedFileExtensions as string | undefined
@@ -229,6 +268,14 @@ export function useObjectFieldForm({
 					),
 					0
 				);
+			}
+		}
+		else if (
+			field.businessType === 'Text' ||
+			field.businessType === 'LongText'
+		) {
+			if (settings.showCounter && !settings.maxLength) {
+				errors.maxLength = REQUIRED_MSG;
 			}
 		}
 		else if (field.businessType === 'Picklist') {
@@ -252,6 +299,52 @@ export function useObjectFieldForm({
 	return {errors, handleChange, handleSubmit, setValues, values};
 }
 
+function AttachmentSourceProperty({
+	disabled,
+	error,
+	objectFieldSettings,
+	onSettingsChange,
+	showDocumentsAndMediaOption,
+}: IAttachmentSourcePropertyProps) {
+	const attachmentSources = showDocumentsAndMediaOption
+		? [userComputer, documentsAndMedia]
+		: [userComputer];
+
+	const settings = normalizeFieldSettings(objectFieldSettings);
+
+	const attachmentSource = attachmentSources.find(
+		({value}) => value === settings.fileSource
+	);
+
+	return (
+		<CustomSelect
+			disabled={disabled}
+			error={error}
+			label={Liferay.Language.get('request-files')}
+			onChange={({value}) =>
+				onSettingsChange({
+					name: 'fileSource',
+					value,
+				})
+			}
+			options={attachmentSources}
+			required
+			value={
+				showDocumentsAndMediaOption
+					? attachmentSource?.label
+					: userComputer.label
+			}
+		/>
+	);
+}
+
+interface IAttachmentSourcePropertyProps {
+	disabled?: boolean;
+	error?: string;
+	objectFieldSettings: ObjectFieldSetting[];
+	onSettingsChange: (setting: ObjectFieldSetting) => void;
+	showDocumentsAndMediaOption: boolean;
+}
 interface IUseObjectFieldForm {
 	initialValues: Partial<ObjectField>;
 	onSubmit: (field: ObjectField) => void;
@@ -262,6 +355,7 @@ interface IPickList {
 }
 
 interface IProps {
+	allowMaxLength?: boolean;
 	children?: ReactNode;
 	disabled?: boolean;
 	errors: ObjectFieldErrors;
@@ -269,6 +363,7 @@ interface IProps {
 	objectField: Partial<ObjectField>;
 	objectFieldTypes: ObjectFieldType[];
 	setValues: (values: Partial<ObjectField>) => void;
+	showDocumentsAndMediaOption: boolean;
 }
 
 export type ObjectFieldErrors = FormError<

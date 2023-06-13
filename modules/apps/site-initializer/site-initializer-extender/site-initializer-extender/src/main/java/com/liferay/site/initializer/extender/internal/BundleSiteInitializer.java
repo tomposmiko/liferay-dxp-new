@@ -43,9 +43,11 @@ import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyCategoryResourc
 import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyVocabularyResource;
 import com.liferay.headless.admin.user.dto.v1_0.Account;
 import com.liferay.headless.admin.user.dto.v1_0.AccountRole;
+import com.liferay.headless.admin.user.dto.v1_0.Organization;
 import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.resource.v1_0.AccountResource;
 import com.liferay.headless.admin.user.resource.v1_0.AccountRoleResource;
+import com.liferay.headless.admin.user.resource.v1_0.OrganizationResource;
 import com.liferay.headless.admin.user.resource.v1_0.UserAccountResource;
 import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowDefinition;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowDefinitionResource;
@@ -210,7 +212,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectDefinitionResource.Factory objectDefinitionResourceFactory,
 		ObjectRelationshipResource.Factory objectRelationshipResourceFactory,
-		ObjectEntryLocalService objectEntryLocalService, Portal portal,
+		ObjectEntryLocalService objectEntryLocalService,
+		OrganizationResource.Factory organizationResourceFactory, Portal portal,
 		PortletSettingsImporter portletSettingsImporter,
 		RemoteAppEntryLocalService remoteAppEntryLocalService,
 		ResourceActionLocalService resourceActionLocalService,
@@ -264,6 +267,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_objectDefinitionResourceFactory = objectDefinitionResourceFactory;
 		_objectRelationshipResourceFactory = objectRelationshipResourceFactory;
 		_objectEntryLocalService = objectEntryLocalService;
+		_organizationResourceFactory = organizationResourceFactory;
 		_portal = portal;
 		_portletSettingsImporter = portletSettingsImporter;
 		_remoteAppEntryLocalService = remoteAppEntryLocalService;
@@ -374,6 +378,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 					assetListEntryIdsStringUtilReplaceValues,
 					documentsStringUtilReplaceValues, serviceContext));
 
+			_invoke(() -> _addOrganizations(serviceContext));
 			_invoke(() -> _addSAPEntries(serviceContext));
 			_invoke(() -> _addSiteConfiguration(serviceContext));
 			_invoke(() -> _addStyleBookEntries(serviceContext));
@@ -1267,24 +1272,26 @@ public class BundleSiteInitializer implements SiteInitializer {
 				Objects.equals(
 					pageElementJSONObject.getString("type"), "Root")) {
 
-				LayoutPageTemplateStructure layoutPageTemplateStructure =
-					_layoutPageTemplateStructureLocalService.
-						fetchLayoutPageTemplateStructure(
-							draftLayout.getGroupId(), draftLayout.getPlid(),
-							true);
-
-				LayoutStructure layoutStructure = LayoutStructure.of(
-					layoutPageTemplateStructure.
-						getDefaultSegmentsExperienceData());
-
 				JSONArray jsonArray = pageElementJSONObject.getJSONArray(
 					"pageElements");
 
-				for (int i = 0; i < jsonArray.length(); i++) {
-					_layoutPageTemplatesImporter.importPageElement(
-						draftLayout, layoutStructure,
-						layoutStructure.getMainItemId(), jsonArray.getString(i),
-						i);
+				if (!JSONUtil.isEmpty(jsonArray)) {
+					LayoutPageTemplateStructure layoutPageTemplateStructure =
+						_layoutPageTemplateStructureLocalService.
+							fetchLayoutPageTemplateStructure(
+								draftLayout.getGroupId(), draftLayout.getPlid(),
+								true);
+
+					LayoutStructure layoutStructure = LayoutStructure.of(
+						layoutPageTemplateStructure.
+							getDefaultSegmentsExperienceData());
+
+					for (int i = 0; i < jsonArray.length(); i++) {
+						_layoutPageTemplatesImporter.importPageElement(
+							draftLayout, layoutStructure,
+							layoutStructure.getMainItemId(),
+							jsonArray.getString(i), i);
+					}
 				}
 			}
 		}
@@ -1807,6 +1814,93 @@ public class BundleSiteInitializer implements SiteInitializer {
 		}
 	}
 
+	private void _addOrganization(
+			String json, Organization parentOrganization,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(json);
+
+		Organization organization = Organization.toDTO(json);
+
+		if (organization == null) {
+			_log.error("Unable to transform organization from JSON: " + json);
+
+			return;
+		}
+
+		organization.setParentOrganization(parentOrganization);
+
+		OrganizationResource.Builder organizationResourceBuilder =
+			_organizationResourceFactory.create();
+
+		OrganizationResource organizationResource =
+			organizationResourceBuilder.user(
+				serviceContext.fetchUser()
+			).httpServletRequest(
+				serviceContext.getRequest()
+			).build();
+
+		Page<Organization> organizationsPage = null;
+
+		if (parentOrganization == null) {
+			organizationsPage = organizationResource.getOrganizationsPage(
+				null, null,
+				organizationResource.toFilter(
+					StringBundler.concat(
+						"name eq '", organization.getName(), "'")),
+				null, null);
+		}
+		else {
+			organizationsPage =
+				organizationResource.getOrganizationChildOrganizationsPage(
+					parentOrganization.getId(), null, null, null, null, null);
+		}
+
+		Organization existingOrganization = organizationsPage.fetchFirstItem();
+
+		if (existingOrganization == null) {
+			organization = organizationResource.postOrganization(organization);
+		}
+		else {
+			organization = organizationResource.putOrganization(
+				existingOrganization.getId(), organization);
+		}
+
+		JSONArray jsonArray = jsonObject.getJSONArray("childOrganizations");
+
+		if (JSONUtil.isEmpty(jsonArray)) {
+			return;
+		}
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			_addOrganization(
+				jsonArray.getString(i), organization, serviceContext);
+		}
+	}
+
+	private void _addOrganizations(ServiceContext serviceContext)
+		throws Exception {
+
+		Set<String> resourcePaths = _servletContext.getResourcePaths(
+			"/site-initializer/organizations");
+
+		if (SetUtil.isEmpty(resourcePaths)) {
+			return;
+		}
+
+		for (String resourcePath : resourcePaths) {
+			String json = SiteInitializerUtil.read(
+				resourcePath, _servletContext);
+
+			if (json == null) {
+				return;
+			}
+
+			_addOrganization(json, null, serviceContext);
+		}
+	}
+
 	private void _addPermissions(
 			Map<String, String> objectDefinitionIdsStringUtilReplaceValues,
 			ServiceContext serviceContext)
@@ -2012,6 +2106,10 @@ public class BundleSiteInitializer implements SiteInitializer {
 		}
 
 		JSONArray jsonArray = jsonObject.getJSONArray("actions");
+
+		if (JSONUtil.isEmpty(jsonArray)) {
+			return;
+		}
 
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject actionsJSONObject = jsonArray.getJSONObject(i);
@@ -2596,7 +2694,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			JSONArray accountBriefsJSONArray = jsonObject.getJSONArray(
 				"accountBriefs");
 
-			if (accountBriefsJSONArray.length() == 0) {
+			if (JSONUtil.isEmpty(accountBriefsJSONArray)) {
 				continue;
 			}
 
@@ -2655,11 +2753,15 @@ public class BundleSiteInitializer implements SiteInitializer {
 		JSONArray jsonArray = _jsonFactory.createJSONArray(json);
 
 		for (int i = 0; i < jsonArray.length(); i++) {
-			List<Role> roles = new ArrayList<>();
-
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
 			JSONArray rolesJSONArray = jsonObject.getJSONArray("roles");
+
+			if (JSONUtil.isEmpty(rolesJSONArray)) {
+				continue;
+			}
+
+			List<Role> roles = new ArrayList<>();
 
 			for (int j = 0; j < rolesJSONArray.length(); j++) {
 				roles.add(
@@ -2801,15 +2903,19 @@ public class BundleSiteInitializer implements SiteInitializer {
 			return;
 		}
 
+		JSONArray jsonArray = accountBriefsJSONObject.getJSONArray(
+			"roleBriefs");
+
+		if (JSONUtil.isEmpty(jsonArray)) {
+			return;
+		}
+
 		AccountRoleResource.Builder builder =
 			_accountRoleResourceFactory.create();
 
 		AccountRoleResource accountRoleResource = builder.user(
 			serviceContext.fetchUser()
 		).build();
-
-		JSONArray jsonArray = accountBriefsJSONObject.getJSONArray(
-			"roleBriefs");
 
 		for (int i = 0; i < jsonArray.length(); i++) {
 			Page<AccountRole> accountRolePage =
@@ -3091,6 +3197,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectRelationshipResource.Factory
 		_objectRelationshipResourceFactory;
+	private final OrganizationResource.Factory _organizationResourceFactory;
 	private final Portal _portal;
 	private final PortletSettingsImporter _portletSettingsImporter;
 	private final RemoteAppEntryLocalService _remoteAppEntryLocalService;

@@ -30,6 +30,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.base.ObjectFieldLocalServiceBaseImpl;
@@ -38,6 +39,7 @@ import com.liferay.object.service.persistence.ObjectEntryPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectFieldSettingPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
+import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
 import com.liferay.object.service.persistence.ObjectViewColumnPersistence;
 import com.liferay.object.service.persistence.ObjectViewPersistence;
 import com.liferay.object.service.persistence.ObjectViewSortColumnPersistence;
@@ -61,6 +63,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -209,6 +212,35 @@ public class ObjectFieldLocalServiceImpl
 	@Override
 	public ObjectField fetchObjectField(long objectDefinitionId, String name) {
 		return objectFieldPersistence.fetchByODI_N(objectDefinitionId, name);
+	}
+
+	@Override
+	public List<ObjectField> getActiveObjectFields(
+			List<ObjectField> objectFields)
+		throws PortalException {
+
+		List<ObjectField> activeObjectFields = new ArrayList<>();
+
+		for (ObjectField objectField : objectFields) {
+			if (Validator.isNotNull(objectField.getRelationshipType())) {
+				ObjectRelationship objectRelationship =
+					_objectRelationshipPersistence.fetchByObjectFieldId2(
+						objectField.getObjectFieldId());
+
+				ObjectDefinition objectDefinition =
+					_objectDefinitionPersistence.findByPrimaryKey(
+						objectRelationship.getObjectDefinitionId1());
+
+				if (objectDefinition.isActive()) {
+					activeObjectFields.add(objectField);
+				}
+			}
+			else {
+				activeObjectFields.add(objectField);
+			}
+		}
+
+		return activeObjectFields;
 	}
 
 	@Override
@@ -458,6 +490,19 @@ public class ObjectFieldLocalServiceImpl
 
 		objectField = objectFieldPersistence.remove(objectField);
 
+		String objectFieldSettingFileSource = StringPool.BLANK;
+
+		if (Objects.equals(
+				objectField.getBusinessType(),
+				ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
+
+			ObjectFieldSetting objectFieldSetting =
+				_objectFieldSettingPersistence.fetchByOFI_N(
+					objectField.getObjectFieldId(), "fileSource");
+
+			objectFieldSettingFileSource = objectFieldSetting.getValue();
+		}
+
 		_objectFieldSettingPersistence.removeByObjectFieldId(
 			objectField.getObjectFieldId());
 
@@ -470,10 +515,7 @@ public class ObjectFieldLocalServiceImpl
 				objectDefinition.getExtensionDBTableName(),
 				objectField.getDBTableName())) {
 
-			if (Objects.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
-
+			if (Objects.equals(objectFieldSettingFileSource, "userComputer")) {
 				_deleteFileEntries(
 					objectField.getObjectDefinitionId(), objectField.getName());
 			}
@@ -642,6 +684,9 @@ public class ObjectFieldLocalServiceImpl
 
 	@Reference
 	private ObjectLayoutColumnPersistence _objectLayoutColumnPersistence;
+
+	@Reference
+	private ObjectRelationshipPersistence _objectRelationshipPersistence;
 
 	@Reference
 	private ObjectViewColumnPersistence _objectViewColumnPersistence;

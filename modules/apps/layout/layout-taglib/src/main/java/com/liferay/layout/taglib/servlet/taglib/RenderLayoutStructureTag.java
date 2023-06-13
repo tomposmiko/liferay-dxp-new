@@ -44,8 +44,10 @@ import com.liferay.layout.util.structure.DropZoneLayoutStructureItem;
 import com.liferay.layout.util.structure.FragmentStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
+import com.liferay.layout.util.structure.LayoutStructureItemCSSUtil;
 import com.liferay.layout.util.structure.RootLayoutStructureItem;
 import com.liferay.layout.util.structure.RowStyledLayoutStructureItem;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -190,9 +192,22 @@ public class RenderLayoutStructureTag extends IncludeTag {
 					httpServletResponse);
 
 		jspWriter.write("<div class=\"");
-		jspWriter.write(
-			renderLayoutStructureDisplayContext.getCssClass(
-				collectionStyledLayoutStructureItem));
+
+		if (renderLayoutStructureDisplayContext.isCommonStylesFFEnabled()) {
+			jspWriter.write(
+				LayoutStructureItemCSSUtil.getLayoutStructureItemUniqueCssClass(
+					collectionStyledLayoutStructureItem));
+			jspWriter.write(StringPool.SPACE);
+			jspWriter.write(
+				LayoutStructureItemCSSUtil.getLayoutStructureItemCssClass(
+					layoutStructureItem));
+		}
+		else {
+			jspWriter.write(
+				renderLayoutStructureDisplayContext.getCssClass(
+					collectionStyledLayoutStructureItem));
+		}
+
 		jspWriter.write("\" style=\"");
 		jspWriter.write(
 			renderLayoutStructureDisplayContext.getStyle(
@@ -261,6 +276,19 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 				for (int i = 0; i < numberOfRows; i++) {
 					RowTag rowTag = new RowTag();
+
+					StringBundler cssClassSB = new StringBundler(3);
+
+					cssClassSB.append("align-items-");
+					cssClassSB.append(
+						collectionStyledLayoutStructureItem.
+							getVerticalAlignment());
+
+					if (!collectionStyledLayoutStructureItem.isGutters()) {
+						cssClassSB.append(" no-gutters");
+					}
+
+					rowTag.setCssClass(cssClassSB.toString());
 
 					rowTag.setPageContext(pageContext);
 
@@ -501,9 +529,47 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		jspWriter.write(StringPool.LESS_THAN);
 		jspWriter.write(htmlTag);
 		jspWriter.write(" class=\"");
-		jspWriter.write(
-			renderLayoutStructureDisplayContext.getCssClass(
-				containerStyledLayoutStructureItem));
+
+		if (renderLayoutStructureDisplayContext.isCommonStylesFFEnabled()) {
+			jspWriter.write(
+				LayoutStructureItemCSSUtil.getLayoutStructureItemUniqueCssClass(
+					containerStyledLayoutStructureItem));
+			jspWriter.write(StringPool.SPACE);
+			jspWriter.write(
+				LayoutStructureItemCSSUtil.getLayoutStructureItemCssClass(
+					layoutStructureItem));
+
+			if (Objects.equals(
+					containerStyledLayoutStructureItem.getWidthType(),
+					"fixed")) {
+
+				jspWriter.write(" container-fluid container-fluid-max-xl");
+			}
+
+			if (!Objects.equals(
+					containerStyledLayoutStructureItem.getDisplay(), "none")) {
+
+				if (Objects.equals(
+						containerStyledLayoutStructureItem.getContentDisplay(),
+						"flex-column")) {
+
+					jspWriter.write(" d-flex flex-column");
+				}
+				else if (Objects.equals(
+							containerStyledLayoutStructureItem.
+								getContentDisplay(),
+							"flex-row")) {
+
+					jspWriter.write(" d-flex flex-row");
+				}
+			}
+		}
+		else {
+			jspWriter.write(
+				renderLayoutStructureDisplayContext.getCssClass(
+					containerStyledLayoutStructureItem));
+		}
+
 		jspWriter.write("\" style=\"");
 		jspWriter.write(
 			renderLayoutStructureDisplayContext.getStyle(
@@ -642,9 +708,25 @@ public class RenderLayoutStructureTag extends IncludeTag {
 							collectionElementIndex);
 
 				jspWriter.write("<div class=\"");
-				jspWriter.write(
-					renderLayoutStructureDisplayContext.getCssClass(
-						fragmentStyledLayoutStructureItem));
+
+				if (renderLayoutStructureDisplayContext.
+						isCommonStylesFFEnabled()) {
+
+					jspWriter.write(
+						LayoutStructureItemCSSUtil.
+							getLayoutStructureItemUniqueCssClass(
+								fragmentStyledLayoutStructureItem));
+					jspWriter.write(StringPool.SPACE);
+					jspWriter.write(
+						LayoutStructureItemCSSUtil.getFragmentEntryLinkCssClass(
+							fragmentEntryLink));
+				}
+				else {
+					jspWriter.write(
+						renderLayoutStructureDisplayContext.getCssClass(
+							fragmentStyledLayoutStructureItem));
+				}
+
 				jspWriter.write("\" style=\"");
 				jspWriter.write(
 					renderLayoutStructureDisplayContext.getStyle(
@@ -817,9 +899,22 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		}
 
 		jspWriter.write("<div class=\"");
-		jspWriter.write(
-			renderLayoutStructureDisplayContext.getCssClass(
-				rowStyledLayoutStructureItem));
+
+		if (renderLayoutStructureDisplayContext.isCommonStylesFFEnabled()) {
+			jspWriter.write(
+				LayoutStructureItemCSSUtil.getLayoutStructureItemUniqueCssClass(
+					rowStyledLayoutStructureItem));
+			jspWriter.write(StringPool.SPACE);
+			jspWriter.write(
+				LayoutStructureItemCSSUtil.getLayoutStructureItemCssClass(
+					layoutStructureItem));
+		}
+		else {
+			jspWriter.write(
+				renderLayoutStructureDisplayContext.getCssClass(
+					rowStyledLayoutStructureItem));
+		}
+
 		jspWriter.write("\" style=\"");
 		jspWriter.write(
 			renderLayoutStructureDisplayContext.getStyle(
