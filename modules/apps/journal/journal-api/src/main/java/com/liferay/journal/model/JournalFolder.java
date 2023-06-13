@@ -26,21 +26,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see JournalFolderModel
+ * @see com.liferay.journal.model.impl.JournalFolderImpl
+ * @see com.liferay.journal.model.impl.JournalFolderModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.journal.model.impl.JournalFolderImpl")
 @ProviderType
-public interface JournalFolder
-	extends JournalFolderModel, PersistedModel, TreeModel {
-
+public interface JournalFolder extends JournalFolderModel, PersistedModel,
+	TreeModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to <code>com.liferay.journal.model.impl.JournalFolderImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.journal.model.impl.JournalFolderImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<JournalFolder, Long> FOLDER_ID_ACCESSOR =
-		new Accessor<JournalFolder, Long>() {
-
+	public static final Accessor<JournalFolder, Long> FOLDER_ID_ACCESSOR = new Accessor<JournalFolder, Long>() {
 			@Override
 			public Long get(JournalFolder journalFolder) {
 				return journalFolder.getFolderId();
@@ -55,7 +54,6 @@ public interface JournalFolder
 			public Class<JournalFolder> getTypeClass() {
 				return JournalFolder.class;
 			}
-
 		};
 
 	public java.util.List<Long> getAncestorFolderIds()
@@ -68,5 +66,4 @@ public interface JournalFolder
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public boolean isRoot();
-
 }

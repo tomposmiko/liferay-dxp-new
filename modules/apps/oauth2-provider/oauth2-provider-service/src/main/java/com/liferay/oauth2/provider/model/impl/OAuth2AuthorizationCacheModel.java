@@ -17,9 +17,11 @@ package com.liferay.oauth2.provider.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing OAuth2Authorization in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see OAuth2Authorization
  * @generated
  */
 @ProviderType
-public class OAuth2AuthorizationCacheModel
-	implements CacheModel<OAuth2Authorization>, Externalizable {
-
+public class OAuth2AuthorizationCacheModel implements CacheModel<OAuth2Authorization>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,12 +50,9 @@ public class OAuth2AuthorizationCacheModel
 			return false;
 		}
 
-		OAuth2AuthorizationCacheModel oAuth2AuthorizationCacheModel =
-			(OAuth2AuthorizationCacheModel)obj;
+		OAuth2AuthorizationCacheModel oAuth2AuthorizationCacheModel = (OAuth2AuthorizationCacheModel)obj;
 
-		if (oAuth2AuthorizationId ==
-				oAuth2AuthorizationCacheModel.oAuth2AuthorizationId) {
-
+		if (oAuth2AuthorizationId == oAuth2AuthorizationCacheModel.oAuth2AuthorizationId) {
 			return true;
 		}
 
@@ -108,8 +107,7 @@ public class OAuth2AuthorizationCacheModel
 
 	@Override
 	public OAuth2Authorization toEntityModel() {
-		OAuth2AuthorizationImpl oAuth2AuthorizationImpl =
-			new OAuth2AuthorizationImpl();
+		OAuth2AuthorizationImpl oAuth2AuthorizationImpl = new OAuth2AuthorizationImpl();
 
 		oAuth2AuthorizationImpl.setOAuth2AuthorizationId(oAuth2AuthorizationId);
 		oAuth2AuthorizationImpl.setCompanyId(companyId);
@@ -130,8 +128,7 @@ public class OAuth2AuthorizationCacheModel
 		}
 
 		oAuth2AuthorizationImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
-		oAuth2AuthorizationImpl.setOAuth2ApplicationScopeAliasesId(
-			oAuth2ApplicationScopeAliasesId);
+		oAuth2AuthorizationImpl.setOAuth2ApplicationScopeAliasesId(oAuth2ApplicationScopeAliasesId);
 
 		if (accessTokenContent == null) {
 			oAuth2AuthorizationImpl.setAccessTokenContent("");
@@ -140,23 +137,22 @@ public class OAuth2AuthorizationCacheModel
 			oAuth2AuthorizationImpl.setAccessTokenContent(accessTokenContent);
 		}
 
-		oAuth2AuthorizationImpl.setAccessTokenContentHash(
-			accessTokenContentHash);
+		oAuth2AuthorizationImpl.setAccessTokenContentHash(accessTokenContentHash);
 
 		if (accessTokenCreateDate == Long.MIN_VALUE) {
 			oAuth2AuthorizationImpl.setAccessTokenCreateDate(null);
 		}
 		else {
-			oAuth2AuthorizationImpl.setAccessTokenCreateDate(
-				new Date(accessTokenCreateDate));
+			oAuth2AuthorizationImpl.setAccessTokenCreateDate(new Date(
+					accessTokenCreateDate));
 		}
 
 		if (accessTokenExpirationDate == Long.MIN_VALUE) {
 			oAuth2AuthorizationImpl.setAccessTokenExpirationDate(null);
 		}
 		else {
-			oAuth2AuthorizationImpl.setAccessTokenExpirationDate(
-				new Date(accessTokenExpirationDate));
+			oAuth2AuthorizationImpl.setAccessTokenExpirationDate(new Date(
+					accessTokenExpirationDate));
 		}
 
 		if (remoteIPInfo == null) {
@@ -173,23 +169,22 @@ public class OAuth2AuthorizationCacheModel
 			oAuth2AuthorizationImpl.setRefreshTokenContent(refreshTokenContent);
 		}
 
-		oAuth2AuthorizationImpl.setRefreshTokenContentHash(
-			refreshTokenContentHash);
+		oAuth2AuthorizationImpl.setRefreshTokenContentHash(refreshTokenContentHash);
 
 		if (refreshTokenCreateDate == Long.MIN_VALUE) {
 			oAuth2AuthorizationImpl.setRefreshTokenCreateDate(null);
 		}
 		else {
-			oAuth2AuthorizationImpl.setRefreshTokenCreateDate(
-				new Date(refreshTokenCreateDate));
+			oAuth2AuthorizationImpl.setRefreshTokenCreateDate(new Date(
+					refreshTokenCreateDate));
 		}
 
 		if (refreshTokenExpirationDate == Long.MIN_VALUE) {
 			oAuth2AuthorizationImpl.setRefreshTokenExpirationDate(null);
 		}
 		else {
-			oAuth2AuthorizationImpl.setRefreshTokenExpirationDate(
-				new Date(refreshTokenExpirationDate));
+			oAuth2AuthorizationImpl.setRefreshTokenExpirationDate(new Date(
+					refreshTokenExpirationDate));
 		}
 
 		oAuth2AuthorizationImpl.resetOriginalValues();
@@ -224,7 +219,8 @@ public class OAuth2AuthorizationCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(oAuth2AuthorizationId);
 
 		objectOutput.writeLong(companyId);
@@ -290,5 +286,4 @@ public class OAuth2AuthorizationCacheModel
 	public long refreshTokenContentHash;
 	public long refreshTokenCreateDate;
 	public long refreshTokenExpirationDate;
-
 }

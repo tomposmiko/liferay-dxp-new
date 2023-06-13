@@ -33,8 +33,6 @@ definition {
 
 	@priority = "5"
 	test MarketplaceSmoke {
-		property osgi.app.includes = "bookmarks";
-
 		Marketplace.smoke();
 	}
 }

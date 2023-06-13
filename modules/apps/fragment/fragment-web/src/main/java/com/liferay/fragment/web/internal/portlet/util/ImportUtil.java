@@ -14,7 +14,9 @@
 
 package com.liferay.fragment.web.internal.portlet.util;
 
+import com.liferay.fragment.constants.FragmentEntryTypeConstants;
 import com.liferay.fragment.constants.FragmentExportImportConstants;
+import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.exception.DuplicateFragmentCollectionKeyException;
 import com.liferay.fragment.exception.DuplicateFragmentEntryKeyException;
 import com.liferay.fragment.exception.FragmentCollectionNameException;
@@ -34,12 +36,18 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Repository;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -47,6 +55,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.File;
+import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -110,6 +119,10 @@ public class ImportUtil {
 
 			FragmentCollection fragmentCollection = _addFragmentCollection(
 				actionRequest, entry.getKey(), name, description, overwrite);
+
+			_importResources(
+				actionRequest, fragmentCollection.getFragmentCollectionId(),
+				fragmentCollection.getResourcesFolderId(), zipFile);
 
 			_importFragmentEntries(
 				actionRequest, zipFile,
@@ -193,10 +206,10 @@ public class ImportUtil {
 		return fragmentCollection;
 	}
 
-	private void _addFragmentEntry(
+	private FragmentEntry _addFragmentEntry(
 			ActionRequest actionRequest, long fragmentCollectionId,
 			String fragmentEntryKey, String name, String css, String html,
-			String js, boolean overwrite)
+			String js, String typeLabel, boolean overwrite)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -225,19 +238,21 @@ public class ImportUtil {
 			_invalidFragmentEntriesNames.add(name);
 		}
 
+		int type = FragmentEntryTypeConstants.getTypeFromLabel(
+			StringUtil.toLowerCase(StringUtil.trim(typeLabel)));
+
 		if (fragmentEntry == null) {
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				actionRequest);
 
-			_fragmentEntryService.addFragmentEntry(
+			return _fragmentEntryService.addFragmentEntry(
 				themeDisplay.getScopeGroupId(), fragmentCollectionId,
-				fragmentEntryKey, name, css, html, js, status, serviceContext);
+				fragmentEntryKey, name, css, html, js, type, status,
+				serviceContext);
 		}
-		else {
-			_fragmentEntryService.updateFragmentEntry(
-				fragmentEntry.getFragmentEntryId(), name, css, html, js,
-				status);
-		}
+
+		return _fragmentEntryService.updateFragmentEntry(
+			fragmentEntry.getFragmentEntryId(), name, css, html, js, status);
 	}
 
 	private String _getContent(ZipFile zipFile, String fileName)
@@ -303,15 +318,23 @@ public class ImportUtil {
 				continue;
 			}
 
+			String fragmentCollectionKey = StringPool.BLANK;
+
 			String[] paths = fileName.split(StringPool.SLASH);
 
-			if (paths.length < 3) {
+			for (String path : paths) {
+				if (fragmentCollectionFolderMap.containsKey(path)) {
+					fragmentCollectionKey = path;
+
+					break;
+				}
+			}
+
+			if (Validator.isNull(fragmentCollectionKey)) {
 				orphanFragmentEntries.put(_getKey(fileName), fileName);
 
 				continue;
 			}
-
-			String fragmentCollectionKey = paths[paths.length - 3];
 
 			FragmentCollectionFolder fragmentCollectionFolder =
 				fragmentCollectionFolderMap.get(fragmentCollectionKey);
@@ -333,8 +356,22 @@ public class ImportUtil {
 			ZipFile zipFile, String fileName, String contentPath)
 		throws Exception {
 
+		InputStream inputStream = _getFragmentEntryInputStream(
+			zipFile, fileName, contentPath);
+
+		if (inputStream == null) {
+			return StringPool.BLANK;
+		}
+
+		return StringUtil.read(inputStream);
+	}
+
+	private InputStream _getFragmentEntryInputStream(
+			ZipFile zipFile, String fileName, String contentPath)
+		throws Exception {
+
 		if (contentPath.startsWith(StringPool.SLASH)) {
-			return _getContent(zipFile, contentPath.substring(1));
+			return _getInputStream(zipFile, contentPath.substring(1));
 		}
 
 		if (contentPath.startsWith("./")) {
@@ -344,7 +381,19 @@ public class ImportUtil {
 		String path = fileName.substring(
 			0, fileName.lastIndexOf(StringPool.SLASH));
 
-		return _getContent(zipFile, path + StringPool.SLASH + contentPath);
+		return _getInputStream(zipFile, path + StringPool.SLASH + contentPath);
+	}
+
+	private InputStream _getInputStream(ZipFile zipFile, String fileName)
+		throws Exception {
+
+		ZipEntry zipEntry = zipFile.getEntry(fileName);
+
+		if (zipEntry == null) {
+			return null;
+		}
+
+		return zipFile.getInputStream(zipEntry);
 	}
 
 	private String _getKey(String fileName) {
@@ -352,6 +401,45 @@ public class ImportUtil {
 			0, fileName.lastIndexOf(CharPool.SLASH));
 
 		return path.substring(path.lastIndexOf(CharPool.SLASH) + 1);
+	}
+
+	private long _getPreviewFileEntryId(
+			ActionRequest actionRequest, ZipFile zipFile, long fragmentEntryId,
+			String fileName, String contentPath)
+		throws Exception {
+
+		InputStream inputStream = _getFragmentEntryInputStream(
+			zipFile, fileName, contentPath);
+
+		if (inputStream == null) {
+			return 0;
+		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Repository repository =
+			PortletFileRepositoryUtil.fetchPortletRepository(
+				themeDisplay.getScopeGroupId(), FragmentPortletKeys.FRAGMENT);
+
+		if (repository == null) {
+			ServiceContext serviceContext = ServiceContextFactory.getInstance(
+				actionRequest);
+
+			repository = PortletFileRepositoryUtil.addPortletRepository(
+				themeDisplay.getScopeGroupId(), FragmentPortletKeys.FRAGMENT,
+				serviceContext);
+		}
+
+		FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
+			themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
+			FragmentEntry.class.getName(), fragmentEntryId,
+			FragmentPortletKeys.FRAGMENT, repository.getDlFolderId(),
+			inputStream,
+			fragmentEntryId + "_preview." + FileUtil.getExtension(contentPath),
+			MimeTypesUtil.getContentType(contentPath), false);
+
+		return fileEntry.getFileEntryId();
 	}
 
 	private void _importFragmentEntries(
@@ -365,6 +453,7 @@ public class ImportUtil {
 			String css = StringPool.BLANK;
 			String html = StringPool.BLANK;
 			String js = StringPool.BLANK;
+			String typeLabel = StringPool.BLANK;
 
 			String fragmentJSON = _getContent(zipFile, entry.getValue());
 
@@ -380,11 +469,76 @@ public class ImportUtil {
 					jsonObject.getString("htmlPath"));
 				js = _getFragmentEntryContent(
 					zipFile, entry.getValue(), jsonObject.getString("jsPath"));
+				typeLabel = jsonObject.getString("type");
 			}
 
-			_addFragmentEntry(
+			FragmentEntry fragmentEntry = _addFragmentEntry(
 				actionRequest, fragmentCollectionId, entry.getKey(), name, css,
-				html, js, overwrite);
+				html, js, typeLabel, overwrite);
+
+			if (Validator.isNotNull(fragmentJSON)) {
+				if (fragmentEntry.getPreviewFileEntryId() > 0) {
+					PortletFileRepositoryUtil.deletePortletFileEntry(
+						fragmentEntry.getPreviewFileEntryId());
+				}
+
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+					fragmentJSON);
+
+				String thumbnailPath = jsonObject.getString("thumbnailPath");
+
+				if (Validator.isNotNull(thumbnailPath)) {
+					long previewFileEntryId = _getPreviewFileEntryId(
+						actionRequest, zipFile,
+						fragmentEntry.getFragmentEntryId(), entry.getValue(),
+						thumbnailPath);
+
+					_fragmentEntryLocalService.updateFragmentEntry(
+						fragmentEntry.getFragmentEntryId(), previewFileEntryId);
+				}
+			}
+		}
+	}
+
+	private void _importResources(
+			ActionRequest actionRequest, long fragmentCollectionId,
+			long folderId, ZipFile zipFile)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
+
+		while (enumeration.hasMoreElements()) {
+			ZipEntry zipEntry = enumeration.nextElement();
+
+			String[] paths = StringUtil.split(
+				zipEntry.getName(), StringPool.FORWARD_SLASH);
+
+			if (!ArrayUtil.contains(paths, "resources")) {
+				continue;
+			}
+
+			String fileName = _getFileName(zipEntry.getName());
+
+			InputStream inputStream = _getInputStream(
+				zipFile, zipEntry.getName());
+
+			FileEntry fileEntry =
+				PortletFileRepositoryUtil.fetchPortletFileEntry(
+					themeDisplay.getScopeGroupId(), folderId, fileName);
+
+			if (fileEntry != null) {
+				PortletFileRepositoryUtil.deletePortletFileEntry(
+					fileEntry.getFileEntryId());
+			}
+
+			PortletFileRepositoryUtil.addPortletFileEntry(
+				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
+				FragmentCollection.class.getName(), fragmentCollectionId,
+				FragmentPortletKeys.FRAGMENT, folderId, inputStream, fileName,
+				MimeTypesUtil.getContentType(fileName), false);
 		}
 	}
 

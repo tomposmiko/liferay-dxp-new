@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -61,21 +63,17 @@ public class ServletContextClassLoaderPoolTest {
 
 	@Test
 	public void testMisc() {
-		_setProps(false);
+		PropsTestUtil.setProps(Collections.emptyMap());
 
 		new ServletContextClassLoaderPool();
 
 		ServletContextClassLoaderPool.unregister(_TEST_SERVLET_CONTEXT_NAME);
 	}
 
-	private void _setProps(boolean fallback) {
+	private void _testGetClassLoader(boolean fallback) {
 		PropsTestUtil.setProps(
 			PropsKeys.SERVLET_CONTEXT_CLASS_LOADER_POOL_FALLBACK,
 			String.valueOf(fallback));
-	}
-
-	private void _testGetClassLoader(boolean fallback) {
-		_setProps(fallback);
 
 		Thread currentThread = Thread.currentThread();
 
@@ -139,7 +137,9 @@ public class ServletContextClassLoaderPoolTest {
 	}
 
 	private void _testGetServletContextName(boolean fallback) {
-		_setProps(fallback);
+		PropsTestUtil.setProps(
+			PropsKeys.SERVLET_CONTEXT_CLASS_LOADER_POOL_FALLBACK,
+			String.valueOf(fallback));
 
 		if (fallback) {
 			Assert.assertEquals(

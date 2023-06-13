@@ -17,9 +17,11 @@ package com.liferay.portlet.asset.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.kernel.model.AssetVocabulary;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing AssetVocabulary in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see AssetVocabulary
  * @generated
  */
 @ProviderType
-public class AssetVocabularyCacheModel
-	implements CacheModel<AssetVocabulary>, Externalizable {
-
+public class AssetVocabularyCacheModel implements CacheModel<AssetVocabulary>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,8 +50,7 @@ public class AssetVocabularyCacheModel
 			return false;
 		}
 
-		AssetVocabularyCacheModel assetVocabularyCacheModel =
-			(AssetVocabularyCacheModel)obj;
+		AssetVocabularyCacheModel assetVocabularyCacheModel = (AssetVocabularyCacheModel)obj;
 
 		if (vocabularyId == assetVocabularyCacheModel.vocabularyId) {
 			return true;
@@ -207,7 +208,8 @@ public class AssetVocabularyCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -285,5 +287,4 @@ public class AssetVocabularyCacheModel
 	public String description;
 	public String settings;
 	public long lastPublishDate;
-
 }

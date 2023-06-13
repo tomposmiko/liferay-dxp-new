@@ -285,7 +285,7 @@ public class DDMStructureTestUtil {
 
 		Map<Locale, String> contents = new HashMap<>();
 
-		contents.put(LocaleUtil.US, keywords);
+		contents.put(Locale.US, keywords);
 
 		return getSampleStructuredContent(
 			name, Collections.singletonList(contents), "en_US");
@@ -378,13 +378,9 @@ public class DDMStructureTestUtil {
 		Element parentElement = element.getParent();
 
 		while (true) {
-			if (parentElement == null) {
-				break;
-			}
+			if ((parentElement == null) ||
+				parentElement.getName().equals("root")) {
 
-			String parentName = parentElement.getName();
-
-			if (parentName.equals("root")) {
 				break;
 			}
 

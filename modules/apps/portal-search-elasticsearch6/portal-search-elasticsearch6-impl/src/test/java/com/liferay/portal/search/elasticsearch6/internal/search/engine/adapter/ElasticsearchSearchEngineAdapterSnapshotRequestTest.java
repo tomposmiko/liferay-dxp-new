@@ -14,9 +14,8 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter;
 
-import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchFixture;
-import com.liferay.portal.search.elasticsearch6.internal.connection.TestElasticsearchConnectionManager;
 import com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.snapshot.SnapshotRequestExecutorFixture;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.snapshot.CreateSnapshotRepositoryRequest;
@@ -81,11 +80,7 @@ public class ElasticsearchSearchEngineAdapterSnapshotRequestTest {
 
 		_elasticsearchFixture.setUp();
 
-		TestElasticsearchConnectionManager elasticsearchConnectionManager =
-			new TestElasticsearchConnectionManager(_elasticsearchFixture);
-
-		_searchEngineAdapter = createSearchEngineAdapter(
-			elasticsearchConnectionManager);
+		_searchEngineAdapter = createSearchEngineAdapter(_elasticsearchFixture);
 
 		_indicesAdminClient = _elasticsearchFixture.getIndicesAdminClient();
 
@@ -342,6 +337,32 @@ public class ElasticsearchSearchEngineAdapterSnapshotRequestTest {
 		deleteSnapshotRequestBuilder.get();
 	}
 
+	protected static SearchEngineAdapter createSearchEngineAdapter(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		return new ElasticsearchSearchEngineAdapterImpl() {
+			{
+				snapshotRequestExecutor = createSnapshotRequestExecutor(
+					elasticsearchClientResolver);
+			}
+		};
+	}
+
+	protected static SnapshotRequestExecutor createSnapshotRequestExecutor(
+		ElasticsearchClientResolver elasticsearchClientResolver1) {
+
+		SnapshotRequestExecutorFixture snapshotRequestExecutorFixture =
+			new SnapshotRequestExecutorFixture() {
+				{
+					elasticsearchClientResolver = elasticsearchClientResolver1;
+				}
+			};
+
+		snapshotRequestExecutorFixture.setUp();
+
+		return snapshotRequestExecutorFixture.getSnapshotRequestExecutor();
+	}
+
 	protected void createIndex() {
 		CreateIndexRequestBuilder createIndexRequestBuilder =
 			_indicesAdminClient.prepareCreate(_INDEX_NAME);
@@ -366,26 +387,6 @@ public class ElasticsearchSearchEngineAdapterSnapshotRequestTest {
 			SnapshotRepositoryDetails.FS_REPOSITORY_TYPE);
 
 		putRepositoryRequestBuilder.get();
-	}
-
-	protected SearchEngineAdapter createSearchEngineAdapter(
-		ElasticsearchConnectionManager elasticsearchConnectionManager) {
-
-		return new ElasticsearchSearchEngineAdapterImpl() {
-			{
-				snapshotRequestExecutor = createSnapshotRequestExecutor(
-					elasticsearchConnectionManager);
-			}
-		};
-	}
-
-	protected SnapshotRequestExecutor createSnapshotRequestExecutor(
-		ElasticsearchConnectionManager elasticsearchConnectionManager) {
-
-		SnapshotRequestExecutorFixture snapshotRequestExecutorFixture =
-			new SnapshotRequestExecutorFixture(elasticsearchConnectionManager);
-
-		return snapshotRequestExecutorFixture.createExecutor();
 	}
 
 	protected void deleteIndex() {
@@ -417,7 +418,9 @@ public class ElasticsearchSearchEngineAdapterSnapshotRequestTest {
 		GetSnapshotsResponse getSnapshotsResponse =
 			getSnapshotsRequestBuilder.get();
 
-		return getSnapshotsResponse.getSnapshots();
+		List<SnapshotInfo> snapshotInfos = getSnapshotsResponse.getSnapshots();
+
+		return snapshotInfos;
 	}
 
 	private static final String _INDEX_NAME = "test_request_index";

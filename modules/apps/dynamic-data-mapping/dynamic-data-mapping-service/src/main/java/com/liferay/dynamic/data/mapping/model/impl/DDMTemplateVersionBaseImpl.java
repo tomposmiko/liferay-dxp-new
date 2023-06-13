@@ -34,11 +34,10 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionLocalServiceUt
 @ProviderType
 public abstract class DDMTemplateVersionBaseImpl
 	extends DDMTemplateVersionModelImpl implements DDMTemplateVersion {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a ddm template version model instance should use the <code>DDMTemplateVersion</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a ddm template version model instance should use the {@link DDMTemplateVersion} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class DDMTemplateVersionBaseImpl
 			DDMTemplateVersionLocalServiceUtil.updateDDMTemplateVersion(this);
 		}
 	}
-
 }

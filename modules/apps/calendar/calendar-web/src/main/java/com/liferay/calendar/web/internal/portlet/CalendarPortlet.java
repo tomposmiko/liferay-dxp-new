@@ -70,6 +70,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
+import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
@@ -99,6 +100,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -621,7 +623,7 @@ public class CalendarPortlet extends MVCPortlet {
 
 		String title = ParamUtil.getString(actionRequest, "title");
 
-		titleMap.put(themeDisplay.getLocale(), title);
+		titleMap.put(LocaleUtil.getSiteDefault(), title);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			CalendarBooking.class.getName(), actionRequest);
@@ -1703,6 +1705,13 @@ public class CalendarPortlet extends MVCPortlet {
 		_groupLocalService = groupLocalService;
 	}
 
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.calendar.web)(&(release.schema.version>=1.1.0)(!(release.schema.version>=1.2.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
 	protected void setRenderRequestAttributes(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
@@ -1760,31 +1769,14 @@ public class CalendarPortlet extends MVCPortlet {
 				serviceContext);
 		}
 		else {
-			if (calendarBooking.isRecurring()) {
-				if (updateInstance) {
-					calendarBooking =
-						_calendarBookingService.updateCalendarBookingInstance(
-							calendarBookingId, instanceIndex,
-							calendar.getCalendarId(), childCalendarIds,
-							titleMap, descriptionMap, location, startTime,
-							endTime, allDay, allFollowing, reminders[0],
-							remindersType[0], reminders[1], remindersType[1],
-							serviceContext);
-				}
-				else {
-					calendarBooking =
-						_calendarBookingService.updateRecurringCalendarBooking(
-							calendarBookingId, calendar.getCalendarId(),
-							childCalendarIds, titleMap, descriptionMap,
-							location, startTime, endTime, allDay, reminders[0],
-							remindersType[0], reminders[1], remindersType[1],
-							serviceContext);
-				}
-
-				_calendarBookingService.
-					updateLastInstanceCalendarBookingRecurrence(
-						calendarBooking.getCalendarBookingId(),
-						RecurrenceSerializer.serialize(recurrence));
+			if (updateInstance) {
+				calendarBooking =
+					_calendarBookingService.updateCalendarBookingInstance(
+						calendarBookingId, instanceIndex,
+						calendar.getCalendarId(), childCalendarIds, titleMap,
+						descriptionMap, location, startTime, endTime, allDay,
+						allFollowing, reminders[0], remindersType[0],
+						reminders[1], remindersType[1], serviceContext);
 			}
 			else {
 				calendarBooking =

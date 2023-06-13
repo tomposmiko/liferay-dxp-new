@@ -100,6 +100,6 @@ public class KaleoDefinitionVersionTitleComparator
 
 	private final boolean _ascending;
 	private final Collator _collator;
-	private final Locale _locale;
+	private Locale _locale;
 
 }

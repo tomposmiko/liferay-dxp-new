@@ -30,28 +30,26 @@ import com.liferay.portal.kernel.transaction.Transactional;
  *
  * @author Brian Wing Shun Chan
  * @see AccountServiceUtil
+ * @see com.liferay.portal.service.base.AccountServiceBaseImpl
+ * @see com.liferay.portal.service.impl.AccountServiceImpl
  * @generated
  */
 @AccessControlled
 @JSONWebService
 @ProviderType
-@Transactional(
-	isolation = Isolation.PORTAL,
-	rollbackFor = {PortalException.class, SystemException.class}
-)
+@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
+	PortalException.class, SystemException.class})
 public interface AccountService extends BaseService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link AccountServiceUtil} to access the account remote service. Add custom service methods to <code>com.liferay.portal.service.impl.AccountServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link AccountServiceUtil} to access the account remote service. Add custom service methods to {@link com.liferay.portal.service.impl.AccountServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public String getOSGiServiceIdentifier();
-
 }

@@ -79,6 +79,23 @@ public class MediaQueryProviderImpl implements MediaQueryProvider {
 		return mediaQueries;
 	}
 
+	@Reference(unbind = "-")
+	protected void setAMImageConfigurationHelper(
+		AMImageConfigurationHelper amImageConfigurationHelper) {
+
+		_amImageConfigurationHelper = amImageConfigurationHelper;
+	}
+
+	@Reference(unbind = "-")
+	protected void setAMImageFinder(AMImageFinder amImageFinder) {
+		_amImageFinder = amImageFinder;
+	}
+
+	@Reference(unbind = "-")
+	protected void setAMImageURLFactory(AMImageURLFactory amImageURLFactory) {
+		_amImageURLFactory = amImageURLFactory;
+	}
+
 	private Optional<AdaptiveMedia<AMImageProcessor>> _findAdaptiveMedia(
 		FileEntry fileEntry,
 		AMImageConfigurationEntry amImageConfigurationEntry) {
@@ -290,15 +307,9 @@ public class MediaQueryProviderImpl implements MediaQueryProvider {
 	private static final Log _log = LogFactoryUtil.getLog(
 		MediaQueryProviderImpl.class);
 
-	@Reference
 	private AMImageConfigurationHelper _amImageConfigurationHelper;
-
-	@Reference
 	private AMImageFinder _amImageFinder;
-
-	@Reference
 	private AMImageURLFactory _amImageURLFactory;
-
 	private final Comparator<AdaptiveMedia<AMImageProcessor>> _comparator =
 		Comparator.comparingInt(this::_getWidth);
 

@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.image.ImageTool;
 import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 
 import java.io.InputStream;
@@ -50,17 +49,15 @@ public class AMImageProcessorImplTest {
 
 	@Before
 	public void setUp() {
-		ReflectionTestUtil.setFieldValue(
-			_amImageProcessorImpl, "_amImageConfigurationHelper",
+		_amImageProcessorImpl.setAMImageConfigurationHelper(
 			_amImageConfigurationHelper);
-		ReflectionTestUtil.setFieldValue(
-			_amImageProcessorImpl, "_amImageEntryLocalService",
+
+		_amImageProcessorImpl.setAMImageEntryLocalService(
 			_amImageEntryLocalService);
-		ReflectionTestUtil.setFieldValue(
-			_amImageProcessorImpl, "_amImageScalerTracker",
-			_amImageScalerTracker);
-		ReflectionTestUtil.setFieldValue(
-			_amImageProcessorImpl, "_amImageValidator", _amImageValidator);
+
+		_amImageProcessorImpl.setAMImageScalerTracker(_amImageScalerTracker);
+
+		_amImageProcessorImpl.setAMImageValidator(_amImageValidator);
 
 		ImageToolUtil imageToolUtil = new ImageToolUtil();
 

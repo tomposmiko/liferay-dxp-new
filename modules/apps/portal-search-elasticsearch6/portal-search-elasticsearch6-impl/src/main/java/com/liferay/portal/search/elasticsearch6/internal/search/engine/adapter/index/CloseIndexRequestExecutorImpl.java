@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.index;
 
-import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.engine.adapter.index.CloseIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.CloseIndexResponse;
 import com.liferay.portal.search.engine.adapter.index.IndicesOptions;
@@ -42,7 +42,10 @@ public class CloseIndexRequestExecutorImpl
 		AcknowledgedResponse acknowledgedResponse =
 			closeIndexRequestBuilder.get();
 
-		return new CloseIndexResponse(acknowledgedResponse.isAcknowledged());
+		CloseIndexResponse closeIndexResponse = new CloseIndexResponse(
+			acknowledgedResponse.isAcknowledged());
+
+		return closeIndexResponse;
 	}
 
 	protected CloseIndexRequestBuilder createCloseIndexRequestBuilder(
@@ -50,7 +53,7 @@ public class CloseIndexRequestExecutorImpl
 
 		CloseIndexRequestBuilder closeIndexRequestBuilder =
 			CloseIndexAction.INSTANCE.newRequestBuilder(
-				elasticsearchConnectionManager.getClient());
+				elasticsearchClientResolver.getClient());
 
 		closeIndexRequestBuilder.setIndices(closeIndexRequest.getIndexNames());
 
@@ -73,7 +76,7 @@ public class CloseIndexRequestExecutorImpl
 	}
 
 	@Reference
-	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
+	protected ElasticsearchClientResolver elasticsearchClientResolver;
 
 	@Reference
 	protected IndicesOptionsTranslator indicesOptionsTranslator;

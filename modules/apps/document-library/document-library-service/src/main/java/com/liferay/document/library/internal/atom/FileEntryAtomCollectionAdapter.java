@@ -14,6 +14,7 @@
 
 package com.liferay.document.library.internal.atom;
 
+import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
 import com.liferay.portal.atom.AtomPager;
@@ -219,9 +220,11 @@ public class FileEntryAtomCollectionAdapter
 
 		ServiceContext serviceContext = new ServiceContext();
 
-		return _dlAppService.addFileEntry(
+		FileEntry fileEntry = _dlAppService.addFileEntry(
 			repositoryId, folderId, title, mimeType, title, summary, null,
 			contentInputStream, contentDecoded.length, serviceContext);
+
+		return fileEntry;
 	}
 
 	@Override
@@ -258,9 +261,11 @@ public class FileEntryAtomCollectionAdapter
 
 		ServiceContext serviceContext = new ServiceContext();
 
-		return _dlAppService.addFileEntry(
+		FileEntry fileEntry = _dlAppService.addFileEntry(
 			repositoryId, folderId, title, mimeType, title, description, null,
 			contentInputStream, content.length, serviceContext);
+
+		return fileEntry;
 	}
 
 	@Override
@@ -284,7 +289,8 @@ public class FileEntryAtomCollectionAdapter
 
 		_dlAppService.updateFileEntry(
 			fileEntry.getFileEntryId(), title, mimeType, title, summary, null,
-			true, contentInputStream, contentDecoded.length, serviceContext);
+			DLVersionNumberIncrease.MAJOR, contentInputStream,
+			contentDecoded.length, serviceContext);
 	}
 
 	@Override
@@ -310,7 +316,8 @@ public class FileEntryAtomCollectionAdapter
 
 		_dlAppService.updateFileEntry(
 			fileEntry.getFileEntryId(), slug, mimeType, title, description,
-			null, true, contentInputStream, content.length, serviceContext);
+			null, DLVersionNumberIncrease.MAJOR, contentInputStream,
+			content.length, serviceContext);
 	}
 
 	@Reference(unbind = "-")

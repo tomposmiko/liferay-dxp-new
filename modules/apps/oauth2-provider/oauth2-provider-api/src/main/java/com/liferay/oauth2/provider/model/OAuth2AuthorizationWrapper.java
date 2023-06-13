@@ -16,16 +16,12 @@ package com.liferay.oauth2.provider.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -37,21 +33,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class OAuth2AuthorizationWrapper
+public class OAuth2AuthorizationWrapper extends BaseModelWrapper<OAuth2Authorization>
 	implements OAuth2Authorization, ModelWrapper<OAuth2Authorization> {
-
 	public OAuth2AuthorizationWrapper(OAuth2Authorization oAuth2Authorization) {
-		_oAuth2Authorization = oAuth2Authorization;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return OAuth2Authorization.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return OAuth2Authorization.class.getName();
+		super(oAuth2Authorization);
 	}
 
 	@Override
@@ -64,20 +49,19 @@ public class OAuth2AuthorizationWrapper
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
-		attributes.put(
-			"oAuth2ApplicationScopeAliasesId",
+		attributes.put("oAuth2ApplicationScopeAliasesId",
 			getOAuth2ApplicationScopeAliasesId());
 		attributes.put("accessTokenContent", getAccessTokenContent());
 		attributes.put("accessTokenContentHash", getAccessTokenContentHash());
 		attributes.put("accessTokenCreateDate", getAccessTokenCreateDate());
-		attributes.put(
-			"accessTokenExpirationDate", getAccessTokenExpirationDate());
+		attributes.put("accessTokenExpirationDate",
+			getAccessTokenExpirationDate());
 		attributes.put("remoteIPInfo", getRemoteIPInfo());
 		attributes.put("refreshTokenContent", getRefreshTokenContent());
 		attributes.put("refreshTokenContentHash", getRefreshTokenContentHash());
 		attributes.put("refreshTokenCreateDate", getRefreshTokenCreateDate());
-		attributes.put(
-			"refreshTokenExpirationDate", getRefreshTokenExpirationDate());
+		attributes.put("refreshTokenExpirationDate",
+			getRefreshTokenExpirationDate());
 
 		return attributes;
 	}
@@ -85,7 +69,7 @@ public class OAuth2AuthorizationWrapper
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
 		Long oAuth2AuthorizationId = (Long)attributes.get(
-			"oAuth2AuthorizationId");
+				"oAuth2AuthorizationId");
 
 		if (oAuth2AuthorizationId != null) {
 			setOAuth2AuthorizationId(oAuth2AuthorizationId);
@@ -122,35 +106,34 @@ public class OAuth2AuthorizationWrapper
 		}
 
 		Long oAuth2ApplicationScopeAliasesId = (Long)attributes.get(
-			"oAuth2ApplicationScopeAliasesId");
+				"oAuth2ApplicationScopeAliasesId");
 
 		if (oAuth2ApplicationScopeAliasesId != null) {
 			setOAuth2ApplicationScopeAliasesId(oAuth2ApplicationScopeAliasesId);
 		}
 
-		String accessTokenContent = (String)attributes.get(
-			"accessTokenContent");
+		String accessTokenContent = (String)attributes.get("accessTokenContent");
 
 		if (accessTokenContent != null) {
 			setAccessTokenContent(accessTokenContent);
 		}
 
 		Long accessTokenContentHash = (Long)attributes.get(
-			"accessTokenContentHash");
+				"accessTokenContentHash");
 
 		if (accessTokenContentHash != null) {
 			setAccessTokenContentHash(accessTokenContentHash);
 		}
 
 		Date accessTokenCreateDate = (Date)attributes.get(
-			"accessTokenCreateDate");
+				"accessTokenCreateDate");
 
 		if (accessTokenCreateDate != null) {
 			setAccessTokenCreateDate(accessTokenCreateDate);
 		}
 
 		Date accessTokenExpirationDate = (Date)attributes.get(
-			"accessTokenExpirationDate");
+				"accessTokenExpirationDate");
 
 		if (accessTokenExpirationDate != null) {
 			setAccessTokenExpirationDate(accessTokenExpirationDate);
@@ -163,550 +146,403 @@ public class OAuth2AuthorizationWrapper
 		}
 
 		String refreshTokenContent = (String)attributes.get(
-			"refreshTokenContent");
+				"refreshTokenContent");
 
 		if (refreshTokenContent != null) {
 			setRefreshTokenContent(refreshTokenContent);
 		}
 
 		Long refreshTokenContentHash = (Long)attributes.get(
-			"refreshTokenContentHash");
+				"refreshTokenContentHash");
 
 		if (refreshTokenContentHash != null) {
 			setRefreshTokenContentHash(refreshTokenContentHash);
 		}
 
 		Date refreshTokenCreateDate = (Date)attributes.get(
-			"refreshTokenCreateDate");
+				"refreshTokenCreateDate");
 
 		if (refreshTokenCreateDate != null) {
 			setRefreshTokenCreateDate(refreshTokenCreateDate);
 		}
 
 		Date refreshTokenExpirationDate = (Date)attributes.get(
-			"refreshTokenExpirationDate");
+				"refreshTokenExpirationDate");
 
 		if (refreshTokenExpirationDate != null) {
 			setRefreshTokenExpirationDate(refreshTokenExpirationDate);
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new OAuth2AuthorizationWrapper(
-			(OAuth2Authorization)_oAuth2Authorization.clone());
-	}
-
-	@Override
-	public int compareTo(OAuth2Authorization oAuth2Authorization) {
-		return _oAuth2Authorization.compareTo(oAuth2Authorization);
-	}
-
 	/**
-	 * Returns the access token content of this o auth2 authorization.
-	 *
-	 * @return the access token content of this o auth2 authorization
-	 */
+	* Returns the access token content of this o auth2 authorization.
+	*
+	* @return the access token content of this o auth2 authorization
+	*/
 	@Override
 	public String getAccessTokenContent() {
-		return _oAuth2Authorization.getAccessTokenContent();
+		return model.getAccessTokenContent();
 	}
 
 	/**
-	 * Returns the access token content hash of this o auth2 authorization.
-	 *
-	 * @return the access token content hash of this o auth2 authorization
-	 */
+	* Returns the access token content hash of this o auth2 authorization.
+	*
+	* @return the access token content hash of this o auth2 authorization
+	*/
 	@Override
 	public long getAccessTokenContentHash() {
-		return _oAuth2Authorization.getAccessTokenContentHash();
+		return model.getAccessTokenContentHash();
 	}
 
 	/**
-	 * Returns the access token create date of this o auth2 authorization.
-	 *
-	 * @return the access token create date of this o auth2 authorization
-	 */
+	* Returns the access token create date of this o auth2 authorization.
+	*
+	* @return the access token create date of this o auth2 authorization
+	*/
 	@Override
 	public Date getAccessTokenCreateDate() {
-		return _oAuth2Authorization.getAccessTokenCreateDate();
+		return model.getAccessTokenCreateDate();
 	}
 
 	/**
-	 * Returns the access token expiration date of this o auth2 authorization.
-	 *
-	 * @return the access token expiration date of this o auth2 authorization
-	 */
+	* Returns the access token expiration date of this o auth2 authorization.
+	*
+	* @return the access token expiration date of this o auth2 authorization
+	*/
 	@Override
 	public Date getAccessTokenExpirationDate() {
-		return _oAuth2Authorization.getAccessTokenExpirationDate();
+		return model.getAccessTokenExpirationDate();
 	}
 
 	/**
-	 * Returns the company ID of this o auth2 authorization.
-	 *
-	 * @return the company ID of this o auth2 authorization
-	 */
+	* Returns the company ID of this o auth2 authorization.
+	*
+	* @return the company ID of this o auth2 authorization
+	*/
 	@Override
 	public long getCompanyId() {
-		return _oAuth2Authorization.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the create date of this o auth2 authorization.
-	 *
-	 * @return the create date of this o auth2 authorization
-	 */
+	* Returns the create date of this o auth2 authorization.
+	*
+	* @return the create date of this o auth2 authorization
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _oAuth2Authorization.getCreateDate();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _oAuth2Authorization.getExpandoBridge();
+		return model.getCreateDate();
 	}
 
 	/**
-	 * Returns the o auth2 application ID of this o auth2 authorization.
-	 *
-	 * @return the o auth2 application ID of this o auth2 authorization
-	 */
+	* Returns the o auth2 application ID of this o auth2 authorization.
+	*
+	* @return the o auth2 application ID of this o auth2 authorization
+	*/
 	@Override
 	public long getOAuth2ApplicationId() {
-		return _oAuth2Authorization.getOAuth2ApplicationId();
+		return model.getOAuth2ApplicationId();
 	}
 
 	/**
-	 * Returns the o auth2 application scope aliases ID of this o auth2 authorization.
-	 *
-	 * @return the o auth2 application scope aliases ID of this o auth2 authorization
-	 */
+	* Returns the o auth2 application scope aliases ID of this o auth2 authorization.
+	*
+	* @return the o auth2 application scope aliases ID of this o auth2 authorization
+	*/
 	@Override
 	public long getOAuth2ApplicationScopeAliasesId() {
-		return _oAuth2Authorization.getOAuth2ApplicationScopeAliasesId();
+		return model.getOAuth2ApplicationScopeAliasesId();
 	}
 
 	/**
-	 * Returns the o auth2 authorization ID of this o auth2 authorization.
-	 *
-	 * @return the o auth2 authorization ID of this o auth2 authorization
-	 */
+	* Returns the o auth2 authorization ID of this o auth2 authorization.
+	*
+	* @return the o auth2 authorization ID of this o auth2 authorization
+	*/
 	@Override
 	public long getOAuth2AuthorizationId() {
-		return _oAuth2Authorization.getOAuth2AuthorizationId();
+		return model.getOAuth2AuthorizationId();
 	}
 
 	/**
-	 * Returns the primary key of this o auth2 authorization.
-	 *
-	 * @return the primary key of this o auth2 authorization
-	 */
+	* Returns the primary key of this o auth2 authorization.
+	*
+	* @return the primary key of this o auth2 authorization
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _oAuth2Authorization.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _oAuth2Authorization.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the refresh token content of this o auth2 authorization.
-	 *
-	 * @return the refresh token content of this o auth2 authorization
-	 */
+	* Returns the refresh token content of this o auth2 authorization.
+	*
+	* @return the refresh token content of this o auth2 authorization
+	*/
 	@Override
 	public String getRefreshTokenContent() {
-		return _oAuth2Authorization.getRefreshTokenContent();
+		return model.getRefreshTokenContent();
 	}
 
 	/**
-	 * Returns the refresh token content hash of this o auth2 authorization.
-	 *
-	 * @return the refresh token content hash of this o auth2 authorization
-	 */
+	* Returns the refresh token content hash of this o auth2 authorization.
+	*
+	* @return the refresh token content hash of this o auth2 authorization
+	*/
 	@Override
 	public long getRefreshTokenContentHash() {
-		return _oAuth2Authorization.getRefreshTokenContentHash();
+		return model.getRefreshTokenContentHash();
 	}
 
 	/**
-	 * Returns the refresh token create date of this o auth2 authorization.
-	 *
-	 * @return the refresh token create date of this o auth2 authorization
-	 */
+	* Returns the refresh token create date of this o auth2 authorization.
+	*
+	* @return the refresh token create date of this o auth2 authorization
+	*/
 	@Override
 	public Date getRefreshTokenCreateDate() {
-		return _oAuth2Authorization.getRefreshTokenCreateDate();
+		return model.getRefreshTokenCreateDate();
 	}
 
 	/**
-	 * Returns the refresh token expiration date of this o auth2 authorization.
-	 *
-	 * @return the refresh token expiration date of this o auth2 authorization
-	 */
+	* Returns the refresh token expiration date of this o auth2 authorization.
+	*
+	* @return the refresh token expiration date of this o auth2 authorization
+	*/
 	@Override
 	public Date getRefreshTokenExpirationDate() {
-		return _oAuth2Authorization.getRefreshTokenExpirationDate();
+		return model.getRefreshTokenExpirationDate();
 	}
 
 	/**
-	 * Returns the remote ip info of this o auth2 authorization.
-	 *
-	 * @return the remote ip info of this o auth2 authorization
-	 */
+	* Returns the remote ip info of this o auth2 authorization.
+	*
+	* @return the remote ip info of this o auth2 authorization
+	*/
 	@Override
 	public String getRemoteIPInfo() {
-		return _oAuth2Authorization.getRemoteIPInfo();
+		return model.getRemoteIPInfo();
 	}
 
 	/**
-	 * Returns the user ID of this o auth2 authorization.
-	 *
-	 * @return the user ID of this o auth2 authorization
-	 */
+	* Returns the user ID of this o auth2 authorization.
+	*
+	* @return the user ID of this o auth2 authorization
+	*/
 	@Override
 	public long getUserId() {
-		return _oAuth2Authorization.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this o auth2 authorization.
-	 *
-	 * @return the user name of this o auth2 authorization
-	 */
+	* Returns the user name of this o auth2 authorization.
+	*
+	* @return the user name of this o auth2 authorization
+	*/
 	@Override
 	public String getUserName() {
-		return _oAuth2Authorization.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this o auth2 authorization.
-	 *
-	 * @return the user uuid of this o auth2 authorization
-	 */
+	* Returns the user uuid of this o auth2 authorization.
+	*
+	* @return the user uuid of this o auth2 authorization
+	*/
 	@Override
 	public String getUserUuid() {
-		return _oAuth2Authorization.getUserUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _oAuth2Authorization.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _oAuth2Authorization.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _oAuth2Authorization.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _oAuth2Authorization.isNew();
+		return model.getUserUuid();
 	}
 
 	@Override
 	public void persist() {
-		_oAuth2Authorization.persist();
+		model.persist();
 	}
 
 	/**
-	 * Sets the access token content of this o auth2 authorization.
-	 *
-	 * @param accessTokenContent the access token content of this o auth2 authorization
-	 */
+	* Sets the access token content of this o auth2 authorization.
+	*
+	* @param accessTokenContent the access token content of this o auth2 authorization
+	*/
 	@Override
 	public void setAccessTokenContent(String accessTokenContent) {
-		_oAuth2Authorization.setAccessTokenContent(accessTokenContent);
+		model.setAccessTokenContent(accessTokenContent);
 	}
 
 	/**
-	 * Sets the access token content hash of this o auth2 authorization.
-	 *
-	 * @param accessTokenContentHash the access token content hash of this o auth2 authorization
-	 */
+	* Sets the access token content hash of this o auth2 authorization.
+	*
+	* @param accessTokenContentHash the access token content hash of this o auth2 authorization
+	*/
 	@Override
 	public void setAccessTokenContentHash(long accessTokenContentHash) {
-		_oAuth2Authorization.setAccessTokenContentHash(accessTokenContentHash);
+		model.setAccessTokenContentHash(accessTokenContentHash);
 	}
 
 	/**
-	 * Sets the access token create date of this o auth2 authorization.
-	 *
-	 * @param accessTokenCreateDate the access token create date of this o auth2 authorization
-	 */
+	* Sets the access token create date of this o auth2 authorization.
+	*
+	* @param accessTokenCreateDate the access token create date of this o auth2 authorization
+	*/
 	@Override
 	public void setAccessTokenCreateDate(Date accessTokenCreateDate) {
-		_oAuth2Authorization.setAccessTokenCreateDate(accessTokenCreateDate);
+		model.setAccessTokenCreateDate(accessTokenCreateDate);
 	}
 
 	/**
-	 * Sets the access token expiration date of this o auth2 authorization.
-	 *
-	 * @param accessTokenExpirationDate the access token expiration date of this o auth2 authorization
-	 */
+	* Sets the access token expiration date of this o auth2 authorization.
+	*
+	* @param accessTokenExpirationDate the access token expiration date of this o auth2 authorization
+	*/
 	@Override
 	public void setAccessTokenExpirationDate(Date accessTokenExpirationDate) {
-		_oAuth2Authorization.setAccessTokenExpirationDate(
-			accessTokenExpirationDate);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_oAuth2Authorization.setCachedModel(cachedModel);
+		model.setAccessTokenExpirationDate(accessTokenExpirationDate);
 	}
 
 	/**
-	 * Sets the company ID of this o auth2 authorization.
-	 *
-	 * @param companyId the company ID of this o auth2 authorization
-	 */
+	* Sets the company ID of this o auth2 authorization.
+	*
+	* @param companyId the company ID of this o auth2 authorization
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_oAuth2Authorization.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this o auth2 authorization.
-	 *
-	 * @param createDate the create date of this o auth2 authorization
-	 */
+	* Sets the create date of this o auth2 authorization.
+	*
+	* @param createDate the create date of this o auth2 authorization
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_oAuth2Authorization.setCreateDate(createDate);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_oAuth2Authorization.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_oAuth2Authorization.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_oAuth2Authorization.setExpandoBridgeAttributes(serviceContext);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_oAuth2Authorization.setNew(n);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the o auth2 application ID of this o auth2 authorization.
-	 *
-	 * @param oAuth2ApplicationId the o auth2 application ID of this o auth2 authorization
-	 */
+	* Sets the o auth2 application ID of this o auth2 authorization.
+	*
+	* @param oAuth2ApplicationId the o auth2 application ID of this o auth2 authorization
+	*/
 	@Override
 	public void setOAuth2ApplicationId(long oAuth2ApplicationId) {
-		_oAuth2Authorization.setOAuth2ApplicationId(oAuth2ApplicationId);
+		model.setOAuth2ApplicationId(oAuth2ApplicationId);
 	}
 
 	/**
-	 * Sets the o auth2 application scope aliases ID of this o auth2 authorization.
-	 *
-	 * @param oAuth2ApplicationScopeAliasesId the o auth2 application scope aliases ID of this o auth2 authorization
-	 */
+	* Sets the o auth2 application scope aliases ID of this o auth2 authorization.
+	*
+	* @param oAuth2ApplicationScopeAliasesId the o auth2 application scope aliases ID of this o auth2 authorization
+	*/
 	@Override
 	public void setOAuth2ApplicationScopeAliasesId(
 		long oAuth2ApplicationScopeAliasesId) {
-
-		_oAuth2Authorization.setOAuth2ApplicationScopeAliasesId(
-			oAuth2ApplicationScopeAliasesId);
+		model.setOAuth2ApplicationScopeAliasesId(oAuth2ApplicationScopeAliasesId);
 	}
 
 	/**
-	 * Sets the o auth2 authorization ID of this o auth2 authorization.
-	 *
-	 * @param oAuth2AuthorizationId the o auth2 authorization ID of this o auth2 authorization
-	 */
+	* Sets the o auth2 authorization ID of this o auth2 authorization.
+	*
+	* @param oAuth2AuthorizationId the o auth2 authorization ID of this o auth2 authorization
+	*/
 	@Override
 	public void setOAuth2AuthorizationId(long oAuth2AuthorizationId) {
-		_oAuth2Authorization.setOAuth2AuthorizationId(oAuth2AuthorizationId);
+		model.setOAuth2AuthorizationId(oAuth2AuthorizationId);
 	}
 
 	/**
-	 * Sets the primary key of this o auth2 authorization.
-	 *
-	 * @param primaryKey the primary key of this o auth2 authorization
-	 */
+	* Sets the primary key of this o auth2 authorization.
+	*
+	* @param primaryKey the primary key of this o auth2 authorization
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_oAuth2Authorization.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_oAuth2Authorization.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the refresh token content of this o auth2 authorization.
-	 *
-	 * @param refreshTokenContent the refresh token content of this o auth2 authorization
-	 */
+	* Sets the refresh token content of this o auth2 authorization.
+	*
+	* @param refreshTokenContent the refresh token content of this o auth2 authorization
+	*/
 	@Override
 	public void setRefreshTokenContent(String refreshTokenContent) {
-		_oAuth2Authorization.setRefreshTokenContent(refreshTokenContent);
+		model.setRefreshTokenContent(refreshTokenContent);
 	}
 
 	/**
-	 * Sets the refresh token content hash of this o auth2 authorization.
-	 *
-	 * @param refreshTokenContentHash the refresh token content hash of this o auth2 authorization
-	 */
+	* Sets the refresh token content hash of this o auth2 authorization.
+	*
+	* @param refreshTokenContentHash the refresh token content hash of this o auth2 authorization
+	*/
 	@Override
 	public void setRefreshTokenContentHash(long refreshTokenContentHash) {
-		_oAuth2Authorization.setRefreshTokenContentHash(
-			refreshTokenContentHash);
+		model.setRefreshTokenContentHash(refreshTokenContentHash);
 	}
 
 	/**
-	 * Sets the refresh token create date of this o auth2 authorization.
-	 *
-	 * @param refreshTokenCreateDate the refresh token create date of this o auth2 authorization
-	 */
+	* Sets the refresh token create date of this o auth2 authorization.
+	*
+	* @param refreshTokenCreateDate the refresh token create date of this o auth2 authorization
+	*/
 	@Override
 	public void setRefreshTokenCreateDate(Date refreshTokenCreateDate) {
-		_oAuth2Authorization.setRefreshTokenCreateDate(refreshTokenCreateDate);
+		model.setRefreshTokenCreateDate(refreshTokenCreateDate);
 	}
 
 	/**
-	 * Sets the refresh token expiration date of this o auth2 authorization.
-	 *
-	 * @param refreshTokenExpirationDate the refresh token expiration date of this o auth2 authorization
-	 */
+	* Sets the refresh token expiration date of this o auth2 authorization.
+	*
+	* @param refreshTokenExpirationDate the refresh token expiration date of this o auth2 authorization
+	*/
 	@Override
 	public void setRefreshTokenExpirationDate(Date refreshTokenExpirationDate) {
-		_oAuth2Authorization.setRefreshTokenExpirationDate(
-			refreshTokenExpirationDate);
+		model.setRefreshTokenExpirationDate(refreshTokenExpirationDate);
 	}
 
 	/**
-	 * Sets the remote ip info of this o auth2 authorization.
-	 *
-	 * @param remoteIPInfo the remote ip info of this o auth2 authorization
-	 */
+	* Sets the remote ip info of this o auth2 authorization.
+	*
+	* @param remoteIPInfo the remote ip info of this o auth2 authorization
+	*/
 	@Override
 	public void setRemoteIPInfo(String remoteIPInfo) {
-		_oAuth2Authorization.setRemoteIPInfo(remoteIPInfo);
+		model.setRemoteIPInfo(remoteIPInfo);
 	}
 
 	/**
-	 * Sets the user ID of this o auth2 authorization.
-	 *
-	 * @param userId the user ID of this o auth2 authorization
-	 */
+	* Sets the user ID of this o auth2 authorization.
+	*
+	* @param userId the user ID of this o auth2 authorization
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_oAuth2Authorization.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this o auth2 authorization.
-	 *
-	 * @param userName the user name of this o auth2 authorization
-	 */
+	* Sets the user name of this o auth2 authorization.
+	*
+	* @param userName the user name of this o auth2 authorization
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_oAuth2Authorization.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this o auth2 authorization.
-	 *
-	 * @param userUuid the user uuid of this o auth2 authorization
-	 */
+	* Sets the user uuid of this o auth2 authorization.
+	*
+	* @param userUuid the user uuid of this o auth2 authorization
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_oAuth2Authorization.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<OAuth2Authorization>
-		toCacheModel() {
-
-		return _oAuth2Authorization.toCacheModel();
+	protected OAuth2AuthorizationWrapper wrap(
+		OAuth2Authorization oAuth2Authorization) {
+		return new OAuth2AuthorizationWrapper(oAuth2Authorization);
 	}
-
-	@Override
-	public OAuth2Authorization toEscapedModel() {
-		return new OAuth2AuthorizationWrapper(
-			_oAuth2Authorization.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _oAuth2Authorization.toString();
-	}
-
-	@Override
-	public OAuth2Authorization toUnescapedModel() {
-		return new OAuth2AuthorizationWrapper(
-			_oAuth2Authorization.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _oAuth2Authorization.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof OAuth2AuthorizationWrapper)) {
-			return false;
-		}
-
-		OAuth2AuthorizationWrapper oAuth2AuthorizationWrapper =
-			(OAuth2AuthorizationWrapper)obj;
-
-		if (Objects.equals(
-				_oAuth2Authorization,
-				oAuth2AuthorizationWrapper._oAuth2Authorization)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public OAuth2Authorization getWrappedModel() {
-		return _oAuth2Authorization;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _oAuth2Authorization.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _oAuth2Authorization.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_oAuth2Authorization.resetOriginalValues();
-	}
-
-	private final OAuth2Authorization _oAuth2Authorization;
-
 }

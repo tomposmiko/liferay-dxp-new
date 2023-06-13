@@ -132,44 +132,30 @@ public class ModelAdapterUtil {
 
 			Class<?> delegateClass = _delegateObject.getClass();
 
-			Method delegateMethod = delegateClass.getMethod(
+			method = delegateClass.getMethod(
 				method.getName(), method.getParameterTypes());
 
-			if (args != null) {
-				for (int i = 0; i < args.length; i++) {
-					if (!ProxyUtil.isProxyClass(args[i].getClass())) {
-						continue;
-					}
+			if (args == null) {
+				return method.invoke(_delegateObject);
+			}
 
-					InvocationHandler invocationHandler =
-						ProxyUtil.getInvocationHandler(args[i]);
+			for (int i = 0; i < args.length; i++) {
+				if (!ProxyUtil.isProxyClass(args[i].getClass())) {
+					continue;
+				}
 
-					if (invocationHandler instanceof
-							DelegateInvocationHandler) {
+				InvocationHandler invocationHandler =
+					ProxyUtil.getInvocationHandler(args[i]);
 
-						DelegateInvocationHandler delegateInvocationHandler =
-							(DelegateInvocationHandler)invocationHandler;
+				if (invocationHandler instanceof DelegateInvocationHandler) {
+					DelegateInvocationHandler delegateInvocationHandler =
+						(DelegateInvocationHandler)invocationHandler;
 
-						args[i] = delegateInvocationHandler._delegateObject;
-					}
+					args[i] = delegateInvocationHandler._delegateObject;
 				}
 			}
 
-			Object result = delegateMethod.invoke(_delegateObject, args);
-
-			if (result == null) {
-				return null;
-			}
-
-			Class<?> returnType = method.getReturnType();
-
-			if (returnType.isAssignableFrom(result.getClass()) ||
-				returnType.isPrimitive()) {
-
-				return result;
-			}
-
-			return adapt(returnType, result);
+			return method.invoke(_delegateObject, args);
 		}
 
 		private DelegateInvocationHandler(Object delegateObject) {

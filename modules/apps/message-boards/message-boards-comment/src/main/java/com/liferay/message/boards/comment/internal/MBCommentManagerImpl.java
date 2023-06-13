@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.ratings.kernel.model.RatingsEntry;
@@ -49,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -176,13 +176,8 @@ public class MBCommentManagerImpl implements CommentManager {
 
 	@Override
 	public Comment fetchComment(long commentId) {
-		MBMessage mbMessage = _mbMessageLocalService.fetchMBMessage(commentId);
-
-		if (mbMessage == null) {
-			return null;
-		}
-
-		return new MBCommentImpl(mbMessage);
+		return new MBCommentImpl(
+			_mbMessageLocalService.fetchMBMessage(commentId));
 	}
 
 	@Override
@@ -330,34 +325,6 @@ public class MBCommentManagerImpl implements CommentManager {
 		}
 	}
 
-	@Reference(unbind = "-")
-	public void setMBDiscussionLocalService(
-		MBDiscussionLocalService mbDiscussionLocalService) {
-
-		_mbDiscussionLocalService = mbDiscussionLocalService;
-	}
-
-	@Reference(unbind = "-")
-	public void setMBMessageLocalService(
-		MBMessageLocalService mbMessageLocalService) {
-
-		_mbMessageLocalService = mbMessageLocalService;
-	}
-
-	@Reference(unbind = "-")
-	public void setRatingsEntryLocalService(
-		RatingsEntryLocalService ratingsEntryLocalService) {
-
-		_ratingsEntryLocalService = ratingsEntryLocalService;
-	}
-
-	@Reference(unbind = "-")
-	public void setRatingsStatsLocalService(
-		RatingsStatsLocalService ratingsStatsLocalService) {
-
-		_ratingsStatsLocalService = ratingsStatsLocalService;
-	}
-
 	@Override
 	public void subscribeDiscussion(
 			long userId, long groupId, String className, long classPK)
@@ -412,9 +379,8 @@ public class MBCommentManagerImpl implements CommentManager {
 
 		if (classPKs.isEmpty()) {
 			return new MBDiscussionCommentImpl(
-				treeWalker.getRoot(), treeWalker,
-				Collections.<Long, RatingsEntry>emptyMap(),
-				Collections.<Long, RatingsStats>emptyMap());
+				treeWalker.getRoot(), treeWalker, Collections.emptyMap(),
+				Collections.emptyMap());
 		}
 
 		long[] classPKsArray = ArrayUtil.toLongArray(classPKs);
@@ -437,21 +403,22 @@ public class MBCommentManagerImpl implements CommentManager {
 			treeWalker.getRoot(), treeWalker, ratingsEntries, ratingsStats);
 	}
 
-	@Reference(unbind = "-")
-	protected void setMBThreadLocalService(
-		MBThreadLocalService mbThreadLocalService) {
-
-		_mbThreadLocalService = mbThreadLocalService;
-	}
-
+	@Reference
 	private MBDiscussionLocalService _mbDiscussionLocalService;
+
+	@Reference
 	private MBMessageLocalService _mbMessageLocalService;
+
+	@Reference
 	private MBThreadLocalService _mbThreadLocalService;
 
 	@Reference
 	private Portal _portal;
 
+	@Reference
 	private RatingsEntryLocalService _ratingsEntryLocalService;
+
+	@Reference
 	private RatingsStatsLocalService _ratingsStatsLocalService;
 
 }

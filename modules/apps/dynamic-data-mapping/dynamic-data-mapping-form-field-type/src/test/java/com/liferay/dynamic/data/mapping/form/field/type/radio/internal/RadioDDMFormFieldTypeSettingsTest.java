@@ -49,6 +49,7 @@ public class RadioDDMFormFieldTypeSettingsTest
 	extends BaseDDMFormFieldTypeSettingsTestCase {
 
 	@Before
+	@Override
 	public void setUp() {
 		setUpLanguageUtil();
 		setUpPortalUtil();
@@ -85,6 +86,7 @@ public class RadioDDMFormFieldTypeSettingsTest
 		Assert.assertEquals("radio", indexTypeDDMFormField.getType());
 	}
 
+	@Override
 	protected void setUpLanguageUtil() {
 		LanguageUtil languageUtil = new LanguageUtil();
 
@@ -109,6 +111,7 @@ public class RadioDDMFormFieldTypeSettingsTest
 		portalUtil.setPortal(portal);
 	}
 
+	@Override
 	protected void setUpResourceBundleUtil() {
 		PowerMockito.mockStatic(ResourceBundleUtil.class);
 

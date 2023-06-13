@@ -17,26 +17,28 @@ package com.liferay.portal.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the remote service utility for Portal. This utility wraps
- * <code>com.liferay.portal.service.impl.PortalServiceImpl</code> and is an
- * access point for service operations in application layer code running on a
- * remote server. Methods of this service are expected to have security checks
- * based on the propagated JAAS credentials because this service can be
+ * {@link com.liferay.portal.service.impl.PortalServiceImpl} and is the
+ * primary access point for service operations in application layer code running
+ * on a remote server. Methods of this service are expected to have security
+ * checks based on the propagated JAAS credentials because this service can be
  * accessed remotely.
  *
  * @author Brian Wing Shun Chan
  * @see PortalService
+ * @see com.liferay.portal.service.base.PortalServiceBaseImpl
+ * @see com.liferay.portal.service.impl.PortalServiceImpl
  * @generated
  */
 @ProviderType
 public class PortalServiceUtil {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.service.impl.PortalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portal.service.impl.PortalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static String getAutoDeployDirectory() {
 		return getService().getAutoDeployDirectory();
@@ -47,10 +49,10 @@ public class PortalServiceUtil {
 	}
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
@@ -67,29 +69,22 @@ public class PortalServiceUtil {
 		getService().testAddClassName_Success(classNameValue);
 	}
 
-	public static void
-		testAddClassNameAndTestTransactionPortletBar_PortalRollback(
-			String transactionPortletBarText) {
-
-		getService().
-			testAddClassNameAndTestTransactionPortletBar_PortalRollback(
-				transactionPortletBarText);
+	public static void testAddClassNameAndTestTransactionPortletBar_PortalRollback(
+		String transactionPortletBarText) {
+		getService()
+			.testAddClassNameAndTestTransactionPortletBar_PortalRollback(transactionPortletBarText);
 	}
 
-	public static void
-		testAddClassNameAndTestTransactionPortletBar_PortletRollback(
-			String transactionPortletBarText) {
-
-		getService().
-			testAddClassNameAndTestTransactionPortletBar_PortletRollback(
-				transactionPortletBarText);
+	public static void testAddClassNameAndTestTransactionPortletBar_PortletRollback(
+		String transactionPortletBarText) {
+		getService()
+			.testAddClassNameAndTestTransactionPortletBar_PortletRollback(transactionPortletBarText);
 	}
 
 	public static void testAddClassNameAndTestTransactionPortletBar_Success(
 		String transactionPortletBarText) {
-
-		getService().testAddClassNameAndTestTransactionPortletBar_Success(
-			transactionPortletBarText);
+		getService()
+			.testAddClassNameAndTestTransactionPortletBar_Success(transactionPortletBarText);
 	}
 
 	public static void testAutoSyncHibernateSessionStateOnTxCreation() {
@@ -98,7 +93,6 @@ public class PortalServiceUtil {
 
 	public static void testDeleteClassName()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		getService().testDeleteClassName();
 	}
 
@@ -116,13 +110,14 @@ public class PortalServiceUtil {
 
 	public static PortalService getService() {
 		if (_service == null) {
-			_service = (PortalService)PortalBeanLocatorUtil.locate(
-				PortalService.class.getName());
+			_service = (PortalService)PortalBeanLocatorUtil.locate(PortalService.class.getName());
+
+			ReferenceRegistry.registerReference(PortalServiceUtil.class,
+				"_service");
 		}
 
 		return _service;
 	}
 
 	private static PortalService _service;
-
 }

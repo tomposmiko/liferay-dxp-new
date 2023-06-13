@@ -88,9 +88,11 @@ public class BlogsExportImportTest extends BasePortletExportImportTestCase {
 		serviceContext.setCreateDate(createdDate);
 		serviceContext.setModifiedDate(createdDate);
 
-		return BlogsEntryLocalServiceUtil.addEntry(
+		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
 			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), serviceContext);
+
+		return entry;
 	}
 
 	@Override

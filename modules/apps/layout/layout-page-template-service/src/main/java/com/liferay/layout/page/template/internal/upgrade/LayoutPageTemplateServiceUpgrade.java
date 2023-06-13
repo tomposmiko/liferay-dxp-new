@@ -14,10 +14,16 @@
 
 package com.liferay.layout.page.template.internal.upgrade;
 
+import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.internal.upgrade.v1_1_0.UpgradeLayoutPrototype;
-import com.liferay.layout.page.template.internal.upgrade.v1_1_1.UpgradeLayoutPageTemplateEntry;
+import com.liferay.layout.page.template.internal.upgrade.v1_2_0.UpgradeLayoutPageTemplateStructure;
+import com.liferay.layout.page.template.internal.upgrade.v2_0_0.util.LayoutPageTemplateCollectionTable;
+import com.liferay.layout.page.template.internal.upgrade.v2_0_0.util.LayoutPageTemplateEntryTable;
+import com.liferay.layout.page.template.internal.upgrade.v2_1_0.UpgradeSchema;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutPrototypeLocalService;
+import com.liferay.portal.kernel.upgrade.BaseUpgradeSQLServerDatetime;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
@@ -41,12 +47,29 @@ public class LayoutPageTemplateServiceUpgrade
 				_companyLocalService, _layoutPrototypeLocalService));
 
 		registry.register(
-			"1.1.0", "1.1.1",
-			new UpgradeLayoutPageTemplateEntry(_companyLocalService));
+			"1.1.0", "1.2.0",
+			new UpgradeLayoutPageTemplateStructure(
+				_fragmentEntryLinkLocalService, _layoutLocalService));
+
+		registry.register(
+			"1.2.0", "2.0.0",
+			new BaseUpgradeSQLServerDatetime(
+				new Class<?>[] {
+					LayoutPageTemplateCollectionTable.class,
+					LayoutPageTemplateEntryTable.class
+				}));
+
+		registry.register("2.0.0", "2.1.0", new UpgradeSchema());
 	}
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Reference
+	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private LayoutPrototypeLocalService _layoutPrototypeLocalService;

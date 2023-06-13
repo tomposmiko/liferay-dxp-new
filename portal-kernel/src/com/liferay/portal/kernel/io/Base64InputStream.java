@@ -205,8 +205,10 @@ public class Base64InputStream extends InputStream {
 					count++;
 				}
 
-				return decode(
+				int returnValue = decode(
 					decodeUnitBuffer, outputBuffer, position, padNumber);
+
+				return returnValue;
 			}
 
 			decodeUnitBuffer[count++] = (byte)intValue;

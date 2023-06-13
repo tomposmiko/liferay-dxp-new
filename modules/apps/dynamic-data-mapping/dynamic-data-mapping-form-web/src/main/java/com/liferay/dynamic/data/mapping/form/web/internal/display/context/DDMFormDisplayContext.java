@@ -21,7 +21,10 @@ import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.form.web.internal.security.permission.resource.DDMFormInstancePermission;
-import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesJSONSerializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesSerializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesSerializerSerializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesSerializerSerializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesSerializerTracker;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
@@ -49,9 +52,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
@@ -75,7 +76,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -83,6 +83,7 @@ import java.util.stream.Stream;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.ResourceURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -93,8 +94,9 @@ public class DDMFormDisplayContext {
 
 	public DDMFormDisplayContext(
 			RenderRequest renderRequest, RenderResponse renderResponse,
-			DDMFormFieldTypesJSONSerializer ddmFormFieldTypesJSONSerializer,
 			DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker,
+			DDMFormFieldTypesSerializerTracker
+				ddmFormFieldTypesSerializerTracker,
 			DDMFormInstanceLocalService ddmFormInstanceLocalService,
 			DDMFormInstanceRecordVersionLocalService
 				ddmFormInstanceRecordVersionLocalService,
@@ -112,8 +114,9 @@ public class DDMFormDisplayContext {
 
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
-		_ddmFormFieldTypesJSONSerializer = ddmFormFieldTypesJSONSerializer;
 		_ddmFormFieldTypeServicesTracker = ddmFormFieldTypeServicesTracker;
+		_ddmFormFieldTypesSerializerTracker =
+			ddmFormFieldTypesSerializerTracker;
 		_ddmFormInstanceLocalService = ddmFormInstanceLocalService;
 		_ddmFormInstanceRecordVersionLocalService =
 			ddmFormInstanceRecordVersionLocalService;
@@ -174,8 +177,20 @@ public class DDMFormDisplayContext {
 		List<DDMFormFieldType> formFieldTypes =
 			_ddmFormFieldTypeServicesTracker.getDDMFormFieldTypes();
 
+		DDMFormFieldTypesSerializer ddmFormFieldTypesSerializer =
+			_ddmFormFieldTypesSerializerTracker.getDDMFormFieldTypesSerializer(
+				"json");
+
+		DDMFormFieldTypesSerializerSerializeRequest.Builder builder =
+			DDMFormFieldTypesSerializerSerializeRequest.Builder.newBuilder(
+				formFieldTypes);
+
+		DDMFormFieldTypesSerializerSerializeResponse
+			ddmFormFieldTypesSerializerSerializeResponse =
+				ddmFormFieldTypesSerializer.serialize(builder.build());
+
 		String serializedFormFieldTypes =
-			_ddmFormFieldTypesJSONSerializer.serialize(formFieldTypes);
+			ddmFormFieldTypesSerializerSerializeResponse.getContent();
 
 		return _jsonFactory.createJSONArray(serializedFormFieldTypes);
 	}
@@ -338,18 +353,6 @@ public class DDMFormDisplayContext {
 		return _autosaveEnabled;
 	}
 
-	public boolean isContentPage() {
-		ThemeDisplay themeDisplay = getThemeDisplay();
-
-		Layout layout = themeDisplay.getLayout();
-
-		if (Objects.equals(layout.getType(), "content")) {
-			return true;
-		}
-
-		return false;
-	}
-
 	public boolean isFormAvailable() throws PortalException {
 		if (isPreview()) {
 			return true;
@@ -415,9 +418,7 @@ public class DDMFormDisplayContext {
 			return _showConfigurationIcon;
 		}
 
-		if (isContentPage() || isPreview() ||
-			(isSharedURL() && isFormShared())) {
-
+		if (isPreview() || (isSharedURL() && isFormShared())) {
 			_showConfigurationIcon = false;
 
 			return _showConfigurationIcon;
@@ -444,13 +445,11 @@ public class DDMFormDisplayContext {
 	}
 
 	protected String createCaptchaResourceURL() {
-		LiferayPortletURL liferayPortletURL =
-			(LiferayPortletURL)_renderResponse.createResourceURL();
+		ResourceURL resourceURL = _renderResponse.createResourceURL();
 
-		liferayPortletURL.setCopyCurrentRenderParameters(false);
-		liferayPortletURL.setResourceID("captcha");
+		resourceURL.setResourceID("captcha");
 
-		return liferayPortletURL.toString();
+		return resourceURL.toString();
 	}
 
 	protected DDMFormRenderingContext createDDMFormRenderingContext(
@@ -509,7 +508,10 @@ public class DDMFormDisplayContext {
 		if (isPreview()) {
 			DDMStructure ddmStructure = ddmFormInstance.getStructure();
 
-			ddmForm = ddmStructure.getDDMForm();
+			DDMStructureVersion latestStructureVersion =
+				ddmStructure.getLatestStructureVersion();
+
+			ddmForm = latestStructureVersion.getDDMForm();
 		}
 		else {
 			DDMFormInstanceVersion latestFormInstanceVersion =
@@ -546,7 +548,10 @@ public class DDMFormDisplayContext {
 		if (isPreview()) {
 			DDMStructure ddmStructure = ddmFormInstance.getStructure();
 
-			ddmFormLayout = ddmStructure.getDDMFormLayout();
+			DDMStructureVersion latestStructureVersion =
+				ddmStructure.getLatestStructureVersion();
+
+			ddmFormLayout = latestStructureVersion.getDDMFormLayout();
 		}
 		else {
 			DDMFormInstanceVersion latestFormInstanceVersion =
@@ -658,7 +663,10 @@ public class DDMFormDisplayContext {
 	}
 
 	protected ThemeDisplay getThemeDisplay() {
-		return (ThemeDisplay)_renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return themeDisplay;
 	}
 
 	protected User getUser() {
@@ -757,8 +765,8 @@ public class DDMFormDisplayContext {
 	private final String _containerId;
 	private final DDMFormFieldTypeServicesTracker
 		_ddmFormFieldTypeServicesTracker;
-	private final DDMFormFieldTypesJSONSerializer
-		_ddmFormFieldTypesJSONSerializer;
+	private final DDMFormFieldTypesSerializerTracker
+		_ddmFormFieldTypesSerializerTracker;
 	private DDMFormInstance _ddmFormInstance;
 	private long _ddmFormInstanceId;
 	private final DDMFormInstanceLocalService _ddmFormInstanceLocalService;

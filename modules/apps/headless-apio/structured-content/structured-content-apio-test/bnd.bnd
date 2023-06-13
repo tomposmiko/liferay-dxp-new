@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Structured Content Apio Test
 Bundle-SymbolicName: com.liferay.structured.content.apio.test
-Bundle-Version: 1.0.0
+Bundle-Version: 2.0.0
 Import-Package:\
 	!com.fasterxml.jackson.*,\
 	\
@@ -25,6 +25,6 @@ Import-Package:\
 	*
 -includeresource:\
 	test-classes/integration,\
-	@cxf-rt-frontend-jaxrs-[0-9]*.jar,\
-	@jackson-databind-[0-9]*.jar,\
-	@lib/assertj-core.jar
+	@lib/assertj-core.jar,\
+	@lib/cxf-rt-frontend-jaxrs.jar,\
+	@lib/jackson-databind.jar

@@ -53,8 +53,10 @@ public class WikiTestUtil {
 
 		serviceContext = (ServiceContext)serviceContext.clone();
 
-		return WikiNodeLocalServiceUtil.addDefaultNode(
+		WikiNode node = WikiNodeLocalServiceUtil.addDefaultNode(
 			TestPropsValues.getUserId(), serviceContext);
+
+		return node;
 	}
 
 	public static WikiNode addNode(long groupId) throws Exception {
@@ -76,8 +78,10 @@ public class WikiTestUtil {
 
 		serviceContext = (ServiceContext)serviceContext.clone();
 
-		return WikiNodeLocalServiceUtil.addNode(
+		WikiNode node = WikiNodeLocalServiceUtil.addNode(
 			userId, name, description, serviceContext);
+
+		return node;
 	}
 
 	public static WikiPage addPage(long groupId, long nodeId, boolean approved)

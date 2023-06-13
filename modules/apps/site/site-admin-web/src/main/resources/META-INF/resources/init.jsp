@@ -68,7 +68,6 @@ page import="com.liferay.portal.kernel.model.RoleConstants" %><%@
 page import="com.liferay.portal.kernel.model.SiteConstants" %><%@
 page import="com.liferay.portal.kernel.model.Team" %><%@
 page import="com.liferay.portal.kernel.model.User" %><%@
-page import="com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
 page import="com.liferay.portal.kernel.portlet.PortletProvider" %><%@
 page import="com.liferay.portal.kernel.portlet.PortletProviderUtil" %><%@
@@ -113,7 +112,6 @@ page import="com.liferay.ratings.kernel.RatingsType" %><%@
 page import="com.liferay.ratings.kernel.display.context.CompanyPortletRatingsDefinitionDisplayContext" %><%@
 page import="com.liferay.ratings.kernel.display.context.GroupPortletRatingsDefinitionDisplayContext" %><%@
 page import="com.liferay.ratings.kernel.transformer.RatingsDataTransformerUtil" %><%@
-page import="com.liferay.site.admin.web.internal.configuration.SiteAdminConfiguration" %><%@
 page import="com.liferay.site.admin.web.internal.constants.SiteAdminConstants" %><%@
 page import="com.liferay.site.admin.web.internal.constants.SiteAdminPortletKeys" %><%@
 page import="com.liferay.site.admin.web.internal.constants.SiteAdminWebKeys" %><%@
@@ -144,8 +142,6 @@ page import="javax.portlet.WindowState" %>
 <portlet:defineObjects />
 
 <%
-SiteAdminConfiguration siteAdminConfiguration = ConfigurationProviderUtil.getSystemConfiguration(SiteAdminConfiguration.class);
-
 SiteAdminDisplayContext siteAdminDisplayContext = new SiteAdminDisplayContext(request, liferayPortletRequest, liferayPortletResponse);
 
 portletDisplay.setShowStagingIcon(false);

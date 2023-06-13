@@ -17,14 +17,13 @@ package com.liferay.portal.internal.messaging.async;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServiceInvokerUtil;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.util.MethodHandler;
+import com.liferay.portal.spring.aop.AopMethodInvocation;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
-
-import org.aopalliance.intercept.MethodInvocation;
 
 /**
  * @author Shuyang Zhou
@@ -33,18 +32,21 @@ public class AsyncProcessCallable
 	implements Externalizable, ProcessCallable<Serializable> {
 
 	public AsyncProcessCallable() {
-		this(null);
+		this(null, null);
 	}
 
-	public AsyncProcessCallable(MethodInvocation methodInvocation) {
-		_methodInvocation = methodInvocation;
+	public AsyncProcessCallable(
+		AopMethodInvocation aopMethodInvocation, Object[] arguments) {
+
+		_aopMethodInvocation = aopMethodInvocation;
+		_arguments = arguments;
 	}
 
 	@Override
 	public Serializable call() {
 		try {
-			if (_methodInvocation != null) {
-				_methodInvocation.proceed();
+			if (_aopMethodInvocation != null) {
+				_aopMethodInvocation.proceed(_arguments);
 			}
 			else {
 				AsyncInvokeThreadLocal.setEnabled(true);
@@ -78,14 +80,15 @@ public class AsyncProcessCallable
 		if (methodHandler == null) {
 			methodHandler =
 				IdentifiableOSGiServiceInvokerUtil.createMethodHandler(
-					_methodInvocation.getThis(), _methodInvocation.getMethod(),
-					_methodInvocation.getArguments());
+					_aopMethodInvocation.getThis(),
+					_aopMethodInvocation.getMethod(), _arguments);
 		}
 
 		objectOutput.writeObject(methodHandler);
 	}
 
+	private final AopMethodInvocation _aopMethodInvocation;
+	private final Object[] _arguments;
 	private MethodHandler _methodHandler;
-	private final MethodInvocation _methodInvocation;
 
 }

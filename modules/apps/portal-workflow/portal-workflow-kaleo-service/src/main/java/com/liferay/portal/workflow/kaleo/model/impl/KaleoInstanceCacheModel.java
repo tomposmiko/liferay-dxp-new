@@ -16,9 +16,10 @@ package com.liferay.portal.workflow.kaleo.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
 
 import java.io.Externalizable;
@@ -32,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing KaleoInstance in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see KaleoInstance
  * @generated
  */
 @ProviderType
-public class KaleoInstanceCacheModel
-	implements CacheModel<KaleoInstance>, Externalizable {
-
+public class KaleoInstanceCacheModel implements CacheModel<KaleoInstance>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,8 +49,7 @@ public class KaleoInstanceCacheModel
 			return false;
 		}
 
-		KaleoInstanceCacheModel kaleoInstanceCacheModel =
-			(KaleoInstanceCacheModel)obj;
+		KaleoInstanceCacheModel kaleoInstanceCacheModel = (KaleoInstanceCacheModel)obj;
 
 		if (kaleoInstanceId == kaleoInstanceCacheModel.kaleoInstanceId) {
 			return true;
@@ -204,7 +204,8 @@ public class KaleoInstanceCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(kaleoInstanceId);
 
 		objectOutput.writeLong(groupId);
@@ -272,5 +273,4 @@ public class KaleoInstanceCacheModel
 	public boolean completed;
 	public long completionDate;
 	public String workflowContext;
-
 }

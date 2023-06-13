@@ -1027,7 +1027,7 @@ definition {
 	}
 
 	macro selectEventIframe {
-		SelectFrame(locator1 = "CalendarEditEvent#EDIT_EVENT_IFRAME");
+		SelectFrame(locator1 = "IFrame#METADATA_SETS_IFRAME");
 	}
 
 	macro selectRepeatFrequency {
@@ -1144,7 +1144,9 @@ definition {
 				value1 = "${frequency}"
 			);
 
-			var currentDay = DateUtil.getCurrentDayOfWeek();
+			var currentDay = selenium.getElementValue("CalendarEditEvent#REPEAT_MONTHLY_CURRENT_DAY");
+			var currentDay = StringUtil.lowerCase("${currentDay}");
+			var currentDay = StringUtil.upperCaseFirstLetter("${currentDay}");
 
 			AssertTextEquals.assertPartialText(
 				locator1 = "CalendarEditEvent#REPEAT_DIALOG_SUMMARY",
@@ -1166,7 +1168,9 @@ definition {
 				value1 = "${frequency}"
 			);
 
-			var currentDay = DateUtil.getCurrentDayOfWeek();
+			var currentDay = selenium.getElementValue("CalendarEditEvent#REPEAT_WEEKLY_CURRENT_DAY");
+			var currentDay = StringUtil.lowerCase("${currentDay}");
+			var currentDay = StringUtil.upperCaseFirstLetter("${currentDay}");
 
 			AssertTextEquals.assertPartialText(
 				locator1 = "CalendarEditEvent#REPEAT_DIALOG_SUMMARY",

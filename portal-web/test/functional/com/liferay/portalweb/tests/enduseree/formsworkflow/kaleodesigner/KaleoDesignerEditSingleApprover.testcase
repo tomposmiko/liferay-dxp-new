@@ -15,9 +15,9 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.gotoEditWorkflowDefinition(workflowDefinitionTitle = "Single Approver");
@@ -42,9 +42,9 @@ definition {
 		PortletEntry.update();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.viewDefinitionPublished(

@@ -137,7 +137,9 @@ public class ModifiedFacetCalendarDisplayBuilder {
 				_toYear, _toMonth, _toDay, 0, 0, 0, 0, _timeZone);
 		}
 
-		return _calendarFactory.getCalendar(_timeZone, _locale);
+		Calendar toCalendar = _calendarFactory.getCalendar(_timeZone, _locale);
+
+		return toCalendar;
 	}
 
 	private boolean _isRangeBackwards(

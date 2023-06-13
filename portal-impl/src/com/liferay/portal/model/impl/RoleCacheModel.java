@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -33,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing Role in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see Role
  * @generated
  */
 @ProviderType
-public class RoleCacheModel
-	implements CacheModel<Role>, Externalizable, MVCCModel {
-
+public class RoleCacheModel implements CacheModel<Role>, Externalizable,
+	MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,8 +53,7 @@ public class RoleCacheModel
 		RoleCacheModel roleCacheModel = (RoleCacheModel)obj;
 
 		if ((roleId == roleCacheModel.roleId) &&
-			(mvccVersion == roleCacheModel.mvccVersion)) {
-
+				(mvccVersion == roleCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -218,7 +218,8 @@ public class RoleCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		if (uuid == null) {
@@ -294,5 +295,4 @@ public class RoleCacheModel
 	public String description;
 	public int type;
 	public String subtype;
-
 }

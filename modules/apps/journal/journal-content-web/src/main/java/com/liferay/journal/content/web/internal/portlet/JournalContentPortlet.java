@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -119,8 +120,14 @@ public class JournalContentPortlet extends MVCPortlet {
 				JournalContentWebKeys.JOURNAL_CONTENT_DISPLAY_CONTEXT);
 
 		if (journalContentDisplayContext != null) {
-			article = journalContentDisplayContext.getArticle();
-			articleDisplay = journalContentDisplayContext.getArticleDisplay();
+			try {
+				article = journalContentDisplayContext.getArticle();
+				articleDisplay =
+					journalContentDisplayContext.getArticleDisplay();
+			}
+			catch (PortalException pe) {
+				_log.error("Unable to get journal article", pe);
+			}
 		}
 		else if ((articleGroupId > 0) && Validator.isNotNull(articleId)) {
 			String viewMode = ParamUtil.getString(renderRequest, "viewMode");
@@ -266,6 +273,13 @@ public class JournalContentPortlet extends MVCPortlet {
 
 			super.serveResource(resourceRequest, resourceResponse);
 		}
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.journal.content.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=1.1.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
 	}
 
 	private static final long _CLASS_NAME_ID = PortalUtil.getClassNameId(

@@ -32,18 +32,17 @@ public class HeptaConsumerTest {
 		List<String> list = new ArrayList<>();
 
 		HeptaConsumer<String, String, String, String, String, String, String>
-			heptaConsumer =
-				(string1, string2, string3, string4, string5, string6,
-				 string7) -> {
-
-					list.add(string1);
-					list.add(string2);
-					list.add(string3);
-					list.add(string4);
-					list.add(string5);
-					list.add(string6);
-					list.add(string7);
-				};
+			heptaConsumer = (
+				string1, string2, string3, string4, string5, string6,
+				string7) -> {
+			list.add(string1);
+			list.add(string2);
+			list.add(string3);
+			list.add(string4);
+			list.add(string5);
+			list.add(string6);
+			list.add(string7);
+		};
 
 		heptaConsumer.andThen(
 			heptaConsumer
@@ -59,10 +58,7 @@ public class HeptaConsumerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterThrowsException() {
-		HeptaConsumer.empty(
-		).andThen(
-			null
-		);
+		HeptaConsumer.empty().andThen(null);
 	}
 
 }

@@ -847,6 +847,7 @@ public class PorygonSiteInitializer implements SiteInitializer {
 		Folder folder = _dlAppLocalService.getFolder(
 			serviceContext.getScopeGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, _THEME_NAME);
+		String imageFileName = FileUtil.getShortFileName(url.getPath());
 
 		byte[] bytes = null;
 
@@ -856,8 +857,8 @@ public class PorygonSiteInitializer implements SiteInitializer {
 
 		FileEntry fileEntry = _dlAppLocalService.addFileEntry(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
-			folder.getFolderId(), fileName, null, fileName, StringPool.BLANK,
-			StringPool.BLANK, bytes, serviceContext);
+			folder.getFolderId(), imageFileName, null, imageFileName,
+			StringPool.BLANK, StringPool.BLANK, bytes, serviceContext);
 
 		return fileEntry.getFileEntryId();
 	}

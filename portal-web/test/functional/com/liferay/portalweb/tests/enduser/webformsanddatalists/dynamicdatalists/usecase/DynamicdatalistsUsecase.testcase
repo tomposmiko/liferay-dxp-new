@@ -90,9 +90,9 @@ definition {
 	@priority = "4"
 	test AddListWithXSSWorkflowDefinition {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.uploadDefinition(
@@ -1894,7 +1894,7 @@ definition {
 
 		DDLNavigator.gotoDDLRecordEditViaWorkflow(
 			userName = "userfn userln",
-			workflowStatus = "Pending (Update)"
+			workflowStatus = "PENDING (UPDATE)"
 		);
 
 		User.logoutPG();
@@ -3385,7 +3385,7 @@ definition {
 	@description = "This is a use case for LPS-60155."
 	@priority = "5"
 	test ViewRequiredNestedDocumentsAndMediaField {
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 		property testray.component.names = "Training";
 
 		Navigator.openURL();

@@ -151,10 +151,13 @@ public class FacebookConnectImpl implements FacebookConnect {
 		long companyId, String path, String accessToken, String fields) {
 
 		try {
-			String graphURL = getGraphURL(companyId);
-
 			String url = _http.addParameter(
-				graphURL.concat(path), "access_token", accessToken);
+				getGraphURL(
+					companyId
+				).concat(
+					path
+				),
+				"access_token", accessToken);
 
 			if (Validator.isNotNull(fields)) {
 				url = _http.addParameter(url, "fields", fields);
@@ -240,10 +243,13 @@ public class FacebookConnectImpl implements FacebookConnect {
 		long companyId) {
 
 		try {
-			return _configurationProvider.getConfiguration(
-				FacebookConnectConfiguration.class,
-				new CompanyServiceSettingsLocator(
-					companyId, FacebookConnectConstants.SERVICE_NAME));
+			FacebookConnectConfiguration facebookConnectCompanyServiceSettings =
+				_configurationProvider.getConfiguration(
+					FacebookConnectConfiguration.class,
+					new CompanyServiceSettingsLocator(
+						companyId, FacebookConnectConstants.SERVICE_NAME));
+
+			return facebookConnectCompanyServiceSettings;
 		}
 		catch (ConfigurationException ce) {
 			_log.error("Unable to get Facebook Connect configuration", ce);

@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.service.persistence;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * @author Brian Wing Shun Chan
@@ -24,23 +25,22 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 @ProviderType
 public class UserGroupRoleFinderUtil {
-
-	public static java.util.List<com.liferay.portal.kernel.model.UserGroupRole>
-		findByGroupRoleType(long groupId, int roleType) {
-
+	public static java.util.List<com.liferay.portal.kernel.model.UserGroupRole> findByGroupRoleType(
+		long groupId, int roleType) {
 		return getFinder().findByGroupRoleType(groupId, roleType);
 	}
 
-	public static java.util.List<com.liferay.portal.kernel.model.UserGroupRole>
-		findByUserUserGroupGroupRole(long userId, long groupId) {
-
+	public static java.util.List<com.liferay.portal.kernel.model.UserGroupRole> findByUserUserGroupGroupRole(
+		long userId, long groupId) {
 		return getFinder().findByUserUserGroupGroupRole(userId, groupId);
 	}
 
 	public static UserGroupRoleFinder getFinder() {
 		if (_finder == null) {
-			_finder = (UserGroupRoleFinder)PortalBeanLocatorUtil.locate(
-				UserGroupRoleFinder.class.getName());
+			_finder = (UserGroupRoleFinder)PortalBeanLocatorUtil.locate(UserGroupRoleFinder.class.getName());
+
+			ReferenceRegistry.registerReference(UserGroupRoleFinderUtil.class,
+				"_finder");
 		}
 
 		return _finder;
@@ -48,8 +48,10 @@ public class UserGroupRoleFinderUtil {
 
 	public void setFinder(UserGroupRoleFinder finder) {
 		_finder = finder;
+
+		ReferenceRegistry.registerReference(UserGroupRoleFinderUtil.class,
+			"_finder");
 	}
 
 	private static UserGroupRoleFinder _finder;
-
 }

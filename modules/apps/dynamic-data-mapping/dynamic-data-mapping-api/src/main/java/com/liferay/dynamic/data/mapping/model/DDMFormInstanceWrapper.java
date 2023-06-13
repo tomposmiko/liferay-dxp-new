@@ -16,17 +16,14 @@ package com.liferay.dynamic.data.mapping.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
 
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -38,21 +35,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class DDMFormInstanceWrapper
+public class DDMFormInstanceWrapper extends BaseModelWrapper<DDMFormInstance>
 	implements DDMFormInstance, ModelWrapper<DDMFormInstance> {
-
 	public DDMFormInstanceWrapper(DDMFormInstance ddmFormInstance) {
-		_ddmFormInstance = ddmFormInstance;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return DDMFormInstance.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return DDMFormInstance.class.getName();
+		super(ddmFormInstance);
 	}
 
 	@Override
@@ -179,838 +165,690 @@ public class DDMFormInstanceWrapper
 	}
 
 	@Override
-	public Object clone() {
-		return new DDMFormInstanceWrapper(
-			(DDMFormInstance)_ddmFormInstance.clone());
-	}
-
-	@Override
-	public int compareTo(DDMFormInstance ddmFormInstance) {
-		return _ddmFormInstance.compareTo(ddmFormInstance);
-	}
-
-	@Override
 	public String[] getAvailableLanguageIds() {
-		return _ddmFormInstance.getAvailableLanguageIds();
+		return model.getAvailableLanguageIds();
 	}
 
 	/**
-	 * Returns the company ID of this ddm form instance.
-	 *
-	 * @return the company ID of this ddm form instance
-	 */
+	* Returns the company ID of this ddm form instance.
+	*
+	* @return the company ID of this ddm form instance
+	*/
 	@Override
 	public long getCompanyId() {
-		return _ddmFormInstance.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the create date of this ddm form instance.
-	 *
-	 * @return the create date of this ddm form instance
-	 */
+	* Returns the create date of this ddm form instance.
+	*
+	* @return the create date of this ddm form instance
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _ddmFormInstance.getCreateDate();
+		return model.getCreateDate();
+	}
+
+	@Override
+	public DDMForm getDDMForm()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return model.getDDMForm();
 	}
 
 	@Override
 	public String getDefaultLanguageId() {
-		return _ddmFormInstance.getDefaultLanguageId();
+		return model.getDefaultLanguageId();
 	}
 
 	/**
-	 * Returns the description of this ddm form instance.
-	 *
-	 * @return the description of this ddm form instance
-	 */
+	* Returns the description of this ddm form instance.
+	*
+	* @return the description of this ddm form instance
+	*/
 	@Override
 	public String getDescription() {
-		return _ddmFormInstance.getDescription();
+		return model.getDescription();
 	}
 
 	/**
-	 * Returns the localized description of this ddm form instance in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the locale of the language
-	 * @return the localized description of this ddm form instance
-	 */
+	* Returns the localized description of this ddm form instance in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized description of this ddm form instance
+	*/
 	@Override
 	public String getDescription(java.util.Locale locale) {
-		return _ddmFormInstance.getDescription(locale);
+		return model.getDescription(locale);
 	}
 
 	/**
-	 * Returns the localized description of this ddm form instance in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the local of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this ddm form instance. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	 */
+	* Returns the localized description of this ddm form instance in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this ddm form instance. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
 	@Override
 	public String getDescription(java.util.Locale locale, boolean useDefault) {
-		return _ddmFormInstance.getDescription(locale, useDefault);
+		return model.getDescription(locale, useDefault);
 	}
 
 	/**
-	 * Returns the localized description of this ddm form instance in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @return the localized description of this ddm form instance
-	 */
+	* Returns the localized description of this ddm form instance in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @return the localized description of this ddm form instance
+	*/
 	@Override
 	public String getDescription(String languageId) {
-		return _ddmFormInstance.getDescription(languageId);
+		return model.getDescription(languageId);
 	}
 
 	/**
-	 * Returns the localized description of this ddm form instance in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this ddm form instance
-	 */
+	* Returns the localized description of this ddm form instance in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this ddm form instance
+	*/
 	@Override
 	public String getDescription(String languageId, boolean useDefault) {
-		return _ddmFormInstance.getDescription(languageId, useDefault);
+		return model.getDescription(languageId, useDefault);
 	}
 
 	@Override
 	public String getDescriptionCurrentLanguageId() {
-		return _ddmFormInstance.getDescriptionCurrentLanguageId();
+		return model.getDescriptionCurrentLanguageId();
 	}
 
 	@Override
 	public String getDescriptionCurrentValue() {
-		return _ddmFormInstance.getDescriptionCurrentValue();
+		return model.getDescriptionCurrentValue();
 	}
 
 	/**
-	 * Returns a map of the locales and localized descriptions of this ddm form instance.
-	 *
-	 * @return the locales and localized descriptions of this ddm form instance
-	 */
+	* Returns a map of the locales and localized descriptions of this ddm form instance.
+	*
+	* @return the locales and localized descriptions of this ddm form instance
+	*/
 	@Override
 	public Map<java.util.Locale, String> getDescriptionMap() {
-		return _ddmFormInstance.getDescriptionMap();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _ddmFormInstance.getExpandoBridge();
+		return model.getDescriptionMap();
 	}
 
 	/**
-	 * Returns the form instance ID of this ddm form instance.
-	 *
-	 * @return the form instance ID of this ddm form instance
-	 */
+	* Returns the form instance ID of this ddm form instance.
+	*
+	* @return the form instance ID of this ddm form instance
+	*/
 	@Override
 	public long getFormInstanceId() {
-		return _ddmFormInstance.getFormInstanceId();
+		return model.getFormInstanceId();
 	}
 
 	@Override
 	public java.util.List<DDMFormInstanceRecord> getFormInstanceRecords() {
-		return _ddmFormInstance.getFormInstanceRecords();
+		return model.getFormInstanceRecords();
 	}
 
 	@Override
 	public DDMFormInstanceVersion getFormInstanceVersion(String version)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddmFormInstance.getFormInstanceVersion(version);
+		return model.getFormInstanceVersion(version);
 	}
 
 	/**
-	 * Returns the group ID of this ddm form instance.
-	 *
-	 * @return the group ID of this ddm form instance
-	 */
+	* Returns the group ID of this ddm form instance.
+	*
+	* @return the group ID of this ddm form instance
+	*/
 	@Override
 	public long getGroupId() {
-		return _ddmFormInstance.getGroupId();
+		return model.getGroupId();
 	}
 
 	/**
-	 * Returns the last publish date of this ddm form instance.
-	 *
-	 * @return the last publish date of this ddm form instance
-	 */
+	* Returns the last publish date of this ddm form instance.
+	*
+	* @return the last publish date of this ddm form instance
+	*/
 	@Override
 	public Date getLastPublishDate() {
-		return _ddmFormInstance.getLastPublishDate();
+		return model.getLastPublishDate();
 	}
 
 	/**
-	 * Returns the modified date of this ddm form instance.
-	 *
-	 * @return the modified date of this ddm form instance
-	 */
+	* Returns the modified date of this ddm form instance.
+	*
+	* @return the modified date of this ddm form instance
+	*/
 	@Override
 	public Date getModifiedDate() {
-		return _ddmFormInstance.getModifiedDate();
+		return model.getModifiedDate();
 	}
 
 	/**
-	 * Returns the name of this ddm form instance.
-	 *
-	 * @return the name of this ddm form instance
-	 */
+	* Returns the name of this ddm form instance.
+	*
+	* @return the name of this ddm form instance
+	*/
 	@Override
 	public String getName() {
-		return _ddmFormInstance.getName();
+		return model.getName();
 	}
 
 	/**
-	 * Returns the localized name of this ddm form instance in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the locale of the language
-	 * @return the localized name of this ddm form instance
-	 */
+	* Returns the localized name of this ddm form instance in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized name of this ddm form instance
+	*/
 	@Override
 	public String getName(java.util.Locale locale) {
-		return _ddmFormInstance.getName(locale);
+		return model.getName(locale);
 	}
 
 	/**
-	 * Returns the localized name of this ddm form instance in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the local of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized name of this ddm form instance. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	 */
+	* Returns the localized name of this ddm form instance in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized name of this ddm form instance. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
 	@Override
 	public String getName(java.util.Locale locale, boolean useDefault) {
-		return _ddmFormInstance.getName(locale, useDefault);
+		return model.getName(locale, useDefault);
 	}
 
 	/**
-	 * Returns the localized name of this ddm form instance in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @return the localized name of this ddm form instance
-	 */
+	* Returns the localized name of this ddm form instance in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @return the localized name of this ddm form instance
+	*/
 	@Override
 	public String getName(String languageId) {
-		return _ddmFormInstance.getName(languageId);
+		return model.getName(languageId);
 	}
 
 	/**
-	 * Returns the localized name of this ddm form instance in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized name of this ddm form instance
-	 */
+	* Returns the localized name of this ddm form instance in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized name of this ddm form instance
+	*/
 	@Override
 	public String getName(String languageId, boolean useDefault) {
-		return _ddmFormInstance.getName(languageId, useDefault);
+		return model.getName(languageId, useDefault);
 	}
 
 	@Override
 	public String getNameCurrentLanguageId() {
-		return _ddmFormInstance.getNameCurrentLanguageId();
+		return model.getNameCurrentLanguageId();
 	}
 
 	@Override
 	public String getNameCurrentValue() {
-		return _ddmFormInstance.getNameCurrentValue();
+		return model.getNameCurrentValue();
 	}
 
 	/**
-	 * Returns a map of the locales and localized names of this ddm form instance.
-	 *
-	 * @return the locales and localized names of this ddm form instance
-	 */
+	* Returns a map of the locales and localized names of this ddm form instance.
+	*
+	* @return the locales and localized names of this ddm form instance
+	*/
 	@Override
 	public Map<java.util.Locale, String> getNameMap() {
-		return _ddmFormInstance.getNameMap();
+		return model.getNameMap();
 	}
 
 	/**
-	 * Returns the primary key of this ddm form instance.
-	 *
-	 * @return the primary key of this ddm form instance
-	 */
+	* Returns the primary key of this ddm form instance.
+	*
+	* @return the primary key of this ddm form instance
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _ddmFormInstance.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _ddmFormInstance.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the settings of this ddm form instance.
-	 *
-	 * @return the settings of this ddm form instance
-	 */
+	* Returns the settings of this ddm form instance.
+	*
+	* @return the settings of this ddm form instance
+	*/
 	@Override
 	public String getSettings() {
-		return _ddmFormInstance.getSettings();
+		return model.getSettings();
 	}
 
 	@Override
-	public com.liferay.dynamic.data.mapping.storage.DDMFormValues
-			getSettingsDDMFormValues()
+	public com.liferay.dynamic.data.mapping.storage.DDMFormValues getSettingsDDMFormValues()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddmFormInstance.getSettingsDDMFormValues();
+		return model.getSettingsDDMFormValues();
 	}
 
 	@Override
 	public DDMFormInstanceSettings getSettingsModel()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddmFormInstance.getSettingsModel();
+		return model.getSettingsModel();
 	}
 
 	@Override
 	public DDMStructure getStructure()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddmFormInstance.getStructure();
+		return model.getStructure();
 	}
 
 	/**
-	 * Returns the structure ID of this ddm form instance.
-	 *
-	 * @return the structure ID of this ddm form instance
-	 */
+	* Returns the structure ID of this ddm form instance.
+	*
+	* @return the structure ID of this ddm form instance
+	*/
 	@Override
 	public long getStructureId() {
-		return _ddmFormInstance.getStructureId();
+		return model.getStructureId();
 	}
 
 	/**
-	 * Returns the user ID of this ddm form instance.
-	 *
-	 * @return the user ID of this ddm form instance
-	 */
+	* Returns the user ID of this ddm form instance.
+	*
+	* @return the user ID of this ddm form instance
+	*/
 	@Override
 	public long getUserId() {
-		return _ddmFormInstance.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this ddm form instance.
-	 *
-	 * @return the user name of this ddm form instance
-	 */
+	* Returns the user name of this ddm form instance.
+	*
+	* @return the user name of this ddm form instance
+	*/
 	@Override
 	public String getUserName() {
-		return _ddmFormInstance.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this ddm form instance.
-	 *
-	 * @return the user uuid of this ddm form instance
-	 */
+	* Returns the user uuid of this ddm form instance.
+	*
+	* @return the user uuid of this ddm form instance
+	*/
 	@Override
 	public String getUserUuid() {
-		return _ddmFormInstance.getUserUuid();
+		return model.getUserUuid();
 	}
 
 	/**
-	 * Returns the uuid of this ddm form instance.
-	 *
-	 * @return the uuid of this ddm form instance
-	 */
+	* Returns the uuid of this ddm form instance.
+	*
+	* @return the uuid of this ddm form instance
+	*/
 	@Override
 	public String getUuid() {
-		return _ddmFormInstance.getUuid();
+		return model.getUuid();
 	}
 
 	/**
-	 * Returns the version of this ddm form instance.
-	 *
-	 * @return the version of this ddm form instance
-	 */
+	* Returns the version of this ddm form instance.
+	*
+	* @return the version of this ddm form instance
+	*/
 	@Override
 	public String getVersion() {
-		return _ddmFormInstance.getVersion();
+		return model.getVersion();
 	}
 
 	/**
-	 * Returns the version user ID of this ddm form instance.
-	 *
-	 * @return the version user ID of this ddm form instance
-	 */
+	* Returns the version user ID of this ddm form instance.
+	*
+	* @return the version user ID of this ddm form instance
+	*/
 	@Override
 	public long getVersionUserId() {
-		return _ddmFormInstance.getVersionUserId();
+		return model.getVersionUserId();
 	}
 
 	/**
-	 * Returns the version user name of this ddm form instance.
-	 *
-	 * @return the version user name of this ddm form instance
-	 */
+	* Returns the version user name of this ddm form instance.
+	*
+	* @return the version user name of this ddm form instance
+	*/
 	@Override
 	public String getVersionUserName() {
-		return _ddmFormInstance.getVersionUserName();
+		return model.getVersionUserName();
 	}
 
 	/**
-	 * Returns the version user uuid of this ddm form instance.
-	 *
-	 * @return the version user uuid of this ddm form instance
-	 */
+	* Returns the version user uuid of this ddm form instance.
+	*
+	* @return the version user uuid of this ddm form instance
+	*/
 	@Override
 	public String getVersionUserUuid() {
-		return _ddmFormInstance.getVersionUserUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _ddmFormInstance.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _ddmFormInstance.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _ddmFormInstance.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _ddmFormInstance.isNew();
+		return model.getVersionUserUuid();
 	}
 
 	@Override
 	public void persist() {
-		_ddmFormInstance.persist();
+		model.persist();
 	}
 
 	@Override
 	public void prepareLocalizedFieldsForImport()
 		throws com.liferay.portal.kernel.exception.LocaleException {
-
-		_ddmFormInstance.prepareLocalizedFieldsForImport();
+		model.prepareLocalizedFieldsForImport();
 	}
 
 	@Override
 	public void prepareLocalizedFieldsForImport(
-			java.util.Locale defaultImportLocale)
+		java.util.Locale defaultImportLocale)
 		throws com.liferay.portal.kernel.exception.LocaleException {
-
-		_ddmFormInstance.prepareLocalizedFieldsForImport(defaultImportLocale);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_ddmFormInstance.setCachedModel(cachedModel);
+		model.prepareLocalizedFieldsForImport(defaultImportLocale);
 	}
 
 	/**
-	 * Sets the company ID of this ddm form instance.
-	 *
-	 * @param companyId the company ID of this ddm form instance
-	 */
+	* Sets the company ID of this ddm form instance.
+	*
+	* @param companyId the company ID of this ddm form instance
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_ddmFormInstance.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this ddm form instance.
-	 *
-	 * @param createDate the create date of this ddm form instance
-	 */
+	* Sets the create date of this ddm form instance.
+	*
+	* @param createDate the create date of this ddm form instance
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_ddmFormInstance.setCreateDate(createDate);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the description of this ddm form instance.
-	 *
-	 * @param description the description of this ddm form instance
-	 */
+	* Sets the description of this ddm form instance.
+	*
+	* @param description the description of this ddm form instance
+	*/
 	@Override
 	public void setDescription(String description) {
-		_ddmFormInstance.setDescription(description);
+		model.setDescription(description);
 	}
 
 	/**
-	 * Sets the localized description of this ddm form instance in the language.
-	 *
-	 * @param description the localized description of this ddm form instance
-	 * @param locale the locale of the language
-	 */
+	* Sets the localized description of this ddm form instance in the language.
+	*
+	* @param description the localized description of this ddm form instance
+	* @param locale the locale of the language
+	*/
 	@Override
 	public void setDescription(String description, java.util.Locale locale) {
-		_ddmFormInstance.setDescription(description, locale);
+		model.setDescription(description, locale);
 	}
 
 	/**
-	 * Sets the localized description of this ddm form instance in the language, and sets the default locale.
-	 *
-	 * @param description the localized description of this ddm form instance
-	 * @param locale the locale of the language
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized description of this ddm form instance in the language, and sets the default locale.
+	*
+	* @param description the localized description of this ddm form instance
+	* @param locale the locale of the language
+	* @param defaultLocale the default locale
+	*/
 	@Override
-	public void setDescription(
-		String description, java.util.Locale locale,
+	public void setDescription(String description, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
-
-		_ddmFormInstance.setDescription(description, locale, defaultLocale);
+		model.setDescription(description, locale, defaultLocale);
 	}
 
 	@Override
 	public void setDescriptionCurrentLanguageId(String languageId) {
-		_ddmFormInstance.setDescriptionCurrentLanguageId(languageId);
+		model.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
-	 * Sets the localized descriptions of this ddm form instance from the map of locales and localized descriptions.
-	 *
-	 * @param descriptionMap the locales and localized descriptions of this ddm form instance
-	 */
+	* Sets the localized descriptions of this ddm form instance from the map of locales and localized descriptions.
+	*
+	* @param descriptionMap the locales and localized descriptions of this ddm form instance
+	*/
 	@Override
-	public void setDescriptionMap(
-		Map<java.util.Locale, String> descriptionMap) {
-
-		_ddmFormInstance.setDescriptionMap(descriptionMap);
+	public void setDescriptionMap(Map<java.util.Locale, String> descriptionMap) {
+		model.setDescriptionMap(descriptionMap);
 	}
 
 	/**
-	 * Sets the localized descriptions of this ddm form instance from the map of locales and localized descriptions, and sets the default locale.
-	 *
-	 * @param descriptionMap the locales and localized descriptions of this ddm form instance
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized descriptions of this ddm form instance from the map of locales and localized descriptions, and sets the default locale.
+	*
+	* @param descriptionMap the locales and localized descriptions of this ddm form instance
+	* @param defaultLocale the default locale
+	*/
 	@Override
 	public void setDescriptionMap(
 		Map<java.util.Locale, String> descriptionMap,
 		java.util.Locale defaultLocale) {
-
-		_ddmFormInstance.setDescriptionMap(descriptionMap, defaultLocale);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_ddmFormInstance.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_ddmFormInstance.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_ddmFormInstance.setExpandoBridgeAttributes(serviceContext);
+		model.setDescriptionMap(descriptionMap, defaultLocale);
 	}
 
 	/**
-	 * Sets the form instance ID of this ddm form instance.
-	 *
-	 * @param formInstanceId the form instance ID of this ddm form instance
-	 */
+	* Sets the form instance ID of this ddm form instance.
+	*
+	* @param formInstanceId the form instance ID of this ddm form instance
+	*/
 	@Override
 	public void setFormInstanceId(long formInstanceId) {
-		_ddmFormInstance.setFormInstanceId(formInstanceId);
+		model.setFormInstanceId(formInstanceId);
 	}
 
 	/**
-	 * Sets the group ID of this ddm form instance.
-	 *
-	 * @param groupId the group ID of this ddm form instance
-	 */
+	* Sets the group ID of this ddm form instance.
+	*
+	* @param groupId the group ID of this ddm form instance
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_ddmFormInstance.setGroupId(groupId);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the last publish date of this ddm form instance.
-	 *
-	 * @param lastPublishDate the last publish date of this ddm form instance
-	 */
+	* Sets the last publish date of this ddm form instance.
+	*
+	* @param lastPublishDate the last publish date of this ddm form instance
+	*/
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
-		_ddmFormInstance.setLastPublishDate(lastPublishDate);
+		model.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	 * Sets the modified date of this ddm form instance.
-	 *
-	 * @param modifiedDate the modified date of this ddm form instance
-	 */
+	* Sets the modified date of this ddm form instance.
+	*
+	* @param modifiedDate the modified date of this ddm form instance
+	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
-		_ddmFormInstance.setModifiedDate(modifiedDate);
+		model.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	 * Sets the name of this ddm form instance.
-	 *
-	 * @param name the name of this ddm form instance
-	 */
+	* Sets the name of this ddm form instance.
+	*
+	* @param name the name of this ddm form instance
+	*/
 	@Override
 	public void setName(String name) {
-		_ddmFormInstance.setName(name);
+		model.setName(name);
 	}
 
 	/**
-	 * Sets the localized name of this ddm form instance in the language.
-	 *
-	 * @param name the localized name of this ddm form instance
-	 * @param locale the locale of the language
-	 */
+	* Sets the localized name of this ddm form instance in the language.
+	*
+	* @param name the localized name of this ddm form instance
+	* @param locale the locale of the language
+	*/
 	@Override
 	public void setName(String name, java.util.Locale locale) {
-		_ddmFormInstance.setName(name, locale);
+		model.setName(name, locale);
 	}
 
 	/**
-	 * Sets the localized name of this ddm form instance in the language, and sets the default locale.
-	 *
-	 * @param name the localized name of this ddm form instance
-	 * @param locale the locale of the language
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized name of this ddm form instance in the language, and sets the default locale.
+	*
+	* @param name the localized name of this ddm form instance
+	* @param locale the locale of the language
+	* @param defaultLocale the default locale
+	*/
 	@Override
-	public void setName(
-		String name, java.util.Locale locale, java.util.Locale defaultLocale) {
-
-		_ddmFormInstance.setName(name, locale, defaultLocale);
+	public void setName(String name, java.util.Locale locale,
+		java.util.Locale defaultLocale) {
+		model.setName(name, locale, defaultLocale);
 	}
 
 	@Override
 	public void setNameCurrentLanguageId(String languageId) {
-		_ddmFormInstance.setNameCurrentLanguageId(languageId);
+		model.setNameCurrentLanguageId(languageId);
 	}
 
 	/**
-	 * Sets the localized names of this ddm form instance from the map of locales and localized names.
-	 *
-	 * @param nameMap the locales and localized names of this ddm form instance
-	 */
+	* Sets the localized names of this ddm form instance from the map of locales and localized names.
+	*
+	* @param nameMap the locales and localized names of this ddm form instance
+	*/
 	@Override
 	public void setNameMap(Map<java.util.Locale, String> nameMap) {
-		_ddmFormInstance.setNameMap(nameMap);
+		model.setNameMap(nameMap);
 	}
 
 	/**
-	 * Sets the localized names of this ddm form instance from the map of locales and localized names, and sets the default locale.
-	 *
-	 * @param nameMap the locales and localized names of this ddm form instance
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized names of this ddm form instance from the map of locales and localized names, and sets the default locale.
+	*
+	* @param nameMap the locales and localized names of this ddm form instance
+	* @param defaultLocale the default locale
+	*/
 	@Override
-	public void setNameMap(
-		Map<java.util.Locale, String> nameMap, java.util.Locale defaultLocale) {
-
-		_ddmFormInstance.setNameMap(nameMap, defaultLocale);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_ddmFormInstance.setNew(n);
+	public void setNameMap(Map<java.util.Locale, String> nameMap,
+		java.util.Locale defaultLocale) {
+		model.setNameMap(nameMap, defaultLocale);
 	}
 
 	/**
-	 * Sets the primary key of this ddm form instance.
-	 *
-	 * @param primaryKey the primary key of this ddm form instance
-	 */
+	* Sets the primary key of this ddm form instance.
+	*
+	* @param primaryKey the primary key of this ddm form instance
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_ddmFormInstance.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_ddmFormInstance.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the settings of this ddm form instance.
-	 *
-	 * @param settings the settings of this ddm form instance
-	 */
+	* Sets the settings of this ddm form instance.
+	*
+	* @param settings the settings of this ddm form instance
+	*/
 	@Override
 	public void setSettings(String settings) {
-		_ddmFormInstance.setSettings(settings);
+		model.setSettings(settings);
 	}
 
 	/**
-	 * Sets the structure ID of this ddm form instance.
-	 *
-	 * @param structureId the structure ID of this ddm form instance
-	 */
+	* Sets the structure ID of this ddm form instance.
+	*
+	* @param structureId the structure ID of this ddm form instance
+	*/
 	@Override
 	public void setStructureId(long structureId) {
-		_ddmFormInstance.setStructureId(structureId);
+		model.setStructureId(structureId);
 	}
 
 	/**
-	 * Sets the user ID of this ddm form instance.
-	 *
-	 * @param userId the user ID of this ddm form instance
-	 */
+	* Sets the user ID of this ddm form instance.
+	*
+	* @param userId the user ID of this ddm form instance
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_ddmFormInstance.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this ddm form instance.
-	 *
-	 * @param userName the user name of this ddm form instance
-	 */
+	* Sets the user name of this ddm form instance.
+	*
+	* @param userName the user name of this ddm form instance
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_ddmFormInstance.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this ddm form instance.
-	 *
-	 * @param userUuid the user uuid of this ddm form instance
-	 */
+	* Sets the user uuid of this ddm form instance.
+	*
+	* @param userUuid the user uuid of this ddm form instance
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_ddmFormInstance.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	/**
-	 * Sets the uuid of this ddm form instance.
-	 *
-	 * @param uuid the uuid of this ddm form instance
-	 */
+	* Sets the uuid of this ddm form instance.
+	*
+	* @param uuid the uuid of this ddm form instance
+	*/
 	@Override
 	public void setUuid(String uuid) {
-		_ddmFormInstance.setUuid(uuid);
+		model.setUuid(uuid);
 	}
 
 	/**
-	 * Sets the version of this ddm form instance.
-	 *
-	 * @param version the version of this ddm form instance
-	 */
+	* Sets the version of this ddm form instance.
+	*
+	* @param version the version of this ddm form instance
+	*/
 	@Override
 	public void setVersion(String version) {
-		_ddmFormInstance.setVersion(version);
+		model.setVersion(version);
 	}
 
 	/**
-	 * Sets the version user ID of this ddm form instance.
-	 *
-	 * @param versionUserId the version user ID of this ddm form instance
-	 */
+	* Sets the version user ID of this ddm form instance.
+	*
+	* @param versionUserId the version user ID of this ddm form instance
+	*/
 	@Override
 	public void setVersionUserId(long versionUserId) {
-		_ddmFormInstance.setVersionUserId(versionUserId);
+		model.setVersionUserId(versionUserId);
 	}
 
 	/**
-	 * Sets the version user name of this ddm form instance.
-	 *
-	 * @param versionUserName the version user name of this ddm form instance
-	 */
+	* Sets the version user name of this ddm form instance.
+	*
+	* @param versionUserName the version user name of this ddm form instance
+	*/
 	@Override
 	public void setVersionUserName(String versionUserName) {
-		_ddmFormInstance.setVersionUserName(versionUserName);
+		model.setVersionUserName(versionUserName);
 	}
 
 	/**
-	 * Sets the version user uuid of this ddm form instance.
-	 *
-	 * @param versionUserUuid the version user uuid of this ddm form instance
-	 */
+	* Sets the version user uuid of this ddm form instance.
+	*
+	* @param versionUserUuid the version user uuid of this ddm form instance
+	*/
 	@Override
 	public void setVersionUserUuid(String versionUserUuid) {
-		_ddmFormInstance.setVersionUserUuid(versionUserUuid);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.CacheModel<DDMFormInstance>
-		toCacheModel() {
-
-		return _ddmFormInstance.toCacheModel();
-	}
-
-	@Override
-	public DDMFormInstance toEscapedModel() {
-		return new DDMFormInstanceWrapper(_ddmFormInstance.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _ddmFormInstance.toString();
-	}
-
-	@Override
-	public DDMFormInstance toUnescapedModel() {
-		return new DDMFormInstanceWrapper(_ddmFormInstance.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _ddmFormInstance.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof DDMFormInstanceWrapper)) {
-			return false;
-		}
-
-		DDMFormInstanceWrapper ddmFormInstanceWrapper =
-			(DDMFormInstanceWrapper)obj;
-
-		if (Objects.equals(
-				_ddmFormInstance, ddmFormInstanceWrapper._ddmFormInstance)) {
-
-			return true;
-		}
-
-		return false;
+		model.setVersionUserUuid(versionUserUuid);
 	}
 
 	@Override
 	public StagedModelType getStagedModelType() {
-		return _ddmFormInstance.getStagedModelType();
+		return model.getStagedModelType();
 	}
 
 	@Override
-	public DDMFormInstance getWrappedModel() {
-		return _ddmFormInstance;
+	protected DDMFormInstanceWrapper wrap(DDMFormInstance ddmFormInstance) {
+		return new DDMFormInstanceWrapper(ddmFormInstance);
 	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _ddmFormInstance.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _ddmFormInstance.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_ddmFormInstance.resetOriginalValues();
-	}
-
-	private final DDMFormInstance _ddmFormInstance;
-
 }

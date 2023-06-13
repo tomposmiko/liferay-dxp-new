@@ -1,0 +1,3 @@
+apiDir: "../headless-document-library-api/src/main/java"
+apiPackagePath: "com.liferay.headless.document.library"
+author: "Javier Gamarra"

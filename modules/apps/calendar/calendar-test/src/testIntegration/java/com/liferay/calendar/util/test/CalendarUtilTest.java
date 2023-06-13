@@ -325,10 +325,13 @@ public class CalendarUtilTest {
 			CalendarBookingTestUtil.addDailyRecurringCalendarBooking(
 				_user, serviceContext);
 
-		return CalendarBookingTestUtil.
-			updateCalendarBookingInstanceAndAllFollowing(
-				calendarBooking, 2, RandomTestUtil.randomLocaleStringMap(),
-				serviceContext);
+		CalendarBooking calendarBookingInstance =
+			CalendarBookingTestUtil.
+				updateCalendarBookingInstanceAndAllFollowing(
+					calendarBooking, 2, RandomTestUtil.randomLocaleStringMap(),
+					serviceContext);
+
+		return calendarBookingInstance;
 	}
 
 	protected CalendarBooking getCalendarBookingChildSingleInstance()
@@ -340,9 +343,12 @@ public class CalendarUtilTest {
 			CalendarBookingTestUtil.addDailyRecurringCalendarBooking(
 				_user, serviceContext);
 
-		return CalendarBookingTestUtil.updateCalendarBookingInstance(
-			calendarBooking, 2, RandomTestUtil.randomLocaleStringMap(),
-			serviceContext);
+		CalendarBooking calendarBookingInstance =
+			CalendarBookingTestUtil.updateCalendarBookingInstance(
+				calendarBooking, 2, RandomTestUtil.randomLocaleStringMap(),
+				serviceContext);
+
+		return calendarBookingInstance;
 	}
 
 	protected Set<Long> getCalendarBookingIds(JSONArray jsonArray) {

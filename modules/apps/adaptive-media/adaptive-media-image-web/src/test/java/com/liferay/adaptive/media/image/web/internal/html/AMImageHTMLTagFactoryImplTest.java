@@ -21,7 +21,6 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 
 import java.util.Arrays;
@@ -44,8 +43,7 @@ public class AMImageHTMLTagFactoryImplTest {
 
 	@Before
 	public void setUp() throws PortalException {
-		ReflectionTestUtil.setFieldValue(
-			_amImageHTMLTagFactory, "_mediaQueryProvider", _mediaQueryProvider);
+		_amImageHTMLTagFactory.setMediaQueryProvider(_mediaQueryProvider);
 
 		Mockito.when(
 			_fileEntry.getFileEntryId()

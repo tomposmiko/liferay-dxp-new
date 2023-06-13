@@ -14,26 +14,13 @@
 
 package com.liferay.layout.type.controller.asset.display.internal.controller;
 
-import com.liferay.asset.display.contributor.constants.AssetDisplayWebKeys;
-import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
-import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
-import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
-import com.liferay.asset.kernel.model.AssetEntry;
-import com.liferay.fragment.model.FragmentEntryLink;
-import com.liferay.fragment.service.FragmentEntryLinkLocalService;
-import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
-import com.liferay.layout.type.controller.asset.display.internal.constants.AssetDisplayLayoutTypeControllerConstants;
-import com.liferay.layout.type.controller.asset.display.internal.constants.AssetDisplayLayoutTypeControllerWebKeys;
+import com.liferay.layout.constants.LayoutConstants;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.model.impl.BaseLayoutTypeControllerImpl;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.taglib.servlet.PipingServletResponse;
-
-import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletResponse;
@@ -48,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	property = "layout.type=" + AssetDisplayLayoutTypeControllerConstants.LAYOUT_TYPE_ASSET_DISPLAY,
+	property = "layout.type=" + LayoutConstants.LAYOUT_TYPE_ASSET_DISPLAY,
 	service = LayoutTypeController.class
 )
 public class AssetDisplayLayoutTypeController
@@ -65,31 +52,12 @@ public class AssetDisplayLayoutTypeController
 	}
 
 	@Override
-	public boolean includeLayoutContent(
+	public String includeEditContent(
 			HttpServletRequest request, HttpServletResponse response,
 			Layout layout)
 		throws Exception {
 
-		AssetEntry assetEntry = (AssetEntry)request.getAttribute(
-			AssetDisplayWebKeys.ASSET_ENTRY);
-
-		if (assetEntry != null) {
-			long layoutPageTemplateEntryId = _getLayoutPageTemplateEntryId(
-				layout.getGroupId(), assetEntry);
-
-			List<FragmentEntryLink> fragmentEntryLinks =
-				_fragmentEntryLinkLocalService.getFragmentEntryLinks(
-					layout.getGroupId(),
-					_portal.getClassNameId(
-						LayoutPageTemplateEntry.class.getName()),
-					layoutPageTemplateEntryId);
-
-			request.setAttribute(
-				AssetDisplayLayoutTypeControllerWebKeys.LAYOUT_FRAGMENTS,
-				fragmentEntryLinks);
-		}
-
-		return super.includeLayoutContent(request, response, layout);
+		return StringPool.BLANK;
 	}
 
 	@Override
@@ -147,57 +115,10 @@ public class AssetDisplayLayoutTypeController
 		this.servletContext = servletContext;
 	}
 
-	private long _getLayoutPageTemplateEntryId(
-		long groupId, AssetEntry assetEntry) {
-
-		AssetDisplayPageEntry assetDisplayPageEntry =
-			_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
-				assetEntry.getGroupId(), assetEntry.getClassNameId(),
-				assetEntry.getClassPK());
-
-		if ((assetDisplayPageEntry == null) ||
-			(assetDisplayPageEntry.getType() ==
-				AssetDisplayPageConstants.TYPE_NONE)) {
-
-			return 0;
-		}
-
-		if (assetDisplayPageEntry.getType() ==
-				AssetDisplayPageConstants.TYPE_SPECIFIC) {
-
-			return assetDisplayPageEntry.getLayoutPageTemplateEntryId();
-		}
-
-		LayoutPageTemplateEntry defaultLayoutPageTemplateEntry =
-			_layoutPageTemplateEntryService.fetchDefaultLayoutPageTemplateEntry(
-				groupId, assetEntry.getClassNameId(),
-				assetEntry.getClassTypeId());
-
-		if (defaultLayoutPageTemplateEntry != null) {
-			return defaultLayoutPageTemplateEntry.
-				getLayoutPageTemplateEntryId();
-		}
-
-		return 0;
-	}
-
 	private static final String _URL =
 		"${liferay:mainPath}/portal/layout?p_l_id=${liferay:plid}" +
 			"&p_v_l_s_g_id=${liferay:pvlsgid}";
 
 	private static final String _VIEW_PAGE = "/layout/view/asset_display.jsp";
-
-	@Reference
-	private AssetDisplayPageEntryLocalService
-		_assetDisplayPageEntryLocalService;
-
-	@Reference
-	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
-
-	@Reference
-	private LayoutPageTemplateEntryService _layoutPageTemplateEntryService;
-
-	@Reference
-	private Portal _portal;
 
 }

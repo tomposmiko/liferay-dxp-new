@@ -175,28 +175,9 @@ public class WorkflowInstanceManagerImpl implements WorkflowInstanceManager {
 			end, orderByComparator, serviceContext);
 	}
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link #search(long, Long,
-	 *             String, String, String, String, String, Boolean, int, int,
-	 *             OrderByComparator)}
-	 */
-	@Deprecated
 	@Override
 	public List<WorkflowInstance> search(
 			long companyId, Long userId, String assetType, String nodeName,
-			String kaleoDefinitionName, Boolean completed, int start, int end,
-			OrderByComparator<WorkflowInstance> orderByComparator)
-		throws WorkflowException {
-
-		return search(
-			companyId, userId, assetType, null, null, nodeName,
-			kaleoDefinitionName, completed, start, end, orderByComparator);
-	}
-
-	@Override
-	public List<WorkflowInstance> search(
-			long companyId, Long userId, String assetClassName,
-			String assetTitle, String assetDescription, String nodeName,
 			String kaleoDefinitionName, Boolean completed, int start, int end,
 			OrderByComparator<WorkflowInstance> orderByComparator)
 		throws WorkflowException {
@@ -206,31 +187,13 @@ public class WorkflowInstanceManagerImpl implements WorkflowInstanceManager {
 		serviceContext.setCompanyId(companyId);
 
 		return _workflowEngine.search(
-			userId, assetClassName, assetTitle, assetDescription, nodeName,
-			kaleoDefinitionName, completed, start, end, orderByComparator,
-			serviceContext);
+			userId, assetType, nodeName, kaleoDefinitionName, completed, start,
+			end, orderByComparator, serviceContext);
 	}
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link #searchCount(long,
-	 *             Long, String, String, String, String, String, Boolean)}
-	 */
-	@Deprecated
 	@Override
 	public int searchCount(
 			long companyId, Long userId, String assetType, String nodeName,
-			String kaleoDefinitionName, Boolean completed)
-		throws WorkflowException {
-
-		return searchCount(
-			companyId, userId, assetType, null, null, nodeName,
-			kaleoDefinitionName, completed);
-	}
-
-	@Override
-	public int searchCount(
-			long companyId, Long userId, String assetClassName,
-			String assetTitle, String assetDescription, String nodeName,
 			String kaleoDefinitionName, Boolean completed)
 		throws WorkflowException {
 
@@ -239,8 +202,8 @@ public class WorkflowInstanceManagerImpl implements WorkflowInstanceManager {
 		serviceContext.setCompanyId(companyId);
 
 		return _workflowEngine.searchCount(
-			userId, assetClassName, assetTitle, assetDescription, nodeName,
-			kaleoDefinitionName, completed, serviceContext);
+			userId, assetType, nodeName, kaleoDefinitionName, completed,
+			serviceContext);
 	}
 
 	@Override

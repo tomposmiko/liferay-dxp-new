@@ -82,10 +82,10 @@ definition {
 		selenium.waitForElementPresent("xpath=(//script)[last()]");
 	}
 
-	function assertTextClickCaseSensitive {
+	function assertTextClickCaseInsensitive {
 		WaitForSPARefresh();
 
-		AssertTextEquals.assertTextCaseSensitive();
+		AssertTextEquals.assertTextCaseInsensitive();
 
 		selenium.mouseOver();
 

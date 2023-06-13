@@ -34,11 +34,10 @@ import com.liferay.changeset.service.ChangesetCollectionLocalServiceUtil;
 @ProviderType
 public abstract class ChangesetCollectionBaseImpl
 	extends ChangesetCollectionModelImpl implements ChangesetCollection {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a changeset collection model instance should use the <code>ChangesetCollection</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a changeset collection model instance should use the {@link ChangesetCollection} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class ChangesetCollectionBaseImpl
 			ChangesetCollectionLocalServiceUtil.updateChangesetCollection(this);
 		}
 	}
-
 }

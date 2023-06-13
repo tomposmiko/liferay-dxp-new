@@ -32,13 +32,12 @@ import com.liferay.mobile.device.rules.service.MDRRuleLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class MDRRuleBaseImpl
-	extends MDRRuleModelImpl implements MDRRule {
-
+public abstract class MDRRuleBaseImpl extends MDRRuleModelImpl
+	implements MDRRule {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a mdr rule model instance should use the <code>MDRRule</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a mdr rule model instance should use the {@link MDRRule} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class MDRRuleBaseImpl
 			MDRRuleLocalServiceUtil.updateMDRRule(this);
 		}
 	}
-
 }

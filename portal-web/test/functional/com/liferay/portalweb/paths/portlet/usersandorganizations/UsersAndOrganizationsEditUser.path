@@ -65,6 +65,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DETAILS_PROFILE_IMAGE</td>
+	<td>//img[contains(@id,'avatar') and contains(@src,'${key_imageName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -224,6 +229,23 @@
 <tr>
 	<td>CUSTOM_FIELDS_SELECT</td>
 	<td>//div[contains(.,'${key_customFieldName}')]/select</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--UPLOAD_IMAGE-->
+<tr>
+	<td>UPLOAD_IMAGE_SELECT</td>
+	<td>//label[@id='uploadImage']</td>
+	<td></td>
+</tr>
+<!--CONTACT-->
+<tr>
+	<td>CONTACT_ADD_BUTTON</td>
+	<td>//a[contains(@class,'btn') and contains(@class,'${key_contactType}')]</td>
 	<td></td>
 </tr>
 </tbody>

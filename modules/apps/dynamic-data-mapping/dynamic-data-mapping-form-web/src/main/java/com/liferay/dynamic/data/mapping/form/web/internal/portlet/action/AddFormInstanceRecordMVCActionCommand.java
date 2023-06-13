@@ -92,14 +92,7 @@ public class AddFormInstanceRecordMVCActionCommand
 		DDMFormInstance ddmFormInstance =
 			_ddmFormInstanceService.getFormInstance(formInstanceId);
 
-		try {
-			validateCaptcha(actionRequest, ddmFormInstance);
-		}
-		catch (CaptchaTextException cte) {
-			SessionErrors.add(actionRequest, cte.getClass());
-
-			return;
-		}
+		validateCaptcha(actionRequest, ddmFormInstance);
 
 		DDMForm ddmForm = getDDMForm(ddmFormInstance);
 
@@ -204,7 +197,15 @@ public class AddFormInstanceRecordMVCActionCommand
 			ddmFormInstance.getSettingsModel();
 
 		if (formInstanceSettings.requireCaptcha()) {
-			CaptchaUtil.check(actionRequest);
+			try {
+				CaptchaUtil.check(actionRequest);
+			}
+			catch (CaptchaTextException cte) {
+				SessionErrors.add(
+					actionRequest, CaptchaTextException.class.getName());
+
+				throw cte;
+			}
 		}
 	}
 

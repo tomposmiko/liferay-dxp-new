@@ -205,6 +205,22 @@ public class ImageToolImpl implements ImageTool {
 				"Unable to configure the default user male portrait: " +
 					e.getMessage());
 		}
+
+		try {
+			InputStream is = classLoader.getResourceAsStream(
+				PropsUtil.get(PropsKeys.IMAGE_DEFAULT_USER_PORTRAIT));
+
+			if (is == null) {
+				_log.error("Default user portrait is not available");
+			}
+
+			_defaultUserPortrait = getImage(is);
+		}
+		catch (Exception e) {
+			_log.error(
+				"Unable to configure the default user portrait: " +
+					e.getMessage());
+		}
 	}
 
 	@Override
@@ -472,6 +488,11 @@ public class ImageToolImpl implements ImageTool {
 	}
 
 	@Override
+	public Image getDefaultUserPortrait() {
+		return _defaultUserPortrait;
+	}
+
+	@Override
 	public Image getImage(byte[] bytes)
 		throws ImageResolutionException, IOException {
 
@@ -680,7 +701,7 @@ public class ImageToolImpl implements ImageTool {
 		affineTransform.translate(
 			rotatedImageWidth / 2, rotatedImageHeight / 2);
 		affineTransform.rotate(radians);
-		affineTransform.translate(imageWidth / -2, imageHeight / -2);
+		affineTransform.translate(imageWidth / (-2), imageHeight / (-2));
 
 		Graphics2D graphics2D = rotatedBufferedImage.createGraphics();
 
@@ -781,16 +802,6 @@ public class ImageToolImpl implements ImageTool {
 			((scaledWidth * 2) >= originalWidth)) {
 
 			Graphics2D scaledGraphics2D = scaledBufferedImage.createGraphics();
-
-			scaledGraphics2D.setRenderingHint(
-				RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-			scaledGraphics2D.setRenderingHint(
-				RenderingHints.KEY_INTERPOLATION,
-				RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			scaledGraphics2D.setRenderingHint(
-				RenderingHints.KEY_RENDERING,
-				RenderingHints.VALUE_RENDER_QUALITY);
 
 			scaledGraphics2D.drawImage(
 				originalBufferedImage, 0, 0, scaledWidth, scaledHeight, null);
@@ -951,5 +962,6 @@ public class ImageToolImpl implements ImageTool {
 	private Image _defaultSpacer;
 	private Image _defaultUserFemalePortrait;
 	private Image _defaultUserMalePortrait;
+	private Image _defaultUserPortrait;
 
 }

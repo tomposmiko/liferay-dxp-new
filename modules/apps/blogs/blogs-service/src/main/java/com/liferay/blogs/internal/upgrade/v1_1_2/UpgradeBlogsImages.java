@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,9 +56,9 @@ public class UpgradeBlogsImages extends UpgradeProcess {
 	protected void doUpgrade() throws Exception {
 		try (PreparedStatement ps1 = connection.prepareStatement(
 				SQLTransformer.transform(
-					"select entryId, groupId, companyId, userId, " +
-						"smallImageId from BlogsEntry where smallImage = " +
-							"[$TRUE$] and smallImageId != 0"));
+					"select entryId, groupId, smallImageId, userId from " +
+						"BlogsEntry where smallImage = [$TRUE$] and " +
+							"smallImageId != 0"));
 			PreparedStatement ps2 = AutoBatchPreparedStatementUtil.autoBatch(
 				connection.prepareStatement(
 					"update BlogsEntry set smallImageFileEntryId = ?, " +
@@ -77,11 +76,7 @@ public class UpgradeBlogsImages extends UpgradeProcess {
 
 				long entryId = rs.getLong("entryId");
 				long groupId = rs.getLong("groupId");
-
-				long companyId = rs.getLong("companyId");
-
-				long userId = PortalUtil.getValidUserId(
-					companyId, rs.getLong("userId"));
+				long userId = rs.getLong("userId");
 
 				byte[] bytes = smallImage.getTextObj();
 

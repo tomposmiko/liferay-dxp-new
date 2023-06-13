@@ -15,11 +15,9 @@
 package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.search;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
 
@@ -42,7 +40,7 @@ public class SearchSearchRequestExecutorImpl
 	public SearchSearchResponse execute(
 		SearchSearchRequest searchSearchRequest) {
 
-		Client client = elasticsearchConnectionManager.getClient();
+		Client client = elasticsearchClientResolver.getClient();
 
 		SearchRequestBuilder searchRequestBuilder =
 			SearchAction.INSTANCE.newRequestBuilder(client);
@@ -54,15 +52,9 @@ public class SearchSearchRequestExecutorImpl
 
 		SearchSearchResponse searchSearchResponse = new SearchSearchResponse();
 
-		String searchRequestBuilderString = searchRequestBuilder.toString();
-
-		searchRequestBuilderString = StringUtil.replace(
-			searchRequestBuilderString, ZERO_TERMS_QUERY_STRING,
-			StringPool.BLANK);
-
 		searchSearchResponseAssembler.assemble(
-			searchResponse, searchSearchResponse, searchSearchRequest,
-			searchRequestBuilderString);
+			searchRequestBuilder, searchResponse, searchSearchRequest,
+			searchSearchResponse);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -75,11 +67,8 @@ public class SearchSearchRequestExecutorImpl
 		return searchSearchResponse;
 	}
 
-	protected static final String ZERO_TERMS_QUERY_STRING =
-		",\"zero_terms_query\":\"NONE\"";
-
 	@Reference
-	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
+	protected ElasticsearchClientResolver elasticsearchClientResolver;
 
 	@Reference
 	protected SearchSearchRequestAssembler searchSearchRequestAssembler;

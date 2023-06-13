@@ -16,17 +16,14 @@ package com.liferay.marketplace.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
 
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -38,20 +35,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class AppWrapper implements App, ModelWrapper<App> {
-
+public class AppWrapper extends BaseModelWrapper<App> implements App,
+	ModelWrapper<App> {
 	public AppWrapper(App app) {
-		_app = app;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return App.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return App.class.getName();
+		super(app);
 	}
 
 	@Override
@@ -165,517 +152,382 @@ public class AppWrapper implements App, ModelWrapper<App> {
 
 	@Override
 	public String[] addContextName(String contextName) {
-		return _app.addContextName(contextName);
-	}
-
-	@Override
-	public Object clone() {
-		return new AppWrapper((App)_app.clone());
-	}
-
-	@Override
-	public int compareTo(App app) {
-		return _app.compareTo(app);
+		return model.addContextName(contextName);
 	}
 
 	/**
-	 * Returns the app ID of this app.
-	 *
-	 * @return the app ID of this app
-	 */
+	* Returns the app ID of this app.
+	*
+	* @return the app ID of this app
+	*/
 	@Override
 	public long getAppId() {
-		return _app.getAppId();
+		return model.getAppId();
 	}
 
 	/**
-	 * Returns the category of this app.
-	 *
-	 * @return the category of this app
-	 */
+	* Returns the category of this app.
+	*
+	* @return the category of this app
+	*/
 	@Override
 	public String getCategory() {
-		return _app.getCategory();
+		return model.getCategory();
 	}
 
 	/**
-	 * Returns the company ID of this app.
-	 *
-	 * @return the company ID of this app
-	 */
+	* Returns the company ID of this app.
+	*
+	* @return the company ID of this app
+	*/
 	@Override
 	public long getCompanyId() {
-		return _app.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	@Override
 	public String[] getContextNames() {
-		return _app.getContextNames();
+		return model.getContextNames();
 	}
 
 	/**
-	 * Returns the create date of this app.
-	 *
-	 * @return the create date of this app
-	 */
+	* Returns the create date of this app.
+	*
+	* @return the create date of this app
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _app.getCreateDate();
+		return model.getCreateDate();
 	}
 
 	/**
-	 * Returns the description of this app.
-	 *
-	 * @return the description of this app
-	 */
+	* Returns the description of this app.
+	*
+	* @return the description of this app
+	*/
 	@Override
 	public String getDescription() {
-		return _app.getDescription();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _app.getExpandoBridge();
+		return model.getDescription();
 	}
 
 	@Override
 	public String getFileDir() {
-		return _app.getFileDir();
+		return model.getFileDir();
 	}
 
 	@Override
 	public String getFileName() {
-		return _app.getFileName();
+		return model.getFileName();
 	}
 
 	@Override
 	public String getFilePath() {
-		return _app.getFilePath();
+		return model.getFilePath();
 	}
 
 	/**
-	 * Returns the icon url of this app.
-	 *
-	 * @return the icon url of this app
-	 */
+	* Returns the icon url of this app.
+	*
+	* @return the icon url of this app
+	*/
 	@Override
 	public String getIconURL() {
-		return _app.getIconURL();
+		return model.getIconURL();
 	}
 
 	/**
-	 * Returns the modified date of this app.
-	 *
-	 * @return the modified date of this app
-	 */
+	* Returns the modified date of this app.
+	*
+	* @return the modified date of this app
+	*/
 	@Override
 	public Date getModifiedDate() {
-		return _app.getModifiedDate();
+		return model.getModifiedDate();
 	}
 
 	/**
-	 * Returns the primary key of this app.
-	 *
-	 * @return the primary key of this app
-	 */
+	* Returns the primary key of this app.
+	*
+	* @return the primary key of this app
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _app.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _app.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the remote app ID of this app.
-	 *
-	 * @return the remote app ID of this app
-	 */
+	* Returns the remote app ID of this app.
+	*
+	* @return the remote app ID of this app
+	*/
 	@Override
 	public long getRemoteAppId() {
-		return _app.getRemoteAppId();
+		return model.getRemoteAppId();
 	}
 
 	/**
-	 * Returns the required of this app.
-	 *
-	 * @return the required of this app
-	 */
+	* Returns the required of this app.
+	*
+	* @return the required of this app
+	*/
 	@Override
 	public boolean getRequired() {
-		return _app.getRequired();
+		return model.getRequired();
 	}
 
 	/**
-	 * Returns the title of this app.
-	 *
-	 * @return the title of this app
-	 */
+	* Returns the title of this app.
+	*
+	* @return the title of this app
+	*/
 	@Override
 	public String getTitle() {
-		return _app.getTitle();
+		return model.getTitle();
 	}
 
 	/**
-	 * Returns the user ID of this app.
-	 *
-	 * @return the user ID of this app
-	 */
+	* Returns the user ID of this app.
+	*
+	* @return the user ID of this app
+	*/
 	@Override
 	public long getUserId() {
-		return _app.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this app.
-	 *
-	 * @return the user name of this app
-	 */
+	* Returns the user name of this app.
+	*
+	* @return the user name of this app
+	*/
 	@Override
 	public String getUserName() {
-		return _app.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this app.
-	 *
-	 * @return the user uuid of this app
-	 */
+	* Returns the user uuid of this app.
+	*
+	* @return the user uuid of this app
+	*/
 	@Override
 	public String getUserUuid() {
-		return _app.getUserUuid();
+		return model.getUserUuid();
 	}
 
 	/**
-	 * Returns the uuid of this app.
-	 *
-	 * @return the uuid of this app
-	 */
+	* Returns the uuid of this app.
+	*
+	* @return the uuid of this app
+	*/
 	@Override
 	public String getUuid() {
-		return _app.getUuid();
+		return model.getUuid();
 	}
 
 	/**
-	 * Returns the version of this app.
-	 *
-	 * @return the version of this app
-	 */
+	* Returns the version of this app.
+	*
+	* @return the version of this app
+	*/
 	@Override
 	public String getVersion() {
-		return _app.getVersion();
-	}
-
-	@Override
-	public int hashCode() {
-		return _app.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _app.isCachedModel();
+		return model.getVersion();
 	}
 
 	@Override
 	public boolean isDownloaded()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _app.isDownloaded();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _app.isEscapedModel();
+		return model.isDownloaded();
 	}
 
 	@Override
 	public boolean isInstalled() {
-		return _app.isInstalled();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _app.isNew();
+		return model.isInstalled();
 	}
 
 	/**
-	 * Returns <code>true</code> if this app is required.
-	 *
-	 * @return <code>true</code> if this app is required; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this app is required.
+	*
+	* @return <code>true</code> if this app is required; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isRequired() {
-		return _app.isRequired();
+		return model.isRequired();
 	}
 
 	@Override
 	public void persist() {
-		_app.persist();
+		model.persist();
 	}
 
 	/**
-	 * Sets the app ID of this app.
-	 *
-	 * @param appId the app ID of this app
-	 */
+	* Sets the app ID of this app.
+	*
+	* @param appId the app ID of this app
+	*/
 	@Override
 	public void setAppId(long appId) {
-		_app.setAppId(appId);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_app.setCachedModel(cachedModel);
+		model.setAppId(appId);
 	}
 
 	/**
-	 * Sets the category of this app.
-	 *
-	 * @param category the category of this app
-	 */
+	* Sets the category of this app.
+	*
+	* @param category the category of this app
+	*/
 	@Override
 	public void setCategory(String category) {
-		_app.setCategory(category);
+		model.setCategory(category);
 	}
 
 	/**
-	 * Sets the company ID of this app.
-	 *
-	 * @param companyId the company ID of this app
-	 */
+	* Sets the company ID of this app.
+	*
+	* @param companyId the company ID of this app
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_app.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this app.
-	 *
-	 * @param createDate the create date of this app
-	 */
+	* Sets the create date of this app.
+	*
+	* @param createDate the create date of this app
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_app.setCreateDate(createDate);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the description of this app.
-	 *
-	 * @param description the description of this app
-	 */
+	* Sets the description of this app.
+	*
+	* @param description the description of this app
+	*/
 	@Override
 	public void setDescription(String description) {
-		_app.setDescription(description);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_app.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_app.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_app.setExpandoBridgeAttributes(serviceContext);
+		model.setDescription(description);
 	}
 
 	/**
-	 * Sets the icon url of this app.
-	 *
-	 * @param iconURL the icon url of this app
-	 */
+	* Sets the icon url of this app.
+	*
+	* @param iconURL the icon url of this app
+	*/
 	@Override
 	public void setIconURL(String iconURL) {
-		_app.setIconURL(iconURL);
+		model.setIconURL(iconURL);
 	}
 
 	/**
-	 * Sets the modified date of this app.
-	 *
-	 * @param modifiedDate the modified date of this app
-	 */
+	* Sets the modified date of this app.
+	*
+	* @param modifiedDate the modified date of this app
+	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
-		_app.setModifiedDate(modifiedDate);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_app.setNew(n);
+		model.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	 * Sets the primary key of this app.
-	 *
-	 * @param primaryKey the primary key of this app
-	 */
+	* Sets the primary key of this app.
+	*
+	* @param primaryKey the primary key of this app
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_app.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_app.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the remote app ID of this app.
-	 *
-	 * @param remoteAppId the remote app ID of this app
-	 */
+	* Sets the remote app ID of this app.
+	*
+	* @param remoteAppId the remote app ID of this app
+	*/
 	@Override
 	public void setRemoteAppId(long remoteAppId) {
-		_app.setRemoteAppId(remoteAppId);
+		model.setRemoteAppId(remoteAppId);
 	}
 
 	/**
-	 * Sets whether this app is required.
-	 *
-	 * @param required the required of this app
-	 */
+	* Sets whether this app is required.
+	*
+	* @param required the required of this app
+	*/
 	@Override
 	public void setRequired(boolean required) {
-		_app.setRequired(required);
+		model.setRequired(required);
 	}
 
 	/**
-	 * Sets the title of this app.
-	 *
-	 * @param title the title of this app
-	 */
+	* Sets the title of this app.
+	*
+	* @param title the title of this app
+	*/
 	@Override
 	public void setTitle(String title) {
-		_app.setTitle(title);
+		model.setTitle(title);
 	}
 
 	/**
-	 * Sets the user ID of this app.
-	 *
-	 * @param userId the user ID of this app
-	 */
+	* Sets the user ID of this app.
+	*
+	* @param userId the user ID of this app
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_app.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this app.
-	 *
-	 * @param userName the user name of this app
-	 */
+	* Sets the user name of this app.
+	*
+	* @param userName the user name of this app
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_app.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this app.
-	 *
-	 * @param userUuid the user uuid of this app
-	 */
+	* Sets the user uuid of this app.
+	*
+	* @param userUuid the user uuid of this app
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_app.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	/**
-	 * Sets the uuid of this app.
-	 *
-	 * @param uuid the uuid of this app
-	 */
+	* Sets the uuid of this app.
+	*
+	* @param uuid the uuid of this app
+	*/
 	@Override
 	public void setUuid(String uuid) {
-		_app.setUuid(uuid);
+		model.setUuid(uuid);
 	}
 
 	/**
-	 * Sets the version of this app.
-	 *
-	 * @param version the version of this app
-	 */
+	* Sets the version of this app.
+	*
+	* @param version the version of this app
+	*/
 	@Override
 	public void setVersion(String version) {
-		_app.setVersion(version);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.CacheModel<App> toCacheModel() {
-		return _app.toCacheModel();
-	}
-
-	@Override
-	public App toEscapedModel() {
-		return new AppWrapper(_app.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _app.toString();
-	}
-
-	@Override
-	public App toUnescapedModel() {
-		return new AppWrapper(_app.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _app.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof AppWrapper)) {
-			return false;
-		}
-
-		AppWrapper appWrapper = (AppWrapper)obj;
-
-		if (Objects.equals(_app, appWrapper._app)) {
-			return true;
-		}
-
-		return false;
+		model.setVersion(version);
 	}
 
 	@Override
 	public StagedModelType getStagedModelType() {
-		return _app.getStagedModelType();
+		return model.getStagedModelType();
 	}
 
 	@Override
-	public App getWrappedModel() {
-		return _app;
+	protected AppWrapper wrap(App app) {
+		return new AppWrapper(app);
 	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _app.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _app.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_app.resetOriginalValues();
-	}
-
-	private final App _app;
-
 }

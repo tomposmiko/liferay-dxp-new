@@ -80,9 +80,7 @@ public class JaxWsApiBundleActivator implements BundleActivator {
 		catch (Exception e) {
 		}
 
-		if (_endpoint != null) {
-			_endpoint.stop();
-		}
+		_endpoint.stop();
 	}
 
 	private ConfigurationAdminBundleActivator

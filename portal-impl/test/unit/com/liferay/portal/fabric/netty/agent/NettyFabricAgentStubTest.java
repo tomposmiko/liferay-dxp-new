@@ -304,24 +304,32 @@ public class NettyFabricAgentStubTest {
 
 			});
 
-		NettyFabricAgentStub nettyFabricAgentStub = new NettyFabricAgentStub(
-			_embeddedChannel, new MockRepository<Channel>(),
-			Paths.get("RepositoryPath"), 0, Long.MAX_VALUE);
+		try {
+			NettyFabricAgentStub nettyFabricAgentStub =
+				new NettyFabricAgentStub(
+					_embeddedChannel, new MockRepository<Channel>(),
+					Paths.get("RepositoryPath"), 0, Long.MAX_VALUE);
 
-		ProcessConfig.Builder builder = new ProcessConfig.Builder();
+			ProcessConfig.Builder builder = new ProcessConfig.Builder();
 
-		FabricWorker<String> fabricWorker = nettyFabricAgentStub.execute(
-			builder.build(), new ReturnProcessCallable<String>("Test result"));
+			FabricWorker<String> fabricWorker = nettyFabricAgentStub.execute(
+				builder.build(),
+				new ReturnProcessCallable<String>("Test result"));
 
-		NoticeableFuture<String> noticeableFuture =
-			fabricWorker.getProcessNoticeableFuture();
+			NoticeableFuture<String> noticeableFuture =
+				fabricWorker.getProcessNoticeableFuture();
 
-		Assert.assertTrue(noticeableFuture.isCancelled());
+			Assert.assertTrue(noticeableFuture.isCancelled());
 
-		Collection<? extends FabricWorker<?>> fabricWorkers =
-			nettyFabricAgentStub.getFabricWorkers();
+			Collection<? extends FabricWorker<?>> fabricWorkers =
+				nettyFabricAgentStub.getFabricWorkers();
 
-		Assert.assertTrue(fabricWorkers.toString(), fabricWorkers.isEmpty());
+			Assert.assertTrue(
+				fabricWorkers.toString(), fabricWorkers.isEmpty());
+		}
+		finally {
+			channelPipeline.removeFirst();
+		}
 	}
 
 	@Test

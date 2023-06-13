@@ -54,6 +54,18 @@ public class ManagementToolbarTag extends BaseClayTag {
 
 		Map<String, Object> context = getContext();
 
+		String searchContainerId = (String)context.get("searchContainerId");
+
+		if (Validator.isNotNull(searchContainerId)) {
+			String componentId = getComponentId();
+
+			putValue("cacheState", _CACHE_STATE);
+
+			if (Validator.isNull(componentId)) {
+				setComponentId(searchContainerId + "ManagementToolbar");
+			}
+		}
+
 		String searchInputName = (String)context.get("searchInputName");
 
 		if (Validator.isNull(searchInputName)) {
@@ -117,17 +129,6 @@ public class ManagementToolbarTag extends BaseClayTag {
 			ManagementToolbarDefaults.isShowInfoButton(infoPanelId));
 
 		setShowInfoButton(showInfoButton);
-
-		if (Validator.isNotNull(context.get("searchValue"))) {
-			setShowResultsBar(true);
-		}
-		else {
-			List filterLabels = (List)context.get("filterLabels");
-
-			if ((filterLabels != null) && !filterLabels.isEmpty()) {
-				setShowResultsBar(true);
-			}
-		}
 
 		return super.doStartTag();
 	}
@@ -246,10 +247,6 @@ public class ManagementToolbarTag extends BaseClayTag {
 		putValue("showInfoButton", showInfoButton);
 	}
 
-	public void setShowResultsBar(Boolean showResultsBar) {
-		putValue("showResultsBar", showResultsBar);
-	}
-
 	public void setShowSearch(Boolean showSearch) {
 		putValue("showSearch", showSearch);
 	}
@@ -293,6 +290,10 @@ public class ManagementToolbarTag extends BaseClayTag {
 				managementToolbarDisplayContext.getClearResultsURL());
 		}
 
+		if (context.get("componentId") == null) {
+			setComponentId(managementToolbarDisplayContext.getComponentId());
+		}
+
 		if (context.get("contentRenderer") == null) {
 			setContentRenderer(
 				managementToolbarDisplayContext.getContentRenderer());
@@ -300,6 +301,11 @@ public class ManagementToolbarTag extends BaseClayTag {
 
 		if (context.get("creationMenu") == null) {
 			setCreationMenu(managementToolbarDisplayContext.getCreationMenu());
+		}
+
+		if (context.get("defaultEventHandler") == null) {
+			setDefaultEventHandler(
+				managementToolbarDisplayContext.getDefaultEventHandler());
 		}
 
 		if (context.get("disabled") == null) {
@@ -434,6 +440,10 @@ public class ManagementToolbarTag extends BaseClayTag {
 
 		return searchData;
 	}
+
+	private static final String[] _CACHE_STATE = {
+		"selectedItems", "totalItems"
+	};
 
 	private static final String[] _NAMESPACED_PARAMS = {
 		"infoPanelId", "searchContainerId", "searchFormName", "searchInputName"

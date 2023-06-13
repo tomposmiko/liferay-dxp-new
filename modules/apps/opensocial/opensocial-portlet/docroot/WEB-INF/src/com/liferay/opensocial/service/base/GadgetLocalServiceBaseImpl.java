@@ -21,11 +21,13 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+
 import com.liferay.opensocial.model.Gadget;
 import com.liferay.opensocial.service.GadgetLocalService;
 import com.liferay.opensocial.service.persistence.GadgetPersistence;
 import com.liferay.opensocial.service.persistence.OAuthConsumerPersistence;
 import com.liferay.opensocial.service.persistence.OAuthTokenPersistence;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -68,17 +70,16 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.opensocial.service.impl.GadgetLocalServiceImpl
+ * @see com.liferay.opensocial.service.GadgetLocalServiceUtil
  * @generated
  */
 @ProviderType
-public abstract class GadgetLocalServiceBaseImpl
-	extends BaseLocalServiceImpl
+public abstract class GadgetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	implements GadgetLocalService, IdentifiableOSGiService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>GadgetLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.opensocial.service.GadgetLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.opensocial.service.GadgetLocalServiceUtil} to access the gadget local service.
 	 */
 
 	/**
@@ -137,8 +138,8 @@ public abstract class GadgetLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(
-			Gadget.class, clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(Gadget.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -156,7 +157,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.opensocial.model.impl.GadgetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.opensocial.model.impl.GadgetModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -165,9 +166,8 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(
-		DynamicQuery dynamicQuery, int start, int end) {
-
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end) {
 		return gadgetPersistence.findWithDynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -175,7 +175,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.opensocial.model.impl.GadgetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.opensocial.model.impl.GadgetModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -185,12 +185,10 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(
-		DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator<T> orderByComparator) {
-
-		return gadgetPersistence.findWithDynamicQuery(
-			dynamicQuery, start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator) {
+		return gadgetPersistence.findWithDynamicQuery(dynamicQuery, start, end,
+			orderByComparator);
 	}
 
 	/**
@@ -212,11 +210,9 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(
-		DynamicQuery dynamicQuery, Projection projection) {
-
-		return gadgetPersistence.countWithDynamicQuery(
-			dynamicQuery, projection);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery,
+		Projection projection) {
+		return gadgetPersistence.countWithDynamicQuery(dynamicQuery, projection);
 	}
 
 	@Override
@@ -250,8 +246,7 @@ public abstract class GadgetLocalServiceBaseImpl
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery =
-			new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(gadgetLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -263,11 +258,8 @@ public abstract class GadgetLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery
-		getIndexableActionableDynamicQuery() {
-
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
-			new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
 
 		indexableActionableDynamicQuery.setBaseLocalService(gadgetLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
@@ -280,7 +272,6 @@ public abstract class GadgetLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-
 		actionableDynamicQuery.setBaseLocalService(gadgetLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(Gadget.class);
@@ -291,64 +282,49 @@ public abstract class GadgetLocalServiceBaseImpl
 	@Override
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		final PortletDataContext portletDataContext) {
-
-		final ExportActionableDynamicQuery exportActionableDynamicQuery =
-			new ExportActionableDynamicQuery() {
-
+		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
 				@Override
 				public long performCount() throws PortalException {
-					ManifestSummary manifestSummary =
-						portletDataContext.getManifestSummary();
+					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
 
 					StagedModelType stagedModelType = getStagedModelType();
 
 					long modelAdditionCount = super.performCount();
 
-					manifestSummary.addModelAdditionCount(
-						stagedModelType, modelAdditionCount);
+					manifestSummary.addModelAdditionCount(stagedModelType,
+						modelAdditionCount);
 
-					long modelDeletionCount =
-						ExportImportHelperUtil.getModelDeletionCount(
-							portletDataContext, stagedModelType);
+					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
+							stagedModelType);
 
-					manifestSummary.addModelDeletionCount(
-						stagedModelType, modelDeletionCount);
+					manifestSummary.addModelDeletionCount(stagedModelType,
+						modelDeletionCount);
 
 					return modelAdditionCount;
 				}
-
 			};
 
 		initActionableDynamicQuery(exportActionableDynamicQuery);
 
-		exportActionableDynamicQuery.setAddCriteriaMethod(
-			new ActionableDynamicQuery.AddCriteriaMethod() {
-
+		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
 				@Override
 				public void addCriteria(DynamicQuery dynamicQuery) {
-					portletDataContext.addDateRangeCriteria(
-						dynamicQuery, "modifiedDate");
+					portletDataContext.addDateRangeCriteria(dynamicQuery,
+						"modifiedDate");
 				}
-
 			});
 
-		exportActionableDynamicQuery.setCompanyId(
-			portletDataContext.getCompanyId());
+		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
 
-		exportActionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod<Gadget>() {
-
+		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<Gadget>() {
 				@Override
 				public void performAction(Gadget gadget)
 					throws PortalException {
-
-					StagedModelDataHandlerUtil.exportStagedModel(
-						portletDataContext, gadget);
+					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
+						gadget);
 				}
-
 			});
-		exportActionableDynamicQuery.setStagedModelType(
-			new StagedModelType(
+		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
 				PortalUtil.getClassNameId(Gadget.class.getName())));
 
 		return exportActionableDynamicQuery;
@@ -360,14 +336,12 @@ public abstract class GadgetLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
 		return gadgetLocalService.deleteGadget((Gadget)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
-
 		return gadgetPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -382,7 +356,6 @@ public abstract class GadgetLocalServiceBaseImpl
 	@Override
 	public Gadget getGadgetByUuidAndCompanyId(String uuid, long companyId)
 		throws PortalException {
-
 		return gadgetPersistence.findByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -390,7 +363,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * Returns a range of all the gadgets.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.opensocial.model.impl.GadgetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.opensocial.model.impl.GadgetModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of gadgets
@@ -465,9 +438,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 *
 	 * @return the o auth consumer local service
 	 */
-	public com.liferay.opensocial.service.OAuthConsumerLocalService
-		getOAuthConsumerLocalService() {
-
+	public com.liferay.opensocial.service.OAuthConsumerLocalService getOAuthConsumerLocalService() {
 		return oAuthConsumerLocalService;
 	}
 
@@ -477,9 +448,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * @param oAuthConsumerLocalService the o auth consumer local service
 	 */
 	public void setOAuthConsumerLocalService(
-		com.liferay.opensocial.service.OAuthConsumerLocalService
-			oAuthConsumerLocalService) {
-
+		com.liferay.opensocial.service.OAuthConsumerLocalService oAuthConsumerLocalService) {
 		this.oAuthConsumerLocalService = oAuthConsumerLocalService;
 	}
 
@@ -499,7 +468,6 @@ public abstract class GadgetLocalServiceBaseImpl
 	 */
 	public void setOAuthConsumerPersistence(
 		OAuthConsumerPersistence oAuthConsumerPersistence) {
-
 		this.oAuthConsumerPersistence = oAuthConsumerPersistence;
 	}
 
@@ -508,9 +476,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 *
 	 * @return the o auth token local service
 	 */
-	public com.liferay.opensocial.service.OAuthTokenLocalService
-		getOAuthTokenLocalService() {
-
+	public com.liferay.opensocial.service.OAuthTokenLocalService getOAuthTokenLocalService() {
 		return oAuthTokenLocalService;
 	}
 
@@ -520,9 +486,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * @param oAuthTokenLocalService the o auth token local service
 	 */
 	public void setOAuthTokenLocalService(
-		com.liferay.opensocial.service.OAuthTokenLocalService
-			oAuthTokenLocalService) {
-
+		com.liferay.opensocial.service.OAuthTokenLocalService oAuthTokenLocalService) {
 		this.oAuthTokenLocalService = oAuthTokenLocalService;
 	}
 
@@ -542,7 +506,6 @@ public abstract class GadgetLocalServiceBaseImpl
 	 */
 	public void setOAuthTokenPersistence(
 		OAuthTokenPersistence oAuthTokenPersistence) {
-
 		this.oAuthTokenPersistence = oAuthTokenPersistence;
 	}
 
@@ -551,9 +514,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -563,9 +524,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -574,9 +533,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 *
 	 * @return the class name local service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService
-		getClassNameLocalService() {
-
+	public com.liferay.portal.kernel.service.ClassNameLocalService getClassNameLocalService() {
 		return classNameLocalService;
 	}
 
@@ -586,9 +543,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * @param classNameLocalService the class name local service
 	 */
 	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService
-			classNameLocalService) {
-
+		com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService) {
 		this.classNameLocalService = classNameLocalService;
 	}
 
@@ -608,7 +563,6 @@ public abstract class GadgetLocalServiceBaseImpl
 	 */
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
-
 		this.classNamePersistence = classNamePersistence;
 	}
 
@@ -617,9 +571,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 *
 	 * @return the portlet local service
 	 */
-	public com.liferay.portal.kernel.service.PortletLocalService
-		getPortletLocalService() {
-
+	public com.liferay.portal.kernel.service.PortletLocalService getPortletLocalService() {
 		return portletLocalService;
 	}
 
@@ -629,9 +581,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * @param portletLocalService the portlet local service
 	 */
 	public void setPortletLocalService(
-		com.liferay.portal.kernel.service.PortletLocalService
-			portletLocalService) {
-
+		com.liferay.portal.kernel.service.PortletLocalService portletLocalService) {
 		this.portletLocalService = portletLocalService;
 	}
 
@@ -658,9 +608,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService
-		getResourceLocalService() {
-
+	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
 		return resourceLocalService;
 	}
 
@@ -670,9 +618,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService
-			resourceLocalService) {
-
+		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -681,9 +627,7 @@ public abstract class GadgetLocalServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -694,7 +638,6 @@ public abstract class GadgetLocalServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -717,8 +660,8 @@ public abstract class GadgetLocalServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		PersistedModelLocalServiceRegistryUtil.register(
-			"com.liferay.opensocial.model.Gadget", gadgetLocalService);
+		PersistedModelLocalServiceRegistryUtil.register("com.liferay.opensocial.model.Gadget",
+			gadgetLocalService);
 	}
 
 	public void destroy() {
@@ -758,8 +701,8 @@ public abstract class GadgetLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -770,65 +713,30 @@ public abstract class GadgetLocalServiceBaseImpl
 
 	@BeanReference(type = GadgetLocalService.class)
 	protected GadgetLocalService gadgetLocalService;
-
 	@BeanReference(type = GadgetPersistence.class)
 	protected GadgetPersistence gadgetPersistence;
-
-	@BeanReference(
-		type = com.liferay.opensocial.service.OAuthConsumerLocalService.class
-	)
-	protected com.liferay.opensocial.service.OAuthConsumerLocalService
-		oAuthConsumerLocalService;
-
+	@BeanReference(type = com.liferay.opensocial.service.OAuthConsumerLocalService.class)
+	protected com.liferay.opensocial.service.OAuthConsumerLocalService oAuthConsumerLocalService;
 	@BeanReference(type = OAuthConsumerPersistence.class)
 	protected OAuthConsumerPersistence oAuthConsumerPersistence;
-
-	@BeanReference(
-		type = com.liferay.opensocial.service.OAuthTokenLocalService.class
-	)
-	protected com.liferay.opensocial.service.OAuthTokenLocalService
-		oAuthTokenLocalService;
-
+	@BeanReference(type = com.liferay.opensocial.service.OAuthTokenLocalService.class)
+	protected com.liferay.opensocial.service.OAuthTokenLocalService oAuthTokenLocalService;
 	@BeanReference(type = OAuthTokenPersistence.class)
 	protected OAuthTokenPersistence oAuthTokenPersistence;
-
-	@BeanReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ClassNameLocalService
-		classNameLocalService;
-
+	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.PortletLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.PortletLocalService
-		portletLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.PortletLocalService.class)
+	protected com.liferay.portal.kernel.service.PortletLocalService portletLocalService;
 	@BeanReference(type = PortletPersistence.class)
 	protected PortletPersistence portletPersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ResourceLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
+	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
 }

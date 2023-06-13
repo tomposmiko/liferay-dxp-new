@@ -32,7 +32,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
@@ -196,13 +195,11 @@ public class JournalTestUtil {
 		int expirationDateHour = 0;
 		int expirationDateMinute = 0;
 
-		User user = TestPropsValues.getUser();
-
 		if (expirationDate != null) {
 			neverExpire = false;
 
 			Calendar expirationCal = CalendarFactoryUtil.getCalendar(
-				user.getTimeZone());
+				TestPropsValues.getUser().getTimeZone());
 
 			expirationCal.setTime(expirationDate);
 
@@ -214,7 +211,7 @@ public class JournalTestUtil {
 		}
 
 		Calendar displayCal = CalendarFactoryUtil.getCalendar(
-			user.getTimeZone());
+			TestPropsValues.getUser().getTimeZone());
 
 		if (displayDate != null) {
 			displayCal.setTime(displayDate);
@@ -893,10 +890,8 @@ public class JournalTestUtil {
 		int displayDateMinute = 0;
 
 		if (displayDate != null) {
-			User user = TestPropsValues.getUser();
-
 			Calendar displayCal = CalendarFactoryUtil.getCalendar(
-				user.getTimeZone());
+				TestPropsValues.getUser().getTimeZone());
 
 			displayCal.setTime(displayDate);
 

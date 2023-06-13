@@ -149,9 +149,11 @@ public class AssetTestUtil {
 			ServiceContextTestUtil.getServiceContext(
 				groupId, TestPropsValues.getUserId());
 
-		return AssetVocabularyServiceUtil.addVocabulary(
+		AssetVocabulary vocabulary = AssetVocabularyServiceUtil.addVocabulary(
 			groupId, RandomTestUtil.randomString(), titleMap, descriptionMap,
 			vocabularySettingsHelper.toString(), serviceContext);
+
+		return vocabulary;
 	}
 
 }

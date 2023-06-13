@@ -36,7 +36,7 @@ import com.liferay.portal.kernel.portlet.PortletQNameUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionPropagator;
+import com.liferay.portal.kernel.security.permission.propagator.PermissionPropagator;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PermissionService;
@@ -118,8 +118,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/edit_configuration.jsp",
 		"javax.portlet.name=" + PortletConfigurationPortletKeys.PORTLET_CONFIGURATION,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.supports.mime-type=text/html",
-		"javax.portlet.version=3.0"
+		"javax.portlet.supports.mime-type=text/html"
 	},
 	service = javax.portlet.Portlet.class
 )
@@ -944,7 +943,7 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 	}
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.portlet.configuration.web)(release.schema.version=1.0.0))",
+		target = "(&(release.bundle.symbolic.name=com.liferay.portlet.configuration.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=1.1.0))))",
 		unbind = "-"
 	)
 	protected void setRelease(Release release) {

@@ -1324,9 +1324,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		}
 
 		if (ignoreFiltersEnabled) {
-			return FileUtil.read(
+			String ignoreFiltersContent = FileUtil.read(
 				DeployUtil.getResourcePath(
 					tempDirPaths, "ignore-filters-web.xml"));
+
+			return ignoreFiltersContent;
 		}
 
 		return StringPool.BLANK;
@@ -1583,9 +1585,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	}
 
 	public String getSessionFiltersContent() throws Exception {
-		return FileUtil.read(
+		String sessionFiltersContent = FileUtil.read(
 			DeployUtil.getResourcePath(
 				tempDirPaths, "session-filters-web.xml"));
+
+		return sessionFiltersContent;
 	}
 
 	public String getSpeedFiltersContent(File srcFile) throws Exception {
@@ -1599,9 +1603,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		}
 
 		if (speedFiltersEnabled) {
-			return FileUtil.read(
+			String speedFiltersContent = FileUtil.read(
 				DeployUtil.getResourcePath(
 					tempDirPaths, "speed-filters-web.xml"));
+
+			return speedFiltersContent;
 		}
 
 		return StringPool.BLANK;

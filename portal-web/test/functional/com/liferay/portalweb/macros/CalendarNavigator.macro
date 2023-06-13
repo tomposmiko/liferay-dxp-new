@@ -92,6 +92,7 @@ definition {
 	macro gotoConfiguration {
 		Portlet.gotoPortletOptions(
 			portletName = "Calendar",
+			portletName = "${portletName}",
 			portletOption = "Configuration"
 		);
 

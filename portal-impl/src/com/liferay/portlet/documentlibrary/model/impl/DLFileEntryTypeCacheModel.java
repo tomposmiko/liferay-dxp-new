@@ -17,9 +17,11 @@ package com.liferay.portlet.documentlibrary.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.document.library.kernel.model.DLFileEntryType;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing DLFileEntryType in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see DLFileEntryType
  * @generated
  */
 @ProviderType
-public class DLFileEntryTypeCacheModel
-	implements CacheModel<DLFileEntryType>, Externalizable {
-
+public class DLFileEntryTypeCacheModel implements CacheModel<DLFileEntryType>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,8 +50,7 @@ public class DLFileEntryTypeCacheModel
 			return false;
 		}
 
-		DLFileEntryTypeCacheModel dlFileEntryTypeCacheModel =
-			(DLFileEntryTypeCacheModel)obj;
+		DLFileEntryTypeCacheModel dlFileEntryTypeCacheModel = (DLFileEntryTypeCacheModel)obj;
 
 		if (fileEntryTypeId == dlFileEntryTypeCacheModel.fileEntryTypeId) {
 			return true;
@@ -187,7 +188,8 @@ public class DLFileEntryTypeCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -249,5 +251,4 @@ public class DLFileEntryTypeCacheModel
 	public String name;
 	public String description;
 	public long lastPublishDate;
-
 }

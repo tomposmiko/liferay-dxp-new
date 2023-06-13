@@ -29,9 +29,9 @@ definition {
 	@priority = "3"
 	test AddConditionNodeEditNameAndDesciptionAndDeleteViaViewTab {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -53,9 +53,9 @@ definition {
 	@priority = "4"
 	test AddEndNodeEditNameAndDesciptionAndDeleteViaViewTab {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -77,9 +77,9 @@ definition {
 	@priority = "3"
 	test AddForkNodeEditNameAndDesciptionAndDeleteViaViewTab {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -101,9 +101,9 @@ definition {
 	@priority = "3"
 	test AddJoinNodeEditNameAndDesciptionAndDeleteViaViewTab {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -125,9 +125,9 @@ definition {
 	@priority = "3"
 	test AddJoinXORNodeEditNameAndDesciptionAndDeleteViaViewTab {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -152,9 +152,9 @@ definition {
 		property testray.component.names = "Training";
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		AssertElementPresent(
@@ -245,9 +245,9 @@ definition {
 	@priority = "5"
 	test AddNewWorkflowDefinitionViaViewTab {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -290,9 +290,9 @@ definition {
 		PortletEntry.publish();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.gotoEditWorkflowDefinition(
@@ -313,9 +313,9 @@ definition {
 	@priority = "4"
 	test AddStartNodeEditNameAndDesciptionAndDeleteViaViewTab {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -339,9 +339,9 @@ definition {
 	@priority = "3"
 	test AddStateNodeEditNameAndDesciptionAndDeleteViaViewTab {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -370,9 +370,9 @@ definition {
 		property testray.component.names = "Training";
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -418,9 +418,9 @@ definition {
 	@priority = "3"
 	test AddTaskNodeViaSourceTabAndEditNameAndDesciptionAndDeleteViaViewTab {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -446,9 +446,9 @@ definition {
 		var fileContent = TestCase.getFileContent(fileName = "workflow_definition_task_timers.xml");
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -472,9 +472,9 @@ definition {
 	@priority = "4"
 	test ConfigureTaskTimersViaViewTab {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -512,46 +512,46 @@ definition {
 
 		KaleoDesigner.viewSourceXMLLine(
 			kdSourceXML = '''<name>Timer Name</name>''',
-			line = "17"
+			line = "19"
 		);
 
 		KaleoDesigner.viewSourceXMLLine(
 			kdSourceXML = '''<duration>5</duration>''',
-			line = "20"
+			line = "22"
 		);
 
 		KaleoDesigner.viewSourceXMLLine(
 			kdSourceXML = '''<scale>hour</scale>''',
-			line = "21"
+			line = "23"
 		);
 
 		KaleoDesigner.viewSourceXMLLine(
 			kdSourceXML = '''<duration>6</duration>''',
-			line = "24"
+			line = "26"
 		);
 
 		KaleoDesigner.viewSourceXMLLine(
 			kdSourceXML = '''<scale>hour</scale>''',
-			line = "25"
+			line = "27"
 		);
 
-		KaleoDesigner.viewSourceXMLLine(kdSourceXML = '''<timer-action>''', line = "29");
+		KaleoDesigner.viewSourceXMLLine(kdSourceXML = '''<timer-action>''', line = "31");
 
 		KaleoDesigner.viewSourceXMLLine(
 			kdSourceXML = '''<name>Blocker Name</name>''',
-			line = "30"
+			line = "32"
 		);
 
 		KaleoDesigner.viewSourceXMLLine(
 			kdSourceXML = '''<description>Blocker Description</description>''',
-			line = "31"
+			line = "33"
 		);
 
-		KaleoDesigner.viewSourceXMLLine(kdSourceXML = '''Test Script''', line = "33");
+		KaleoDesigner.viewSourceXMLLine(kdSourceXML = '''Test Script''', line = "35");
 
 		KaleoDesigner.viewSourceXMLLine(
 			kdSourceXML = '''<blocking>true</blocking>''',
-			line = "27"
+			line = "29"
 		);
 	}
 
@@ -562,9 +562,9 @@ definition {
 		property testray.component.names = "Training";
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -617,9 +617,9 @@ definition {
 		Workflow.saveDefinition();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.gotoEditWorkflowDefinition(
@@ -640,9 +640,9 @@ definition {
 	@priority = "3"
 	test DeleteWorkflowDefinitionDraft {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
@@ -652,9 +652,9 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.viewDefinitionUnpublished(
@@ -677,9 +677,9 @@ definition {
 		property testray.component.names = "Training";
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -711,9 +711,9 @@ definition {
 	@priority = "5"
 	test PublishDefaultWorkflowDefinition {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -732,9 +732,9 @@ definition {
 	@priority = "3"
 	test PublishFromSourceTabAndViewNameChange {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(workflowDefinitionTitle = "Test Definition");
@@ -744,9 +744,9 @@ definition {
 		PortletEntry.publish();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.viewDefinitionPublished(
@@ -765,9 +765,9 @@ definition {
 	@priority = "3"
 	test PublishWorkflowDefinitionWithConnectorPointingToStartNodeAndViewErrorMessage {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -807,16 +807,16 @@ definition {
 		);
 
 		Workflow.publishInvalidWorkflowDefinition(
-			errorMessage = "The Start node cannot have an incoming transition."
+			errorMessage = "The StartNode node cannot have an incoming transition."
 		);
 	}
 
 	@priority = "3"
 	test PublishWorkflowDefinitionWithInvalidConditionNodeAndViewErrorMessage {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -901,9 +901,9 @@ definition {
 ''';
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -955,9 +955,9 @@ definition {
 	@priority = "3"
 	test PublishWorkflowDefinitionWithInvalidForkNodeAndViewErrorMessage {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -1005,9 +1005,9 @@ definition {
 	@priority = "3"
 	test PublishWorkflowDefinitionWithInvalidJoinNodeAndViewErrorMessage {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -1055,9 +1055,9 @@ definition {
 	@priority = "3"
 	test PublishWorkflowDefinitionWithInvalidJoinXORNodeAndViewErrorMessage {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -1105,9 +1105,9 @@ definition {
 	@priority = "4"
 	test PublishWorkflowDefinitionWithMultipleStartNodesAndViewErrorMessage {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -1129,9 +1129,9 @@ definition {
 	@priority = "4"
 	test PublishWorkflowDefinitionWithNoConnectorsAndViewErrorMessage {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -1148,9 +1148,9 @@ definition {
 	@priority = "4"
 	test PublishWorkflowDefinitionWithNoEndNodeAndViewErrorMessage {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -1169,9 +1169,9 @@ definition {
 	@priority = "4"
 	test PublishWorkflowDefinitionWithNoStartNodeAndViewErrorMessage {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -1190,9 +1190,9 @@ definition {
 	@priority = "3"
 	test SaveInvalidWorkflowDefinitionAsDraft {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -1209,9 +1209,9 @@ definition {
 	@priority = "3"
 	test UndoDraftDefinition {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -1278,9 +1278,9 @@ definition {
 		KaleoDesigner.viewConnectorNotPresent(connectorLabel = "Complete");
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.gotoEditWorkflowDefinition(
@@ -1313,9 +1313,9 @@ definition {
 	@priority = "4"
 	test ViewAndPublishWorkflowDefinitionDraft {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
@@ -1325,9 +1325,9 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.viewDefinitionUnpublished(
@@ -1337,9 +1337,9 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.gotoEditWorkflowDefinition(
@@ -1351,9 +1351,9 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.viewDefinitionPublished(
@@ -1367,9 +1367,9 @@ definition {
 		property test.name.skip.portal.instance = "Kaleodesigner#ViewSourceXMLNotErasedWhenInvalid";
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(
@@ -1398,9 +1398,9 @@ definition {
 	@priority = "2"
 	test ViewWorkflowDefinitionButtons {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.addNewDefinition(

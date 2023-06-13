@@ -230,7 +230,8 @@ public class FormTransformer {
 
 				fieldStep.addOptionalNestedModelList(
 					nestedParsedType.getFieldName(),
-					builder -> _fillForm(parsedTypeNested, builder),
+					builder ->
+						_fillForm(parsedTypeNested, builder),
 					unsafeCast(formFunction.apply(methodName)));
 			});
 

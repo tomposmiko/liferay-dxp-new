@@ -24,20 +24,19 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * <code>WeDeployAuthAppServiceUtil</code> service
- * utility. The static methods of this class call the same methods of the
- * service utility. However, the signatures are different because it is
- * difficult for SOAP to support certain types.
+ * {@link WeDeployAuthAppServiceUtil} service utility. The
+ * static methods of this class calls the same methods of the service utility.
+ * However, the signatures are different because it is difficult for SOAP to
+ * support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a <code>java.util.List</code>,
- * that is translated to an array of
- * <code>com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap</code>. If the method in the
- * service utility returns a
- * <code>com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthApp</code>, that is translated to a
- * <code>com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap</code>. Methods that SOAP
- * cannot safely wire are skipped.
+ * if the method in the service utility returns a {@link java.util.List}, that
+ * is translated to an array of {@link com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap}.
+ * If the method in the service utility returns a
+ * {@link com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthApp}, that is translated to a
+ * {@link com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap}. Methods that SOAP cannot
+ * safely wire are skipped.
  * </p>
  *
  * <p>
@@ -59,26 +58,22 @@ import java.rmi.RemoteException;
  *
  * @author Supritha Sundaram
  * @see WeDeployAuthAppServiceHttp
+ * @see com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap
+ * @see WeDeployAuthAppServiceUtil
  * @generated
  */
 @ProviderType
 public class WeDeployAuthAppServiceSoap {
-
-	public static
-		com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap
-				addWeDeployAuthApp(
-					String name, String redirectURI,
-					com.liferay.portal.kernel.service.ServiceContext
-						serviceContext)
-			throws RemoteException {
-
+	public static com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap addWeDeployAuthApp(
+		String name, String redirectURI,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
 		try {
-			com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthApp
-				returnValue = WeDeployAuthAppServiceUtil.addWeDeployAuthApp(
-					name, redirectURI, serviceContext);
+			com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthApp returnValue =
+				WeDeployAuthAppServiceUtil.addWeDeployAuthApp(name,
+					redirectURI, serviceContext);
 
-			return com.liferay.portal.security.wedeploy.auth.model.
-				WeDeployAuthAppSoap.toSoapModel(returnValue);
+			return com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -87,18 +82,13 @@ public class WeDeployAuthAppServiceSoap {
 		}
 	}
 
-	public static
-		com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap
-				deleteWeDeployAuthApp(long weDeployAuthAppId)
-			throws RemoteException {
-
+	public static com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap deleteWeDeployAuthApp(
+		long weDeployAuthAppId) throws RemoteException {
 		try {
-			com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthApp
-				returnValue = WeDeployAuthAppServiceUtil.deleteWeDeployAuthApp(
-					weDeployAuthAppId);
+			com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthApp returnValue =
+				WeDeployAuthAppServiceUtil.deleteWeDeployAuthApp(weDeployAuthAppId);
 
-			return com.liferay.portal.security.wedeploy.auth.model.
-				WeDeployAuthAppSoap.toSoapModel(returnValue);
+			return com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -107,7 +97,5 @@ public class WeDeployAuthAppServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		WeDeployAuthAppServiceSoap.class);
-
+	private static Log _log = LogFactoryUtil.getLog(WeDeployAuthAppServiceSoap.class);
 }

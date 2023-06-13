@@ -17,9 +17,12 @@ package com.liferay.dynamic.data.lists.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordSetVersion;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.model.MVCCModel;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +35,12 @@ import java.util.Date;
  * The cache model class for representing DDLRecordSetVersion in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see DDLRecordSetVersion
  * @generated
  */
 @ProviderType
-public class DDLRecordSetVersionCacheModel
-	implements CacheModel<DDLRecordSetVersion>, Externalizable {
-
+public class DDLRecordSetVersionCacheModel implements CacheModel<DDLRecordSetVersion>,
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,12 +51,10 @@ public class DDLRecordSetVersionCacheModel
 			return false;
 		}
 
-		DDLRecordSetVersionCacheModel ddlRecordSetVersionCacheModel =
-			(DDLRecordSetVersionCacheModel)obj;
+		DDLRecordSetVersionCacheModel ddlRecordSetVersionCacheModel = (DDLRecordSetVersionCacheModel)obj;
 
-		if (recordSetVersionId ==
-				ddlRecordSetVersionCacheModel.recordSetVersionId) {
-
+		if ((recordSetVersionId == ddlRecordSetVersionCacheModel.recordSetVersionId) &&
+				(mvccVersion == ddlRecordSetVersionCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -62,14 +63,28 @@ public class DDLRecordSetVersionCacheModel
 
 	@Override
 	public int hashCode() {
-		return HashUtil.hash(0, recordSetVersionId);
+		int hashCode = HashUtil.hash(0, recordSetVersionId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
+	public long getMvccVersion() {
+		return mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		this.mvccVersion = mvccVersion;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(33);
+		StringBundler sb = new StringBundler(35);
 
-		sb.append("{recordSetVersionId=");
+		sb.append("{mvccVersion=");
+		sb.append(mvccVersion);
+		sb.append(", recordSetVersionId=");
 		sb.append(recordSetVersionId);
 		sb.append(", groupId=");
 		sb.append(groupId);
@@ -108,9 +123,9 @@ public class DDLRecordSetVersionCacheModel
 
 	@Override
 	public DDLRecordSetVersion toEntityModel() {
-		DDLRecordSetVersionImpl ddlRecordSetVersionImpl =
-			new DDLRecordSetVersionImpl();
+		DDLRecordSetVersionImpl ddlRecordSetVersionImpl = new DDLRecordSetVersionImpl();
 
+		ddlRecordSetVersionImpl.setMvccVersion(mvccVersion);
 		ddlRecordSetVersionImpl.setRecordSetVersionId(recordSetVersionId);
 		ddlRecordSetVersionImpl.setGroupId(groupId);
 		ddlRecordSetVersionImpl.setCompanyId(companyId);
@@ -185,6 +200,8 @@ public class DDLRecordSetVersionCacheModel
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
+		mvccVersion = objectInput.readLong();
+
 		recordSetVersionId = objectInput.readLong();
 
 		groupId = objectInput.readLong();
@@ -211,7 +228,10 @@ public class DDLRecordSetVersionCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
+		objectOutput.writeLong(mvccVersion);
+
 		objectOutput.writeLong(recordSetVersionId);
 
 		objectOutput.writeLong(groupId);
@@ -275,6 +295,7 @@ public class DDLRecordSetVersionCacheModel
 		objectOutput.writeLong(statusDate);
 	}
 
+	public long mvccVersion;
 	public long recordSetVersionId;
 	public long groupId;
 	public long companyId;
@@ -291,5 +312,4 @@ public class DDLRecordSetVersionCacheModel
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
-
 }

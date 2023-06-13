@@ -25,16 +25,16 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.AggregatePredicateFilter;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PredicateFilter;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -47,9 +47,9 @@ import com.liferay.portal.workflow.web.internal.display.context.util.WorkflowDef
 import com.liferay.portal.workflow.web.internal.search.WorkflowDefinitionSearch;
 import com.liferay.portal.workflow.web.internal.search.WorkflowDefinitionSearchTerms;
 import com.liferay.portal.workflow.web.internal.util.WorkflowDefinitionPortletUtil;
-import com.liferay.portal.workflow.web.internal.util.filter.WorkflowDefinitionActivePredicateFilter;
-import com.liferay.portal.workflow.web.internal.util.filter.WorkflowDefinitionDescriptionPredicateFilter;
-import com.liferay.portal.workflow.web.internal.util.filter.WorkflowDefinitionTitlePredicateFilter;
+import com.liferay.portal.workflow.web.internal.util.filter.WorkflowDefinitionActivePredicate;
+import com.liferay.portal.workflow.web.internal.util.filter.WorkflowDefinitionDescriptionPredicate;
+import com.liferay.portal.workflow.web.internal.util.filter.WorkflowDefinitionTitlePredicate;
 
 import java.util.Collections;
 import java.util.Date;
@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
@@ -80,6 +81,23 @@ public class WorkflowDefinitionDisplayContext {
 
 		_workflowDefinitionRequestHelper = new WorkflowDefinitionRequestHelper(
 			renderRequest);
+	}
+
+	public boolean canPublishWorkflowDefinition() {
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (_companyAdministratorCanPublish &&
+			permissionChecker.isCompanyAdmin()) {
+
+			return true;
+		}
+
+		if (permissionChecker.isOmniadmin()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public String getActive(WorkflowDefinition workflowDefinition) {
@@ -113,6 +131,10 @@ public class WorkflowDefinitionDisplayContext {
 	}
 
 	public JSPCreationMenu getCreationMenu(PageContext pageContext) {
+		if (!canPublishWorkflowDefinition()) {
+			return null;
+		}
+
 		LiferayPortletResponse response =
 			_workflowDefinitionRequestHelper.getLiferayPortletResponse();
 
@@ -337,8 +359,6 @@ public class WorkflowDefinitionDisplayContext {
 				workflowDefinitionSearch.getEnd());
 		}
 
-		workflowDefinitionSearch.setTotal(workflowDefinitions.size());
-
 		workflowDefinitionSearch.setResults(workflowDefinitions);
 
 		return workflowDefinitionSearch;
@@ -464,26 +484,28 @@ public class WorkflowDefinitionDisplayContext {
 		return !searchContainer.hasResults();
 	}
 
-	protected PredicateFilter<WorkflowDefinition> createPredicateFilter(
+	public void setCompanyAdministratorCanPublish(
+		boolean companyAdministratorCanPublish) {
+
+		_companyAdministratorCanPublish = companyAdministratorCanPublish;
+	}
+
+	protected Predicate<WorkflowDefinition> createPredicate(
 		String description, String title, int status, boolean andOperator) {
 
-		AggregatePredicateFilter<WorkflowDefinition> aggregatePredicateFilter =
-			new AggregatePredicateFilter<>(
-				new WorkflowDefinitionTitlePredicateFilter(title));
+		Predicate<WorkflowDefinition> predicate =
+			new WorkflowDefinitionTitlePredicate(title);
 
 		if (andOperator) {
-			aggregatePredicateFilter.and(
-				new WorkflowDefinitionDescriptionPredicateFilter(description));
+			predicate = predicate.and(
+				new WorkflowDefinitionDescriptionPredicate(description));
 		}
 		else {
-			aggregatePredicateFilter.or(
-				new WorkflowDefinitionDescriptionPredicateFilter(description));
+			predicate = predicate.or(
+				new WorkflowDefinitionDescriptionPredicate(description));
 		}
 
-		aggregatePredicateFilter.and(
-			new WorkflowDefinitionActivePredicateFilter(status));
-
-		return aggregatePredicateFilter;
+		return predicate.and(new WorkflowDefinitionActivePredicate(status));
 	}
 
 	protected List<WorkflowDefinition> filter(
@@ -496,10 +518,12 @@ public class WorkflowDefinitionDisplayContext {
 			return workflowDefinitions;
 		}
 
-		PredicateFilter<WorkflowDefinition> predicateFilter =
-			createPredicateFilter(description, title, status, andOperator);
+		Predicate<WorkflowDefinition> predicate = createPredicate(
+			description, title, status, andOperator);
 
-		return ListUtil.filter(workflowDefinitions, predicateFilter);
+		return ListUtil.filter(
+			workflowDefinitions,
+			workflowDefinition -> predicate.test(workflowDefinition));
 	}
 
 	protected String getConfigureAssignementLink() throws PortletException {
@@ -581,6 +605,7 @@ public class WorkflowDefinitionDisplayContext {
 			dropdownItem.setLabel(
 				LanguageUtil.get(
 					_workflowDefinitionRequestHelper.getRequest(), navigation));
+
 		};
 	}
 
@@ -625,6 +650,7 @@ public class WorkflowDefinitionDisplayContext {
 	private static final String _HTML =
 		"<a class='alert-link' href='[$RENDER_URL$]'>[$MESSAGE$]</a>";
 
+	private boolean _companyAdministratorCanPublish;
 	private final ResourceBundleLoader _resourceBundleLoader;
 	private final UserLocalService _userLocalService;
 	private final WorkflowDefinitionRequestHelper

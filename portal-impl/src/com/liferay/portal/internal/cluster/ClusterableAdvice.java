@@ -18,49 +18,46 @@ import com.liferay.portal.kernel.cluster.ClusterInvokeThreadLocal;
 import com.liferay.portal.kernel.cluster.ClusterMasterExecutorUtil;
 import com.liferay.portal.kernel.cluster.Clusterable;
 import com.liferay.portal.kernel.cluster.ClusterableInvokerUtil;
-import com.liferay.portal.kernel.cluster.NullClusterable;
-import com.liferay.portal.spring.aop.AnnotationChainableMethodAdvice;
+import com.liferay.portal.spring.aop.AopMethodInvocation;
+import com.liferay.portal.spring.aop.ChainableMethodAdvice;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import org.aopalliance.intercept.MethodInvocation;
+import java.util.Map;
 
 /**
  * @author Shuyang Zhou
  */
-public class ClusterableAdvice
-	extends AnnotationChainableMethodAdvice<Clusterable> {
+public class ClusterableAdvice extends ChainableMethodAdvice {
 
 	@Override
-	public void afterReturning(MethodInvocation methodInvocation, Object result)
+	public void afterReturning(
+			AopMethodInvocation aopMethodInvocation, Object[] arguments,
+			Object result)
 		throws Throwable {
 
 		if (!ClusterInvokeThreadLocal.isEnabled()) {
 			return;
 		}
 
-		Clusterable clusterable = findAnnotation(methodInvocation);
-
-		if (clusterable == NullClusterable.NULL_CLUSTERABLE) {
-			return;
-		}
+		Clusterable clusterable = aopMethodInvocation.getAdviceMethodContext();
 
 		ClusterableInvokerUtil.invokeOnCluster(
-			clusterable.acceptor(), methodInvocation.getThis(),
-			methodInvocation.getMethod(), methodInvocation.getArguments());
+			clusterable.acceptor(), aopMethodInvocation.getThis(),
+			aopMethodInvocation.getMethod(), arguments);
 	}
 
 	@Override
-	public Object before(MethodInvocation methodInvocation) throws Throwable {
+	public Object before(
+			AopMethodInvocation aopMethodInvocation, Object[] arguments)
+		throws Throwable {
+
 		if (!ClusterInvokeThreadLocal.isEnabled()) {
 			return null;
 		}
 
-		Clusterable clusterable = findAnnotation(methodInvocation);
-
-		if (clusterable == NullClusterable.NULL_CLUSTERABLE) {
-			return null;
-		}
+		Clusterable clusterable = aopMethodInvocation.getAdviceMethodContext();
 
 		if (!clusterable.onMaster()) {
 			return null;
@@ -69,15 +66,15 @@ public class ClusterableAdvice
 		Object result = null;
 
 		if (ClusterMasterExecutorUtil.isMaster()) {
-			result = methodInvocation.proceed();
+			result = aopMethodInvocation.proceed(arguments);
 		}
 		else {
 			result = ClusterableInvokerUtil.invokeOnMaster(
-				clusterable.acceptor(), methodInvocation.getThis(),
-				methodInvocation.getMethod(), methodInvocation.getArguments());
+				clusterable.acceptor(), aopMethodInvocation.getThis(),
+				aopMethodInvocation.getMethod(), arguments);
 		}
 
-		Method method = methodInvocation.getMethod();
+		Method method = aopMethodInvocation.getMethod();
 
 		Class<?> returnType = method.getReturnType();
 
@@ -89,8 +86,11 @@ public class ClusterableAdvice
 	}
 
 	@Override
-	public Clusterable getNullAnnotation() {
-		return NullClusterable.NULL_CLUSTERABLE;
+	public Object createMethodContext(
+		Class<?> targetClass, Method method,
+		Map<Class<? extends Annotation>, Annotation> annotations) {
+
+		return annotations.get(Clusterable.class);
 	}
 
 }

@@ -44,21 +44,20 @@ if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(articles)) {
 
 		<%
 		JournalFolder folder = folders.get(0);
-
-		request.setAttribute("info_panel.jsp-folder", folder);
 		%>
 
 		<div class="sidebar-header">
-			<c:if test="<%= journalDisplayContext.isShowEditActions() %>">
-				<ul class="sidebar-header-actions">
-					<li>
-						<liferay-util:include page="/subscribe.jsp" servletContext="<%= application %>" />
-					</li>
-					<li>
-						<liferay-util:include page="/folder_action.jsp" servletContext="<%= application %>" />
-					</li>
-				</ul>
-			</c:if>
+			<ul class="sidebar-header-actions">
+				<li>
+					<liferay-util:include page="/subscribe.jsp" servletContext="<%= application %>" />
+				</li>
+				<li>
+					<clay:dropdown-actions
+						defaultEventHandler="<%= JournalWebConstants.JOURNAL_INFO_PANEL_ELEMENTS_DEFAULT_EVENT_HANDLER %>"
+						dropdownItems="<%= journalDisplayContext.getFolderInfoPanelDropdownItems(folder) %>"
+					/>
+				</li>
+			</ul>
 
 			<h4><%= (folder != null) ? HtmlUtil.escape(folder.getName()) : LanguageUtil.get(request, "home") %></h4>
 
@@ -107,8 +106,6 @@ if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(articles)) {
 		DDMStructure ddmStructure = article.getDDMStructure();
 
 		DDMTemplate ddmTemplate = DDMTemplateLocalServiceUtil.fetchTemplate(scopeGroupId, PortalUtil.getClassNameId(DDMStructure.class), article.getDDMTemplateKey(), true);
-
-		request.setAttribute("info_panel.jsp-entry", article);
 		%>
 
 		<div class="sidebar-header">
@@ -117,7 +114,10 @@ if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(articles)) {
 					<liferay-util:include page="/subscribe.jsp" servletContext="<%= application %>" />
 				</li>
 				<li>
-					<liferay-util:include page="/article_action.jsp" servletContext="<%= application %>" />
+					<clay:dropdown-actions
+						defaultEventHandler="<%= JournalWebConstants.JOURNAL_INFO_PANEL_ELEMENTS_DEFAULT_EVENT_HANDLER %>"
+						dropdownItems="<%= journalDisplayContext.getArticleInfoPanelDropdownItems(article) %>"
+					/>
 				</li>
 			</ul>
 
@@ -242,3 +242,19 @@ if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(articles)) {
 		</div>
 	</c:otherwise>
 </c:choose>
+
+<aui:script require='<%= npmResolvedPackageName + "/js/ElementsDefaultEventHandler.es as ElementsDefaultEventHandler" %>'>
+	Liferay.component(
+		'<%= JournalWebConstants.JOURNAL_INFO_PANEL_ELEMENTS_DEFAULT_EVENT_HANDLER %>',
+		new ElementsDefaultEventHandler.default(
+			{
+				namespace: '<%= liferayPortletResponse.getNamespace() %>',
+				trashEnabled: <%= trashHelper.isTrashEnabled(scopeGroupId) %>
+			}
+		),
+		{
+			destroyOnNavigate: true,
+			portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>'
+		}
+	);
+</aui:script>

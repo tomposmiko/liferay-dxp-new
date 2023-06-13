@@ -30,6 +30,9 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.security.sso.SSOUtil;
+import com.liferay.portal.struts.Action;
+import com.liferay.portal.struts.model.ActionForward;
+import com.liferay.portal.struts.model.ActionMapping;
 import com.liferay.portal.util.PropsValues;
 
 import javax.portlet.PortletMode;
@@ -41,21 +44,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
 /**
  * @author Brian Wing Shun Chan
  * @author Scott Lee
  */
-public class LoginAction extends Action {
+public class LoginAction implements Action {
 
 	@Override
 	public ActionForward execute(
-			ActionMapping actionMapping, ActionForm actionForm,
-			HttpServletRequest request, HttpServletResponse response)
+			ActionMapping actionMapping, HttpServletRequest request,
+			HttpServletResponse response)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
@@ -103,7 +101,8 @@ public class LoginAction extends Action {
 			(session.getAttribute("j_password") != null)) {
 
 			if (PropsValues.PORTAL_JAAS_ENABLE) {
-				return actionMapping.findForward("/portal/touch_protected.jsp");
+				return actionMapping.getActionForward(
+					"/portal/touch_protected.jsp");
 			}
 
 			String redirect = ParamUtil.getString(request, "redirect");

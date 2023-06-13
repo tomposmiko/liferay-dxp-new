@@ -17,9 +17,12 @@ package com.liferay.dynamic.data.lists.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.model.MVCCModel;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +35,12 @@ import java.util.Date;
  * The cache model class for representing DDLRecordSet in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see DDLRecordSet
  * @generated
  */
 @ProviderType
-public class DDLRecordSetCacheModel
-	implements CacheModel<DDLRecordSet>, Externalizable {
-
+public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,10 +51,10 @@ public class DDLRecordSetCacheModel
 			return false;
 		}
 
-		DDLRecordSetCacheModel ddlRecordSetCacheModel =
-			(DDLRecordSetCacheModel)obj;
+		DDLRecordSetCacheModel ddlRecordSetCacheModel = (DDLRecordSetCacheModel)obj;
 
-		if (recordSetId == ddlRecordSetCacheModel.recordSetId) {
+		if ((recordSetId == ddlRecordSetCacheModel.recordSetId) &&
+				(mvccVersion == ddlRecordSetCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -60,14 +63,28 @@ public class DDLRecordSetCacheModel
 
 	@Override
 	public int hashCode() {
-		return HashUtil.hash(0, recordSetId);
+		int hashCode = HashUtil.hash(0, recordSetId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
+	public long getMvccVersion() {
+		return mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		this.mvccVersion = mvccVersion;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(39);
+		StringBundler sb = new StringBundler(41);
 
-		sb.append("{uuid=");
+		sb.append("{mvccVersion=");
+		sb.append(mvccVersion);
+		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", recordSetId=");
 		sb.append(recordSetId);
@@ -113,6 +130,8 @@ public class DDLRecordSetCacheModel
 	@Override
 	public DDLRecordSet toEntityModel() {
 		DDLRecordSetImpl ddlRecordSetImpl = new DDLRecordSetImpl();
+
+		ddlRecordSetImpl.setMvccVersion(mvccVersion);
 
 		if (uuid == null) {
 			ddlRecordSetImpl.setUuid("");
@@ -213,7 +232,7 @@ public class DDLRecordSetCacheModel
 	@Override
 	public void readExternal(ObjectInput objectInput)
 		throws ClassNotFoundException, IOException {
-
+		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
 		recordSetId = objectInput.readLong();
@@ -242,13 +261,14 @@ public class DDLRecordSetCacheModel
 		settings = objectInput.readUTF();
 		lastPublishDate = objectInput.readLong();
 
-		_ddmFormValues =
-			(com.liferay.dynamic.data.mapping.storage.DDMFormValues)
-				objectInput.readObject();
+		_ddmFormValues = (com.liferay.dynamic.data.mapping.storage.DDMFormValues)objectInput.readObject();
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
+		objectOutput.writeLong(mvccVersion);
+
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -329,6 +349,7 @@ public class DDLRecordSetCacheModel
 		objectOutput.writeObject(_ddmFormValues);
 	}
 
+	public long mvccVersion;
 	public String uuid;
 	public long recordSetId;
 	public long groupId;
@@ -348,7 +369,5 @@ public class DDLRecordSetCacheModel
 	public int scope;
 	public String settings;
 	public long lastPublishDate;
-	public com.liferay.dynamic.data.mapping.storage.DDMFormValues
-		_ddmFormValues;
-
+	public com.liferay.dynamic.data.mapping.storage.DDMFormValues _ddmFormValues;
 }

@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.UserServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.portal.service.http.UserServiceSoap
  * @generated
  */
 @ProviderType
 public class UserSoap implements Serializable {
-
 	public static UserSoap toSoapModel(User model) {
 		UserSoap soapModel = new UserSoap();
 
@@ -540,5 +540,4 @@ public class UserSoap implements Serializable {
 	private boolean _agreedToTermsOfUse;
 	private boolean _emailAddressVerified;
 	private int _status;
-
 }

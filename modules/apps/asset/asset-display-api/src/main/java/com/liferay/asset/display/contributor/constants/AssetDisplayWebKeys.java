@@ -22,6 +22,15 @@ public class AssetDisplayWebKeys {
 	public static final String ASSET_DISPLAY_CONTRIBUTOR =
 		"ASSET_DISPLAY_CONTRIBUTOR";
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String ASSET_ENTRY = "ASSET_ENTRY";
+
+	public static final String CURRENT_I18N_LANGUAGE_ID =
+		"CURRENT_I18N_LANGUAGE_ID";
+
+	public static final String VERSION_CLASS_PK = "VERSION_CLASS_PK";
 
 }

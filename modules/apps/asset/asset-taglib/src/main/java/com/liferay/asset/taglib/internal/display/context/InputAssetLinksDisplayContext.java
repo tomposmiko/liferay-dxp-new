@@ -42,7 +42,6 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.PredicateFilter;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -116,21 +115,14 @@ public class InputAssetLinksDisplayContext {
 
 		assetRendererFactories = ListUtil.filter(
 			assetRendererFactories,
-			new PredicateFilter<AssetRendererFactory<?>>() {
+			assetRendererFactory -> {
+				if (assetRendererFactory.isLinkable() &&
+					assetRendererFactory.isSelectable()) {
 
-				@Override
-				public boolean filter(
-					AssetRendererFactory<?> assetRendererFactory) {
-
-					if (assetRendererFactory.isLinkable() &&
-						assetRendererFactory.isSelectable()) {
-
-						return true;
-					}
-
-					return false;
+					return true;
 				}
 
+				return false;
 			});
 
 		return ListUtil.sort(
@@ -368,6 +360,9 @@ public class InputAssetLinksDisplayContext {
 		long groupId = _getAssetBrowserGroupId(assetRendererFactory);
 
 		portletURL.setParameter("groupId", String.valueOf(groupId));
+
+		portletURL.setParameter(
+			"multipleSelection", String.valueOf(Boolean.TRUE));
 		portletURL.setParameter("selectedGroupId", String.valueOf(groupId));
 
 		if (_assetEntryId > 0) {

@@ -150,12 +150,11 @@ public abstract class BaseGroupByTestCase extends BaseIndexingTestCase {
 
 		Set<Map.Entry<String, Integer>> entries = map1.entrySet();
 
-		Map<String, String> map2 = entries.stream(
-		).collect(
+		Map<String, String> map2 = entries.stream().collect(
 			Collectors.toMap(
 				Map.Entry::getKey,
-				entry -> getCountPairString(entry.getValue(), entry.getValue()))
-		);
+				entry -> getCountPairString(
+					entry.getValue(), entry.getValue())));
 
 		assertSearch(
 			indexingTestHelper -> {
@@ -244,12 +243,10 @@ public abstract class BaseGroupByTestCase extends BaseIndexingTestCase {
 
 		Collection<Map.Entry<String, Hits>> entries = hitsMap.entrySet();
 
-		Map<String, String> actualCountsMap = entries.stream(
-		).collect(
+		Map<String, String> actualCountsMap = entries.stream().collect(
 			Collectors.toMap(
 				Map.Entry::getKey,
-				entry -> getCountPairString(entry.getValue()))
-		);
+				entry -> getCountPairString(entry.getValue())));
 
 		AssertUtils.assertEquals(
 			indexingTestHelper.getQueryString(), expectedCountsMap,

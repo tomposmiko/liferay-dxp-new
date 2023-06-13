@@ -18,6 +18,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
+import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -59,8 +60,8 @@ public class DLAppServiceWhenUpdatingAndCheckingInAFileEntryTest
 		fileEntry = DLAppServiceUtil.updateFileEntryAndCheckIn(
 			fileEntry.getFileEntryId(), fileEntry.getFileName(),
 			fileEntry.getMimeType(), fileEntry.getTitle(),
-			RandomTestUtil.randomString(), StringPool.BLANK, false, null,
-			serviceContext);
+			RandomTestUtil.randomString(), StringPool.BLANK,
+			DLVersionNumberIncrease.MINOR, null, serviceContext);
 
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
 			DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId());

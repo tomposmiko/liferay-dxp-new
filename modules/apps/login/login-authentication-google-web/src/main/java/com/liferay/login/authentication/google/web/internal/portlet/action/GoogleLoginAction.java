@@ -14,11 +14,13 @@
 
 package com.liferay.login.authentication.google.web.internal.portlet.action;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.struts.BaseStrutsAction;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -53,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true, property = "path=/portal/google_login",
 	service = StrutsAction.class
 )
-public class GoogleLoginAction extends BaseStrutsAction {
+public class GoogleLoginAction implements StrutsAction {
 
 	@Override
 	public String execute(
@@ -87,14 +89,28 @@ public class GoogleLoginAction extends BaseStrutsAction {
 			if (Validator.isNotNull(authorizationCode)) {
 				String returnRequestUri = getReturnRequestUri(request);
 
-				User user = _googleAuthorization.addOrUpdateUser(
-					session, themeDisplay.getCompanyId(), authorizationCode,
-					returnRequestUri, _scopesLogin);
+				try {
+					User user = _googleAuthorization.addOrUpdateUser(
+						session, themeDisplay.getCompanyId(), authorizationCode,
+						returnRequestUri, _scopesLogin);
 
-				if ((user != null) &&
-					(user.getStatus() == WorkflowConstants.STATUS_INCOMPLETE)) {
+					if ((user != null) &&
+						(user.getStatus() ==
+							WorkflowConstants.STATUS_INCOMPLETE)) {
 
-					sendUpdateAccountRedirect(request, response, user);
+						sendUpdateAccountRedirect(request, response, user);
+
+						return null;
+					}
+				}
+				catch (PortalException pe) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(pe, pe);
+					}
+
+					Class<?> clazz = pe.getClass();
+
+					sendError(clazz.getSimpleName(), request, response);
 
 					return null;
 				}
@@ -119,6 +135,22 @@ public class GoogleLoginAction extends BaseStrutsAction {
 	protected String getReturnRequestUri(HttpServletRequest request) {
 		return _portal.getPortalURL(request) + _portal.getPathMain() +
 			_REDIRECT_URI;
+	}
+
+	protected void sendError(
+			String error, HttpServletRequest request,
+			HttpServletResponse response)
+		throws Exception {
+
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			request, PortletKeys.LOGIN, PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/login/google_login_error");
+		portletURL.setParameter("error", error);
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		response.sendRedirect(portletURL.toString());
 	}
 
 	protected void sendLoginRedirect(
@@ -170,6 +202,9 @@ public class GoogleLoginAction extends BaseStrutsAction {
 
 	private static final String _REDIRECT_URI =
 		"/portal/google_login?cmd=token";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		GoogleLoginAction.class);
 
 	private static final List<String> _scopesLogin = Arrays.asList(
 		"email", "profile");

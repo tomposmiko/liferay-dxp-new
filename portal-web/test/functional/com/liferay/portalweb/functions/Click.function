@@ -129,24 +129,6 @@ definition {
 		selenium.assertLiferayErrors();
 	}
 
-	function mouseMoveLeftClick {
-		WaitForSPARefresh();
-
-		selenium.waitForElementPresent("${locator1}");
-
-		selenium.mouseOver("${locator1}");
-
-		selenium.waitForVisible("${locator1}");
-
-		selenium.mouseMoveAt("${locator1}", "-100,0");
-
-		selenium.click();
-
-		selenium.assertJavaScriptErrors();
-
-		selenium.assertLiferayErrors();
-	}
-
 	function mouseOverClick {
 		WaitForSPARefresh();
 

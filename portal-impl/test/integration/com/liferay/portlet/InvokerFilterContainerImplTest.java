@@ -14,6 +14,7 @@
 
 package com.liferay.portlet;
 
+import com.liferay.portal.internal.servlet.MainServlet;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletContextFactory;
 import com.liferay.portal.kernel.portlet.PortletContextFactoryUtil;
@@ -21,7 +22,6 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.model.impl.PortletAppImpl;
 import com.liferay.portal.model.impl.PortletImpl;
-import com.liferay.portal.servlet.MainServlet;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.SyntheticBundleRule;
 import com.liferay.portal.test.rule.callback.MainServletTestCallback;
@@ -111,10 +111,10 @@ public class InvokerFilterContainerImplTest {
 
 	@Test
 	public void testGetActionFilters() {
+		boolean found = false;
+
 		List<ActionFilter> actionFilters =
 			_invokerFilterContainerImpl.getActionFilters();
-
-		boolean found = false;
 
 		for (ActionFilter actionFilter : actionFilters) {
 			Class<?> clazz = actionFilter.getClass();
@@ -133,10 +133,10 @@ public class InvokerFilterContainerImplTest {
 
 	@Test
 	public void testGetEventFilters() {
+		boolean found = false;
+
 		List<EventFilter> eventFilters =
 			_invokerFilterContainerImpl.getEventFilters();
-
-		boolean found = false;
 
 		for (EventFilter eventFilter : eventFilters) {
 			Class<?> clazz = eventFilter.getClass();
@@ -155,10 +155,10 @@ public class InvokerFilterContainerImplTest {
 
 	@Test
 	public void testGetRenderFilters() {
+		boolean found = false;
+
 		List<RenderFilter> renderFilters =
 			_invokerFilterContainerImpl.getRenderFilters();
-
-		boolean found = false;
 
 		for (RenderFilter renderFilter : renderFilters) {
 			Class<?> clazz = renderFilter.getClass();
@@ -177,10 +177,10 @@ public class InvokerFilterContainerImplTest {
 
 	@Test
 	public void testGetResourceFilters() {
+		boolean found = false;
+
 		List<ResourceFilter> resourceFilters =
 			_invokerFilterContainerImpl.getResourceFilters();
-
-		boolean found = false;
 
 		for (ResourceFilter resourceFilter : resourceFilters) {
 			Class<?> clazz = resourceFilter.getClass();

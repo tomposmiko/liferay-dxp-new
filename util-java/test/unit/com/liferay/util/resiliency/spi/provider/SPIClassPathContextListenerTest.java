@@ -518,6 +518,7 @@ public class SPIClassPathContextListenerTest {
 
 	private final MockServletContext _mockServletContext =
 		new MockServletContext() {
+
 			{
 				addInitParameter("spiEmbeddedLibDir", _EMBEDDED_LIB_DIR_NAME);
 			}

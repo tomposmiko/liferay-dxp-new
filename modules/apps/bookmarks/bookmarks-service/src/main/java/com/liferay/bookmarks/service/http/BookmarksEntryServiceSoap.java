@@ -17,6 +17,7 @@ package com.liferay.bookmarks.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.bookmarks.service.BookmarksEntryServiceUtil;
+
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -25,20 +26,19 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * <code>BookmarksEntryServiceUtil</code> service
- * utility. The static methods of this class call the same methods of the
- * service utility. However, the signatures are different because it is
- * difficult for SOAP to support certain types.
+ * {@link BookmarksEntryServiceUtil} service utility. The
+ * static methods of this class calls the same methods of the service utility.
+ * However, the signatures are different because it is difficult for SOAP to
+ * support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a <code>java.util.List</code>,
- * that is translated to an array of
- * <code>com.liferay.bookmarks.model.BookmarksEntrySoap</code>. If the method in the
- * service utility returns a
- * <code>com.liferay.bookmarks.model.BookmarksEntry</code>, that is translated to a
- * <code>com.liferay.bookmarks.model.BookmarksEntrySoap</code>. Methods that SOAP
- * cannot safely wire are skipped.
+ * if the method in the service utility returns a {@link java.util.List}, that
+ * is translated to an array of {@link com.liferay.bookmarks.model.BookmarksEntrySoap}.
+ * If the method in the service utility returns a
+ * {@link com.liferay.bookmarks.model.BookmarksEntry}, that is translated to a
+ * {@link com.liferay.bookmarks.model.BookmarksEntrySoap}. Methods that SOAP cannot
+ * safely wire are skipped.
  * </p>
  *
  * <p>
@@ -60,24 +60,22 @@ import java.rmi.RemoteException;
  *
  * @author Brian Wing Shun Chan
  * @see BookmarksEntryServiceHttp
+ * @see com.liferay.bookmarks.model.BookmarksEntrySoap
+ * @see BookmarksEntryServiceUtil
  * @generated
  */
 @ProviderType
 public class BookmarksEntryServiceSoap {
-
 	public static com.liferay.bookmarks.model.BookmarksEntrySoap addEntry(
-			long groupId, long folderId, String name, String url,
-			String description,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		long groupId, long folderId, String name, String url,
+		String description,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
-
 		try {
-			com.liferay.bookmarks.model.BookmarksEntry returnValue =
-				BookmarksEntryServiceUtil.addEntry(
-					groupId, folderId, name, url, description, serviceContext);
+			com.liferay.bookmarks.model.BookmarksEntry returnValue = BookmarksEntryServiceUtil.addEntry(groupId,
+					folderId, name, url, description, serviceContext);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -98,16 +96,14 @@ public class BookmarksEntryServiceSoap {
 	}
 
 	public static com.liferay.bookmarks.model.BookmarksEntrySoap[] getEntries(
-			long groupId, long folderId, int start, int end)
+		long groupId, long folderId, int start, int end)
 		throws RemoteException {
-
 		try {
-			java.util.List<com.liferay.bookmarks.model.BookmarksEntry>
-				returnValue = BookmarksEntryServiceUtil.getEntries(
-					groupId, folderId, start, end);
+			java.util.List<com.liferay.bookmarks.model.BookmarksEntry> returnValue =
+				BookmarksEntryServiceUtil.getEntries(groupId, folderId, start,
+					end);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModels(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -117,18 +113,15 @@ public class BookmarksEntryServiceSoap {
 	}
 
 	public static com.liferay.bookmarks.model.BookmarksEntrySoap[] getEntries(
-			long groupId, long folderId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.bookmarks.model.BookmarksEntry> orderByComparator)
+		long groupId, long folderId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.bookmarks.model.BookmarksEntry> orderByComparator)
 		throws RemoteException {
-
 		try {
-			java.util.List<com.liferay.bookmarks.model.BookmarksEntry>
-				returnValue = BookmarksEntryServiceUtil.getEntries(
-					groupId, folderId, start, end, orderByComparator);
+			java.util.List<com.liferay.bookmarks.model.BookmarksEntry> returnValue =
+				BookmarksEntryServiceUtil.getEntries(groupId, folderId, start,
+					end, orderByComparator);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModels(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -139,10 +132,9 @@ public class BookmarksEntryServiceSoap {
 
 	public static int getEntriesCount(long groupId, long folderId)
 		throws RemoteException {
-
 		try {
-			int returnValue = BookmarksEntryServiceUtil.getEntriesCount(
-				groupId, folderId);
+			int returnValue = BookmarksEntryServiceUtil.getEntriesCount(groupId,
+					folderId);
 
 			return returnValue;
 		}
@@ -155,10 +147,9 @@ public class BookmarksEntryServiceSoap {
 
 	public static int getEntriesCount(long groupId, long folderId, int status)
 		throws RemoteException {
-
 		try {
-			int returnValue = BookmarksEntryServiceUtil.getEntriesCount(
-				groupId, folderId, status);
+			int returnValue = BookmarksEntryServiceUtil.getEntriesCount(groupId,
+					folderId, status);
 
 			return returnValue;
 		}
@@ -170,15 +161,11 @@ public class BookmarksEntryServiceSoap {
 	}
 
 	public static com.liferay.bookmarks.model.BookmarksEntrySoap getEntry(
-			long entryId)
-		throws RemoteException {
-
+		long entryId) throws RemoteException {
 		try {
-			com.liferay.bookmarks.model.BookmarksEntry returnValue =
-				BookmarksEntryServiceUtil.getEntry(entryId);
+			com.liferay.bookmarks.model.BookmarksEntry returnValue = BookmarksEntryServiceUtil.getEntry(entryId);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -189,10 +176,9 @@ public class BookmarksEntryServiceSoap {
 
 	public static int getFoldersEntriesCount(long groupId, Long[] folderIds)
 		throws RemoteException {
-
 		try {
-			int returnValue = BookmarksEntryServiceUtil.getFoldersEntriesCount(
-				groupId, ListUtil.toList(folderIds));
+			int returnValue = BookmarksEntryServiceUtil.getFoldersEntriesCount(groupId,
+					ListUtil.toList(folderIds));
 
 			return returnValue;
 		}
@@ -203,17 +189,13 @@ public class BookmarksEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.bookmarks.model.BookmarksEntrySoap[]
-			getGroupEntries(long groupId, int start, int end)
-		throws RemoteException {
-
+	public static com.liferay.bookmarks.model.BookmarksEntrySoap[] getGroupEntries(
+		long groupId, int start, int end) throws RemoteException {
 		try {
-			java.util.List<com.liferay.bookmarks.model.BookmarksEntry>
-				returnValue = BookmarksEntryServiceUtil.getGroupEntries(
-					groupId, start, end);
+			java.util.List<com.liferay.bookmarks.model.BookmarksEntry> returnValue =
+				BookmarksEntryServiceUtil.getGroupEntries(groupId, start, end);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModels(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -222,17 +204,15 @@ public class BookmarksEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.bookmarks.model.BookmarksEntrySoap[]
-			getGroupEntries(long groupId, long userId, int start, int end)
+	public static com.liferay.bookmarks.model.BookmarksEntrySoap[] getGroupEntries(
+		long groupId, long userId, int start, int end)
 		throws RemoteException {
-
 		try {
-			java.util.List<com.liferay.bookmarks.model.BookmarksEntry>
-				returnValue = BookmarksEntryServiceUtil.getGroupEntries(
-					groupId, userId, start, end);
+			java.util.List<com.liferay.bookmarks.model.BookmarksEntry> returnValue =
+				BookmarksEntryServiceUtil.getGroupEntries(groupId, userId,
+					start, end);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModels(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -241,19 +221,15 @@ public class BookmarksEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.bookmarks.model.BookmarksEntrySoap[]
-			getGroupEntries(
-				long groupId, long userId, long rootFolderId, int start,
-				int end)
+	public static com.liferay.bookmarks.model.BookmarksEntrySoap[] getGroupEntries(
+		long groupId, long userId, long rootFolderId, int start, int end)
 		throws RemoteException {
-
 		try {
-			java.util.List<com.liferay.bookmarks.model.BookmarksEntry>
-				returnValue = BookmarksEntryServiceUtil.getGroupEntries(
-					groupId, userId, rootFolderId, start, end);
+			java.util.List<com.liferay.bookmarks.model.BookmarksEntry> returnValue =
+				BookmarksEntryServiceUtil.getGroupEntries(groupId, userId,
+					rootFolderId, start, end);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModels(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -264,10 +240,8 @@ public class BookmarksEntryServiceSoap {
 
 	public static int getGroupEntriesCount(long groupId)
 		throws RemoteException {
-
 		try {
-			int returnValue = BookmarksEntryServiceUtil.getGroupEntriesCount(
-				groupId);
+			int returnValue = BookmarksEntryServiceUtil.getGroupEntriesCount(groupId);
 
 			return returnValue;
 		}
@@ -280,10 +254,9 @@ public class BookmarksEntryServiceSoap {
 
 	public static int getGroupEntriesCount(long groupId, long userId)
 		throws RemoteException {
-
 		try {
-			int returnValue = BookmarksEntryServiceUtil.getGroupEntriesCount(
-				groupId, userId);
+			int returnValue = BookmarksEntryServiceUtil.getGroupEntriesCount(groupId,
+					userId);
 
 			return returnValue;
 		}
@@ -294,13 +267,11 @@ public class BookmarksEntryServiceSoap {
 		}
 	}
 
-	public static int getGroupEntriesCount(
-			long groupId, long userId, long rootFolderId)
-		throws RemoteException {
-
+	public static int getGroupEntriesCount(long groupId, long userId,
+		long rootFolderId) throws RemoteException {
 		try {
-			int returnValue = BookmarksEntryServiceUtil.getGroupEntriesCount(
-				groupId, userId, rootFolderId);
+			int returnValue = BookmarksEntryServiceUtil.getGroupEntriesCount(groupId,
+					userId, rootFolderId);
 
 			return returnValue;
 		}
@@ -312,15 +283,12 @@ public class BookmarksEntryServiceSoap {
 	}
 
 	public static com.liferay.bookmarks.model.BookmarksEntrySoap moveEntry(
-			long entryId, long parentFolderId)
-		throws RemoteException {
-
+		long entryId, long parentFolderId) throws RemoteException {
 		try {
-			com.liferay.bookmarks.model.BookmarksEntry returnValue =
-				BookmarksEntryServiceUtil.moveEntry(entryId, parentFolderId);
+			com.liferay.bookmarks.model.BookmarksEntry returnValue = BookmarksEntryServiceUtil.moveEntry(entryId,
+					parentFolderId);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -329,17 +297,13 @@ public class BookmarksEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.bookmarks.model.BookmarksEntrySoap
-			moveEntryFromTrash(long entryId, long parentFolderId)
-		throws RemoteException {
-
+	public static com.liferay.bookmarks.model.BookmarksEntrySoap moveEntryFromTrash(
+		long entryId, long parentFolderId) throws RemoteException {
 		try {
-			com.liferay.bookmarks.model.BookmarksEntry returnValue =
-				BookmarksEntryServiceUtil.moveEntryFromTrash(
-					entryId, parentFolderId);
+			com.liferay.bookmarks.model.BookmarksEntry returnValue = BookmarksEntryServiceUtil.moveEntryFromTrash(entryId,
+					parentFolderId);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -348,16 +312,12 @@ public class BookmarksEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.bookmarks.model.BookmarksEntrySoap
-			moveEntryToTrash(long entryId)
-		throws RemoteException {
-
+	public static com.liferay.bookmarks.model.BookmarksEntrySoap moveEntryToTrash(
+		long entryId) throws RemoteException {
 		try {
-			com.liferay.bookmarks.model.BookmarksEntry returnValue =
-				BookmarksEntryServiceUtil.moveEntryToTrash(entryId);
+			com.liferay.bookmarks.model.BookmarksEntry returnValue = BookmarksEntryServiceUtil.moveEntryToTrash(entryId);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -367,17 +327,13 @@ public class BookmarksEntryServiceSoap {
 	}
 
 	public static com.liferay.bookmarks.model.BookmarksEntrySoap openEntry(
-			com.liferay.bookmarks.model.BookmarksEntrySoap entry)
+		com.liferay.bookmarks.model.BookmarksEntrySoap entry)
 		throws RemoteException {
-
 		try {
-			com.liferay.bookmarks.model.BookmarksEntry returnValue =
-				BookmarksEntryServiceUtil.openEntry(
-					com.liferay.bookmarks.model.impl.BookmarksEntryModelImpl.
-						toModel(entry));
+			com.liferay.bookmarks.model.BookmarksEntry returnValue = BookmarksEntryServiceUtil.openEntry(com.liferay.bookmarks.model.impl.BookmarksEntryModelImpl.toModel(
+						entry));
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -387,15 +343,11 @@ public class BookmarksEntryServiceSoap {
 	}
 
 	public static com.liferay.bookmarks.model.BookmarksEntrySoap openEntry(
-			long entryId)
-		throws RemoteException {
-
+		long entryId) throws RemoteException {
 		try {
-			com.liferay.bookmarks.model.BookmarksEntry returnValue =
-				BookmarksEntryServiceUtil.openEntry(entryId);
+			com.liferay.bookmarks.model.BookmarksEntry returnValue = BookmarksEntryServiceUtil.openEntry(entryId);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -406,7 +358,6 @@ public class BookmarksEntryServiceSoap {
 
 	public static void restoreEntryFromTrash(long entryId)
 		throws RemoteException {
-
 		try {
 			BookmarksEntryServiceUtil.restoreEntryFromTrash(entryId);
 		}
@@ -440,19 +391,15 @@ public class BookmarksEntryServiceSoap {
 	}
 
 	public static com.liferay.bookmarks.model.BookmarksEntrySoap updateEntry(
-			long entryId, long groupId, long folderId, String name, String url,
-			String description,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		long entryId, long groupId, long folderId, String name, String url,
+		String description,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
-
 		try {
-			com.liferay.bookmarks.model.BookmarksEntry returnValue =
-				BookmarksEntryServiceUtil.updateEntry(
-					entryId, groupId, folderId, name, url, description,
-					serviceContext);
+			com.liferay.bookmarks.model.BookmarksEntry returnValue = BookmarksEntryServiceUtil.updateEntry(entryId,
+					groupId, folderId, name, url, description, serviceContext);
 
-			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(
-				returnValue);
+			return com.liferay.bookmarks.model.BookmarksEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -461,7 +408,5 @@ public class BookmarksEntryServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		BookmarksEntryServiceSoap.class);
-
+	private static Log _log = LogFactoryUtil.getLog(BookmarksEntryServiceSoap.class);
 }

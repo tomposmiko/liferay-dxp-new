@@ -49,9 +49,11 @@ public class DefaultSoapDescriptorBuilder implements SoapDescriptorBuilder {
 			Object soapEndpointName = _properties.get("soap.endpoint.name");
 
 			if ((soapEndpointName != null) &&
-				(soapEndpointName instanceof QName)) {
+				soapEndpointName instanceof QName) {
 
-				return (QName)soapEndpointName;
+				QName endpointName = (QName)soapEndpointName;
+
+				return endpointName;
 			}
 
 			return null;
@@ -75,7 +77,7 @@ public class DefaultSoapDescriptorBuilder implements SoapDescriptorBuilder {
 			Object soapServiceClass = _properties.get("soap.service.class");
 
 			if ((soapServiceClass != null) &&
-				(soapServiceClass instanceof Class<?>)) {
+				soapServiceClass instanceof Class<?>) {
 
 				return (Class<?>)soapServiceClass;
 			}

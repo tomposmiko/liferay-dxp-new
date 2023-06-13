@@ -120,7 +120,7 @@ public class ScopeMapperNarrowDownClientTest extends BaseClientTestCase {
 				new HashMapDictionary<>();
 
 			applicationProperties.put(
-				"oauth2.scope.checker.type", "annotations");
+				"oauth2.scopechecker.type", "annotations");
 
 			Dictionary<String, Object> scopeMapperProperties =
 				new HashMapDictionary<>();

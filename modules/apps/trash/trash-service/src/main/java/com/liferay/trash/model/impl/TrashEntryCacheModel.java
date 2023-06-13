@@ -16,9 +16,11 @@ package com.liferay.trash.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+
 import com.liferay.trash.model.TrashEntry;
 
 import java.io.Externalizable;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing TrashEntry in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see TrashEntry
  * @generated
  */
 @ProviderType
-public class TrashEntryCacheModel
-	implements CacheModel<TrashEntry>, Externalizable {
-
+public class TrashEntryCacheModel implements CacheModel<TrashEntry>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -157,7 +159,8 @@ public class TrashEntryCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(entryId);
 
 		objectOutput.writeLong(groupId);
@@ -202,5 +205,4 @@ public class TrashEntryCacheModel
 	public long systemEventSetKey;
 	public String typeSettings;
 	public int status;
-
 }

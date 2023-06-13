@@ -30,14 +30,11 @@ import java.util.List;
  */
 @ProviderType
 public class KaleoDefinitionVersionSoap implements Serializable {
-
 	public static KaleoDefinitionVersionSoap toSoapModel(
 		KaleoDefinitionVersion model) {
-
 		KaleoDefinitionVersionSoap soapModel = new KaleoDefinitionVersionSoap();
 
-		soapModel.setKaleoDefinitionVersionId(
-			model.getKaleoDefinitionVersionId());
+		soapModel.setKaleoDefinitionVersionId(model.getKaleoDefinitionVersionId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
@@ -60,9 +57,7 @@ public class KaleoDefinitionVersionSoap implements Serializable {
 
 	public static KaleoDefinitionVersionSoap[] toSoapModels(
 		KaleoDefinitionVersion[] models) {
-
-		KaleoDefinitionVersionSoap[] soapModels =
-			new KaleoDefinitionVersionSoap[models.length];
+		KaleoDefinitionVersionSoap[] soapModels = new KaleoDefinitionVersionSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -73,12 +68,10 @@ public class KaleoDefinitionVersionSoap implements Serializable {
 
 	public static KaleoDefinitionVersionSoap[][] toSoapModels(
 		KaleoDefinitionVersion[][] models) {
-
 		KaleoDefinitionVersionSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels =
-				new KaleoDefinitionVersionSoap[models.length][models[0].length];
+			soapModels = new KaleoDefinitionVersionSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new KaleoDefinitionVersionSoap[0][0];
@@ -93,16 +86,13 @@ public class KaleoDefinitionVersionSoap implements Serializable {
 
 	public static KaleoDefinitionVersionSoap[] toSoapModels(
 		List<KaleoDefinitionVersion> models) {
-
-		List<KaleoDefinitionVersionSoap> soapModels =
-			new ArrayList<KaleoDefinitionVersionSoap>(models.size());
+		List<KaleoDefinitionVersionSoap> soapModels = new ArrayList<KaleoDefinitionVersionSoap>(models.size());
 
 		for (KaleoDefinitionVersion model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(
-			new KaleoDefinitionVersionSoap[soapModels.size()]);
+		return soapModels.toArray(new KaleoDefinitionVersionSoap[soapModels.size()]);
 	}
 
 	public KaleoDefinitionVersionSoap() {
@@ -269,5 +259,4 @@ public class KaleoDefinitionVersionSoap implements Serializable {
 	private String _version;
 	private long _startKaleoNodeId;
 	private int _status;
-
 }

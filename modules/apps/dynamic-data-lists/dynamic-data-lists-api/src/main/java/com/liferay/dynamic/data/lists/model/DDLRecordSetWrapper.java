@@ -16,17 +16,14 @@ package com.liferay.dynamic.data.lists.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
 
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -38,27 +35,17 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class DDLRecordSetWrapper
+public class DDLRecordSetWrapper extends BaseModelWrapper<DDLRecordSet>
 	implements DDLRecordSet, ModelWrapper<DDLRecordSet> {
-
 	public DDLRecordSetWrapper(DDLRecordSet ddlRecordSet) {
-		_ddlRecordSet = ddlRecordSet;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return DDLRecordSet.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return DDLRecordSet.class.getName();
+		super(ddlRecordSet);
 	}
 
 	@Override
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("recordSetId", getRecordSetId());
 		attributes.put("groupId", getGroupId());
@@ -84,6 +71,12 @@ public class DDLRecordSetWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -200,909 +193,777 @@ public class DDLRecordSetWrapper
 	}
 
 	@Override
-	public Object clone() {
-		return new DDLRecordSetWrapper((DDLRecordSet)_ddlRecordSet.clone());
-	}
-
-	@Override
-	public int compareTo(DDLRecordSet ddlRecordSet) {
-		return _ddlRecordSet.compareTo(ddlRecordSet);
-	}
-
-	@Override
 	public String[] getAvailableLanguageIds() {
-		return _ddlRecordSet.getAvailableLanguageIds();
+		return model.getAvailableLanguageIds();
 	}
 
 	/**
-	 * Returns the company ID of this ddl record set.
-	 *
-	 * @return the company ID of this ddl record set
-	 */
+	* Returns the company ID of this ddl record set.
+	*
+	* @return the company ID of this ddl record set
+	*/
 	@Override
 	public long getCompanyId() {
-		return _ddlRecordSet.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the create date of this ddl record set.
-	 *
-	 * @return the create date of this ddl record set
-	 */
+	* Returns the create date of this ddl record set.
+	*
+	* @return the create date of this ddl record set
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _ddlRecordSet.getCreateDate();
+		return model.getCreateDate();
 	}
 
 	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMStructure getDDMStructure()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddlRecordSet.getDDMStructure();
+		return model.getDDMStructure();
 	}
 
 	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMStructure getDDMStructure(
-			long formDDMTemplateId)
+		long formDDMTemplateId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddlRecordSet.getDDMStructure(formDDMTemplateId);
+		return model.getDDMStructure(formDDMTemplateId);
 	}
 
 	/**
-	 * Returns the ddm structure ID of this ddl record set.
-	 *
-	 * @return the ddm structure ID of this ddl record set
-	 */
+	* Returns the ddm structure ID of this ddl record set.
+	*
+	* @return the ddm structure ID of this ddl record set
+	*/
 	@Override
 	public long getDDMStructureId() {
-		return _ddlRecordSet.getDDMStructureId();
+		return model.getDDMStructureId();
 	}
 
 	@Override
 	public String getDefaultLanguageId() {
-		return _ddlRecordSet.getDefaultLanguageId();
+		return model.getDefaultLanguageId();
 	}
 
 	/**
-	 * Returns the description of this ddl record set.
-	 *
-	 * @return the description of this ddl record set
-	 */
+	* Returns the description of this ddl record set.
+	*
+	* @return the description of this ddl record set
+	*/
 	@Override
 	public String getDescription() {
-		return _ddlRecordSet.getDescription();
+		return model.getDescription();
 	}
 
 	/**
-	 * Returns the localized description of this ddl record set in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the locale of the language
-	 * @return the localized description of this ddl record set
-	 */
+	* Returns the localized description of this ddl record set in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized description of this ddl record set
+	*/
 	@Override
 	public String getDescription(java.util.Locale locale) {
-		return _ddlRecordSet.getDescription(locale);
+		return model.getDescription(locale);
 	}
 
 	/**
-	 * Returns the localized description of this ddl record set in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the local of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this ddl record set. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	 */
+	* Returns the localized description of this ddl record set in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this ddl record set. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
 	@Override
 	public String getDescription(java.util.Locale locale, boolean useDefault) {
-		return _ddlRecordSet.getDescription(locale, useDefault);
+		return model.getDescription(locale, useDefault);
 	}
 
 	/**
-	 * Returns the localized description of this ddl record set in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @return the localized description of this ddl record set
-	 */
+	* Returns the localized description of this ddl record set in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @return the localized description of this ddl record set
+	*/
 	@Override
 	public String getDescription(String languageId) {
-		return _ddlRecordSet.getDescription(languageId);
+		return model.getDescription(languageId);
 	}
 
 	/**
-	 * Returns the localized description of this ddl record set in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this ddl record set
-	 */
+	* Returns the localized description of this ddl record set in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this ddl record set
+	*/
 	@Override
 	public String getDescription(String languageId, boolean useDefault) {
-		return _ddlRecordSet.getDescription(languageId, useDefault);
+		return model.getDescription(languageId, useDefault);
 	}
 
 	@Override
 	public String getDescriptionCurrentLanguageId() {
-		return _ddlRecordSet.getDescriptionCurrentLanguageId();
+		return model.getDescriptionCurrentLanguageId();
 	}
 
 	@Override
 	public String getDescriptionCurrentValue() {
-		return _ddlRecordSet.getDescriptionCurrentValue();
+		return model.getDescriptionCurrentValue();
 	}
 
 	/**
-	 * Returns a map of the locales and localized descriptions of this ddl record set.
-	 *
-	 * @return the locales and localized descriptions of this ddl record set
-	 */
+	* Returns a map of the locales and localized descriptions of this ddl record set.
+	*
+	* @return the locales and localized descriptions of this ddl record set
+	*/
 	@Override
 	public Map<java.util.Locale, String> getDescriptionMap() {
-		return _ddlRecordSet.getDescriptionMap();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _ddlRecordSet.getExpandoBridge();
+		return model.getDescriptionMap();
 	}
 
 	/**
-	 * Returns the group ID of this ddl record set.
-	 *
-	 * @return the group ID of this ddl record set
-	 */
+	* Returns the group ID of this ddl record set.
+	*
+	* @return the group ID of this ddl record set
+	*/
 	@Override
 	public long getGroupId() {
-		return _ddlRecordSet.getGroupId();
+		return model.getGroupId();
 	}
 
 	/**
-	 * Returns the last publish date of this ddl record set.
-	 *
-	 * @return the last publish date of this ddl record set
-	 */
+	* Returns the last publish date of this ddl record set.
+	*
+	* @return the last publish date of this ddl record set
+	*/
 	@Override
 	public Date getLastPublishDate() {
-		return _ddlRecordSet.getLastPublishDate();
+		return model.getLastPublishDate();
 	}
 
 	/**
-	 * Returns the min display rows of this ddl record set.
-	 *
-	 * @return the min display rows of this ddl record set
-	 */
+	* Returns the min display rows of this ddl record set.
+	*
+	* @return the min display rows of this ddl record set
+	*/
 	@Override
 	public int getMinDisplayRows() {
-		return _ddlRecordSet.getMinDisplayRows();
+		return model.getMinDisplayRows();
 	}
 
 	/**
-	 * Returns the modified date of this ddl record set.
-	 *
-	 * @return the modified date of this ddl record set
-	 */
+	* Returns the modified date of this ddl record set.
+	*
+	* @return the modified date of this ddl record set
+	*/
 	@Override
 	public Date getModifiedDate() {
-		return _ddlRecordSet.getModifiedDate();
+		return model.getModifiedDate();
 	}
 
 	/**
-	 * Returns the name of this ddl record set.
-	 *
-	 * @return the name of this ddl record set
-	 */
+	* Returns the mvcc version of this ddl record set.
+	*
+	* @return the mvcc version of this ddl record set
+	*/
+	@Override
+	public long getMvccVersion() {
+		return model.getMvccVersion();
+	}
+
+	/**
+	* Returns the name of this ddl record set.
+	*
+	* @return the name of this ddl record set
+	*/
 	@Override
 	public String getName() {
-		return _ddlRecordSet.getName();
+		return model.getName();
 	}
 
 	/**
-	 * Returns the localized name of this ddl record set in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the locale of the language
-	 * @return the localized name of this ddl record set
-	 */
+	* Returns the localized name of this ddl record set in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized name of this ddl record set
+	*/
 	@Override
 	public String getName(java.util.Locale locale) {
-		return _ddlRecordSet.getName(locale);
+		return model.getName(locale);
 	}
 
 	/**
-	 * Returns the localized name of this ddl record set in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the local of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized name of this ddl record set. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	 */
+	* Returns the localized name of this ddl record set in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized name of this ddl record set. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
 	@Override
 	public String getName(java.util.Locale locale, boolean useDefault) {
-		return _ddlRecordSet.getName(locale, useDefault);
+		return model.getName(locale, useDefault);
 	}
 
 	/**
-	 * Returns the localized name of this ddl record set in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @return the localized name of this ddl record set
-	 */
+	* Returns the localized name of this ddl record set in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @return the localized name of this ddl record set
+	*/
 	@Override
 	public String getName(String languageId) {
-		return _ddlRecordSet.getName(languageId);
+		return model.getName(languageId);
 	}
 
 	/**
-	 * Returns the localized name of this ddl record set in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized name of this ddl record set
-	 */
+	* Returns the localized name of this ddl record set in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized name of this ddl record set
+	*/
 	@Override
 	public String getName(String languageId, boolean useDefault) {
-		return _ddlRecordSet.getName(languageId, useDefault);
+		return model.getName(languageId, useDefault);
 	}
 
 	@Override
 	public String getNameCurrentLanguageId() {
-		return _ddlRecordSet.getNameCurrentLanguageId();
+		return model.getNameCurrentLanguageId();
 	}
 
 	@Override
 	public String getNameCurrentValue() {
-		return _ddlRecordSet.getNameCurrentValue();
+		return model.getNameCurrentValue();
 	}
 
 	/**
-	 * Returns a map of the locales and localized names of this ddl record set.
-	 *
-	 * @return the locales and localized names of this ddl record set
-	 */
+	* Returns a map of the locales and localized names of this ddl record set.
+	*
+	* @return the locales and localized names of this ddl record set
+	*/
 	@Override
 	public Map<java.util.Locale, String> getNameMap() {
-		return _ddlRecordSet.getNameMap();
+		return model.getNameMap();
 	}
 
 	/**
-	 * Returns the primary key of this ddl record set.
-	 *
-	 * @return the primary key of this ddl record set
-	 */
+	* Returns the primary key of this ddl record set.
+	*
+	* @return the primary key of this ddl record set
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _ddlRecordSet.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _ddlRecordSet.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	@Override
 	public java.util.List<DDLRecord> getRecords() {
-		return _ddlRecordSet.getRecords();
+		return model.getRecords();
 	}
 
 	/**
-	 * Returns the record set ID of this ddl record set.
-	 *
-	 * @return the record set ID of this ddl record set
-	 */
+	* Returns the record set ID of this ddl record set.
+	*
+	* @return the record set ID of this ddl record set
+	*/
 	@Override
 	public long getRecordSetId() {
-		return _ddlRecordSet.getRecordSetId();
+		return model.getRecordSetId();
 	}
 
 	/**
-	 * Returns the record set key of this ddl record set.
-	 *
-	 * @return the record set key of this ddl record set
-	 */
+	* Returns the record set key of this ddl record set.
+	*
+	* @return the record set key of this ddl record set
+	*/
 	@Override
 	public String getRecordSetKey() {
-		return _ddlRecordSet.getRecordSetKey();
+		return model.getRecordSetKey();
 	}
 
 	@Override
 	public DDLRecordSetVersion getRecordSetVersion()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddlRecordSet.getRecordSetVersion();
+		return model.getRecordSetVersion();
 	}
 
 	@Override
 	public DDLRecordSetVersion getRecordSetVersion(String version)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddlRecordSet.getRecordSetVersion(version);
+		return model.getRecordSetVersion(version);
 	}
 
 	/**
-	 * Returns the scope of this ddl record set.
-	 *
-	 * @return the scope of this ddl record set
-	 */
+	* Returns the scope of this ddl record set.
+	*
+	* @return the scope of this ddl record set
+	*/
 	@Override
 	public int getScope() {
-		return _ddlRecordSet.getScope();
+		return model.getScope();
 	}
 
 	/**
-	 * Returns the settings of this ddl record set.
-	 *
-	 * @return the settings of this ddl record set
-	 */
+	* Returns the settings of this ddl record set.
+	*
+	* @return the settings of this ddl record set
+	*/
 	@Override
 	public String getSettings() {
-		return _ddlRecordSet.getSettings();
+		return model.getSettings();
 	}
 
 	@Override
-	public com.liferay.dynamic.data.mapping.storage.DDMFormValues
-			getSettingsDDMFormValues()
+	public com.liferay.dynamic.data.mapping.storage.DDMFormValues getSettingsDDMFormValues()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddlRecordSet.getSettingsDDMFormValues();
+		return model.getSettingsDDMFormValues();
 	}
 
 	@Override
 	public DDLRecordSetSettings getSettingsModel()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddlRecordSet.getSettingsModel();
+		return model.getSettingsModel();
 	}
 
 	/**
-	 * Returns the user ID of this ddl record set.
-	 *
-	 * @return the user ID of this ddl record set
-	 */
+	* Returns the user ID of this ddl record set.
+	*
+	* @return the user ID of this ddl record set
+	*/
 	@Override
 	public long getUserId() {
-		return _ddlRecordSet.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this ddl record set.
-	 *
-	 * @return the user name of this ddl record set
-	 */
+	* Returns the user name of this ddl record set.
+	*
+	* @return the user name of this ddl record set
+	*/
 	@Override
 	public String getUserName() {
-		return _ddlRecordSet.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this ddl record set.
-	 *
-	 * @return the user uuid of this ddl record set
-	 */
+	* Returns the user uuid of this ddl record set.
+	*
+	* @return the user uuid of this ddl record set
+	*/
 	@Override
 	public String getUserUuid() {
-		return _ddlRecordSet.getUserUuid();
+		return model.getUserUuid();
 	}
 
 	/**
-	 * Returns the uuid of this ddl record set.
-	 *
-	 * @return the uuid of this ddl record set
-	 */
+	* Returns the uuid of this ddl record set.
+	*
+	* @return the uuid of this ddl record set
+	*/
 	@Override
 	public String getUuid() {
-		return _ddlRecordSet.getUuid();
+		return model.getUuid();
 	}
 
 	/**
-	 * Returns the version of this ddl record set.
-	 *
-	 * @return the version of this ddl record set
-	 */
+	* Returns the version of this ddl record set.
+	*
+	* @return the version of this ddl record set
+	*/
 	@Override
 	public String getVersion() {
-		return _ddlRecordSet.getVersion();
+		return model.getVersion();
 	}
 
 	/**
-	 * Returns the version user ID of this ddl record set.
-	 *
-	 * @return the version user ID of this ddl record set
-	 */
+	* Returns the version user ID of this ddl record set.
+	*
+	* @return the version user ID of this ddl record set
+	*/
 	@Override
 	public long getVersionUserId() {
-		return _ddlRecordSet.getVersionUserId();
+		return model.getVersionUserId();
 	}
 
 	/**
-	 * Returns the version user name of this ddl record set.
-	 *
-	 * @return the version user name of this ddl record set
-	 */
+	* Returns the version user name of this ddl record set.
+	*
+	* @return the version user name of this ddl record set
+	*/
 	@Override
 	public String getVersionUserName() {
-		return _ddlRecordSet.getVersionUserName();
+		return model.getVersionUserName();
 	}
 
 	/**
-	 * Returns the version user uuid of this ddl record set.
-	 *
-	 * @return the version user uuid of this ddl record set
-	 */
+	* Returns the version user uuid of this ddl record set.
+	*
+	* @return the version user uuid of this ddl record set
+	*/
 	@Override
 	public String getVersionUserUuid() {
-		return _ddlRecordSet.getVersionUserUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _ddlRecordSet.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _ddlRecordSet.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _ddlRecordSet.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _ddlRecordSet.isNew();
+		return model.getVersionUserUuid();
 	}
 
 	@Override
 	public void persist() {
-		_ddlRecordSet.persist();
+		model.persist();
 	}
 
 	@Override
 	public void prepareLocalizedFieldsForImport()
 		throws com.liferay.portal.kernel.exception.LocaleException {
-
-		_ddlRecordSet.prepareLocalizedFieldsForImport();
+		model.prepareLocalizedFieldsForImport();
 	}
 
 	@Override
 	public void prepareLocalizedFieldsForImport(
-			java.util.Locale defaultImportLocale)
+		java.util.Locale defaultImportLocale)
 		throws com.liferay.portal.kernel.exception.LocaleException {
-
-		_ddlRecordSet.prepareLocalizedFieldsForImport(defaultImportLocale);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_ddlRecordSet.setCachedModel(cachedModel);
+		model.prepareLocalizedFieldsForImport(defaultImportLocale);
 	}
 
 	/**
-	 * Sets the company ID of this ddl record set.
-	 *
-	 * @param companyId the company ID of this ddl record set
-	 */
+	* Sets the company ID of this ddl record set.
+	*
+	* @param companyId the company ID of this ddl record set
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_ddlRecordSet.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this ddl record set.
-	 *
-	 * @param createDate the create date of this ddl record set
-	 */
+	* Sets the create date of this ddl record set.
+	*
+	* @param createDate the create date of this ddl record set
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_ddlRecordSet.setCreateDate(createDate);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the ddm structure ID of this ddl record set.
-	 *
-	 * @param DDMStructureId the ddm structure ID of this ddl record set
-	 */
+	* Sets the ddm structure ID of this ddl record set.
+	*
+	* @param DDMStructureId the ddm structure ID of this ddl record set
+	*/
 	@Override
 	public void setDDMStructureId(long DDMStructureId) {
-		_ddlRecordSet.setDDMStructureId(DDMStructureId);
+		model.setDDMStructureId(DDMStructureId);
 	}
 
 	/**
-	 * Sets the description of this ddl record set.
-	 *
-	 * @param description the description of this ddl record set
-	 */
+	* Sets the description of this ddl record set.
+	*
+	* @param description the description of this ddl record set
+	*/
 	@Override
 	public void setDescription(String description) {
-		_ddlRecordSet.setDescription(description);
+		model.setDescription(description);
 	}
 
 	/**
-	 * Sets the localized description of this ddl record set in the language.
-	 *
-	 * @param description the localized description of this ddl record set
-	 * @param locale the locale of the language
-	 */
+	* Sets the localized description of this ddl record set in the language.
+	*
+	* @param description the localized description of this ddl record set
+	* @param locale the locale of the language
+	*/
 	@Override
 	public void setDescription(String description, java.util.Locale locale) {
-		_ddlRecordSet.setDescription(description, locale);
+		model.setDescription(description, locale);
 	}
 
 	/**
-	 * Sets the localized description of this ddl record set in the language, and sets the default locale.
-	 *
-	 * @param description the localized description of this ddl record set
-	 * @param locale the locale of the language
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized description of this ddl record set in the language, and sets the default locale.
+	*
+	* @param description the localized description of this ddl record set
+	* @param locale the locale of the language
+	* @param defaultLocale the default locale
+	*/
 	@Override
-	public void setDescription(
-		String description, java.util.Locale locale,
+	public void setDescription(String description, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
-
-		_ddlRecordSet.setDescription(description, locale, defaultLocale);
+		model.setDescription(description, locale, defaultLocale);
 	}
 
 	@Override
 	public void setDescriptionCurrentLanguageId(String languageId) {
-		_ddlRecordSet.setDescriptionCurrentLanguageId(languageId);
+		model.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
-	 * Sets the localized descriptions of this ddl record set from the map of locales and localized descriptions.
-	 *
-	 * @param descriptionMap the locales and localized descriptions of this ddl record set
-	 */
+	* Sets the localized descriptions of this ddl record set from the map of locales and localized descriptions.
+	*
+	* @param descriptionMap the locales and localized descriptions of this ddl record set
+	*/
 	@Override
-	public void setDescriptionMap(
-		Map<java.util.Locale, String> descriptionMap) {
-
-		_ddlRecordSet.setDescriptionMap(descriptionMap);
+	public void setDescriptionMap(Map<java.util.Locale, String> descriptionMap) {
+		model.setDescriptionMap(descriptionMap);
 	}
 
 	/**
-	 * Sets the localized descriptions of this ddl record set from the map of locales and localized descriptions, and sets the default locale.
-	 *
-	 * @param descriptionMap the locales and localized descriptions of this ddl record set
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized descriptions of this ddl record set from the map of locales and localized descriptions, and sets the default locale.
+	*
+	* @param descriptionMap the locales and localized descriptions of this ddl record set
+	* @param defaultLocale the default locale
+	*/
 	@Override
 	public void setDescriptionMap(
 		Map<java.util.Locale, String> descriptionMap,
 		java.util.Locale defaultLocale) {
-
-		_ddlRecordSet.setDescriptionMap(descriptionMap, defaultLocale);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_ddlRecordSet.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_ddlRecordSet.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_ddlRecordSet.setExpandoBridgeAttributes(serviceContext);
+		model.setDescriptionMap(descriptionMap, defaultLocale);
 	}
 
 	/**
-	 * Sets the group ID of this ddl record set.
-	 *
-	 * @param groupId the group ID of this ddl record set
-	 */
+	* Sets the group ID of this ddl record set.
+	*
+	* @param groupId the group ID of this ddl record set
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_ddlRecordSet.setGroupId(groupId);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the last publish date of this ddl record set.
-	 *
-	 * @param lastPublishDate the last publish date of this ddl record set
-	 */
+	* Sets the last publish date of this ddl record set.
+	*
+	* @param lastPublishDate the last publish date of this ddl record set
+	*/
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
-		_ddlRecordSet.setLastPublishDate(lastPublishDate);
+		model.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	 * Sets the min display rows of this ddl record set.
-	 *
-	 * @param minDisplayRows the min display rows of this ddl record set
-	 */
+	* Sets the min display rows of this ddl record set.
+	*
+	* @param minDisplayRows the min display rows of this ddl record set
+	*/
 	@Override
 	public void setMinDisplayRows(int minDisplayRows) {
-		_ddlRecordSet.setMinDisplayRows(minDisplayRows);
+		model.setMinDisplayRows(minDisplayRows);
 	}
 
 	/**
-	 * Sets the modified date of this ddl record set.
-	 *
-	 * @param modifiedDate the modified date of this ddl record set
-	 */
+	* Sets the modified date of this ddl record set.
+	*
+	* @param modifiedDate the modified date of this ddl record set
+	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
-		_ddlRecordSet.setModifiedDate(modifiedDate);
+		model.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	 * Sets the name of this ddl record set.
-	 *
-	 * @param name the name of this ddl record set
-	 */
+	* Sets the mvcc version of this ddl record set.
+	*
+	* @param mvccVersion the mvcc version of this ddl record set
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		model.setMvccVersion(mvccVersion);
+	}
+
+	/**
+	* Sets the name of this ddl record set.
+	*
+	* @param name the name of this ddl record set
+	*/
 	@Override
 	public void setName(String name) {
-		_ddlRecordSet.setName(name);
+		model.setName(name);
 	}
 
 	/**
-	 * Sets the localized name of this ddl record set in the language.
-	 *
-	 * @param name the localized name of this ddl record set
-	 * @param locale the locale of the language
-	 */
+	* Sets the localized name of this ddl record set in the language.
+	*
+	* @param name the localized name of this ddl record set
+	* @param locale the locale of the language
+	*/
 	@Override
 	public void setName(String name, java.util.Locale locale) {
-		_ddlRecordSet.setName(name, locale);
+		model.setName(name, locale);
 	}
 
 	/**
-	 * Sets the localized name of this ddl record set in the language, and sets the default locale.
-	 *
-	 * @param name the localized name of this ddl record set
-	 * @param locale the locale of the language
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized name of this ddl record set in the language, and sets the default locale.
+	*
+	* @param name the localized name of this ddl record set
+	* @param locale the locale of the language
+	* @param defaultLocale the default locale
+	*/
 	@Override
-	public void setName(
-		String name, java.util.Locale locale, java.util.Locale defaultLocale) {
-
-		_ddlRecordSet.setName(name, locale, defaultLocale);
+	public void setName(String name, java.util.Locale locale,
+		java.util.Locale defaultLocale) {
+		model.setName(name, locale, defaultLocale);
 	}
 
 	@Override
 	public void setNameCurrentLanguageId(String languageId) {
-		_ddlRecordSet.setNameCurrentLanguageId(languageId);
+		model.setNameCurrentLanguageId(languageId);
 	}
 
 	/**
-	 * Sets the localized names of this ddl record set from the map of locales and localized names.
-	 *
-	 * @param nameMap the locales and localized names of this ddl record set
-	 */
+	* Sets the localized names of this ddl record set from the map of locales and localized names.
+	*
+	* @param nameMap the locales and localized names of this ddl record set
+	*/
 	@Override
 	public void setNameMap(Map<java.util.Locale, String> nameMap) {
-		_ddlRecordSet.setNameMap(nameMap);
+		model.setNameMap(nameMap);
 	}
 
 	/**
-	 * Sets the localized names of this ddl record set from the map of locales and localized names, and sets the default locale.
-	 *
-	 * @param nameMap the locales and localized names of this ddl record set
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized names of this ddl record set from the map of locales and localized names, and sets the default locale.
+	*
+	* @param nameMap the locales and localized names of this ddl record set
+	* @param defaultLocale the default locale
+	*/
 	@Override
-	public void setNameMap(
-		Map<java.util.Locale, String> nameMap, java.util.Locale defaultLocale) {
-
-		_ddlRecordSet.setNameMap(nameMap, defaultLocale);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_ddlRecordSet.setNew(n);
+	public void setNameMap(Map<java.util.Locale, String> nameMap,
+		java.util.Locale defaultLocale) {
+		model.setNameMap(nameMap, defaultLocale);
 	}
 
 	/**
-	 * Sets the primary key of this ddl record set.
-	 *
-	 * @param primaryKey the primary key of this ddl record set
-	 */
+	* Sets the primary key of this ddl record set.
+	*
+	* @param primaryKey the primary key of this ddl record set
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_ddlRecordSet.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_ddlRecordSet.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the record set ID of this ddl record set.
-	 *
-	 * @param recordSetId the record set ID of this ddl record set
-	 */
+	* Sets the record set ID of this ddl record set.
+	*
+	* @param recordSetId the record set ID of this ddl record set
+	*/
 	@Override
 	public void setRecordSetId(long recordSetId) {
-		_ddlRecordSet.setRecordSetId(recordSetId);
+		model.setRecordSetId(recordSetId);
 	}
 
 	/**
-	 * Sets the record set key of this ddl record set.
-	 *
-	 * @param recordSetKey the record set key of this ddl record set
-	 */
+	* Sets the record set key of this ddl record set.
+	*
+	* @param recordSetKey the record set key of this ddl record set
+	*/
 	@Override
 	public void setRecordSetKey(String recordSetKey) {
-		_ddlRecordSet.setRecordSetKey(recordSetKey);
+		model.setRecordSetKey(recordSetKey);
 	}
 
 	/**
-	 * Sets the scope of this ddl record set.
-	 *
-	 * @param scope the scope of this ddl record set
-	 */
+	* Sets the scope of this ddl record set.
+	*
+	* @param scope the scope of this ddl record set
+	*/
 	@Override
 	public void setScope(int scope) {
-		_ddlRecordSet.setScope(scope);
+		model.setScope(scope);
 	}
 
 	/**
-	 * Sets the settings of this ddl record set.
-	 *
-	 * @param settings the settings of this ddl record set
-	 */
+	* Sets the settings of this ddl record set.
+	*
+	* @param settings the settings of this ddl record set
+	*/
 	@Override
 	public void setSettings(String settings) {
-		_ddlRecordSet.setSettings(settings);
+		model.setSettings(settings);
 	}
 
 	/**
-	 * Sets the user ID of this ddl record set.
-	 *
-	 * @param userId the user ID of this ddl record set
-	 */
+	* Sets the user ID of this ddl record set.
+	*
+	* @param userId the user ID of this ddl record set
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_ddlRecordSet.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this ddl record set.
-	 *
-	 * @param userName the user name of this ddl record set
-	 */
+	* Sets the user name of this ddl record set.
+	*
+	* @param userName the user name of this ddl record set
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_ddlRecordSet.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this ddl record set.
-	 *
-	 * @param userUuid the user uuid of this ddl record set
-	 */
+	* Sets the user uuid of this ddl record set.
+	*
+	* @param userUuid the user uuid of this ddl record set
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_ddlRecordSet.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	/**
-	 * Sets the uuid of this ddl record set.
-	 *
-	 * @param uuid the uuid of this ddl record set
-	 */
+	* Sets the uuid of this ddl record set.
+	*
+	* @param uuid the uuid of this ddl record set
+	*/
 	@Override
 	public void setUuid(String uuid) {
-		_ddlRecordSet.setUuid(uuid);
+		model.setUuid(uuid);
 	}
 
 	/**
-	 * Sets the version of this ddl record set.
-	 *
-	 * @param version the version of this ddl record set
-	 */
+	* Sets the version of this ddl record set.
+	*
+	* @param version the version of this ddl record set
+	*/
 	@Override
 	public void setVersion(String version) {
-		_ddlRecordSet.setVersion(version);
+		model.setVersion(version);
 	}
 
 	/**
-	 * Sets the version user ID of this ddl record set.
-	 *
-	 * @param versionUserId the version user ID of this ddl record set
-	 */
+	* Sets the version user ID of this ddl record set.
+	*
+	* @param versionUserId the version user ID of this ddl record set
+	*/
 	@Override
 	public void setVersionUserId(long versionUserId) {
-		_ddlRecordSet.setVersionUserId(versionUserId);
+		model.setVersionUserId(versionUserId);
 	}
 
 	/**
-	 * Sets the version user name of this ddl record set.
-	 *
-	 * @param versionUserName the version user name of this ddl record set
-	 */
+	* Sets the version user name of this ddl record set.
+	*
+	* @param versionUserName the version user name of this ddl record set
+	*/
 	@Override
 	public void setVersionUserName(String versionUserName) {
-		_ddlRecordSet.setVersionUserName(versionUserName);
+		model.setVersionUserName(versionUserName);
 	}
 
 	/**
-	 * Sets the version user uuid of this ddl record set.
-	 *
-	 * @param versionUserUuid the version user uuid of this ddl record set
-	 */
+	* Sets the version user uuid of this ddl record set.
+	*
+	* @param versionUserUuid the version user uuid of this ddl record set
+	*/
 	@Override
 	public void setVersionUserUuid(String versionUserUuid) {
-		_ddlRecordSet.setVersionUserUuid(versionUserUuid);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.CacheModel<DDLRecordSet>
-		toCacheModel() {
-
-		return _ddlRecordSet.toCacheModel();
-	}
-
-	@Override
-	public DDLRecordSet toEscapedModel() {
-		return new DDLRecordSetWrapper(_ddlRecordSet.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _ddlRecordSet.toString();
-	}
-
-	@Override
-	public DDLRecordSet toUnescapedModel() {
-		return new DDLRecordSetWrapper(_ddlRecordSet.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _ddlRecordSet.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof DDLRecordSetWrapper)) {
-			return false;
-		}
-
-		DDLRecordSetWrapper ddlRecordSetWrapper = (DDLRecordSetWrapper)obj;
-
-		if (Objects.equals(_ddlRecordSet, ddlRecordSetWrapper._ddlRecordSet)) {
-			return true;
-		}
-
-		return false;
+		model.setVersionUserUuid(versionUserUuid);
 	}
 
 	@Override
 	public StagedModelType getStagedModelType() {
-		return _ddlRecordSet.getStagedModelType();
+		return model.getStagedModelType();
 	}
 
 	@Override
-	public DDLRecordSet getWrappedModel() {
-		return _ddlRecordSet;
+	protected DDLRecordSetWrapper wrap(DDLRecordSet ddlRecordSet) {
+		return new DDLRecordSetWrapper(ddlRecordSet);
 	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _ddlRecordSet.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _ddlRecordSet.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_ddlRecordSet.resetOriginalValues();
-	}
-
-	private final DDLRecordSet _ddlRecordSet;
-
 }

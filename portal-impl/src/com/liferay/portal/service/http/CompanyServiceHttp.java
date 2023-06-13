@@ -26,11 +26,10 @@ import com.liferay.portal.kernel.util.MethodKey;
 
 /**
  * Provides the HTTP utility for the
- * <code>CompanyServiceUtil</code> service
- * utility. The
+ * {@link CompanyServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it requires an additional
- * <code>HttpPrincipal</code> parameter.
+ * {@link HttpPrincipal} parameter.
  *
  * <p>
  * The benefits of using the HTTP utility is that it is fast and allows for
@@ -49,23 +48,22 @@ import com.liferay.portal.kernel.util.MethodKey;
  *
  * @author Brian Wing Shun Chan
  * @see CompanyServiceSoap
+ * @see HttpPrincipal
+ * @see CompanyServiceUtil
  * @generated
  */
 @ProviderType
 public class CompanyServiceHttp {
-
 	public static com.liferay.portal.kernel.model.Company addCompany(
-			HttpPrincipal httpPrincipal, String webId, String virtualHost,
-			String mx, boolean system, int maxUsers, boolean active)
+		HttpPrincipal httpPrincipal, String webId, String virtualHost,
+		String mx, boolean system, int maxUsers, boolean active)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "addCompany",
-				_addCompanyParameterTypes0);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"addCompany", _addCompanyParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, webId, virtualHost, mx, system, maxUsers, active);
+			MethodHandler methodHandler = new MethodHandler(methodKey, webId,
+					virtualHost, mx, system, maxUsers, active);
 
 			Object returnObj = null;
 
@@ -73,15 +71,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -94,16 +88,13 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company deleteCompany(
-			HttpPrincipal httpPrincipal, long companyId)
+		HttpPrincipal httpPrincipal, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "deleteCompany",
-				_deleteCompanyParameterTypes1);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"deleteCompany", _deleteCompanyParameterTypes1);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId);
+			MethodHandler methodHandler = new MethodHandler(methodKey, companyId);
 
 			Object returnObj = null;
 
@@ -111,15 +102,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -133,28 +120,21 @@ public class CompanyServiceHttp {
 
 	public static void deleteLogo(HttpPrincipal httpPrincipal, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "deleteLogo",
-				_deleteLogoParameterTypes2);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"deleteLogo", _deleteLogoParameterTypes2);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId);
+			MethodHandler methodHandler = new MethodHandler(methodKey, companyId);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
@@ -164,13 +144,11 @@ public class CompanyServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.portal.kernel.model.Company>
-		getCompanies(HttpPrincipal httpPrincipal) {
-
+	public static java.util.List<com.liferay.portal.kernel.model.Company> getCompanies(
+		HttpPrincipal httpPrincipal) {
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "getCompanies",
-				_getCompaniesParameterTypes3);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"getCompanies", _getCompaniesParameterTypes3);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey);
 
@@ -180,12 +158,10 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (java.util.List<com.liferay.portal.kernel.model.Company>)
-				returnObj;
+			return (java.util.List<com.liferay.portal.kernel.model.Company>)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -195,16 +171,13 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company getCompanyById(
-			HttpPrincipal httpPrincipal, long companyId)
+		HttpPrincipal httpPrincipal, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "getCompanyById",
-				_getCompanyByIdParameterTypes4);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"getCompanyById", _getCompanyByIdParameterTypes4);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId);
+			MethodHandler methodHandler = new MethodHandler(methodKey, companyId);
 
 			Object returnObj = null;
 
@@ -212,15 +185,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -233,13 +202,11 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company getCompanyByLogoId(
-			HttpPrincipal httpPrincipal, long logoId)
+		HttpPrincipal httpPrincipal, long logoId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "getCompanyByLogoId",
-				_getCompanyByLogoIdParameterTypes5);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"getCompanyByLogoId", _getCompanyByLogoIdParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, logoId);
 
@@ -249,15 +216,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -270,13 +233,11 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company getCompanyByMx(
-			HttpPrincipal httpPrincipal, String mx)
+		HttpPrincipal httpPrincipal, String mx)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "getCompanyByMx",
-				_getCompanyByMxParameterTypes6);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"getCompanyByMx", _getCompanyByMxParameterTypes6);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, mx);
 
@@ -286,15 +247,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -306,18 +263,16 @@ public class CompanyServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.kernel.model.Company
-			getCompanyByVirtualHost(
-				HttpPrincipal httpPrincipal, String virtualHost)
+	public static com.liferay.portal.kernel.model.Company getCompanyByVirtualHost(
+		HttpPrincipal httpPrincipal, String virtualHost)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "getCompanyByVirtualHost",
-				_getCompanyByVirtualHostParameterTypes7);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"getCompanyByVirtualHost",
+					_getCompanyByVirtualHostParameterTypes7);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, virtualHost);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					virtualHost);
 
 			Object returnObj = null;
 
@@ -325,15 +280,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -346,13 +297,11 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company getCompanyByWebId(
-			HttpPrincipal httpPrincipal, String webId)
+		HttpPrincipal httpPrincipal, String webId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "getCompanyByWebId",
-				_getCompanyByWebIdParameterTypes8);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"getCompanyByWebId", _getCompanyByWebIdParameterTypes8);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, webId);
 
@@ -362,15 +311,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -382,31 +327,25 @@ public class CompanyServiceHttp {
 		}
 	}
 
-	public static void removePreferences(
-			HttpPrincipal httpPrincipal, long companyId, String[] keys)
+	public static void removePreferences(HttpPrincipal httpPrincipal,
+		long companyId, String[] keys)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "removePreferences",
-				_removePreferencesParameterTypes9);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"removePreferences", _removePreferencesParameterTypes9);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, keys);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, keys);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
@@ -417,17 +356,15 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company updateCompany(
-			HttpPrincipal httpPrincipal, long companyId, String virtualHost,
-			String mx, int maxUsers, boolean active)
+		HttpPrincipal httpPrincipal, long companyId, String virtualHost,
+		String mx, int maxUsers, boolean active)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "updateCompany",
-				_updateCompanyParameterTypes10);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"updateCompany", _updateCompanyParameterTypes10);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, virtualHost, mx, maxUsers, active);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, virtualHost, mx, maxUsers, active);
 
 			Object returnObj = null;
 
@@ -435,15 +372,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -456,22 +389,19 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company updateCompany(
-			HttpPrincipal httpPrincipal, long companyId, String virtualHost,
-			String mx, String homeURL, boolean logo, byte[] logoBytes,
-			String name, String legalName, String legalId, String legalType,
-			String sicCode, String tickerSymbol, String industry, String type,
-			String size)
+		HttpPrincipal httpPrincipal, long companyId, String virtualHost,
+		String mx, String homeURL, boolean logo, byte[] logoBytes, String name,
+		String legalName, String legalId, String legalType, String sicCode,
+		String tickerSymbol, String industry, String type, String size)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "updateCompany",
-				_updateCompanyParameterTypes11);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"updateCompany", _updateCompanyParameterTypes11);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, virtualHost, mx, homeURL, logo, logoBytes,
-				name, legalName, legalId, legalType, sicCode, tickerSymbol,
-				industry, type, size);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, virtualHost, mx, homeURL, logo, logoBytes, name,
+					legalName, legalId, legalType, sicCode, tickerSymbol,
+					industry, type, size);
 
 			Object returnObj = null;
 
@@ -479,15 +409,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -500,29 +426,26 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company updateCompany(
-			HttpPrincipal httpPrincipal, long companyId, String virtualHost,
-			String mx, String homeURL, boolean logo, byte[] logoBytes,
-			String name, String legalName, String legalId, String legalType,
-			String sicCode, String tickerSymbol, String industry, String type,
-			String size, String languageId, String timeZoneId,
-			java.util.List<com.liferay.portal.kernel.model.Address> addresses,
-			java.util.List<com.liferay.portal.kernel.model.EmailAddress>
-				emailAddresses,
-			java.util.List<com.liferay.portal.kernel.model.Phone> phones,
-			java.util.List<com.liferay.portal.kernel.model.Website> websites,
-			com.liferay.portal.kernel.util.UnicodeProperties properties)
+		HttpPrincipal httpPrincipal, long companyId, String virtualHost,
+		String mx, String homeURL, boolean logo, byte[] logoBytes, String name,
+		String legalName, String legalId, String legalType, String sicCode,
+		String tickerSymbol, String industry, String type, String size,
+		String languageId, String timeZoneId,
+		java.util.List<com.liferay.portal.kernel.model.Address> addresses,
+		java.util.List<com.liferay.portal.kernel.model.EmailAddress> emailAddresses,
+		java.util.List<com.liferay.portal.kernel.model.Phone> phones,
+		java.util.List<com.liferay.portal.kernel.model.Website> websites,
+		com.liferay.portal.kernel.util.UnicodeProperties properties)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "updateCompany",
-				_updateCompanyParameterTypes12);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"updateCompany", _updateCompanyParameterTypes12);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, virtualHost, mx, homeURL, logo, logoBytes,
-				name, legalName, legalId, legalType, sicCode, tickerSymbol,
-				industry, type, size, languageId, timeZoneId, addresses,
-				emailAddresses, phones, websites, properties);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, virtualHost, mx, homeURL, logo, logoBytes, name,
+					legalName, legalId, legalType, sicCode, tickerSymbol,
+					industry, type, size, languageId, timeZoneId, addresses,
+					emailAddresses, phones, websites, properties);
 
 			Object returnObj = null;
 
@@ -530,15 +453,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -551,21 +470,19 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company updateCompany(
-			HttpPrincipal httpPrincipal, long companyId, String virtualHost,
-			String mx, String homeURL, String name, String legalName,
-			String legalId, String legalType, String sicCode,
-			String tickerSymbol, String industry, String type, String size)
+		HttpPrincipal httpPrincipal, long companyId, String virtualHost,
+		String mx, String homeURL, String name, String legalName,
+		String legalId, String legalType, String sicCode, String tickerSymbol,
+		String industry, String type, String size)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "updateCompany",
-				_updateCompanyParameterTypes13);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"updateCompany", _updateCompanyParameterTypes13);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, virtualHost, mx, homeURL, name, legalName,
-				legalId, legalType, sicCode, tickerSymbol, industry, type,
-				size);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, virtualHost, mx, homeURL, name, legalName,
+					legalId, legalType, sicCode, tickerSymbol, industry, type,
+					size);
 
 			Object returnObj = null;
 
@@ -573,15 +490,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -594,29 +507,26 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company updateCompany(
-			HttpPrincipal httpPrincipal, long companyId, String virtualHost,
-			String mx, String homeURL, String name, String legalName,
-			String legalId, String legalType, String sicCode,
-			String tickerSymbol, String industry, String type, String size,
-			String languageId, String timeZoneId,
-			java.util.List<com.liferay.portal.kernel.model.Address> addresses,
-			java.util.List<com.liferay.portal.kernel.model.EmailAddress>
-				emailAddresses,
-			java.util.List<com.liferay.portal.kernel.model.Phone> phones,
-			java.util.List<com.liferay.portal.kernel.model.Website> websites,
-			com.liferay.portal.kernel.util.UnicodeProperties properties)
+		HttpPrincipal httpPrincipal, long companyId, String virtualHost,
+		String mx, String homeURL, String name, String legalName,
+		String legalId, String legalType, String sicCode, String tickerSymbol,
+		String industry, String type, String size, String languageId,
+		String timeZoneId,
+		java.util.List<com.liferay.portal.kernel.model.Address> addresses,
+		java.util.List<com.liferay.portal.kernel.model.EmailAddress> emailAddresses,
+		java.util.List<com.liferay.portal.kernel.model.Phone> phones,
+		java.util.List<com.liferay.portal.kernel.model.Website> websites,
+		com.liferay.portal.kernel.util.UnicodeProperties properties)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "updateCompany",
-				_updateCompanyParameterTypes14);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"updateCompany", _updateCompanyParameterTypes14);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, virtualHost, mx, homeURL, name, legalName,
-				legalId, legalType, sicCode, tickerSymbol, industry, type, size,
-				languageId, timeZoneId, addresses, emailAddresses, phones,
-				websites, properties);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, virtualHost, mx, homeURL, name, legalName,
+					legalId, legalType, sicCode, tickerSymbol, industry, type,
+					size, languageId, timeZoneId, addresses, emailAddresses,
+					phones, websites, properties);
 
 			Object returnObj = null;
 
@@ -624,15 +534,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -644,32 +550,25 @@ public class CompanyServiceHttp {
 		}
 	}
 
-	public static void updateDisplay(
-			HttpPrincipal httpPrincipal, long companyId, String languageId,
-			String timeZoneId)
+	public static void updateDisplay(HttpPrincipal httpPrincipal,
+		long companyId, String languageId, String timeZoneId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "updateDisplay",
-				_updateDisplayParameterTypes15);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"updateDisplay", _updateDisplayParameterTypes15);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, languageId, timeZoneId);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, languageId, timeZoneId);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
@@ -680,16 +579,14 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company updateLogo(
-			HttpPrincipal httpPrincipal, long companyId, byte[] bytes)
+		HttpPrincipal httpPrincipal, long companyId, byte[] bytes)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "updateLogo",
-				_updateLogoParameterTypes16);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"updateLogo", _updateLogoParameterTypes16);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, bytes);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, bytes);
 
 			Object returnObj = null;
 
@@ -697,15 +594,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -718,17 +611,15 @@ public class CompanyServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.model.Company updateLogo(
-			HttpPrincipal httpPrincipal, long companyId,
-			java.io.InputStream inputStream)
+		HttpPrincipal httpPrincipal, long companyId,
+		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "updateLogo",
-				_updateLogoParameterTypes17);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"updateLogo", _updateLogoParameterTypes17);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, inputStream);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, inputStream);
 
 			Object returnObj = null;
 
@@ -736,15 +627,11 @@ public class CompanyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.model.Company)returnObj;
@@ -756,32 +643,26 @@ public class CompanyServiceHttp {
 		}
 	}
 
-	public static void updatePreferences(
-			HttpPrincipal httpPrincipal, long companyId,
-			com.liferay.portal.kernel.util.UnicodeProperties properties)
+	public static void updatePreferences(HttpPrincipal httpPrincipal,
+		long companyId,
+		com.liferay.portal.kernel.util.UnicodeProperties properties)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "updatePreferences",
-				_updatePreferencesParameterTypes18);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"updatePreferences", _updatePreferencesParameterTypes18);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, properties);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, properties);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
@@ -791,34 +672,28 @@ public class CompanyServiceHttp {
 		}
 	}
 
-	public static void updateSecurity(
-			HttpPrincipal httpPrincipal, long companyId, String authType,
-			boolean autoLogin, boolean sendPassword, boolean strangers,
-			boolean strangersWithMx, boolean strangersVerify, boolean siteLogo)
+	public static void updateSecurity(HttpPrincipal httpPrincipal,
+		long companyId, String authType, boolean autoLogin,
+		boolean sendPassword, boolean strangers, boolean strangersWithMx,
+		boolean strangersVerify, boolean siteLogo)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				CompanyServiceUtil.class, "updateSecurity",
-				_updateSecurityParameterTypes19);
+			MethodKey methodKey = new MethodKey(CompanyServiceUtil.class,
+					"updateSecurity", _updateSecurityParameterTypes19);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, authType, autoLogin, sendPassword,
-				strangers, strangersWithMx, strangersVerify, siteLogo);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, authType, autoLogin, sendPassword, strangers,
+					strangersWithMx, strangersVerify, siteLogo);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
@@ -829,83 +704,78 @@ public class CompanyServiceHttp {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(CompanyServiceHttp.class);
-
 	private static final Class<?>[] _addCompanyParameterTypes0 = new Class[] {
-		String.class, String.class, String.class, boolean.class, int.class,
-		boolean.class
-	};
-	private static final Class<?>[] _deleteCompanyParameterTypes1 =
-		new Class[] {long.class};
+			String.class, String.class, String.class, boolean.class, int.class,
+			boolean.class
+		};
+	private static final Class<?>[] _deleteCompanyParameterTypes1 = new Class[] {
+			long.class
+		};
 	private static final Class<?>[] _deleteLogoParameterTypes2 = new Class[] {
-		long.class
-	};
-	private static final Class<?>[] _getCompaniesParameterTypes3 = new Class[] {
-		
-	};
-	private static final Class<?>[] _getCompanyByIdParameterTypes4 =
-		new Class[] {long.class};
-	private static final Class<?>[] _getCompanyByLogoIdParameterTypes5 =
-		new Class[] {long.class};
-	private static final Class<?>[] _getCompanyByMxParameterTypes6 =
-		new Class[] {String.class};
-	private static final Class<?>[] _getCompanyByVirtualHostParameterTypes7 =
-		new Class[] {String.class};
-	private static final Class<?>[] _getCompanyByWebIdParameterTypes8 =
-		new Class[] {String.class};
-	private static final Class<?>[] _removePreferencesParameterTypes9 =
-		new Class[] {long.class, String[].class};
-	private static final Class<?>[] _updateCompanyParameterTypes10 =
-		new Class[] {
+			long.class
+		};
+	private static final Class<?>[] _getCompaniesParameterTypes3 = new Class[] {  };
+	private static final Class<?>[] _getCompanyByIdParameterTypes4 = new Class[] {
+			long.class
+		};
+	private static final Class<?>[] _getCompanyByLogoIdParameterTypes5 = new Class[] {
+			long.class
+		};
+	private static final Class<?>[] _getCompanyByMxParameterTypes6 = new Class[] {
+			String.class
+		};
+	private static final Class<?>[] _getCompanyByVirtualHostParameterTypes7 = new Class[] {
+			String.class
+		};
+	private static final Class<?>[] _getCompanyByWebIdParameterTypes8 = new Class[] {
+			String.class
+		};
+	private static final Class<?>[] _removePreferencesParameterTypes9 = new Class[] {
+			long.class, String[].class
+		};
+	private static final Class<?>[] _updateCompanyParameterTypes10 = new Class[] {
 			long.class, String.class, String.class, int.class, boolean.class
 		};
-	private static final Class<?>[] _updateCompanyParameterTypes11 =
-		new Class[] {
+	private static final Class<?>[] _updateCompanyParameterTypes11 = new Class[] {
 			long.class, String.class, String.class, String.class, boolean.class,
-			byte[].class, String.class, String.class, String.class,
-			String.class, String.class, String.class, String.class,
-			String.class, String.class
+			byte[].class, String.class, String.class, String.class, String.class,
+			String.class, String.class, String.class, String.class, String.class
 		};
-	private static final Class<?>[] _updateCompanyParameterTypes12 =
-		new Class[] {
+	private static final Class<?>[] _updateCompanyParameterTypes12 = new Class[] {
 			long.class, String.class, String.class, String.class, boolean.class,
-			byte[].class, String.class, String.class, String.class,
-			String.class, String.class, String.class, String.class,
-			String.class, String.class, String.class, String.class,
-			java.util.List.class, java.util.List.class, java.util.List.class,
-			java.util.List.class,
-			com.liferay.portal.kernel.util.UnicodeProperties.class
-		};
-	private static final Class<?>[] _updateCompanyParameterTypes13 =
-		new Class[] {
-			long.class, String.class, String.class, String.class, String.class,
-			String.class, String.class, String.class, String.class,
-			String.class, String.class, String.class, String.class
-		};
-	private static final Class<?>[] _updateCompanyParameterTypes14 =
-		new Class[] {
-			long.class, String.class, String.class, String.class, String.class,
-			String.class, String.class, String.class, String.class,
-			String.class, String.class, String.class, String.class,
+			byte[].class, String.class, String.class, String.class, String.class,
+			String.class, String.class, String.class, String.class, String.class,
 			String.class, String.class, java.util.List.class,
 			java.util.List.class, java.util.List.class, java.util.List.class,
 			com.liferay.portal.kernel.util.UnicodeProperties.class
 		};
-	private static final Class<?>[] _updateDisplayParameterTypes15 =
-		new Class[] {long.class, String.class, String.class};
+	private static final Class<?>[] _updateCompanyParameterTypes13 = new Class[] {
+			long.class, String.class, String.class, String.class, String.class,
+			String.class, String.class, String.class, String.class, String.class,
+			String.class, String.class, String.class
+		};
+	private static final Class<?>[] _updateCompanyParameterTypes14 = new Class[] {
+			long.class, String.class, String.class, String.class, String.class,
+			String.class, String.class, String.class, String.class, String.class,
+			String.class, String.class, String.class, String.class, String.class,
+			java.util.List.class, java.util.List.class, java.util.List.class,
+			java.util.List.class,
+			com.liferay.portal.kernel.util.UnicodeProperties.class
+		};
+	private static final Class<?>[] _updateDisplayParameterTypes15 = new Class[] {
+			long.class, String.class, String.class
+		};
 	private static final Class<?>[] _updateLogoParameterTypes16 = new Class[] {
-		long.class, byte[].class
-	};
+			long.class, byte[].class
+		};
 	private static final Class<?>[] _updateLogoParameterTypes17 = new Class[] {
-		long.class, java.io.InputStream.class
-	};
-	private static final Class<?>[] _updatePreferencesParameterTypes18 =
-		new Class[] {
+			long.class, java.io.InputStream.class
+		};
+	private static final Class<?>[] _updatePreferencesParameterTypes18 = new Class[] {
 			long.class, com.liferay.portal.kernel.util.UnicodeProperties.class
 		};
-	private static final Class<?>[] _updateSecurityParameterTypes19 =
-		new Class[] {
+	private static final Class<?>[] _updateSecurityParameterTypes19 = new Class[] {
 			long.class, String.class, boolean.class, boolean.class,
 			boolean.class, boolean.class, boolean.class, boolean.class
 		};
-
 }

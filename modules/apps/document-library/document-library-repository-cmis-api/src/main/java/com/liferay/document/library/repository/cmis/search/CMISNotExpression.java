@@ -14,8 +14,6 @@
 
 package com.liferay.document.library.repository.cmis.search;
 
-import com.liferay.petra.string.StringBundler;
-
 /**
  * @author Mika Koivisto
  */
@@ -27,8 +25,7 @@ public class CMISNotExpression implements CMISCriterion {
 
 	@Override
 	public String toQueryFragment() {
-		return StringBundler.concat(
-			"NOT(", _cmisCriterion.toQueryFragment(), ")");
+		return "NOT(".concat(_cmisCriterion.toQueryFragment().concat(")"));
 	}
 
 	private final CMISCriterion _cmisCriterion;

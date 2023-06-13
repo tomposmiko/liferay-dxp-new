@@ -33,11 +33,10 @@ import com.liferay.mail.reader.service.FolderLocalServiceUtil;
  */
 @ProviderType
 public abstract class FolderBaseImpl extends FolderModelImpl implements Folder {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a folder model instance should use the <code>Folder</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a folder model instance should use the {@link Folder} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,5 +47,4 @@ public abstract class FolderBaseImpl extends FolderModelImpl implements Folder {
 			FolderLocalServiceUtil.updateFolder(this);
 		}
 	}
-
 }

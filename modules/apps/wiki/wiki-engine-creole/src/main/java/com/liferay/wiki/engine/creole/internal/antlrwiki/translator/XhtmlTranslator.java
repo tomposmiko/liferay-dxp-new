@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TreeNode;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.wiki.engine.creole.internal.antlrwiki.translator.internal.UnformattedHeadingTextVisitor;
 import com.liferay.wiki.engine.creole.internal.antlrwiki.translator.internal.UnformattedLinksTextVisitor;
 import com.liferay.wiki.engine.creole.internal.parser.ast.CollectionNode;
@@ -101,11 +102,11 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 		append(" src=\"");
 
 		if (imageNode.isAbsoluteLink()) {
-			append(HtmlUtil.escapeAttribute(imageNode.getLink()));
+			append(URLCodec.encodeURL(imageNode.getLink()));
 		}
 		else {
 			append(_attachmentURLPrefix);
-			append(HtmlUtil.escapeAttribute(imageNode.getLink()));
+			append(URLCodec.encodeURL(imageNode.getLink()));
 		}
 
 		append("\" />");
@@ -285,7 +286,7 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 		String postfix = StringPool.BLANK;
 
 		if (textCounts.containsKey(text)) {
-			postfix = StringPool.DASH + textCounts.get(text);
+			postfix = StringPool.DASH + String.valueOf(textCounts.get(text));
 		}
 
 		return StringUtil.replace(

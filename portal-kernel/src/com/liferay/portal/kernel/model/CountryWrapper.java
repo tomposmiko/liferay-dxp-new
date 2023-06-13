@@ -16,14 +16,10 @@ package com.liferay.portal.kernel.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
-import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -35,20 +31,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class CountryWrapper implements Country, ModelWrapper<Country> {
-
+public class CountryWrapper extends BaseModelWrapper<Country> implements Country,
+	ModelWrapper<Country> {
 	public CountryWrapper(Country country) {
-		_country = country;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return Country.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return Country.class.getName();
+		super(country);
 	}
 
 	@Override
@@ -125,380 +111,248 @@ public class CountryWrapper implements Country, ModelWrapper<Country> {
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new CountryWrapper((Country)_country.clone());
-	}
-
-	@Override
-	public int compareTo(Country country) {
-		return _country.compareTo(country);
-	}
-
 	/**
-	 * Returns the a2 of this country.
-	 *
-	 * @return the a2 of this country
-	 */
+	* Returns the a2 of this country.
+	*
+	* @return the a2 of this country
+	*/
 	@Override
 	public String getA2() {
-		return _country.getA2();
+		return model.getA2();
 	}
 
 	/**
-	 * Returns the a3 of this country.
-	 *
-	 * @return the a3 of this country
-	 */
+	* Returns the a3 of this country.
+	*
+	* @return the a3 of this country
+	*/
 	@Override
 	public String getA3() {
-		return _country.getA3();
+		return model.getA3();
 	}
 
 	/**
-	 * Returns the active of this country.
-	 *
-	 * @return the active of this country
-	 */
+	* Returns the active of this country.
+	*
+	* @return the active of this country
+	*/
 	@Override
 	public boolean getActive() {
-		return _country.getActive();
+		return model.getActive();
 	}
 
 	/**
-	 * Returns the country ID of this country.
-	 *
-	 * @return the country ID of this country
-	 */
+	* Returns the country ID of this country.
+	*
+	* @return the country ID of this country
+	*/
 	@Override
 	public long getCountryId() {
-		return _country.getCountryId();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _country.getExpandoBridge();
+		return model.getCountryId();
 	}
 
 	/**
-	 * Returns the idd of this country.
-	 *
-	 * @return the idd of this country
-	 */
+	* Returns the idd of this country.
+	*
+	* @return the idd of this country
+	*/
 	@Override
 	public String getIdd() {
-		return _country.getIdd();
+		return model.getIdd();
 	}
 
 	/**
-	 * Returns the mvcc version of this country.
-	 *
-	 * @return the mvcc version of this country
-	 */
+	* Returns the mvcc version of this country.
+	*
+	* @return the mvcc version of this country
+	*/
 	@Override
 	public long getMvccVersion() {
-		return _country.getMvccVersion();
+		return model.getMvccVersion();
 	}
 
 	/**
-	 * Returns the name of this country.
-	 *
-	 * @return the name of this country
-	 */
+	* Returns the name of this country.
+	*
+	* @return the name of this country
+	*/
 	@Override
 	public String getName() {
-		return _country.getName();
+		return model.getName();
 	}
 
 	@Override
 	public String getName(java.util.Locale locale) {
-		return _country.getName(locale);
+		return model.getName(locale);
 	}
 
 	@Override
 	public String getNameCurrentLanguageId() {
-		return _country.getNameCurrentLanguageId();
+		return model.getNameCurrentLanguageId();
 	}
 
 	@Override
 	public String getNameCurrentValue() {
-		return _country.getNameCurrentValue();
+		return model.getNameCurrentValue();
 	}
 
 	/**
-	 * Returns the number of this country.
-	 *
-	 * @return the number of this country
-	 */
+	* Returns the number of this country.
+	*
+	* @return the number of this country
+	*/
 	@Override
 	public String getNumber() {
-		return _country.getNumber();
+		return model.getNumber();
 	}
 
 	/**
-	 * Returns the primary key of this country.
-	 *
-	 * @return the primary key of this country
-	 */
+	* Returns the primary key of this country.
+	*
+	* @return the primary key of this country
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _country.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _country.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the zip required of this country.
-	 *
-	 * @return the zip required of this country
-	 */
+	* Returns the zip required of this country.
+	*
+	* @return the zip required of this country
+	*/
 	@Override
 	public boolean getZipRequired() {
-		return _country.getZipRequired();
-	}
-
-	@Override
-	public int hashCode() {
-		return _country.hashCode();
+		return model.getZipRequired();
 	}
 
 	/**
-	 * Returns <code>true</code> if this country is active.
-	 *
-	 * @return <code>true</code> if this country is active; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this country is active.
+	*
+	* @return <code>true</code> if this country is active; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isActive() {
-		return _country.isActive();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _country.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _country.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _country.isNew();
+		return model.isActive();
 	}
 
 	/**
-	 * Returns <code>true</code> if this country is zip required.
-	 *
-	 * @return <code>true</code> if this country is zip required; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this country is zip required.
+	*
+	* @return <code>true</code> if this country is zip required; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isZipRequired() {
-		return _country.isZipRequired();
+		return model.isZipRequired();
 	}
 
 	/**
-	 * Sets the a2 of this country.
-	 *
-	 * @param a2 the a2 of this country
-	 */
+	* Sets the a2 of this country.
+	*
+	* @param a2 the a2 of this country
+	*/
 	@Override
 	public void setA2(String a2) {
-		_country.setA2(a2);
+		model.setA2(a2);
 	}
 
 	/**
-	 * Sets the a3 of this country.
-	 *
-	 * @param a3 the a3 of this country
-	 */
+	* Sets the a3 of this country.
+	*
+	* @param a3 the a3 of this country
+	*/
 	@Override
 	public void setA3(String a3) {
-		_country.setA3(a3);
+		model.setA3(a3);
 	}
 
 	/**
-	 * Sets whether this country is active.
-	 *
-	 * @param active the active of this country
-	 */
+	* Sets whether this country is active.
+	*
+	* @param active the active of this country
+	*/
 	@Override
 	public void setActive(boolean active) {
-		_country.setActive(active);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_country.setCachedModel(cachedModel);
+		model.setActive(active);
 	}
 
 	/**
-	 * Sets the country ID of this country.
-	 *
-	 * @param countryId the country ID of this country
-	 */
+	* Sets the country ID of this country.
+	*
+	* @param countryId the country ID of this country
+	*/
 	@Override
 	public void setCountryId(long countryId) {
-		_country.setCountryId(countryId);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
-		_country.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_country.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_country.setExpandoBridgeAttributes(serviceContext);
+		model.setCountryId(countryId);
 	}
 
 	/**
-	 * Sets the idd of this country.
-	 *
-	 * @param idd the idd of this country
-	 */
+	* Sets the idd of this country.
+	*
+	* @param idd the idd of this country
+	*/
 	@Override
 	public void setIdd(String idd) {
-		_country.setIdd(idd);
+		model.setIdd(idd);
 	}
 
 	/**
-	 * Sets the mvcc version of this country.
-	 *
-	 * @param mvccVersion the mvcc version of this country
-	 */
+	* Sets the mvcc version of this country.
+	*
+	* @param mvccVersion the mvcc version of this country
+	*/
 	@Override
 	public void setMvccVersion(long mvccVersion) {
-		_country.setMvccVersion(mvccVersion);
+		model.setMvccVersion(mvccVersion);
 	}
 
 	/**
-	 * Sets the name of this country.
-	 *
-	 * @param name the name of this country
-	 */
+	* Sets the name of this country.
+	*
+	* @param name the name of this country
+	*/
 	@Override
 	public void setName(String name) {
-		_country.setName(name);
+		model.setName(name);
 	}
 
 	@Override
 	public void setNameCurrentLanguageId(String languageId) {
-		_country.setNameCurrentLanguageId(languageId);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_country.setNew(n);
+		model.setNameCurrentLanguageId(languageId);
 	}
 
 	/**
-	 * Sets the number of this country.
-	 *
-	 * @param number the number of this country
-	 */
+	* Sets the number of this country.
+	*
+	* @param number the number of this country
+	*/
 	@Override
 	public void setNumber(String number) {
-		_country.setNumber(number);
+		model.setNumber(number);
 	}
 
 	/**
-	 * Sets the primary key of this country.
-	 *
-	 * @param primaryKey the primary key of this country
-	 */
+	* Sets the primary key of this country.
+	*
+	* @param primaryKey the primary key of this country
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_country.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_country.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets whether this country is zip required.
-	 *
-	 * @param zipRequired the zip required of this country
-	 */
+	* Sets whether this country is zip required.
+	*
+	* @param zipRequired the zip required of this country
+	*/
 	@Override
 	public void setZipRequired(boolean zipRequired) {
-		_country.setZipRequired(zipRequired);
+		model.setZipRequired(zipRequired);
 	}
 
 	@Override
-	public CacheModel<Country> toCacheModel() {
-		return _country.toCacheModel();
+	protected CountryWrapper wrap(Country country) {
+		return new CountryWrapper(country);
 	}
-
-	@Override
-	public Country toEscapedModel() {
-		return new CountryWrapper(_country.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _country.toString();
-	}
-
-	@Override
-	public Country toUnescapedModel() {
-		return new CountryWrapper(_country.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _country.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof CountryWrapper)) {
-			return false;
-		}
-
-		CountryWrapper countryWrapper = (CountryWrapper)obj;
-
-		if (Objects.equals(_country, countryWrapper._country)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public Country getWrappedModel() {
-		return _country;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _country.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _country.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_country.resetOriginalValues();
-	}
-
-	private final Country _country;
-
 }

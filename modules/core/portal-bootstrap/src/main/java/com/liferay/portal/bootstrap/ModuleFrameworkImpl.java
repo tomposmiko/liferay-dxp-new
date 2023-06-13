@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.util.ServiceLoader;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.module.framework.ModuleFramework;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.Registry;
@@ -116,7 +117,8 @@ import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.FrameworkWiring;
 
 import org.springframework.beans.factory.BeanIsAbstractException;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * @author Raymond Augé
@@ -263,8 +265,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		List<FrameworkFactory> frameworkFactories = ServiceLoader.load(
 			new URLClassLoader(_getClassPathURLs(), null),
-			currentThread.getContextClassLoader(), FrameworkFactory.class,
-			null);
+			currentThread.getContextClassLoader(), FrameworkFactory.class);
 
 		FrameworkFactory frameworkFactory = frameworkFactories.get(0);
 
@@ -320,10 +321,11 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			_log.debug("Registering context " + context);
 		}
 
-		if (context instanceof ApplicationContext) {
-			ApplicationContext applicationContext = (ApplicationContext)context;
+		if (context instanceof ConfigurableApplicationContext) {
+			ConfigurableApplicationContext configurableApplicationContext =
+				(ConfigurableApplicationContext)context;
 
-			_registerApplicationContext(applicationContext);
+			_registerApplicationContext(configurableApplicationContext);
 		}
 		else if (context instanceof ServletContext) {
 			ServletContext servletContext = (ServletContext)context;
@@ -556,11 +558,11 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			_log.debug("Unregistering context " + context);
 		}
 
-		if (!(context instanceof ApplicationContext)) {
+		if (!(context instanceof ConfigurableApplicationContext)) {
 			return;
 		}
 
-		_unregisterApplicationContext((ApplicationContext)context);
+		_unregisterApplicationContext((ConfigurableApplicationContext)context);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Registered context " + context);
@@ -613,15 +615,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		}
 
 		return urls;
-	}
-
-	private static String _getLPKGLocation(File lpkgFile) {
-		URI uri = lpkgFile.toURI();
-
-		String uriString = uri.toString();
-
-		return StringUtil.replace(
-			uriString, CharPool.BACK_SLASH, CharPool.FORWARD_SLASH);
 	}
 
 	private Bundle _addBundle(
@@ -727,14 +720,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			PropsValues.MODULE_FRAMEWORK_RESOLVER_REVISION_BATCH_SIZE);
 		properties.put("java.security.manager", null);
 		properties.put("org.osgi.framework.security", null);
-
-		File file = new File(PropsValues.LIFERAY_HOME);
-
-		URI uri = file.toURI();
-
-		uri = uri.normalize();
-
-		properties.put("osgi.home", uri.toString());
+		properties.put("osgi.home", PropsValues.LIFERAY_HOME);
 
 		ProtectionDomain protectionDomain = clazz.getProtectionDomain();
 
@@ -901,7 +887,13 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		Map<String, Bundle> bundles = new HashMap<>();
 
-		String path = _getLPKGLocation(file);
+		URI uri = file.toURI();
+
+		URL url = uri.toURL();
+
+		String path = url.getPath();
+
+		path = URLCodec.decodeURL(path);
 
 		try (ZipFile zipFile = new ZipFile(file)) {
 			Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
@@ -1248,7 +1240,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	}
 
 	private void _registerApplicationContext(
-		ApplicationContext applicationContext) {
+		ConfigurableApplicationContext configurableApplicationContext) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Register application context");
@@ -1256,29 +1248,38 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		List<ServiceRegistration<?>> serviceRegistrations = new ArrayList<>();
 
-		for (String beanName : applicationContext.getBeanDefinitionNames()) {
-			Object bean = null;
+		ConfigurableListableBeanFactory configurableListableBeanFactory =
+			configurableApplicationContext.getBeanFactory();
 
-			try {
-				bean = applicationContext.getBean(beanName);
-			}
-			catch (BeanIsAbstractException biae) {
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
+		Iterator<String> iterator =
+			configurableListableBeanFactory.getBeanNamesIterator();
 
-			if (bean != null) {
-				ServiceRegistration<?> serviceRegistration = _registerService(
-					_framework.getBundleContext(), beanName, bean);
+		iterator.forEachRemaining(
+			beanName -> {
+				Object bean = null;
 
-				if (serviceRegistration != null) {
-					serviceRegistrations.add(serviceRegistration);
+				try {
+					bean = configurableApplicationContext.getBean(beanName);
 				}
-			}
-		}
+				catch (BeanIsAbstractException biae) {
+				}
+				catch (Exception e) {
+					_log.error(e, e);
+				}
 
-		_springContextServices.put(applicationContext, serviceRegistrations);
+				if (bean != null) {
+					ServiceRegistration<?> serviceRegistration =
+						_registerService(
+							_framework.getBundleContext(), beanName, bean);
+
+					if (serviceRegistration != null) {
+						serviceRegistrations.add(serviceRegistration);
+					}
+				}
+			});
+
+		_springContextServices.put(
+			configurableApplicationContext, serviceRegistrations);
 	}
 
 	private ServiceRegistration<?> _registerService(
@@ -1441,9 +1442,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		for (Path jarPath : jarPaths) {
 			try (InputStream inputStream = Files.newInputStream(jarPath)) {
-				File file = jarPath.toFile();
-
-				URI uri = file.toURI();
+				URI uri = jarPath.toUri();
 
 				String uriString = uri.toString();
 
@@ -1720,14 +1719,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 					bundle.start();
 				}
 				catch (BundleException be) {
-					String message = be.getMessage();
-
-					if (message.endsWith(
-							"Bundle was filtered by a resolver hook.\n")) {
-
-						continue;
-					}
-
 					_log.error(
 						"Unable to start bundle " + bundle.getSymbolicName(),
 						be);
@@ -1745,10 +1736,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	}
 
 	private void _unregisterApplicationContext(
-		ApplicationContext applicationContext) {
+		ConfigurableApplicationContext configurableApplicationContext) {
 
 		List<ServiceRegistration<?>> serviceRegistrations =
-			_springContextServices.remove(applicationContext);
+			_springContextServices.remove(configurableApplicationContext);
 
 		if (serviceRegistrations == null) {
 			return;
@@ -1805,7 +1796,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		ModuleFrameworkImpl.class);
 
 	private Framework _framework;
-	private final Map<ApplicationContext, List<ServiceRegistration<?>>>
-		_springContextServices = new ConcurrentHashMap<>();
+	private final Map
+		<ConfigurableApplicationContext, List<ServiceRegistration<?>>>
+			_springContextServices = new ConcurrentHashMap<>();
 
 }

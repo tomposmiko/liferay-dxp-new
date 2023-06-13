@@ -231,31 +231,6 @@ definition {
 
 		UsersAndOrganizationsNavigator.gotoOrganizations();
 
-		Organization.viewSubOrganizationCP(
-			orgName = "Organization1",
-			orgType = "Organization",
-			suborgName = "Sub-organization-Pre",
-			suborgType = "Organization"
-		);
-
-		Organization.gotoCP(
-			orgName = "Sub-organization-Pre",
-			searchToken = "Sub-organization-Pre"
-		);
-
-		Organization.viewAssignMemberCP(
-			userName = "userfn userln",
-			userScreenName = "usersn"
-		);
-
-		ProductMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Users and Organizations"
-		);
-
-		UsersAndOrganizationsNavigator.gotoOrganizations();
-
 		Organization.editSiteCP(
 			orgName = "Organization1",
 			orgNameEdit = "Organization1 Edit"
@@ -678,7 +653,7 @@ definition {
 		);
 
 		WebContentNavigator.gotoViewStatus(
-			webContentStatus = "Draft",
+			webContentStatus = "DRAFT",
 			webContentTitle = "Web Content Draft Title"
 		);
 
@@ -695,7 +670,7 @@ definition {
 		);
 
 		WebContentNavigator.gotoViewStatus(
-			webContentStatus = "Approved",
+			webContentStatus = "APPROVED",
 			webContentTitle = "Web Content Title"
 		);
 
@@ -1016,7 +991,11 @@ definition {
 	macro viewAssetPublisher {
 		Navigator.gotoPage(pageName = "Asset Publisher");
 
-		AssertTextEquals(
+		AssetPublisherPortlet.configureAssetLinkBehaviorPG(
+			assetLinkBehavior = "Show Full Content"
+		);
+
+		AssertTextEquals.assertTextCaseInsensitive(
 			locator1 = "Portlet#TITLE",
 			value1 = "Asset Publisher",
 			key_portletName = "Asset Publisher"
@@ -1105,16 +1084,11 @@ definition {
 			portlet = "App Manager"
 		);
 
-		AppManager.viewAppCP(
-			appName = "Liferay Drools",
-			appStatus = "Active",
-			searchTerm = "Drools"
-		);
+		AppManager.viewAppCP(appName = "Liferay Drools", appStatus = "Active");
 
 		AppManager.viewAppCP(
 			appName = "Liferay Portal Rules Engine Drools",
-			appStatus = "Active",
-			searchTerm = "Drools"
+			appStatus = "Active"
 		);
 	}
 
@@ -1127,7 +1101,7 @@ definition {
 	macro viewNestedPortlets {
 		Navigator.gotoPage(pageName = "Nested Portlets");
 
-		AssertTextEquals(
+		AssertTextEquals.assertTextCaseInsensitive(
 			locator1 = "Portlet#TITLE",
 			value1 = "Nested Applications",
 			key_portletName = "Nested Applications"
@@ -1304,7 +1278,7 @@ definition {
 			siteName = "Staging Site"
 		);
 
-		AssertTextEquals(
+		AssertTextEquals.assertTextCaseInsensitive(
 			locator1 = "Portlet#TITLE",
 			value1 = "Nested Applications",
 			key_portletName = "Nested Applications"

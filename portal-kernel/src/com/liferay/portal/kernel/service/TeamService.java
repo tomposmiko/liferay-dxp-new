@@ -36,35 +36,32 @@ import java.util.List;
  *
  * @author Brian Wing Shun Chan
  * @see TeamServiceUtil
+ * @see com.liferay.portal.service.base.TeamServiceBaseImpl
+ * @see com.liferay.portal.service.impl.TeamServiceImpl
  * @generated
  */
 @AccessControlled
 @JSONWebService
 @ProviderType
-@Transactional(
-	isolation = Isolation.PORTAL,
-	rollbackFor = {PortalException.class, SystemException.class}
-)
+@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
+	PortalException.class, SystemException.class})
 public interface TeamService extends BaseService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link TeamServiceUtil} to access the team remote service. Add custom service methods to <code>com.liferay.portal.service.impl.TeamServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link TeamServiceUtil} to access the team remote service. Add custom service methods to {@link com.liferay.portal.service.impl.TeamServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 
 	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link #addTeam(long,
-	 String, String, ServiceContext)}
-	 */
+	* @deprecated As of Wilberforce (7.0.x), replaced by {@link #addTeam(long,
+	String, String, ServiceContext)}
+	*/
 	@Deprecated
 	public Team addTeam(long groupId, String name, String description)
 		throws PortalException;
 
-	public Team addTeam(
-			long groupId, String name, String description,
-			ServiceContext serviceContext)
-		throws PortalException;
+	public Team addTeam(long groupId, String name, String description,
+		ServiceContext serviceContext) throws PortalException;
 
 	public void deleteTeam(long teamId) throws PortalException;
 
@@ -72,10 +69,10 @@ public interface TeamService extends BaseService {
 	public List<Team> getGroupTeams(long groupId) throws PortalException;
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public String getOSGiServiceIdentifier();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -92,20 +89,18 @@ public interface TeamService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean hasUserTeam(long userId, long teamId) throws PortalException;
+	public boolean hasUserTeam(long userId, long teamId)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<Team> search(
-		long groupId, String name, String description,
+	public List<Team> search(long groupId, String name, String description,
 		LinkedHashMap<String, Object> params, int start, int end,
 		OrderByComparator<Team> obc);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(
-		long groupId, String name, String description,
+	public int searchCount(long groupId, String name, String description,
 		LinkedHashMap<String, Object> params);
 
 	public Team updateTeam(long teamId, String name, String description)
 		throws PortalException;
-
 }

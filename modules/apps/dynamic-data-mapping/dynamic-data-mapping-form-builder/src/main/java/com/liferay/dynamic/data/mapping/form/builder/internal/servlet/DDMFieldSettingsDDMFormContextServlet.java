@@ -19,7 +19,6 @@ import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServices
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormTemplateContextFactory;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
@@ -106,6 +105,7 @@ public class DDMFieldSettingsDDMFormContextServlet
 			ddmFormRenderingContext.setContainerId("settings");
 			ddmFormRenderingContext.setLocale(locale);
 			ddmFormRenderingContext.setPortletNamespace(portletNamespace);
+			ddmFormRenderingContext.setReturnFullContext(true);
 
 			return _ddmFormTemplateContextFactory.create(
 				ddmFormFieldTypeSettingsDDMForm,
@@ -171,9 +171,6 @@ public class DDMFieldSettingsDDMFormContextServlet
 
 	@Reference
 	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
-
-	@Reference
-	private DDMFormJSONDeserializer _ddmFormJSONDeserializer;
 
 	@Reference
 	private DDMFormTemplateContextFactory _ddmFormTemplateContextFactory;

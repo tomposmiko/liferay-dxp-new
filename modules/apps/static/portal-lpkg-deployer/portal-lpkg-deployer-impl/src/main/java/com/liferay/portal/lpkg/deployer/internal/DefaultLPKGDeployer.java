@@ -127,7 +127,10 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 							String.valueOf(lpkgFile)));
 				}
 
-				String location = LPKGLocationUtil.getLPKGLocation(lpkgFile);
+				String location = lpkgFile.getCanonicalPath();
+
+				location = StringUtil.replace(
+					location, CharPool.BACK_SLASH, CharPool.FORWARD_SLASH);
 
 				if (!location.equals(bundle.getLocation()) &&
 					Files.deleteIfExists(Paths.get(bundle.getLocation())) &&
@@ -147,7 +150,10 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 		}
 
 		try {
-			String location = LPKGLocationUtil.getLPKGLocation(lpkgFile);
+			String location = lpkgFile.getCanonicalPath();
+
+			location = StringUtil.replace(
+				location, CharPool.BACK_SLASH, CharPool.FORWARD_SLASH);
 
 			Bundle lpkgBundle = bundleContext.getBundle(location);
 
@@ -181,10 +187,6 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 
 			if (newBundles != null) {
 				bundles.addAll(newBundles);
-			}
-
-			if (LPKGIndexValidatorThreadLocal.isEnabled()) {
-				_lpkgIndexValidator.updateIntegrityProperties();
 			}
 
 			if (!oldBundles.isEmpty()) {
@@ -330,10 +332,6 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 
 		List<File> lpkgFiles = _scanFiles(_deploymentDirPath, ".lpkg", false);
 
-		_lpkgIndexValidator.setLPKGDeployer(this);
-
-		_lpkgIndexValidator.setJarFiles(jarFiles);
-
 		if (lpkgFiles.isEmpty()) {
 			return;
 		}
@@ -357,27 +355,11 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 
 		lpkgFiles.addAll(explodedLPKGFiles);
 
-		boolean updateIntegrityProperties = _lpkgIndexValidator.validate(
-			lpkgFiles);
+		_installLPKGs(bundleContext, lpkgFiles);
 
-		boolean enabled = LPKGIndexValidatorThreadLocal.isEnabled();
+		_installOverrideJars(bundleContext, jarFiles);
 
-		LPKGIndexValidatorThreadLocal.setEnabled(false);
-
-		try {
-			_installLPKGs(bundleContext, lpkgFiles);
-
-			_installOverrideJars(bundleContext, jarFiles);
-
-			_installOverrideWars(bundleContext, warFiles);
-
-			if (updateIntegrityProperties) {
-				_lpkgIndexValidator.updateIntegrityProperties();
-			}
-		}
-		finally {
-			LPKGIndexValidatorThreadLocal.setEnabled(enabled);
-		}
+		_installOverrideWars(bundleContext, warFiles);
 	}
 
 	private Path _getDeploymentDirPath(BundleContext bundleContext)
@@ -742,9 +724,6 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 
 	private Path _deploymentDirPath;
 	private BundleTracker<List<Bundle>> _lpkgBundleTracker;
-
-	@Reference
-	private LPKGIndexValidator _lpkgIndexValidator;
 
 	@Reference
 	private LPKGVerifier _lpkgVerifier;

@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.AsyncPortletServletRequest;
 
@@ -53,8 +52,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.apache.struts.Globals;
 
 /**
  * @author Brian Wing Shun Chan
@@ -170,12 +167,10 @@ public class I18nServlet extends HttpServlet {
 				String friendlyURL = path.substring(
 					friendlyURLIndices[0], friendlyURLIndices[1]);
 
-				siteGroup = GroupLocalServiceUtil.fetchFriendlyURLGroup(
-					PortalInstances.getCompanyId(request), friendlyURL);
-
-				if (siteGroup == null) {
-					return null;
-				}
+				siteGroup = GroupLocalServiceUtil.getFriendlyURLGroup(
+					GetterUtil.getLong(
+						request.getAttribute(WebKeys.COMPANY_ID)),
+					friendlyURL);
 
 				siteDefaultLocale = LanguageUtil.getLocale(
 					siteGroup.getGroupId(), i18nLanguageCode);
@@ -360,7 +355,7 @@ public class I18nServlet extends HttpServlet {
 
 		HttpSession session = request.getSession();
 
-		session.setAttribute(Globals.LOCALE_KEY, locale);
+		session.setAttribute(WebKeys.LOCALE, locale);
 
 		LanguageUtil.updateCookie(request, response, locale);
 	}

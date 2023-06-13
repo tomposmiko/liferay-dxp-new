@@ -101,12 +101,6 @@ module.framework.properties.osgi.console=11312</echo>
 
 					<var name="tstamp.value" unset="true" />
 				</then>
-				<elseif>
-					<isset property="update.properties" />
-					<then>
-						<print-file file.name="${test.app.server.classes.portal.dir}/portal-ext.properties" />
-					</then>
-				</elseif>
 				<else>
 					<copy
 						file="portal-impl/src/portal-ext.properties"
@@ -434,33 +428,6 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 		</sequential>
 	</macrodef>
 
-	<macrodef name="get-java-jdk-bundle-type">
-		<attribute default="" name="test.batch.name" />
-
-		<sequential>
-			<local name="test.batch.name" />
-
-			<condition else="@{test.batch.name}" property="test.batch.name" value="${env.TEST_BATCH_NAME}">
-				<contains string="@{test.batch.name}" substring="{test.batch.name}" />
-			</condition>
-
-			<var name="java.jdk.bundle.type" unset="true" />
-
-			<propertyregex
-				input="${test.batch.name}"
-				property="java.jdk.bundle.type"
-				regexp="-jdk[0-9]+_(\w+)"
-				select="\1"
-			/>
-
-			<condition property="java.jdk.bundle.type" value="oracle">
-				<matches pattern="-jdk[0-9]+$" string="${test.batch.name}" />
-			</condition>
-
-			<property name="java.jdk.bundle.type" value="oracle" />
-		</sequential>
-	</macrodef>
-
 	<macrodef name="get-java-jdk-bundle-version">
 		<attribute default="" name="test.batch.name" />
 
@@ -473,38 +440,66 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 
 			<var name="java.jdk.bundle.version" unset="true" />
 
-			<propertyregex
-				input="${test.batch.name}"
-				property="java.jdk.bundle.version"
-				regexp="-jdk([0-9]+)(_(adopt|open|oracle|redhat|zulu))?"
-				select="1.\1"
-			/>
+			<if>
+				<contains string="${test.batch.name}" substring="-jdk7" />
+				<then>
+					<property name="java.jdk.bundle.version" value="1.7" />
+				</then>
+				<elseif>
+					<contains string="${test.batch.name}" substring="-jdk8" />
+					<then>
+						<property name="java.jdk.bundle.version" value="1.8" />
+					</then>
+				</elseif>
+				<elseif>
+					<contains string="${test.batch.name}" substring="-open11" />
+					<then>
+						<property name="java.jdk.bundle.version" value="1.11" />
+					</then>
+				</elseif>
+			</if>
 
 			<property name="java.jdk.bundle.version" value="${ant.java.version}" />
 		</sequential>
 	</macrodef>
 
 	<macrodef name="get-java-jdk-home">
-		<attribute default="${java.jdk.architecture}" name="architecture" />
-		<attribute default="oracle" name="type" />
+		<attribute default="x64" name="architecture" />
 		<attribute default="${ant.java.version}" name="version" />
 
 		<sequential>
 			<var name="java.jdk.home" unset="true" />
 
-			<local name="version" />
-
-			<propertyregex
-				defaultValue="@{version}"
-				input="@{version}"
-				property="version"
-				regexp="1\.([0-9]+)"
-				select="\1"
-			/>
-
-			<propertycopy from="java.jdk.home[${version}][@{architecture}][@{type}]" property="java.jdk.home" silent="true" />
-
-			<property name="java.jdk.home" value="${java.home}" />
+			<if>
+				<and>
+					<equals arg1="@{version}" arg2="1.7" />
+					<isset property="java.jdk.7.@{architecture}.home" />
+				</and>
+				<then>
+					<property name="java.jdk.home" value="${java.jdk.7.@{architecture}.home}" />
+				</then>
+				<elseif>
+					<and>
+						<equals arg1="@{version}" arg2="1.8" />
+						<isset property="java.jdk.8.@{architecture}.home" />
+					</and>
+					<then>
+						<property name="java.jdk.home" value="${java.jdk.8.@{architecture}.home}" />
+					</then>
+				</elseif>
+				<elseif>
+					<and>
+						<equals arg1="@{version}" arg2="1.11" />
+						<isset property="java.jdk.11.@{architecture}.home" />
+					</and>
+					<then>
+						<property name="java.jdk.home" value="${java.jdk.11.@{architecture}.home}" />
+					</then>
+				</elseif>
+				<else>
+					<property name="java.jdk.home" value="${java.home}" />
+				</else>
+			</if>
 
 			<if>
 				<not>
@@ -513,7 +508,7 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 				<then>
 					<var name="java.jdk.home" unset="true" />
 
-					<property name="java.jdk.home" value="${java.home}" />
+					<var name="java.jdk.home" value="${java.home}" />
 				</then>
 			</if>
 		</sequential>
@@ -1409,12 +1404,6 @@ war.path=${app.server.portal.dir}/</echo>
 							value="liferay.home=${test.app.server.parent.dir}"
 						/>
 
-						<replace
-							file="${test.app.server.classes.portal.dir}/portal-ext.properties"
-							token="web.server.http.port=8080"
-							value="web.server.http.port=${test.app.server.leading.port.number}080"
-						/>
-
 						<math
 							datatype="int"
 							operand1="${app.server.bundle.index}"
@@ -2184,54 +2173,6 @@ tell application "Safari" to quit
 							<include name="**/*.sh" />
 						</fileset>
 					</chmod>
-
-					<local name="weblogic.fix.sh" />
-
-					<property name="weblogic.fix.sh" value="weblogic_fix.sh" />
-
-					<echo file="${weblogic.fix.sh}">
-						<![CDATA[
-							#!/bin/bash
-
-							DEFAULT_LIFERAY_HOME=/opt/dev/projects/github/liferay-portal/bundles
-
-							APP_SERVER_DIR=${app.server.weblogic.dir}
-							LIFERAY_HOME=${liferay.home}
-
-							for file in $(find ${APP_SERVER_DIR} | grep "\.cmd$\|\.domains$\|\.properties$\|\.py$\|\.sh$\|\.txt$\|\.xml$")
-							do
-								if [[ -f $file ]]
-								then
-									if [[ -n $(cat $file | grep "${DEFAULT_LIFERAY_HOME}") ]]
-									then
-										echo $file
-
-										sed -i "s|${DEFAULT_LIFERAY_HOME}|${LIFERAY_HOME}|g" $file
-									fi
-								fi
-							done
-						]]>
-					</echo>
-
-					<chmod
-						perm="a+x"
-					>
-						<fileset
-							dir="."
-						>
-							<include name="${weblogic.fix.sh}" />
-						</fileset>
-					</chmod>
-
-					<exec executable="/bin/bash" os="${os.apple},${os.unix}">
-						<arg value="${weblogic.fix.sh}" />
-					</exec>
-
-					<exec executable="cmd.exe" os="${os.windows}">
-						<arg value="${weblogic.fix.sh}" />
-					</exec>
-
-					<delete file="${weblogic.fix.sh}" />
 				</then>
 				<elseif>
 					<equals arg1="${app.server.type}" arg2="websphere" />
@@ -2802,7 +2743,7 @@ ${tomcat-gc-log}
 					import com.liferay.jenkins.results.parser.test.clazz.group.BatchTestClassGroup;
 					import com.liferay.jenkins.results.parser.test.clazz.group.TestClassGroupFactory;
 
-					Job job = JobFactory.newJob(project.getProperty("top.level.job.name"), project.getProperty("env.CI_TEST_SUITE"), project.getProperty("portal.branch.name"), project.getProperty("env.REPOSITORY_NAME"));
+					Job job = JobFactory.newJob(project.getProperty("top.level.job.name"), project.getProperty("env.CI_TEST_SUITE"), project.getProperty("portal.branch.name"));
 
 					BatchTestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), job);
 
@@ -3041,82 +2982,32 @@ ${tomcat-gc-log}
 							<if>
 								<isset property="lpkg.path" />
 								<then>
-									<local name="tstamp.value" />
-
 									<tstamp>
 										<format pattern="yyyyMMddkkmmssSSS" property="tstamp.value" />
 									</tstamp>
 
-									<local name="lpkg.dir" />
-
-									<property name="lpkg.dir" value="${tstamp.value}/lpkg-dir" />
-
-									<mkdir dir="${lpkg.dir}" />
-
-									<local name="lpkg.impl.include.name" />
-
-									<property name="lpkg.impl.include.name" value="Liferay Documentum Connector - Impl.lpkg" />
+									<mkdir dir="${tstamp.value}" />
 
 									<unzip
-										dest="${lpkg.dir}"
+										dest="${tstamp.value}"
 										src="${lpkg.path}"
 									>
 										<patternset>
-											<include name="${lpkg.impl.include.name}" />
+											<include name="documentum-hook-*.war" />
 										</patternset>
 									</unzip>
-
-									<local name="lpkg.impl.path" />
-
-									<pathconvert property="lpkg.impl.path" setonempty="false">
-										<path>
-											<fileset
-												dir="${lpkg.dir}"
-											>
-												<include name="${lpkg.impl.include.name}" />
-											</fileset>
-										</path>
-									</pathconvert>
-
-									<local name="lpkg.impl.dir" />
-
-									<property name="lpkg.impl.dir" value="${tstamp.value}/lpkg-impl-dir" />
-
-									<mkdir dir="${lpkg.impl.dir}" />
-
-									<local name="war.include.name" />
-
-									<property name="war.include.name" value="documentum-hook-*.war" />
-
-									<unzip
-										dest="${lpkg.impl.dir}"
-										src="${lpkg.impl.path}"
-									>
-										<patternset>
-											<include name="${war.include.name}" />
-										</patternset>
-									</unzip>
-
-									<local name="war.path" />
 
 									<pathconvert property="war.path" setonempty="false">
 										<path>
 											<fileset
-												dir="${lpkg.impl.dir}"
-											>
-												<include name="${war.include.name}" />
-											</fileset>
+												dir="${tstamp.value}"
+												includes="documentum-hook-*.war"
+											/>
 										</path>
 									</pathconvert>
 
-									<local name="war.dir" />
-
-									<property name="war.dir" value="${tstamp.value}/war-dir" />
-
-									<mkdir dir="${war.dir}" />
-
 									<unzip
-										dest="${war.dir}"
+										dest="${tstamp.value}"
 										src="${war.path}"
 									>
 										<flattenmapper />
@@ -3125,7 +3016,7 @@ ${tomcat-gc-log}
 										</patternset>
 									</unzip>
 
-									<propertyfile file="${war.dir}/dfc.properties">
+									<propertyfile file="${tstamp.value}/dfc.properties">
 										<entry key="dfc.docbroker.host[0]" value="${cmis.repository.vm.host.name}" />
 									</propertyfile>
 
@@ -3134,31 +3025,21 @@ ${tomcat-gc-log}
 										update="true"
 									>
 										<zipfileset
-											file="${war.dir}/dfc.properties"
+											file="${tstamp.value}/dfc.properties"
 											fullpath="WEB-INF/classes/dfc.properties"
 										/>
 									</war>
 
-									<zip
-										destfile="${lpkg.impl.path}"
-										update="true"
-									>
-										<zipfileset
-											dir="${lpkg.impl.dir}"
-										>
-											<include name="${war.include.name}" />
-										</zipfileset>
-									</zip>
+									<delete file="${tstamp.value}/dfc.properties" />
 
 									<zip
 										destfile="${lpkg.path}"
 										update="true"
 									>
 										<zipfileset
-											dir="${lpkg.dir}"
-										>
-											<include name="${lpkg.impl.include.name}" />
-										</zipfileset>
+											dir="${tstamp.value}"
+											includes="documentum-hook-*.war"
+										/>
 									</zip>
 
 									<delete dir="${tstamp.value}" />
@@ -3454,7 +3335,6 @@ go</echo>
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.0.10.7" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.0.10.8" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.0.10.9" />
-						<equals arg1="@{liferay.portal.bundle}" arg2="7.0.10.10" />
 					</or>
 					<then>
 						<var name="app.server.tomcat.version" value="8.0.32" />
@@ -3471,16 +3351,9 @@ go</echo>
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.0" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.10" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.10.1" />
-						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.10.2" />
 					</or>
 					<then>
 						<var name="app.server.tomcat.version" value="9.0.6" />
-					</then>
-				</elseif>
-				<elseif>
-					<equals arg1="@{liferay.portal.bundle}" arg2="7.1.1" />
-					<then>
-						<var name="app.server.tomcat.version" value="9.0.10" />
 					</then>
 				</elseif>
 			</if>
@@ -3946,7 +3819,6 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 						app.server.bin.dir="${app.server.tcat.admin.bin.dir}"
 						app.server.bundle.index="@{app.server.bundle.index}"
 						delete.liferay.home="@{delete.liferay.home}"
-						test.docker.environment="${test.docker.environment}"
 						testable.portal.started.marker.file="@{testable.portal.started.marker.file}"
 					/>
 
@@ -3954,7 +3826,6 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 						app.server.bin.dir="${app.server.tcat.agent.bin.dir}"
 						app.server.bundle.index="@{app.server.bundle.index}"
 						delete.liferay.home="@{delete.liferay.home}"
-						test.docker.environment="${test.docker.environment}"
 						testable.portal.started.marker.file="@{testable.portal.started.marker.file}"
 					/>
 				</then>
@@ -3962,7 +3833,6 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					<start-app-server-cmd
 						app.server.bundle.index="@{app.server.bundle.index}"
 						delete.liferay.home="@{delete.liferay.home}"
-						test.docker.environment="${test.docker.environment}"
 						testable.portal.started.marker.file="@{testable.portal.started.marker.file}"
 					/>
 				</else>
@@ -3974,8 +3844,6 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 		<attribute default="${app.server.bin.dir}" name="app.server.bin.dir" />
 		<attribute default="0" name="app.server.bundle.index" />
 		<attribute default="true" name="delete.liferay.home" />
-		<attribute default="host" name="docker.network.name" />
-		<attribute default="false" name="test.docker.environment" />
 		<attribute default="" name="testable.portal.started.marker.file" />
 
 		<sequential>
@@ -4055,37 +3923,15 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 					<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-					<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
-
-					<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
+					<get-java-jdk-home version="${java.jdk.bundle.version}" />
 
 					<if>
 						<equals arg1="${test.ant.launched.by.selenium}" arg2="true" />
 						<then>
-							<if>
-								<istrue value="${test.docker.environment}" />
-								<then>
-									<echo>docker run -d -p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080 -v ${app.server.parent.dir}:${app.server.parent.dir} --cidfile=docker.process.pid --network=@{docker.network.name} openjdk:8-alpine ${app.server.bin.dir}/${app.server.start.executable} ${app.server.start.executable.arg.line}</echo>
-
-									<exec executable="docker">
-										<arg line="run -d" />
-										<arg line="-p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080" />
-										<arg value="-v" />
-										<arg value="${app.server.parent.dir}:${app.server.parent.dir}" />
-										<arg value="--cidfile=docker.process.pid" />
-										<arg value="--network=@{docker.network.name}" />
-										<arg value="openjdk:8u191-jdk-alpine3.8" />
-										<arg value="${app.server.bin.dir}/${app.server.start.executable}" />
-										<arg value="${app.server.start.executable.arg.line}" />
-									</exec>
-								</then>
-								<else>
-									<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
-										<arg line="${app.server.start.executable.arg.line}" />
-										<env key="JAVA_HOME" path="${java.jdk.home}" />
-									</exec>
-								</else>
-							</if>
+							<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
+								<arg line="${app.server.start.executable.arg.line}" />
+								<env key="JAVA_HOME" path="${java.jdk.home}" />
+							</exec>
 
 							<wait-for-app-server app.server.bin.dir="@{app.server.bin.dir}" app.server.bundle.index="@{app.server.bundle.index}" />
 						</then>
@@ -4105,30 +3951,10 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 								</if>
 
 								<daemons>
-									<if>
-										<istrue value="${test.docker.environment}" />
-										<then>
-											<echo>docker run -d -p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080 -v ${app.server.parent.dir}:${app.server.parent.dir} --cidfile=docker.process.pid --network=@{docker.network.name} openjdk:8-alpine ${app.server.bin.dir}/${app.server.start.executable} ${app.server.start.executable.arg.line}</echo>
-
-											<exec executable="docker">
-												<arg line="run -d" />
-												<arg line="-p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080" />
-												<arg value="-v" />
-												<arg value="${app.server.parent.dir}:${app.server.parent.dir}" />
-												<arg value="--cidfile=docker.process.pid" />
-												<arg value="--network=@{docker.network.name}" />
-												<arg value="openjdk:8u191-jdk-alpine3.8" />
-												<arg value="${app.server.bin.dir}/${app.server.start.executable}" />
-												<arg value="${app.server.start.executable.arg.line}" />
-											</exec>
-										</then>
-										<else>
-											<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" failonerror="true" resolveexecutable="true">
-												<arg line="${app.server.start.executable.arg.line}" />
-												<env key="JAVA_HOME" path="${java.jdk.home}" />
-											</exec>
-										</else>
-									</if>
+									<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" failonerror="true" resolveexecutable="true">
+										<arg line="${app.server.start.executable.arg.line}" />
+										<env key="JAVA_HOME" path="${java.jdk.home}" />
+									</exec>
 								</daemons>
 							</parallel>
 						</else>
@@ -4262,15 +4088,6 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 						app.server.explicit.stop.count="@{app.server.explicit.stop.count}"
 					/>
 				</then>
-				<elseif>
-					<istrue value="${test.docker.environment}" />
-					<then>
-						<stop-app-server-docker-cmd
-							app.server.bundle.index="@{app.server.bundle.index}"
-							app.server.explicit.stop.count="@{app.server.explicit.stop.count}"
-						/>
-					</then>
-				</elseif>
 				<else>
 					<stop-app-server-cmd
 						app.server.bundle.index="@{app.server.bundle.index}"
@@ -4294,9 +4111,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 			<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-			<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
-
-			<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
+			<get-java-jdk-home version="${java.jdk.bundle.version}" />
 
 			<parallel>
 				<daemons>
@@ -4453,34 +4268,6 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					</if>
 				</sequential>
 			</parallel>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="stop-app-server-docker-cmd">
-		<attribute default="${app.server.bin.dir}" name="app.server.bin.dir" />
-		<attribute default="0" name="app.server.bundle.index" />
-		<attribute default="0" name="app.server.explicit.stop.count" />
-
-		<sequential>
-			<set-app-server-properties
-				app.server.bin.dir="@{app.server.bin.dir}"
-				app.server.bundle.index="@{app.server.bundle.index}"
-			/>
-
-			<loadfile
-				property="docker.process.pid"
-				srcfile="docker.process.pid"
-			/>
-
-			<exec executable="docker">
-				<arg line="container stop ${docker.process.pid}" />
-			</exec>
-
-			<exec executable="docker">
-				<arg line="container rm ${docker.process.pid}" />
-			</exec>
-
-			<delete file="docker.process.pid" />
 		</sequential>
 	</macrodef>
 
@@ -5026,10 +4813,7 @@ war.path=${app.server.portal.dir}/</echo>
 				<if>
 					<and>
 						<isset property="databases.size" />
-						<or>
-							<equals arg1="${database.type}" arg2="mysql" />
-							<equals arg1="${database.type}" arg2="mariadb" />
-						</or>
+						<equals arg1="${database.type}" arg2="mysql" />
 					</and>
 					<then>
 						<var name="database.index" value="1" />
@@ -5054,22 +4838,6 @@ create database lportal${database.index} character set utf8;</echo>
 
 						<var name="database.index" unset="true" />
 					</then>
-					<elseif>
-						<and>
-							<isset property="databases.size" />
-							<equals arg1="${database.type}" arg2="postgresql" />
-						</and>
-						<then>
-							<echo file="create.sql">
-drop database lportal;
-create database lportal encoding = 'UNICODE';</echo>
-
-							<echo append="true" file="create.sql">
-
-drop database lportal${databases.size};
-create database lportal${databases.size} encoding = 'UNICODE';</echo>
-						</then>
-					</elseif>
 					<else>
 						<if>
 							<or>
@@ -5142,18 +4910,6 @@ connect to lportal;</replacevalue>
 							<replacetoken>create database lportal pagesize 8192;</replacetoken>
 							<replacevalue>create database lportal pagesize 32768 temporary tablespace managed by automatic storage;</replacevalue>
 						</replace>
-
-						<if>
-							<isset property="databases.size" />
-							<then>
-								<echo append="true" file="create.sql">
-
-disconnect lportal;
-create database lportal${databases.size} pagesize 32768 temporary tablespace managed by automatic storage;
-update db cfg for lportal${databases.size} using logprimary 2;
-update db cfg for lportal${databases.size} using logsecond 254;</echo>
-							</then>
-						</if>
 					</then>
 					<elseif>
 						<equals arg1="${database.type}" arg2="oracle" />
@@ -5165,32 +4921,6 @@ update db cfg for lportal${databases.size} using logsecond 254;</echo>
 								<replacevalue>grant connect,resource to &amp;1;
 	grant unlimited tablespace to &amp;1;</replacevalue>
 							</replace>
-
-							<if>
-								<isset property="databases.size" />
-								<then>
-									<replace
-										file="create.sql"
-									>
-										<replacetoken>grant connect,resource to &amp;1;
-	grant unlimited tablespace to &amp;1;</replacetoken>
-										<replacevalue>grant all privileges to &amp;1;</replacevalue>
-									</replace>
-									<replace
-										file="create.sql"
-									>
-										<replacetoken>quit</replacetoken>
-										<replacevalue></replacevalue>
-									</replace>
-
-									<echo append="true" file="create.sql">
-	drop user lportal1 cascade;
-	create user lportal1 identified by lportal1;
-	grant connect,resource to lportal1;
-	grant unlimited tablespace to lportal1;
-	quit</echo>
-								</then>
-							</if>
 						</then>
 					</elseif>
 					<elseif>
@@ -5212,40 +4942,6 @@ use lportal</replacetoken>
 go]]></replacevalue>
 								</replacefilter>
 							</replace>
-
-							<if>
-								<isset property="databases.size" />
-								<then>
-									<echo append="true" file="create.sql">
-
-use master
-go
-
-drop database lportal${databases.size}
-go
-
-create database lportal${databases.size}
-go
-
-alter database lportal${databases.size} on default=1400
-go
-
-alter database lportal${databases.size} with override
-go
-
-exec sp_dboption 'lportal${databases.size}', 'allow nulls by default' , true
-go
-
-exec sp_dboption 'lportal${databases.size}', 'select into/bulkcopy/pllsort' , true
-go
-
-use lportal${databases.size}
-go
-
-checkpoint
-go</echo>
-								</then>
-							</if>
 						</then>
 					</elseif>
 				</if>
@@ -5489,36 +5185,6 @@ go</echo>
 			<arg value="releng.gradle" />
 			<arg value="-PgitRepoPath=${module.dir}" />
 		</gradle-execute>
-	</target>
-
-	<target name="copy-cluster-log">
-		<local name="log.dir" />
-
-		<condition else="${app.server.parent.dir}-${app.server.bundle.index}/logs" property="log.dir" value="${app.server.parent.dir}/logs">
-			<or>
-				<not>
-					<isset property="app.server.bundle.index" />
-				</not>
-				<equals arg1="${app.server.bundle.index}" arg2="0" />
-			</or>
-		</condition>
-
-		<for param="log.file">
-			<path>
-				<fileset
-					dir="${log.dir}"
-				>
-					<include name="*.log" />
-				</fileset>
-			</path>
-			<sequential>
-				<copy
-					file="@{log.file}"
-					overwrite="true"
-					tofile="${liferay.home}/cluster${app.server.bundle.index}.log"
-				/>
-			</sequential>
-		</for>
 	</target>
 
 	<target name="copy-log-file">
@@ -5865,34 +5531,6 @@ go</echo>
 				/>
 			</then>
 		</if>
-
-		<condition else="${app.server.parent.dir}-${app.server.bundle.index}/deploy" property="deploy.dir" value="${app.server.parent.dir}/deploy">
-			<or>
-				<not>
-					<isset property="app.server.bundle.index" />
-				</not>
-				<equals arg1="${app.server.bundle.index}" arg2="0" />
-			</or>
-		</condition>
-
-		<echo>Deploy directory is ${deploy.dir}.</echo>
-
-		<if>
-			<isset property="liferay.dependency.jars" />
-			<then>
-				<property name="liferay.dependency.jars" value="${liferay.dependency.jars}" />
-
-				<echo>Copying ${project.dir}/portal-web/test/functional/com/liferay/portalweb/dependencies/${liferay.dependency.jars} to ${deploy.dir}/${liferay.dependency.jars}.</echo>
-
-				<copy
-					file="${project.dir}/portal-web/test/functional/com/liferay/portalweb/dependencies/${liferay.dependency.jars}"
-					todir="${deploy.dir}"
-				/>
-			</then>
-			<else>
-				<echo>The property "liferay.dependency.jars" is not set.</echo>
-			</else>
-		</if>
 	</target>
 
 	<target name="deploy-extra-apps">
@@ -6008,19 +5646,6 @@ go</echo>
 	</target>
 
 	<target name="deploy-lcs-environment-token">
-		<if>
-			<and>
-				<isset property="portal.lcs.license.url" />
-				<matches pattern="https?://" string="${portal.lcs.license.url}" />
-			</and>
-			<then>
-				<mirrors-get
-					dest="${selenium.output.dir.name}"
-					src="${portal.lcs.license.url}"
-				/>
-			</then>
-		</if>
-
 		<get-testcase-property property.name="app.server.bundles.size" />
 
 		<if>
@@ -6297,15 +5922,7 @@ go</echo>
 
 				<local name="osgi.module.pattern" />
 
-				<if>
-					<equals arg1="${osgi.modules.includes}" arg2="revert-schema-version" />
-					<then>
-						<property name="osgi.module.pattern" value="**/test/**" />
-					</then>
-					<else>
-						<property name="osgi.module.pattern" value="**/apps/**" />
-					</else>
-				</if>
+				<property name="osgi.module.pattern" value="**/apps/**" />
 
 				<antelope:stringutil property="osgi.modules.includes.pattern" string="${osgi.module.pattern}/${osgi.modules.includes}">
 					<antelope:replace regex="," replacement=",${osgi.module.pattern}/" />
@@ -6361,6 +5978,58 @@ go</echo>
 					</sequential>
 				</for>
 			</then>
+		</if>
+	</target>
+
+	<target name="deploy-project-templates">
+		<if>
+			<equals arg1="${project.templates}" arg2="mvc-portlet" />
+			<then>
+				<gradle-execute dir="${project.dir}/modules/sdk/project-templates/project-templates-${project.templates}" task="generateSampleProject" />
+
+				<gradle-execute dir="${project.dir}/modules/sdk/project-templates/project-templates-${project.templates}/build/samplemvc" task="assemble" />
+
+				<copy
+					file="${project.dir}/modules/sdk/project-templates/project-templates-${project.templates}/build/samplemvc/build/libs/samplemvc-1.0.0.jar"
+					todir="${liferay.home}/deploy"
+				/>
+			</then>
+			<elseif>
+				<equals arg1="${project.templates}" arg2="simple" />
+				<then>
+					<gradle-execute dir="${project.dir}/modules/sdk/project-templates/project-templates-npm-portlet" task="generateSampleProject" />
+
+					<gradle-execute dir="${project.dir}/modules/sdk/project-templates/project-templates-npm-portlet/build/npm-simple-portlet" task="assemble" />
+
+					<copy
+						file="${project.dir}/modules/sdk/project-templates/project-templates-npm-portlet/build/npm-simple-portlet/build/libs/npm.simple.portlet-1.0.0.jar"
+						todir="${liferay.home}/deploy"
+					/>
+				</then>
+			</elseif>
+			<elseif>
+				<equals arg1="${project.templates}" arg2="theme" />
+				<then>
+					<gradle-execute dir="${project.dir}/modules/sdk/project-templates/project-templates-${project.templates}" task="generateSampleProject" />
+
+					<gradle-execute dir="${project.dir}/modules/sdk/project-templates/project-templates-${project.templates}/build/sampletheme" task="assemble" />
+
+					<copy
+						file="${project.dir}/modules/sdk/project-templates/project-templates-${project.templates}/build/sampletheme/build/libs/sampletheme.war"
+						todir="${liferay.home}/deploy"
+					/>
+				</then>
+			</elseif>
+			<else>
+				<gradle-execute dir="${project.dir}/modules/sdk/project-templates/project-templates-npm-${project.templates}-portlet" task="generateSampleProject" />
+
+				<gradle-execute dir="${project.dir}/modules/sdk/project-templates/project-templates-npm-${project.templates}-portlet/build/npm-${project.templates}-portlet" task="assemble" />
+
+				<copy
+					file="${project.dir}/modules/sdk/project-templates/project-templates-npm-${project.templates}-portlet/build/npm-${project.templates}-portlet/build/libs/npm.${project.templates}.portlet-1.0.0.jar"
+					todir="${liferay.home}/deploy"
+				/>
+			</else>
 		</if>
 	</target>
 
@@ -6888,35 +6557,14 @@ go</echo>
 
 	<target name="portal-ext-properties-update">
 		<if>
-			<not>
-				<isset property="app.server.bundle.index" />
-			</not>
-			<then>
-				<var name="app.server.bundle.index" value="0" />
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${app.server.bundle.index}" arg2="0" />
-			<then>
-				<var name="test.app.server.classes.portal.dir" value="${app.server.classes.portal.dir}" />
-			</then>
-			<else>
-				<antelope:stringutil property="test.app.server.classes.portal.dir" string="${app.server.classes.portal.dir}">
-					<antelope:replace regex="(${app.server.parent.dir})(.*)" replacement="$1-${app.server.bundle.index}$2" />
-				</antelope:stringutil>
-			</else>
-		</if>
-
-		<if>
 			<equals arg1="${add.new.properties}" arg2="true" />
 			<then>
-				<echo append="true" file="${test.app.server.classes.portal.dir}/portal-ext.properties">
+				<echo append="true" file="portal-impl/src/portal-ext.properties">
 ${update.properties}</echo>
 			</then>
 			<else>
 				<replace
-					file="${test.app.server.classes.portal.dir}/portal-ext.properties"
+					file="portal-impl/src/portal-ext.properties"
 					token="${update.properties.original}"
 					value="${update.properties}"
 				/>
@@ -7358,9 +7006,7 @@ memory.scheduler.org.quartz.threadPool.threadCount=1
 
 persisted.scheduler.org.quartz.threadPool.threadCount=1
 
-virtual.hosts.default.site.name=
-
-web.server.http.port=8080</echo>
+virtual.hosts.default.site.name=</echo>
 
 		<if>
 			<equals arg1="${database.type}" arg2="oracle" />
@@ -7376,22 +7022,14 @@ jdbc.default.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 			<equals arg1="${cluster.enabled}" arg2="true" />
 			<then>
 				<echo append="true" file="portal-impl/src/portal-ext.properties">
+
 cluster.link.autodetect.address=
 
 cluster.link.enabled=true
 
+dl.store.impl=com.liferay.portal.store.db.DBStore
+
 web.server.display.node=true</echo>
-			</then>
-		</if>
-
-		<get-testcase-property property.name="cluster.jdbc.ping" />
-
-		<if>
-			<equals arg1="${cluster.jdbc.ping}" arg2="true" />
-			<then>
-				<echo append="true" file="portal-impl/src/portal-ext.properties">
-
-cluster.link.channel.properties.control=UDP(bind_addr=${cluster.link.bind.addr["cluster-link-control"]};mcast_group_addr=${multicast.group.address["cluster-link-control"]};mcast_port=${multicast.group.port["cluster-link-control"]}):JDBC_PING(connection_driver=${jdbc.default.driverClassName};connection_url=${jdbc.default.url};connection_username=${jdbc.default.username};connection_password=${jdbc.default.password}):MERGE3(min_interval=10000;max_interval=30000):FD_SOCK:FD_ALL:VERIFY_SUSPECT(timeout=1500):pbcast.NAKACK2(xmit_interval=500;xmit_table_num_rows=100;xmit_table_msgs_per_row=2000;xmit_table_max_compaction_time=30000;max_msg_batch_size=500;use_mcast_xmit=false;discard_delivered_msgs=true):UNICAST3(xmit_interval=500;xmit_table_num_rows=100;xmit_table_msgs_per_row=2000;xmit_table_max_compaction_time=60000;conn_expiry_timeout=0;max_msg_batch_size=500):pbcast.STABLE(stability_delay=1000;desired_avg_gossip=50000;max_bytes=4M):pbcast.GMS(join_timeout=2000;print_local_addr=true;view_bundling=true):UFC(max_credits=2M;min_threshold=0.4):MFC(max_credits=2M;min_threshold=0.4):FRAG2(frag_size=60K):RSVP(resend_interval=2000;timeout=10000)</echo>
 			</then>
 		</if>
 
@@ -7931,25 +7569,25 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			</then>
 		</if>
 
-		<for list="${test.case.available.property.names}" param="test.case.available.property.name">
-			<sequential>
-				<if>
-					<isset property="test.case.available.property.values[@{test.case.available.property.name}]" />
-					<then>
-						<echo append="true" file="${test.ext.properties.file}">
-							test.case.available.property.values[@{test.case.available.property.name}]=${test.case.available.property.values[@{test.case.available.property.name}]}
-						</echo>
-					</then>
-				</if>
-			</sequential>
-		</for>
-
 		<if>
 			<isset property="test.case.required.property.names" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
 					test.case.required.property.names=${test.case.required.property.names}
 				</echo>
+
+				<for list="${test.case.required.property.names}" param="test.case.required.property.name">
+					<sequential>
+						<if>
+							<isset property="test.case.available.property.values[@{test.case.required.property.name}]" />
+							<then>
+								<echo append="true" file="${test.ext.properties.file}">
+									test.case.available.property.values[@{test.case.required.property.name}]=${test.case.available.property.values[@{test.case.required.property.name}]}
+								</echo>
+							</then>
+						</if>
+					</sequential>
+				</for>
 			</then>
 		</if>
 
@@ -8042,6 +7680,39 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			<else>
 				<echo append="true" file="${test.ext.properties.file}">
 					test.portal.instance=${test.portal.instance}
+				</echo>
+			</else>
+		</if>
+
+		<var name="test.toggle.file.names" unset="true" />
+
+		<pathconvert pathsep="," property="test.toggle.file.names">
+			<fileset
+				dir="${project.dir}"
+			>
+				<include name="modules/*/*/poshi.toggle" />
+				<include name="modules/*/*/*/poshi.toggle" />
+				<include name="modules/*/*/*/*/poshi.toggle" />
+				<include name="modules/*/*/*/*/*/poshi.toggle" />
+				<include name="modules/*/*/*/*/*/*/poshi.toggle" />
+				<include name="portal-web/poshi.toggle" />
+			</fileset>
+		</pathconvert>
+
+		<antelope:stringutil property="test.toggle.file.names" string="${test.toggle.file.names}">
+			<antelope:replace regex="\\" replacement="/" />
+		</antelope:stringutil>
+
+		<if>
+			<isset property="test.base.dir.name" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					test.toggle.file.names=${test.toggle.file.names},${test.base.dir.name}/poshi.toggle
+				</echo>
+			</then>
+			<else>
+				<echo append="true" file="${test.ext.properties.file}">
+					test.toggle.file.names=${test.toggle.file.names}
 				</echo>
 			</else>
 		</if>
@@ -9216,8 +8887,6 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 			</then>
 		</if>
 
-		<lstopwatch action="start" name="prepare.bundles.${app.server.name}" />
-
 		<if>
 			<matches pattern="(file|https?)://" string="${test.build.bundle.zip.url}" />
 			<then>
@@ -9571,8 +9240,6 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 				<antcall target="prepare-tomcat-ext-environment" />
 			</then>
 		</if>
-
-		<lstopwatch action="total" name="prepare.bundles.${app.server.name}" />
 	</target>
 
 	<target name="prepare-tomcat-ext-environment">
@@ -9715,8 +9382,6 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 				<if>
 					<equals arg1="${database.type}" arg2="db2" />
 					<then>
-						<get-testcase-property property.name="databases.size" />
-
 						<if>
 							<os family="windows" />
 							<then>
@@ -9727,15 +9392,6 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 								<exec executable="${db2.executable}">
 									<arg line="/c /w db2 drop db lportal" />
 								</exec>
-
-								<if>
-									<isset property="databases.size" />
-									<then>
-										<exec executable="${db2.executable}">
-											<arg line="/c /w db2 drop db lportal${databases.size}" />
-										</exec>
-									</then>
-								</if>
 
 								<exec executable="${db2.executable}">
 									<arg line="/c /w db2 -fcreate.sql -td;" />
@@ -9749,15 +9405,6 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 								<exec executable="${db2.executable}">
 									<arg line="drop db lportal" />
 								</exec>
-
-								<if>
-									<isset property="databases.size" />
-									<then>
-										<exec executable="${db2.executable}">
-											<arg line="drop db lportal${databases.size}" />
-										</exec>
-									</then>
-								</if>
 
 								<exec executable="${db2.executable}" failonerror="true">
 									<arg value="-fcreate.sql" />
@@ -9791,24 +9438,35 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 							<equals arg1="${database.type}" arg2="mysql" />
 						</or>
 						<then>
-							<var name="arg.line" value="" />
+							<var name="arg.line" unset="true" />
 
-							<get-database-property property.name="database.host" />
 							<get-database-property property.name="database.password" />
 							<get-database-property property.name="database.username" />
 
-							<local name="mysql.host" />
-
-							<condition else="" property="mysql.host" value="127.0.0.1">
+							<if>
 								<and>
-									<equals arg1="${database.host}" arg2="localhost" />
-									<istrue value="${test.docker.environment}" />
+									<equals arg1="${database.password}" arg2="" />
+									<equals arg1="${database.username}" arg2="" />
 								</and>
-							</condition>
-
-							<var name="arg.line" unless:blank="${mysql.host}" value="${arg.line} -h ${mysql.host}" />
-							<var name="arg.line" unless:blank="${database.username}" value="${arg.line} -u ${database.username}" />
-							<var name="arg.line" unless:blank="${database.password}" value="${arg.line} -p${database.password}" />
+								<then>
+									<var name="arg.line" value="" />
+								</then>
+								<elseif>
+									<equals arg1="${database.password}" arg2="" />
+									<then>
+										<var name="arg.line" value="-u ${database.username}" />
+									</then>
+								</elseif>
+								<elseif>
+									<equals arg1="${database.username}" arg2="" />
+									<then>
+										<var name="arg.line" value="-p${database.password}" />
+									</then>
+								</elseif>
+								<else>
+									<var name="arg.line" value="-p${database.password} -u ${database.username}" />
+								</else>
+							</if>
 
 							<propertycopy from="${database.type}.executable" name="database.executable" override="true" />
 
@@ -10483,76 +10141,6 @@ if (ppstate.equals("normal")) {
 		<echo>Writing ${project.dir}/${report.csv.file.name}</echo>
 	</target>
 
-	<target name="redeploy-osgi-modules">
-		<get-testcase-property property.name="osgi.modules.includes" />
-
-		<if>
-			<isset property="update.properties" />
-			<then>
-				<replace
-					file="${project.dir}/${module.base.dir}/${osgi.modules.includes}/bnd.bnd"
-					token="${update.properties.original}"
-					value="${update.properties}"
-				/>
-			</then>
-		</if>
-
-		<echo file="tools/sdk/build.${user.name}.properties">auto.deploy.dir=${liferay.home}/deploy</echo>
-
-		<local name="osgi.module.pattern" />
-
-		<if>
-			<equals arg1="${osgi.modules.includes}" arg2="revert-schema-version" />
-			<then>
-				<property name="osgi.module.pattern" value="**/test/**" />
-			</then>
-			<else>
-				<property name="osgi.module.pattern" value="**/apps/**" />
-			</else>
-		</if>
-
-		<antelope:stringutil property="osgi.modules.includes.pattern" string="${osgi.module.pattern}/${osgi.modules.includes}">
-			<antelope:replace regex="," replacement=",${osgi.module.pattern}/" />
-		</antelope:stringutil>
-
-		<pathconvert pathsep="," property="osgi.modules.paths">
-			<dirset
-				dir="modules"
-				includes="${osgi.modules.includes.pattern}"
-			>
-				<or>
-					<present targetdir="modules">
-						<mapper
-							from="*"
-							to="*/build.gradle"
-							type="glob"
-						/>
-					</present>
-					<present targetdir="modules">
-						<mapper
-							from="*"
-							to="*/build.xml"
-							type="glob"
-						/>
-					</present>
-				</or>
-			</dirset>
-		</pathconvert>
-
-		<for list="${osgi.modules.paths}" parallel="true" param="osgi.module.path">
-			<sequential>
-				<local name="module.base.dir" />
-				<local name="osgi.module.command.prefix" />
-
-				<dirname file="@{osgi.module.path}" property="module.base.dir" />
-
-				<gradle-execute dir="@{osgi.module.path}" forcedcacheenabled="false" task="deploy">
-					<arg value="clean" />
-				</gradle-execute>
-			</sequential>
-		</for>
-	</target>
-
 	<target name="remove-plugin">
 		<get-auto-deploy-dir />
 
@@ -10933,6 +10521,19 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 			</then>
 		</if>
 
+		<!--
+		Deploy project samples to the deploy directory.
+		-->
+
+		<get-testcase-property property.name="project.templates" />
+
+		<if>
+			<isset property="project.templates" />
+			<then>
+				<antcall target="deploy-project-templates" />
+			</then>
+		</if>
+
 		<get-testcase-property property.name="openam.enabled" />
 
 		<if>
@@ -11105,15 +10706,6 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 
 		<remake-dir dir="${selenium.output.dir.name}" />
 
-		<get-testcase-property property.name="deploy.lcs.token.file" />
-
-		<if>
-			<equals arg1="${deploy.lcs.token.file}" arg2="true" />
-			<then>
-				<antcall target="deploy-lcs-environment-token" />
-			</then>
-		</if>
-
 		<get-testcase-property property.name="skip.start-app-server" />
 
 		<if>
@@ -11152,7 +10744,7 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 					<param name="database.type" value="@{database.type}" />
 				</antcall>
 
-				<antcall target="start-app-server-preserve-liferay-home" />
+				<start-app-server />
 
 				<get-testcase-property property.name="app.server.bundles.size" />
 
@@ -11507,38 +11099,12 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 		<uninstall-patches patching.tool.dir="${patching.tool.dir}" />
 	</target>
 
-	<target name="update-osgi-module-configuration">
-		<local name="osgi.configs.dir" />
-
-		<condition else="${app.server.parent.dir}-${install.patch.cluster.node.index}/osgi/configs" property="osgi.configs.dir" value="${app.server.parent.dir}/osgi/configs">
-			<or>
-				<not>
-					<isset property="install.patch.cluster.node.index" />
-				</not>
-				<equals arg1="${install.patch.cluster.node.index}" arg2="0" />
-			</or>
-		</condition>
-
-		<get-testcase-property property.name="osgi.module.configurations" />
-		<get-testcase-property property.name="osgi.module.configuration.file.names" />
-
-		<replace
-			file="${osgi.configs.dir}/${osgi.module.configuration.file.names}"
-			token="${osgi.module.configurations}"
-			value="${update.configuration}"
-		/>
-
-		<echo message="osgi.module.configurations= ${update.configuration}" />
-	</target>
-
 	<target name="upgrade-legacy-database">
 		<prepare-database-upgrade-configuration />
 
 		<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-		<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
-
-		<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
+		<get-java-jdk-home version="${java.jdk.bundle.version}" />
 
 		<trycatch property="upgrade.error">
 			<try>

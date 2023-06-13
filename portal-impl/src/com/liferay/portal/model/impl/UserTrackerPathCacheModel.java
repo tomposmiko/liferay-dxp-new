@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.UserTrackerPath;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -33,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing UserTrackerPath in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see UserTrackerPath
  * @generated
  */
 @ProviderType
-public class UserTrackerPathCacheModel
-	implements CacheModel<UserTrackerPath>, Externalizable, MVCCModel {
-
+public class UserTrackerPathCacheModel implements CacheModel<UserTrackerPath>,
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,13 +50,10 @@ public class UserTrackerPathCacheModel
 			return false;
 		}
 
-		UserTrackerPathCacheModel userTrackerPathCacheModel =
-			(UserTrackerPathCacheModel)obj;
+		UserTrackerPathCacheModel userTrackerPathCacheModel = (UserTrackerPathCacheModel)obj;
 
-		if ((userTrackerPathId ==
-				userTrackerPathCacheModel.userTrackerPathId) &&
-			(mvccVersion == userTrackerPathCacheModel.mvccVersion)) {
-
+		if ((userTrackerPathId == userTrackerPathCacheModel.userTrackerPathId) &&
+				(mvccVersion == userTrackerPathCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -142,7 +140,8 @@ public class UserTrackerPathCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(userTrackerPathId);
@@ -167,5 +166,4 @@ public class UserTrackerPathCacheModel
 	public long userTrackerId;
 	public String path;
 	public long pathDate;
-
 }

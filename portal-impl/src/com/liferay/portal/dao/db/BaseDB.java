@@ -19,7 +19,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.db.Index;
 import com.liferay.portal.kernel.dao.db.IndexMetadata;
@@ -51,12 +50,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -177,50 +174,7 @@ public abstract class BaseDB implements DB {
 
 	@Override
 	public List<Index> getIndexes(Connection con) throws SQLException {
-		Set<Index> indexes = new HashSet<>();
-
-		DatabaseMetaData databaseMetaData = con.getMetaData();
-
-		DBInspector dbInspector = new DBInspector(con);
-
-		String catalog = dbInspector.getCatalog();
-		String schema = dbInspector.getSchema();
-
-		try (ResultSet tableRS = databaseMetaData.getTables(
-				catalog, schema, null, new String[] {"TABLE"})) {
-
-			while (tableRS.next()) {
-				String tableName = dbInspector.normalizeName(
-					tableRS.getString("TABLE_NAME"));
-
-				try (ResultSet indexRS = databaseMetaData.getIndexInfo(
-						catalog, schema, tableName, false, false)) {
-
-					while (indexRS.next()) {
-						String indexName = indexRS.getString("INDEX_NAME");
-
-						if (indexName == null) {
-							continue;
-						}
-
-						String lowerCaseIndexName = StringUtil.toLowerCase(
-							indexName);
-
-						if (!lowerCaseIndexName.startsWith("liferay_") &&
-							!lowerCaseIndexName.startsWith("ix_")) {
-
-							continue;
-						}
-
-						boolean unique = !indexRS.getBoolean("NON_UNIQUE");
-
-						indexes.add(new Index(indexName, tableName, unique));
-					}
-				}
-			}
-		}
-
-		return new ArrayList<>(indexes);
+		return Collections.emptyList();
 	}
 
 	@Override
@@ -686,7 +640,9 @@ public abstract class BaseDB implements DB {
 			nullable = "not null;";
 		}
 
-		return new String[] {words[1], words[2], words[3], words[4], nullable};
+		String[] template = {words[1], words[2], words[3], words[4], nullable};
+
+		return template;
 	}
 
 	protected String[] buildColumnTypeTokens(String line) {
@@ -708,7 +664,9 @@ public abstract class BaseDB implements DB {
 			}
 		}
 
-		return new String[] {words[1], words[2], "", words[3], nullable};
+		String[] template = {words[1], words[2], "", words[3], nullable};
+
+		return template;
 	}
 
 	protected abstract String buildCreateFileContent(

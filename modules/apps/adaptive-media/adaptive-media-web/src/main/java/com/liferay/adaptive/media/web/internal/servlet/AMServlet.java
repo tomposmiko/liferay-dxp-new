@@ -55,6 +55,13 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class AMServlet extends HttpServlet {
 
+	@Reference(unbind = "-")
+	public void setAMRequestHandlerLocator(
+		AMRequestHandlerLocator amRequestHandlerLocator) {
+
+		_amRequestHandlerLocator = amRequestHandlerLocator;
+	}
+
 	@Override
 	protected void doGet(
 			HttpServletRequest request, HttpServletResponse response)
@@ -152,7 +159,6 @@ public class AMServlet extends HttpServlet {
 	private static final Pattern _requestHandlerPattern = Pattern.compile(
 		"^/([^/]*)");
 
-	@Reference
 	private AMRequestHandlerLocator _amRequestHandlerLocator;
 
 }

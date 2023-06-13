@@ -47,7 +47,7 @@ try {
 	String templateContent = (String)request.getAttribute(NestedPortletsWebKeys.TEMPLATE_CONTENT + portletDisplay.getId());
 
 	if (Validator.isNotNull(templateId) && Validator.isNotNull(templateContent)) {
-		RuntimePageUtil.processTemplate(nestedPortletsDisplayContext.getLastForwardRequest(), response, new StringTemplateResource(templateId, templateContent), TemplateConstants.LANG_TYPE_FTL);
+		RuntimePageUtil.processTemplate(nestedPortletsDisplayContext.getLastForwardRequest(), response, new StringTemplateResource(templateId, templateContent));
 	}
 }
 catch (Exception e) {

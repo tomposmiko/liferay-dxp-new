@@ -37,7 +37,7 @@ import java.util.Map;
  * @author Sergio González
  */
 public abstract class ExtRepositoryModelAdapter<T>
-	implements Cloneable, RepositoryModel<T> {
+	implements RepositoryModel<T>, Cloneable {
 
 	@Override
 	@SuppressWarnings("unchecked")

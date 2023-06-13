@@ -14,9 +14,10 @@
 
 package com.liferay.portal.upgrade;
 
+import aQute.bnd.version.Version;
+
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.version.Version;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.sql.Connection;
@@ -203,7 +204,7 @@ public class PortalUpgradeProcessTest {
 	}
 
 	private static final Version _ORIGINAL_SCHEMA_VERSION = new Version(
-		0, 0, 0);
+		"0.0.0");
 
 	private static Version _currentSchemaVersion;
 

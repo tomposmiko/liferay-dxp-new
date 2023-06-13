@@ -335,14 +335,6 @@ public class LocalizationUtil {
 		return getLocalization().getXml(map, defaultLanguageId, key);
 	}
 
-	public static Map<Locale, String> populateLocalizationMap(
-		Map<Locale, String> localizationMap, String defaultLanguageId,
-		long groupId) {
-
-		return getLocalization().populateLocalizationMap(
-			localizationMap, defaultLanguageId, groupId);
-	}
-
 	public static String removeLocalization(
 		String xml, String key, String requestedLanguageId) {
 

@@ -19,60 +19,61 @@
 <%
 JournalArticle article = journalDisplayContext.getArticle();
 
-long groupId = BeanParamUtil.getLong(article, request, "groupId", scopeGroupId);
+JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalEditArticleDisplayContext(request, liferayPortletResponse, article);
+
 long classNameId = ParamUtil.getLong(request, "classNameId");
 
-DDMStructure ddmStructure = (DDMStructure)request.getAttribute("edit_article.jsp-structure");
-DDMTemplate ddmTemplate = (DDMTemplate)request.getAttribute("edit_article.jsp-template");
+DDMStructure ddmStructure = journalEditArticleDisplayContext.getDDMStructure();
+DDMTemplate ddmTemplate = journalEditArticleDisplayContext.getDDMTemplate();
 %>
 
-<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
+<aui:input name="groupId" type="hidden" value="<%= journalEditArticleDisplayContext.getGroupId() %>" />
 <aui:input name="ddmStructureKey" type="hidden" value="<%= ddmStructure.getStructureKey() %>" />
 <aui:input name="ddmTemplateKey" type="hidden" value="<%= (ddmTemplate != null) ? ddmTemplate.getTemplateKey() : StringPool.BLANK %>" />
 
 <div class="article-structure">
 	<liferay-ui:message key="structure" />:
 
-	<span id="<portlet:namespace />structureNameLabel">
-		<c:choose>
-			<c:when test="<%= DDMStructurePermission.contains(permissionChecker, ddmStructure, ActionKeys.UPDATE) %>">
-				<aui:a href="javascript:;" id="editDDMStructure" label="<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>" />
-			</c:when>
-			<c:otherwise>
-				<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>
-			</c:otherwise>
-		</c:choose>
-	</span>
+	<c:choose>
+		<c:when test="<%= DDMStructurePermission.contains(permissionChecker, ddmStructure, ActionKeys.UPDATE) %>">
+			<aui:a href="javascript:;" id="editDDMStructure" label="<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>" />
+		</c:when>
+		<c:otherwise>
+			<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>
+		</c:otherwise>
+	</c:choose>
 
 	<c:if test="<%= classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT %>">
 		<div class="button-holder">
-			<aui:button id="selectStructure" value="select" />
+			<aui:button id="selectDDMStructure" value="select" />
 		</div>
 	</c:if>
 </div>
 
-<div class="article-template">
-	<liferay-ui:message key="template" />:
+<c:if test="<%= ListUtil.isNotEmpty(ddmStructure.getTemplates()) %>">
+	<div class="article-template">
+		<liferay-ui:message key="template" />:
 
-	<span id="<portlet:namespace />templateNameLabel">
-		<c:if test="<%= (ddmTemplate != null) && ddmTemplate.isSmallImage() %>">
-			<img alt="" class="article-template-image" id="<portlet:namespace />templateImage" src="<%= HtmlUtil.escapeAttribute(ddmTemplate.getTemplateImageURL(themeDisplay)) %>" />
-		</c:if>
+		<span id="<portlet:namespace />templateNameLabel">
+			<c:if test="<%= (ddmTemplate != null) && ddmTemplate.isSmallImage() %>">
+				<img alt="" class="article-template-image" id="<portlet:namespace />templateImage" src="<%= HtmlUtil.escapeAttribute(ddmTemplate.getTemplateImageURL(themeDisplay)) %>" />
+			</c:if>
 
-		<c:choose>
-			<c:when test="<%= (ddmTemplate != null) && DDMTemplatePermission.contains(permissionChecker, ddmTemplate, ActionKeys.UPDATE) %>">
-				<aui:a href="javascript:;" id="editDDMTemplate" label="<%= HtmlUtil.escape(ddmTemplate.getName(locale)) %>" />
-			</c:when>
-			<c:otherwise>
-				<%= (ddmTemplate != null) ? HtmlUtil.escape(ddmTemplate.getName(locale)) : LanguageUtil.get(request, "none") %>
-			</c:otherwise>
-		</c:choose>
-	</span>
+			<c:choose>
+				<c:when test="<%= (ddmTemplate != null) && DDMTemplatePermission.contains(permissionChecker, ddmTemplate, ActionKeys.UPDATE) %>">
+					<aui:a href="javascript:;" id="editDDMTemplate" label="<%= HtmlUtil.escape(ddmTemplate.getName(locale)) %>" />
+				</c:when>
+				<c:otherwise>
+					<%= (ddmTemplate != null) ? HtmlUtil.escape(ddmTemplate.getName(locale)) : LanguageUtil.get(request, "none") %>
+				</c:otherwise>
+			</c:choose>
+		</span>
 
-	<div class="button-holder">
-		<aui:button id="selectTemplate" value="select" />
+		<div class="button-holder">
+			<aui:button id="selectDDMTemplate" value="select" />
+		</div>
 	</div>
-</div>
+</c:if>
 
 <aui:script>
 
@@ -92,7 +93,7 @@ DDMTemplate ddmTemplate = (DDMTemplate)request.getAttribute("edit_article.jsp-te
 	}
 	%>
 
-	$('#<portlet:namespace />selectStructure').on(
+	$('#<portlet:namespace />selectDDMStructure').on(
 		'click',
 		function(event) {
 			Liferay.Util.selectEntity(
@@ -101,10 +102,10 @@ DDMTemplate ddmTemplate = (DDMTemplate)request.getAttribute("edit_article.jsp-te
 						constrain: true,
 						modal: true
 					},
-					eventName: '<portlet:namespace />selectStructure',
-					id: '<portlet:namespace />selectStructure',
+					eventName: '<portlet:namespace />selectDDMStructure',
+					id: '<portlet:namespace />selectDDMStructure',
 					title: '<%= UnicodeLanguageUtil.get(request, "structures") %>',
-					uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/select_structure.jsp" /><portlet:param name="searchRestriction" value="<%= String.valueOf(searchRestriction) %>" /><portlet:param name="searchRestrictionClassNameId" value="<%= String.valueOf(ClassNameLocalServiceUtil.getClassNameId(JournalFolder.class)) %>" /><portlet:param name="searchRestrictionClassPK" value="<%= String.valueOf(folderId) %>" /></portlet:renderURL>'
+					uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/select_ddm_structure.jsp" /><portlet:param name="searchRestriction" value="<%= String.valueOf(searchRestriction) %>" /><portlet:param name="searchRestrictionClassNameId" value="<%= String.valueOf(ClassNameLocalServiceUtil.getClassNameId(JournalFolder.class)) %>" /><portlet:param name="searchRestrictionClassPK" value="<%= String.valueOf(folderId) %>" /></portlet:renderURL>'
 				},
 				function(event) {
 					var ddmStructureId = '<%= ddmStructure.getPrimaryKey() %>';
@@ -115,7 +116,7 @@ DDMTemplate ddmTemplate = (DDMTemplate)request.getAttribute("edit_article.jsp-te
 
 					if (ddmStructureId != event.ddmstructureid) {
 						if (confirm('<%= UnicodeLanguageUtil.get(request, "editing-the-current-structure-deletes-all-unsaved-content") %>')) {
-							document.<portlet:namespace />fm1.<portlet:namespace />changeStructure.value = 'true';
+							document.<portlet:namespace />fm1.<portlet:namespace />changeDDMStructure.value = 'true';
 							document.<portlet:namespace />fm1.<portlet:namespace />ddmStructureId.value = event.ddmstructureid;
 							document.<portlet:namespace />fm1.<portlet:namespace />ddmStructureKey.value = event.ddmstructurekey;
 							document.<portlet:namespace />fm1.<portlet:namespace />ddmTemplateKey.value = '';
@@ -128,7 +129,35 @@ DDMTemplate ddmTemplate = (DDMTemplate)request.getAttribute("edit_article.jsp-te
 		}
 	);
 
-	$('#<portlet:namespace />selectTemplate').on(
+	$('#<portlet:namespace />editDDMStructure').on(
+		'click',
+		function(event) {
+			if (confirm('<%= UnicodeLanguageUtil.get(request, "editing-the-current-structure-deletes-all-unsaved-content") %>')) {
+				Liferay.Util.openWindow(
+					{
+						dialog: {
+							destroyOnHide: true
+						},
+						dialogIframe: {
+							bodyCssClass: 'dialog-with-footer'
+						},
+						id: '<portlet:namespace />editDDMStructure',
+						title: '<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>',
+
+						<portlet:renderURL var="editDDMStructureURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+							<portlet:param name="mvcPath" value="/edit_ddm_structure.jsp" />
+							<portlet:param name="closeRedirect" value="<%= currentURL %>" />
+							<portlet:param name="ddmStructureId" value="<%= String.valueOf(ddmStructure.getStructureId()) %>" />
+						</portlet:renderURL>
+
+						uri: '<%= editDDMStructureURL %>'
+					}
+				);
+			}
+		}
+	);
+
+	$('#<portlet:namespace />selectDDMTemplate').on(
 		'click',
 		function(event) {
 			Liferay.Util.selectEntity(
@@ -137,10 +166,10 @@ DDMTemplate ddmTemplate = (DDMTemplate)request.getAttribute("edit_article.jsp-te
 						constrain: true,
 						modal: true
 					},
-					eventName: '<portlet:namespace />selectTemplate',
-					id: '<portlet:namespace />selectTemplate',
+					eventName: '<portlet:namespace />selectDDMTemplate',
+					id: '<portlet:namespace />selectDDMTemplate',
 					title: '<%= UnicodeLanguageUtil.get(request, "templates") %>',
-					uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/select_template.jsp" /><portlet:param name="structureId" value="<%= String.valueOf(ddmStructure.getStructureId()) %>" /></portlet:renderURL>'
+					uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/select_ddm_template.jsp" /><portlet:param name="ddmStructureId" value="<%= String.valueOf(ddmStructure.getStructureId()) %>" /></portlet:renderURL>'
 				},
 				function(event) {
 					var ddmTemplateId = '<%= (ddmTemplate != null) ? ddmTemplate.getTemplateId() : 0 %>';
@@ -158,6 +187,34 @@ DDMTemplate ddmTemplate = (DDMTemplate)request.getAttribute("edit_article.jsp-te
 					}
 				}
 			);
+		}
+	);
+
+	$('#<portlet:namespace />editDDMTemplate').on(
+		'click',
+		function(event) {
+			if (confirm('<%= UnicodeLanguageUtil.get(request, "editing-the-current-template-deletes-all-unsaved-content") %>')) {
+				Liferay.Util.openWindow(
+					{
+						dialog: {
+							destroyOnHide: true
+						},
+						dialogIframe: {
+							bodyCssClass: 'dialog-with-footer'
+						},
+						id: '<portlet:namespace />editDDMTemplate',
+						title: '<%= (ddmTemplate != null) ? HtmlUtil.escape(ddmTemplate.getName(locale)) : StringPool.BLANK %>',
+
+						<portlet:renderURL var="editDDMTemplateURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+							<portlet:param name="mvcPath" value="/edit_ddm_template.jsp" />
+							<portlet:param name="closeRedirect" value="<%= currentURL %>" />
+							<portlet:param name="ddmTemplateId" value="<%= (ddmTemplate != null) ? String.valueOf(ddmTemplate.getTemplateId()) : StringPool.BLANK %>" />
+						</portlet:renderURL>
+
+						uri: '<%= editDDMTemplateURL %>'
+					}
+				);
+			}
 		}
 	);
 </aui:script>

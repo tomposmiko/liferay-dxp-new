@@ -17,6 +17,7 @@ package com.liferay.external.reference.service.base;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.external.reference.service.EROrganizationLocalService;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -42,17 +43,17 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.external.reference.service.impl.EROrganizationLocalServiceImpl
+ * @see com.liferay.external.reference.service.EROrganizationLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class EROrganizationLocalServiceBaseImpl
-	extends BaseLocalServiceImpl
-	implements EROrganizationLocalService, IdentifiableOSGiService {
-
+	extends BaseLocalServiceImpl implements EROrganizationLocalService,
+		IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>EROrganizationLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.external.reference.service.EROrganizationLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.external.reference.service.EROrganizationLocalServiceUtil} to access the er organization local service.
 	 */
 
 	/**
@@ -71,7 +72,6 @@ public abstract class EROrganizationLocalServiceBaseImpl
 	 */
 	public void setEROrganizationLocalService(
 		EROrganizationLocalService erOrganizationLocalService) {
-
 		this.erOrganizationLocalService = erOrganizationLocalService;
 	}
 
@@ -80,9 +80,7 @@ public abstract class EROrganizationLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -92,9 +90,7 @@ public abstract class EROrganizationLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -103,9 +99,7 @@ public abstract class EROrganizationLocalServiceBaseImpl
 	 *
 	 * @return the organization local service
 	 */
-	public com.liferay.portal.kernel.service.OrganizationLocalService
-		getOrganizationLocalService() {
-
+	public com.liferay.portal.kernel.service.OrganizationLocalService getOrganizationLocalService() {
 		return organizationLocalService;
 	}
 
@@ -115,9 +109,7 @@ public abstract class EROrganizationLocalServiceBaseImpl
 	 * @param organizationLocalService the organization local service
 	 */
 	public void setOrganizationLocalService(
-		com.liferay.portal.kernel.service.OrganizationLocalService
-			organizationLocalService) {
-
+		com.liferay.portal.kernel.service.OrganizationLocalService organizationLocalService) {
 		this.organizationLocalService = organizationLocalService;
 	}
 
@@ -137,7 +129,6 @@ public abstract class EROrganizationLocalServiceBaseImpl
 	 */
 	public void setOrganizationPersistence(
 		OrganizationPersistence organizationPersistence) {
-
 		this.organizationPersistence = organizationPersistence;
 	}
 
@@ -146,9 +137,7 @@ public abstract class EROrganizationLocalServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -159,7 +148,6 @@ public abstract class EROrganizationLocalServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -211,8 +199,8 @@ public abstract class EROrganizationLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -223,29 +211,14 @@ public abstract class EROrganizationLocalServiceBaseImpl
 
 	@BeanReference(type = EROrganizationLocalService.class)
 	protected EROrganizationLocalService erOrganizationLocalService;
-
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.OrganizationLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.OrganizationLocalService
-		organizationLocalService;
-
+	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.OrganizationLocalService.class)
+	protected com.liferay.portal.kernel.service.OrganizationLocalService organizationLocalService;
 	@ServiceReference(type = OrganizationPersistence.class)
 	protected OrganizationPersistence organizationPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
 }

@@ -28,9 +28,6 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutPrototypeLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.ArrayList;
@@ -107,13 +104,6 @@ public class LayoutPrototypeStagedModelDataHandler
 		Element layoutPrototypeElement =
 			portletDataContext.getExportDataElement(layoutPrototype);
 
-		long defaultUserId = _userLocalService.getDefaultUserId(
-			layoutPrototype.getCompanyId());
-
-		if (defaultUserId == layoutPrototype.getUserId()) {
-			layoutPrototypeElement.addAttribute("preloaded", "true");
-		}
-
 		portletDataContext.addClassedModel(
 			layoutPrototypeElement,
 			ExportImportPathUtil.getModelPath(layoutPrototype),
@@ -137,20 +127,11 @@ public class LayoutPrototypeStagedModelDataHandler
 		LayoutPrototype importedLayoutPrototype = null;
 
 		if (portletDataContext.isDataStrategyMirror()) {
-			Element element =
-				portletDataContext.getImportDataStagedModelElement(
-					layoutPrototype);
-
-			boolean preloaded = GetterUtil.getBoolean(
-				element.attributeValue("preloaded"));
-
 			LayoutPrototype existingLayoutPrototype =
-				fetchExistingLayoutPrototype(
-					layoutPrototype.getUuid(),
-					portletDataContext.getCompanyId(),
-					layoutPrototype.getName(
-						layoutPrototype.getDefaultLanguageId()),
-					layoutPrototype.getDefaultLanguageId(), preloaded);
+				_layoutPrototypeLocalService.
+					fetchLayoutPrototypeByUuidAndCompanyId(
+						layoutPrototype.getUuid(),
+						portletDataContext.getCompanyId());
 
 			if (existingLayoutPrototype == null) {
 				serviceContext.setUuid(layoutPrototype.getUuid());
@@ -221,19 +202,6 @@ public class LayoutPrototypeStagedModelDataHandler
 		}
 	}
 
-	protected LayoutPrototype fetchExistingLayoutPrototype(
-		String uuid, long companyId, String name, String languageId,
-		boolean preloaded) {
-
-		if (preloaded) {
-			return _layoutPrototypeLocalService.fetchLayoutPrototype(
-				companyId, name, LocaleUtil.fromLanguageId(languageId));
-		}
-
-		return _layoutPrototypeLocalService.
-			fetchLayoutPrototypeByUuidAndCompanyId(uuid, companyId);
-	}
-
 	protected void importLayouts(
 			PortletDataContext portletDataContext,
 			LayoutPrototype layoutPrototype, long importedGroupId)
@@ -282,14 +250,8 @@ public class LayoutPrototypeStagedModelDataHandler
 		_layoutPrototypeLocalService = layoutPrototypeLocalService;
 	}
 
-	@Reference(unbind = "-")
-	protected void setUserLocalService(UserLocalService userLocalService) {
-		_userLocalService = userLocalService;
-	}
-
 	private GroupLocalService _groupLocalService;
 	private LayoutLocalService _layoutLocalService;
 	private LayoutPrototypeLocalService _layoutPrototypeLocalService;
-	private UserLocalService _userLocalService;
 
 }

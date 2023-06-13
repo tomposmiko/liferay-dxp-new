@@ -21,20 +21,61 @@ definition {
 		Button.clickSave();
 	}
 
-	macro addFragment {
-		LexiconEntry.gotoAdd();
+	macro addSection {
+		LexiconEntry.gotoAddMenuItem(menuItem = "Section");
 
-		AssertTextEquals(locator1 = "Modal#HEADER", value1 = "Add Fragment");
+		AssertTextEquals(locator1 = "Modal#HEADER", value1 = "Add Section");
 
 		PortletEntry.inputName(name = "${fragmentName}");
 
 		Button.clickSave();
 	}
 
+	macro deleteFragment {
+		LexiconCard.delete(
+			card = "${fragmentName}"
+		);
+	}
+
+	@summary = "Type HTML into the fragment HTML editor using the auto complete feature."
+	macro autocompleteFragmentHTML {
+
+		var htmlSnippet = '''<lfr-''';
+
+		Type.typeAceEditorNoError(
+			locator1 = "FragmentEditor#HTML_EDITOR",
+			value1 = "${htmlSnippet}"
+		);
+
+		Click(
+			locator1 = "FragmentEditor#AUTOCOMPLETE_FIELD",
+			autocompleteField = "${autocompleteField}"
+		);
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "FragmentEditor#HTML_EDITOR_CONTENT",
+			value1 = "${fragmentHTML}"
+		);
+	}
+
 	macro exportCollection {
 		Navigator.gotoNavNested(navNested = "${collectionName}");
 
 		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Export");
+	}
+
+	macro gotoFragment {
+		Click(
+			locator1 = "LexiconCard#CARD_TITLE",
+			key_card = "${fragmentName}"
+		);
+	}
+
+	macro gotoFragmentEllipsisItem {
+		LexiconCard.gotoEllipsisItem(
+			card = "${fragmentName}",
+			item = "${item}"
+		);
 	}
 
 	macro gotoImportCollection {
@@ -82,6 +123,13 @@ definition {
 	macro openFragmentsAdmin {
 		Navigator.openWithAppendToBaseURL(
 			urlAppend = "group/${siteURLKey}/~/control_panel/manage/-/fragments"
+		);
+	}
+
+	macro viewFragmentWorkflowStatus {
+		LexiconCard.viewCardLabel(
+			card = "${fragmentName}",
+			cardLabel = "${workflowStatus}"
 		);
 	}
 }

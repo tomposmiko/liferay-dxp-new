@@ -18,8 +18,10 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.service.DLFolderLocalServiceUtil;
+
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +39,12 @@ import java.util.List;
  * @generated
  */
 @ProviderType
-public abstract class DLFolderBaseImpl
-	extends DLFolderModelImpl implements DLFolder {
-
+public abstract class DLFolderBaseImpl extends DLFolderModelImpl
+	implements DLFolder {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a document library folder model instance should use the <code>DLFolder</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a document library folder model instance should use the {@link DLFolder} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -65,11 +66,10 @@ public abstract class DLFolderBaseImpl
 		while (dlFolder != null) {
 			dlFolders.add(dlFolder);
 
-			dlFolder = DLFolderLocalServiceUtil.fetchDLFolder(
-				dlFolder.getParentFolderId());
+			dlFolder = DLFolderLocalServiceUtil.fetchDLFolder(dlFolder.getParentFolderId());
 		}
 
-		StringBundler sb = new StringBundler(dlFolders.size() * 2 + 1);
+		StringBundler sb = new StringBundler((dlFolders.size() * 2) + 1);
 
 		sb.append("/");
 
@@ -91,5 +91,4 @@ public abstract class DLFolderBaseImpl
 
 		DLFolderLocalServiceUtil.updateDLFolder(dlFolder);
 	}
-
 }

@@ -32,13 +32,12 @@ import com.liferay.opensocial.service.OAuthTokenLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class OAuthTokenBaseImpl
-	extends OAuthTokenModelImpl implements OAuthToken {
-
+public abstract class OAuthTokenBaseImpl extends OAuthTokenModelImpl
+	implements OAuthToken {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a o auth token model instance should use the <code>OAuthToken</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a o auth token model instance should use the {@link OAuthToken} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class OAuthTokenBaseImpl
 			OAuthTokenLocalServiceUtil.updateOAuthToken(this);
 		}
 	}
-
 }

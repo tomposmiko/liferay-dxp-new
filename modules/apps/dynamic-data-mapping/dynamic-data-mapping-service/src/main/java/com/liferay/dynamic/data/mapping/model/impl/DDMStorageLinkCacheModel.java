@@ -17,9 +17,11 @@ package com.liferay.dynamic.data.mapping.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMStorageLink;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -30,12 +32,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing DDMStorageLink in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see DDMStorageLink
  * @generated
  */
 @ProviderType
-public class DDMStorageLinkCacheModel
-	implements CacheModel<DDMStorageLink>, Externalizable {
-
+public class DDMStorageLinkCacheModel implements CacheModel<DDMStorageLink>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -46,8 +48,7 @@ public class DDMStorageLinkCacheModel
 			return false;
 		}
 
-		DDMStorageLinkCacheModel ddmStorageLinkCacheModel =
-			(DDMStorageLinkCacheModel)obj;
+		DDMStorageLinkCacheModel ddmStorageLinkCacheModel = (DDMStorageLinkCacheModel)obj;
 
 		if (storageLinkId == ddmStorageLinkCacheModel.storageLinkId) {
 			return true;
@@ -125,7 +126,8 @@ public class DDMStorageLinkCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -153,5 +155,4 @@ public class DDMStorageLinkCacheModel
 	public long classPK;
 	public long structureId;
 	public long structureVersionId;
-
 }

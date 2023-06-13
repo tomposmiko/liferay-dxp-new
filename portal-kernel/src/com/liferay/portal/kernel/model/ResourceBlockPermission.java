@@ -24,44 +24,36 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see ResourceBlockPermissionModel
+ * @see com.liferay.portal.model.impl.ResourceBlockPermissionImpl
+ * @see com.liferay.portal.model.impl.ResourceBlockPermissionModelImpl
  * @deprecated As of Judson (7.1.x), with no direct replacement
  * @generated
  */
 @Deprecated
-@ImplementationClassName(
-	"com.liferay.portal.model.impl.ResourceBlockPermissionImpl"
-)
+@ImplementationClassName("com.liferay.portal.model.impl.ResourceBlockPermissionImpl")
 @ProviderType
-public interface ResourceBlockPermission
-	extends PermissionedModel, ResourceBlockPermissionModel {
-
+public interface ResourceBlockPermission extends ResourceBlockPermissionModel,
+	PermissionedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.ResourceBlockPermissionImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.ResourceBlockPermissionImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<ResourceBlockPermission, Long>
-		RESOURCE_BLOCK_PERMISSION_ID_ACCESSOR =
-			new Accessor<ResourceBlockPermission, Long>() {
+	public static final Accessor<ResourceBlockPermission, Long> RESOURCE_BLOCK_PERMISSION_ID_ACCESSOR =
+		new Accessor<ResourceBlockPermission, Long>() {
+			@Override
+			public Long get(ResourceBlockPermission resourceBlockPermission) {
+				return resourceBlockPermission.getResourceBlockPermissionId();
+			}
 
-				@Override
-				public Long get(
-					ResourceBlockPermission resourceBlockPermission) {
+			@Override
+			public Class<Long> getAttributeClass() {
+				return Long.class;
+			}
 
-					return resourceBlockPermission.
-						getResourceBlockPermissionId();
-				}
-
-				@Override
-				public Class<Long> getAttributeClass() {
-					return Long.class;
-				}
-
-				@Override
-				public Class<ResourceBlockPermission> getTypeClass() {
-					return ResourceBlockPermission.class;
-				}
-
-			};
-
+			@Override
+			public Class<ResourceBlockPermission> getTypeClass() {
+				return ResourceBlockPermission.class;
+			}
+		};
 }

@@ -53,10 +53,7 @@ public class TetraConsumerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterThrowsException() {
-		TetraConsumer.empty(
-		).andThen(
-			null
-		);
+		TetraConsumer.empty().andThen(null);
 	}
 
 }

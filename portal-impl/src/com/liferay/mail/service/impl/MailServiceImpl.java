@@ -45,7 +45,7 @@ import javax.mail.Session;
 /**
  * @author Brian Wing Shun Chan
  */
-public class MailServiceImpl implements IdentifiableOSGiService, MailService {
+public class MailServiceImpl implements MailService, IdentifiableOSGiService {
 
 	@Override
 	public void addForward(

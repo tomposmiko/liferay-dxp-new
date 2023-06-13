@@ -35,48 +35,39 @@ import java.util.Locale;
  *
  * @author José Manuel Navarro
  * @see ScreensJournalArticleServiceUtil
+ * @see com.liferay.screens.service.base.ScreensJournalArticleServiceBaseImpl
+ * @see com.liferay.screens.service.impl.ScreensJournalArticleServiceImpl
  * @generated
  */
 @AccessControlled
 @JSONWebService
-@OSGiBeanProperties(
-	property = {
-		"json.web.service.context.name=screens",
-		"json.web.service.context.path=ScreensJournalArticle"
-	},
-	service = ScreensJournalArticleService.class
-)
+@OSGiBeanProperties(property =  {
+	"json.web.service.context.name=screens", "json.web.service.context.path=ScreensJournalArticle"}, service = ScreensJournalArticleService.class)
 @ProviderType
-@Transactional(
-	isolation = Isolation.PORTAL,
-	rollbackFor = {PortalException.class, SystemException.class}
-)
+@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
+	PortalException.class, SystemException.class})
 public interface ScreensJournalArticleService extends BaseService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link ScreensJournalArticleServiceUtil} to access the screens journal article remote service. Add custom service methods to <code>com.liferay.screens.service.impl.ScreensJournalArticleServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link ScreensJournalArticleServiceUtil} to access the screens journal article remote service. Add custom service methods to {@link com.liferay.screens.service.impl.ScreensJournalArticleServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public String getJournalArticleContent(long classPK, Locale locale)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public String getJournalArticleContent(
-			long classPK, long ddmTemplateId, Locale locale)
-		throws PortalException;
+	public String getJournalArticleContent(long classPK, long ddmTemplateId,
+		Locale locale) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public String getJournalArticleContent(
-			long groupId, String articleId, long ddmTemplateId, Locale locale)
-		throws PortalException;
+	public String getJournalArticleContent(long groupId, String articleId,
+		long ddmTemplateId, Locale locale) throws PortalException;
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public String getOSGiServiceIdentifier();
-
 }

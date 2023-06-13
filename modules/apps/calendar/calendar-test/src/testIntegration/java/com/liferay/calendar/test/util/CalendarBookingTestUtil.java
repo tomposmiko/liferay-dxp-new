@@ -73,14 +73,19 @@ public class CalendarBookingTestUtil {
 			secondReminderTypeString = secondReminderType.getValue();
 		}
 
-		return CalendarBookingLocalServiceUtil.addCalendarBooking(
-			user.getUserId(), calendar.getCalendarId(), childCalendarBookingIds,
-			CalendarBookingConstants.PARENT_CALENDAR_BOOKING_ID_DEFAULT,
-			CalendarBookingConstants.RECURRING_CALENDAR_BOOKING_ID_DEFAULT,
-			titleMap, descriptionMap, RandomTestUtil.randomString(), startTime,
-			endTime, allDay, RecurrenceSerializer.serialize(recurrence),
-			firstReminder, firstReminderTypeString, secondReminder,
-			secondReminderTypeString, serviceContext);
+		CalendarBooking calendarBooking =
+			CalendarBookingLocalServiceUtil.addCalendarBooking(
+				user.getUserId(), calendar.getCalendarId(),
+				childCalendarBookingIds,
+				CalendarBookingConstants.PARENT_CALENDAR_BOOKING_ID_DEFAULT,
+				CalendarBookingConstants.RECURRING_CALENDAR_BOOKING_ID_DEFAULT,
+				titleMap, descriptionMap, RandomTestUtil.randomString(),
+				startTime, endTime, allDay,
+				RecurrenceSerializer.serialize(recurrence), firstReminder,
+				firstReminderTypeString, secondReminder,
+				secondReminderTypeString, serviceContext);
+
+		return calendarBooking;
 	}
 
 	public static CalendarBooking addCalendarBooking(
@@ -222,18 +227,19 @@ public class CalendarBookingTestUtil {
 			int actionPublish)
 		throws PortalException {
 
-		User user = UserLocalServiceUtil.fetchUser(
-			invitingCalendar.getUserId());
+		User user = UserLocalServiceUtil.fetchUser(invitedCalendar.getUserId());
 		long startTime = System.currentTimeMillis();
 
 		ServiceContext serviceContext = createServiceContext(user);
 
 		serviceContext.setWorkflowAction(actionPublish);
 
-		return addMasterCalendarBooking(
+		CalendarBooking calendarBooking = addMasterCalendarBooking(
 			user, invitingCalendar,
 			new long[] {invitedCalendar.getCalendarId()}, startTime,
 			startTime + (Time.HOUR * 10), serviceContext);
+
+		return calendarBooking;
 	}
 
 	public static CalendarBooking addMasterRecurringCalendarBooking(

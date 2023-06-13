@@ -92,10 +92,13 @@ public class SSOImpl implements SSO {
 
 	private CASConfiguration _getCASConfiguration(long companyId) {
 		try {
-			return _configurationProvider.getConfiguration(
-				CASConfiguration.class,
-				new CompanyServiceSettingsLocator(
-					companyId, CASConstants.SERVICE_NAME));
+			CASConfiguration casCompanyServiceSettings =
+				_configurationProvider.getConfiguration(
+					CASConfiguration.class,
+					new CompanyServiceSettingsLocator(
+						companyId, CASConstants.SERVICE_NAME));
+
+			return casCompanyServiceSettings;
 		}
 		catch (ConfigurationException ce) {
 			_log.error("Unable to get CAS configuration", ce);

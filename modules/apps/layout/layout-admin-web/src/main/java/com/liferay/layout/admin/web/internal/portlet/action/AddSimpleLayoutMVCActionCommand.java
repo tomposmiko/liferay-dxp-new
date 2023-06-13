@@ -16,6 +16,7 @@ package com.liferay.layout.admin.web.internal.portlet.action;
 
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.admin.web.internal.handler.LayoutExceptionRequestHandler;
+import com.liferay.layout.constants.LayoutConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -28,8 +29,8 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -118,13 +119,13 @@ public class AddSimpleLayoutMVCActionCommand
 				stagingGroupId, privateLayout, layout.getLayoutId(),
 				layout.getTypeSettingsProperties());
 
-			SessionMessages.add(actionRequest, "layoutAdded", layout);
+			MultiSessionMessages.add(actionRequest, "layoutAdded", layout);
 
 			String redirectURL = getRedirectURL(
 				actionRequest, actionResponse, layout);
 
-			if (Objects.equals(type, "content")) {
-				redirectURL = getContentRedirectURL(actionResponse, layout);
+			if (Objects.equals(type, LayoutConstants.LAYOUT_TYPE_CONTENT)) {
+				redirectURL = getContentRedirectURL(themeDisplay, layout);
 			}
 
 			jsonObject.put("redirectURL", redirectURL);

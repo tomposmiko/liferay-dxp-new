@@ -84,25 +84,6 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 				<c:when test="<%= fileEntry != null %>">
 
 					<%
-					FileVersion latestFileVersion = fileEntry.getFileVersion();
-
-					if ((user.getUserId() == fileEntry.getUserId()) || permissionChecker.isContentReviewer(user.getCompanyId(), scopeGroupId) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE)) {
-						latestFileVersion = fileEntry.getLatestFileVersion();
-					}
-
-					DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext = null;
-
-					if (fileShortcut == null) {
-						dlViewFileVersionDisplayContext = dlDisplayContextProvider.getDLViewFileVersionDisplayContext(request, response, fileEntry.getFileVersion());
-
-						row.setPrimaryKey(String.valueOf(fileEntry.getFileEntryId()));
-					}
-					else {
-						dlViewFileVersionDisplayContext = dlDisplayContextProvider.getDLViewFileVersionDisplayContext(request, response, fileShortcut);
-
-						row.setPrimaryKey(String.valueOf(fileShortcut.getFileShortcutId()));
-					}
-
 					boolean draggable = false;
 
 					if (!BrowserSnifferUtil.isMobile(request) && (DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE))) {
@@ -119,10 +100,32 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 
 					Map<String, Object> rowData = new HashMap<String, Object>();
 
+					rowData.put("actions", String.join(StringPool.COMMA, dlAdminManagementToolbarDisplayContext.getAvailableActionDropdownItems(fileEntry)));
 					rowData.put("draggable", draggable);
 					rowData.put("title", fileEntry.getTitle());
 
 					row.setData(rowData);
+
+					DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext = null;
+
+					if (fileShortcut == null) {
+						dlViewFileVersionDisplayContext = dlDisplayContextProvider.getDLViewFileVersionDisplayContext(request, response, fileEntry.getFileVersion());
+
+						row.setPrimaryKey(String.valueOf(fileEntry.getFileEntryId()));
+					}
+					else {
+						dlViewFileVersionDisplayContext = dlDisplayContextProvider.getDLViewFileVersionDisplayContext(request, response, fileShortcut);
+
+						row.setPrimaryKey(String.valueOf(fileShortcut.getFileShortcutId()));
+					}
+
+					FileVersion latestFileVersion = fileEntry.getFileVersion();
+
+					if ((user.getUserId() == fileEntry.getUserId()) || permissionChecker.isContentReviewer(user.getCompanyId(), scopeGroupId) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE)) {
+						latestFileVersion = fileEntry.getLatestFileVersion();
+					}
+
+					latestFileVersion = latestFileVersion.toEscapedModel();
 
 					String thumbnailSrc = DLUtil.getThumbnailSrc(fileEntry, latestFileVersion, themeDisplay);
 					%>
@@ -183,6 +186,30 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 								%>
 
 								<c:choose>
+									<c:when test="<%= dlViewFileVersionDisplayContext.hasCustomThumbnail() %>">
+										<liferay-util:buffer
+											var="customThumbnailHtml"
+										>
+
+											<%
+											dlViewFileVersionDisplayContext.renderCustomThumbnail(request, PipingServletResponse.createPipingServletResponse(pageContext));
+											%>
+
+										</liferay-util:buffer>
+
+										<liferay-frontend:html-vertical-card
+											actionJsp="/document_library/file_entry_action.jsp"
+											actionJspServletContext="<%= application %>"
+											cssClass="entry-display-style"
+											html="<%= customThumbnailHtml %>"
+											resultRow="<%= row %>"
+											rowChecker="<%= entriesChecker %>"
+											title="<%= latestFileVersion.getTitle() %>"
+											url="<%= (rowURL != null) ? rowURL.toString() : null %>"
+										>
+											<%@ include file="/document_library/file_entry_vertical_card.jspf" %>
+										</liferay-frontend:html-vertical-card>
+									</c:when>
 									<c:when test="<%= Validator.isNull(thumbnailSrc) %>">
 										<liferay-frontend:icon-vertical-card
 											actionJsp="/document_library/file_entry_action.jsp"
@@ -330,8 +357,6 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 						dlSearchContainer.setRowChecker(entriesChecker);
 					}
 
-					Map<String, Object> rowData = new HashMap<String, Object>();
-
 					boolean draggable = false;
 
 					if (!BrowserSnifferUtil.isMobile(request) && (DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE))) {
@@ -342,8 +367,10 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 						}
 					}
 
-					rowData.put("draggable", draggable);
+					Map<String, Object> rowData = new HashMap<String, Object>();
 
+					rowData.put("actions", String.join(StringPool.COMMA, dlAdminManagementToolbarDisplayContext.getAvailableActionDropdownItems(curFolder)));
+					rowData.put("draggable", draggable);
 					rowData.put("folder", true);
 					rowData.put("folder-id", curFolder.getFolderId());
 					rowData.put("title", curFolder.getName());
@@ -415,7 +442,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 									cssClass="table-cell-expand table-cell-minw-200 table-title"
 									href="<%= rowURL %>"
 									name="title"
-									value="<%= curFolder.getName() %>"
+									value="<%= HtmlUtil.escape(curFolder.getName()) %>"
 								/>
 							</c:if>
 
@@ -499,7 +526,6 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 request.setAttribute("edit_file_entry.jsp-checkedOut", true);
 %>
 
-<liferay-util:include page="/document_library/version_details.jsp" servletContext="<%= application %>" />
-
-<%!
-%>
+<c:if test="<%= dlAdminDisplayContext.isVersioningStrategyOverridable() %>">
+	<liferay-util:include page="/document_library/version_details.jsp" servletContext="<%= application %>" />
+</c:if>

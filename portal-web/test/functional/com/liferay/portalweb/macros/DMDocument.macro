@@ -266,6 +266,19 @@ definition {
 		Alert.viewSuccessMessage();
 	}
 
+	macro addGoogleApp {
+		Portlet.clickPortletPlusIconPG(portletName = "Documents and Media");
+
+		if ("${dmGoogleApp}" == "Google Docs") {
+			Click(locator1 = "DocumentsAndMedia#GOOGLE_DOCS_MENU_ITEM");
+		}
+		else {
+			var key_menuItem = "${dmGoogleApp}";
+
+			MenuItem.click(menuItem = "${dmGoogleApp}");
+		}
+	}
+
 	macro addMultiplePG {
 		Portlet.clickPortletPlusIconPG(portletName = "Documents and Media");
 
@@ -275,17 +288,17 @@ definition {
 			for (var dmDocumentFile : list "${dmDocumentFileList}") {
 				var key_dmDocumentFile = "${dmDocumentFile}";
 
-				AssertElementPresent(locator1 = "Button#SELECT_FILES");
+				AssertClick(locator1 = "Button#SELECT_FILES", value1 = "Select Files");
 
 				if ("${uploadTempFile}" == "true") {
-					UploadTempFile.uploadTempFileHiddenNoMouseOver(
-						locator1 = "TextInput#FILE",
+					SikuliUploadTempFile(
+						locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
 						value1 = "${dmDocumentFile}"
 					);
 				}
 				else {
-					UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
-						locator1 = "TextInput#FILE",
+					SikuliUploadCommonFile(
+						locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
 						value1 = "${dmDocumentFile}"
 					);
 				}
@@ -300,10 +313,7 @@ definition {
 		}
 
 		if (isSet(viewableBy)) {
-			Select(
-				locator1 = "DocumentsAndMediaEditFolder#PERMISSIONS_SELECT",
-				value1 = "${viewableBy}"
-			);
+			Select(locator1 = "Select#PERMISSIONS", value1 = "${viewableBy}");
 		}
 
 		AssertClick(locator1 = "Button#PUBLISH", value1 = "Publish");
@@ -345,7 +355,7 @@ definition {
 		}
 
 		if (isSet(dmDocumentRelatedAsset)) {
-			DMDocument.addRelatedAssetPG(
+			RelatedAssets.selectAsset(
 				assetTitle = "${assetTitle}",
 				assetType = "${assetType}"
 			);
@@ -357,6 +367,12 @@ definition {
 			for (var tagName : list "${tagNameList}") {
 				AssetCategorization.addTag(tagName = "${tagName}");
 			}
+		}
+
+		if (isSet(viewableBy)) {
+			Panel.expandPanel(panel = "Permissions");
+
+			Select(locator1 = "Select#PERMISSIONS", value1 = "${viewableBy}");
 		}
 
 		AssertClick(locator1 = "Button#PUBLISH", value1 = "Publish");
@@ -556,6 +572,9 @@ definition {
 			}
 			else if ("${revision}" == "Minor") {
 				Click(locator1 = "Radio#MINOR_VERSION");
+			}
+			else if ("${revision}" == "Current") {
+				Click(locator1 = "Radio#CURRENT_VERSION");
 			}
 
 			if (isSet(changeLog)) {
@@ -797,6 +816,25 @@ definition {
 			dmDocumentTitleEdit = "${dmDocumentTitleEdit}"
 		);
 
+		if (isSet(versioning)) {
+			Panel.expandPanel(panel = "Categorization");
+
+			Check.checkToggleSwitch(
+				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH",
+				key_toggleSwitchLabel = " Customize the Version Number Increment and Describe My Changes"
+			);
+
+			if ("${revision}" == "Major") {
+				Click(locator1 = "Radio#MAJOR_VERSION");
+			}
+			else if ("${revision}" == "Minor") {
+				Click(locator1 = "Radio#MINOR_VERSION");
+			}
+			else if ("${revision}" == "Current") {
+				Click(locator1 = "Radio#CURRENT_VERSION");
+			}
+		}
+
 		if (isSet(checkedOut)) {
 			Click(locator1 = "Button#SAVE");
 		}
@@ -896,6 +934,8 @@ definition {
 		SelectFrame(locator1 = "DocumentsAndMedia#CONFIGURATION_IFRAME");
 
 		Check(locator1 = "Checkbox#SHOW_ACTIONS_CHECKBOX");
+
+		Check(locator1 = "Checkbox#SHOW_NAVIGATION_LINKS_CHECKBOX");
 
 		PortletEntry.save();
 
@@ -1095,6 +1135,22 @@ definition {
 		AssertClick(locator1 = "BreadcrumbPortlet#BREADCRUMB_PAGE", value1 = "Home");
 	}
 
+	macro openDocumentsAndMediaAdmin {
+		Navigator.openWithAppendToBaseURL(
+			urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_document_library_web_portlet_DLAdminPortlet"
+		);
+	}
+
+	macro removeTag {
+		Click(locator1 = "Button#EDIT");
+
+		Panel.expandPanel(panel = "Categorization");
+
+		var key_removeTag = "${removeTag}";
+
+		Click(locator1 = "Icon#REMOVE_TAG", value1="${removeTag}");
+	}
+
 	macro revertPG {
 		DMNavigator.gotoDocumentVersion();
 
@@ -1138,6 +1194,49 @@ definition {
 			locator1 = "MenuItem#ANY_MENU_ITEM",
 			value1 = "Versions",
 			key_menuItem = "Versions"
+		);
+	}
+
+	macro sharePG {
+		IFrame.selectModalFrame();
+
+		Type(
+			locator1 = "DocumentsAndMediaShare#INVITE_TO_COLLABORATE_INPUT",
+			value1 = "${userEmailAddress}"
+		);
+
+		if (isSet(shareable)) {
+			FormFields.enableCheckbox(fieldName = "shareable");
+		}
+		else {
+			FormFields.disableCheckbox(fieldName = "shareable");
+		}
+
+		if ("${sharingPermissions}" == "Update") {
+			FormFields.selectRadioOption(
+				fieldName = "sharingEntryPermission",
+				radioOption = "Update"
+			);
+		}
+		else if ("${sharingPermissions}" == "Comment") {
+			FormFields.selectRadioOption(
+				fieldName = "sharingEntryPermission",
+				radioOption = "Comment"
+			);
+		}
+		else {
+			FormFields.viewRadioValue(
+				fieldName = "sharingEntryPermission",
+				fieldValue = "View"
+			);
+		}
+
+		Button.clickShare();
+
+		SelectFrame(value1 = "relative=top");
+
+		Alert.viewSuccessMessageText(
+			successMessage = "The item was shared successfully."
 		);
 	}
 
@@ -1443,10 +1542,7 @@ definition {
 	}
 
 	macro viewDocumentNoCommentsCmdPG {
-		AssertTextEquals(
-			locator1 = "Comments#SUBSCRIBE_TO_COMMENTS_LINK",
-			value1 = "Subscribe to Comments"
-		);
+		AssertTextEquals(locator1 = "Button#SUBSCRIBE", value1 = "Subscribe");
 	}
 
 	macro viewDocumentTitleCmdPG {
@@ -1603,6 +1699,10 @@ definition {
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE",
 			value1 = "${dmDocumentTitleEdit}"
 		);
+
+		if (isSet(dmDocumentVersionNumber)) {
+			DMDocument.viewDocumentVersionNumberCmdPG(dmDocumentVersionNumber = "${dmDocumentVersionNumber}");
+		}
 	}
 
 	macro viewIconLockedCP {
@@ -1793,10 +1893,7 @@ definition {
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_RATING"
 		);
 
-		AssertTextEquals(
-			locator1 = "Comments#SUBSCRIBE_TO_COMMENTS_LINK",
-			value1 = "Subscribe to Comments"
-		);
+		AssertTextEquals(locator1 = "Button#SUBSCRIBE", value1 = "Subscribe");
 
 		Click(locator1 = "Button#INFO");
 

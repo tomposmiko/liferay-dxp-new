@@ -22,12 +22,13 @@ import com.liferay.announcements.kernel.service.persistence.AnnouncementsDeliver
 import com.liferay.announcements.kernel.service.persistence.AnnouncementsEntryFinder;
 import com.liferay.announcements.kernel.service.persistence.AnnouncementsEntryPersistence;
 import com.liferay.announcements.kernel.service.persistence.AnnouncementsFlagPersistence;
-import com.liferay.counter.kernel.service.persistence.CounterPersistence;
+
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -82,17 +83,17 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.portlet.announcements.service.impl.AnnouncementsEntryLocalServiceImpl
+ * @see com.liferay.announcements.kernel.service.AnnouncementsEntryLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class AnnouncementsEntryLocalServiceBaseImpl
-	extends BaseLocalServiceImpl
-	implements AnnouncementsEntryLocalService, IdentifiableOSGiService {
-
+	extends BaseLocalServiceImpl implements AnnouncementsEntryLocalService,
+		IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>AnnouncementsEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.announcements.kernel.service.AnnouncementsEntryLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.announcements.kernel.service.AnnouncementsEntryLocalServiceUtil} to access the announcements entry local service.
 	 */
 
 	/**
@@ -105,7 +106,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	@Override
 	public AnnouncementsEntry addAnnouncementsEntry(
 		AnnouncementsEntry announcementsEntry) {
-
 		announcementsEntry.setNew(true);
 
 		return announcementsEntryPersistence.update(announcementsEntry);
@@ -134,7 +134,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	@Override
 	public AnnouncementsEntry deleteAnnouncementsEntry(long entryId)
 		throws PortalException {
-
 		return announcementsEntryPersistence.remove(entryId);
 	}
 
@@ -148,7 +147,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	@Override
 	public AnnouncementsEntry deleteAnnouncementsEntry(
 		AnnouncementsEntry announcementsEntry) {
-
 		return announcementsEntryPersistence.remove(announcementsEntry);
 	}
 
@@ -156,8 +154,8 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(
-			AnnouncementsEntry.class, clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(AnnouncementsEntry.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -175,7 +173,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portlet.announcements.model.impl.AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.announcements.model.impl.AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -184,18 +182,17 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(
-		DynamicQuery dynamicQuery, int start, int end) {
-
-		return announcementsEntryPersistence.findWithDynamicQuery(
-			dynamicQuery, start, end);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end) {
+		return announcementsEntryPersistence.findWithDynamicQuery(dynamicQuery,
+			start, end);
 	}
 
 	/**
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portlet.announcements.model.impl.AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.announcements.model.impl.AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -205,12 +202,10 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(
-		DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator<T> orderByComparator) {
-
-		return announcementsEntryPersistence.findWithDynamicQuery(
-			dynamicQuery, start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator) {
+		return announcementsEntryPersistence.findWithDynamicQuery(dynamicQuery,
+			start, end, orderByComparator);
 	}
 
 	/**
@@ -221,8 +216,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
-		return announcementsEntryPersistence.countWithDynamicQuery(
-			dynamicQuery);
+		return announcementsEntryPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
 	/**
@@ -233,11 +227,10 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(
-		DynamicQuery dynamicQuery, Projection projection) {
-
-		return announcementsEntryPersistence.countWithDynamicQuery(
-			dynamicQuery, projection);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery,
+		Projection projection) {
+		return announcementsEntryPersistence.countWithDynamicQuery(dynamicQuery,
+			projection);
 	}
 
 	@Override
@@ -255,9 +248,8 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	@Override
 	public AnnouncementsEntry fetchAnnouncementsEntryByUuidAndCompanyId(
 		String uuid, long companyId) {
-
-		return announcementsEntryPersistence.fetchByUuid_C_First(
-			uuid, companyId, null);
+		return announcementsEntryPersistence.fetchByUuid_C_First(uuid,
+			companyId, null);
 	}
 
 	/**
@@ -270,17 +262,14 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	@Override
 	public AnnouncementsEntry getAnnouncementsEntry(long entryId)
 		throws PortalException {
-
 		return announcementsEntryPersistence.findByPrimaryKey(entryId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery =
-			new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(
-			announcementsEntryLocalService);
+		actionableDynamicQuery.setBaseLocalService(announcementsEntryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(AnnouncementsEntry.class);
 
@@ -290,14 +279,10 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery
-		getIndexableActionableDynamicQuery() {
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
 
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
-			new IndexableActionableDynamicQuery();
-
-		indexableActionableDynamicQuery.setBaseLocalService(
-			announcementsEntryLocalService);
+		indexableActionableDynamicQuery.setBaseLocalService(announcementsEntryLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(AnnouncementsEntry.class);
 
@@ -308,9 +293,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-
-		actionableDynamicQuery.setBaseLocalService(
-			announcementsEntryLocalService);
+		actionableDynamicQuery.setBaseLocalService(announcementsEntryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(AnnouncementsEntry.class);
 
@@ -320,89 +303,65 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	@Override
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		final PortletDataContext portletDataContext) {
-
-		final ExportActionableDynamicQuery exportActionableDynamicQuery =
-			new ExportActionableDynamicQuery() {
-
+		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
 				@Override
 				public long performCount() throws PortalException {
-					ManifestSummary manifestSummary =
-						portletDataContext.getManifestSummary();
+					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
 
 					StagedModelType stagedModelType = getStagedModelType();
 
 					long modelAdditionCount = super.performCount();
 
-					manifestSummary.addModelAdditionCount(
-						stagedModelType, modelAdditionCount);
+					manifestSummary.addModelAdditionCount(stagedModelType,
+						modelAdditionCount);
 
-					long modelDeletionCount =
-						ExportImportHelperUtil.getModelDeletionCount(
-							portletDataContext, stagedModelType);
+					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
+							stagedModelType);
 
-					manifestSummary.addModelDeletionCount(
-						stagedModelType, modelDeletionCount);
+					manifestSummary.addModelDeletionCount(stagedModelType,
+						modelDeletionCount);
 
 					return modelAdditionCount;
 				}
-
 			};
 
 		initActionableDynamicQuery(exportActionableDynamicQuery);
 
-		exportActionableDynamicQuery.setAddCriteriaMethod(
-			new ActionableDynamicQuery.AddCriteriaMethod() {
-
+		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
 				@Override
 				public void addCriteria(DynamicQuery dynamicQuery) {
-					portletDataContext.addDateRangeCriteria(
-						dynamicQuery, "modifiedDate");
+					portletDataContext.addDateRangeCriteria(dynamicQuery,
+						"modifiedDate");
 
-					StagedModelType stagedModelType =
-						exportActionableDynamicQuery.getStagedModelType();
+					StagedModelType stagedModelType = exportActionableDynamicQuery.getStagedModelType();
 
-					long referrerClassNameId =
-						stagedModelType.getReferrerClassNameId();
+					long referrerClassNameId = stagedModelType.getReferrerClassNameId();
 
 					Property classNameIdProperty = PropertyFactoryUtil.forName(
-						"classNameId");
+							"classNameId");
 
-					if ((referrerClassNameId !=
-							StagedModelType.REFERRER_CLASS_NAME_ID_ALL) &&
-						(referrerClassNameId !=
-							StagedModelType.REFERRER_CLASS_NAME_ID_ANY)) {
-
-						dynamicQuery.add(
-							classNameIdProperty.eq(
+					if ((referrerClassNameId != StagedModelType.REFERRER_CLASS_NAME_ID_ALL) &&
+							(referrerClassNameId != StagedModelType.REFERRER_CLASS_NAME_ID_ANY)) {
+						dynamicQuery.add(classNameIdProperty.eq(
 								stagedModelType.getReferrerClassNameId()));
 					}
-					else if (referrerClassNameId ==
-								StagedModelType.REFERRER_CLASS_NAME_ID_ANY) {
-
+					else if (referrerClassNameId == StagedModelType.REFERRER_CLASS_NAME_ID_ANY) {
 						dynamicQuery.add(classNameIdProperty.isNotNull());
 					}
 				}
-
 			});
 
-		exportActionableDynamicQuery.setCompanyId(
-			portletDataContext.getCompanyId());
+		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
 
-		exportActionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod
-				<AnnouncementsEntry>() {
-
+		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<AnnouncementsEntry>() {
 				@Override
 				public void performAction(AnnouncementsEntry announcementsEntry)
 					throws PortalException {
-
-					StagedModelDataHandlerUtil.exportStagedModel(
-						portletDataContext, announcementsEntry);
+					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
+						announcementsEntry);
 				}
-
 			});
-		exportActionableDynamicQuery.setStagedModelType(
-			new StagedModelType(
+		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
 				PortalUtil.getClassNameId(AnnouncementsEntry.class.getName()),
 				StagedModelType.REFERRER_CLASS_NAME_ID_ALL));
 
@@ -415,15 +374,12 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
-		return announcementsEntryLocalService.deleteAnnouncementsEntry(
-			(AnnouncementsEntry)persistedModel);
+		return announcementsEntryLocalService.deleteAnnouncementsEntry((AnnouncementsEntry)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
-
 		return announcementsEntryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -437,18 +393,16 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	@Override
 	public AnnouncementsEntry getAnnouncementsEntryByUuidAndCompanyId(
-			String uuid, long companyId)
-		throws PortalException {
-
-		return announcementsEntryPersistence.findByUuid_C_First(
-			uuid, companyId, null);
+		String uuid, long companyId) throws PortalException {
+		return announcementsEntryPersistence.findByUuid_C_First(uuid,
+			companyId, null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portlet.announcements.model.impl.AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.announcements.model.impl.AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of announcements entries
@@ -456,9 +410,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @return the range of announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> getAnnouncementsEntries(
-		int start, int end) {
-
+	public List<AnnouncementsEntry> getAnnouncementsEntries(int start, int end) {
 		return announcementsEntryPersistence.findAll(start, end);
 	}
 
@@ -482,7 +434,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	@Override
 	public AnnouncementsEntry updateAnnouncementsEntry(
 		AnnouncementsEntry announcementsEntry) {
-
 		return announcementsEntryPersistence.update(announcementsEntry);
 	}
 
@@ -502,7 +453,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	public void setAnnouncementsEntryLocalService(
 		AnnouncementsEntryLocalService announcementsEntryLocalService) {
-
 		this.announcementsEntryLocalService = announcementsEntryLocalService;
 	}
 
@@ -522,7 +472,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	public void setAnnouncementsEntryPersistence(
 		AnnouncementsEntryPersistence announcementsEntryPersistence) {
-
 		this.announcementsEntryPersistence = announcementsEntryPersistence;
 	}
 
@@ -542,7 +491,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	public void setAnnouncementsEntryFinder(
 		AnnouncementsEntryFinder announcementsEntryFinder) {
-
 		this.announcementsEntryFinder = announcementsEntryFinder;
 	}
 
@@ -551,9 +499,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -563,28 +509,8 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
-	}
-
-	/**
-	 * Returns the counter persistence.
-	 *
-	 * @return the counter persistence
-	 */
-	public CounterPersistence getCounterPersistence() {
-		return counterPersistence;
-	}
-
-	/**
-	 * Sets the counter persistence.
-	 *
-	 * @param counterPersistence the counter persistence
-	 */
-	public void setCounterPersistence(CounterPersistence counterPersistence) {
-		this.counterPersistence = counterPersistence;
 	}
 
 	/**
@@ -592,9 +518,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the company local service
 	 */
-	public com.liferay.portal.kernel.service.CompanyLocalService
-		getCompanyLocalService() {
-
+	public com.liferay.portal.kernel.service.CompanyLocalService getCompanyLocalService() {
 		return companyLocalService;
 	}
 
@@ -604,9 +528,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @param companyLocalService the company local service
 	 */
 	public void setCompanyLocalService(
-		com.liferay.portal.kernel.service.CompanyLocalService
-			companyLocalService) {
-
+		com.liferay.portal.kernel.service.CompanyLocalService companyLocalService) {
 		this.companyLocalService = companyLocalService;
 	}
 
@@ -633,9 +555,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the group local service
 	 */
-	public com.liferay.portal.kernel.service.GroupLocalService
-		getGroupLocalService() {
-
+	public com.liferay.portal.kernel.service.GroupLocalService getGroupLocalService() {
 		return groupLocalService;
 	}
 
@@ -646,7 +566,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	public void setGroupLocalService(
 		com.liferay.portal.kernel.service.GroupLocalService groupLocalService) {
-
 		this.groupLocalService = groupLocalService;
 	}
 
@@ -691,9 +610,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the organization local service
 	 */
-	public com.liferay.portal.kernel.service.OrganizationLocalService
-		getOrganizationLocalService() {
-
+	public com.liferay.portal.kernel.service.OrganizationLocalService getOrganizationLocalService() {
 		return organizationLocalService;
 	}
 
@@ -703,9 +620,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @param organizationLocalService the organization local service
 	 */
 	public void setOrganizationLocalService(
-		com.liferay.portal.kernel.service.OrganizationLocalService
-			organizationLocalService) {
-
+		com.liferay.portal.kernel.service.OrganizationLocalService organizationLocalService) {
 		this.organizationLocalService = organizationLocalService;
 	}
 
@@ -725,7 +640,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	public void setOrganizationPersistence(
 		OrganizationPersistence organizationPersistence) {
-
 		this.organizationPersistence = organizationPersistence;
 	}
 
@@ -752,9 +666,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService
-		getResourceLocalService() {
-
+	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
 		return resourceLocalService;
 	}
 
@@ -764,9 +676,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService
-			resourceLocalService) {
-
+		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -775,9 +685,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the role local service
 	 */
-	public com.liferay.portal.kernel.service.RoleLocalService
-		getRoleLocalService() {
-
+	public com.liferay.portal.kernel.service.RoleLocalService getRoleLocalService() {
 		return roleLocalService;
 	}
 
@@ -788,7 +696,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	public void setRoleLocalService(
 		com.liferay.portal.kernel.service.RoleLocalService roleLocalService) {
-
 		this.roleLocalService = roleLocalService;
 	}
 
@@ -833,9 +740,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the team local service
 	 */
-	public com.liferay.portal.kernel.service.TeamLocalService
-		getTeamLocalService() {
-
+	public com.liferay.portal.kernel.service.TeamLocalService getTeamLocalService() {
 		return teamLocalService;
 	}
 
@@ -846,7 +751,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	public void setTeamLocalService(
 		com.liferay.portal.kernel.service.TeamLocalService teamLocalService) {
-
 		this.teamLocalService = teamLocalService;
 	}
 
@@ -891,9 +795,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -904,7 +806,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -949,9 +850,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the user group local service
 	 */
-	public com.liferay.portal.kernel.service.UserGroupLocalService
-		getUserGroupLocalService() {
-
+	public com.liferay.portal.kernel.service.UserGroupLocalService getUserGroupLocalService() {
 		return userGroupLocalService;
 	}
 
@@ -961,9 +860,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @param userGroupLocalService the user group local service
 	 */
 	public void setUserGroupLocalService(
-		com.liferay.portal.kernel.service.UserGroupLocalService
-			userGroupLocalService) {
-
+		com.liferay.portal.kernel.service.UserGroupLocalService userGroupLocalService) {
 		this.userGroupLocalService = userGroupLocalService;
 	}
 
@@ -983,7 +880,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	public void setUserGroupPersistence(
 		UserGroupPersistence userGroupPersistence) {
-
 		this.userGroupPersistence = userGroupPersistence;
 	}
 
@@ -1010,11 +906,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the announcements delivery local service
 	 */
-	public
-		com.liferay.announcements.kernel.service.
-			AnnouncementsDeliveryLocalService
-				getAnnouncementsDeliveryLocalService() {
-
+	public com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalService getAnnouncementsDeliveryLocalService() {
 		return announcementsDeliveryLocalService;
 	}
 
@@ -1024,12 +916,8 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @param announcementsDeliveryLocalService the announcements delivery local service
 	 */
 	public void setAnnouncementsDeliveryLocalService(
-		com.liferay.announcements.kernel.service.
-			AnnouncementsDeliveryLocalService
-				announcementsDeliveryLocalService) {
-
-		this.announcementsDeliveryLocalService =
-			announcementsDeliveryLocalService;
+		com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalService announcementsDeliveryLocalService) {
+		this.announcementsDeliveryLocalService = announcementsDeliveryLocalService;
 	}
 
 	/**
@@ -1037,9 +925,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the announcements delivery persistence
 	 */
-	public AnnouncementsDeliveryPersistence
-		getAnnouncementsDeliveryPersistence() {
-
+	public AnnouncementsDeliveryPersistence getAnnouncementsDeliveryPersistence() {
 		return announcementsDeliveryPersistence;
 	}
 
@@ -1050,9 +936,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	public void setAnnouncementsDeliveryPersistence(
 		AnnouncementsDeliveryPersistence announcementsDeliveryPersistence) {
-
-		this.announcementsDeliveryPersistence =
-			announcementsDeliveryPersistence;
+		this.announcementsDeliveryPersistence = announcementsDeliveryPersistence;
 	}
 
 	/**
@@ -1060,10 +944,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 *
 	 * @return the announcements flag local service
 	 */
-	public
-		com.liferay.announcements.kernel.service.AnnouncementsFlagLocalService
-			getAnnouncementsFlagLocalService() {
-
+	public com.liferay.announcements.kernel.service.AnnouncementsFlagLocalService getAnnouncementsFlagLocalService() {
 		return announcementsFlagLocalService;
 	}
 
@@ -1073,9 +954,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @param announcementsFlagLocalService the announcements flag local service
 	 */
 	public void setAnnouncementsFlagLocalService(
-		com.liferay.announcements.kernel.service.AnnouncementsFlagLocalService
-			announcementsFlagLocalService) {
-
+		com.liferay.announcements.kernel.service.AnnouncementsFlagLocalService announcementsFlagLocalService) {
 		this.announcementsFlagLocalService = announcementsFlagLocalService;
 	}
 
@@ -1095,13 +974,11 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	public void setAnnouncementsFlagPersistence(
 		AnnouncementsFlagPersistence announcementsFlagPersistence) {
-
 		this.announcementsFlagPersistence = announcementsFlagPersistence;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register(
-			"com.liferay.announcements.kernel.model.AnnouncementsEntry",
+		persistedModelLocalServiceRegistry.register("com.liferay.announcements.kernel.model.AnnouncementsEntry",
 			announcementsEntryLocalService);
 	}
 
@@ -1135,16 +1012,15 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource =
-				announcementsEntryPersistence.getDataSource();
+			DataSource dataSource = announcementsEntryPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -1155,131 +1031,62 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 
 	@BeanReference(type = AnnouncementsEntryLocalService.class)
 	protected AnnouncementsEntryLocalService announcementsEntryLocalService;
-
 	@BeanReference(type = AnnouncementsEntryPersistence.class)
 	protected AnnouncementsEntryPersistence announcementsEntryPersistence;
-
 	@BeanReference(type = AnnouncementsEntryFinder.class)
 	protected AnnouncementsEntryFinder announcementsEntryFinder;
-
-	@BeanReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@BeanReference(type = CounterPersistence.class)
-	protected CounterPersistence counterPersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.CompanyLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.CompanyLocalService
-		companyLocalService;
-
+	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.CompanyLocalService.class)
+	protected com.liferay.portal.kernel.service.CompanyLocalService companyLocalService;
 	@BeanReference(type = CompanyPersistence.class)
 	protected CompanyPersistence companyPersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.GroupLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.GroupLocalService
-		groupLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.GroupLocalService.class)
+	protected com.liferay.portal.kernel.service.GroupLocalService groupLocalService;
 	@BeanReference(type = GroupPersistence.class)
 	protected GroupPersistence groupPersistence;
-
 	@BeanReference(type = GroupFinder.class)
 	protected GroupFinder groupFinder;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.OrganizationLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.OrganizationLocalService
-		organizationLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.OrganizationLocalService.class)
+	protected com.liferay.portal.kernel.service.OrganizationLocalService organizationLocalService;
 	@BeanReference(type = OrganizationPersistence.class)
 	protected OrganizationPersistence organizationPersistence;
-
 	@BeanReference(type = OrganizationFinder.class)
 	protected OrganizationFinder organizationFinder;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ResourceLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.RoleLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.RoleLocalService
-		roleLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
+	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.RoleLocalService.class)
+	protected com.liferay.portal.kernel.service.RoleLocalService roleLocalService;
 	@BeanReference(type = RolePersistence.class)
 	protected RolePersistence rolePersistence;
-
 	@BeanReference(type = RoleFinder.class)
 	protected RoleFinder roleFinder;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.TeamLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.TeamLocalService
-		teamLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.TeamLocalService.class)
+	protected com.liferay.portal.kernel.service.TeamLocalService teamLocalService;
 	@BeanReference(type = TeamPersistence.class)
 	protected TeamPersistence teamPersistence;
-
 	@BeanReference(type = TeamFinder.class)
 	protected TeamFinder teamFinder;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.UserGroupLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserGroupLocalService
-		userGroupLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.UserGroupLocalService.class)
+	protected com.liferay.portal.kernel.service.UserGroupLocalService userGroupLocalService;
 	@BeanReference(type = UserGroupPersistence.class)
 	protected UserGroupPersistence userGroupPersistence;
-
 	@BeanReference(type = UserGroupFinder.class)
 	protected UserGroupFinder userGroupFinder;
-
-	@BeanReference(
-		type = com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalService.class
-	)
-	protected
-		com.liferay.announcements.kernel.service.
-			AnnouncementsDeliveryLocalService announcementsDeliveryLocalService;
-
+	@BeanReference(type = com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalService.class)
+	protected com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalService announcementsDeliveryLocalService;
 	@BeanReference(type = AnnouncementsDeliveryPersistence.class)
 	protected AnnouncementsDeliveryPersistence announcementsDeliveryPersistence;
-
-	@BeanReference(
-		type = com.liferay.announcements.kernel.service.AnnouncementsFlagLocalService.class
-	)
-	protected
-		com.liferay.announcements.kernel.service.AnnouncementsFlagLocalService
-			announcementsFlagLocalService;
-
+	@BeanReference(type = com.liferay.announcements.kernel.service.AnnouncementsFlagLocalService.class)
+	protected com.liferay.announcements.kernel.service.AnnouncementsFlagLocalService announcementsFlagLocalService;
 	@BeanReference(type = AnnouncementsFlagPersistence.class)
 	protected AnnouncementsFlagPersistence announcementsFlagPersistence;
-
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry
-		persistedModelLocalServiceRegistry;
-
+	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }

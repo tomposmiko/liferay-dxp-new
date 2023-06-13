@@ -17,9 +17,11 @@ package com.liferay.asset.display.page.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing AssetDisplayPageEntry in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see AssetDisplayPageEntry
  * @generated
  */
 @ProviderType
-public class AssetDisplayPageEntryCacheModel
-	implements CacheModel<AssetDisplayPageEntry>, Externalizable {
-
+public class AssetDisplayPageEntryCacheModel implements CacheModel<AssetDisplayPageEntry>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,12 +50,9 @@ public class AssetDisplayPageEntryCacheModel
 			return false;
 		}
 
-		AssetDisplayPageEntryCacheModel assetDisplayPageEntryCacheModel =
-			(AssetDisplayPageEntryCacheModel)obj;
+		AssetDisplayPageEntryCacheModel assetDisplayPageEntryCacheModel = (AssetDisplayPageEntryCacheModel)obj;
 
-		if (assetDisplayPageEntryId ==
-				assetDisplayPageEntryCacheModel.assetDisplayPageEntryId) {
-
+		if (assetDisplayPageEntryId == assetDisplayPageEntryCacheModel.assetDisplayPageEntryId) {
 			return true;
 		}
 
@@ -67,7 +66,7 @@ public class AssetDisplayPageEntryCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(27);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -93,6 +92,8 @@ public class AssetDisplayPageEntryCacheModel
 		sb.append(layoutPageTemplateEntryId);
 		sb.append(", type=");
 		sb.append(type);
+		sb.append(", plid=");
+		sb.append(plid);
 		sb.append("}");
 
 		return sb.toString();
@@ -100,8 +101,7 @@ public class AssetDisplayPageEntryCacheModel
 
 	@Override
 	public AssetDisplayPageEntry toEntityModel() {
-		AssetDisplayPageEntryImpl assetDisplayPageEntryImpl =
-			new AssetDisplayPageEntryImpl();
+		AssetDisplayPageEntryImpl assetDisplayPageEntryImpl = new AssetDisplayPageEntryImpl();
 
 		if (uuid == null) {
 			assetDisplayPageEntryImpl.setUuid("");
@@ -110,8 +110,7 @@ public class AssetDisplayPageEntryCacheModel
 			assetDisplayPageEntryImpl.setUuid(uuid);
 		}
 
-		assetDisplayPageEntryImpl.setAssetDisplayPageEntryId(
-			assetDisplayPageEntryId);
+		assetDisplayPageEntryImpl.setAssetDisplayPageEntryId(assetDisplayPageEntryId);
 		assetDisplayPageEntryImpl.setGroupId(groupId);
 		assetDisplayPageEntryImpl.setCompanyId(companyId);
 		assetDisplayPageEntryImpl.setUserId(userId);
@@ -139,9 +138,9 @@ public class AssetDisplayPageEntryCacheModel
 
 		assetDisplayPageEntryImpl.setClassNameId(classNameId);
 		assetDisplayPageEntryImpl.setClassPK(classPK);
-		assetDisplayPageEntryImpl.setLayoutPageTemplateEntryId(
-			layoutPageTemplateEntryId);
+		assetDisplayPageEntryImpl.setLayoutPageTemplateEntryId(layoutPageTemplateEntryId);
 		assetDisplayPageEntryImpl.setType(type);
+		assetDisplayPageEntryImpl.setPlid(plid);
 
 		assetDisplayPageEntryImpl.resetOriginalValues();
 
@@ -170,10 +169,13 @@ public class AssetDisplayPageEntryCacheModel
 		layoutPageTemplateEntryId = objectInput.readLong();
 
 		type = objectInput.readInt();
+
+		plid = objectInput.readLong();
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -206,6 +208,8 @@ public class AssetDisplayPageEntryCacheModel
 		objectOutput.writeLong(layoutPageTemplateEntryId);
 
 		objectOutput.writeInt(type);
+
+		objectOutput.writeLong(plid);
 	}
 
 	public String uuid;
@@ -220,5 +224,5 @@ public class AssetDisplayPageEntryCacheModel
 	public long classPK;
 	public long layoutPageTemplateEntryId;
 	public int type;
-
+	public long plid;
 }

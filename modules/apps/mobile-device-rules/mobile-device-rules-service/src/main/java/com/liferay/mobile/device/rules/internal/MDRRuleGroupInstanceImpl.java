@@ -35,9 +35,12 @@ public class MDRRuleGroupInstanceImpl implements MDRRuleGroupInstance {
 
 	@Override
 	public Object clone() {
-		return new MDRRuleGroupInstanceImpl(
-			(com.liferay.mobile.device.rules.model.MDRRuleGroupInstance)
-				_mdrRuleGroupInstance.clone());
+		MDRRuleGroupInstanceImpl mdrRuleGroupInstanceImpl =
+			new MDRRuleGroupInstanceImpl(
+				(com.liferay.mobile.device.rules.model.MDRRuleGroupInstance)
+					_mdrRuleGroupInstance.clone());
+
+		return mdrRuleGroupInstanceImpl;
 	}
 
 	@Override

@@ -528,8 +528,8 @@ public interface CollectionRoutes<T, S> {
 		 * @review
 		 */
 		@Deprecated
-		public <A, B, C, D, R, U, I extends Identifier> Builder<T, S>
-			addCustomRoute(
+		public <A, B, C, D, R, U, I extends Identifier>
+			Builder<T, S> addCustomRoute(
 				CustomRoute customRoute,
 				ThrowableHexaFunction<Pagination, R, A, B, C, D, U>
 					throwableHexaFunction,
@@ -559,8 +559,8 @@ public interface CollectionRoutes<T, S> {
 		 * @review
 		 */
 		@Deprecated
-		public default <A, B, C, R, U, I extends Identifier> Builder<T, S>
-			addCustomRoute(
+		public default <A, B, C, R, U, I extends Identifier>
+			Builder<T, S> addCustomRoute(
 				CustomRoute customRoute,
 				ThrowablePentaFunction<Pagination, R, A, B, C, U>
 					throwablePentaFunction,

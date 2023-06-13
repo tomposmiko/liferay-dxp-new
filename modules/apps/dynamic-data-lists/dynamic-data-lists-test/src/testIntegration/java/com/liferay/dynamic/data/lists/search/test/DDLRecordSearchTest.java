@@ -369,9 +369,7 @@ public class DDLRecordSearchTest {
 
 		Locale[] locales = new Locale[name.size()];
 
-		Set<Locale> localesKeySet = name.keySet();
-
-		localesKeySet.toArray(locales);
+		name.keySet().toArray(locales);
 
 		DDMFormValues ddmFormValues = createDDMFormValues(locales);
 

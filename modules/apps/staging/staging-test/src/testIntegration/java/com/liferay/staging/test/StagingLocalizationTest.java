@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerTestRule;
 
 import java.io.File;
 import java.io.Serializable;
@@ -79,7 +80,9 @@ public class StagingLocalizationTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerTestRule.INSTANCE);
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -101,7 +104,7 @@ public class StagingLocalizationTest {
 		LanguageUtil.init();
 
 		CompanyTestUtil.resetCompanyLocales(
-			TestPropsValues.getCompanyId(), _locales, LocaleUtil.US);
+			TestPropsValues.getCompanyId(), _locales, Locale.US);
 
 		_sourceGroup = GroupTestUtil.addGroup();
 		_targetGroup = GroupTestUtil.addGroup();

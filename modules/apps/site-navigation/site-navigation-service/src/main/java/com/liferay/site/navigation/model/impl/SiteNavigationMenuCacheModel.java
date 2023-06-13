@@ -16,9 +16,11 @@ package com.liferay.site.navigation.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+
 import com.liferay.site.navigation.model.SiteNavigationMenu;
 
 import java.io.Externalizable;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing SiteNavigationMenu in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see SiteNavigationMenu
  * @generated
  */
 @ProviderType
-public class SiteNavigationMenuCacheModel
-	implements CacheModel<SiteNavigationMenu>, Externalizable {
-
+public class SiteNavigationMenuCacheModel implements CacheModel<SiteNavigationMenu>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,12 +50,9 @@ public class SiteNavigationMenuCacheModel
 			return false;
 		}
 
-		SiteNavigationMenuCacheModel siteNavigationMenuCacheModel =
-			(SiteNavigationMenuCacheModel)obj;
+		SiteNavigationMenuCacheModel siteNavigationMenuCacheModel = (SiteNavigationMenuCacheModel)obj;
 
-		if (siteNavigationMenuId ==
-				siteNavigationMenuCacheModel.siteNavigationMenuId) {
-
+		if (siteNavigationMenuId == siteNavigationMenuCacheModel.siteNavigationMenuId) {
 			return true;
 		}
 
@@ -100,8 +99,7 @@ public class SiteNavigationMenuCacheModel
 
 	@Override
 	public SiteNavigationMenu toEntityModel() {
-		SiteNavigationMenuImpl siteNavigationMenuImpl =
-			new SiteNavigationMenuImpl();
+		SiteNavigationMenuImpl siteNavigationMenuImpl = new SiteNavigationMenuImpl();
 
 		if (uuid == null) {
 			siteNavigationMenuImpl.setUuid("");
@@ -150,8 +148,7 @@ public class SiteNavigationMenuCacheModel
 			siteNavigationMenuImpl.setLastPublishDate(null);
 		}
 		else {
-			siteNavigationMenuImpl.setLastPublishDate(
-				new Date(lastPublishDate));
+			siteNavigationMenuImpl.setLastPublishDate(new Date(lastPublishDate));
 		}
 
 		siteNavigationMenuImpl.resetOriginalValues();
@@ -182,7 +179,8 @@ public class SiteNavigationMenuCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -233,5 +231,4 @@ public class SiteNavigationMenuCacheModel
 	public int type;
 	public boolean auto;
 	public long lastPublishDate;
-
 }

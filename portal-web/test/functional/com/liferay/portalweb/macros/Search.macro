@@ -19,6 +19,13 @@ definition {
 		KeyPress(locator1 = "Portlet#SEARCH_FIELD", value1 = "\RETURN");
 	}
 
+	macro viewNoResultAssetTitle {
+		AssertElementNotPresent(
+			locator1 = "SearchResults#ASSET_ENTRY_TABLE_TITLE",
+			key_searchAssetTitle = "${searchAssetTitle}"
+		);
+	}
+
 	macro viewResultAssetTitle {
 		var key_searchAssetTitle = "${searchAssetTitle}";
 

@@ -137,9 +137,12 @@ public class KaleoTaskAssignmentInstanceLocalServiceImpl
 
 		deleteKaleoTaskAssignmentInstances(kaleoTaskInstanceToken);
 
-		return addKaleoTaskAssignmentInstance(
-			kaleoTaskInstanceToken.getGroupId(), kaleoTaskInstanceToken,
-			assigneeClassName, assigneeClassPK, serviceContext);
+		KaleoTaskAssignmentInstance kaleoTaskAssignmentInstance =
+			addKaleoTaskAssignmentInstance(
+				kaleoTaskInstanceToken.getGroupId(), kaleoTaskInstanceToken,
+				assigneeClassName, assigneeClassPK, serviceContext);
+
+		return kaleoTaskAssignmentInstance;
 	}
 
 	@Override

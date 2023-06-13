@@ -47,7 +47,10 @@ public class DeleteDocumentRequestExecutorImpl
 
 		RestStatus restStatus = deleteResponse.status();
 
-		return new DeleteDocumentResponse(restStatus.getStatus());
+		DeleteDocumentResponse deleteDocumentResponse =
+			new DeleteDocumentResponse(restStatus.getStatus());
+
+		return deleteDocumentResponse;
 	}
 
 	@Reference(target = "(search.engine.impl=Elasticsearch)")

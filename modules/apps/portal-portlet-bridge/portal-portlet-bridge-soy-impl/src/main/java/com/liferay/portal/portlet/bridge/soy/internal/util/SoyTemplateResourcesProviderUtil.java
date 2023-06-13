@@ -15,7 +15,7 @@
 package com.liferay.portal.portlet.bridge.soy.internal.util;
 
 import com.liferay.portal.kernel.template.TemplateResource;
-import com.liferay.portal.template.soy.utils.SoyTemplateResourcesProvider;
+import com.liferay.portal.template.soy.util.SoyTemplateResourcesProvider;
 
 import java.util.List;
 
@@ -32,8 +32,7 @@ public class SoyTemplateResourcesProviderUtil {
 	public static List<TemplateResource> getBundleTemplateResources(
 		Bundle bundle, String templatePath) {
 
-		return _soyTemplateResourcesProvider.getBundleTemplateResources(
-			bundle, templatePath);
+		return _soyTemplateResourcesProvider.getAllTemplateResources();
 	}
 
 	@Reference(unbind = "-")

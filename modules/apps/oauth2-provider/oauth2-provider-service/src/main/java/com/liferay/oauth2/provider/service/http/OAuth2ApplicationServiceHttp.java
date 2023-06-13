@@ -17,6 +17,7 @@ package com.liferay.oauth2.provider.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.oauth2.provider.service.OAuth2ApplicationServiceUtil;
+
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.HttpPrincipal;
@@ -26,11 +27,10 @@ import com.liferay.portal.kernel.util.MethodKey;
 
 /**
  * Provides the HTTP utility for the
- * <code>OAuth2ApplicationServiceUtil</code> service
- * utility. The
+ * {@link OAuth2ApplicationServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it requires an additional
- * <code>HttpPrincipal</code> parameter.
+ * {@link HttpPrincipal} parameter.
  *
  * <p>
  * The benefits of using the HTTP utility is that it is fast and allows for
@@ -49,35 +49,31 @@ import com.liferay.portal.kernel.util.MethodKey;
  *
  * @author Brian Wing Shun Chan
  * @see OAuth2ApplicationServiceSoap
+ * @see HttpPrincipal
+ * @see OAuth2ApplicationServiceUtil
  * @generated
  */
 @ProviderType
 public class OAuth2ApplicationServiceHttp {
-
-	public static com.liferay.oauth2.provider.model.OAuth2Application
-			addOAuth2Application(
-				HttpPrincipal httpPrincipal,
-				java.util.List<com.liferay.oauth2.provider.constants.GrantType>
-					allowedGrantTypesList,
-				String clientId, int clientProfile, String clientSecret,
-				String description, java.util.List<String> featuresList,
-				String homePageURL, long iconFileEntryId, String name,
-				String privacyPolicyURL,
-				java.util.List<String> redirectURIsList,
-				java.util.List<String> scopeAliasesList,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.oauth2.provider.model.OAuth2Application addOAuth2Application(
+		HttpPrincipal httpPrincipal,
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
+		String clientId, int clientProfile, String clientSecret,
+		String description, java.util.List<String> featuresList,
+		String homePageURL, long iconFileEntryId, String name,
+		String privacyPolicyURL, java.util.List<String> redirectURIsList,
+		java.util.List<String> scopeAliasesList,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				OAuth2ApplicationServiceUtil.class, "addOAuth2Application",
-				_addOAuth2ApplicationParameterTypes0);
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"addOAuth2Application", _addOAuth2ApplicationParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, allowedGrantTypesList, clientId, clientProfile,
-				clientSecret, description, featuresList, homePageURL,
-				iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
-				scopeAliasesList, serviceContext);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					allowedGrantTypesList, clientId, clientProfile,
+					clientSecret, description, featuresList, homePageURL,
+					iconFileEntryId, name, privacyPolicyURL, redirectURIsList,
+					scopeAliasesList, serviceContext);
 
 			Object returnObj = null;
 
@@ -85,19 +81,14 @@ public class OAuth2ApplicationServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.oauth2.provider.model.OAuth2Application)
-				returnObj;
+			return (com.liferay.oauth2.provider.model.OAuth2Application)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -106,18 +97,16 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2Application
-			deleteOAuth2Application(
-				HttpPrincipal httpPrincipal, long oAuth2ApplicationId)
+	public static com.liferay.oauth2.provider.model.OAuth2Application deleteOAuth2Application(
+		HttpPrincipal httpPrincipal, long oAuth2ApplicationId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				OAuth2ApplicationServiceUtil.class, "deleteOAuth2Application",
-				_deleteOAuth2ApplicationParameterTypes1);
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"deleteOAuth2Application",
+					_deleteOAuth2ApplicationParameterTypes1);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, oAuth2ApplicationId);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					oAuth2ApplicationId);
 
 			Object returnObj = null;
 
@@ -125,19 +114,14 @@ public class OAuth2ApplicationServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.oauth2.provider.model.OAuth2Application)
-				returnObj;
+			return (com.liferay.oauth2.provider.model.OAuth2Application)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -146,18 +130,16 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2Application
-			fetchOAuth2Application(
-				HttpPrincipal httpPrincipal, long companyId, String clientId)
+	public static com.liferay.oauth2.provider.model.OAuth2Application fetchOAuth2Application(
+		HttpPrincipal httpPrincipal, long companyId, String clientId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				OAuth2ApplicationServiceUtil.class, "fetchOAuth2Application",
-				_fetchOAuth2ApplicationParameterTypes2);
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"fetchOAuth2Application",
+					_fetchOAuth2ApplicationParameterTypes2);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, clientId);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, clientId);
 
 			Object returnObj = null;
 
@@ -165,19 +147,14 @@ public class OAuth2ApplicationServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.oauth2.provider.model.OAuth2Application)
-				returnObj;
+			return (com.liferay.oauth2.provider.model.OAuth2Application)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -186,18 +163,15 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2Application
-			getOAuth2Application(
-				HttpPrincipal httpPrincipal, long oAuth2ApplicationId)
+	public static com.liferay.oauth2.provider.model.OAuth2Application getOAuth2Application(
+		HttpPrincipal httpPrincipal, long oAuth2ApplicationId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				OAuth2ApplicationServiceUtil.class, "getOAuth2Application",
-				_getOAuth2ApplicationParameterTypes3);
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"getOAuth2Application", _getOAuth2ApplicationParameterTypes3);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, oAuth2ApplicationId);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					oAuth2ApplicationId);
 
 			Object returnObj = null;
 
@@ -205,19 +179,14 @@ public class OAuth2ApplicationServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.oauth2.provider.model.OAuth2Application)
-				returnObj;
+			return (com.liferay.oauth2.provider.model.OAuth2Application)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -226,18 +195,15 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2Application
-			getOAuth2Application(
-				HttpPrincipal httpPrincipal, long companyId, String clientId)
+	public static com.liferay.oauth2.provider.model.OAuth2Application getOAuth2Application(
+		HttpPrincipal httpPrincipal, long companyId, String clientId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				OAuth2ApplicationServiceUtil.class, "getOAuth2Application",
-				_getOAuth2ApplicationParameterTypes4);
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"getOAuth2Application", _getOAuth2ApplicationParameterTypes4);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, clientId);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, clientId);
 
 			Object returnObj = null;
 
@@ -245,19 +211,14 @@ public class OAuth2ApplicationServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.oauth2.provider.model.OAuth2Application)
-				returnObj;
+			return (com.liferay.oauth2.provider.model.OAuth2Application)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -266,21 +227,16 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
-	public static java.util.List
-		<com.liferay.oauth2.provider.model.OAuth2Application>
-			getOAuth2Applications(
-				HttpPrincipal httpPrincipal, long companyId, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.oauth2.provider.model.OAuth2Application>
-						orderByComparator) {
-
+	public static java.util.List<com.liferay.oauth2.provider.model.OAuth2Application> getOAuth2Applications(
+		HttpPrincipal httpPrincipal, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.oauth2.provider.model.OAuth2Application> orderByComparator) {
 		try {
-			MethodKey methodKey = new MethodKey(
-				OAuth2ApplicationServiceUtil.class, "getOAuth2Applications",
-				_getOAuth2ApplicationsParameterTypes5);
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"getOAuth2Applications",
+					_getOAuth2ApplicationsParameterTypes5);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, start, end, orderByComparator);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					companyId, start, end, orderByComparator);
 
 			Object returnObj = null;
 
@@ -288,12 +244,10 @@ public class OAuth2ApplicationServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (java.util.List
-				<com.liferay.oauth2.provider.model.OAuth2Application>)returnObj;
+			return (java.util.List<com.liferay.oauth2.provider.model.OAuth2Application>)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -302,17 +256,14 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
-	public static int getOAuth2ApplicationsCount(
-		HttpPrincipal httpPrincipal, long companyId) {
-
+	public static int getOAuth2ApplicationsCount(HttpPrincipal httpPrincipal,
+		long companyId) {
 		try {
-			MethodKey methodKey = new MethodKey(
-				OAuth2ApplicationServiceUtil.class,
-				"getOAuth2ApplicationsCount",
-				_getOAuth2ApplicationsCountParameterTypes6);
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"getOAuth2ApplicationsCount",
+					_getOAuth2ApplicationsCountParameterTypes6);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId);
+			MethodHandler methodHandler = new MethodHandler(methodKey, companyId);
 
 			Object returnObj = null;
 
@@ -320,8 +271,7 @@ public class OAuth2ApplicationServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return ((Integer)returnObj).intValue();
@@ -333,19 +283,16 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2Application
-			updateIcon(
-				HttpPrincipal httpPrincipal, long oAuth2ApplicationId,
-				java.io.InputStream inputStream)
+	public static com.liferay.oauth2.provider.model.OAuth2Application updateIcon(
+		HttpPrincipal httpPrincipal, long oAuth2ApplicationId,
+		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				OAuth2ApplicationServiceUtil.class, "updateIcon",
-				_updateIconParameterTypes7);
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"updateIcon", _updateIconParameterTypes7);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, oAuth2ApplicationId, inputStream);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					oAuth2ApplicationId, inputStream);
 
 			Object returnObj = null;
 
@@ -353,19 +300,14 @@ public class OAuth2ApplicationServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.oauth2.provider.model.OAuth2Application)
-				returnObj;
+			return (com.liferay.oauth2.provider.model.OAuth2Application)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -374,31 +316,27 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2Application
-			updateOAuth2Application(
-				HttpPrincipal httpPrincipal, long oAuth2ApplicationId,
-				java.util.List<com.liferay.oauth2.provider.constants.GrantType>
-					allowedGrantTypesList,
-				String clientId, int clientProfile, String clientSecret,
-				String description, java.util.List<String> featuresList,
-				String homePageURL, long iconFileEntryId, String name,
-				String privacyPolicyURL,
-				java.util.List<String> redirectURIsList,
-				long auth2ApplicationScopeAliasesId,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.oauth2.provider.model.OAuth2Application updateOAuth2Application(
+		HttpPrincipal httpPrincipal, long oAuth2ApplicationId,
+		java.util.List<com.liferay.oauth2.provider.constants.GrantType> allowedGrantTypesList,
+		String clientId, int clientProfile, String clientSecret,
+		String description, java.util.List<String> featuresList,
+		String homePageURL, long iconFileEntryId, String name,
+		String privacyPolicyURL, java.util.List<String> redirectURIsList,
+		long auth2ApplicationScopeAliasesId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				OAuth2ApplicationServiceUtil.class, "updateOAuth2Application",
-				_updateOAuth2ApplicationParameterTypes8);
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"updateOAuth2Application",
+					_updateOAuth2ApplicationParameterTypes8);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, oAuth2ApplicationId, allowedGrantTypesList, clientId,
-				clientProfile, clientSecret, description, featuresList,
-				homePageURL, iconFileEntryId, name, privacyPolicyURL,
-				redirectURIsList, auth2ApplicationScopeAliasesId,
-				serviceContext);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					oAuth2ApplicationId, allowedGrantTypesList, clientId,
+					clientProfile, clientSecret, description, featuresList,
+					homePageURL, iconFileEntryId, name, privacyPolicyURL,
+					redirectURIsList, auth2ApplicationScopeAliasesId,
+					serviceContext);
 
 			Object returnObj = null;
 
@@ -406,19 +344,14 @@ public class OAuth2ApplicationServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.oauth2.provider.model.OAuth2Application)
-				returnObj;
+			return (com.liferay.oauth2.provider.model.OAuth2Application)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -427,19 +360,16 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
-	public static com.liferay.oauth2.provider.model.OAuth2Application
-			updateScopeAliases(
-				HttpPrincipal httpPrincipal, long oAuth2ApplicationId,
-				java.util.List<String> scopeAliasesList)
+	public static com.liferay.oauth2.provider.model.OAuth2Application updateScopeAliases(
+		HttpPrincipal httpPrincipal, long oAuth2ApplicationId,
+		java.util.List<String> scopeAliasesList)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				OAuth2ApplicationServiceUtil.class, "updateScopeAliases",
-				_updateScopeAliasesParameterTypes9);
+			MethodKey methodKey = new MethodKey(OAuth2ApplicationServiceUtil.class,
+					"updateScopeAliases", _updateScopeAliasesParameterTypes9);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, oAuth2ApplicationId, scopeAliasesList);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					oAuth2ApplicationId, scopeAliasesList);
 
 			Object returnObj = null;
 
@@ -447,19 +377,14 @@ public class OAuth2ApplicationServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.oauth2.provider.model.OAuth2Application)
-				returnObj;
+			return (com.liferay.oauth2.provider.model.OAuth2Application)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -468,43 +393,43 @@ public class OAuth2ApplicationServiceHttp {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		OAuth2ApplicationServiceHttp.class);
-
-	private static final Class<?>[] _addOAuth2ApplicationParameterTypes0 =
-		new Class[] {
+	private static Log _log = LogFactoryUtil.getLog(OAuth2ApplicationServiceHttp.class);
+	private static final Class<?>[] _addOAuth2ApplicationParameterTypes0 = new Class[] {
 			java.util.List.class, String.class, int.class, String.class,
 			String.class, java.util.List.class, String.class, long.class,
 			String.class, String.class, java.util.List.class,
 			java.util.List.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _deleteOAuth2ApplicationParameterTypes1 =
-		new Class[] {long.class};
-	private static final Class<?>[] _fetchOAuth2ApplicationParameterTypes2 =
-		new Class[] {long.class, String.class};
-	private static final Class<?>[] _getOAuth2ApplicationParameterTypes3 =
-		new Class[] {long.class};
-	private static final Class<?>[] _getOAuth2ApplicationParameterTypes4 =
-		new Class[] {long.class, String.class};
-	private static final Class<?>[] _getOAuth2ApplicationsParameterTypes5 =
-		new Class[] {
+	private static final Class<?>[] _deleteOAuth2ApplicationParameterTypes1 = new Class[] {
+			long.class
+		};
+	private static final Class<?>[] _fetchOAuth2ApplicationParameterTypes2 = new Class[] {
+			long.class, String.class
+		};
+	private static final Class<?>[] _getOAuth2ApplicationParameterTypes3 = new Class[] {
+			long.class
+		};
+	private static final Class<?>[] _getOAuth2ApplicationParameterTypes4 = new Class[] {
+			long.class, String.class
+		};
+	private static final Class<?>[] _getOAuth2ApplicationsParameterTypes5 = new Class[] {
 			long.class, int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getOAuth2ApplicationsCountParameterTypes6 =
-		new Class[] {long.class};
+	private static final Class<?>[] _getOAuth2ApplicationsCountParameterTypes6 = new Class[] {
+			long.class
+		};
 	private static final Class<?>[] _updateIconParameterTypes7 = new Class[] {
-		long.class, java.io.InputStream.class
-	};
-	private static final Class<?>[] _updateOAuth2ApplicationParameterTypes8 =
-		new Class[] {
+			long.class, java.io.InputStream.class
+		};
+	private static final Class<?>[] _updateOAuth2ApplicationParameterTypes8 = new Class[] {
 			long.class, java.util.List.class, String.class, int.class,
 			String.class, String.class, java.util.List.class, String.class,
 			long.class, String.class, String.class, java.util.List.class,
 			long.class, com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _updateScopeAliasesParameterTypes9 =
-		new Class[] {long.class, java.util.List.class};
-
+	private static final Class<?>[] _updateScopeAliasesParameterTypes9 = new Class[] {
+			long.class, java.util.List.class
+		};
 }

@@ -29,9 +29,11 @@ import com.liferay.dynamic.data.mapping.exception.StorageFieldRequiredException;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.Fields;
+import com.liferay.dynamic.data.mapping.util.DDMTemplateHelper;
 import com.liferay.dynamic.data.mapping.util.DDMUtil;
 import com.liferay.exportimport.kernel.exception.ExportImportContentValidationException;
 import com.liferay.item.selector.ItemSelector;
+import com.liferay.journal.configuration.JournalFileUploadsConfiguration;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.constants.JournalWebKeys;
 import com.liferay.journal.exception.ArticleContentException;
@@ -90,8 +92,6 @@ import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.portlet.PortletProvider;
-import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
@@ -99,7 +99,6 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
-import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -172,6 +171,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-journal",
 		"com.liferay.portlet.display-category=category.hidden",
+		"com.liferay.portlet.header-portlet-css=/css/ddm_form.css",
 		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.header-portlet-css=/css/tree.css",
 		"com.liferay.portlet.icon=/icons/journal.png",
@@ -227,6 +227,12 @@ public class JournalPortlet extends MVCPortlet {
 		portalPreferences.setValues(
 			JournalPortletKeys.JOURNAL, key,
 			ArrayUtil.append(addMenuFavItems, ddmStructureKey));
+
+		SessionMessages.add(
+			actionRequest,
+			_portal.getPortletId(actionRequest) +
+				SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
+			JournalPortletKeys.JOURNAL);
 	}
 
 	public void addArticle(
@@ -455,6 +461,12 @@ public class JournalPortlet extends MVCPortlet {
 		portalPreferences.setValues(
 			JournalPortletKeys.JOURNAL, key,
 			ArrayUtil.remove(addMenuFavItems, ddmStructureKey));
+
+		SessionMessages.add(
+			actionRequest,
+			_portal.getPortletId(actionRequest) +
+				SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
+			JournalPortletKeys.JOURNAL);
 	}
 
 	@Override
@@ -470,6 +482,15 @@ public class JournalPortlet extends MVCPortlet {
 			renderRequest.setAttribute(
 				JournalWebKeys.ITEM_SELECTOR, _itemSelector);
 		}
+
+		if (Objects.equals(path, "/edit_ddm_template.jsp")) {
+			renderRequest.setAttribute(
+				DDMTemplateHelper.class.getName(), _ddmTemplateHelper);
+		}
+
+		renderRequest.setAttribute(
+			JournalFileUploadsConfiguration.class.getName(),
+			_journalFileUploadsConfiguration);
 
 		renderRequest.setAttribute(
 			JournalWebConfiguration.class.getName(), _journalWebConfiguration);
@@ -499,6 +520,9 @@ public class JournalPortlet extends MVCPortlet {
 	public void serveResource(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException, PortletException {
+
+		resourceRequest.setAttribute(
+			DDMTemplateHelper.class.getName(), _ddmTemplateHelper);
 
 		resourceRequest.setAttribute(TrashWebKeys.TRASH_HELPER, _trashHelper);
 
@@ -737,25 +761,13 @@ public class JournalPortlet extends MVCPortlet {
 		String layoutUuid = ParamUtil.getString(
 			uploadPortletRequest, "layoutUuid");
 
-		if (displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC) {
+		if ((displayPageType == AssetDisplayPageConstants.TYPE_DEFAULT) ||
+			(displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC)) {
+
 			Layout targetLayout = _journalHelper.getArticleLayout(
 				layoutUuid, groupId);
 
-			JournalArticle latestArticle = _journalArticleService.fetchArticle(
-				groupId, articleId);
-
-			if ((displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC) &&
-				(targetLayout == null) && (latestArticle != null) &&
-				Validator.isNotNull(latestArticle.getLayoutUuid())) {
-
-				Layout latestTargetLayout = _journalHelper.getArticleLayout(
-					latestArticle.getLayoutUuid(), groupId);
-
-				if (latestTargetLayout == null) {
-					layoutUuid = latestArticle.getLayoutUuid();
-				}
-			}
-			else if ((assetDisplayPageId != 0) || (targetLayout == null)) {
+			if ((assetDisplayPageId != 0) || (targetLayout == null)) {
 				layoutUuid = null;
 			}
 		}
@@ -795,7 +807,7 @@ public class JournalPortlet extends MVCPortlet {
 			uploadPortletRequest, "expirationDateAmPm");
 
 		boolean neverExpire = ParamUtil.getBoolean(
-			uploadPortletRequest, "neverExpire", displayDateYear == 0);
+			uploadPortletRequest, "neverExpire");
 
 		if (!PropsValues.SCHEDULER_ENABLED) {
 			neverExpire = true;
@@ -819,7 +831,7 @@ public class JournalPortlet extends MVCPortlet {
 			uploadPortletRequest, "reviewDateAmPm");
 
 		boolean neverReview = ParamUtil.getBoolean(
-			uploadPortletRequest, "neverReview", displayDateYear == 0);
+			uploadPortletRequest, "neverReview");
 
 		if (!PropsValues.SCHEDULER_ENABLED) {
 			neverReview = true;
@@ -869,9 +881,7 @@ public class JournalPortlet extends MVCPortlet {
 
 			String tempOldUrlTitle = article.getUrlTitle();
 
-			if (actionName.equals("previewArticle") ||
-				actionName.equals("updateArticle")) {
-
+			if (actionName.equals("updateArticle")) {
 				article = _journalArticleService.updateArticle(
 					groupId, folderId, articleId, version, titleMap,
 					descriptionMap, friendlyURLMap, content, ddmStructureKey,
@@ -899,10 +909,10 @@ public class JournalPortlet extends MVCPortlet {
 		String portletResource = ParamUtil.getString(
 			actionRequest, "portletResource");
 
-		long refererPlid = ParamUtil.getLong(actionRequest, "refererPlid");
+		long referringPlid = ParamUtil.getLong(actionRequest, "referringPlid");
 
-		if (Validator.isNotNull(portletResource) && (refererPlid > 0)) {
-			Layout layout = _layoutLocalService.getLayout(refererPlid);
+		if (Validator.isNotNull(portletResource) && (referringPlid > 0)) {
+			Layout layout = _layoutLocalService.getLayout(referringPlid);
 
 			PortletPreferences portletPreferences =
 				PortletPreferencesFactoryUtil.getStrictPortletSetup(
@@ -942,17 +952,6 @@ public class JournalPortlet extends MVCPortlet {
 
 		sendEditArticleRedirect(
 			actionRequest, actionResponse, article, oldUrlTitle);
-
-		long ddmStructureClassNameId = _portal.getClassNameId(
-			DDMStructure.class);
-
-		if (article.getClassNameId() == ddmStructureClassNameId) {
-			String ddmPortletId = PortletProviderUtil.getPortletId(
-				DDMStructure.class.getName(), PortletProvider.Action.EDIT);
-
-			MultiSessionMessages.add(
-				actionRequest, ddmPortletId + "requestProcessed");
-		}
 
 		boolean hideDefaultSuccessMessage = ParamUtil.getBoolean(
 			actionRequest, "hideDefaultSuccessMessage");
@@ -1091,6 +1090,9 @@ public class JournalPortlet extends MVCPortlet {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
+		_journalFileUploadsConfiguration = ConfigurableUtil.createConfigurable(
+			JournalFileUploadsConfiguration.class, properties);
+
 		_journalWebConfiguration = ConfigurableUtil.createConfigurable(
 			JournalWebConfiguration.class, properties);
 	}
@@ -1249,15 +1251,14 @@ public class JournalPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		try {
+			ActionUtil.getFolder(renderRequest);
+
 			String path = getPath(renderRequest, renderResponse);
 
 			if (Objects.equals(path, "/edit_article.jsp") ||
 				Objects.equals(path, "/view_article_history.jsp")) {
 
 				ActionUtil.getArticle(renderRequest);
-			}
-			else {
-				ActionUtil.getFolder(renderRequest);
 			}
 		}
 		catch (Exception e) {
@@ -1470,7 +1471,7 @@ public class JournalPortlet extends MVCPortlet {
 	}
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.journal.web)(release.schema.version=1.0.0))",
+		target = "(&(release.bundle.symbolic.name=com.liferay.journal.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=1.1.0))))",
 		unbind = "-"
 	)
 	protected void setRelease(Release release) {
@@ -1486,10 +1487,10 @@ public class JournalPortlet extends MVCPortlet {
 
 		Layout layout = themeDisplay.getLayout();
 
-		long refererPlid = ParamUtil.getLong(actionRequest, "refererPlid");
+		long referringPlid = ParamUtil.getLong(actionRequest, "referringPlid");
 
-		if (refererPlid > 0) {
-			layout = _layoutLocalService.fetchLayout(refererPlid);
+		if (referringPlid > 0) {
+			layout = _layoutLocalService.fetchLayout(referringPlid);
 		}
 
 		_journalContentSearchLocalService.updateContentSearch(
@@ -1499,7 +1500,7 @@ public class JournalPortlet extends MVCPortlet {
 
 	private void _updateAssetDisplayPage(
 			long userId, long groupId, JournalArticle article,
-			long assetDisplayPageId, int displayPageType,
+			long layoutPageTemplateEntryId, int displayPageType,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -1518,26 +1519,24 @@ public class JournalPortlet extends MVCPortlet {
 		}
 		else if (assetDisplayPageEntry == null) {
 			_assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
-				userId, groupId, classNameId, classPK, assetDisplayPageId,
-				displayPageType, serviceContext);
+				userId, groupId, classNameId, classPK,
+				layoutPageTemplateEntryId, displayPageType, serviceContext);
 		}
 		else {
 			_assetDisplayPageEntryLocalService.updateAssetDisplayPageEntry(
 				assetDisplayPageEntry.getAssetDisplayPageEntryId(),
-				assetDisplayPageId, displayPageType);
+				layoutPageTemplateEntryId, displayPageType);
 		}
 
-		if (assetDisplayPageId > 0) {
-			LayoutPageTemplateEntry layoutPageTemplateEntry =
-				_layoutPageTemplateEntryLocalService.getLayoutPageTemplateEntry(
-					assetDisplayPageId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
+				layoutPageTemplateEntryId);
 
-			if (layoutPageTemplateEntry != null) {
-				layoutPageTemplateEntry.setModifiedDate(new Date());
+		if (layoutPageTemplateEntry != null) {
+			layoutPageTemplateEntry.setModifiedDate(new Date());
 
-				_layoutPageTemplateEntryLocalService.
-					updateLayoutPageTemplateEntry(layoutPageTemplateEntry);
-			}
+			_layoutPageTemplateEntryLocalService.updateLayoutPageTemplateEntry(
+				layoutPageTemplateEntry);
 		}
 	}
 
@@ -1552,6 +1551,9 @@ public class JournalPortlet extends MVCPortlet {
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
+
+	@Reference
+	private DDMTemplateHelper _ddmTemplateHelper;
 
 	@Reference
 	private Http _http;
@@ -1573,6 +1575,9 @@ public class JournalPortlet extends MVCPortlet {
 
 	@Reference
 	private JournalFeedService _journalFeedService;
+
+	private volatile JournalFileUploadsConfiguration
+		_journalFileUploadsConfiguration;
 
 	@Reference
 	private JournalFolderService _journalFolderService;

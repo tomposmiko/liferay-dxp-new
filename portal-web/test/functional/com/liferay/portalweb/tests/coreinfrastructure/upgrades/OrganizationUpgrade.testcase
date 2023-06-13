@@ -67,15 +67,6 @@ definition {
 	}
 
 	@priority = "5"
-	test AddOrganizationAfterUpgrade7110 {
-		property data.archive.type = "data-archive-portal";
-		property portal.version = "7.1.10";
-		property test.run.environment = "EE";
-
-		Upgrade.addOrganization();
-	}
-
-	@priority = "5"
 	test AddUserandSuborganizationAfterUpgrade621015 {
 		property data.archive.type = "data-archive-admin-org-with-user";
 		property database.types = "db2,mysql,oracle,sybase";
@@ -116,16 +107,6 @@ definition {
 		property data.archive.type = "data-archive-admin-org-with-user";
 		property database.types = "mariadb,mysql,postgresql";
 		property portal.version = "7.0.4";
-
-		Upgrade.addUserAndSuborganization();
-	}
-
-	@priority = "5"
-	test AddUserandSuborganizationAfterUpgrade7110 {
-		property data.archive.type = "data-archive-admin-org-with-user";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
-		property portal.version = "7.1.10";
-		property test.run.environment = "EE";
 
 		Upgrade.addUserAndSuborganization();
 	}

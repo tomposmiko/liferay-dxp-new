@@ -148,7 +148,10 @@ public class ExportImportConfigurationIndexer
 			PortletRequest portletRequest, PortletResponse portletResponse)
 		throws Exception {
 
-		return createSummary(document, Field.TITLE, Field.DESCRIPTION);
+		Summary summary = createSummary(
+			document, Field.TITLE, Field.DESCRIPTION);
+
+		return summary;
 	}
 
 	@Override

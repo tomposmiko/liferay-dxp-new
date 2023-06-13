@@ -75,9 +75,9 @@ public class ConfigurationExportImportTest {
 
 		exportImportProperties(_dictionary);
 
-		Dictionary dictionary = _configuration.getProperties();
-
-		Assert.assertEquals(blankStringValue, dictionary.get(blankStringKey));
+		Assert.assertEquals(
+			blankStringValue,
+			_configuration.getProperties().get(blankStringKey));
 	}
 
 	@Test
@@ -88,9 +88,8 @@ public class ConfigurationExportImportTest {
 
 		exportImportProperties(_dictionary);
 
-		Dictionary dictionary = _configuration.getProperties();
-
-		Assert.assertTrue((boolean)dictionary.get(booleanKey));
+		Assert.assertTrue(
+			(boolean)_configuration.getProperties().get(booleanKey));
 	}
 
 	@Test
@@ -102,9 +101,8 @@ public class ConfigurationExportImportTest {
 
 		exportImportProperties(_dictionary);
 
-		Dictionary dictionary = _configuration.getProperties();
-
-		Assert.assertEquals(stringValue, dictionary.get(stringKey));
+		Assert.assertEquals(
+			stringValue, _configuration.getProperties().get(stringKey));
 	}
 
 	@Test
@@ -116,10 +114,9 @@ public class ConfigurationExportImportTest {
 
 		exportImportProperties(_dictionary);
 
-		Dictionary dictionary = _configuration.getProperties();
-
 		Assert.assertArrayEquals(
-			arrayValues, (String[])dictionary.get(arrayKey));
+			arrayValues,
+			(String[])_configuration.getProperties().get(arrayKey));
 	}
 
 	protected void exportImportProperties(Dictionary dictionary)

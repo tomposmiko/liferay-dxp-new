@@ -14,15 +14,16 @@
 
 package com.liferay.portal.security.access.control;
 
-import com.liferay.portal.kernel.security.access.control.AccessControl;
 import com.liferay.portal.kernel.security.access.control.AccessControlUtil;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
-import com.liferay.portal.spring.aop.AnnotationChainableMethodAdvice;
+import com.liferay.portal.spring.aop.AopMethodInvocation;
+import com.liferay.portal.spring.aop.ChainableMethodAdvice;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 import java.util.Map;
-
-import org.aopalliance.intercept.MethodInvocation;
 
 /**
  * @author Tomas Polesovsky
@@ -31,42 +32,36 @@ import org.aopalliance.intercept.MethodInvocation;
  * @author Raymond Augé
  * @author Shuyang Zhou
  */
-public class AccessControlAdvice
-	extends AnnotationChainableMethodAdvice<AccessControlled> {
+public class AccessControlAdvice extends ChainableMethodAdvice {
 
 	@Override
-	public Object before(MethodInvocation methodInvocation) throws Throwable {
+	public Object before(
+		AopMethodInvocation aopMethodInvocation, Object[] arguments) {
+
 		incrementServiceDepth();
 
-		AccessControlled accessControlled = findAnnotation(methodInvocation);
+		AccessControlled accessControlled =
+			aopMethodInvocation.getAdviceMethodContext();
 
-		if (accessControlled == AccessControl.NULL_ACCESS_CONTROLLED) {
-			return null;
-		}
-
-		_accessControlAdvisor.accept(methodInvocation, accessControlled);
+		_accessControlAdvisor.accept(
+			aopMethodInvocation.getMethod(), arguments, accessControlled);
 
 		return null;
 	}
 
 	@Override
-	public void duringFinally(MethodInvocation methodInvocation) {
-		decrementServiceDepth();
+	public Object createMethodContext(
+		Class<?> targetClass, Method method,
+		Map<Class<? extends Annotation>, Annotation> annotations) {
+
+		return annotations.get(AccessControlled.class);
 	}
 
 	@Override
-	public AccessControlled getNullAnnotation() {
-		return AccessControl.NULL_ACCESS_CONTROLLED;
-	}
+	public void duringFinally(
+		AopMethodInvocation aopMethodInvocation, Object[] arguments) {
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setAccessControlAdvisor(
-		AccessControlAdvisor accessControlAdvisor) {
-
-		_accessControlAdvisor = accessControlAdvisor;
+		decrementServiceDepth();
 	}
 
 	protected void decrementServiceDepth() {
@@ -118,7 +113,7 @@ public class AccessControlAdvice
 			serviceDepth);
 	}
 
-	private AccessControlAdvisor _accessControlAdvisor =
+	private final AccessControlAdvisor _accessControlAdvisor =
 		new AccessControlAdvisorImpl();
 
 }

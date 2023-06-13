@@ -49,8 +49,7 @@ public enum MethodType {
 
 	ACTION(
 		ActionMethod.class,
-		new Class<?>[] {ActionRequest.class, ActionResponse.class}, false, null,
-		annotation -> null,
+		new Class<?>[] {ActionRequest.class, ActionResponse.class}, false,
 		annotation -> {
 			ActionMethod actionMethod = ActionMethod.class.cast(annotation);
 
@@ -58,7 +57,7 @@ public enum MethodType {
 		},
 		annotation -> 0, annotation -> null),
 	DESTROY(
-		DestroyMethod.class, new Class<?>[0], false, null, annotation -> null,
+		DestroyMethod.class, new Class<?>[0], false,
 		annotation -> {
 			DestroyMethod destroyMethod = DestroyMethod.class.cast(annotation);
 
@@ -67,8 +66,7 @@ public enum MethodType {
 		annotation -> 0, annotation -> null),
 	EVENT(
 		EventMethod.class,
-		new Class<?>[] {EventRequest.class, EventResponse.class}, false, null,
-		annotation -> null,
+		new Class<?>[] {EventRequest.class, EventResponse.class}, false,
 		annotation -> {
 			EventMethod eventMethod = EventMethod.class.cast(annotation);
 
@@ -78,7 +76,6 @@ public enum MethodType {
 	HEADER(
 		HeaderMethod.class,
 		new Class<?>[] {HeaderRequest.class, HeaderResponse.class}, true,
-		annotation -> null, annotation -> null,
 		annotation -> {
 			HeaderMethod headerMethod = HeaderMethod.class.cast(annotation);
 
@@ -95,8 +92,7 @@ public enum MethodType {
 			return headerMethod.include();
 		}),
 	INIT(
-		InitMethod.class, new Class<?>[] {PortletConfig.class}, false, null,
-		annotation -> null,
+		InitMethod.class, new Class<?>[] {PortletConfig.class}, false,
 		annotation -> {
 			InitMethod initMethod = InitMethod.class.cast(annotation);
 
@@ -106,7 +102,6 @@ public enum MethodType {
 	RENDER(
 		RenderMethod.class,
 		new Class<?>[] {RenderRequest.class, RenderResponse.class}, true,
-		annotation -> null, annotation -> null,
 		annotation -> {
 			RenderMethod renderMethod = RenderMethod.class.cast(annotation);
 
@@ -129,18 +124,6 @@ public enum MethodType {
 			ServeResourceMethod serveResourceMethod =
 				ServeResourceMethod.class.cast(annotation);
 
-			return serveResourceMethod.characterEncoding();
-		},
-		annotation -> {
-			ServeResourceMethod serveResourceMethod =
-				ServeResourceMethod.class.cast(annotation);
-
-			return serveResourceMethod.contentType();
-		},
-		annotation -> {
-			ServeResourceMethod serveResourceMethod =
-				ServeResourceMethod.class.cast(annotation);
-
 			return serveResourceMethod.portletNames();
 		},
 		annotation -> {
@@ -155,26 +138,6 @@ public enum MethodType {
 
 			return serveResourceMethod.include();
 		});
-
-	public String getCharacterEncoding(Method method) {
-		Annotation annotation = method.getAnnotation(_annotation);
-
-		if (annotation == null) {
-			return null;
-		}
-
-		return _characterEncodingFunction.apply(annotation);
-	}
-
-	public String getContentType(Method method) {
-		Annotation annotation = method.getAnnotation(_annotation);
-
-		if (annotation == null) {
-			return null;
-		}
-
-		return _contentTypeFunction.apply(annotation);
-	}
 
 	public String getInclude(Method method) {
 		Annotation annotation = method.getAnnotation(_annotation);
@@ -239,17 +202,13 @@ public enum MethodType {
 
 	private MethodType(
 		Class<? extends Annotation> annotation, Class<?>[] parameterTypes,
-		boolean variant, Function<Annotation, String> characterEncodingFunction,
-		Function<Annotation, String> contentTypeFunction,
-		Function<Annotation, String[]> portletNamesFunction,
+		boolean variant, Function<Annotation, String[]> portletNamesFunction,
 		Function<Annotation, Integer> ordinalFunction,
 		Function<Annotation, String> includeFunction) {
 
 		_annotation = annotation;
 		_parameterTypes = parameterTypes;
 		_variant = variant;
-		_characterEncodingFunction = characterEncodingFunction;
-		_contentTypeFunction = contentTypeFunction;
 		_portletNamesFunction = portletNamesFunction;
 		_ordinalFunction = ordinalFunction;
 		_includeFunction = includeFunction;
@@ -272,8 +231,6 @@ public enum MethodType {
 	private static final Log _log = LogFactoryUtil.getLog(MethodType.class);
 
 	private final Class<? extends Annotation> _annotation;
-	private final Function<Annotation, String> _characterEncodingFunction;
-	private final Function<Annotation, String> _contentTypeFunction;
 	private final Function<Annotation, String> _includeFunction;
 	private final Function<Annotation, Integer> _ordinalFunction;
 	private final Class<?>[] _parameterTypes;

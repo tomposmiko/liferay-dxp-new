@@ -83,6 +83,9 @@ AUI.add(
 					fieldsMap[name] = [];
 				}
 
+				context.errorMessage = '';
+				context.valid = true;
+
 				if (instance.get('viewMode')) {
 					var editingLanguageId = instance.get('editingLanguageId');
 

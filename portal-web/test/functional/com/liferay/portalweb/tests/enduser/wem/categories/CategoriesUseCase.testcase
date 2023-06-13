@@ -27,7 +27,7 @@ definition {
 	test AddCategorywithLocalization {
 		property testray.component.names = "Categories,Localization";
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
@@ -249,12 +249,12 @@ definition {
 			userLoginFullName = "userfn userln"
 		);
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
@@ -278,7 +278,7 @@ definition {
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
@@ -323,13 +323,13 @@ definition {
 
 		SystemSettings.configureDisplayStyle(displayStyle = "Flattened Tree");
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Topic"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name",
@@ -355,18 +355,18 @@ definition {
 	test AddSubcategoryProperty {
 		property testray.component.names = "Categories";
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name",
@@ -433,7 +433,7 @@ definition {
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
@@ -483,7 +483,7 @@ definition {
 
 		Button.clickSave();
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
@@ -531,7 +531,7 @@ definition {
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
@@ -576,7 +576,7 @@ definition {
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
@@ -615,12 +615,12 @@ definition {
 	test DeletePartialCategory {
 		property testray.component.names = "Categories,Permissions,Roles";
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
@@ -723,7 +723,7 @@ definition {
 			userLoginFullName = "userfn userln"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 2",
 			vocabularyName = "Vocabulary Name"
@@ -827,12 +827,12 @@ definition {
 	test DuplicateCategoriesViaWebContentCopy {
 		property testray.component.names = "Categories,Web Content Administration";
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
@@ -886,18 +886,18 @@ definition {
 			layoutName = "Test Page Name"
 		);
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name",
@@ -957,7 +957,13 @@ definition {
 			value1 = "Successful"
 		);
 
-		var larFileName = LAR.getLarFileName();
+		var valueName = selenium.getText("//ul/li/div/h5");
+
+		echo("value name ${valueName}");
+
+		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
+
+		echo("lar file name ${larFileName}");
 
 		LAR.downloadLar();
 
@@ -1024,7 +1030,7 @@ definition {
 	test MoveSubcategory {
 		property testray.component.names = "Categories";
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
@@ -1070,7 +1076,7 @@ definition {
 	test SearchCategory {
 		property testray.component.names = "Categories";
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
@@ -1130,12 +1136,12 @@ definition {
 	test SearchCategoryWithNullResult {
 		property testray.component.names = "Categories";
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
@@ -1202,12 +1208,12 @@ definition {
 	test SearchSubcategory {
 		property testray.component.names = "Categories";
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
@@ -1275,18 +1281,18 @@ definition {
 	test SearchSubcategoryWithNullResult {
 		property testray.component.names = "Categories";
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name",
@@ -1371,12 +1377,12 @@ definition {
 
 		var parentSiteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
@@ -1413,18 +1419,18 @@ definition {
 	test ViewCannotAddDuplicateSubCategory {
 		property testray.component.names = "Categories";
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name",
@@ -1489,18 +1495,18 @@ definition {
 	test ViewNavigation {
 		property testray.component.names = "Categories";
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name",

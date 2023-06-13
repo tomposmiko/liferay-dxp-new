@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.Account;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -33,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing Account in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see Account
  * @generated
  */
 @ProviderType
-public class AccountCacheModel
-	implements CacheModel<Account>, Externalizable, MVCCModel {
-
+public class AccountCacheModel implements CacheModel<Account>, Externalizable,
+	MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,8 +53,7 @@ public class AccountCacheModel
 		AccountCacheModel accountCacheModel = (AccountCacheModel)obj;
 
 		if ((accountId == accountCacheModel.accountId) &&
-			(mvccVersion == accountCacheModel.mvccVersion)) {
-
+				(mvccVersion == accountCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -246,7 +246,8 @@ public class AccountCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(accountId);
@@ -348,5 +349,4 @@ public class AccountCacheModel
 	public String industry;
 	public String type;
 	public String size;
-
 }

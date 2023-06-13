@@ -17,6 +17,7 @@ package com.liferay.dynamic.data.mapping.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionServiceUtil;
+
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -24,20 +25,19 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * <code>DDMTemplateVersionServiceUtil</code> service
- * utility. The static methods of this class call the same methods of the
- * service utility. However, the signatures are different because it is
- * difficult for SOAP to support certain types.
+ * {@link DDMTemplateVersionServiceUtil} service utility. The
+ * static methods of this class calls the same methods of the service utility.
+ * However, the signatures are different because it is difficult for SOAP to
+ * support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a <code>java.util.List</code>,
- * that is translated to an array of
- * <code>com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap</code>. If the method in the
- * service utility returns a
- * <code>com.liferay.dynamic.data.mapping.model.DDMTemplateVersion</code>, that is translated to a
- * <code>com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap</code>. Methods that SOAP
- * cannot safely wire are skipped.
+ * if the method in the service utility returns a {@link java.util.List}, that
+ * is translated to an array of {@link com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap}.
+ * If the method in the service utility returns a
+ * {@link com.liferay.dynamic.data.mapping.model.DDMTemplateVersion}, that is translated to a
+ * {@link com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap}. Methods that SOAP cannot
+ * safely wire are skipped.
  * </p>
  *
  * <p>
@@ -59,23 +59,19 @@ import java.rmi.RemoteException;
  *
  * @author Brian Wing Shun Chan
  * @see DDMTemplateVersionServiceHttp
+ * @see com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap
+ * @see DDMTemplateVersionServiceUtil
  * @generated
  */
 @ProviderType
 public class DDMTemplateVersionServiceSoap {
-
-	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap
-			getLatestTemplateVersion(long templateId)
-		throws RemoteException {
-
+	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap getLatestTemplateVersion(
+		long templateId) throws RemoteException {
 		try {
-			com.liferay.dynamic.data.mapping.model.DDMTemplateVersion
-				returnValue =
-					DDMTemplateVersionServiceUtil.getLatestTemplateVersion(
-						templateId);
+			com.liferay.dynamic.data.mapping.model.DDMTemplateVersion returnValue =
+				DDMTemplateVersionServiceUtil.getLatestTemplateVersion(templateId);
 
-			return com.liferay.dynamic.data.mapping.model.
-				DDMTemplateVersionSoap.toSoapModel(returnValue);
+			return com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -84,17 +80,13 @@ public class DDMTemplateVersionServiceSoap {
 		}
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap
-			getTemplateVersion(long templateVersionId)
-		throws RemoteException {
-
+	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap getTemplateVersion(
+		long templateVersionId) throws RemoteException {
 		try {
-			com.liferay.dynamic.data.mapping.model.DDMTemplateVersion
-				returnValue = DDMTemplateVersionServiceUtil.getTemplateVersion(
-					templateVersionId);
+			com.liferay.dynamic.data.mapping.model.DDMTemplateVersion returnValue =
+				DDMTemplateVersionServiceUtil.getTemplateVersion(templateVersionId);
 
-			return com.liferay.dynamic.data.mapping.model.
-				DDMTemplateVersionSoap.toSoapModel(returnValue);
+			return com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -103,24 +95,16 @@ public class DDMTemplateVersionServiceSoap {
 		}
 	}
 
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap[]
-				getTemplateVersions(
-					long templateId, int start, int end,
-					com.liferay.portal.kernel.util.OrderByComparator
-						<com.liferay.dynamic.data.mapping.model.
-							DDMTemplateVersion> orderByComparator)
-			throws RemoteException {
-
+	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap[] getTemplateVersions(
+		long templateId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.mapping.model.DDMTemplateVersion> orderByComparator)
+		throws RemoteException {
 		try {
-			java.util.List
-				<com.liferay.dynamic.data.mapping.model.DDMTemplateVersion>
-					returnValue =
-						DDMTemplateVersionServiceUtil.getTemplateVersions(
-							templateId, start, end, orderByComparator);
+			java.util.List<com.liferay.dynamic.data.mapping.model.DDMTemplateVersion> returnValue =
+				DDMTemplateVersionServiceUtil.getTemplateVersions(templateId,
+					start, end, orderByComparator);
 
-			return com.liferay.dynamic.data.mapping.model.
-				DDMTemplateVersionSoap.toSoapModels(returnValue);
+			return com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -131,11 +115,8 @@ public class DDMTemplateVersionServiceSoap {
 
 	public static int getTemplateVersionsCount(long templateId)
 		throws RemoteException {
-
 		try {
-			int returnValue =
-				DDMTemplateVersionServiceUtil.getTemplateVersionsCount(
-					templateId);
+			int returnValue = DDMTemplateVersionServiceUtil.getTemplateVersionsCount(templateId);
 
 			return returnValue;
 		}
@@ -146,7 +127,5 @@ public class DDMTemplateVersionServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		DDMTemplateVersionServiceSoap.class);
-
+	private static Log _log = LogFactoryUtil.getLog(DDMTemplateVersionServiceSoap.class);
 }

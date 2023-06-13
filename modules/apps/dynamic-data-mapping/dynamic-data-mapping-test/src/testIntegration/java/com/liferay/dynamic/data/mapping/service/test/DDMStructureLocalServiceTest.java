@@ -550,11 +550,11 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 			WorkflowConstants.STATUS_APPROVED, true, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
 
-		Assert.assertEquals(structures.toString(), 0, structures.size());
+		Assert.assertEquals(structures.toString(), 2, structures.size());
 	}
 
 	@Test
-	public void testSearchByNameOrDescription() throws Exception {
+	public void testSearchByNameAndDescriptionOrdered() throws Exception {
 		addStructure(_classNameId, "Contact", "Contact");
 		addStructure(_classNameId, "Event", "Event");
 
@@ -849,7 +849,7 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 
 		DDMFormField textField = ddmFormField.get(0);
 
-		Assert.assertEquals(StringPool.BLANK, textField.getIndexType());
+		Assert.assertEquals("keyword", textField.getIndexType());
 	}
 
 	@Test

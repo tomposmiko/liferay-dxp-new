@@ -76,7 +76,6 @@ import java.time.format.FormatStyle;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -107,9 +106,8 @@ public class DDLExporterTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_availableLocales = DDMFormTestUtil.createAvailableLocales(
-			LocaleUtil.US);
-		_defaultLocale = LocaleUtil.US;
+		_availableLocales = DDMFormTestUtil.createAvailableLocales(Locale.US);
+		_defaultLocale = Locale.US;
 		_group = GroupTestUtil.addGroup();
 
 		_originalPermissionChecker =
@@ -251,11 +249,7 @@ public class DDLExporterTest {
 
 		DDLRecordVersion recordVersion0 = record0.getRecordVersion();
 
-		List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
-
-		ddmFormFields.clear();
-
-		ddmForm.setDDMFormFields(ddmFormFields);
+		ddmForm.getDDMFormFields().clear();
 
 		ddmForm.addDDMFormField(
 			DDMFormTestUtil.createTextDDMFormField(
@@ -780,6 +774,7 @@ public class DDLExporterTest {
 	protected void setUpPermissionChecker() throws Exception {
 		PermissionThreadLocal.setPermissionChecker(
 			new SimplePermissionChecker() {
+
 				{
 					init(TestPropsValues.getUser());
 				}

@@ -28,16 +28,8 @@ import java.util.Set;
 @ProviderType
 public interface ScopeMapper {
 
-	public static final ScopeMapper PASS_THROUGH_SCOPE_MAPPER =
-		Collections::singleton;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #PASS_THROUGH_SCOPE_MAPPER}
-	 */
-	@Deprecated
 	public static final ScopeMapper PASSTHROUGH_SCOPEMAPPER =
-		PASS_THROUGH_SCOPE_MAPPER;
+		Collections::singleton;
 
 	/**
 	 * Renames an application provided scope to new scope names

@@ -17,9 +17,11 @@ package com.liferay.portlet.documentlibrary.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing DLFileEntry in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see DLFileEntry
  * @generated
  */
 @ProviderType
-public class DLFileEntryCacheModel
-	implements CacheModel<DLFileEntry>, Externalizable {
-
+public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,8 +50,7 @@ public class DLFileEntryCacheModel
 			return false;
 		}
 
-		DLFileEntryCacheModel dlFileEntryCacheModel =
-			(DLFileEntryCacheModel)obj;
+		DLFileEntryCacheModel dlFileEntryCacheModel = (DLFileEntryCacheModel)obj;
 
 		if (fileEntryId == dlFileEntryCacheModel.fileEntryId) {
 			return true;
@@ -310,7 +311,8 @@ public class DLFileEntryCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -455,5 +457,4 @@ public class DLFileEntryCacheModel
 	public long custom2ImageId;
 	public boolean manualCheckInRequired;
 	public long lastPublishDate;
-
 }

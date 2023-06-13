@@ -14,9 +14,11 @@
 
 package com.liferay.portal.apio.test.util;
 
+import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -35,13 +37,14 @@ public class AuthConfigurationTestUtil {
 		ConfigurationAdmin configurationAdmin = bundleContext.getService(
 			serviceReference);
 
-		Configuration configuration =
-			configurationAdmin.createFactoryConfiguration(
-				"com.liferay.apio.architect.internal.application." +
-					"ApioApplication",
-				null);
+		Filter filter = bundleContext.createFilter(
+			"(service.factoryPid=com.liferay.apio.architect.internal." +
+				"application.ApioApplication)");
 
-		configuration.update(
+		Configuration[] configurations = configurationAdmin.listConfigurations(
+			filter.toString());
+
+		Dictionary<String, Object> dictionary =
 			new Hashtable<String, Object>() {
 				{
 					put(
@@ -55,7 +58,13 @@ public class AuthConfigurationTestUtil {
 					put("auth.verifier.guest.allowed", "true");
 					put("oauth2.scopechecker.type", "none");
 				}
-			});
+			};
+
+		if (configurations != null) {
+			for (Configuration configuration : configurations) {
+				configuration.update(dictionary);
+			}
+		}
 	}
 
 }

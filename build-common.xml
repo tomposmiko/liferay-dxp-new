@@ -53,7 +53,7 @@
 	<path id="lib.classpath">
 		<fileset
 			dir="${project.dir}/lib/development"
-			excludes="com.liferay.ant.bnd.jar"
+			excludes="biz.aQute.bnd.jar,com.liferay.ant.bnd.jar"
 			includes="*.jar"
 		/>
 		<fileset
@@ -84,11 +84,15 @@
 		<pathelement path="${classpath.full}" />
 		<fileset
 			dir="${project.dir}/lib/development"
-			includes="biz.aQute.bnd.jar,jsp-api.jar,mail.jar,servlet-api.jar"
+			includes="jsp-api.jar,mail.jar,servlet-api.jar"
 		/>
 		<fileset
 			dir="${project.dir}/lib/global"
 			includes="*.jar"
+		/>
+		<fileset
+			dir="${project.dir}/lib/portal"
+			includes="bnd.jar"
 		/>
 		<path refid="lib.pre.classpath" />
 		<path refid="web-lib.classpath" />
@@ -866,8 +870,8 @@ information.
 						<arg value="-Dforced.cache.enabled=@{forcedcacheenabled}" />
 						<arg value="-Dliferay.home=${liferay.home}" />
 						<arg if:set="env.JENKINS_HOME" value="-Dliferay.ssl.context.enabled=true" />
-						<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.connectionTimeout=120000" />
-						<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.socketTimeout=120000" />
+						<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.connectionTimeout=60000" />
+						<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.socketTimeout=60000" />
 						<arg value="tasks" />
 						<arg value="--all" />
 						<env key="GRADLE_OPTS" value="@{gradleopts}" />
@@ -908,8 +912,8 @@ information.
 								<arg value="-Dforced.cache.enabled=@{forcedcacheenabled}" />
 								<arg value="-Dliferay.home=${liferay.home}" />
 								<arg if:set="env.JENKINS_HOME" value="-Dliferay.ssl.context.enabled=true" />
-								<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.connectionTimeout=120000" />
-								<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.socketTimeout=120000" />
+								<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.connectionTimeout=60000" />
+								<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.socketTimeout=60000" />
 								<arg line="@{task}" />
 								<env key="GRADLE_OPTS" value="@{gradleopts}" />
 								<redirector errorproperty="@{outputproperty}.error" outputproperty="@{outputproperty}" unless:blank="@{outputproperty}" />
@@ -1124,27 +1128,6 @@ information.
 					</for>
 				</then>
 			</if>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="lstopwatch">
-		<attribute name="action" />
-		<attribute name="name" />
-		<sequential>
-			<if>
-				<equals arg1="@{action}" arg2="start" />
-				<then>
-					<local name="timestamp" />
-
-					<tstamp>
-						<format pattern="MM-dd-yyyy HH:mm:ss:SSS z" property="timestamp" timezone="America/Los_Angeles" />
-					</tstamp>
-
-					<echo>@{name}.start.timestamp: ${timestamp}</echo>
-				</then>
-			</if>
-
-			<stopwatch action="@{action}" name="@{name}" />
 		</sequential>
 	</macrodef>
 

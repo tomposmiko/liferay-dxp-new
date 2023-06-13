@@ -99,7 +99,9 @@ public class UserGroupIndexerTest {
 	protected Hits search(long companyId) throws Exception {
 		SearchContext searchContext = getSearchContext(companyId);
 
-		return _indexer.search(searchContext);
+		Hits hits = _indexer.search(searchContext);
+
+		return hits;
 	}
 
 	@Inject

@@ -91,33 +91,20 @@ public class OrganizationImplTest {
 
 	@Test
 	public void testGetDescendants() throws Exception {
-		List<Organization> organizations1 = _organization1.getDescendants();
+		Assert.assertEquals(3, _organization1.getDescendants().size());
+		Assert.assertEquals(2, _organization2.getDescendants().size());
+		Assert.assertEquals(1, _organization3.getDescendants().size());
+		Assert.assertEquals(0, _organization4.getDescendants().size());
 
-		Assert.assertEquals(
-			organizations1.toString(), 3, organizations1.size());
-
-		List<Organization> organizations2 = _organization2.getDescendants();
-
-		Assert.assertEquals(
-			organizations2.toString(), 2, organizations2.size());
-
-		List<Organization> organizations3 = _organization3.getDescendants();
-
-		Assert.assertEquals(
-			organizations3.toString(), 1, organizations3.size());
-
-		List<Organization> organizations4 = _organization4.getDescendants();
-
-		Assert.assertEquals(
-			organizations4.toString(), 0, organizations4.size());
+		List<Organization> organizations = _organization1.getDescendants();
 
 		Assert.assertTrue(
-			organizations1.toString(), organizations1.contains(_organization2));
+			organizations.toString(), organizations.contains(_organization2));
 		Assert.assertTrue(
-			organizations1.toString(), organizations1.contains(_organization3));
+			organizations.toString(), organizations.contains(_organization3));
 		Assert.assertTrue(
-			organizations1.toString(), organizations1.contains(_organization4));
-		Assert.assertTrue(!organizations1.contains(_organization1));
+			organizations.toString(), organizations.contains(_organization4));
+		Assert.assertTrue(!organizations.contains(_organization1));
 	}
 
 	private Organization _organization1;

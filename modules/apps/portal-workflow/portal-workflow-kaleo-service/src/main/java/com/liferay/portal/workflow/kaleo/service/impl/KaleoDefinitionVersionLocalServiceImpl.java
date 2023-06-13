@@ -196,8 +196,11 @@ public class KaleoDefinitionVersionLocalServiceImpl
 			OrderByComparator<KaleoDefinitionVersion> orderByComparator)
 		throws PortalException {
 
-		return kaleoDefinitionVersionPersistence.fetchByC_N_Last(
-			companyId, name, orderByComparator);
+		KaleoDefinitionVersion kaleoDefinitionVersion =
+			kaleoDefinitionVersionPersistence.fetchByC_N_Last(
+				companyId, name, orderByComparator);
+
+		return kaleoDefinitionVersion;
 	}
 
 	@Override

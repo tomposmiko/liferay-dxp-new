@@ -45,12 +45,6 @@ public @interface Details {
 	@Meta.AD(deflt = "false", name = "expose-global", required = false)
 	public boolean exposeGlobal();
 
-	@Meta.AD(
-		deflt = "false", description = "use-loader-version-4-x-help",
-		name = "use-loader-version-4-x", required = false
-	)
-	public boolean useLoaderVersion4x();
-
 	@Meta.AD(deflt = "7", name = "wait-timeout", required = false)
 	public int waitTimeout();
 

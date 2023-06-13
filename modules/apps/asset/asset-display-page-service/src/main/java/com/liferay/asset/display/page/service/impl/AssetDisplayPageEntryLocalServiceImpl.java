@@ -17,14 +17,25 @@ package com.liferay.asset.display.page.service.impl;
 import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
 import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
 import com.liferay.asset.display.page.service.base.AssetDisplayPageEntryLocalServiceBaseImpl;
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Eudaldo Alonso
@@ -60,6 +71,11 @@ public class AssetDisplayPageEntryLocalServiceImpl
 		assetDisplayPageEntry.setLayoutPageTemplateEntryId(
 			layoutPageTemplateEntryId);
 		assetDisplayPageEntry.setType(type);
+
+		long plid = _getPlid(
+			groupId, classNameId, classPK, layoutPageTemplateEntryId);
+
+		assetDisplayPageEntry.setPlid(plid);
 
 		assetDisplayPageEntryPersistence.update(assetDisplayPageEntry);
 
@@ -127,9 +143,66 @@ public class AssetDisplayPageEntryLocalServiceImpl
 			layoutPageTemplateEntryId);
 		assetDisplayPageEntry.setType(type);
 
+		long plid = _getPlid(
+			assetDisplayPageEntry.getGroupId(),
+			assetDisplayPageEntry.getClassNameId(),
+			assetDisplayPageEntry.getClassPK(), layoutPageTemplateEntryId);
+
+		assetDisplayPageEntry.setPlid(plid);
+
 		assetDisplayPageEntryPersistence.update(assetDisplayPageEntry);
 
 		return assetDisplayPageEntry;
 	}
+
+	private long _getPlid(
+			long groupId, long classNameId, long classPK,
+			long layoutPageTemplateEntryId)
+		throws PortalException {
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.
+				getAssetRendererFactoryByClassNameId(classNameId);
+
+		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
+			_portal.getClassName(classNameId), classPK);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = Optional.ofNullable(
+			_layoutPageTemplateEntryService.fetchLayoutPageTemplateEntry(
+				layoutPageTemplateEntryId)
+		).orElse(
+			_layoutPageTemplateEntryService.fetchDefaultLayoutPageTemplateEntry(
+				groupId, classNameId, assetEntry.getClassTypeId())
+		);
+
+		if (layoutPageTemplateEntry != null) {
+			return layoutPageTemplateEntry.getPlid();
+		}
+
+		Layout layout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
+			assetEntry.getLayoutUuid(), assetEntry.getGroupId(), false);
+
+		if (layout != null) {
+			return layout.getPlid();
+		}
+
+		layout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
+			assetEntry.getLayoutUuid(), assetEntry.getGroupId(), true);
+
+		if (layout != null) {
+			return layout.getPlid();
+		}
+
+		return LayoutConstants.DEFAULT_PLID;
+	}
+
+	@ServiceReference(type = LayoutLocalService.class)
+	private LayoutLocalService _layoutLocalService;
+
+	@ServiceReference(type = LayoutPageTemplateEntryService.class)
+	private LayoutPageTemplateEntryService _layoutPageTemplateEntryService;
+
+	@ServiceReference(type = Portal.class)
+	private Portal _portal;
 
 }

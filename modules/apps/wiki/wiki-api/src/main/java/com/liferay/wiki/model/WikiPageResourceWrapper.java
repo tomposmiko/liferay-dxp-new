@@ -16,15 +16,11 @@ package com.liferay.wiki.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -36,21 +32,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class WikiPageResourceWrapper
+public class WikiPageResourceWrapper extends BaseModelWrapper<WikiPageResource>
 	implements WikiPageResource, ModelWrapper<WikiPageResource> {
-
 	public WikiPageResourceWrapper(WikiPageResource wikiPageResource) {
-		_wikiPageResource = wikiPageResource;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return WikiPageResource.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return WikiPageResource.class.getName();
+		super(wikiPageResource);
 	}
 
 	@Override
@@ -106,294 +91,153 @@ public class WikiPageResourceWrapper
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new WikiPageResourceWrapper(
-			(WikiPageResource)_wikiPageResource.clone());
-	}
-
-	@Override
-	public int compareTo(WikiPageResource wikiPageResource) {
-		return _wikiPageResource.compareTo(wikiPageResource);
-	}
-
 	/**
-	 * Returns the company ID of this wiki page resource.
-	 *
-	 * @return the company ID of this wiki page resource
-	 */
+	* Returns the company ID of this wiki page resource.
+	*
+	* @return the company ID of this wiki page resource
+	*/
 	@Override
 	public long getCompanyId() {
-		return _wikiPageResource.getCompanyId();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _wikiPageResource.getExpandoBridge();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the group ID of this wiki page resource.
-	 *
-	 * @return the group ID of this wiki page resource
-	 */
+	* Returns the group ID of this wiki page resource.
+	*
+	* @return the group ID of this wiki page resource
+	*/
 	@Override
 	public long getGroupId() {
-		return _wikiPageResource.getGroupId();
+		return model.getGroupId();
 	}
 
 	/**
-	 * Returns the node ID of this wiki page resource.
-	 *
-	 * @return the node ID of this wiki page resource
-	 */
+	* Returns the node ID of this wiki page resource.
+	*
+	* @return the node ID of this wiki page resource
+	*/
 	@Override
 	public long getNodeId() {
-		return _wikiPageResource.getNodeId();
+		return model.getNodeId();
 	}
 
 	/**
-	 * Returns the primary key of this wiki page resource.
-	 *
-	 * @return the primary key of this wiki page resource
-	 */
+	* Returns the primary key of this wiki page resource.
+	*
+	* @return the primary key of this wiki page resource
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _wikiPageResource.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _wikiPageResource.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the resource prim key of this wiki page resource.
-	 *
-	 * @return the resource prim key of this wiki page resource
-	 */
+	* Returns the resource prim key of this wiki page resource.
+	*
+	* @return the resource prim key of this wiki page resource
+	*/
 	@Override
 	public long getResourcePrimKey() {
-		return _wikiPageResource.getResourcePrimKey();
+		return model.getResourcePrimKey();
 	}
 
 	/**
-	 * Returns the title of this wiki page resource.
-	 *
-	 * @return the title of this wiki page resource
-	 */
+	* Returns the title of this wiki page resource.
+	*
+	* @return the title of this wiki page resource
+	*/
 	@Override
 	public String getTitle() {
-		return _wikiPageResource.getTitle();
+		return model.getTitle();
 	}
 
 	/**
-	 * Returns the uuid of this wiki page resource.
-	 *
-	 * @return the uuid of this wiki page resource
-	 */
+	* Returns the uuid of this wiki page resource.
+	*
+	* @return the uuid of this wiki page resource
+	*/
 	@Override
 	public String getUuid() {
-		return _wikiPageResource.getUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _wikiPageResource.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _wikiPageResource.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _wikiPageResource.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _wikiPageResource.isNew();
+		return model.getUuid();
 	}
 
 	@Override
 	public void persist() {
-		_wikiPageResource.persist();
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_wikiPageResource.setCachedModel(cachedModel);
+		model.persist();
 	}
 
 	/**
-	 * Sets the company ID of this wiki page resource.
-	 *
-	 * @param companyId the company ID of this wiki page resource
-	 */
+	* Sets the company ID of this wiki page resource.
+	*
+	* @param companyId the company ID of this wiki page resource
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_wikiPageResource.setCompanyId(companyId);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_wikiPageResource.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_wikiPageResource.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_wikiPageResource.setExpandoBridgeAttributes(serviceContext);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the group ID of this wiki page resource.
-	 *
-	 * @param groupId the group ID of this wiki page resource
-	 */
+	* Sets the group ID of this wiki page resource.
+	*
+	* @param groupId the group ID of this wiki page resource
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_wikiPageResource.setGroupId(groupId);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_wikiPageResource.setNew(n);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the node ID of this wiki page resource.
-	 *
-	 * @param nodeId the node ID of this wiki page resource
-	 */
+	* Sets the node ID of this wiki page resource.
+	*
+	* @param nodeId the node ID of this wiki page resource
+	*/
 	@Override
 	public void setNodeId(long nodeId) {
-		_wikiPageResource.setNodeId(nodeId);
+		model.setNodeId(nodeId);
 	}
 
 	/**
-	 * Sets the primary key of this wiki page resource.
-	 *
-	 * @param primaryKey the primary key of this wiki page resource
-	 */
+	* Sets the primary key of this wiki page resource.
+	*
+	* @param primaryKey the primary key of this wiki page resource
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_wikiPageResource.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_wikiPageResource.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the resource prim key of this wiki page resource.
-	 *
-	 * @param resourcePrimKey the resource prim key of this wiki page resource
-	 */
+	* Sets the resource prim key of this wiki page resource.
+	*
+	* @param resourcePrimKey the resource prim key of this wiki page resource
+	*/
 	@Override
 	public void setResourcePrimKey(long resourcePrimKey) {
-		_wikiPageResource.setResourcePrimKey(resourcePrimKey);
+		model.setResourcePrimKey(resourcePrimKey);
 	}
 
 	/**
-	 * Sets the title of this wiki page resource.
-	 *
-	 * @param title the title of this wiki page resource
-	 */
+	* Sets the title of this wiki page resource.
+	*
+	* @param title the title of this wiki page resource
+	*/
 	@Override
 	public void setTitle(String title) {
-		_wikiPageResource.setTitle(title);
+		model.setTitle(title);
 	}
 
 	/**
-	 * Sets the uuid of this wiki page resource.
-	 *
-	 * @param uuid the uuid of this wiki page resource
-	 */
+	* Sets the uuid of this wiki page resource.
+	*
+	* @param uuid the uuid of this wiki page resource
+	*/
 	@Override
 	public void setUuid(String uuid) {
-		_wikiPageResource.setUuid(uuid);
+		model.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<WikiPageResource>
-		toCacheModel() {
-
-		return _wikiPageResource.toCacheModel();
+	protected WikiPageResourceWrapper wrap(WikiPageResource wikiPageResource) {
+		return new WikiPageResourceWrapper(wikiPageResource);
 	}
-
-	@Override
-	public WikiPageResource toEscapedModel() {
-		return new WikiPageResourceWrapper(_wikiPageResource.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _wikiPageResource.toString();
-	}
-
-	@Override
-	public WikiPageResource toUnescapedModel() {
-		return new WikiPageResourceWrapper(
-			_wikiPageResource.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _wikiPageResource.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof WikiPageResourceWrapper)) {
-			return false;
-		}
-
-		WikiPageResourceWrapper wikiPageResourceWrapper =
-			(WikiPageResourceWrapper)obj;
-
-		if (Objects.equals(
-				_wikiPageResource, wikiPageResourceWrapper._wikiPageResource)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public WikiPageResource getWrappedModel() {
-		return _wikiPageResource;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _wikiPageResource.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _wikiPageResource.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_wikiPageResource.resetOriginalValues();
-	}
-
-	private final WikiPageResource _wikiPageResource;
-
 }

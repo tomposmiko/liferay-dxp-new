@@ -77,15 +77,6 @@ public abstract class BaseTestPreparatorBundleActivator
 
 		autoCloseables = new ArrayList<>();
 
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put("osgi.jaxrs.name", "Default");
-		properties.put("service.ranking", Integer.MAX_VALUE);
-
-		registerPrefixHandler(
-			PrefixHandler.PASS_THROUGH_PREFIX_HANDLER, properties);
-		registerScopeMapper(ScopeMapper.PASS_THROUGH_SCOPE_MAPPER, properties);
-
 		try {
 			prepareTest();
 		}
@@ -453,10 +444,6 @@ public abstract class BaseTestPreparatorBundleActivator
 
 		if ((properties == null) || properties.isEmpty()) {
 			properties = new HashMapDictionary<>();
-		}
-
-		if (properties.get("auth.verifier.guest.allowed") == null) {
-			properties.put("auth.verifier.guest.allowed", "false");
 		}
 
 		properties.put("oauth2.test.application", "true");

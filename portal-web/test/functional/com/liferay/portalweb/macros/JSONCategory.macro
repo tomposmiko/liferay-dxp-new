@@ -167,7 +167,7 @@ definition {
 	}
 
 	@summary = "Add a basic category"
-	macro addCategoryByGroupName {
+	macro addCategory {
 		if (!(isSet(groupName))) {
 			fail("Please set 'groupName'.");
 		}
@@ -195,7 +195,7 @@ definition {
 	}
 
 	@summary = "Add a basic subcategory"
-	macro addSubcategoryByGroupName {
+	macro addSubcategory {
 		if (!(isSet(categoryName))) {
 			fail("Please set 'categoryName'.");
 		}
@@ -234,7 +234,7 @@ definition {
 	}
 
 	@summary = "Add a basic vocabulary"
-	macro addVocabularyByGroupName {
+	macro addVocabulary {
 		if (!(isSet(groupName))) {
 			fail("Please set 'groupName'.");
 		}

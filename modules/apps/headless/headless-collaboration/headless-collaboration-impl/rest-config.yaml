@@ -1,0 +1,3 @@
+apiDir: "../headless-collaboration-api/src/main/java"
+apiPackagePath: "com.liferay.headless.collaboration"
+author: "Javier Gamarra"

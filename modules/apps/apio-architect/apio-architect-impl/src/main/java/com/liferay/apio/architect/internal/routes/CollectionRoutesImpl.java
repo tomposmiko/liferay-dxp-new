@@ -129,8 +129,8 @@ public class CollectionRoutesImpl<T, S> implements CollectionRoutes<T, S> {
 			FormBuilderFunction<R> formBuilderFunction) {
 
 			ThrowablePentaFunction<List<R>, A, B, C, D, List<S>>
-				batchCreatorThrowablePentaFunction =
-					(formList, a, b, c, d) -> _transformList(
+				batchCreatorThrowablePentaFunction = (formList, a, b, c, d) ->
+					_transformList(
 						formList,
 						r -> creatorThrowablePentaFunction.apply(
 							r, a, b, c, d));
@@ -229,8 +229,8 @@ public class CollectionRoutesImpl<T, S> implements CollectionRoutes<T, S> {
 		}
 
 		@Override
-		public <A, B, C, D, R, U, I extends Identifier> Builder<T, S>
-			addCustomRoute(
+		public <A, B, C, D, R, U, I extends Identifier>
+			Builder<T, S> addCustomRoute(
 				CustomRoute customRoute,
 				ThrowableHexaFunction<Pagination, R, A, B, C, D, U>
 					throwableHexaFunction,

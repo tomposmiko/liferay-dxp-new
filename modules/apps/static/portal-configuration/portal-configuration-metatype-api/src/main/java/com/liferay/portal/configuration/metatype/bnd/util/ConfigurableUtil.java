@@ -57,9 +57,7 @@ public class ConfigurableUtil {
 	private static <T> T _createConfigurableSnapshot(
 		Class<T> interfaceClass, T configurable) {
 
-		String interfaceClassName = interfaceClass.getName();
-
-		String snapshotClassName = interfaceClassName.concat("Snapshot");
+		String snapshotClassName = interfaceClass.getName().concat("Snapshot");
 
 		snapshotClassName = snapshotClassName.concat(
 			String.valueOf(_counter.getAndIncrement()));

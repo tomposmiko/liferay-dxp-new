@@ -18,6 +18,8 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
+import com.liferay.message.boards.model.MBDiscussion;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.comment.Comment;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.comment.Discussion;
@@ -35,7 +37,6 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
@@ -47,6 +48,7 @@ import com.liferay.subscription.service.SubscriptionLocalService;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -95,7 +97,7 @@ public class MBCommentManagerImplTest {
 	}
 
 	@Test
-	public void testGetChildComments() throws Exception {
+	public void testGetChildComments() {
 		List<Comment> childComments = _commentManager.getChildComments(
 			_parentCommentId, WorkflowConstants.STATUS_APPROVED,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
@@ -104,7 +106,7 @@ public class MBCommentManagerImplTest {
 	}
 
 	@Test
-	public void testGetChildCommentsCount() throws Exception {
+	public void testGetChildCommentsCount() {
 		int childCommentsCount = _commentManager.getChildCommentsCount(
 			_parentCommentId, WorkflowConstants.STATUS_APPROVED);
 
@@ -122,7 +124,7 @@ public class MBCommentManagerImplTest {
 	}
 
 	@Test
-	public void testGetRootCommentsCount() throws Exception {
+	public void testGetRootCommentsCount() {
 		int rootCommentsCount = _commentManager.getRootCommentsCount(
 			DLFileEntryConstants.getClassName(), _fileEntry.getFileEntryId(),
 			WorkflowConstants.STATUS_APPROVED);
@@ -161,7 +163,8 @@ public class MBCommentManagerImplTest {
 		Assert.assertNotNull(
 			_subscriptionLocalService.fetchSubscription(
 				TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
-				DLFileEntryConstants.getClassName(),
+				MBDiscussion.class.getName() + StringPool.UNDERLINE +
+					DLFileEntryConstants.getClassName(),
 				_fileEntry.getFileEntryId()));
 	}
 

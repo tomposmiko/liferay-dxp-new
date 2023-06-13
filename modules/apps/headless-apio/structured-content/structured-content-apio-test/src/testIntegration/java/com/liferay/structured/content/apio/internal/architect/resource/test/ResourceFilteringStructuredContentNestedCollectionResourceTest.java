@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.util.ISO8601Utils;
 import com.liferay.apio.architect.language.AcceptLanguage;
 import com.liferay.apio.architect.pagination.PageItems;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerTracker;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
@@ -798,8 +798,6 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 
 	@Test
 	public void testGetPageItemsFilterByDateStructureField() throws Throwable {
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -808,7 +806,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -824,7 +822,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -854,8 +852,6 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsFilterByDecimalStructureField()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -864,7 +860,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -880,7 +876,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -910,8 +906,6 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsFilterByFalseCheckboxStructureField()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -920,7 +914,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -936,7 +930,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -966,8 +960,6 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsFilterByIntegerStructureField()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -976,7 +968,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -992,7 +984,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -1094,8 +1086,6 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsFilterByNumberStructureField()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -1104,7 +1094,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -1120,7 +1110,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -1253,8 +1243,6 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 
 	@Test
 	public void testGetPageItemsFilterByRadioStructureField() throws Throwable {
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -1263,7 +1251,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -1279,7 +1267,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -1309,8 +1297,6 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsFilterByStringStructureField()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -1319,7 +1305,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -1335,7 +1321,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -2062,8 +2048,6 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsFilterByTrueCheckboxStructureField()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -2072,7 +2056,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -2088,7 +2072,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -2118,8 +2102,6 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsFilterByTrueCheckboxStructureFieldInNoDefaultLocale()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -2128,7 +2110,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -2144,7 +2126,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -2192,7 +2174,7 @@ public class ResourceFilteringStructuredContentNestedCollectionResourceTest
 	private static ServiceTracker<FilterParser, FilterParser> _serviceTracker;
 
 	@Inject
-	private DDMFormJSONDeserializer _ddmFormJSONDeserializer;
+	private DDMFormDeserializerTracker _ddmFormDeserializerTracker;
 
 	@DeleteAfterTestRun
 	private Group _group;

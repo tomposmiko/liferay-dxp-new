@@ -71,26 +71,16 @@ public class NestedRepresentorTransformerTest {
 
 		List<NestedFieldFunction<DummyWithNested, ?>> nestedDummyList =
 			stream.filter(
-				nestedFieldFunction -> {
-					String key = nestedFieldFunction.getKey();
-
-					if (key.equals("nestedDummy")) {
-						return true;
-					}
-
-					return false;
-				}
+				nestedFieldFunction ->
+					nestedFieldFunction.getKey().equals("nestedDummy")
 			).collect(
 				Collectors.toList()
 			);
 
 		assertThat(nestedDummyList.size(), is(1));
 
-		NestedFieldFunction<DummyWithNested, ?> nestedDummy =
-			nestedDummyList.get(0);
-
 		NestedRepresentor<NestedDummy> nestedRepresentor = unsafeCast(
-			nestedDummy.getNestedRepresentor());
+			nestedDummyList.get(0).getNestedRepresentor());
 
 		_testRelatedModels(nestedRepresentor);
 
@@ -111,26 +101,16 @@ public class NestedRepresentorTransformerTest {
 
 		List<NestedListFieldFunction<DummyWithNested, ?>> nestedDummyList =
 			stream.filter(
-				nestedFieldFunction -> {
-					String key = nestedFieldFunction.getKey();
-
-					if (key.equals("nestedDummyList")) {
-						return true;
-					}
-
-					return false;
-				}
+				nestedFieldFunction ->
+					nestedFieldFunction.getKey().equals("nestedDummyList")
 			).collect(
 				Collectors.toList()
 			);
 
 		assertThat(nestedDummyList.size(), is(1));
 
-		NestedListFieldFunction<DummyWithNested, ?> nestedDummy =
-			nestedDummyList.get(0);
-
 		NestedRepresentor<NestedDummy> nestedRepresentor = unsafeCast(
-			nestedDummy.getNestedRepresentor());
+			nestedDummyList.get(0).getNestedRepresentor());
 
 		_testRelatedModels(nestedRepresentor);
 
@@ -164,15 +144,8 @@ public class NestedRepresentorTransformerTest {
 				relatedCollection.getIdentifierClass() ==
 					IntegerIdentifier.class
 		).filter(
-			relatedCollection -> {
-				String key = relatedCollection.getKey();
-
-				if (key.equals("linkToChildCollection")) {
-					return true;
-				}
-
-				return false;
-			}
+			relatedCollection ->
+				relatedCollection.getKey().equals("linkToChildCollection")
 		).collect(
 			Collectors.toList()
 		);

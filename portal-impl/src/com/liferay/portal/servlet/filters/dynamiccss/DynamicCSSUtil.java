@@ -161,7 +161,10 @@ public class DynamicCSSUtil {
 
 		if (Validator.isNotNull(themeId)) {
 			try {
-				return ThemeLocalServiceUtil.getTheme(companyId, themeId);
+				Theme theme = ThemeLocalServiceUtil.getTheme(
+					companyId, themeId);
+
+				return theme;
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -209,7 +212,9 @@ public class DynamicCSSUtil {
 		}
 
 		try {
-			return ThemeLocalServiceUtil.getTheme(companyId, themeId);
+			Theme theme = ThemeLocalServiceUtil.getTheme(companyId, themeId);
+
+			return theme;
 		}
 		catch (Exception e) {
 			_log.error(e, e);

@@ -17,7 +17,7 @@ package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.engine.adapter.search.MultisearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.MultisearchSearchResponse;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
@@ -49,7 +49,7 @@ public class MultisearchSearchRequestExecutorImpl
 	public MultisearchSearchResponse execute(
 		MultisearchSearchRequest multisearchSearchRequest) {
 
-		Client client = elasticsearchConnectionManager.getClient();
+		Client client = elasticsearchClientResolver.getClient();
 
 		MultiSearchRequestBuilder multiSearchRequestBuilder =
 			MultiSearchAction.INSTANCE.newRequestBuilder(client);
@@ -70,7 +70,7 @@ public class MultisearchSearchRequestExecutorImpl
 
 				SearchRequestHolder searchRequestHolder =
 					new SearchRequestHolder(
-						searchSearchRequest, searchRequestBuilder.toString());
+						searchSearchRequest, searchRequestBuilder);
 
 				searchRequestHolders.add(searchRequestHolder);
 
@@ -101,10 +101,12 @@ public class MultisearchSearchRequestExecutorImpl
 			SearchRequestHolder searchRequestHolder = searchRequestHolders.get(
 				counter);
 
+			SearchSearchRequest searchSearchRequest =
+				searchRequestHolder.getSearchSearchRequest();
+
 			searchSearchResponseAssembler.assemble(
-				searchResponse, searchSearchResponse,
-				searchRequestHolder.getSearchSearchRequest(),
-				searchRequestHolder.getSearchRequestBuilderString());
+				searchRequestHolder.getSearchRequestBuilder(), searchResponse,
+				searchSearchRequest, searchSearchResponse);
 
 			if (_log.isDebugEnabled()) {
 				_log.debug(
@@ -114,6 +116,11 @@ public class MultisearchSearchRequestExecutorImpl
 						searchSearchResponse.getExecutionTime() + " ms"));
 			}
 
+			if (searchSearchRequest.isIncludeResponseString()) {
+				searchSearchResponse.setSearchResponseString(
+					searchResponse.toString());
+			}
+
 			counter++;
 		}
 
@@ -121,7 +128,7 @@ public class MultisearchSearchRequestExecutorImpl
 	}
 
 	@Reference
-	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
+	protected ElasticsearchClientResolver elasticsearchClientResolver;
 
 	@Reference
 	protected SearchSearchRequestAssembler searchSearchRequestAssembler;
@@ -136,21 +143,21 @@ public class MultisearchSearchRequestExecutorImpl
 
 		public SearchRequestHolder(
 			SearchSearchRequest searchSearchRequest,
-			String searchRequestBuilderString) {
+			SearchRequestBuilder searchRequestBuilder) {
 
 			_searchSearchRequest = searchSearchRequest;
-			_searchRequestBuilderString = searchRequestBuilderString;
+			_searchRequestBuilder = searchRequestBuilder;
 		}
 
-		public String getSearchRequestBuilderString() {
-			return _searchRequestBuilderString;
+		public SearchRequestBuilder getSearchRequestBuilder() {
+			return _searchRequestBuilder;
 		}
 
 		public SearchSearchRequest getSearchSearchRequest() {
 			return _searchSearchRequest;
 		}
 
-		private final String _searchRequestBuilderString;
+		private final SearchRequestBuilder _searchRequestBuilder;
 		private final SearchSearchRequest _searchSearchRequest;
 
 	}

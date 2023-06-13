@@ -23,10 +23,10 @@ import com.liferay.registry.ServiceReference;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
 
+import java.lang.reflect.Method;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.aopalliance.intercept.MethodInvocation;
 
 /**
  * @author Tomas Polesovsky
@@ -38,7 +38,7 @@ public class AccessControlAdvisorImpl implements AccessControlAdvisor {
 
 	@Override
 	public void accept(
-			MethodInvocation methodInvocation,
+			Method method, Object[] arguments,
 			AccessControlled accessControlled)
 		throws SecurityException {
 
@@ -47,8 +47,7 @@ public class AccessControlAdvisorImpl implements AccessControlAdvisor {
 					_accessControlPolicies) {
 
 				accessControlPolicy.onServiceRemoteAccess(
-					methodInvocation.getMethod(),
-					methodInvocation.getArguments(), accessControlled);
+					method, arguments, accessControlled);
 			}
 		}
 		else {
@@ -56,8 +55,7 @@ public class AccessControlAdvisorImpl implements AccessControlAdvisor {
 					_accessControlPolicies) {
 
 				accessControlPolicy.onServiceAccess(
-					methodInvocation.getMethod(),
-					methodInvocation.getArguments(), accessControlled);
+					method, arguments, accessControlled);
 			}
 		}
 	}

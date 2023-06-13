@@ -31,7 +31,7 @@ public interface PrefixHandler {
 	 *
 	 * @review
 	 */
-	public static PrefixHandler PASS_THROUGH_PREFIX_HANDLER =
+	public static PrefixHandler PASSTHROUGH_PREFIXHANDLER =
 		new PrefixHandler() {
 
 			@Override
@@ -45,14 +45,6 @@ public interface PrefixHandler {
 			}
 
 		};
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #PASS_THROUGH_PREFIX_HANDLER}
-	 */
-	@Deprecated
-	public static PrefixHandler PASSTHROUGH_PREFIXHANDLER =
-		PASS_THROUGH_PREFIX_HANDLER;
 
 	/**
 	 * Adds the prefix to a given input.

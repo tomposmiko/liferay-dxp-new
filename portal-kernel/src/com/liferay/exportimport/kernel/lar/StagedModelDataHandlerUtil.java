@@ -691,9 +691,12 @@ public class StagedModelDataHandlerUtil {
 			return null;
 		}
 
-		return (StagedModelDataHandler<T>)
-			StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
-				ExportImportClassedModelUtil.getClassName(stagedModel));
+		StagedModelDataHandler<T> stagedModelDataHandler =
+			(StagedModelDataHandler<T>)
+				StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
+					ExportImportClassedModelUtil.getClassName(stagedModel));
+
+		return stagedModelDataHandler;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

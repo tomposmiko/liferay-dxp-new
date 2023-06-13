@@ -39,8 +39,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DOCUMENT_VERSION_ANY</td>
+	<td>//li[@class='list-group-item']/div[contains(.,'${key_dmDocumentVersionNumber}')]/div</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DOCUMENT_VERSION_VERTICAL_ELLIPSIS</td>
 	<td>//li[@class='list-group-item']/div[contains(.,'${key_dmDocumentVersionNumber}')]/..//div//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>GOOGLE_DOCS_MENU_ITEM</td>
+	<td>//li[11]/a[contains(.,'Google Docs')]</td>
 	<td></td>
 </tr>
 <tr>

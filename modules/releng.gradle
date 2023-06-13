@@ -218,7 +218,7 @@ lockDependencyVersion {
 
 			File moduleDir = buildGradleFile.parentFile
 
-			if (moduleDir.name.endsWith("-test") || _isGitRepoReadOnly(moduleDir)) {
+			if (_isGitRepoReadOnly(moduleDir)) {
 				return
 			}
 

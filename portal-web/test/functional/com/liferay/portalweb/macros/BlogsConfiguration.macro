@@ -167,6 +167,11 @@ definition {
 			locator1 = "SocialBookmarks#ENABLE_SOCIAL_BOOKMARK_CURRENT_SELECT",
 			value1 = "Facebook"
 		);
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "SocialBookmarks#ENABLE_SOCIAL_BOOKMARK_CURRENT_SELECT",
+			value1 = "Google+"
+		);
 	}
 
 	macro viewDefaultConfigurationRSS {
@@ -191,7 +196,7 @@ definition {
 	macro viewNoPermissionCP {
 		var key_portletTitle = "Blogs";
 
-		AssertTextEquals(
+		AssertTextEquals.assertTextCaseInsensitive(
 			locator1 = "Home#SITE_ADMINISTRATION_PORTLET_TITLE",
 			value1 = "Blogs"
 		);
@@ -213,7 +218,7 @@ definition {
 
 		var key_text = "RSS";
 
-		AssertTextEquals.assertPartialText(locator1 = "Button#ANY", value1 = "RSS");
+		AssertTextEquals(locator1 = "Button#ANY", value1 = "RSS");
 
 		if (IsElementPresent(locator1 = "Portlet#OPTIONS_ICON")) {
 			Click.mouseOverClick(locator1 = "Portlet#OPTIONS_ICON");

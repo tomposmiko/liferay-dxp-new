@@ -32,13 +32,12 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class DDMFormInstanceBaseImpl
-	extends DDMFormInstanceModelImpl implements DDMFormInstance {
-
+public abstract class DDMFormInstanceBaseImpl extends DDMFormInstanceModelImpl
+	implements DDMFormInstance {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a ddm form instance model instance should use the <code>DDMFormInstance</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a ddm form instance model instance should use the {@link DDMFormInstance} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class DDMFormInstanceBaseImpl
 			DDMFormInstanceLocalServiceUtil.updateDDMFormInstance(this);
 		}
 	}
-
 }

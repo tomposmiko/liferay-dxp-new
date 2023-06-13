@@ -31,7 +31,8 @@
 
 			<soy:component-renderer
 				context="<%= contextUseForAllPadding %>"
-				module="portlet-configuration-css-web/js/ToggleDisableInputs.es"
+				module="js/ToggleDisableInputs.es"
+				servletContext="<%= application %>"
 				templateNamespace="com.liferay.portlet.configuration.css.web.ToggleDisableInputs.render"
 			/>
 
@@ -88,7 +89,8 @@
 
 			<soy:component-renderer
 				context="<%= contextUseForAllMargin %>"
-				module="portlet-configuration-css-web/js/ToggleDisableInputs.es"
+				module="js/ToggleDisableInputs.es"
+				servletContext="<%= application %>"
 				templateNamespace="com.liferay.portlet.configuration.css.web.ToggleDisableInputs.render"
 			/>
 

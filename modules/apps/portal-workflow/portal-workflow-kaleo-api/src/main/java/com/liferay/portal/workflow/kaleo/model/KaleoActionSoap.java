@@ -30,7 +30,6 @@ import java.util.List;
  */
 @ProviderType
 public class KaleoActionSoap implements Serializable {
-
 	public static KaleoActionSoap toSoapModel(KaleoAction model) {
 		KaleoActionSoap soapModel = new KaleoActionSoap();
 
@@ -43,8 +42,7 @@ public class KaleoActionSoap implements Serializable {
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setKaleoClassName(model.getKaleoClassName());
 		soapModel.setKaleoClassPK(model.getKaleoClassPK());
-		soapModel.setKaleoDefinitionVersionId(
-			model.getKaleoDefinitionVersionId());
+		soapModel.setKaleoDefinitionVersionId(model.getKaleoDefinitionVersionId());
 		soapModel.setKaleoNodeName(model.getKaleoNodeName());
 		soapModel.setName(model.getName());
 		soapModel.setDescription(model.getDescription());
@@ -85,8 +83,7 @@ public class KaleoActionSoap implements Serializable {
 	}
 
 	public static KaleoActionSoap[] toSoapModels(List<KaleoAction> models) {
-		List<KaleoActionSoap> soapModels = new ArrayList<KaleoActionSoap>(
-			models.size());
+		List<KaleoActionSoap> soapModels = new ArrayList<KaleoActionSoap>(models.size());
 
 		for (KaleoAction model : models) {
 			soapModels.add(toSoapModel(model));
@@ -268,5 +265,4 @@ public class KaleoActionSoap implements Serializable {
 	private String _scriptLanguage;
 	private String _scriptRequiredContexts;
 	private int _priority;
-
 }

@@ -45,7 +45,10 @@ public class PortletSharedRequestHelperImpl
 
 	@Override
 	public String getCompleteURL(RenderRequest renderRequest) {
-		return _http.getCompleteURL(getSharedRequest(renderRequest));
+		String urlString = _http.getCompleteURL(
+			getSharedRequest(renderRequest));
+
+		return urlString;
 	}
 
 	@Override

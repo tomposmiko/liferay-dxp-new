@@ -20,7 +20,6 @@ import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.expando.kernel.exception.ValueDataException;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
-import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.layouts.admin.kernel.model.LayoutTypePortletConstants;
 import com.liferay.petra.encryptor.Encryptor;
@@ -66,9 +65,7 @@ import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutFriendlyURL;
 import com.liferay.portal.kernel.model.LayoutFriendlyURLComposite;
 import com.liferay.portal.kernel.model.LayoutQueryStringComposite;
-import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSet;
-import com.liferay.portal.kernel.model.LayoutStagingHandler;
 import com.liferay.portal.kernel.model.LayoutType;
 import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
@@ -298,8 +295,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.apache.struts.Globals;
 
 /**
  * @author Brian Wing Shun Chan
@@ -911,21 +906,6 @@ public class PortalImpl implements Portal {
 					null) {
 
 				String[] values = actionRequest.getParameterValues(param);
-
-				if (values == null) {
-					values = new String[0];
-				}
-				else {
-					values = ArrayUtil.filter(
-						values,
-						s -> {
-							if (s == null) {
-								return false;
-							}
-
-							return true;
-						});
-				}
 
 				actionResponse.setRenderParameter(param, values);
 			}
@@ -2554,11 +2534,19 @@ public class PortalImpl implements Portal {
 		return null;
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public String[] getGroupPermissions(HttpServletRequest request) {
 		return request.getParameterValues("groupPermissions");
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public String[] getGroupPermissions(
 		HttpServletRequest request, String className) {
@@ -2573,11 +2561,19 @@ public class PortalImpl implements Portal {
 			groupPermissions, className, inputPermissionsShowOptions);
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public String[] getGroupPermissions(PortletRequest portletRequest) {
 		return portletRequest.getParameterValues("groupPermissions");
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public String[] getGroupPermissions(
 		PortletRequest portletRequest, String className) {
@@ -2592,11 +2588,19 @@ public class PortalImpl implements Portal {
 			groupPermissions, className, inputPermissionsShowOptions);
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public String[] getGuestPermissions(HttpServletRequest request) {
 		return request.getParameterValues("guestPermissions");
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public String[] getGuestPermissions(
 		HttpServletRequest request, String className) {
@@ -2611,11 +2615,19 @@ public class PortalImpl implements Portal {
 			guestPermissions, className, inputPermissionsShowOptions);
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public String[] getGuestPermissions(PortletRequest portletRequest) {
 		return portletRequest.getParameterValues("guestPermissions");
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public String[] getGuestPermissions(
 		PortletRequest portletRequest, String className) {
@@ -3276,21 +3288,8 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public String getLayoutTarget(Layout layout) {
-		UnicodeProperties typeSettingsProps = null;
-
-		if (LayoutStagingUtil.isBranchingLayout(layout)) {
-			LayoutStagingHandler layoutStagingHandler =
-				new LayoutStagingHandler(layout);
-
-			LayoutRevision layoutRevision =
-				layoutStagingHandler.getLayoutRevision();
-
-			typeSettingsProps = layoutRevision.getTypeSettingsProperties();
-		}
-
-		if (typeSettingsProps == null) {
-			typeSettingsProps = layout.getTypeSettingsProperties();
-		}
+		UnicodeProperties typeSettingsProps =
+			layout.getTypeSettingsProperties();
 
 		String target = typeSettingsProps.getProperty("target");
 
@@ -3386,7 +3385,10 @@ public class PortalImpl implements Portal {
 			return (LiferayPortletRequest)portletRequest;
 		}
 
-		return LiferayPortletUtil.getLiferayPortletRequest(portletRequest);
+		LiferayPortletRequest liferayPortletRequest =
+			LiferayPortletUtil.getLiferayPortletRequest(portletRequest);
+
+		return liferayPortletRequest;
 	}
 
 	@Override
@@ -3397,7 +3399,10 @@ public class PortalImpl implements Portal {
 			return (LiferayPortletResponse)portletResponse;
 		}
 
-		return LiferayPortletUtil.getLiferayPortletResponse(portletResponse);
+		LiferayPortletResponse liferayPortletResponse =
+			LiferayPortletUtil.getLiferayPortletResponse(portletResponse);
+
+		return liferayPortletResponse;
 	}
 
 	@Override
@@ -3525,7 +3530,7 @@ public class PortalImpl implements Portal {
 		HttpSession session = request.getSession(false);
 
 		if (session != null) {
-			locale = (Locale)session.getAttribute(Globals.LOCALE_KEY);
+			locale = (Locale)session.getAttribute(WebKeys.LOCALE);
 
 			if (LanguageUtil.isAvailableLocale(groupId, locale)) {
 				return locale;
@@ -7894,6 +7899,8 @@ public class PortalImpl implements Portal {
 			portletCategory.equals(PortletCategoryKeys.CONTROL_PANEL_SITES) ||
 			portletCategory.equals(PortletCategoryKeys.CONTROL_PANEL_SYSTEM) ||
 			portletCategory.equals(PortletCategoryKeys.CONTROL_PANEL_USERS) ||
+			portletCategory.equals(
+				PortletCategoryKeys.CONTROL_PANEL_WORKFLOW) ||
 			portletCategory.equals(PortletCategoryKeys.USER_MY_ACCOUNT)) {
 
 			return controlPanelGroup;
@@ -7939,24 +7946,22 @@ public class PortalImpl implements Portal {
 			return 0;
 		}
 
-		long doAsUserId = GetterUtil.getLong(doAsUserIdString);
+		long doAsUserId = 0;
 
-		if (doAsUserId == 0) {
-			try {
-				Company company = getCompany(request);
+		try {
+			Company company = getCompany(request);
 
-				doAsUserId = GetterUtil.getLong(
-					Encryptor.decrypt(company.getKeyObj(), doAsUserIdString));
+			doAsUserId = GetterUtil.getLong(
+				Encryptor.decrypt(company.getKeyObj(), doAsUserIdString));
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to impersonate " + doAsUserIdString +
+						" because the string cannot be decrypted");
 			}
-			catch (Exception e) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to impersonate " + doAsUserIdString +
-							" because the string cannot be decrypted");
-				}
 
-				return 0;
-			}
+			return 0;
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -8428,7 +8433,7 @@ public class PortalImpl implements Portal {
 
 		HttpSession session = request.getSession();
 
-		session.setAttribute(Globals.LOCALE_KEY, locale);
+		session.setAttribute(WebKeys.LOCALE, locale);
 
 		LanguageUtil.updateCookie(request, response, locale);
 	}
@@ -9100,7 +9105,7 @@ public class PortalImpl implements Portal {
 	private static final Date _upTime = new Date();
 
 	static {
-		Locale locale = LocaleUtil.getDefault();
+		Locale locale = Locale.getDefault();
 
 		_NULL_LOCALE = (Locale)locale.clone();
 	}

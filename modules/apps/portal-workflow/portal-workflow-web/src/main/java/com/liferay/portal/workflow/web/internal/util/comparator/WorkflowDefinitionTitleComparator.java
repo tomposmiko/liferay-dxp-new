@@ -36,7 +36,7 @@ public class WorkflowDefinitionTitleComparator
 	public static final String[] ORDER_BY_FIELDS = {"title"};
 
 	public WorkflowDefinitionTitleComparator() {
-		this(false, LocaleUtil.getDefault());
+		this(false, Locale.getDefault());
 	}
 
 	public WorkflowDefinitionTitleComparator(boolean ascending, Locale locale) {

@@ -407,13 +407,11 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 			return false;
 		}
 
-		if (!scopeGroup.hasLocalOrRemoteStagingGroup() ||
-			!scopeGroup.isStagedPortlet(portletId)) {
-
+		if (!scopeGroup.hasLocalOrRemoteStagingGroup()) {
 			return true;
 		}
 
-		return false;
+		return scopeGroup.isStagingGroup();
 	}
 
 	@Override

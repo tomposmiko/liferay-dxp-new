@@ -55,7 +55,6 @@ import com.liferay.portal.test.rule.PermissionCheckerTestRule;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -221,9 +220,7 @@ public class DDMFormInstanceRecordSearchTest {
 
 		Locale[] locales = new Locale[name.size()];
 
-		Set<Locale> localesKeySet = name.keySet();
-
-		localesKeySet.toArray(locales);
+		name.keySet().toArray(locales);
 
 		DDMFormValues ddmFormValues = createDDMFormValues(locales);
 

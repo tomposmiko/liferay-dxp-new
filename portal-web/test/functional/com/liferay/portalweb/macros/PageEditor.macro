@@ -1,12 +1,9 @@
 definition {
 	macro addFragment {
-		PageEditor.gotoTab(tabName = "Available");
-
 		PageEditor.expandFragmentCollection(collectionName = "${collectionName}");
 
-		Click(
-			locator1 = "PageEditor#FRAGMENT_SIDEBAR_FRAGMENT",
-			key_collectionName = "${collectionName}",
+		Click.clickNoMouseOverNoWaitForVisible(
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_ADD_FRAGMENT_BUTTON",
 			key_fragmentName = "${fragmentName}"
 		);
 
@@ -30,10 +27,12 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
-		AssertElementPresent(locator1 = "Button#SELECT_FILE");
+		AssertClick(locator1 = "Button#SELECT_FILE", value1 = "Select File");
 
-		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
-			locator1 = "TextInput#FILE",
+		SikuliClick(locator1 = "OS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG");
+
+		SikuliUploadCommonFile(
+			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
 			value1 = "${fileName}"
 		);
 
@@ -66,24 +65,17 @@ definition {
 			key_id = "${id}"
 		);
 
-		KeyPress(
-			locator1 = "Fragment#EDITABLE_FIELD_CK_EDITOR",
-			value1 = "\SPACE",
-			key_fragmentName = "${fragmentName}",
-			key_id = "${id}"
-		);
-
-		KeyPress(
-			locator1 = "Fragment#EDITABLE_FIELD_CK_EDITOR",
-			value1 = "\BACK_SPACE",
-			key_fragmentName = "${fragmentName}",
-			key_id = "${id}"
-		);
+		Pause(locator1 = "3000");
 	}
 
 	macro expandFragmentCollection {
+		AssertVisible(
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COLLECTION_PANEL",
+			key_collectionName = "${collectionName}"
+		);
+
 		if (IsElementPresent(locator1 = "PageEditor#FRAGMENT_SIDEBAR_COLLECTION_PANEL_COLLAPSED", key_collectionName = "${collectionName}")) {
-			AssertClick(
+			AssertClick.assertTextClickCaseInsensitive(
 				locator1 = "PageEditor#FRAGMENT_SIDEBAR_COLLECTION_PANEL_COLLAPSED",
 				value1 = "${collectionName}",
 				key_collectionName = "${collectionName}"
@@ -97,31 +89,10 @@ definition {
 	}
 
 	macro gotoTab {
-		AssertClick(
-			locator1 = "PageEditor#FRAGMENT_SIDEBAR_TAB",
-			value1 = "${tabName}",
+		Click(
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_TAB_BUTTON",
 			key_tabName = "${tabName}"
 		);
-	}
-
-	macro moveFragment {
-		MouseOver(
-			locator1 = "Fragment#FRAGMENT_BODY",
-			key_fragmentName = "${fragmentName}"
-		);
-
-		if ("${direction}" == "up") {
-			Click.clickNoWaitForVisible(
-				locator1 = "Fragment#FRAGMENT_HEADER_UP_ARROW_BUTTON",
-				key_fragmentName = "${fragmentName}"
-			);
-		}
-		else if ("${direction}" == "down") {
-			Click.clickNoWaitForVisible(
-				locator1 = "Fragment#FRAGMENT_HEADER_DOWN_ARROW_BUTTON",
-				key_fragmentName = "${fragmentName}"
-			);
-		}
 	}
 
 	macro removeFragment {
@@ -138,6 +109,18 @@ definition {
 		AssertElementNotPresent(
 			locator1 = "Fragment#FRAGMENT_HEADER",
 			key_fragmentName = "${fragmentName}"
+		);
+	}
+
+	macro removeSection {
+		MouseOver.mouseOverNotVisible(
+			locator1 = "PageEditor#SECTION",
+			key_position = "${position}"
+		);
+
+		Click(
+			locator1 = "PageEditor#SECTION_HEADER_DELETE_BUTTON",
+			key_position = "${position}"
 		);
 	}
 

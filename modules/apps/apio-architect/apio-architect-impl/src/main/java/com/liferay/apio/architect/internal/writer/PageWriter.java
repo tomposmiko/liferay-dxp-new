@@ -438,8 +438,8 @@ public class PageWriter<T> {
 
 		fieldsWriter.writeNestedResources(
 			baseRepresentorFunction, singleModel, null,
-			(nestedSingleModel, nestedPathElements,
-			 nestedRepresentorFunction) -> _writeItemEmbeddedModelFields(
+			(nestedSingleModel, nestedPathElements, nestedRepresentorFunction)
+				-> _writeItemEmbeddedModelFields(
 				nestedSingleModel, nestedPathElements, itemJsonObjectBuilder,
 				nestedRepresentorFunction, rootSingleModel));
 
@@ -503,8 +503,8 @@ public class PageWriter<T> {
 
 		fieldsWriter.writeNestedResources(
 			_representorFunction::apply, singleModel, null,
-			(nestedSingleModel, nestedPathElements,
-			 nestedRepresentorFunction) -> _writeItemEmbeddedModelFields(
+			(nestedSingleModel, nestedPathElements, nestedRepresentorFunction)
+				-> _writeItemEmbeddedModelFields(
 				nestedSingleModel, nestedPathElements, itemJsonObjectBuilder,
 				nestedRepresentorFunction, singleModel));
 
@@ -650,8 +650,8 @@ public class PageWriter<T> {
 
 		fieldsWriter.writeNestedResources(
 			baseRepresentorFunction, singleModel, embeddedPathElements,
-			(nestedSingleModel, nestedPathElements,
-			 nestedRepresentorFunction) -> _writeItemEmbeddedModelFields(
+			(nestedSingleModel, nestedPathElements, nestedRepresentorFunction)
+				-> _writeItemEmbeddedModelFields(
 				nestedSingleModel, nestedPathElements, itemJsonObjectBuilder,
 				nestedRepresentorFunction, rootSingleModel));
 

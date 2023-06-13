@@ -242,7 +242,7 @@ public class EditRoleAssignmentsManagementToolbarDisplayContext {
 		Indexer<?> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 			Organization.class);
 
-		if (!_tabs3.equals("current") && indexer.isIndexerEnabled() &&
+		if (indexer.isIndexerEnabled() &&
 			PropsValues.ORGANIZATIONS_SEARCH_WITH_INDEX) {
 
 			organizationParams.put("expandoAttributes", getKeywords());

@@ -49,12 +49,24 @@ public abstract class BaseSearchRequest {
 		return _query;
 	}
 
+	public Query getRescoreQuery() {
+		return _rescoreQuery;
+	}
+
 	public long getTimeoutInMilliseconds() {
 		return _timeoutInMilliseconds;
 	}
 
 	public boolean isBasicFacetSelection() {
 		return _basicFacetSelection;
+	}
+
+	public boolean isExplain() {
+		return _explain;
+	}
+
+	public boolean isIncludeResponseString() {
+		return _includeResponseString;
 	}
 
 	public boolean isRequestCache() {
@@ -77,7 +89,15 @@ public abstract class BaseSearchRequest {
 		_basicFacetSelection = basicFacetSelection;
 	}
 
-	public void setIndexNames(String[] indexNames) {
+	public void setExplain(boolean explain) {
+		_explain = explain;
+	}
+
+	public void setIncludeResponseString(boolean includeResponseString) {
+		_includeResponseString = includeResponseString;
+	}
+
+	public void setIndexNames(String... indexNames) {
 		_indexNames = indexNames;
 	}
 
@@ -97,6 +117,10 @@ public abstract class BaseSearchRequest {
 		_requestCache = requestCache;
 	}
 
+	public void setRescoreQuery(Query rescoreQuery) {
+		_rescoreQuery = rescoreQuery;
+	}
+
 	public void setTimeoutInMilliseconds(long timeoutInMilliseconds) {
 		_timeoutInMilliseconds = timeoutInMilliseconds;
 	}
@@ -106,12 +130,15 @@ public abstract class BaseSearchRequest {
 	}
 
 	private boolean _basicFacetSelection;
+	private boolean _explain;
 	private final Map<String, Facet> _facets = new HashMap<>();
+	private boolean _includeResponseString;
 	private String[] _indexNames;
 	private float _minimumScore;
 	private Filter _postFilter;
 	private Query _query;
 	private boolean _requestCache;
+	private Query _rescoreQuery;
 	private long _timeoutInMilliseconds;
 	private boolean _trackTotalHits = true;
 

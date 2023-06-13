@@ -26,22 +26,19 @@ import com.liferay.portal.kernel.util.LocaleThreadLocal;
  *
  * @author Edward C. Han
  * @see MDRActionModel
+ * @see com.liferay.mobile.device.rules.model.impl.MDRActionImpl
+ * @see com.liferay.mobile.device.rules.model.impl.MDRActionModelImpl
  * @generated
  */
-@ImplementationClassName(
-	"com.liferay.mobile.device.rules.model.impl.MDRActionImpl"
-)
+@ImplementationClassName("com.liferay.mobile.device.rules.model.impl.MDRActionImpl")
 @ProviderType
 public interface MDRAction extends MDRActionModel, PersistedModel {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to <code>com.liferay.mobile.device.rules.model.impl.MDRActionImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.mobile.device.rules.model.impl.MDRActionImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<MDRAction, Long> ACTION_ID_ACCESSOR =
-		new Accessor<MDRAction, Long>() {
-
+	public static final Accessor<MDRAction, Long> ACTION_ID_ACCESSOR = new Accessor<MDRAction, Long>() {
 			@Override
 			public Long get(MDRAction mdrAction) {
 				return mdrAction.getActionId();
@@ -56,15 +53,12 @@ public interface MDRAction extends MDRActionModel, PersistedModel {
 			public Class<MDRAction> getTypeClass() {
 				return MDRAction.class;
 			}
-
 		};
-	public static final Accessor<MDRAction, String> NAME_ACCESSOR =
-		new Accessor<MDRAction, String>() {
 
+	public static final Accessor<MDRAction, String> NAME_ACCESSOR = new Accessor<MDRAction, String>() {
 			@Override
 			public String get(MDRAction mdrAction) {
-				return mdrAction.getName(
-					LocaleThreadLocal.getThemeDisplayLocale());
+				return mdrAction.getName(LocaleThreadLocal.getThemeDisplayLocale());
 			}
 
 			@Override
@@ -76,14 +70,10 @@ public interface MDRAction extends MDRActionModel, PersistedModel {
 			public Class<MDRAction> getTypeClass() {
 				return MDRAction.class;
 			}
-
 		};
 
-	public com.liferay.portal.kernel.util.UnicodeProperties
-		getTypeSettingsProperties();
+	public com.liferay.portal.kernel.util.UnicodeProperties getTypeSettingsProperties();
 
 	public void setTypeSettingsProperties(
-		com.liferay.portal.kernel.util.UnicodeProperties
-			typeSettingsProperties);
-
+		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties);
 }

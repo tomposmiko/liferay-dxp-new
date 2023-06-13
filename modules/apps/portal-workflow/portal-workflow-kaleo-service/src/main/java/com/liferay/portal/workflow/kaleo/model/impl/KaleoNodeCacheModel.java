@@ -16,9 +16,10 @@ package com.liferay.portal.workflow.kaleo.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.workflow.kaleo.model.KaleoNode;
 
 import java.io.Externalizable;
@@ -32,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing KaleoNode in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see KaleoNode
  * @generated
  */
 @ProviderType
-public class KaleoNodeCacheModel
-	implements CacheModel<KaleoNode>, Externalizable {
-
+public class KaleoNodeCacheModel implements CacheModel<KaleoNode>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -192,7 +193,8 @@ public class KaleoNodeCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(kaleoNodeId);
 
 		objectOutput.writeLong(groupId);
@@ -260,5 +262,4 @@ public class KaleoNodeCacheModel
 	public String type;
 	public boolean initial;
 	public boolean terminal;
-
 }

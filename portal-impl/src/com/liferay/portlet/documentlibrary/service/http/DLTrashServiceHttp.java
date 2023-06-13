@@ -17,6 +17,7 @@ package com.liferay.portlet.documentlibrary.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.document.library.kernel.service.DLTrashServiceUtil;
+
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.HttpPrincipal;
@@ -26,11 +27,10 @@ import com.liferay.portal.kernel.util.MethodKey;
 
 /**
  * Provides the HTTP utility for the
- * <code>DLTrashServiceUtil</code> service
- * utility. The
+ * {@link DLTrashServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it requires an additional
- * <code>HttpPrincipal</code> parameter.
+ * {@link HttpPrincipal} parameter.
  *
  * <p>
  * The benefits of using the HTTP utility is that it is fast and allows for
@@ -49,24 +49,23 @@ import com.liferay.portal.kernel.util.MethodKey;
  *
  * @author Brian Wing Shun Chan
  * @see DLTrashServiceSoap
+ * @see HttpPrincipal
+ * @see DLTrashServiceUtil
  * @generated
  */
 @ProviderType
 public class DLTrashServiceHttp {
-
-	public static com.liferay.portal.kernel.repository.model.FileEntry
-			moveFileEntryFromTrash(
-				HttpPrincipal httpPrincipal, long fileEntryId, long newFolderId,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.portal.kernel.repository.model.FileEntry moveFileEntryFromTrash(
+		HttpPrincipal httpPrincipal, long fileEntryId, long newFolderId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				DLTrashServiceUtil.class, "moveFileEntryFromTrash",
-				_moveFileEntryFromTrashParameterTypes0);
+			MethodKey methodKey = new MethodKey(DLTrashServiceUtil.class,
+					"moveFileEntryFromTrash",
+					_moveFileEntryFromTrashParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, fileEntryId, newFolderId, serviceContext);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					fileEntryId, newFolderId, serviceContext);
 
 			Object returnObj = null;
 
@@ -74,19 +73,14 @@ public class DLTrashServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.portal.kernel.repository.model.FileEntry)
-				returnObj;
+			return (com.liferay.portal.kernel.repository.model.FileEntry)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -95,17 +89,15 @@ public class DLTrashServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.kernel.repository.model.FileEntry
-			moveFileEntryToTrash(HttpPrincipal httpPrincipal, long fileEntryId)
+	public static com.liferay.portal.kernel.repository.model.FileEntry moveFileEntryToTrash(
+		HttpPrincipal httpPrincipal, long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				DLTrashServiceUtil.class, "moveFileEntryToTrash",
-				_moveFileEntryToTrashParameterTypes1);
+			MethodKey methodKey = new MethodKey(DLTrashServiceUtil.class,
+					"moveFileEntryToTrash", _moveFileEntryToTrashParameterTypes1);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, fileEntryId);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					fileEntryId);
 
 			Object returnObj = null;
 
@@ -113,19 +105,14 @@ public class DLTrashServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.portal.kernel.repository.model.FileEntry)
-				returnObj;
+			return (com.liferay.portal.kernel.repository.model.FileEntry)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -134,20 +121,17 @@ public class DLTrashServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.kernel.repository.model.FileShortcut
-			moveFileShortcutFromTrash(
-				HttpPrincipal httpPrincipal, long fileShortcutId,
-				long newFolderId,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.portal.kernel.repository.model.FileShortcut moveFileShortcutFromTrash(
+		HttpPrincipal httpPrincipal, long fileShortcutId, long newFolderId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				DLTrashServiceUtil.class, "moveFileShortcutFromTrash",
-				_moveFileShortcutFromTrashParameterTypes2);
+			MethodKey methodKey = new MethodKey(DLTrashServiceUtil.class,
+					"moveFileShortcutFromTrash",
+					_moveFileShortcutFromTrashParameterTypes2);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, fileShortcutId, newFolderId, serviceContext);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					fileShortcutId, newFolderId, serviceContext);
 
 			Object returnObj = null;
 
@@ -155,19 +139,14 @@ public class DLTrashServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.portal.kernel.repository.model.FileShortcut)
-				returnObj;
+			return (com.liferay.portal.kernel.repository.model.FileShortcut)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -176,18 +155,16 @@ public class DLTrashServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.kernel.repository.model.FileShortcut
-			moveFileShortcutToTrash(
-				HttpPrincipal httpPrincipal, long fileShortcutId)
+	public static com.liferay.portal.kernel.repository.model.FileShortcut moveFileShortcutToTrash(
+		HttpPrincipal httpPrincipal, long fileShortcutId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				DLTrashServiceUtil.class, "moveFileShortcutToTrash",
-				_moveFileShortcutToTrashParameterTypes3);
+			MethodKey methodKey = new MethodKey(DLTrashServiceUtil.class,
+					"moveFileShortcutToTrash",
+					_moveFileShortcutToTrashParameterTypes3);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, fileShortcutId);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					fileShortcutId);
 
 			Object returnObj = null;
 
@@ -195,19 +172,14 @@ public class DLTrashServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.portal.kernel.repository.model.FileShortcut)
-				returnObj;
+			return (com.liferay.portal.kernel.repository.model.FileShortcut)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -216,19 +188,16 @@ public class DLTrashServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.kernel.repository.model.Folder
-			moveFolderFromTrash(
-				HttpPrincipal httpPrincipal, long folderId, long parentFolderId,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.portal.kernel.repository.model.Folder moveFolderFromTrash(
+		HttpPrincipal httpPrincipal, long folderId, long parentFolderId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				DLTrashServiceUtil.class, "moveFolderFromTrash",
-				_moveFolderFromTrashParameterTypes4);
+			MethodKey methodKey = new MethodKey(DLTrashServiceUtil.class,
+					"moveFolderFromTrash", _moveFolderFromTrashParameterTypes4);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, folderId, parentFolderId, serviceContext);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					folderId, parentFolderId, serviceContext);
 
 			Object returnObj = null;
 
@@ -236,15 +205,11 @@ public class DLTrashServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.repository.model.Folder)returnObj;
@@ -256,17 +221,14 @@ public class DLTrashServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.kernel.repository.model.Folder
-			moveFolderToTrash(HttpPrincipal httpPrincipal, long folderId)
+	public static com.liferay.portal.kernel.repository.model.Folder moveFolderToTrash(
+		HttpPrincipal httpPrincipal, long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				DLTrashServiceUtil.class, "moveFolderToTrash",
-				_moveFolderToTrashParameterTypes5);
+			MethodKey methodKey = new MethodKey(DLTrashServiceUtil.class,
+					"moveFolderToTrash", _moveFolderToTrashParameterTypes5);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, folderId);
+			MethodHandler methodHandler = new MethodHandler(methodKey, folderId);
 
 			Object returnObj = null;
 
@@ -274,15 +236,11 @@ public class DLTrashServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.portal.kernel.repository.model.Folder)returnObj;
@@ -294,31 +252,26 @@ public class DLTrashServiceHttp {
 		}
 	}
 
-	public static void restoreFileEntryFromTrash(
-			HttpPrincipal httpPrincipal, long fileEntryId)
+	public static void restoreFileEntryFromTrash(HttpPrincipal httpPrincipal,
+		long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				DLTrashServiceUtil.class, "restoreFileEntryFromTrash",
-				_restoreFileEntryFromTrashParameterTypes6);
+			MethodKey methodKey = new MethodKey(DLTrashServiceUtil.class,
+					"restoreFileEntryFromTrash",
+					_restoreFileEntryFromTrashParameterTypes6);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, fileEntryId);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					fileEntryId);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
@@ -329,30 +282,25 @@ public class DLTrashServiceHttp {
 	}
 
 	public static void restoreFileShortcutFromTrash(
-			HttpPrincipal httpPrincipal, long fileShortcutId)
+		HttpPrincipal httpPrincipal, long fileShortcutId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				DLTrashServiceUtil.class, "restoreFileShortcutFromTrash",
-				_restoreFileShortcutFromTrashParameterTypes7);
+			MethodKey methodKey = new MethodKey(DLTrashServiceUtil.class,
+					"restoreFileShortcutFromTrash",
+					_restoreFileShortcutFromTrashParameterTypes7);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, fileShortcutId);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					fileShortcutId);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
@@ -362,31 +310,25 @@ public class DLTrashServiceHttp {
 		}
 	}
 
-	public static void restoreFolderFromTrash(
-			HttpPrincipal httpPrincipal, long folderId)
+	public static void restoreFolderFromTrash(HttpPrincipal httpPrincipal,
+		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				DLTrashServiceUtil.class, "restoreFolderFromTrash",
-				_restoreFolderFromTrashParameterTypes8);
+			MethodKey methodKey = new MethodKey(DLTrashServiceUtil.class,
+					"restoreFolderFromTrash",
+					_restoreFolderFromTrashParameterTypes8);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, folderId);
+			MethodHandler methodHandler = new MethodHandler(methodKey, folderId);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
@@ -397,33 +339,33 @@ public class DLTrashServiceHttp {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(DLTrashServiceHttp.class);
-
-	private static final Class<?>[] _moveFileEntryFromTrashParameterTypes0 =
-		new Class[] {
+	private static final Class<?>[] _moveFileEntryFromTrashParameterTypes0 = new Class[] {
 			long.class, long.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _moveFileEntryToTrashParameterTypes1 =
-		new Class[] {long.class};
-	private static final Class<?>[] _moveFileShortcutFromTrashParameterTypes2 =
-		new Class[] {
+	private static final Class<?>[] _moveFileEntryToTrashParameterTypes1 = new Class[] {
+			long.class
+		};
+	private static final Class<?>[] _moveFileShortcutFromTrashParameterTypes2 = new Class[] {
 			long.class, long.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _moveFileShortcutToTrashParameterTypes3 =
-		new Class[] {long.class};
-	private static final Class<?>[] _moveFolderFromTrashParameterTypes4 =
-		new Class[] {
+	private static final Class<?>[] _moveFileShortcutToTrashParameterTypes3 = new Class[] {
+			long.class
+		};
+	private static final Class<?>[] _moveFolderFromTrashParameterTypes4 = new Class[] {
 			long.class, long.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _moveFolderToTrashParameterTypes5 =
-		new Class[] {long.class};
-	private static final Class<?>[] _restoreFileEntryFromTrashParameterTypes6 =
-		new Class[] {long.class};
-	private static final Class<?>[]
-		_restoreFileShortcutFromTrashParameterTypes7 = new Class[] {long.class};
-	private static final Class<?>[] _restoreFolderFromTrashParameterTypes8 =
-		new Class[] {long.class};
-
+	private static final Class<?>[] _moveFolderToTrashParameterTypes5 = new Class[] {
+			long.class
+		};
+	private static final Class<?>[] _restoreFileEntryFromTrashParameterTypes6 = new Class[] {
+			long.class
+		};
+	private static final Class<?>[] _restoreFileShortcutFromTrashParameterTypes7 =
+		new Class[] { long.class };
+	private static final Class<?>[] _restoreFolderFromTrashParameterTypes8 = new Class[] {
+			long.class
+		};
 }

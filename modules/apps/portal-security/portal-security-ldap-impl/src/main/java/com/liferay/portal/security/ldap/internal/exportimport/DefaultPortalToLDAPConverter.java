@@ -19,7 +19,6 @@ import com.liferay.expando.kernel.util.ExpandoConverterUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
-import com.liferay.portal.kernel.exception.PwdEncryptorException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -47,7 +46,6 @@ import com.liferay.portal.security.ldap.exportimport.Modifications;
 import com.liferay.portal.security.ldap.exportimport.PortalToLDAPConverter;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -433,49 +431,43 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 
 		String algorithm = ldapAuthConfiguration.passwordEncryptionAlgorithm();
 
-		if (Validator.isNotNull(algorithm) &&
-			!algorithm.equals(PasswordEncryptorUtil.TYPE_NONE)) {
-
-			try {
-				StringBundler sb = new StringBundler(4);
-
-				if (!hasLegacyPasswordEncryptionAlgorithm()) {
-					sb.append(StringPool.OPEN_CURLY_BRACE);
-					sb.append(algorithm);
-					sb.append(StringPool.CLOSE_CURLY_BRACE);
-				}
-
-				sb.append(
-					_passwordEncryptor.encrypt(algorithm, password, null));
-
-				password = sb.toString();
-			}
-			catch (PwdEncryptorException pee) {
-				throw new SystemException(pee);
-			}
+		if (Validator.isNull(algorithm)) {
+			return password;
 		}
 
-		String passwordKey = userMappings.getProperty(
-			UserConverterKeys.PASSWORD);
+		try {
+			StringBundler sb = new StringBundler(4);
 
-		if (passwordKey.equals("unicodePwd")) {
-			String quotedPassword = StringPool.QUOTE.concat(
-				password
-			).concat(
-				StringPool.QUOTE
-			);
+			if (!algorithm.equals(PasswordEncryptorUtil.TYPE_NONE) &&
+				!hasLegacyPasswordEncryptionAlgorithm()) {
 
-			try {
+				sb.append(StringPool.OPEN_CURLY_BRACE);
+				sb.append(algorithm);
+				sb.append(StringPool.CLOSE_CURLY_BRACE);
+			}
+
+			sb.append(_passwordEncryptor.encrypt(algorithm, password, null));
+
+			String passwordKey = userMappings.getProperty(
+				UserConverterKeys.PASSWORD);
+
+			if (passwordKey.equals("unicodePwd")) {
+				String quotedPassword = StringPool.QUOTE.concat(
+					sb.toString()
+				).concat(
+					StringPool.QUOTE
+				);
+
 				byte[] unicodePassword = quotedPassword.getBytes("UTF-16LE");
 
 				return new String(unicodePassword);
 			}
-			catch (UnsupportedEncodingException uee) {
-				throw new SystemException(uee);
-			}
-		}
 
-		return password;
+			return sb.toString();
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
 	}
 
 	protected Modifications getModifications(

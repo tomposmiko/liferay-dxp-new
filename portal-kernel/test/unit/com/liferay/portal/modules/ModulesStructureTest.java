@@ -14,6 +14,8 @@
 
 package com.liferay.portal.modules;
 
+import aQute.bnd.version.Version;
+
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
@@ -23,7 +25,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.version.Version;
 import com.liferay.portal.modules.util.GradleDependency;
 import com.liferay.portal.modules.util.ModulesStructureTestUtil;
 
@@ -209,9 +210,7 @@ public class ModulesStructureTest {
 						}
 					}
 
-					if (Files.exists(dirPath.resolve("package.json")) &&
-						!Files.exists(_modulesDirPath.resolve("yarn.lock"))) {
-
+					if (Files.exists(dirPath.resolve("package.json"))) {
 						String dirAbsolutePath =
 							ModulesStructureTestUtil.getAbsolutePath(dirPath);
 						Path packageJSONPath = dirPath.resolve("package.json");
@@ -370,10 +369,6 @@ public class ModulesStructureTest {
 					if (dirName.equals("gradleTest") ||
 						dirName.equals("project-templates")) {
 
-						return FileVisitResult.SKIP_SUBTREE;
-					}
-
-					if (_excludedDirNames.contains(dirName)) {
 						return FileVisitResult.SKIP_SUBTREE;
 					}
 
@@ -877,7 +872,6 @@ public class ModulesStructureTest {
 
 		if (name.equals("com.liferay.ant.bnd") ||
 			name.equals("com.liferay.arquillian.extension.junit.bridge") ||
-			name.equals("com.liferay.gradle.plugins.defaults") ||
 			name.equals("com.liferay.portal.cache.test.util") ||
 			name.equals("com.liferay.whip") ||
 			!name.startsWith("com.liferay.")) {
@@ -1120,7 +1114,6 @@ public class ModulesStructureTest {
 				Assert.assertFalse(
 					sb.toString(),
 					!_gitRepoGradlePropertiesKeys.contains(key) &&
-					!key.endsWith(".ignore.local") &&
 					!key.endsWith(".version") && !matcher.matches());
 			}
 

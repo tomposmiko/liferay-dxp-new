@@ -14,7 +14,6 @@
 
 package com.liferay.dynamic.data.mapping.form.field.type.select.internal;
 
-import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormFieldEvaluationResult;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldOptionsFactory;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
@@ -87,11 +86,14 @@ public class SelectDDMFormFieldTemplateContextContributor
 
 		Map<String, String> stringsMap = new HashMap<>();
 
-		Locale displayLocale = getDisplayLocale(
-			ddmFormFieldRenderingContext.getHttpServletRequest());
+		Locale displayLocale;
 
-		if (displayLocale == null) {
+		if (ddmFormFieldRenderingContext.isViewMode()) {
 			displayLocale = ddmFormFieldRenderingContext.getLocale();
+		}
+		else {
+			displayLocale = getDisplayLocale(
+				ddmFormFieldRenderingContext.getHttpServletRequest());
 		}
 
 		ResourceBundle resourceBundle = getResourceBundle(displayLocale);
@@ -139,14 +141,12 @@ public class SelectDDMFormFieldTemplateContextContributor
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
-		DDMFormFieldEvaluationResult ddmFormFieldEvaluationResult =
-			(DDMFormFieldEvaluationResult)
-				ddmFormFieldRenderingContext.getProperty(
-					"ddmFormFieldEvaluationResult");
+		Map<String, Object> changedProperties =
+			(Map<String, Object>)ddmFormFieldRenderingContext.getProperty(
+				"changedProperties");
 
-		if (ddmFormFieldEvaluationResult != null) {
-			Boolean multiple = ddmFormFieldEvaluationResult.getProperty(
-				"multiple");
+		if (changedProperties != null) {
+			Boolean multiple = (Boolean)changedProperties.get("multiple");
 
 			if (multiple != null) {
 				return multiple;
@@ -194,8 +194,10 @@ public class SelectDDMFormFieldTemplateContextContributor
 			return null;
 		}
 
-		return predefinedValue.getString(
+		String predefinedValueString = predefinedValue.getString(
 			ddmFormFieldRenderingContext.getLocale());
+
+		return predefinedValueString;
 	}
 
 	protected ResourceBundle getResourceBundle(Locale locale) {

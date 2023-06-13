@@ -42,5 +42,5 @@
 	"scripts": {
 		"build": "liferay-npm-bundler && liferay-npm-bridge-generator"
 	},
-	"version": "2.0.7"
+	"version": "3.0.0"
 }

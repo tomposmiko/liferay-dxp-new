@@ -81,11 +81,7 @@ definition {
 	macro inputTextArea {
 		Click(locator1 = "TextArea#ANY", key_text = "${fieldId}");
 
-		Type(
-			locator1 = "TextArea#ANY",
-			value1 = "${text}",
-			key_text = "${fieldId}"
-		);
+		Type(locator1 = "TextArea#ANY", value1 = "${text}", key_text = "${fieldId}");
 	}
 
 	macro inputTitle {
@@ -131,6 +127,12 @@ definition {
 		AssertChecked.assertCheckedNotVisible(
 			locator1 = "Checkbox#LEXICON_SELECT_ALL_INPUT"
 		);
+	}
+
+	macro submitForPublication {
+		Button.clickSubmitForPublication();
+
+		Alert.viewSuccessMessage();
 	}
 
 	macro update {

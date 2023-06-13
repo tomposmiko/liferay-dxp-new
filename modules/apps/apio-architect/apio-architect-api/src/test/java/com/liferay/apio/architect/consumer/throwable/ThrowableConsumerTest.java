@@ -49,10 +49,7 @@ public class ThrowableConsumerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterThrowsException() {
-		ThrowableConsumer.empty(
-		).andThen(
-			null
-		);
+		ThrowableConsumer.empty().andThen(null);
 	}
 
 }

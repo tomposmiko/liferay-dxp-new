@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 
 import java.io.Serializable;
@@ -94,10 +93,10 @@ public abstract class BaseBackgroundTaskTestCase {
 
 		_companyId = 1234L;
 		_clusterInvokeEnabled = true;
-		_defaultLocale = LocaleUtil.US;
+		_defaultLocale = Locale.US;
 		_groupId = 1234L;
-		_siteDefaultLocale = LocaleUtil.CANADA;
-		_themeDisplayLocale = LocaleUtil.FRANCE;
+		_siteDefaultLocale = Locale.CANADA;
+		_themeDisplayLocale = Locale.FRANCE;
 
 		_principalName = String.valueOf(1234L);
 	}

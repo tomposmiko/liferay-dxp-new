@@ -33,11 +33,10 @@ import com.liferay.portal.kernel.service.PhoneLocalServiceUtil;
  */
 @ProviderType
 public abstract class PhoneBaseImpl extends PhoneModelImpl implements Phone {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a phone model instance should use the <code>Phone</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a phone model instance should use the {@link Phone} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,5 +47,4 @@ public abstract class PhoneBaseImpl extends PhoneModelImpl implements Phone {
 			PhoneLocalServiceUtil.updatePhone(this);
 		}
 	}
-
 }

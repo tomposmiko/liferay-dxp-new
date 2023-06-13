@@ -201,7 +201,10 @@ public class IMAPAccessor {
 
 			Part part = getPart(jxMessage, contentPath);
 
-			return new IMAPAttachmentHandler(part.getInputStream(), jxFolder);
+			AttachmentHandler attachmentHandler = new IMAPAttachmentHandler(
+				part.getInputStream(), jxFolder);
+
+			return attachmentHandler;
 		}
 		catch (MessagingException me) {
 			throw new MailException(me);
@@ -967,9 +970,11 @@ public class IMAPAccessor {
 				continue;
 			}
 
-			String indexValue = String.valueOf(index);
-
-			String prefix = indexValue.concat(StringPool.PERIOD);
+			String prefix = String.valueOf(
+				index
+			).concat(
+				StringPool.PERIOD
+			);
 
 			return getPart(
 				multipart.getBodyPart(i),

@@ -223,7 +223,10 @@ public class PortletServletRequest extends HttpServletRequestWrapper {
 			InputStream portletInputStream =
 				clientDataRequest.getPortletInputStream();
 
-			return new ServletInputStreamAdapter(portletInputStream);
+			ServletInputStream servletInputStream =
+				new ServletInputStreamAdapter(portletInputStream);
+
+			return servletInputStream;
 		}
 
 		return null;

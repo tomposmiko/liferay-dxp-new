@@ -31,10 +31,13 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 <%@ page import="com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil" %><%@
 page import="com.liferay.asset.kernel.model.AssetRenderer" %><%@
 page import="com.liferay.asset.kernel.model.AssetRendererFactory" %><%@
+page import="com.liferay.asset.kernel.model.AssetTag" %><%@
+page import="com.liferay.asset.kernel.service.AssetTagServiceUtil" %><%@
 page import="com.liferay.document.library.kernel.model.DLFileEntry" %><%@
 page import="com.liferay.document.library.kernel.util.DLUtil" %><%@
 page import="com.liferay.exportimport.kernel.staging.LayoutStagingUtil" %><%@
 page import="com.liferay.exportimport.kernel.staging.StagingUtil" %><%@
+page import="com.liferay.petra.encryptor.Encryptor" %><%@
 page import="com.liferay.petra.string.CharPool" %><%@
 page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
@@ -192,8 +195,7 @@ page import="com.liferay.taglib.search.SearchEntry" %><%@
 page import="com.liferay.taglib.search.TextSearchEntry" %><%@
 page import="com.liferay.taglib.util.OutputTag" %><%@
 page import="com.liferay.users.admin.kernel.util.UsersAdmin" %><%@
-page import="com.liferay.users.admin.kernel.util.UsersAdminUtil" %><%@
-page import="com.liferay.util.Encryptor" %>
+page import="com.liferay.users.admin.kernel.util.UsersAdminUtil" %>
 
 <%@ page import="java.io.Serializable" %>
 

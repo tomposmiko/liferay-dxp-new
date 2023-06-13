@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ResourceBlock;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -31,14 +32,14 @@ import java.io.ObjectOutput;
  * The cache model class for representing ResourceBlock in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see ResourceBlock
  * @deprecated As of Judson (7.1.x), with no direct replacement
  * @generated
  */
 @Deprecated
 @ProviderType
-public class ResourceBlockCacheModel
-	implements CacheModel<ResourceBlock>, Externalizable, MVCCModel {
-
+public class ResourceBlockCacheModel implements CacheModel<ResourceBlock>,
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,12 +50,10 @@ public class ResourceBlockCacheModel
 			return false;
 		}
 
-		ResourceBlockCacheModel resourceBlockCacheModel =
-			(ResourceBlockCacheModel)obj;
+		ResourceBlockCacheModel resourceBlockCacheModel = (ResourceBlockCacheModel)obj;
 
 		if ((resourceBlockId == resourceBlockCacheModel.resourceBlockId) &&
-			(mvccVersion == resourceBlockCacheModel.mvccVersion)) {
-
+				(mvccVersion == resourceBlockCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -147,7 +146,8 @@ public class ResourceBlockCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(resourceBlockId);
@@ -180,5 +180,4 @@ public class ResourceBlockCacheModel
 	public String name;
 	public String permissionsHash;
 	public long referenceCount;
-
 }

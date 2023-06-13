@@ -16,7 +16,7 @@
 
 <%@ include file="/html/taglib/ui/breadcrumb/init.jsp" %>
 
-<nav aria-label="<%= portletDisplay.getTitle() %>" id="<portlet:namespace />breadcrumbs-defaultScreen">
+<div id="<portlet:namespace />breadcrumbs-defaultScreen">
 	<c:if test="<%= !breadcrumbEntries.isEmpty() %>">
 
 		<%
@@ -31,4 +31,4 @@
 
 		<%= renderedDDMTemplate %>
 	</c:if>
-</nav>
+</div>

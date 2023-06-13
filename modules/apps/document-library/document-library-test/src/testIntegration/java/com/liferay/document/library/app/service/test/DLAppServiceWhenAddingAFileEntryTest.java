@@ -29,6 +29,8 @@ import com.liferay.document.library.sync.constants.DLSyncConstants;
 import com.liferay.document.library.workflow.WorkflowHandlerInvocationCounter;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -389,6 +391,9 @@ public class DLAppServiceWhenAddingAFileEntryTest extends BaseDLAppTestCase {
 			StringPool.BLANK, null, 0, serviceContext);
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLAppServiceWhenAddingAFileEntryTest.class);
+
 	private long[] _fileEntryIds;
 
 	@DeleteAfterTestRun
@@ -418,15 +423,14 @@ public class DLAppServiceWhenAddingAFileEntryTest extends BaseDLAppTestCase {
 
 				_fileEntryIds[_index] = fileEntry.getFileEntryId();
 
-				if (DLAppServiceTestUtil.log.isDebugEnabled()) {
-					DLAppServiceTestUtil.log.debug("Added file " + _index);
+				if (_log.isDebugEnabled()) {
+					_log.debug("Added file " + _index);
 				}
 
 				_success = true;
 			}
 			catch (Exception e) {
-				DLAppServiceTestUtil.log.error(
-					"Unable to add file " + _index, e);
+				_log.error("Unable to add file " + _index, e);
 			}
 		}
 
@@ -459,17 +463,15 @@ public class DLAppServiceWhenAddingAFileEntryTest extends BaseDLAppTestCase {
 				String content = StringUtil.read(is);
 
 				if (CONTENT.equals(content)) {
-					if (DLAppServiceTestUtil.log.isDebugEnabled()) {
-						DLAppServiceTestUtil.log.debug(
-							"Retrieved file " + _index);
+					if (_log.isDebugEnabled()) {
+						_log.debug("Retrieved file " + _index);
 					}
 
 					_success = true;
 				}
 			}
 			catch (Exception e) {
-				DLAppServiceTestUtil.log.error(
-					"Unable to get file " + _index, e);
+				_log.error("Unable to get file " + _index, e);
 			}
 		}
 

@@ -1,17 +1,25 @@
-<#if getterUtil.getBoolean(Boolean.getData())>  </#if>
+#if ($getterUtil.getBoolean($Boolean.getData()))
 
-<#assign Date_Data = getterUtil.getString(Date.getData())> <#if validator.isNotNull(Date_Data)> <#assign Date_DateObj = dateUtil.parseDate("yyyy-MM-dd", Date_Data, locale)> ${dateUtil.getDate(Date_DateObj, "dd MMM yyyy - HH:mm:ss", locale)} </#if>
+#end
+#set ($Date_DateObj = $dateUtil.newDate($getterUtil.getLong($Date.getData())))
 
-${HTML.getData()}
+$dateUtil.getDate($Date_DateObj, "dd MMM yyyy - HH:mm:ss", $locale)
+$Decimal.getData()
+<a href="$Documents_and_Media.getData()">
 
-<#if Image.getData()?? && Image.getData() != ""> <img alt="${Image.getAttribute("alt")}" data-fileentryid="${Image.getAttribute("fileEntryId")}" src="${Image.getData()}" /> </#if>
+$languageUtil.format($locale, "download-x", "Documents and Media")
 
-${Integer.getData()}
+</a>
+$HTML.getData()
+<img alt="Image" src="$Image.getData()" />
+$Integer.getData()
+<a href="$Link_to_Page.getFriendlyUrl()">
 
-<a href="${LinktoPage.getFriendlyUrl()}"> Link to Page </a>
+Link to Page
 
-${Number.getData()}
-${Radio.getData()}
-${Select.getData()}
-${Text.getData()}
-${TextBox.getData()}
+</a>
+$Number.getData()
+$Radio.getData()
+$Select.getData()
+$Text.getData()
+$Text_Box.getData()

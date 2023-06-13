@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
-import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -56,16 +55,15 @@ public class UpgradeImageTypeContent extends UpgradeProcess {
 	protected void copyJournalArticleImagesToJournalRepository()
 		throws Exception {
 
-		StringBundler sb = new StringBundler(8);
+		StringBundler sb = new StringBundler(7);
 
 		sb.append("select JournalArticleImage.articleImageId, ");
 		sb.append("JournalArticleImage.groupId, ");
-		sb.append("JournalArticleImage.companyId, ");
 		sb.append("JournalArticle.resourcePrimKey, JournalArticle.userId ");
 		sb.append("from JournalArticleImage inner join JournalArticle on ");
-		sb.append("(JournalArticle.groupId = JournalArticleImage.groupId and ");
-		sb.append("JournalArticle.articleId = JournalArticleImage.articleId ");
-		sb.append("and JournalArticle.version = JournalArticleImage.version)");
+		sb.append("(JournalArticle.groupId=JournalArticleImage.groupId and ");
+		sb.append("JournalArticle.articleId=JournalArticleImage.articleId ");
+		sb.append("and JournalArticle.version=JournalArticleImage.version)");
 
 		List<SaveImageFileEntryCallable> saveImageFileEntryCallables =
 			new ArrayList<>();
@@ -76,12 +74,10 @@ public class UpgradeImageTypeContent extends UpgradeProcess {
 
 			while (rs1.next()) {
 				long articleImageId = rs1.getLong(1);
-				long groupId = rs1.getLong(2);
-				long companyId = rs1.getLong(3);
-				long resourcePrimKey = rs1.getLong(4);
 
-				long userId = PortalUtil.getValidUserId(
-					companyId, rs1.getLong(5));
+				long groupId = rs1.getLong(2);
+				long resourcePrimKey = rs1.getLong(3);
+				long userId = rs1.getLong(4);
 
 				long folderId = _journalArticleImageUpgradeUtil.getFolderId(
 					userId, groupId, resourcePrimKey);

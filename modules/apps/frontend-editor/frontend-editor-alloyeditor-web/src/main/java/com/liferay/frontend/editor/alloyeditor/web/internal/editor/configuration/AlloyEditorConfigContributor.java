@@ -21,9 +21,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -32,7 +30,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -76,13 +73,6 @@ public class AlloyEditorConfigContributor
 			"toolbars", getToolbarsJSONObject(themeDisplay.getLocale()));
 	}
 
-	@Activate
-	protected void activate() {
-		_aggregateResourceBundleLoader = new AggregateResourceBundleLoader(
-			_resourceBundleLoader,
-			ResourceBundleLoaderUtil.getPortalResourceBundleLoader());
-	}
-
 	protected JSONObject getStyleFormatJSONObject(
 		String styleFormatName, String element, String cssClass, int type) {
 
@@ -100,8 +90,7 @@ public class AlloyEditorConfigContributor
 		ResourceBundle resourceBundle = null;
 
 		try {
-			resourceBundle = _aggregateResourceBundleLoader.loadResourceBundle(
-				locale);
+			resourceBundle = _resourceBundleLoader.loadResourceBundle(locale);
 		}
 		catch (MissingResourceException mre) {
 			resourceBundle = ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE;
@@ -236,8 +225,7 @@ public class AlloyEditorConfigContributor
 		jsonObject.put(
 			"buttons",
 			toJSONArray(
-				"['imageLeft', 'imageCenter', 'imageRight', 'linkBrowse', " +
-					"'imageAlt']"));
+				"['imageLeft', 'imageCenter', 'imageRight', 'linkBrowse']"));
 		jsonObject.put("name", "image");
 		jsonObject.put("setPosition", "AlloyEditor.SelectionSetPosition.image");
 		jsonObject.put("test", "AlloyEditor.SelectionTest.image");
@@ -311,8 +299,6 @@ public class AlloyEditorConfigContributor
 	private static final int _CKEDITOR_STYLE_BLOCK = 1;
 
 	private static final int _CKEDITOR_STYLE_INLINE = 2;
-
-	private ResourceBundleLoader _aggregateResourceBundleLoader;
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,

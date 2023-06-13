@@ -40,7 +40,7 @@ import java.util.List;
  * @param  <T> the model's type
  */
 public interface SingleModelMessageMapper<T>
-	extends ActionMapper, MessageMapper<SingleModel<T>> {
+	extends MessageMapper<SingleModel<T>>, ActionMapper {
 
 	/**
 	 * Maps a resource's boolean field to its JSON object representation.

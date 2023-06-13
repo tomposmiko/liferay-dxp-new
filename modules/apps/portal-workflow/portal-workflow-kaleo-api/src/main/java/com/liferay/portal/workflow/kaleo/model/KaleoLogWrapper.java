@@ -16,16 +16,12 @@ package com.liferay.portal.workflow.kaleo.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -37,20 +33,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class KaleoLogWrapper implements KaleoLog, ModelWrapper<KaleoLog> {
-
+public class KaleoLogWrapper extends BaseModelWrapper<KaleoLog>
+	implements KaleoLog, ModelWrapper<KaleoLog> {
 	public KaleoLogWrapper(KaleoLog kaleoLog) {
-		_kaleoLog = kaleoLog;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return KaleoLog.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return KaleoLog.class.getName();
+		super(kaleoLog);
 	}
 
 	@Override
@@ -66,12 +52,10 @@ public class KaleoLogWrapper implements KaleoLog, ModelWrapper<KaleoLog> {
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("kaleoClassName", getKaleoClassName());
 		attributes.put("kaleoClassPK", getKaleoClassPK());
-		attributes.put(
-			"kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
+		attributes.put("kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
 		attributes.put("kaleoInstanceId", getKaleoInstanceId());
 		attributes.put("kaleoInstanceTokenId", getKaleoInstanceTokenId());
-		attributes.put(
-			"kaleoTaskInstanceTokenId", getKaleoTaskInstanceTokenId());
+		attributes.put("kaleoTaskInstanceTokenId", getKaleoTaskInstanceTokenId());
 		attributes.put("kaleoNodeName", getKaleoNodeName());
 		attributes.put("terminalKaleoNode", isTerminalKaleoNode());
 		attributes.put("kaleoActionId", getKaleoActionId());
@@ -79,11 +63,10 @@ public class KaleoLogWrapper implements KaleoLog, ModelWrapper<KaleoLog> {
 		attributes.put("kaleoActionDescription", getKaleoActionDescription());
 		attributes.put("previousKaleoNodeId", getPreviousKaleoNodeId());
 		attributes.put("previousKaleoNodeName", getPreviousKaleoNodeName());
-		attributes.put(
-			"previousAssigneeClassName", getPreviousAssigneeClassName());
+		attributes.put("previousAssigneeClassName",
+			getPreviousAssigneeClassName());
 		attributes.put("previousAssigneeClassPK", getPreviousAssigneeClassPK());
-		attributes.put(
-			"currentAssigneeClassName", getCurrentAssigneeClassName());
+		attributes.put("currentAssigneeClassName", getCurrentAssigneeClassName());
 		attributes.put("currentAssigneeClassPK", getCurrentAssigneeClassPK());
 		attributes.put("type", getType());
 		attributes.put("comment", getComment());
@@ -152,7 +135,7 @@ public class KaleoLogWrapper implements KaleoLog, ModelWrapper<KaleoLog> {
 		}
 
 		Long kaleoDefinitionVersionId = (Long)attributes.get(
-			"kaleoDefinitionVersionId");
+				"kaleoDefinitionVersionId");
 
 		if (kaleoDefinitionVersionId != null) {
 			setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
@@ -164,15 +147,14 @@ public class KaleoLogWrapper implements KaleoLog, ModelWrapper<KaleoLog> {
 			setKaleoInstanceId(kaleoInstanceId);
 		}
 
-		Long kaleoInstanceTokenId = (Long)attributes.get(
-			"kaleoInstanceTokenId");
+		Long kaleoInstanceTokenId = (Long)attributes.get("kaleoInstanceTokenId");
 
 		if (kaleoInstanceTokenId != null) {
 			setKaleoInstanceTokenId(kaleoInstanceTokenId);
 		}
 
 		Long kaleoTaskInstanceTokenId = (Long)attributes.get(
-			"kaleoTaskInstanceTokenId");
+				"kaleoTaskInstanceTokenId");
 
 		if (kaleoTaskInstanceTokenId != null) {
 			setKaleoTaskInstanceTokenId(kaleoTaskInstanceTokenId);
@@ -184,8 +166,7 @@ public class KaleoLogWrapper implements KaleoLog, ModelWrapper<KaleoLog> {
 			setKaleoNodeName(kaleoNodeName);
 		}
 
-		Boolean terminalKaleoNode = (Boolean)attributes.get(
-			"terminalKaleoNode");
+		Boolean terminalKaleoNode = (Boolean)attributes.get("terminalKaleoNode");
 
 		if (terminalKaleoNode != null) {
 			setTerminalKaleoNode(terminalKaleoNode);
@@ -204,7 +185,7 @@ public class KaleoLogWrapper implements KaleoLog, ModelWrapper<KaleoLog> {
 		}
 
 		String kaleoActionDescription = (String)attributes.get(
-			"kaleoActionDescription");
+				"kaleoActionDescription");
 
 		if (kaleoActionDescription != null) {
 			setKaleoActionDescription(kaleoActionDescription);
@@ -217,35 +198,35 @@ public class KaleoLogWrapper implements KaleoLog, ModelWrapper<KaleoLog> {
 		}
 
 		String previousKaleoNodeName = (String)attributes.get(
-			"previousKaleoNodeName");
+				"previousKaleoNodeName");
 
 		if (previousKaleoNodeName != null) {
 			setPreviousKaleoNodeName(previousKaleoNodeName);
 		}
 
 		String previousAssigneeClassName = (String)attributes.get(
-			"previousAssigneeClassName");
+				"previousAssigneeClassName");
 
 		if (previousAssigneeClassName != null) {
 			setPreviousAssigneeClassName(previousAssigneeClassName);
 		}
 
 		Long previousAssigneeClassPK = (Long)attributes.get(
-			"previousAssigneeClassPK");
+				"previousAssigneeClassPK");
 
 		if (previousAssigneeClassPK != null) {
 			setPreviousAssigneeClassPK(previousAssigneeClassPK);
 		}
 
 		String currentAssigneeClassName = (String)attributes.get(
-			"currentAssigneeClassName");
+				"currentAssigneeClassName");
 
 		if (currentAssigneeClassName != null) {
 			setCurrentAssigneeClassName(currentAssigneeClassName);
 		}
 
 		Long currentAssigneeClassPK = (Long)attributes.get(
-			"currentAssigneeClassPK");
+				"currentAssigneeClassPK");
 
 		if (currentAssigneeClassPK != null) {
 			setCurrentAssigneeClassPK(currentAssigneeClassPK);
@@ -288,797 +269,663 @@ public class KaleoLogWrapper implements KaleoLog, ModelWrapper<KaleoLog> {
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new KaleoLogWrapper((KaleoLog)_kaleoLog.clone());
-	}
-
-	@Override
-	public int compareTo(KaleoLog kaleoLog) {
-		return _kaleoLog.compareTo(kaleoLog);
-	}
-
 	/**
-	 * Returns the comment of this kaleo log.
-	 *
-	 * @return the comment of this kaleo log
-	 */
+	* Returns the comment of this kaleo log.
+	*
+	* @return the comment of this kaleo log
+	*/
 	@Override
 	public String getComment() {
-		return _kaleoLog.getComment();
+		return model.getComment();
 	}
 
 	/**
-	 * Returns the company ID of this kaleo log.
-	 *
-	 * @return the company ID of this kaleo log
-	 */
+	* Returns the company ID of this kaleo log.
+	*
+	* @return the company ID of this kaleo log
+	*/
 	@Override
 	public long getCompanyId() {
-		return _kaleoLog.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the create date of this kaleo log.
-	 *
-	 * @return the create date of this kaleo log
-	 */
+	* Returns the create date of this kaleo log.
+	*
+	* @return the create date of this kaleo log
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _kaleoLog.getCreateDate();
+		return model.getCreateDate();
 	}
 
 	/**
-	 * Returns the current assignee class name of this kaleo log.
-	 *
-	 * @return the current assignee class name of this kaleo log
-	 */
+	* Returns the current assignee class name of this kaleo log.
+	*
+	* @return the current assignee class name of this kaleo log
+	*/
 	@Override
 	public String getCurrentAssigneeClassName() {
-		return _kaleoLog.getCurrentAssigneeClassName();
+		return model.getCurrentAssigneeClassName();
 	}
 
 	/**
-	 * Returns the current assignee class pk of this kaleo log.
-	 *
-	 * @return the current assignee class pk of this kaleo log
-	 */
+	* Returns the current assignee class pk of this kaleo log.
+	*
+	* @return the current assignee class pk of this kaleo log
+	*/
 	@Override
 	public long getCurrentAssigneeClassPK() {
-		return _kaleoLog.getCurrentAssigneeClassPK();
+		return model.getCurrentAssigneeClassPK();
 	}
 
 	/**
-	 * Returns the duration of this kaleo log.
-	 *
-	 * @return the duration of this kaleo log
-	 */
+	* Returns the duration of this kaleo log.
+	*
+	* @return the duration of this kaleo log
+	*/
 	@Override
 	public long getDuration() {
-		return _kaleoLog.getDuration();
+		return model.getDuration();
 	}
 
 	/**
-	 * Returns the end date of this kaleo log.
-	 *
-	 * @return the end date of this kaleo log
-	 */
+	* Returns the end date of this kaleo log.
+	*
+	* @return the end date of this kaleo log
+	*/
 	@Override
 	public Date getEndDate() {
-		return _kaleoLog.getEndDate();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _kaleoLog.getExpandoBridge();
+		return model.getEndDate();
 	}
 
 	/**
-	 * Returns the group ID of this kaleo log.
-	 *
-	 * @return the group ID of this kaleo log
-	 */
+	* Returns the group ID of this kaleo log.
+	*
+	* @return the group ID of this kaleo log
+	*/
 	@Override
 	public long getGroupId() {
-		return _kaleoLog.getGroupId();
+		return model.getGroupId();
 	}
 
 	/**
-	 * Returns the kaleo action description of this kaleo log.
-	 *
-	 * @return the kaleo action description of this kaleo log
-	 */
+	* Returns the kaleo action description of this kaleo log.
+	*
+	* @return the kaleo action description of this kaleo log
+	*/
 	@Override
 	public String getKaleoActionDescription() {
-		return _kaleoLog.getKaleoActionDescription();
+		return model.getKaleoActionDescription();
 	}
 
 	/**
-	 * Returns the kaleo action ID of this kaleo log.
-	 *
-	 * @return the kaleo action ID of this kaleo log
-	 */
+	* Returns the kaleo action ID of this kaleo log.
+	*
+	* @return the kaleo action ID of this kaleo log
+	*/
 	@Override
 	public long getKaleoActionId() {
-		return _kaleoLog.getKaleoActionId();
+		return model.getKaleoActionId();
 	}
 
 	/**
-	 * Returns the kaleo action name of this kaleo log.
-	 *
-	 * @return the kaleo action name of this kaleo log
-	 */
+	* Returns the kaleo action name of this kaleo log.
+	*
+	* @return the kaleo action name of this kaleo log
+	*/
 	@Override
 	public String getKaleoActionName() {
-		return _kaleoLog.getKaleoActionName();
+		return model.getKaleoActionName();
 	}
 
 	/**
-	 * Returns the kaleo class name of this kaleo log.
-	 *
-	 * @return the kaleo class name of this kaleo log
-	 */
+	* Returns the kaleo class name of this kaleo log.
+	*
+	* @return the kaleo class name of this kaleo log
+	*/
 	@Override
 	public String getKaleoClassName() {
-		return _kaleoLog.getKaleoClassName();
+		return model.getKaleoClassName();
 	}
 
 	/**
-	 * Returns the kaleo class pk of this kaleo log.
-	 *
-	 * @return the kaleo class pk of this kaleo log
-	 */
+	* Returns the kaleo class pk of this kaleo log.
+	*
+	* @return the kaleo class pk of this kaleo log
+	*/
 	@Override
 	public long getKaleoClassPK() {
-		return _kaleoLog.getKaleoClassPK();
+		return model.getKaleoClassPK();
 	}
 
 	/**
-	 * Returns the kaleo definition version ID of this kaleo log.
-	 *
-	 * @return the kaleo definition version ID of this kaleo log
-	 */
+	* Returns the kaleo definition version ID of this kaleo log.
+	*
+	* @return the kaleo definition version ID of this kaleo log
+	*/
 	@Override
 	public long getKaleoDefinitionVersionId() {
-		return _kaleoLog.getKaleoDefinitionVersionId();
+		return model.getKaleoDefinitionVersionId();
 	}
 
 	/**
-	 * Returns the kaleo instance ID of this kaleo log.
-	 *
-	 * @return the kaleo instance ID of this kaleo log
-	 */
+	* Returns the kaleo instance ID of this kaleo log.
+	*
+	* @return the kaleo instance ID of this kaleo log
+	*/
 	@Override
 	public long getKaleoInstanceId() {
-		return _kaleoLog.getKaleoInstanceId();
+		return model.getKaleoInstanceId();
 	}
 
 	/**
-	 * Returns the kaleo instance token ID of this kaleo log.
-	 *
-	 * @return the kaleo instance token ID of this kaleo log
-	 */
+	* Returns the kaleo instance token ID of this kaleo log.
+	*
+	* @return the kaleo instance token ID of this kaleo log
+	*/
 	@Override
 	public long getKaleoInstanceTokenId() {
-		return _kaleoLog.getKaleoInstanceTokenId();
+		return model.getKaleoInstanceTokenId();
 	}
 
 	/**
-	 * Returns the kaleo log ID of this kaleo log.
-	 *
-	 * @return the kaleo log ID of this kaleo log
-	 */
+	* Returns the kaleo log ID of this kaleo log.
+	*
+	* @return the kaleo log ID of this kaleo log
+	*/
 	@Override
 	public long getKaleoLogId() {
-		return _kaleoLog.getKaleoLogId();
+		return model.getKaleoLogId();
 	}
 
 	/**
-	 * Returns the kaleo node name of this kaleo log.
-	 *
-	 * @return the kaleo node name of this kaleo log
-	 */
+	* Returns the kaleo node name of this kaleo log.
+	*
+	* @return the kaleo node name of this kaleo log
+	*/
 	@Override
 	public String getKaleoNodeName() {
-		return _kaleoLog.getKaleoNodeName();
+		return model.getKaleoNodeName();
 	}
 
 	/**
-	 * Returns the kaleo task instance token ID of this kaleo log.
-	 *
-	 * @return the kaleo task instance token ID of this kaleo log
-	 */
+	* Returns the kaleo task instance token ID of this kaleo log.
+	*
+	* @return the kaleo task instance token ID of this kaleo log
+	*/
 	@Override
 	public long getKaleoTaskInstanceTokenId() {
-		return _kaleoLog.getKaleoTaskInstanceTokenId();
+		return model.getKaleoTaskInstanceTokenId();
 	}
 
 	/**
-	 * Returns the modified date of this kaleo log.
-	 *
-	 * @return the modified date of this kaleo log
-	 */
+	* Returns the modified date of this kaleo log.
+	*
+	* @return the modified date of this kaleo log
+	*/
 	@Override
 	public Date getModifiedDate() {
-		return _kaleoLog.getModifiedDate();
+		return model.getModifiedDate();
 	}
 
 	/**
-	 * Returns the previous assignee class name of this kaleo log.
-	 *
-	 * @return the previous assignee class name of this kaleo log
-	 */
+	* Returns the previous assignee class name of this kaleo log.
+	*
+	* @return the previous assignee class name of this kaleo log
+	*/
 	@Override
 	public String getPreviousAssigneeClassName() {
-		return _kaleoLog.getPreviousAssigneeClassName();
+		return model.getPreviousAssigneeClassName();
 	}
 
 	/**
-	 * Returns the previous assignee class pk of this kaleo log.
-	 *
-	 * @return the previous assignee class pk of this kaleo log
-	 */
+	* Returns the previous assignee class pk of this kaleo log.
+	*
+	* @return the previous assignee class pk of this kaleo log
+	*/
 	@Override
 	public long getPreviousAssigneeClassPK() {
-		return _kaleoLog.getPreviousAssigneeClassPK();
+		return model.getPreviousAssigneeClassPK();
 	}
 
 	/**
-	 * Returns the previous kaleo node ID of this kaleo log.
-	 *
-	 * @return the previous kaleo node ID of this kaleo log
-	 */
+	* Returns the previous kaleo node ID of this kaleo log.
+	*
+	* @return the previous kaleo node ID of this kaleo log
+	*/
 	@Override
 	public long getPreviousKaleoNodeId() {
-		return _kaleoLog.getPreviousKaleoNodeId();
+		return model.getPreviousKaleoNodeId();
 	}
 
 	/**
-	 * Returns the previous kaleo node name of this kaleo log.
-	 *
-	 * @return the previous kaleo node name of this kaleo log
-	 */
+	* Returns the previous kaleo node name of this kaleo log.
+	*
+	* @return the previous kaleo node name of this kaleo log
+	*/
 	@Override
 	public String getPreviousKaleoNodeName() {
-		return _kaleoLog.getPreviousKaleoNodeName();
+		return model.getPreviousKaleoNodeName();
 	}
 
 	/**
-	 * Returns the primary key of this kaleo log.
-	 *
-	 * @return the primary key of this kaleo log
-	 */
+	* Returns the primary key of this kaleo log.
+	*
+	* @return the primary key of this kaleo log
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _kaleoLog.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _kaleoLog.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the start date of this kaleo log.
-	 *
-	 * @return the start date of this kaleo log
-	 */
+	* Returns the start date of this kaleo log.
+	*
+	* @return the start date of this kaleo log
+	*/
 	@Override
 	public Date getStartDate() {
-		return _kaleoLog.getStartDate();
+		return model.getStartDate();
 	}
 
 	/**
-	 * Returns the terminal kaleo node of this kaleo log.
-	 *
-	 * @return the terminal kaleo node of this kaleo log
-	 */
+	* Returns the terminal kaleo node of this kaleo log.
+	*
+	* @return the terminal kaleo node of this kaleo log
+	*/
 	@Override
 	public boolean getTerminalKaleoNode() {
-		return _kaleoLog.getTerminalKaleoNode();
+		return model.getTerminalKaleoNode();
 	}
 
 	/**
-	 * Returns the type of this kaleo log.
-	 *
-	 * @return the type of this kaleo log
-	 */
+	* Returns the type of this kaleo log.
+	*
+	* @return the type of this kaleo log
+	*/
 	@Override
 	public String getType() {
-		return _kaleoLog.getType();
+		return model.getType();
 	}
 
 	/**
-	 * Returns the user ID of this kaleo log.
-	 *
-	 * @return the user ID of this kaleo log
-	 */
+	* Returns the user ID of this kaleo log.
+	*
+	* @return the user ID of this kaleo log
+	*/
 	@Override
 	public long getUserId() {
-		return _kaleoLog.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this kaleo log.
-	 *
-	 * @return the user name of this kaleo log
-	 */
+	* Returns the user name of this kaleo log.
+	*
+	* @return the user name of this kaleo log
+	*/
 	@Override
 	public String getUserName() {
-		return _kaleoLog.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this kaleo log.
-	 *
-	 * @return the user uuid of this kaleo log
-	 */
+	* Returns the user uuid of this kaleo log.
+	*
+	* @return the user uuid of this kaleo log
+	*/
 	@Override
 	public String getUserUuid() {
-		return _kaleoLog.getUserUuid();
+		return model.getUserUuid();
 	}
 
 	/**
-	 * Returns the workflow context of this kaleo log.
-	 *
-	 * @return the workflow context of this kaleo log
-	 */
+	* Returns the workflow context of this kaleo log.
+	*
+	* @return the workflow context of this kaleo log
+	*/
 	@Override
 	public String getWorkflowContext() {
-		return _kaleoLog.getWorkflowContext();
-	}
-
-	@Override
-	public int hashCode() {
-		return _kaleoLog.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _kaleoLog.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _kaleoLog.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _kaleoLog.isNew();
+		return model.getWorkflowContext();
 	}
 
 	/**
-	 * Returns <code>true</code> if this kaleo log is terminal kaleo node.
-	 *
-	 * @return <code>true</code> if this kaleo log is terminal kaleo node; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this kaleo log is terminal kaleo node.
+	*
+	* @return <code>true</code> if this kaleo log is terminal kaleo node; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isTerminalKaleoNode() {
-		return _kaleoLog.isTerminalKaleoNode();
+		return model.isTerminalKaleoNode();
 	}
 
 	@Override
 	public void persist() {
-		_kaleoLog.persist();
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_kaleoLog.setCachedModel(cachedModel);
+		model.persist();
 	}
 
 	/**
-	 * Sets the comment of this kaleo log.
-	 *
-	 * @param comment the comment of this kaleo log
-	 */
+	* Sets the comment of this kaleo log.
+	*
+	* @param comment the comment of this kaleo log
+	*/
 	@Override
 	public void setComment(String comment) {
-		_kaleoLog.setComment(comment);
+		model.setComment(comment);
 	}
 
 	/**
-	 * Sets the company ID of this kaleo log.
-	 *
-	 * @param companyId the company ID of this kaleo log
-	 */
+	* Sets the company ID of this kaleo log.
+	*
+	* @param companyId the company ID of this kaleo log
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_kaleoLog.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this kaleo log.
-	 *
-	 * @param createDate the create date of this kaleo log
-	 */
+	* Sets the create date of this kaleo log.
+	*
+	* @param createDate the create date of this kaleo log
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_kaleoLog.setCreateDate(createDate);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the current assignee class name of this kaleo log.
-	 *
-	 * @param currentAssigneeClassName the current assignee class name of this kaleo log
-	 */
+	* Sets the current assignee class name of this kaleo log.
+	*
+	* @param currentAssigneeClassName the current assignee class name of this kaleo log
+	*/
 	@Override
 	public void setCurrentAssigneeClassName(String currentAssigneeClassName) {
-		_kaleoLog.setCurrentAssigneeClassName(currentAssigneeClassName);
+		model.setCurrentAssigneeClassName(currentAssigneeClassName);
 	}
 
 	/**
-	 * Sets the current assignee class pk of this kaleo log.
-	 *
-	 * @param currentAssigneeClassPK the current assignee class pk of this kaleo log
-	 */
+	* Sets the current assignee class pk of this kaleo log.
+	*
+	* @param currentAssigneeClassPK the current assignee class pk of this kaleo log
+	*/
 	@Override
 	public void setCurrentAssigneeClassPK(long currentAssigneeClassPK) {
-		_kaleoLog.setCurrentAssigneeClassPK(currentAssigneeClassPK);
+		model.setCurrentAssigneeClassPK(currentAssigneeClassPK);
 	}
 
 	/**
-	 * Sets the duration of this kaleo log.
-	 *
-	 * @param duration the duration of this kaleo log
-	 */
+	* Sets the duration of this kaleo log.
+	*
+	* @param duration the duration of this kaleo log
+	*/
 	@Override
 	public void setDuration(long duration) {
-		_kaleoLog.setDuration(duration);
+		model.setDuration(duration);
 	}
 
 	/**
-	 * Sets the end date of this kaleo log.
-	 *
-	 * @param endDate the end date of this kaleo log
-	 */
+	* Sets the end date of this kaleo log.
+	*
+	* @param endDate the end date of this kaleo log
+	*/
 	@Override
 	public void setEndDate(Date endDate) {
-		_kaleoLog.setEndDate(endDate);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_kaleoLog.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_kaleoLog.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_kaleoLog.setExpandoBridgeAttributes(serviceContext);
+		model.setEndDate(endDate);
 	}
 
 	/**
-	 * Sets the group ID of this kaleo log.
-	 *
-	 * @param groupId the group ID of this kaleo log
-	 */
+	* Sets the group ID of this kaleo log.
+	*
+	* @param groupId the group ID of this kaleo log
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_kaleoLog.setGroupId(groupId);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the kaleo action description of this kaleo log.
-	 *
-	 * @param kaleoActionDescription the kaleo action description of this kaleo log
-	 */
+	* Sets the kaleo action description of this kaleo log.
+	*
+	* @param kaleoActionDescription the kaleo action description of this kaleo log
+	*/
 	@Override
 	public void setKaleoActionDescription(String kaleoActionDescription) {
-		_kaleoLog.setKaleoActionDescription(kaleoActionDescription);
+		model.setKaleoActionDescription(kaleoActionDescription);
 	}
 
 	/**
-	 * Sets the kaleo action ID of this kaleo log.
-	 *
-	 * @param kaleoActionId the kaleo action ID of this kaleo log
-	 */
+	* Sets the kaleo action ID of this kaleo log.
+	*
+	* @param kaleoActionId the kaleo action ID of this kaleo log
+	*/
 	@Override
 	public void setKaleoActionId(long kaleoActionId) {
-		_kaleoLog.setKaleoActionId(kaleoActionId);
+		model.setKaleoActionId(kaleoActionId);
 	}
 
 	/**
-	 * Sets the kaleo action name of this kaleo log.
-	 *
-	 * @param kaleoActionName the kaleo action name of this kaleo log
-	 */
+	* Sets the kaleo action name of this kaleo log.
+	*
+	* @param kaleoActionName the kaleo action name of this kaleo log
+	*/
 	@Override
 	public void setKaleoActionName(String kaleoActionName) {
-		_kaleoLog.setKaleoActionName(kaleoActionName);
+		model.setKaleoActionName(kaleoActionName);
 	}
 
 	/**
-	 * Sets the kaleo class name of this kaleo log.
-	 *
-	 * @param kaleoClassName the kaleo class name of this kaleo log
-	 */
+	* Sets the kaleo class name of this kaleo log.
+	*
+	* @param kaleoClassName the kaleo class name of this kaleo log
+	*/
 	@Override
 	public void setKaleoClassName(String kaleoClassName) {
-		_kaleoLog.setKaleoClassName(kaleoClassName);
+		model.setKaleoClassName(kaleoClassName);
 	}
 
 	/**
-	 * Sets the kaleo class pk of this kaleo log.
-	 *
-	 * @param kaleoClassPK the kaleo class pk of this kaleo log
-	 */
+	* Sets the kaleo class pk of this kaleo log.
+	*
+	* @param kaleoClassPK the kaleo class pk of this kaleo log
+	*/
 	@Override
 	public void setKaleoClassPK(long kaleoClassPK) {
-		_kaleoLog.setKaleoClassPK(kaleoClassPK);
+		model.setKaleoClassPK(kaleoClassPK);
 	}
 
 	/**
-	 * Sets the kaleo definition version ID of this kaleo log.
-	 *
-	 * @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo log
-	 */
+	* Sets the kaleo definition version ID of this kaleo log.
+	*
+	* @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo log
+	*/
 	@Override
 	public void setKaleoDefinitionVersionId(long kaleoDefinitionVersionId) {
-		_kaleoLog.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
+		model.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
-	 * Sets the kaleo instance ID of this kaleo log.
-	 *
-	 * @param kaleoInstanceId the kaleo instance ID of this kaleo log
-	 */
+	* Sets the kaleo instance ID of this kaleo log.
+	*
+	* @param kaleoInstanceId the kaleo instance ID of this kaleo log
+	*/
 	@Override
 	public void setKaleoInstanceId(long kaleoInstanceId) {
-		_kaleoLog.setKaleoInstanceId(kaleoInstanceId);
+		model.setKaleoInstanceId(kaleoInstanceId);
 	}
 
 	/**
-	 * Sets the kaleo instance token ID of this kaleo log.
-	 *
-	 * @param kaleoInstanceTokenId the kaleo instance token ID of this kaleo log
-	 */
+	* Sets the kaleo instance token ID of this kaleo log.
+	*
+	* @param kaleoInstanceTokenId the kaleo instance token ID of this kaleo log
+	*/
 	@Override
 	public void setKaleoInstanceTokenId(long kaleoInstanceTokenId) {
-		_kaleoLog.setKaleoInstanceTokenId(kaleoInstanceTokenId);
+		model.setKaleoInstanceTokenId(kaleoInstanceTokenId);
 	}
 
 	/**
-	 * Sets the kaleo log ID of this kaleo log.
-	 *
-	 * @param kaleoLogId the kaleo log ID of this kaleo log
-	 */
+	* Sets the kaleo log ID of this kaleo log.
+	*
+	* @param kaleoLogId the kaleo log ID of this kaleo log
+	*/
 	@Override
 	public void setKaleoLogId(long kaleoLogId) {
-		_kaleoLog.setKaleoLogId(kaleoLogId);
+		model.setKaleoLogId(kaleoLogId);
 	}
 
 	/**
-	 * Sets the kaleo node name of this kaleo log.
-	 *
-	 * @param kaleoNodeName the kaleo node name of this kaleo log
-	 */
+	* Sets the kaleo node name of this kaleo log.
+	*
+	* @param kaleoNodeName the kaleo node name of this kaleo log
+	*/
 	@Override
 	public void setKaleoNodeName(String kaleoNodeName) {
-		_kaleoLog.setKaleoNodeName(kaleoNodeName);
+		model.setKaleoNodeName(kaleoNodeName);
 	}
 
 	/**
-	 * Sets the kaleo task instance token ID of this kaleo log.
-	 *
-	 * @param kaleoTaskInstanceTokenId the kaleo task instance token ID of this kaleo log
-	 */
+	* Sets the kaleo task instance token ID of this kaleo log.
+	*
+	* @param kaleoTaskInstanceTokenId the kaleo task instance token ID of this kaleo log
+	*/
 	@Override
 	public void setKaleoTaskInstanceTokenId(long kaleoTaskInstanceTokenId) {
-		_kaleoLog.setKaleoTaskInstanceTokenId(kaleoTaskInstanceTokenId);
+		model.setKaleoTaskInstanceTokenId(kaleoTaskInstanceTokenId);
 	}
 
 	/**
-	 * Sets the modified date of this kaleo log.
-	 *
-	 * @param modifiedDate the modified date of this kaleo log
-	 */
+	* Sets the modified date of this kaleo log.
+	*
+	* @param modifiedDate the modified date of this kaleo log
+	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
-		_kaleoLog.setModifiedDate(modifiedDate);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_kaleoLog.setNew(n);
+		model.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	 * Sets the previous assignee class name of this kaleo log.
-	 *
-	 * @param previousAssigneeClassName the previous assignee class name of this kaleo log
-	 */
+	* Sets the previous assignee class name of this kaleo log.
+	*
+	* @param previousAssigneeClassName the previous assignee class name of this kaleo log
+	*/
 	@Override
 	public void setPreviousAssigneeClassName(String previousAssigneeClassName) {
-		_kaleoLog.setPreviousAssigneeClassName(previousAssigneeClassName);
+		model.setPreviousAssigneeClassName(previousAssigneeClassName);
 	}
 
 	/**
-	 * Sets the previous assignee class pk of this kaleo log.
-	 *
-	 * @param previousAssigneeClassPK the previous assignee class pk of this kaleo log
-	 */
+	* Sets the previous assignee class pk of this kaleo log.
+	*
+	* @param previousAssigneeClassPK the previous assignee class pk of this kaleo log
+	*/
 	@Override
 	public void setPreviousAssigneeClassPK(long previousAssigneeClassPK) {
-		_kaleoLog.setPreviousAssigneeClassPK(previousAssigneeClassPK);
+		model.setPreviousAssigneeClassPK(previousAssigneeClassPK);
 	}
 
 	/**
-	 * Sets the previous kaleo node ID of this kaleo log.
-	 *
-	 * @param previousKaleoNodeId the previous kaleo node ID of this kaleo log
-	 */
+	* Sets the previous kaleo node ID of this kaleo log.
+	*
+	* @param previousKaleoNodeId the previous kaleo node ID of this kaleo log
+	*/
 	@Override
 	public void setPreviousKaleoNodeId(long previousKaleoNodeId) {
-		_kaleoLog.setPreviousKaleoNodeId(previousKaleoNodeId);
+		model.setPreviousKaleoNodeId(previousKaleoNodeId);
 	}
 
 	/**
-	 * Sets the previous kaleo node name of this kaleo log.
-	 *
-	 * @param previousKaleoNodeName the previous kaleo node name of this kaleo log
-	 */
+	* Sets the previous kaleo node name of this kaleo log.
+	*
+	* @param previousKaleoNodeName the previous kaleo node name of this kaleo log
+	*/
 	@Override
 	public void setPreviousKaleoNodeName(String previousKaleoNodeName) {
-		_kaleoLog.setPreviousKaleoNodeName(previousKaleoNodeName);
+		model.setPreviousKaleoNodeName(previousKaleoNodeName);
 	}
 
 	/**
-	 * Sets the primary key of this kaleo log.
-	 *
-	 * @param primaryKey the primary key of this kaleo log
-	 */
+	* Sets the primary key of this kaleo log.
+	*
+	* @param primaryKey the primary key of this kaleo log
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_kaleoLog.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_kaleoLog.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the start date of this kaleo log.
-	 *
-	 * @param startDate the start date of this kaleo log
-	 */
+	* Sets the start date of this kaleo log.
+	*
+	* @param startDate the start date of this kaleo log
+	*/
 	@Override
 	public void setStartDate(Date startDate) {
-		_kaleoLog.setStartDate(startDate);
+		model.setStartDate(startDate);
 	}
 
 	/**
-	 * Sets whether this kaleo log is terminal kaleo node.
-	 *
-	 * @param terminalKaleoNode the terminal kaleo node of this kaleo log
-	 */
+	* Sets whether this kaleo log is terminal kaleo node.
+	*
+	* @param terminalKaleoNode the terminal kaleo node of this kaleo log
+	*/
 	@Override
 	public void setTerminalKaleoNode(boolean terminalKaleoNode) {
-		_kaleoLog.setTerminalKaleoNode(terminalKaleoNode);
+		model.setTerminalKaleoNode(terminalKaleoNode);
 	}
 
 	/**
-	 * Sets the type of this kaleo log.
-	 *
-	 * @param type the type of this kaleo log
-	 */
+	* Sets the type of this kaleo log.
+	*
+	* @param type the type of this kaleo log
+	*/
 	@Override
 	public void setType(String type) {
-		_kaleoLog.setType(type);
+		model.setType(type);
 	}
 
 	/**
-	 * Sets the user ID of this kaleo log.
-	 *
-	 * @param userId the user ID of this kaleo log
-	 */
+	* Sets the user ID of this kaleo log.
+	*
+	* @param userId the user ID of this kaleo log
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_kaleoLog.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this kaleo log.
-	 *
-	 * @param userName the user name of this kaleo log
-	 */
+	* Sets the user name of this kaleo log.
+	*
+	* @param userName the user name of this kaleo log
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_kaleoLog.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this kaleo log.
-	 *
-	 * @param userUuid the user uuid of this kaleo log
-	 */
+	* Sets the user uuid of this kaleo log.
+	*
+	* @param userUuid the user uuid of this kaleo log
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_kaleoLog.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	/**
-	 * Sets the workflow context of this kaleo log.
-	 *
-	 * @param workflowContext the workflow context of this kaleo log
-	 */
+	* Sets the workflow context of this kaleo log.
+	*
+	* @param workflowContext the workflow context of this kaleo log
+	*/
 	@Override
 	public void setWorkflowContext(String workflowContext) {
-		_kaleoLog.setWorkflowContext(workflowContext);
+		model.setWorkflowContext(workflowContext);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<KaleoLog> toCacheModel() {
-		return _kaleoLog.toCacheModel();
+	protected KaleoLogWrapper wrap(KaleoLog kaleoLog) {
+		return new KaleoLogWrapper(kaleoLog);
 	}
-
-	@Override
-	public KaleoLog toEscapedModel() {
-		return new KaleoLogWrapper(_kaleoLog.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _kaleoLog.toString();
-	}
-
-	@Override
-	public KaleoLog toUnescapedModel() {
-		return new KaleoLogWrapper(_kaleoLog.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _kaleoLog.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof KaleoLogWrapper)) {
-			return false;
-		}
-
-		KaleoLogWrapper kaleoLogWrapper = (KaleoLogWrapper)obj;
-
-		if (Objects.equals(_kaleoLog, kaleoLogWrapper._kaleoLog)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public KaleoLog getWrappedModel() {
-		return _kaleoLog;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _kaleoLog.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _kaleoLog.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_kaleoLog.resetOriginalValues();
-	}
-
-	private final KaleoLog _kaleoLog;
-
 }

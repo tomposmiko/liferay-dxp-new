@@ -21,6 +21,9 @@ import com.liferay.document.library.file.rank.model.DLFileRank;
 import com.liferay.document.library.file.rank.model.impl.DLFileRankImpl;
 import com.liferay.document.library.file.rank.model.impl.DLFileRankModelImpl;
 import com.liferay.document.library.file.rank.service.persistence.DLFileRankPersistence;
+
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -36,19 +39,14 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,26 +59,23 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see DLFileRankPersistence
+ * @see com.liferay.document.library.file.rank.service.persistence.DLFileRankUtil
  * @generated
  */
 @ProviderType
-public class DLFileRankPersistenceImpl
-	extends BasePersistenceImpl<DLFileRank> implements DLFileRankPersistence {
-
+public class DLFileRankPersistenceImpl extends BasePersistenceImpl<DLFileRank>
+	implements DLFileRankPersistence {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use <code>DLFileRankUtil</code> to access the document library file rank persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use {@link DLFileRankUtil} to access the document library file rank persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY =
-		DLFileRankImpl.class.getName();
-
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List1";
-
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List2";
-
+	public static final String FINDER_CLASS_NAME_ENTITY = DLFileRankImpl.class.getName();
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -103,7 +98,7 @@ public class DLFileRankPersistenceImpl
 	 * Returns a range of all the document library file ranks where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -120,7 +115,7 @@ public class DLFileRankPersistenceImpl
 	 * Returns an ordered range of all the document library file ranks where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -130,10 +125,8 @@ public class DLFileRankPersistenceImpl
 	 * @return the ordered range of matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByUserId(
-		long userId, int start, int end,
+	public List<DLFileRank> findByUserId(long userId, int start, int end,
 		OrderByComparator<DLFileRank> orderByComparator) {
-
 		return findByUserId(userId, start, end, orderByComparator, true);
 	}
 
@@ -141,7 +134,7 @@ public class DLFileRankPersistenceImpl
 	 * Returns an ordered range of all the document library file ranks where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -152,32 +145,29 @@ public class DLFileRankPersistenceImpl
 	 * @return the ordered range of matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByUserId(
-		long userId, int start, int end,
+	public List<DLFileRank> findByUserId(long userId, int start, int end,
 		OrderByComparator<DLFileRank> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUserId;
-			finderArgs = new Object[] {userId};
+			finderArgs = new Object[] { userId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUserId;
-			finderArgs = new Object[] {userId, start, end, orderByComparator};
+			finderArgs = new Object[] { userId, start, end, orderByComparator };
 		}
 
 		List<DLFileRank> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<DLFileRank>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<DLFileRank>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLFileRank dlFileRank : list) {
@@ -194,8 +184,8 @@ public class DLFileRankPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -206,10 +196,11 @@ public class DLFileRankPersistenceImpl
 			query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(DLFileRankModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -227,16 +218,16 @@ public class DLFileRankPersistenceImpl
 				qPos.add(userId);
 
 				if (!pagination) {
-					list = (List<DLFileRank>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<DLFileRank>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<DLFileRank>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<DLFileRank>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -265,10 +256,9 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank findByUserId_First(
-			long userId, OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank findByUserId_First(long userId,
+		OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
 		DLFileRank dlFileRank = fetchByUserId_First(userId, orderByComparator);
 
 		if (dlFileRank != null) {
@@ -295,9 +285,8 @@ public class DLFileRankPersistenceImpl
 	 * @return the first matching document library file rank, or <code>null</code> if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank fetchByUserId_First(
-		long userId, OrderByComparator<DLFileRank> orderByComparator) {
-
+	public DLFileRank fetchByUserId_First(long userId,
+		OrderByComparator<DLFileRank> orderByComparator) {
 		List<DLFileRank> list = findByUserId(userId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -316,10 +305,9 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank findByUserId_Last(
-			long userId, OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank findByUserId_Last(long userId,
+		OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
 		DLFileRank dlFileRank = fetchByUserId_Last(userId, orderByComparator);
 
 		if (dlFileRank != null) {
@@ -346,17 +334,16 @@ public class DLFileRankPersistenceImpl
 	 * @return the last matching document library file rank, or <code>null</code> if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank fetchByUserId_Last(
-		long userId, OrderByComparator<DLFileRank> orderByComparator) {
-
+	public DLFileRank fetchByUserId_Last(long userId,
+		OrderByComparator<DLFileRank> orderByComparator) {
 		int count = countByUserId(userId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<DLFileRank> list = findByUserId(
-			userId, count - 1, count, orderByComparator);
+		List<DLFileRank> list = findByUserId(userId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -375,11 +362,9 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a document library file rank with the primary key could not be found
 	 */
 	@Override
-	public DLFileRank[] findByUserId_PrevAndNext(
-			long fileRankId, long userId,
-			OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank[] findByUserId_PrevAndNext(long fileRankId, long userId,
+		OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
 		DLFileRank dlFileRank = findByPrimaryKey(fileRankId);
 
 		Session session = null;
@@ -389,13 +374,13 @@ public class DLFileRankPersistenceImpl
 
 			DLFileRank[] array = new DLFileRankImpl[3];
 
-			array[0] = getByUserId_PrevAndNext(
-				session, dlFileRank, userId, orderByComparator, true);
+			array[0] = getByUserId_PrevAndNext(session, dlFileRank, userId,
+					orderByComparator, true);
 
 			array[1] = dlFileRank;
 
-			array[2] = getByUserId_PrevAndNext(
-				session, dlFileRank, userId, orderByComparator, false);
+			array[2] = getByUserId_PrevAndNext(session, dlFileRank, userId,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -407,15 +392,14 @@ public class DLFileRankPersistenceImpl
 		}
 	}
 
-	protected DLFileRank getByUserId_PrevAndNext(
-		Session session, DLFileRank dlFileRank, long userId,
+	protected DLFileRank getByUserId_PrevAndNext(Session session,
+		DLFileRank dlFileRank, long userId,
 		OrderByComparator<DLFileRank> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -427,8 +411,7 @@ public class DLFileRankPersistenceImpl
 		query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -498,9 +481,8 @@ public class DLFileRankPersistenceImpl
 		qPos.add(userId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(dlFileRank)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					dlFileRank)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -522,10 +504,8 @@ public class DLFileRankPersistenceImpl
 	 */
 	@Override
 	public void removeByUserId(long userId) {
-		for (DLFileRank dlFileRank :
-				findByUserId(
-					userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (DLFileRank dlFileRank : findByUserId(userId, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(dlFileRank);
 		}
 	}
@@ -540,7 +520,7 @@ public class DLFileRankPersistenceImpl
 	public int countByUserId(long userId) {
 		FinderPath finderPath = _finderPathCountByUserId;
 
-		Object[] finderArgs = new Object[] {userId};
+		Object[] finderArgs = new Object[] { userId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -581,9 +561,7 @@ public class DLFileRankPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_USERID_USERID_2 =
-		"dlFileRank.userId = ?";
-
+	private static final String _FINDER_COLUMN_USERID_USERID_2 = "dlFileRank.userId = ?";
 	private FinderPath _finderPathWithPaginationFindByFileEntryId;
 	private FinderPath _finderPathWithoutPaginationFindByFileEntryId;
 	private FinderPath _finderPathCountByFileEntryId;
@@ -596,15 +574,15 @@ public class DLFileRankPersistenceImpl
 	 */
 	@Override
 	public List<DLFileRank> findByFileEntryId(long fileEntryId) {
-		return findByFileEntryId(
-			fileEntryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByFileEntryId(fileEntryId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the document library file ranks where fileEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param fileEntryId the file entry ID
@@ -613,9 +591,8 @@ public class DLFileRankPersistenceImpl
 	 * @return the range of matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByFileEntryId(
-		long fileEntryId, int start, int end) {
-
+	public List<DLFileRank> findByFileEntryId(long fileEntryId, int start,
+		int end) {
 		return findByFileEntryId(fileEntryId, start, end, null);
 	}
 
@@ -623,7 +600,7 @@ public class DLFileRankPersistenceImpl
 	 * Returns an ordered range of all the document library file ranks where fileEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param fileEntryId the file entry ID
@@ -633,19 +610,17 @@ public class DLFileRankPersistenceImpl
 	 * @return the ordered range of matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByFileEntryId(
-		long fileEntryId, int start, int end,
-		OrderByComparator<DLFileRank> orderByComparator) {
-
-		return findByFileEntryId(
-			fileEntryId, start, end, orderByComparator, true);
+	public List<DLFileRank> findByFileEntryId(long fileEntryId, int start,
+		int end, OrderByComparator<DLFileRank> orderByComparator) {
+		return findByFileEntryId(fileEntryId, start, end, orderByComparator,
+			true);
 	}
 
 	/**
 	 * Returns an ordered range of all the document library file ranks where fileEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param fileEntryId the file entry ID
@@ -656,34 +631,29 @@ public class DLFileRankPersistenceImpl
 	 * @return the ordered range of matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByFileEntryId(
-		long fileEntryId, int start, int end,
-		OrderByComparator<DLFileRank> orderByComparator,
+	public List<DLFileRank> findByFileEntryId(long fileEntryId, int start,
+		int end, OrderByComparator<DLFileRank> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByFileEntryId;
-			finderArgs = new Object[] {fileEntryId};
+			finderArgs = new Object[] { fileEntryId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByFileEntryId;
-			finderArgs = new Object[] {
-				fileEntryId, start, end, orderByComparator
-			};
+			finderArgs = new Object[] { fileEntryId, start, end, orderByComparator };
 		}
 
 		List<DLFileRank> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<DLFileRank>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<DLFileRank>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLFileRank dlFileRank : list) {
@@ -700,8 +670,8 @@ public class DLFileRankPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -712,10 +682,11 @@ public class DLFileRankPersistenceImpl
 			query.append(_FINDER_COLUMN_FILEENTRYID_FILEENTRYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(DLFileRankModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -733,16 +704,16 @@ public class DLFileRankPersistenceImpl
 				qPos.add(fileEntryId);
 
 				if (!pagination) {
-					list = (List<DLFileRank>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<DLFileRank>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<DLFileRank>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<DLFileRank>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -771,12 +742,11 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank findByFileEntryId_First(
-			long fileEntryId, OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank findByFileEntryId_First(long fileEntryId,
+		OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
-		DLFileRank dlFileRank = fetchByFileEntryId_First(
-			fileEntryId, orderByComparator);
+		DLFileRank dlFileRank = fetchByFileEntryId_First(fileEntryId,
+				orderByComparator);
 
 		if (dlFileRank != null) {
 			return dlFileRank;
@@ -802,11 +772,10 @@ public class DLFileRankPersistenceImpl
 	 * @return the first matching document library file rank, or <code>null</code> if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank fetchByFileEntryId_First(
-		long fileEntryId, OrderByComparator<DLFileRank> orderByComparator) {
-
-		List<DLFileRank> list = findByFileEntryId(
-			fileEntryId, 0, 1, orderByComparator);
+	public DLFileRank fetchByFileEntryId_First(long fileEntryId,
+		OrderByComparator<DLFileRank> orderByComparator) {
+		List<DLFileRank> list = findByFileEntryId(fileEntryId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -824,12 +793,11 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank findByFileEntryId_Last(
-			long fileEntryId, OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank findByFileEntryId_Last(long fileEntryId,
+		OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
-		DLFileRank dlFileRank = fetchByFileEntryId_Last(
-			fileEntryId, orderByComparator);
+		DLFileRank dlFileRank = fetchByFileEntryId_Last(fileEntryId,
+				orderByComparator);
 
 		if (dlFileRank != null) {
 			return dlFileRank;
@@ -855,17 +823,16 @@ public class DLFileRankPersistenceImpl
 	 * @return the last matching document library file rank, or <code>null</code> if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank fetchByFileEntryId_Last(
-		long fileEntryId, OrderByComparator<DLFileRank> orderByComparator) {
-
+	public DLFileRank fetchByFileEntryId_Last(long fileEntryId,
+		OrderByComparator<DLFileRank> orderByComparator) {
 		int count = countByFileEntryId(fileEntryId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<DLFileRank> list = findByFileEntryId(
-			fileEntryId, count - 1, count, orderByComparator);
+		List<DLFileRank> list = findByFileEntryId(fileEntryId, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -884,11 +851,9 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a document library file rank with the primary key could not be found
 	 */
 	@Override
-	public DLFileRank[] findByFileEntryId_PrevAndNext(
-			long fileRankId, long fileEntryId,
-			OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank[] findByFileEntryId_PrevAndNext(long fileRankId,
+		long fileEntryId, OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
 		DLFileRank dlFileRank = findByPrimaryKey(fileRankId);
 
 		Session session = null;
@@ -898,13 +863,13 @@ public class DLFileRankPersistenceImpl
 
 			DLFileRank[] array = new DLFileRankImpl[3];
 
-			array[0] = getByFileEntryId_PrevAndNext(
-				session, dlFileRank, fileEntryId, orderByComparator, true);
+			array[0] = getByFileEntryId_PrevAndNext(session, dlFileRank,
+					fileEntryId, orderByComparator, true);
 
 			array[1] = dlFileRank;
 
-			array[2] = getByFileEntryId_PrevAndNext(
-				session, dlFileRank, fileEntryId, orderByComparator, false);
+			array[2] = getByFileEntryId_PrevAndNext(session, dlFileRank,
+					fileEntryId, orderByComparator, false);
 
 			return array;
 		}
@@ -916,15 +881,14 @@ public class DLFileRankPersistenceImpl
 		}
 	}
 
-	protected DLFileRank getByFileEntryId_PrevAndNext(
-		Session session, DLFileRank dlFileRank, long fileEntryId,
+	protected DLFileRank getByFileEntryId_PrevAndNext(Session session,
+		DLFileRank dlFileRank, long fileEntryId,
 		OrderByComparator<DLFileRank> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -936,8 +900,7 @@ public class DLFileRankPersistenceImpl
 		query.append(_FINDER_COLUMN_FILEENTRYID_FILEENTRYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1007,9 +970,8 @@ public class DLFileRankPersistenceImpl
 		qPos.add(fileEntryId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(dlFileRank)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					dlFileRank)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1031,10 +993,8 @@ public class DLFileRankPersistenceImpl
 	 */
 	@Override
 	public void removeByFileEntryId(long fileEntryId) {
-		for (DLFileRank dlFileRank :
-				findByFileEntryId(
-					fileEntryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (DLFileRank dlFileRank : findByFileEntryId(fileEntryId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(dlFileRank);
 		}
 	}
@@ -1049,7 +1009,7 @@ public class DLFileRankPersistenceImpl
 	public int countByFileEntryId(long fileEntryId) {
 		FinderPath finderPath = _finderPathCountByFileEntryId;
 
-		Object[] finderArgs = new Object[] {fileEntryId};
+		Object[] finderArgs = new Object[] { fileEntryId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1090,9 +1050,7 @@ public class DLFileRankPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_FILEENTRYID_FILEENTRYID_2 =
-		"dlFileRank.fileEntryId = ?";
-
+	private static final String _FINDER_COLUMN_FILEENTRYID_FILEENTRYID_2 = "dlFileRank.fileEntryId = ?";
 	private FinderPath _finderPathWithPaginationFindByG_U;
 	private FinderPath _finderPathWithoutPaginationFindByG_U;
 	private FinderPath _finderPathCountByG_U;
@@ -1106,15 +1064,15 @@ public class DLFileRankPersistenceImpl
 	 */
 	@Override
 	public List<DLFileRank> findByG_U(long groupId, long userId) {
-		return findByG_U(
-			groupId, userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByG_U(groupId, userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the document library file ranks where groupId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1124,9 +1082,8 @@ public class DLFileRankPersistenceImpl
 	 * @return the range of matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByG_U(
-		long groupId, long userId, int start, int end) {
-
+	public List<DLFileRank> findByG_U(long groupId, long userId, int start,
+		int end) {
 		return findByG_U(groupId, userId, start, end, null);
 	}
 
@@ -1134,7 +1091,7 @@ public class DLFileRankPersistenceImpl
 	 * Returns an ordered range of all the document library file ranks where groupId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1145,10 +1102,8 @@ public class DLFileRankPersistenceImpl
 	 * @return the ordered range of matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByG_U(
-		long groupId, long userId, int start, int end,
-		OrderByComparator<DLFileRank> orderByComparator) {
-
+	public List<DLFileRank> findByG_U(long groupId, long userId, int start,
+		int end, OrderByComparator<DLFileRank> orderByComparator) {
 		return findByG_U(groupId, userId, start, end, orderByComparator, true);
 	}
 
@@ -1156,7 +1111,7 @@ public class DLFileRankPersistenceImpl
 	 * Returns an ordered range of all the document library file ranks where groupId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1168,40 +1123,38 @@ public class DLFileRankPersistenceImpl
 	 * @return the ordered range of matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByG_U(
-		long groupId, long userId, int start, int end,
-		OrderByComparator<DLFileRank> orderByComparator,
+	public List<DLFileRank> findByG_U(long groupId, long userId, int start,
+		int end, OrderByComparator<DLFileRank> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_U;
-			finderArgs = new Object[] {groupId, userId};
+			finderArgs = new Object[] { groupId, userId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_U;
 			finderArgs = new Object[] {
-				groupId, userId, start, end, orderByComparator
-			};
+					groupId, userId,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<DLFileRank> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<DLFileRank>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<DLFileRank>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLFileRank dlFileRank : list) {
 					if ((groupId != dlFileRank.getGroupId()) ||
-						(userId != dlFileRank.getUserId())) {
-
+							(userId != dlFileRank.getUserId())) {
 						list = null;
 
 						break;
@@ -1214,8 +1167,8 @@ public class DLFileRankPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1228,10 +1181,11 @@ public class DLFileRankPersistenceImpl
 			query.append(_FINDER_COLUMN_G_U_USERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(DLFileRankModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1251,16 +1205,16 @@ public class DLFileRankPersistenceImpl
 				qPos.add(userId);
 
 				if (!pagination) {
-					list = (List<DLFileRank>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<DLFileRank>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<DLFileRank>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<DLFileRank>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -1290,13 +1244,11 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank findByG_U_First(
-			long groupId, long userId,
-			OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank findByG_U_First(long groupId, long userId,
+		OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
-		DLFileRank dlFileRank = fetchByG_U_First(
-			groupId, userId, orderByComparator);
+		DLFileRank dlFileRank = fetchByG_U_First(groupId, userId,
+				orderByComparator);
 
 		if (dlFileRank != null) {
 			return dlFileRank;
@@ -1326,12 +1278,10 @@ public class DLFileRankPersistenceImpl
 	 * @return the first matching document library file rank, or <code>null</code> if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank fetchByG_U_First(
-		long groupId, long userId,
+	public DLFileRank fetchByG_U_First(long groupId, long userId,
 		OrderByComparator<DLFileRank> orderByComparator) {
-
-		List<DLFileRank> list = findByG_U(
-			groupId, userId, 0, 1, orderByComparator);
+		List<DLFileRank> list = findByG_U(groupId, userId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1350,13 +1300,11 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank findByG_U_Last(
-			long groupId, long userId,
-			OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank findByG_U_Last(long groupId, long userId,
+		OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
-		DLFileRank dlFileRank = fetchByG_U_Last(
-			groupId, userId, orderByComparator);
+		DLFileRank dlFileRank = fetchByG_U_Last(groupId, userId,
+				orderByComparator);
 
 		if (dlFileRank != null) {
 			return dlFileRank;
@@ -1386,18 +1334,16 @@ public class DLFileRankPersistenceImpl
 	 * @return the last matching document library file rank, or <code>null</code> if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank fetchByG_U_Last(
-		long groupId, long userId,
+	public DLFileRank fetchByG_U_Last(long groupId, long userId,
 		OrderByComparator<DLFileRank> orderByComparator) {
-
 		int count = countByG_U(groupId, userId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<DLFileRank> list = findByG_U(
-			groupId, userId, count - 1, count, orderByComparator);
+		List<DLFileRank> list = findByG_U(groupId, userId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1417,11 +1363,9 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a document library file rank with the primary key could not be found
 	 */
 	@Override
-	public DLFileRank[] findByG_U_PrevAndNext(
-			long fileRankId, long groupId, long userId,
-			OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank[] findByG_U_PrevAndNext(long fileRankId, long groupId,
+		long userId, OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
 		DLFileRank dlFileRank = findByPrimaryKey(fileRankId);
 
 		Session session = null;
@@ -1431,13 +1375,13 @@ public class DLFileRankPersistenceImpl
 
 			DLFileRank[] array = new DLFileRankImpl[3];
 
-			array[0] = getByG_U_PrevAndNext(
-				session, dlFileRank, groupId, userId, orderByComparator, true);
+			array[0] = getByG_U_PrevAndNext(session, dlFileRank, groupId,
+					userId, orderByComparator, true);
 
 			array[1] = dlFileRank;
 
-			array[2] = getByG_U_PrevAndNext(
-				session, dlFileRank, groupId, userId, orderByComparator, false);
+			array[2] = getByG_U_PrevAndNext(session, dlFileRank, groupId,
+					userId, orderByComparator, false);
 
 			return array;
 		}
@@ -1449,15 +1393,14 @@ public class DLFileRankPersistenceImpl
 		}
 	}
 
-	protected DLFileRank getByG_U_PrevAndNext(
-		Session session, DLFileRank dlFileRank, long groupId, long userId,
+	protected DLFileRank getByG_U_PrevAndNext(Session session,
+		DLFileRank dlFileRank, long groupId, long userId,
 		OrderByComparator<DLFileRank> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1471,8 +1414,7 @@ public class DLFileRankPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_USERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1544,9 +1486,8 @@ public class DLFileRankPersistenceImpl
 		qPos.add(userId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(dlFileRank)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					dlFileRank)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1569,11 +1510,8 @@ public class DLFileRankPersistenceImpl
 	 */
 	@Override
 	public void removeByG_U(long groupId, long userId) {
-		for (DLFileRank dlFileRank :
-				findByG_U(
-					groupId, userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (DLFileRank dlFileRank : findByG_U(groupId, userId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(dlFileRank);
 		}
 	}
@@ -1589,7 +1527,7 @@ public class DLFileRankPersistenceImpl
 	public int countByG_U(long groupId, long userId) {
 		FinderPath finderPath = _finderPathCountByG_U;
 
-		Object[] finderArgs = new Object[] {groupId, userId};
+		Object[] finderArgs = new Object[] { groupId, userId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1634,12 +1572,8 @@ public class DLFileRankPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_G_U_GROUPID_2 =
-		"dlFileRank.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_USERID_2 =
-		"dlFileRank.userId = ?";
-
+	private static final String _FINDER_COLUMN_G_U_GROUPID_2 = "dlFileRank.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_USERID_2 = "dlFileRank.userId = ?";
 	private FinderPath _finderPathWithPaginationFindByG_U_A;
 	private FinderPath _finderPathWithoutPaginationFindByG_U_A;
 	private FinderPath _finderPathCountByG_U_A;
@@ -1653,19 +1587,17 @@ public class DLFileRankPersistenceImpl
 	 * @return the matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByG_U_A(
-		long groupId, long userId, boolean active) {
-
-		return findByG_U_A(
-			groupId, userId, active, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<DLFileRank> findByG_U_A(long groupId, long userId,
+		boolean active) {
+		return findByG_U_A(groupId, userId, active, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the document library file ranks where groupId = &#63; and userId = &#63; and active = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1676,9 +1608,8 @@ public class DLFileRankPersistenceImpl
 	 * @return the range of matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByG_U_A(
-		long groupId, long userId, boolean active, int start, int end) {
-
+	public List<DLFileRank> findByG_U_A(long groupId, long userId,
+		boolean active, int start, int end) {
 		return findByG_U_A(groupId, userId, active, start, end, null);
 	}
 
@@ -1686,7 +1617,7 @@ public class DLFileRankPersistenceImpl
 	 * Returns an ordered range of all the document library file ranks where groupId = &#63; and userId = &#63; and active = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1698,19 +1629,18 @@ public class DLFileRankPersistenceImpl
 	 * @return the ordered range of matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByG_U_A(
-		long groupId, long userId, boolean active, int start, int end,
+	public List<DLFileRank> findByG_U_A(long groupId, long userId,
+		boolean active, int start, int end,
 		OrderByComparator<DLFileRank> orderByComparator) {
-
-		return findByG_U_A(
-			groupId, userId, active, start, end, orderByComparator, true);
+		return findByG_U_A(groupId, userId, active, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the document library file ranks where groupId = &#63; and userId = &#63; and active = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1723,41 +1653,40 @@ public class DLFileRankPersistenceImpl
 	 * @return the ordered range of matching document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findByG_U_A(
-		long groupId, long userId, boolean active, int start, int end,
+	public List<DLFileRank> findByG_U_A(long groupId, long userId,
+		boolean active, int start, int end,
 		OrderByComparator<DLFileRank> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_U_A;
-			finderArgs = new Object[] {groupId, userId, active};
+			finderArgs = new Object[] { groupId, userId, active };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_U_A;
 			finderArgs = new Object[] {
-				groupId, userId, active, start, end, orderByComparator
-			};
+					groupId, userId, active,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<DLFileRank> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<DLFileRank>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<DLFileRank>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLFileRank dlFileRank : list) {
 					if ((groupId != dlFileRank.getGroupId()) ||
-						(userId != dlFileRank.getUserId()) ||
-						(active != dlFileRank.isActive())) {
-
+							(userId != dlFileRank.getUserId()) ||
+							(active != dlFileRank.isActive())) {
 						list = null;
 
 						break;
@@ -1770,8 +1699,8 @@ public class DLFileRankPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -1786,10 +1715,11 @@ public class DLFileRankPersistenceImpl
 			query.append(_FINDER_COLUMN_G_U_A_ACTIVE_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(DLFileRankModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1811,16 +1741,16 @@ public class DLFileRankPersistenceImpl
 				qPos.add(active);
 
 				if (!pagination) {
-					list = (List<DLFileRank>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<DLFileRank>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<DLFileRank>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<DLFileRank>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -1851,13 +1781,11 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank findByG_U_A_First(
-			long groupId, long userId, boolean active,
-			OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank findByG_U_A_First(long groupId, long userId,
+		boolean active, OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
-		DLFileRank dlFileRank = fetchByG_U_A_First(
-			groupId, userId, active, orderByComparator);
+		DLFileRank dlFileRank = fetchByG_U_A_First(groupId, userId, active,
+				orderByComparator);
 
 		if (dlFileRank != null) {
 			return dlFileRank;
@@ -1891,12 +1819,10 @@ public class DLFileRankPersistenceImpl
 	 * @return the first matching document library file rank, or <code>null</code> if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank fetchByG_U_A_First(
-		long groupId, long userId, boolean active,
-		OrderByComparator<DLFileRank> orderByComparator) {
-
-		List<DLFileRank> list = findByG_U_A(
-			groupId, userId, active, 0, 1, orderByComparator);
+	public DLFileRank fetchByG_U_A_First(long groupId, long userId,
+		boolean active, OrderByComparator<DLFileRank> orderByComparator) {
+		List<DLFileRank> list = findByG_U_A(groupId, userId, active, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1916,13 +1842,11 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank findByG_U_A_Last(
-			long groupId, long userId, boolean active,
-			OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank findByG_U_A_Last(long groupId, long userId,
+		boolean active, OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
-		DLFileRank dlFileRank = fetchByG_U_A_Last(
-			groupId, userId, active, orderByComparator);
+		DLFileRank dlFileRank = fetchByG_U_A_Last(groupId, userId, active,
+				orderByComparator);
 
 		if (dlFileRank != null) {
 			return dlFileRank;
@@ -1956,18 +1880,16 @@ public class DLFileRankPersistenceImpl
 	 * @return the last matching document library file rank, or <code>null</code> if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank fetchByG_U_A_Last(
-		long groupId, long userId, boolean active,
-		OrderByComparator<DLFileRank> orderByComparator) {
-
+	public DLFileRank fetchByG_U_A_Last(long groupId, long userId,
+		boolean active, OrderByComparator<DLFileRank> orderByComparator) {
 		int count = countByG_U_A(groupId, userId, active);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<DLFileRank> list = findByG_U_A(
-			groupId, userId, active, count - 1, count, orderByComparator);
+		List<DLFileRank> list = findByG_U_A(groupId, userId, active, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1988,11 +1910,10 @@ public class DLFileRankPersistenceImpl
 	 * @throws NoSuchFileRankException if a document library file rank with the primary key could not be found
 	 */
 	@Override
-	public DLFileRank[] findByG_U_A_PrevAndNext(
-			long fileRankId, long groupId, long userId, boolean active,
-			OrderByComparator<DLFileRank> orderByComparator)
+	public DLFileRank[] findByG_U_A_PrevAndNext(long fileRankId, long groupId,
+		long userId, boolean active,
+		OrderByComparator<DLFileRank> orderByComparator)
 		throws NoSuchFileRankException {
-
 		DLFileRank dlFileRank = findByPrimaryKey(fileRankId);
 
 		Session session = null;
@@ -2002,15 +1923,13 @@ public class DLFileRankPersistenceImpl
 
 			DLFileRank[] array = new DLFileRankImpl[3];
 
-			array[0] = getByG_U_A_PrevAndNext(
-				session, dlFileRank, groupId, userId, active, orderByComparator,
-				true);
+			array[0] = getByG_U_A_PrevAndNext(session, dlFileRank, groupId,
+					userId, active, orderByComparator, true);
 
 			array[1] = dlFileRank;
 
-			array[2] = getByG_U_A_PrevAndNext(
-				session, dlFileRank, groupId, userId, active, orderByComparator,
-				false);
+			array[2] = getByG_U_A_PrevAndNext(session, dlFileRank, groupId,
+					userId, active, orderByComparator, false);
 
 			return array;
 		}
@@ -2022,16 +1941,14 @@ public class DLFileRankPersistenceImpl
 		}
 	}
 
-	protected DLFileRank getByG_U_A_PrevAndNext(
-		Session session, DLFileRank dlFileRank, long groupId, long userId,
-		boolean active, OrderByComparator<DLFileRank> orderByComparator,
-		boolean previous) {
-
+	protected DLFileRank getByG_U_A_PrevAndNext(Session session,
+		DLFileRank dlFileRank, long groupId, long userId, boolean active,
+		OrderByComparator<DLFileRank> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2047,8 +1964,7 @@ public class DLFileRankPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_A_ACTIVE_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2122,9 +2038,8 @@ public class DLFileRankPersistenceImpl
 		qPos.add(active);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(dlFileRank)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					dlFileRank)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2148,11 +2063,8 @@ public class DLFileRankPersistenceImpl
 	 */
 	@Override
 	public void removeByG_U_A(long groupId, long userId, boolean active) {
-		for (DLFileRank dlFileRank :
-				findByG_U_A(
-					groupId, userId, active, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (DLFileRank dlFileRank : findByG_U_A(groupId, userId, active,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(dlFileRank);
 		}
 	}
@@ -2169,7 +2081,7 @@ public class DLFileRankPersistenceImpl
 	public int countByG_U_A(long groupId, long userId, boolean active) {
 		FinderPath finderPath = _finderPathCountByG_U_A;
 
-		Object[] finderArgs = new Object[] {groupId, userId, active};
+		Object[] finderArgs = new Object[] { groupId, userId, active };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2218,20 +2130,14 @@ public class DLFileRankPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_G_U_A_GROUPID_2 =
-		"dlFileRank.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_A_USERID_2 =
-		"dlFileRank.userId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_A_ACTIVE_2 =
-		"dlFileRank.active = ?";
-
+	private static final String _FINDER_COLUMN_G_U_A_GROUPID_2 = "dlFileRank.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_A_USERID_2 = "dlFileRank.userId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_A_ACTIVE_2 = "dlFileRank.active = ?";
 	private FinderPath _finderPathFetchByC_U_F;
 	private FinderPath _finderPathCountByC_U_F;
 
 	/**
-	 * Returns the document library file rank where companyId = &#63; and userId = &#63; and fileEntryId = &#63; or throws a <code>NoSuchFileRankException</code> if it could not be found.
+	 * Returns the document library file rank where companyId = &#63; and userId = &#63; and fileEntryId = &#63; or throws a {@link NoSuchFileRankException} if it could not be found.
 	 *
 	 * @param companyId the company ID
 	 * @param userId the user ID
@@ -2242,7 +2148,6 @@ public class DLFileRankPersistenceImpl
 	@Override
 	public DLFileRank findByC_U_F(long companyId, long userId, long fileEntryId)
 		throws NoSuchFileRankException {
-
 		DLFileRank dlFileRank = fetchByC_U_F(companyId, userId, fileEntryId);
 
 		if (dlFileRank == null) {
@@ -2280,9 +2185,7 @@ public class DLFileRankPersistenceImpl
 	 * @return the matching document library file rank, or <code>null</code> if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank fetchByC_U_F(
-		long companyId, long userId, long fileEntryId) {
-
+	public DLFileRank fetchByC_U_F(long companyId, long userId, long fileEntryId) {
 		return fetchByC_U_F(companyId, userId, fileEntryId, true);
 	}
 
@@ -2296,26 +2199,23 @@ public class DLFileRankPersistenceImpl
 	 * @return the matching document library file rank, or <code>null</code> if a matching document library file rank could not be found
 	 */
 	@Override
-	public DLFileRank fetchByC_U_F(
-		long companyId, long userId, long fileEntryId,
-		boolean retrieveFromCache) {
-
-		Object[] finderArgs = new Object[] {companyId, userId, fileEntryId};
+	public DLFileRank fetchByC_U_F(long companyId, long userId,
+		long fileEntryId, boolean retrieveFromCache) {
+		Object[] finderArgs = new Object[] { companyId, userId, fileEntryId };
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_U_F, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_U_F, finderArgs,
+					this);
 		}
 
 		if (result instanceof DLFileRank) {
 			DLFileRank dlFileRank = (DLFileRank)result;
 
 			if ((companyId != dlFileRank.getCompanyId()) ||
-				(userId != dlFileRank.getUserId()) ||
-				(fileEntryId != dlFileRank.getFileEntryId())) {
-
+					(userId != dlFileRank.getUserId()) ||
+					(fileEntryId != dlFileRank.getFileEntryId())) {
 				result = null;
 			}
 		}
@@ -2351,8 +2251,8 @@ public class DLFileRankPersistenceImpl
 				List<DLFileRank> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByC_U_F, finderArgs, list);
+					finderCache.putResult(_finderPathFetchByC_U_F, finderArgs,
+						list);
 				}
 				else {
 					if (list.size() > 1) {
@@ -2361,8 +2261,8 @@ public class DLFileRankPersistenceImpl
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"DLFileRankPersistenceImpl.fetchByC_U_F(long, long, long, boolean) with parameters (" +
-									StringUtil.merge(finderArgs) +
-										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+								StringUtil.merge(finderArgs) +
+								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
 						}
 					}
 
@@ -2400,10 +2300,8 @@ public class DLFileRankPersistenceImpl
 	 * @return the document library file rank that was removed
 	 */
 	@Override
-	public DLFileRank removeByC_U_F(
-			long companyId, long userId, long fileEntryId)
-		throws NoSuchFileRankException {
-
+	public DLFileRank removeByC_U_F(long companyId, long userId,
+		long fileEntryId) throws NoSuchFileRankException {
 		DLFileRank dlFileRank = findByC_U_F(companyId, userId, fileEntryId);
 
 		return remove(dlFileRank);
@@ -2421,7 +2319,7 @@ public class DLFileRankPersistenceImpl
 	public int countByC_U_F(long companyId, long userId, long fileEntryId) {
 		FinderPath finderPath = _finderPathCountByC_U_F;
 
-		Object[] finderArgs = new Object[] {companyId, userId, fileEntryId};
+		Object[] finderArgs = new Object[] { companyId, userId, fileEntryId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2470,35 +2368,16 @@ public class DLFileRankPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_U_F_COMPANYID_2 =
-		"dlFileRank.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_U_F_USERID_2 =
-		"dlFileRank.userId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_U_F_FILEENTRYID_2 =
-		"dlFileRank.fileEntryId = ?";
+	private static final String _FINDER_COLUMN_C_U_F_COMPANYID_2 = "dlFileRank.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_U_F_USERID_2 = "dlFileRank.userId = ? AND ";
+	private static final String _FINDER_COLUMN_C_U_F_FILEENTRYID_2 = "dlFileRank.fileEntryId = ?";
 
 	public DLFileRankPersistenceImpl() {
 		setModelClass(DLFileRank.class);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("active", "active_");
-
-		try {
-			Field field = BasePersistenceImpl.class.getDeclaredField(
-				"_dbColumnNames");
-
-			field.setAccessible(true);
-
-			field.set(this, dbColumnNames);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
+		setModelImplClass(DLFileRankImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(DLFileRankModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -2508,17 +2387,14 @@ public class DLFileRankPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(DLFileRank dlFileRank) {
-		entityCache.putResult(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED, DLFileRankImpl.class,
-			dlFileRank.getPrimaryKey(), dlFileRank);
+		entityCache.putResult(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+			DLFileRankImpl.class, dlFileRank.getPrimaryKey(), dlFileRank);
 
-		finderCache.putResult(
-			_finderPathFetchByC_U_F,
+		finderCache.putResult(_finderPathFetchByC_U_F,
 			new Object[] {
 				dlFileRank.getCompanyId(), dlFileRank.getUserId(),
 				dlFileRank.getFileEntryId()
-			},
-			dlFileRank);
+			}, dlFileRank);
 
 		dlFileRank.resetOriginalValues();
 	}
@@ -2532,9 +2408,8 @@ public class DLFileRankPersistenceImpl
 	public void cacheResult(List<DLFileRank> dlFileRanks) {
 		for (DLFileRank dlFileRank : dlFileRanks) {
 			if (entityCache.getResult(
-					DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-					DLFileRankImpl.class, dlFileRank.getPrimaryKey()) == null) {
-
+						DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+						DLFileRankImpl.class, dlFileRank.getPrimaryKey()) == null) {
 				cacheResult(dlFileRank);
 			}
 			else {
@@ -2547,7 +2422,7 @@ public class DLFileRankPersistenceImpl
 	 * Clears the cache for all document library file ranks.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -2563,14 +2438,13 @@ public class DLFileRankPersistenceImpl
 	 * Clears the cache for the document library file rank.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(DLFileRank dlFileRank) {
-		entityCache.removeResult(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED, DLFileRankImpl.class,
-			dlFileRank.getPrimaryKey());
+		entityCache.removeResult(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+			DLFileRankImpl.class, dlFileRank.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -2584,9 +2458,8 @@ public class DLFileRankPersistenceImpl
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (DLFileRank dlFileRank : dlFileRanks) {
-			entityCache.removeResult(
-				DLFileRankModelImpl.ENTITY_CACHE_ENABLED, DLFileRankImpl.class,
-				dlFileRank.getPrimaryKey());
+			entityCache.removeResult(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankImpl.class, dlFileRank.getPrimaryKey());
 
 			clearUniqueFindersCache((DLFileRankModelImpl)dlFileRank, true);
 		}
@@ -2594,40 +2467,38 @@ public class DLFileRankPersistenceImpl
 
 	protected void cacheUniqueFindersCache(
 		DLFileRankModelImpl dlFileRankModelImpl) {
-
 		Object[] args = new Object[] {
-			dlFileRankModelImpl.getCompanyId(), dlFileRankModelImpl.getUserId(),
-			dlFileRankModelImpl.getFileEntryId()
-		};
-
-		finderCache.putResult(
-			_finderPathCountByC_U_F, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByC_U_F, args, dlFileRankModelImpl, false);
-	}
-
-	protected void clearUniqueFindersCache(
-		DLFileRankModelImpl dlFileRankModelImpl, boolean clearCurrent) {
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
 				dlFileRankModelImpl.getCompanyId(),
 				dlFileRankModelImpl.getUserId(),
 				dlFileRankModelImpl.getFileEntryId()
 			};
+
+		finderCache.putResult(_finderPathCountByC_U_F, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(_finderPathFetchByC_U_F, args,
+			dlFileRankModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		DLFileRankModelImpl dlFileRankModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					dlFileRankModelImpl.getCompanyId(),
+					dlFileRankModelImpl.getUserId(),
+					dlFileRankModelImpl.getFileEntryId()
+				};
 
 			finderCache.removeResult(_finderPathCountByC_U_F, args);
 			finderCache.removeResult(_finderPathFetchByC_U_F, args);
 		}
 
 		if ((dlFileRankModelImpl.getColumnBitmask() &
-			 _finderPathFetchByC_U_F.getColumnBitmask()) != 0) {
-
+				_finderPathFetchByC_U_F.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
-				dlFileRankModelImpl.getOriginalCompanyId(),
-				dlFileRankModelImpl.getOriginalUserId(),
-				dlFileRankModelImpl.getOriginalFileEntryId()
-			};
+					dlFileRankModelImpl.getOriginalCompanyId(),
+					dlFileRankModelImpl.getOriginalUserId(),
+					dlFileRankModelImpl.getOriginalFileEntryId()
+				};
 
 			finderCache.removeResult(_finderPathCountByC_U_F, args);
 			finderCache.removeResult(_finderPathFetchByC_U_F, args);
@@ -2674,22 +2545,21 @@ public class DLFileRankPersistenceImpl
 	@Override
 	public DLFileRank remove(Serializable primaryKey)
 		throws NoSuchFileRankException {
-
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			DLFileRank dlFileRank = (DLFileRank)session.get(
-				DLFileRankImpl.class, primaryKey);
+			DLFileRank dlFileRank = (DLFileRank)session.get(DLFileRankImpl.class,
+					primaryKey);
 
 			if (dlFileRank == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchFileRankException(
-					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				throw new NoSuchFileRankException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
 			}
 
 			return remove(dlFileRank);
@@ -2713,8 +2583,8 @@ public class DLFileRankPersistenceImpl
 			session = openSession();
 
 			if (!session.contains(dlFileRank)) {
-				dlFileRank = (DLFileRank)session.get(
-					DLFileRankImpl.class, dlFileRank.getPrimaryKeyObj());
+				dlFileRank = (DLFileRank)session.get(DLFileRankImpl.class,
+						dlFileRank.getPrimaryKeyObj());
 			}
 
 			if (dlFileRank != null) {
@@ -2747,16 +2617,15 @@ public class DLFileRankPersistenceImpl
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in dlFileRank proxy " +
-						invocationHandler.getClass());
+					invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom DLFileRank implementation " +
-					dlFileRank.getClass());
+				dlFileRank.getClass());
 		}
 
-		DLFileRankModelImpl dlFileRankModelImpl =
-			(DLFileRankModelImpl)dlFileRank;
+		DLFileRankModelImpl dlFileRankModelImpl = (DLFileRankModelImpl)dlFileRank;
 
 		Session session = null;
 
@@ -2784,132 +2653,125 @@ public class DLFileRankPersistenceImpl
 		if (!DLFileRankModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else if (isNew) {
-			Object[] args = new Object[] {dlFileRankModelImpl.getUserId()};
+		else
+		 if (isNew) {
+			Object[] args = new Object[] { dlFileRankModelImpl.getUserId() };
 
 			finderCache.removeResult(_finderPathCountByUserId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByUserId, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByUserId,
+				args);
 
-			args = new Object[] {dlFileRankModelImpl.getFileEntryId()};
+			args = new Object[] { dlFileRankModelImpl.getFileEntryId() };
 
 			finderCache.removeResult(_finderPathCountByFileEntryId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByFileEntryId, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByFileEntryId,
+				args);
 
 			args = new Object[] {
-				dlFileRankModelImpl.getGroupId(),
-				dlFileRankModelImpl.getUserId()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_U, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_U, args);
-
-			args = new Object[] {
-				dlFileRankModelImpl.getGroupId(),
-				dlFileRankModelImpl.getUserId(), dlFileRankModelImpl.isActive()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_U_A, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_U_A, args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
-		}
-		else {
-			if ((dlFileRankModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUserId.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					dlFileRankModelImpl.getOriginalUserId()
-				};
-
-				finderCache.removeResult(_finderPathCountByUserId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUserId, args);
-
-				args = new Object[] {dlFileRankModelImpl.getUserId()};
-
-				finderCache.removeResult(_finderPathCountByUserId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUserId, args);
-			}
-
-			if ((dlFileRankModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByFileEntryId.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					dlFileRankModelImpl.getOriginalFileEntryId()
-				};
-
-				finderCache.removeResult(_finderPathCountByFileEntryId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByFileEntryId, args);
-
-				args = new Object[] {dlFileRankModelImpl.getFileEntryId()};
-
-				finderCache.removeResult(_finderPathCountByFileEntryId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByFileEntryId, args);
-			}
-
-			if ((dlFileRankModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_U.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					dlFileRankModelImpl.getOriginalGroupId(),
-					dlFileRankModelImpl.getOriginalUserId()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_U, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_U, args);
-
-				args = new Object[] {
 					dlFileRankModelImpl.getGroupId(),
 					dlFileRankModelImpl.getUserId()
 				};
 
-				finderCache.removeResult(_finderPathCountByG_U, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_U, args);
-			}
+			finderCache.removeResult(_finderPathCountByG_U, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_U, args);
 
-			if ((dlFileRankModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_U_A.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					dlFileRankModelImpl.getOriginalGroupId(),
-					dlFileRankModelImpl.getOriginalUserId(),
-					dlFileRankModelImpl.getOriginalActive()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_U_A, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_U_A, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					dlFileRankModelImpl.getGroupId(),
 					dlFileRankModelImpl.getUserId(),
 					dlFileRankModelImpl.isActive()
 				};
 
+			finderCache.removeResult(_finderPathCountByG_U_A, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_A,
+				args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
+				FINDER_ARGS_EMPTY);
+		}
+
+		else {
+			if ((dlFileRankModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByUserId.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						dlFileRankModelImpl.getOriginalUserId()
+					};
+
+				finderCache.removeResult(_finderPathCountByUserId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUserId,
+					args);
+
+				args = new Object[] { dlFileRankModelImpl.getUserId() };
+
+				finderCache.removeResult(_finderPathCountByUserId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUserId,
+					args);
+			}
+
+			if ((dlFileRankModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByFileEntryId.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						dlFileRankModelImpl.getOriginalFileEntryId()
+					};
+
+				finderCache.removeResult(_finderPathCountByFileEntryId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByFileEntryId,
+					args);
+
+				args = new Object[] { dlFileRankModelImpl.getFileEntryId() };
+
+				finderCache.removeResult(_finderPathCountByFileEntryId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByFileEntryId,
+					args);
+			}
+
+			if ((dlFileRankModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_U.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						dlFileRankModelImpl.getOriginalGroupId(),
+						dlFileRankModelImpl.getOriginalUserId()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_U, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U,
+					args);
+
+				args = new Object[] {
+						dlFileRankModelImpl.getGroupId(),
+						dlFileRankModelImpl.getUserId()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_U, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U,
+					args);
+			}
+
+			if ((dlFileRankModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_U_A.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						dlFileRankModelImpl.getOriginalGroupId(),
+						dlFileRankModelImpl.getOriginalUserId(),
+						dlFileRankModelImpl.getOriginalActive()
+					};
+
 				finderCache.removeResult(_finderPathCountByG_U_A, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_U_A, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_A,
+					args);
+
+				args = new Object[] {
+						dlFileRankModelImpl.getGroupId(),
+						dlFileRankModelImpl.getUserId(),
+						dlFileRankModelImpl.isActive()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_U_A, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_A,
+					args);
 			}
 		}
 
-		entityCache.putResult(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED, DLFileRankImpl.class,
-			dlFileRank.getPrimaryKey(), dlFileRank, false);
+		entityCache.putResult(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+			DLFileRankImpl.class, dlFileRank.getPrimaryKey(), dlFileRank, false);
 
 		clearUniqueFindersCache(dlFileRankModelImpl, false);
 		cacheUniqueFindersCache(dlFileRankModelImpl);
@@ -2920,7 +2782,7 @@ public class DLFileRankPersistenceImpl
 	}
 
 	/**
-	 * Returns the document library file rank with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
+	 * Returns the document library file rank with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the document library file rank
 	 * @return the document library file rank
@@ -2929,7 +2791,6 @@ public class DLFileRankPersistenceImpl
 	@Override
 	public DLFileRank findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchFileRankException {
-
 		DLFileRank dlFileRank = fetchByPrimaryKey(primaryKey);
 
 		if (dlFileRank == null) {
@@ -2937,15 +2798,15 @@ public class DLFileRankPersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchFileRankException(
-				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			throw new NoSuchFileRankException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
 		}
 
 		return dlFileRank;
 	}
 
 	/**
-	 * Returns the document library file rank with the primary key or throws a <code>NoSuchFileRankException</code> if it could not be found.
+	 * Returns the document library file rank with the primary key or throws a {@link NoSuchFileRankException} if it could not be found.
 	 *
 	 * @param fileRankId the primary key of the document library file rank
 	 * @return the document library file rank
@@ -2954,59 +2815,7 @@ public class DLFileRankPersistenceImpl
 	@Override
 	public DLFileRank findByPrimaryKey(long fileRankId)
 		throws NoSuchFileRankException {
-
 		return findByPrimaryKey((Serializable)fileRankId);
-	}
-
-	/**
-	 * Returns the document library file rank with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param primaryKey the primary key of the document library file rank
-	 * @return the document library file rank, or <code>null</code> if a document library file rank with the primary key could not be found
-	 */
-	@Override
-	public DLFileRank fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED, DLFileRankImpl.class,
-			primaryKey);
-
-		if (serializable == nullModel) {
-			return null;
-		}
-
-		DLFileRank dlFileRank = (DLFileRank)serializable;
-
-		if (dlFileRank == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				dlFileRank = (DLFileRank)session.get(
-					DLFileRankImpl.class, primaryKey);
-
-				if (dlFileRank != null) {
-					cacheResult(dlFileRank);
-				}
-				else {
-					entityCache.putResult(
-						DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-						DLFileRankImpl.class, primaryKey, nullModel);
-				}
-			}
-			catch (Exception e) {
-				entityCache.removeResult(
-					DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-					DLFileRankImpl.class, primaryKey);
-
-				throw processException(e);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return dlFileRank;
 	}
 
 	/**
@@ -3018,104 +2827,6 @@ public class DLFileRankPersistenceImpl
 	@Override
 	public DLFileRank fetchByPrimaryKey(long fileRankId) {
 		return fetchByPrimaryKey((Serializable)fileRankId);
-	}
-
-	@Override
-	public Map<Serializable, DLFileRank> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, DLFileRank> map =
-			new HashMap<Serializable, DLFileRank>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			DLFileRank dlFileRank = fetchByPrimaryKey(primaryKey);
-
-			if (dlFileRank != null) {
-				map.put(primaryKey, dlFileRank);
-			}
-
-			return map;
-		}
-
-		Set<Serializable> uncachedPrimaryKeys = null;
-
-		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(
-				DLFileRankModelImpl.ENTITY_CACHE_ENABLED, DLFileRankImpl.class,
-				primaryKey);
-
-			if (serializable != nullModel) {
-				if (serializable == null) {
-					if (uncachedPrimaryKeys == null) {
-						uncachedPrimaryKeys = new HashSet<Serializable>();
-					}
-
-					uncachedPrimaryKeys.add(primaryKey);
-				}
-				else {
-					map.put(primaryKey, (DLFileRank)serializable);
-				}
-			}
-		}
-
-		if (uncachedPrimaryKeys == null) {
-			return map;
-		}
-
-		StringBundler query = new StringBundler(
-			uncachedPrimaryKeys.size() * 2 + 1);
-
-		query.append(_SQL_SELECT_DLFILERANK_WHERE_PKS_IN);
-
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
-
-			query.append(",");
-		}
-
-		query.setIndex(query.index() - 1);
-
-		query.append(")");
-
-		String sql = query.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query q = session.createQuery(sql);
-
-			for (DLFileRank dlFileRank : (List<DLFileRank>)q.list()) {
-				map.put(dlFileRank.getPrimaryKeyObj(), dlFileRank);
-
-				cacheResult(dlFileRank);
-
-				uncachedPrimaryKeys.remove(dlFileRank.getPrimaryKeyObj());
-			}
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(
-					DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-					DLFileRankImpl.class, primaryKey, nullModel);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -3132,7 +2843,7 @@ public class DLFileRankPersistenceImpl
 	 * Returns a range of all the document library file ranks.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of document library file ranks
@@ -3148,7 +2859,7 @@ public class DLFileRankPersistenceImpl
 	 * Returns an ordered range of all the document library file ranks.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of document library file ranks
@@ -3157,9 +2868,8 @@ public class DLFileRankPersistenceImpl
 	 * @return the ordered range of document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findAll(
-		int start, int end, OrderByComparator<DLFileRank> orderByComparator) {
-
+	public List<DLFileRank> findAll(int start, int end,
+		OrderByComparator<DLFileRank> orderByComparator) {
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -3167,7 +2877,7 @@ public class DLFileRankPersistenceImpl
 	 * Returns an ordered range of all the document library file ranks.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileRankModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLFileRankModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of document library file ranks
@@ -3177,31 +2887,29 @@ public class DLFileRankPersistenceImpl
 	 * @return the ordered range of document library file ranks
 	 */
 	@Override
-	public List<DLFileRank> findAll(
-		int start, int end, OrderByComparator<DLFileRank> orderByComparator,
+	public List<DLFileRank> findAll(int start, int end,
+		OrderByComparator<DLFileRank> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] {start, end, orderByComparator};
+			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
 		List<DLFileRank> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<DLFileRank>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<DLFileRank>)finderCache.getResult(finderPath,
+					finderArgs, this);
 		}
 
 		if (list == null) {
@@ -3209,13 +2917,13 @@ public class DLFileRankPersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					2 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_DLFILERANK);
 
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 
 				sql = query.toString();
 			}
@@ -3235,16 +2943,16 @@ public class DLFileRankPersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<DLFileRank>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<DLFileRank>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<DLFileRank>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<DLFileRank>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -3282,8 +2990,8 @@ public class DLFileRankPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(_finderPathCountAll,
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -3295,12 +3003,11 @@ public class DLFileRankPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
+					count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -3318,6 +3025,21 @@ public class DLFileRankPersistenceImpl
 	}
 
 	@Override
+	protected EntityCache getEntityCache() {
+		return entityCache;
+	}
+
+	@Override
+	protected String getPKDBName() {
+		return "fileRankId";
+	}
+
+	@Override
+	protected String getSelectSQL() {
+		return _SQL_SELECT_DLFILERANK;
+	}
+
+	@Override
 	protected Map<String, Integer> getTableColumnsMap() {
 		return DLFileRankModelImpl.TABLE_COLUMNS_MAP;
 	}
@@ -3326,144 +3048,136 @@ public class DLFileRankPersistenceImpl
 	 * Initializes the document library file rank persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-			new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+				new String[0]);
 
-		_finderPathCountAll = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+		_finderPathCountAll = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+				new String[0]);
 
-		_finderPathWithPaginationFindByUserId = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByUserId = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
-			new String[] {Long.class.getName()},
-			DLFileRankModelImpl.USERID_COLUMN_BITMASK |
-			DLFileRankModelImpl.CREATEDATE_COLUMN_BITMASK);
-
-		_finderPathCountByUserId = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
-			new String[] {Long.class.getName()});
-
-		_finderPathWithPaginationFindByFileEntryId = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFileEntryId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByFileEntryId = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFileEntryId",
-			new String[] {Long.class.getName()},
-			DLFileRankModelImpl.FILEENTRYID_COLUMN_BITMASK |
-			DLFileRankModelImpl.CREATEDATE_COLUMN_BITMASK);
-
-		_finderPathCountByFileEntryId = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFileEntryId",
-			new String[] {Long.class.getName()});
-
-		_finderPathWithPaginationFindByG_U = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByUserId = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
+				new String[] {
+					Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByG_U = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U",
-			new String[] {Long.class.getName(), Long.class.getName()},
-			DLFileRankModelImpl.GROUPID_COLUMN_BITMASK |
-			DLFileRankModelImpl.USERID_COLUMN_BITMASK |
-			DLFileRankModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUserId = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
+				new String[] { Long.class.getName() },
+				DLFileRankModelImpl.USERID_COLUMN_BITMASK |
+				DLFileRankModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathCountByG_U = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U",
-			new String[] {Long.class.getName(), Long.class.getName()});
+		_finderPathCountByUserId = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
+				new String[] { Long.class.getName() });
 
-		_finderPathWithPaginationFindByG_U_A = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_A",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+		_finderPathWithPaginationFindByFileEntryId = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFileEntryId",
+				new String[] {
+					Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByG_U_A = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_A",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName()
-			},
-			DLFileRankModelImpl.GROUPID_COLUMN_BITMASK |
-			DLFileRankModelImpl.USERID_COLUMN_BITMASK |
-			DLFileRankModelImpl.ACTIVE_COLUMN_BITMASK |
-			DLFileRankModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByFileEntryId = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFileEntryId",
+				new String[] { Long.class.getName() },
+				DLFileRankModelImpl.FILEENTRYID_COLUMN_BITMASK |
+				DLFileRankModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathCountByG_U_A = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_A",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName()
-			});
+		_finderPathCountByFileEntryId = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+				"countByFileEntryId", new String[] { Long.class.getName() });
 
-		_finderPathFetchByC_U_F = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByC_U_F",
-			new String[] {
-				Long.class.getName(), Long.class.getName(), Long.class.getName()
-			},
-			DLFileRankModelImpl.COMPANYID_COLUMN_BITMASK |
-			DLFileRankModelImpl.USERID_COLUMN_BITMASK |
-			DLFileRankModelImpl.FILEENTRYID_COLUMN_BITMASK);
+		_finderPathWithPaginationFindByG_U = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathCountByC_U_F = new FinderPath(
-			DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
-			DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U_F",
-			new String[] {
-				Long.class.getName(), Long.class.getName(), Long.class.getName()
-			});
+		_finderPathWithoutPaginationFindByG_U = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U",
+				new String[] { Long.class.getName(), Long.class.getName() },
+				DLFileRankModelImpl.GROUPID_COLUMN_BITMASK |
+				DLFileRankModelImpl.USERID_COLUMN_BITMASK |
+				DLFileRankModelImpl.CREATEDATE_COLUMN_BITMASK);
+
+		_finderPathCountByG_U = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U",
+				new String[] { Long.class.getName(), Long.class.getName() });
+
+		_finderPathWithPaginationFindByG_U_A = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_A",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByG_U_A = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_A",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName()
+				},
+				DLFileRankModelImpl.GROUPID_COLUMN_BITMASK |
+				DLFileRankModelImpl.USERID_COLUMN_BITMASK |
+				DLFileRankModelImpl.ACTIVE_COLUMN_BITMASK |
+				DLFileRankModelImpl.CREATEDATE_COLUMN_BITMASK);
+
+		_finderPathCountByG_U_A = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_A",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName()
+				});
+
+		_finderPathFetchByC_U_F = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, DLFileRankImpl.class,
+				FINDER_CLASS_NAME_ENTITY, "fetchByC_U_F",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName()
+				},
+				DLFileRankModelImpl.COMPANYID_COLUMN_BITMASK |
+				DLFileRankModelImpl.USERID_COLUMN_BITMASK |
+				DLFileRankModelImpl.FILEENTRYID_COLUMN_BITMASK);
+
+		_finderPathCountByC_U_F = new FinderPath(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
+				DLFileRankModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U_F",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName()
+				});
 	}
 
 	public void destroy() {
@@ -3475,40 +3189,19 @@ public class DLFileRankPersistenceImpl
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
-
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-
-	private static final String _SQL_SELECT_DLFILERANK =
-		"SELECT dlFileRank FROM DLFileRank dlFileRank";
-
-	private static final String _SQL_SELECT_DLFILERANK_WHERE_PKS_IN =
-		"SELECT dlFileRank FROM DLFileRank dlFileRank WHERE fileRankId IN (";
-
-	private static final String _SQL_SELECT_DLFILERANK_WHERE =
-		"SELECT dlFileRank FROM DLFileRank dlFileRank WHERE ";
-
-	private static final String _SQL_COUNT_DLFILERANK =
-		"SELECT COUNT(dlFileRank) FROM DLFileRank dlFileRank";
-
-	private static final String _SQL_COUNT_DLFILERANK_WHERE =
-		"SELECT COUNT(dlFileRank) FROM DLFileRank dlFileRank WHERE ";
-
+	private static final String _SQL_SELECT_DLFILERANK = "SELECT dlFileRank FROM DLFileRank dlFileRank";
+	private static final String _SQL_SELECT_DLFILERANK_WHERE = "SELECT dlFileRank FROM DLFileRank dlFileRank WHERE ";
+	private static final String _SQL_COUNT_DLFILERANK = "SELECT COUNT(dlFileRank) FROM DLFileRank dlFileRank";
+	private static final String _SQL_COUNT_DLFILERANK_WHERE = "SELECT COUNT(dlFileRank) FROM DLFileRank dlFileRank WHERE ";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "dlFileRank.";
-
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
-		"No DLFileRank exists with the primary key ";
-
-	private static final String _NO_SUCH_ENTITY_WITH_KEY =
-		"No DLFileRank exists with the key {";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLFileRankPersistenceImpl.class);
-
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"active"});
-
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No DLFileRank exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No DLFileRank exists with the key {";
+	private static final Log _log = LogFactoryUtil.getLog(DLFileRankPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+				"active"
+			});
 }

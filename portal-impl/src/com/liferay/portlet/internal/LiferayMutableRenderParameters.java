@@ -20,7 +20,7 @@ import javax.portlet.MutableRenderParameters;
  * @author Neil Griffin
  */
 public interface LiferayMutableRenderParameters
-	extends LiferayMutablePortletParameters, MutableRenderParameters {
+	extends MutableRenderParameters, LiferayMutablePortletParameters {
 
 	/**
 	 * Returns <code>true</code> if the value of the parameter associated with

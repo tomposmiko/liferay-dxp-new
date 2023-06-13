@@ -747,9 +747,12 @@ public class CompanyLocalServiceTest {
 
 		nameMap.put(LocaleUtil.getDefault(), name);
 
-		return LayoutSetPrototypeLocalServiceUtil.addLayoutSetPrototype(
-			userId, companyId, nameMap, new HashMap<Locale, String>(), true,
-			true, getServiceContext(companyId));
+		LayoutSetPrototype layoutSetPrototype =
+			LayoutSetPrototypeLocalServiceUtil.addLayoutSetPrototype(
+				userId, companyId, nameMap, new HashMap<Locale, String>(), true,
+				true, getServiceContext(companyId));
+
+		return layoutSetPrototype;
 	}
 
 	protected User addUser(

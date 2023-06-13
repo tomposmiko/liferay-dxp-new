@@ -16,7 +16,6 @@ package com.liferay.portal.service.base;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.counter.kernel.service.persistence.CounterPersistence;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -58,17 +57,17 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.portal.service.impl.BrowserTrackerLocalServiceImpl
+ * @see com.liferay.portal.kernel.service.BrowserTrackerLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class BrowserTrackerLocalServiceBaseImpl
-	extends BaseLocalServiceImpl
-	implements BrowserTrackerLocalService, IdentifiableOSGiService {
-
+	extends BaseLocalServiceImpl implements BrowserTrackerLocalService,
+		IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>BrowserTrackerLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.BrowserTrackerLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.portal.kernel.service.BrowserTrackerLocalServiceUtil} to access the browser tracker local service.
 	 */
 
 	/**
@@ -108,7 +107,6 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	@Override
 	public BrowserTracker deleteBrowserTracker(long browserTrackerId)
 		throws PortalException {
-
 		return browserTrackerPersistence.remove(browserTrackerId);
 	}
 
@@ -128,8 +126,8 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(
-			BrowserTracker.class, clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(BrowserTracker.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -147,7 +145,7 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.BrowserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.BrowserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -156,18 +154,17 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(
-		DynamicQuery dynamicQuery, int start, int end) {
-
-		return browserTrackerPersistence.findWithDynamicQuery(
-			dynamicQuery, start, end);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end) {
+		return browserTrackerPersistence.findWithDynamicQuery(dynamicQuery,
+			start, end);
 	}
 
 	/**
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.BrowserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.BrowserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -177,12 +174,10 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(
-		DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator<T> orderByComparator) {
-
-		return browserTrackerPersistence.findWithDynamicQuery(
-			dynamicQuery, start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator) {
+		return browserTrackerPersistence.findWithDynamicQuery(dynamicQuery,
+			start, end, orderByComparator);
 	}
 
 	/**
@@ -204,11 +199,10 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(
-		DynamicQuery dynamicQuery, Projection projection) {
-
-		return browserTrackerPersistence.countWithDynamicQuery(
-			dynamicQuery, projection);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery,
+		Projection projection) {
+		return browserTrackerPersistence.countWithDynamicQuery(dynamicQuery,
+			projection);
 	}
 
 	@Override
@@ -226,14 +220,12 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	@Override
 	public BrowserTracker getBrowserTracker(long browserTrackerId)
 		throws PortalException {
-
 		return browserTrackerPersistence.findByPrimaryKey(browserTrackerId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery =
-			new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(browserTrackerLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -245,14 +237,10 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery
-		getIndexableActionableDynamicQuery() {
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
 
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
-			new IndexableActionableDynamicQuery();
-
-		indexableActionableDynamicQuery.setBaseLocalService(
-			browserTrackerLocalService);
+		indexableActionableDynamicQuery.setBaseLocalService(browserTrackerLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(BrowserTracker.class);
 
@@ -264,7 +252,6 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-
 		actionableDynamicQuery.setBaseLocalService(browserTrackerLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(BrowserTracker.class);
@@ -278,15 +265,12 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
-		return browserTrackerLocalService.deleteBrowserTracker(
-			(BrowserTracker)persistedModel);
+		return browserTrackerLocalService.deleteBrowserTracker((BrowserTracker)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
-
 		return browserTrackerPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -294,7 +278,7 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	 * Returns a range of all the browser trackers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.BrowserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.BrowserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of browser trackers
@@ -344,7 +328,6 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	 */
 	public void setBrowserTrackerLocalService(
 		BrowserTrackerLocalService browserTrackerLocalService) {
-
 		this.browserTrackerLocalService = browserTrackerLocalService;
 	}
 
@@ -364,7 +347,6 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	 */
 	public void setBrowserTrackerPersistence(
 		BrowserTrackerPersistence browserTrackerPersistence) {
-
 		this.browserTrackerPersistence = browserTrackerPersistence;
 	}
 
@@ -373,9 +355,7 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -385,33 +365,12 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
-	/**
-	 * Returns the counter persistence.
-	 *
-	 * @return the counter persistence
-	 */
-	public CounterPersistence getCounterPersistence() {
-		return counterPersistence;
-	}
-
-	/**
-	 * Sets the counter persistence.
-	 *
-	 * @param counterPersistence the counter persistence
-	 */
-	public void setCounterPersistence(CounterPersistence counterPersistence) {
-		this.counterPersistence = counterPersistence;
-	}
-
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register(
-			"com.liferay.portal.kernel.model.BrowserTracker",
+		persistedModelLocalServiceRegistry.register("com.liferay.portal.kernel.model.BrowserTracker",
 			browserTrackerLocalService);
 	}
 
@@ -452,8 +411,8 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -464,21 +423,10 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 
 	@BeanReference(type = BrowserTrackerLocalService.class)
 	protected BrowserTrackerLocalService browserTrackerLocalService;
-
 	@BeanReference(type = BrowserTrackerPersistence.class)
 	protected BrowserTrackerPersistence browserTrackerPersistence;
-
-	@BeanReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@BeanReference(type = CounterPersistence.class)
-	protected CounterPersistence counterPersistence;
-
+	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry
-		persistedModelLocalServiceRegistry;
-
+	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }

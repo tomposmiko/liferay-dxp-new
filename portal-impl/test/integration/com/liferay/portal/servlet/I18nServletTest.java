@@ -155,13 +155,13 @@ public class I18nServletTest {
 
 		mockHttpServletRequest.setPathInfo(StringPool.SLASH);
 		mockHttpServletRequest.setServletPath(
-			StringPool.SLASH + LocaleUtil.CANADA_FRENCH.toLanguageTag());
+			StringPool.SLASH + Locale.CANADA_FRENCH.toLanguageTag());
 
 		I18nServlet.I18nData actualI18nData = _i18nServlet.getI18nData(
 			mockHttpServletRequest);
 
 		I18nServlet.I18nData expectedI18nData = getI18nData(
-			LocaleUtil.CANADA_FRENCH);
+			Locale.CANADA_FRENCH);
 
 		Assert.assertEquals(expectedI18nData, actualI18nData);
 	}

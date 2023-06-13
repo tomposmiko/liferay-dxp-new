@@ -18,7 +18,9 @@ import com.liferay.asset.kernel.service.persistence.AssetCategoryPersistence;
 import com.liferay.asset.kernel.service.persistence.AssetEntryPersistence;
 import com.liferay.asset.kernel.service.persistence.AssetLinkPersistence;
 import com.liferay.asset.kernel.service.persistence.AssetTagPersistence;
+
 import com.liferay.expando.kernel.service.persistence.ExpandoRowPersistence;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -32,7 +34,9 @@ import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.service.persistence.WorkflowInstanceLinkPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+
 import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
+
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.service.WikiPageService;
 import com.liferay.wiki.service.persistence.WikiNodePersistence;
@@ -51,16 +55,15 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.wiki.service.impl.WikiPageServiceImpl
+ * @see com.liferay.wiki.service.WikiPageServiceUtil
  * @generated
  */
-public abstract class WikiPageServiceBaseImpl
-	extends BaseServiceImpl
+public abstract class WikiPageServiceBaseImpl extends BaseServiceImpl
 	implements WikiPageService, IdentifiableOSGiService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>WikiPageService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.wiki.service.WikiPageServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.wiki.service.WikiPageServiceUtil} to access the wiki page remote service.
 	 */
 
 	/**
@@ -68,9 +71,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the wiki page local service
 	 */
-	public com.liferay.wiki.service.WikiPageLocalService
-		getWikiPageLocalService() {
-
+	public com.liferay.wiki.service.WikiPageLocalService getWikiPageLocalService() {
 		return wikiPageLocalService;
 	}
 
@@ -81,7 +82,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setWikiPageLocalService(
 		com.liferay.wiki.service.WikiPageLocalService wikiPageLocalService) {
-
 		this.wikiPageLocalService = wikiPageLocalService;
 	}
 
@@ -117,9 +117,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @param wikiPagePersistence the wiki page persistence
 	 */
-	public void setWikiPagePersistence(
-		WikiPagePersistence wikiPagePersistence) {
-
+	public void setWikiPagePersistence(WikiPagePersistence wikiPagePersistence) {
 		this.wikiPagePersistence = wikiPagePersistence;
 	}
 
@@ -146,9 +144,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -158,9 +154,7 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -169,9 +163,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService
-		getResourceLocalService() {
-
+	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
 		return resourceLocalService;
 	}
 
@@ -181,9 +173,7 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService
-			resourceLocalService) {
-
+		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -192,9 +182,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the system event local service
 	 */
-	public com.liferay.portal.kernel.service.SystemEventLocalService
-		getSystemEventLocalService() {
-
+	public com.liferay.portal.kernel.service.SystemEventLocalService getSystemEventLocalService() {
 		return systemEventLocalService;
 	}
 
@@ -204,9 +192,7 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param systemEventLocalService the system event local service
 	 */
 	public void setSystemEventLocalService(
-		com.liferay.portal.kernel.service.SystemEventLocalService
-			systemEventLocalService) {
-
+		com.liferay.portal.kernel.service.SystemEventLocalService systemEventLocalService) {
 		this.systemEventLocalService = systemEventLocalService;
 	}
 
@@ -226,7 +212,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setSystemEventPersistence(
 		SystemEventPersistence systemEventPersistence) {
-
 		this.systemEventPersistence = systemEventPersistence;
 	}
 
@@ -235,9 +220,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -248,7 +231,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -268,7 +250,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
-
 		this.userService = userService;
 	}
 
@@ -295,9 +276,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the workflow instance link local service
 	 */
-	public com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-		getWorkflowInstanceLinkLocalService() {
-
+	public com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService getWorkflowInstanceLinkLocalService() {
 		return workflowInstanceLinkLocalService;
 	}
 
@@ -307,11 +286,8 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param workflowInstanceLinkLocalService the workflow instance link local service
 	 */
 	public void setWorkflowInstanceLinkLocalService(
-		com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-			workflowInstanceLinkLocalService) {
-
-		this.workflowInstanceLinkLocalService =
-			workflowInstanceLinkLocalService;
+		com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService) {
+		this.workflowInstanceLinkLocalService = workflowInstanceLinkLocalService;
 	}
 
 	/**
@@ -319,9 +295,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the workflow instance link persistence
 	 */
-	public WorkflowInstanceLinkPersistence
-		getWorkflowInstanceLinkPersistence() {
-
+	public WorkflowInstanceLinkPersistence getWorkflowInstanceLinkPersistence() {
 		return workflowInstanceLinkPersistence;
 	}
 
@@ -332,7 +306,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setWorkflowInstanceLinkPersistence(
 		WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence) {
-
 		this.workflowInstanceLinkPersistence = workflowInstanceLinkPersistence;
 	}
 
@@ -341,9 +314,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the asset category local service
 	 */
-	public com.liferay.asset.kernel.service.AssetCategoryLocalService
-		getAssetCategoryLocalService() {
-
+	public com.liferay.asset.kernel.service.AssetCategoryLocalService getAssetCategoryLocalService() {
 		return assetCategoryLocalService;
 	}
 
@@ -353,9 +324,7 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param assetCategoryLocalService the asset category local service
 	 */
 	public void setAssetCategoryLocalService(
-		com.liferay.asset.kernel.service.AssetCategoryLocalService
-			assetCategoryLocalService) {
-
+		com.liferay.asset.kernel.service.AssetCategoryLocalService assetCategoryLocalService) {
 		this.assetCategoryLocalService = assetCategoryLocalService;
 	}
 
@@ -364,9 +333,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the asset category remote service
 	 */
-	public com.liferay.asset.kernel.service.AssetCategoryService
-		getAssetCategoryService() {
-
+	public com.liferay.asset.kernel.service.AssetCategoryService getAssetCategoryService() {
 		return assetCategoryService;
 	}
 
@@ -376,9 +343,7 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param assetCategoryService the asset category remote service
 	 */
 	public void setAssetCategoryService(
-		com.liferay.asset.kernel.service.AssetCategoryService
-			assetCategoryService) {
-
+		com.liferay.asset.kernel.service.AssetCategoryService assetCategoryService) {
 		this.assetCategoryService = assetCategoryService;
 	}
 
@@ -398,7 +363,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setAssetCategoryPersistence(
 		AssetCategoryPersistence assetCategoryPersistence) {
-
 		this.assetCategoryPersistence = assetCategoryPersistence;
 	}
 
@@ -407,9 +371,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the asset entry local service
 	 */
-	public com.liferay.asset.kernel.service.AssetEntryLocalService
-		getAssetEntryLocalService() {
-
+	public com.liferay.asset.kernel.service.AssetEntryLocalService getAssetEntryLocalService() {
 		return assetEntryLocalService;
 	}
 
@@ -419,9 +381,7 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param assetEntryLocalService the asset entry local service
 	 */
 	public void setAssetEntryLocalService(
-		com.liferay.asset.kernel.service.AssetEntryLocalService
-			assetEntryLocalService) {
-
+		com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService) {
 		this.assetEntryLocalService = assetEntryLocalService;
 	}
 
@@ -430,9 +390,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the asset entry remote service
 	 */
-	public com.liferay.asset.kernel.service.AssetEntryService
-		getAssetEntryService() {
-
+	public com.liferay.asset.kernel.service.AssetEntryService getAssetEntryService() {
 		return assetEntryService;
 	}
 
@@ -443,7 +401,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setAssetEntryService(
 		com.liferay.asset.kernel.service.AssetEntryService assetEntryService) {
-
 		this.assetEntryService = assetEntryService;
 	}
 
@@ -463,7 +420,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setAssetEntryPersistence(
 		AssetEntryPersistence assetEntryPersistence) {
-
 		this.assetEntryPersistence = assetEntryPersistence;
 	}
 
@@ -472,9 +428,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the asset link local service
 	 */
-	public com.liferay.asset.kernel.service.AssetLinkLocalService
-		getAssetLinkLocalService() {
-
+	public com.liferay.asset.kernel.service.AssetLinkLocalService getAssetLinkLocalService() {
 		return assetLinkLocalService;
 	}
 
@@ -484,9 +438,7 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param assetLinkLocalService the asset link local service
 	 */
 	public void setAssetLinkLocalService(
-		com.liferay.asset.kernel.service.AssetLinkLocalService
-			assetLinkLocalService) {
-
+		com.liferay.asset.kernel.service.AssetLinkLocalService assetLinkLocalService) {
 		this.assetLinkLocalService = assetLinkLocalService;
 	}
 
@@ -506,7 +458,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setAssetLinkPersistence(
 		AssetLinkPersistence assetLinkPersistence) {
-
 		this.assetLinkPersistence = assetLinkPersistence;
 	}
 
@@ -515,9 +466,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the asset tag local service
 	 */
-	public com.liferay.asset.kernel.service.AssetTagLocalService
-		getAssetTagLocalService() {
-
+	public com.liferay.asset.kernel.service.AssetTagLocalService getAssetTagLocalService() {
 		return assetTagLocalService;
 	}
 
@@ -527,9 +476,7 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param assetTagLocalService the asset tag local service
 	 */
 	public void setAssetTagLocalService(
-		com.liferay.asset.kernel.service.AssetTagLocalService
-			assetTagLocalService) {
-
+		com.liferay.asset.kernel.service.AssetTagLocalService assetTagLocalService) {
 		this.assetTagLocalService = assetTagLocalService;
 	}
 
@@ -538,9 +485,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the asset tag remote service
 	 */
-	public com.liferay.asset.kernel.service.AssetTagService
-		getAssetTagService() {
-
+	public com.liferay.asset.kernel.service.AssetTagService getAssetTagService() {
 		return assetTagService;
 	}
 
@@ -551,7 +496,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setAssetTagService(
 		com.liferay.asset.kernel.service.AssetTagService assetTagService) {
-
 		this.assetTagService = assetTagService;
 	}
 
@@ -569,9 +513,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @param assetTagPersistence the asset tag persistence
 	 */
-	public void setAssetTagPersistence(
-		AssetTagPersistence assetTagPersistence) {
-
+	public void setAssetTagPersistence(AssetTagPersistence assetTagPersistence) {
 		this.assetTagPersistence = assetTagPersistence;
 	}
 
@@ -580,9 +522,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the expando row local service
 	 */
-	public com.liferay.expando.kernel.service.ExpandoRowLocalService
-		getExpandoRowLocalService() {
-
+	public com.liferay.expando.kernel.service.ExpandoRowLocalService getExpandoRowLocalService() {
 		return expandoRowLocalService;
 	}
 
@@ -592,9 +532,7 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param expandoRowLocalService the expando row local service
 	 */
 	public void setExpandoRowLocalService(
-		com.liferay.expando.kernel.service.ExpandoRowLocalService
-			expandoRowLocalService) {
-
+		com.liferay.expando.kernel.service.ExpandoRowLocalService expandoRowLocalService) {
 		this.expandoRowLocalService = expandoRowLocalService;
 	}
 
@@ -614,7 +552,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setExpandoRowPersistence(
 		ExpandoRowPersistence expandoRowPersistence) {
-
 		this.expandoRowPersistence = expandoRowPersistence;
 	}
 
@@ -623,9 +560,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the ratings stats local service
 	 */
-	public com.liferay.ratings.kernel.service.RatingsStatsLocalService
-		getRatingsStatsLocalService() {
-
+	public com.liferay.ratings.kernel.service.RatingsStatsLocalService getRatingsStatsLocalService() {
 		return ratingsStatsLocalService;
 	}
 
@@ -635,9 +570,7 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param ratingsStatsLocalService the ratings stats local service
 	 */
 	public void setRatingsStatsLocalService(
-		com.liferay.ratings.kernel.service.RatingsStatsLocalService
-			ratingsStatsLocalService) {
-
+		com.liferay.ratings.kernel.service.RatingsStatsLocalService ratingsStatsLocalService) {
 		this.ratingsStatsLocalService = ratingsStatsLocalService;
 	}
 
@@ -657,7 +590,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setRatingsStatsPersistence(
 		RatingsStatsPersistence ratingsStatsPersistence) {
-
 		this.ratingsStatsPersistence = ratingsStatsPersistence;
 	}
 
@@ -666,9 +598,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the wiki node local service
 	 */
-	public com.liferay.wiki.service.WikiNodeLocalService
-		getWikiNodeLocalService() {
-
+	public com.liferay.wiki.service.WikiNodeLocalService getWikiNodeLocalService() {
 		return wikiNodeLocalService;
 	}
 
@@ -679,7 +609,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setWikiNodeLocalService(
 		com.liferay.wiki.service.WikiNodeLocalService wikiNodeLocalService) {
-
 		this.wikiNodeLocalService = wikiNodeLocalService;
 	}
 
@@ -699,7 +628,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setWikiNodeService(
 		com.liferay.wiki.service.WikiNodeService wikiNodeService) {
-
 		this.wikiNodeService = wikiNodeService;
 	}
 
@@ -717,9 +645,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @param wikiNodePersistence the wiki node persistence
 	 */
-	public void setWikiNodePersistence(
-		WikiNodePersistence wikiNodePersistence) {
-
+	public void setWikiNodePersistence(WikiNodePersistence wikiNodePersistence) {
 		this.wikiNodePersistence = wikiNodePersistence;
 	}
 
@@ -728,9 +654,7 @@ public abstract class WikiPageServiceBaseImpl
 	 *
 	 * @return the wiki page resource local service
 	 */
-	public com.liferay.wiki.service.WikiPageResourceLocalService
-		getWikiPageResourceLocalService() {
-
+	public com.liferay.wiki.service.WikiPageResourceLocalService getWikiPageResourceLocalService() {
 		return wikiPageResourceLocalService;
 	}
 
@@ -740,9 +664,7 @@ public abstract class WikiPageServiceBaseImpl
 	 * @param wikiPageResourceLocalService the wiki page resource local service
 	 */
 	public void setWikiPageResourceLocalService(
-		com.liferay.wiki.service.WikiPageResourceLocalService
-			wikiPageResourceLocalService) {
-
+		com.liferay.wiki.service.WikiPageResourceLocalService wikiPageResourceLocalService) {
 		this.wikiPageResourceLocalService = wikiPageResourceLocalService;
 	}
 
@@ -762,7 +684,6 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	public void setWikiPageResourcePersistence(
 		WikiPageResourcePersistence wikiPageResourcePersistence) {
-
 		this.wikiPageResourcePersistence = wikiPageResourcePersistence;
 	}
 
@@ -804,8 +725,8 @@ public abstract class WikiPageServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -815,150 +736,69 @@ public abstract class WikiPageServiceBaseImpl
 	}
 
 	@BeanReference(type = com.liferay.wiki.service.WikiPageLocalService.class)
-	protected com.liferay.wiki.service.WikiPageLocalService
-		wikiPageLocalService;
-
+	protected com.liferay.wiki.service.WikiPageLocalService wikiPageLocalService;
 	@BeanReference(type = WikiPageService.class)
 	protected WikiPageService wikiPageService;
-
 	@BeanReference(type = WikiPagePersistence.class)
 	protected WikiPagePersistence wikiPagePersistence;
-
 	@BeanReference(type = WikiPageFinder.class)
 	protected WikiPageFinder wikiPageFinder;
-
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ResourceLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.SystemEventLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.SystemEventLocalService
-		systemEventLocalService;
-
+	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
+	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.SystemEventLocalService.class)
+	protected com.liferay.portal.kernel.service.SystemEventLocalService systemEventLocalService;
 	@ServiceReference(type = SystemEventPersistence.class)
 	protected SystemEventPersistence systemEventPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserService.class
-	)
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserService.class)
 	protected com.liferay.portal.kernel.service.UserService userService;
-
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-		workflowInstanceLinkLocalService;
-
+	@ServiceReference(type = com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService.class)
+	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService;
 	@ServiceReference(type = WorkflowInstanceLinkPersistence.class)
 	protected WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetCategoryLocalService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetCategoryLocalService
-		assetCategoryLocalService;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetCategoryService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetCategoryService
-		assetCategoryService;
-
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetCategoryLocalService.class)
+	protected com.liferay.asset.kernel.service.AssetCategoryLocalService assetCategoryLocalService;
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetCategoryService.class)
+	protected com.liferay.asset.kernel.service.AssetCategoryService assetCategoryService;
 	@ServiceReference(type = AssetCategoryPersistence.class)
 	protected AssetCategoryPersistence assetCategoryPersistence;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetEntryLocalService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetEntryLocalService
-		assetEntryLocalService;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetEntryService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetEntryService
-		assetEntryService;
-
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetEntryLocalService.class)
+	protected com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService;
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetEntryService.class)
+	protected com.liferay.asset.kernel.service.AssetEntryService assetEntryService;
 	@ServiceReference(type = AssetEntryPersistence.class)
 	protected AssetEntryPersistence assetEntryPersistence;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetLinkLocalService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetLinkLocalService
-		assetLinkLocalService;
-
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetLinkLocalService.class)
+	protected com.liferay.asset.kernel.service.AssetLinkLocalService assetLinkLocalService;
 	@ServiceReference(type = AssetLinkPersistence.class)
 	protected AssetLinkPersistence assetLinkPersistence;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetTagLocalService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetTagLocalService
-		assetTagLocalService;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetTagService.class
-	)
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetTagLocalService.class)
+	protected com.liferay.asset.kernel.service.AssetTagLocalService assetTagLocalService;
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetTagService.class)
 	protected com.liferay.asset.kernel.service.AssetTagService assetTagService;
-
 	@ServiceReference(type = AssetTagPersistence.class)
 	protected AssetTagPersistence assetTagPersistence;
-
-	@ServiceReference(
-		type = com.liferay.expando.kernel.service.ExpandoRowLocalService.class
-	)
-	protected com.liferay.expando.kernel.service.ExpandoRowLocalService
-		expandoRowLocalService;
-
+	@ServiceReference(type = com.liferay.expando.kernel.service.ExpandoRowLocalService.class)
+	protected com.liferay.expando.kernel.service.ExpandoRowLocalService expandoRowLocalService;
 	@ServiceReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-
-	@ServiceReference(
-		type = com.liferay.ratings.kernel.service.RatingsStatsLocalService.class
-	)
-	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService
-		ratingsStatsLocalService;
-
+	@ServiceReference(type = com.liferay.ratings.kernel.service.RatingsStatsLocalService.class)
+	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService ratingsStatsLocalService;
 	@ServiceReference(type = RatingsStatsPersistence.class)
 	protected RatingsStatsPersistence ratingsStatsPersistence;
-
 	@BeanReference(type = com.liferay.wiki.service.WikiNodeLocalService.class)
-	protected com.liferay.wiki.service.WikiNodeLocalService
-		wikiNodeLocalService;
-
+	protected com.liferay.wiki.service.WikiNodeLocalService wikiNodeLocalService;
 	@BeanReference(type = com.liferay.wiki.service.WikiNodeService.class)
 	protected com.liferay.wiki.service.WikiNodeService wikiNodeService;
-
 	@BeanReference(type = WikiNodePersistence.class)
 	protected WikiNodePersistence wikiNodePersistence;
-
-	@BeanReference(
-		type = com.liferay.wiki.service.WikiPageResourceLocalService.class
-	)
-	protected com.liferay.wiki.service.WikiPageResourceLocalService
-		wikiPageResourceLocalService;
-
+	@BeanReference(type = com.liferay.wiki.service.WikiPageResourceLocalService.class)
+	protected com.liferay.wiki.service.WikiPageResourceLocalService wikiPageResourceLocalService;
 	@BeanReference(type = WikiPageResourcePersistence.class)
 	protected WikiPageResourcePersistence wikiPageResourcePersistence;
-
 }

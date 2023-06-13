@@ -12,6 +12,20 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Site Administration",
+			portlet = "Site Settings"
+		);
+
+		Site.configureCurrentLanguagesCP(
+			currentSiteLanguages = "English (United States),Spanish (Spain),Portuguese (Brazil)",
+			defaultSiteLanguage = "Portuguese (Brazil)",
+			displaySettings = "Display Settings"
+		);
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
 			category = "Content",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists"
@@ -70,8 +84,6 @@ definition {
 	@description = "This is a use case for LPS-69325."
 	@priority = "4"
 	test ViewFieldInputWhenSwitchingTranslations {
-		property test.name.skip.portal.instance = "DDMStructureWithTranslations#ViewFieldInputWhenSwitchingTranslations";
-
 		DDLRecord.addCP();
 
 		DDLRecord.populateFieldText(

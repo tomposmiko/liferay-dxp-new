@@ -25,11 +25,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.CountryServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.portal.service.http.CountryServiceSoap
  * @generated
  */
 @ProviderType
 public class CountrySoap implements Serializable {
-
 	public static CountrySoap toSoapModel(Country model) {
 		CountrySoap soapModel = new CountrySoap();
 
@@ -74,8 +74,7 @@ public class CountrySoap implements Serializable {
 	}
 
 	public static CountrySoap[] toSoapModels(List<Country> models) {
-		List<CountrySoap> soapModels = new ArrayList<CountrySoap>(
-			models.size());
+		List<CountrySoap> soapModels = new ArrayList<CountrySoap>(models.size());
 
 		for (Country model : models) {
 			soapModels.add(toSoapModel(model));
@@ -184,5 +183,4 @@ public class CountrySoap implements Serializable {
 	private String _idd;
 	private boolean _zipRequired;
 	private boolean _active;
-
 }

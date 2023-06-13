@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.search.test.SearchTestUtil;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
@@ -39,7 +40,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.search.internal.summary.SummaryBuilderFactoryImpl;
-import com.liferay.portal.search.test.SearchTestUtil;
 import com.liferay.portal.search.web.internal.display.context.PortletURLFactory;
 import com.liferay.portal.search.web.internal.display.context.SearchResultPreferences;
 import com.liferay.portal.search.web.internal.result.display.context.SearchResultSummaryDisplayContext;
@@ -376,7 +376,7 @@ public class SearchResultSummaryDisplayBuilderTest {
 		Indexer<?> indexer = Mockito.mock(Indexer.class);
 
 		Mockito.doReturn(
-			new Summary(LocaleUtil.US, null, null)
+			new Summary(Locale.US, null, null)
 		).when(
 			indexer
 		).getSummary(
@@ -462,7 +462,7 @@ public class SearchResultSummaryDisplayBuilderTest {
 	}
 
 	protected void setUpLocaleThreadLocal() {
-		LocaleThreadLocal.setThemeDisplayLocale(LocaleUtil.US);
+		LocaleThreadLocal.setThemeDisplayLocale(Locale.US);
 	}
 
 	protected void setUpProps() {
@@ -549,7 +549,7 @@ public class SearchResultSummaryDisplayBuilderTest {
 	@Mock
 	protected IndexerRegistry indexerRegistry;
 
-	protected Locale locale = LocaleUtil.US;
+	protected Locale locale = Locale.US;
 
 	@Mock
 	protected PermissionChecker permissionChecker;

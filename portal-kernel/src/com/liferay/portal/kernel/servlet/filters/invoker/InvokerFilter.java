@@ -83,7 +83,7 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 
 		response = secureResponseHeaders(request, response);
 
-		String uri = getURI(request, originalURI);
+		String uri = getURI(originalURI);
 
 		request.setAttribute(WebKeys.INVOKER_FILTER_URI, uri);
 
@@ -190,30 +190,20 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 	protected InvokerFilterChain getInvokerFilterChain(
 		HttpServletRequest request, String uri, FilterChain filterChain) {
 
-		if (_filterChains == null) {
+		if ((_filterChains == null) ||
+			Validator.isNotNull(request.getQueryString())) {
+
 			return _invokerFilterHelper.createInvokerFilterChain(
 				request, _dispatcher, uri, filterChain);
 		}
 
-		String key = uri;
-
-		String queryString = request.getQueryString();
-
-		if (Validator.isNotNull(queryString)) {
-			key = key.concat(
-				StringPool.QUESTION
-			).concat(
-				queryString
-			);
-		}
-
-		InvokerFilterChain invokerFilterChain = _filterChains.get(key);
+		InvokerFilterChain invokerFilterChain = _filterChains.get(uri);
 
 		if (invokerFilterChain == null) {
 			invokerFilterChain = _invokerFilterHelper.createInvokerFilterChain(
 				request, _dispatcher, uri, filterChain);
 
-			_filterChains.put(key, invokerFilterChain);
+			_filterChains.put(uri, invokerFilterChain);
 		}
 
 		return invokerFilterChain.clone(filterChain);
@@ -246,7 +236,16 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		return null;
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getURI(String)}
+	 */
+	@Deprecated
 	protected String getURI(HttpServletRequest request, String originalURI) {
+		return getURI(originalURI);
+	}
+
+	protected String getURI(String originalURI) {
 		if (Validator.isNotNull(_contextPath) &&
 			!_contextPath.equals(StringPool.SLASH) &&
 			originalURI.startsWith(_contextPath)) {

@@ -34,7 +34,10 @@ public class SerialBackgroundTaskExecutor
 
 	@Override
 	public BackgroundTaskExecutor clone() {
-		return new SerialBackgroundTaskExecutor(getBackgroundTaskExecutor());
+		BackgroundTaskExecutor backgroundTaskExecutor =
+			new SerialBackgroundTaskExecutor(getBackgroundTaskExecutor());
+
+		return backgroundTaskExecutor;
 	}
 
 	@Override

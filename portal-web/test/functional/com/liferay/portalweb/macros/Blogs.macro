@@ -207,6 +207,8 @@ definition {
 	}
 
 	macro addViaAPSelectScope {
+		AssetPublisherPortlet.addAsset(assetType = "Blogs Entry");
+
 		MouseOver.mouseOverNotVisible(locator1 = "AP#ADD_ASSET_PLUS_ICON");
 
 		Click(locator1 = "AP#ADD_ASSET_PLUS_ICON");
@@ -532,7 +534,7 @@ definition {
 
 		var key_text = "RSS";
 
-		AssertTextEquals.assertPartialText(locator1 = "Button#ANY", value1 = "RSS");
+		AssertTextEquals(locator1 = "Button#ANY", value1 = "RSS");
 	}
 
 	macro viewNoEntryCP {

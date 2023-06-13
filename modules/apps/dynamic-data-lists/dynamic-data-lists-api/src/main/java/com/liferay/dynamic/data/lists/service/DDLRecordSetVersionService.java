@@ -17,6 +17,7 @@ package com.liferay.dynamic.data.lists.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordSetVersion;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -37,38 +38,32 @@ import java.util.List;
  *
  * @author Brian Wing Shun Chan
  * @see DDLRecordSetVersionServiceUtil
+ * @see com.liferay.dynamic.data.lists.service.base.DDLRecordSetVersionServiceBaseImpl
+ * @see com.liferay.dynamic.data.lists.service.impl.DDLRecordSetVersionServiceImpl
  * @generated
  */
 @AccessControlled
 @JSONWebService
-@OSGiBeanProperties(
-	property = {
-		"json.web.service.context.name=ddl",
-		"json.web.service.context.path=DDLRecordSetVersion"
-	},
-	service = DDLRecordSetVersionService.class
-)
+@OSGiBeanProperties(property =  {
+	"json.web.service.context.name=ddl", "json.web.service.context.path=DDLRecordSetVersion"}, service = DDLRecordSetVersionService.class)
 @ProviderType
-@Transactional(
-	isolation = Isolation.PORTAL,
-	rollbackFor = {PortalException.class, SystemException.class}
-)
+@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
+	PortalException.class, SystemException.class})
 public interface DDLRecordSetVersionService extends BaseService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link DDLRecordSetVersionServiceUtil} to access the ddl record set version remote service. Add custom service methods to <code>com.liferay.dynamic.data.lists.service.impl.DDLRecordSetVersionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link DDLRecordSetVersionServiceUtil} to access the ddl record set version remote service. Add custom service methods to {@link com.liferay.dynamic.data.lists.service.impl.DDLRecordSetVersionServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDLRecordSetVersion getLatestRecordSetVersion(long recordSetId)
 		throws PortalException;
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public String getOSGiServiceIdentifier();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -76,13 +71,12 @@ public interface DDLRecordSetVersionService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<DDLRecordSetVersion> getRecordSetVersions(
-			long recordSetId, int start, int end,
-			OrderByComparator<DDLRecordSetVersion> orderByComparator)
+	public List<DDLRecordSetVersion> getRecordSetVersions(long recordSetId,
+		int start, int end,
+		OrderByComparator<DDLRecordSetVersion> orderByComparator)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getRecordSetVersionsCount(long recordSetId)
 		throws PortalException;
-
 }

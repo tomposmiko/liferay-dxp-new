@@ -42,7 +42,7 @@ import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsLocatorHelperUtil;
 import com.liferay.portal.kernel.spring.aop.Property;
 import com.liferay.portal.kernel.spring.aop.Retry;
-import com.liferay.portal.kernel.spring.aop.Skip;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -158,6 +158,11 @@ public class PortletPreferencesLocalServiceImpl
 	}
 
 	@Override
+	public void deletePortletPreferencesByOwnerId(long ownerId) {
+		portletPreferencesPersistence.removeByOwnerId(ownerId);
+	}
+
+	@Override
 	public void deletePortletPreferencesByPlid(long plid) {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Delete {plid=" + plid + "}");
@@ -169,10 +174,6 @@ public class PortletPreferencesLocalServiceImpl
 	@Override
 	public PortletPreferences fetchPortletPreferences(
 		long ownerId, int ownerType, long plid, String portletId) {
-
-		if (!_exists(plid, portletId)) {
-			return null;
-		}
 
 		return portletPreferencesPersistence.fetchByO_O_P_P(
 			ownerId, ownerType, _swapPlidForPortletPreferences(plid),
@@ -210,7 +211,7 @@ public class PortletPreferencesLocalServiceImpl
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public javax.portlet.PortletPreferences getDefaultPreferences(
 		long companyId, String portletId) {
 
@@ -349,6 +350,13 @@ public class PortletPreferencesLocalServiceImpl
 	}
 
 	@Override
+	public List<PortletPreferences> getPortletPreferencesByOwnerId(
+		long ownerId) {
+
+		return portletPreferencesPersistence.findByOwnerId(ownerId);
+	}
+
+	@Override
 	public List<PortletPreferences> getPortletPreferencesByPlid(long plid) {
 		return portletPreferencesPersistence.findByPlid(plid);
 	}
@@ -356,10 +364,6 @@ public class PortletPreferencesLocalServiceImpl
 	@Override
 	public long getPortletPreferencesCount(
 		int ownerType, long plid, String portletId) {
-
-		if (!_exists(plid, portletId)) {
-			return 0;
-		}
 
 		return portletPreferencesPersistence.countByO_P_P(
 			ownerType, _swapPlidForPortletPreferences(plid), portletId);
@@ -542,12 +546,6 @@ public class PortletPreferencesLocalServiceImpl
 		long companyId, long ownerId, int ownerType, long plid,
 		String portletId) {
 
-		if (!_exists(plid, companyId, portletId)) {
-			return PortletPreferencesFactoryUtil.strictFromXML(
-				companyId, ownerId, ownerType, plid, portletId,
-				PortletConstants.DEFAULT_PREFERENCES);
-		}
-
 		plid = _swapPlidForPreferences(plid);
 
 		PortletPreferences portletPreferences =
@@ -631,34 +629,6 @@ public class PortletPreferencesLocalServiceImpl
 		portletPreferencesPersistence.update(portletPreferences);
 
 		return portletPreferences;
-	}
-
-	private boolean _exists(long plid, long companyId, String portletId) {
-		if (plid == PortletKeys.PREFS_PLID_SHARED) {
-			return true;
-		}
-
-		if (portletLocalService.fetchPortletById(companyId, portletId) !=
-				null) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private boolean _exists(long plid, String portletId) {
-		if (plid == PortletKeys.PREFS_PLID_SHARED) {
-			return true;
-		}
-
-		Layout layout = layoutPersistence.fetchByPrimaryKey(plid);
-
-		if (layout == null) {
-			return false;
-		}
-
-		return _exists(plid, layout.getCompanyId(), portletId);
 	}
 
 	private LayoutRevision _getLayoutRevision(long plid) {
@@ -780,11 +750,6 @@ public class PortletPreferencesLocalServiceImpl
 		}
 
 		try {
-			boolean hasWorkflowTask = StagingUtil.hasWorkflowTask(
-				serviceContext.getUserId(), layoutRevision);
-
-			serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
-
 			layoutRevision = layoutRevisionLocalService.updateLayoutRevision(
 				serviceContext.getUserId(),
 				layoutRevision.getLayoutRevisionId(),

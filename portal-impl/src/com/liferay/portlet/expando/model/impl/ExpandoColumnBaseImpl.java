@@ -32,13 +32,12 @@ import com.liferay.expando.kernel.service.ExpandoColumnLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class ExpandoColumnBaseImpl
-	extends ExpandoColumnModelImpl implements ExpandoColumn {
-
+public abstract class ExpandoColumnBaseImpl extends ExpandoColumnModelImpl
+	implements ExpandoColumn {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a expando column model instance should use the <code>ExpandoColumn</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a expando column model instance should use the {@link ExpandoColumn} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class ExpandoColumnBaseImpl
 			ExpandoColumnLocalServiceUtil.updateExpandoColumn(this);
 		}
 	}
-
 }

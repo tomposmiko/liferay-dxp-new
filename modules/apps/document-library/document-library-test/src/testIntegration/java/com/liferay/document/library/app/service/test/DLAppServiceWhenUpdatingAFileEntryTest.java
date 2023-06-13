@@ -21,6 +21,7 @@ import com.liferay.document.library.kernel.exception.FileSizeException;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.document.library.sync.constants.DLSyncConstants;
 import com.liferay.document.library.workflow.WorkflowHandlerInvocationCounter;
@@ -82,8 +83,8 @@ public class DLAppServiceWhenUpdatingAFileEntryTest extends BaseDLAppTestCase {
 
 		fileEntry = DLAppServiceUtil.updateFileEntry(
 			fileEntry.getFileEntryId(), fileName, ContentTypes.TEXT_PLAIN,
-			fileName, StringPool.BLANK, StringPool.BLANK, false, bytes,
-			serviceContext);
+			fileName, StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.MINOR, bytes, serviceContext);
 
 		FileVersion fileVersion = fileEntry.getLatestFileVersion();
 
@@ -128,8 +129,8 @@ public class DLAppServiceWhenUpdatingAFileEntryTest extends BaseDLAppTestCase {
 
 		fileEntry = DLAppServiceUtil.updateFileEntry(
 			fileEntry.getFileEntryId(), fileName, ContentTypes.TEXT_PLAIN,
-			fileName, StringPool.BLANK, StringPool.BLANK, false, null, 0,
-			serviceContext);
+			fileName, StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.MINOR, null, 0, serviceContext);
 
 		FileVersion fileVersion = fileEntry.getLatestFileVersion();
 
@@ -170,8 +171,8 @@ public class DLAppServiceWhenUpdatingAFileEntryTest extends BaseDLAppTestCase {
 
 		fileEntry = DLAppServiceUtil.updateFileEntry(
 			fileEntry.getFileEntryId(), fileName, ContentTypes.TEXT_PLAIN,
-			fileName, StringPool.BLANK, StringPool.BLANK, false, bytes,
-			serviceContext);
+			fileName, StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.MINOR, bytes, serviceContext);
 
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
 			DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId());
@@ -225,8 +226,8 @@ public class DLAppServiceWhenUpdatingAFileEntryTest extends BaseDLAppTestCase {
 
 			DLAppServiceUtil.updateFileEntry(
 				fileEntry.getFileEntryId(), fileName, ContentTypes.TEXT_PLAIN,
-				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, true,
-				bytes, serviceContext);
+				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
+				DLVersionNumberIncrease.MAJOR, bytes, serviceContext);
 		}
 	}
 
@@ -279,8 +280,9 @@ public class DLAppServiceWhenUpdatingAFileEntryTest extends BaseDLAppTestCase {
 
 		fileEntry = DLAppServiceUtil.updateFileEntry(
 			fileEntry.getFileEntryId(), fileName, ContentTypes.TEXT_PLAIN,
-			fileName, StringPool.BLANK, StringPool.BLANK, false,
-			TestDataConstants.repeatByteArray(2), serviceContext);
+			fileName, StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.MINOR, TestDataConstants.repeatByteArray(2),
+			serviceContext);
 
 		Assert.assertEquals(
 			"Version label incorrect after major update", "1.2",
@@ -301,7 +303,8 @@ public class DLAppServiceWhenUpdatingAFileEntryTest extends BaseDLAppTestCase {
 
 		fileEntry = DLAppServiceUtil.updateFileEntry(
 			fileEntry.getFileEntryId(), fileName, null, fileName,
-			StringPool.BLANK, StringPool.BLANK, true, bytes, serviceContext);
+			StringPool.BLANK, StringPool.BLANK, DLVersionNumberIncrease.MAJOR,
+			bytes, serviceContext);
 
 		Assert.assertEquals(ContentTypes.TEXT_PLAIN, fileEntry.getMimeType());
 	}
@@ -328,8 +331,8 @@ public class DLAppServiceWhenUpdatingAFileEntryTest extends BaseDLAppTestCase {
 
 		DLAppServiceUtil.updateFileEntry(
 			fileEntry.getFileEntryId(), fileName, ContentTypes.TEXT_PLAIN,
-			fileName, StringPool.BLANK, StringPool.BLANK, true, (byte[])null,
-			serviceContext);
+			fileName, StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.MAJOR, (byte[])null, serviceContext);
 	}
 
 	@Test
@@ -344,8 +347,8 @@ public class DLAppServiceWhenUpdatingAFileEntryTest extends BaseDLAppTestCase {
 
 		DLAppServiceUtil.updateFileEntry(
 			fileEntry.getFileEntryId(), fileName, ContentTypes.TEXT_PLAIN,
-			fileName, StringPool.BLANK, StringPool.BLANK, true, (File)null,
-			serviceContext);
+			fileName, StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.MAJOR, (File)null, serviceContext);
 	}
 
 	@Test
@@ -360,8 +363,8 @@ public class DLAppServiceWhenUpdatingAFileEntryTest extends BaseDLAppTestCase {
 
 		DLAppServiceUtil.updateFileEntry(
 			fileEntry.getFileEntryId(), fileName, ContentTypes.TEXT_PLAIN,
-			fileName, StringPool.BLANK, StringPool.BLANK, true, null, 0,
-			serviceContext);
+			fileName, StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.MAJOR, null, 0, serviceContext);
 	}
 
 }

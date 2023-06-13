@@ -138,16 +138,35 @@ public final class AMImageProcessorImpl implements AMImageProcessor {
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	public void setAMImageConfigurationHelper(
+		AMImageConfigurationHelper amImageConfigurationHelper) {
+
+		_amImageConfigurationHelper = amImageConfigurationHelper;
+	}
+
+	@Reference(unbind = "-")
+	public void setAMImageEntryLocalService(
+		AMImageEntryLocalService amImageEntryLocalService) {
+
+		_amImageEntryLocalService = amImageEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	public void setAMImageScalerTracker(
+		AMImageScalerTracker amImageScalerTracker) {
+
+		_amImageScalerTracker = amImageScalerTracker;
+	}
+
+	@Reference(unbind = "-")
+	public void setAMImageValidator(AMImageValidator amImageValidator) {
+		_amImageValidator = amImageValidator;
+	}
+
 	private AMImageConfigurationHelper _amImageConfigurationHelper;
-
-	@Reference
 	private AMImageEntryLocalService _amImageEntryLocalService;
-
-	@Reference
 	private AMImageScalerTracker _amImageScalerTracker;
-
-	@Reference
 	private AMImageValidator _amImageValidator;
 
 }

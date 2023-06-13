@@ -16,9 +16,10 @@ package com.liferay.portal.workflow.kaleo.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.workflow.kaleo.model.KaleoAction;
 
 import java.io.Externalizable;
@@ -32,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing KaleoAction in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see KaleoAction
  * @generated
  */
 @ProviderType
-public class KaleoActionCacheModel
-	implements CacheModel<KaleoAction>, Externalizable {
-
+public class KaleoActionCacheModel implements CacheModel<KaleoAction>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,8 +49,7 @@ public class KaleoActionCacheModel
 			return false;
 		}
 
-		KaleoActionCacheModel kaleoActionCacheModel =
-			(KaleoActionCacheModel)obj;
+		KaleoActionCacheModel kaleoActionCacheModel = (KaleoActionCacheModel)obj;
 
 		if (kaleoActionId == kaleoActionCacheModel.kaleoActionId) {
 			return true;
@@ -233,7 +233,8 @@ public class KaleoActionCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(kaleoActionId);
 
 		objectOutput.writeLong(groupId);
@@ -333,5 +334,4 @@ public class KaleoActionCacheModel
 	public String scriptLanguage;
 	public String scriptRequiredContexts;
 	public int priority;
-
 }

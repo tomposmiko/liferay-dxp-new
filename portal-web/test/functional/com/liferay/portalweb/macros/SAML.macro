@@ -77,9 +77,8 @@ definition {
 
 		SAMLNavigation.gotoIdentityProviderConnection();
 
-		SAMLPortlet.addIdentityProviderConnection(
+		SAMLPortlet.configureIdentityProviderConnection(
 			IdpEntityID = "samlidp",
-			IdpKeepAliveURL = "${idpKeepAliveURL}",
 			IdpMetadataURL = "http://localhost:8080/c/portal/saml/metadata",
 			IdpNameID = "samlidp",
 			nameIdentifierFormat = "${nameIdentifierFormat}"
@@ -112,7 +111,6 @@ definition {
 			nameIdentifierAttributeName = "${nameIdentifierAttributeName}",
 			nameIdentifierFormat = "${nameIdentifierFormat}",
 			SPEntityID = "${samlEntityID}",
-			SPKeepAliveURL = "${spKeepAliveURL}",
 			SPMetadataURL = "${spURL}/c/portal/saml/metadata",
 			SPNameID = "${samlEntityID}"
 		);

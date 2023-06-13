@@ -25,41 +25,36 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see SocialActivityCounterModel
+ * @see com.liferay.portlet.social.model.impl.SocialActivityCounterImpl
+ * @see com.liferay.portlet.social.model.impl.SocialActivityCounterModelImpl
  * @generated
  */
-@ImplementationClassName(
-	"com.liferay.portlet.social.model.impl.SocialActivityCounterImpl"
-)
+@ImplementationClassName("com.liferay.portlet.social.model.impl.SocialActivityCounterImpl")
 @ProviderType
-public interface SocialActivityCounter
-	extends PersistedModel, SocialActivityCounterModel {
-
+public interface SocialActivityCounter extends SocialActivityCounterModel,
+	PersistedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.social.model.impl.SocialActivityCounterImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.social.model.impl.SocialActivityCounterImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<SocialActivityCounter, Long>
-		ACTIVITY_COUNTER_ID_ACCESSOR =
-			new Accessor<SocialActivityCounter, Long>() {
+	public static final Accessor<SocialActivityCounter, Long> ACTIVITY_COUNTER_ID_ACCESSOR =
+		new Accessor<SocialActivityCounter, Long>() {
+			@Override
+			public Long get(SocialActivityCounter socialActivityCounter) {
+				return socialActivityCounter.getActivityCounterId();
+			}
 
-				@Override
-				public Long get(SocialActivityCounter socialActivityCounter) {
-					return socialActivityCounter.getActivityCounterId();
-				}
+			@Override
+			public Class<Long> getAttributeClass() {
+				return Long.class;
+			}
 
-				@Override
-				public Class<Long> getAttributeClass() {
-					return Long.class;
-				}
-
-				@Override
-				public Class<SocialActivityCounter> getTypeClass() {
-					return SocialActivityCounter.class;
-				}
-
-			};
+			@Override
+			public Class<SocialActivityCounter> getTypeClass() {
+				return SocialActivityCounter.class;
+			}
+		};
 
 	public boolean isActivePeriod(int periodLength);
-
 }

@@ -122,8 +122,8 @@ public class CollectionRoutesImplTest {
 	public void testFiveParameterBuilderMethodsCreatesActionSemantics() {
 		CollectionRoutes<String, Long> collectionRoutes = _builder.addCreator(
 			this::_testAndReturnFourParameterCreatorRoute, String.class,
-			Long.class, Boolean.class, Integer.class, __ -> true,
-			FORM_BUILDER_FUNCTION
+			Long.class, Boolean.class, Integer.class,
+			__ -> true, FORM_BUILDER_FUNCTION
 		).addCustomRoute(
 			GET_CUSTOM_ROUTE, this::_testAndReturnFourParameterCustomRoute,
 			String.class, Long.class, Boolean.class, Integer.class,
@@ -172,8 +172,8 @@ public class CollectionRoutesImplTest {
 	@Test
 	public void testOneParameterBuilderMethodsCreatesActionSemantics() {
 		CollectionRoutes<String, Long> collectionRoutes = _builder.addCreator(
-			this::_testAndReturnNoParameterCreatorRoute, __ -> true,
-			FORM_BUILDER_FUNCTION
+			this::_testAndReturnNoParameterCreatorRoute,
+			__ -> true, FORM_BUILDER_FUNCTION
 		).addCustomRoute(
 			GET_CUSTOM_ROUTE, this::_testAndReturnNoParameterCustomRoute,
 			CustomIdentifier.class, __ -> true, null
@@ -201,8 +201,8 @@ public class CollectionRoutesImplTest {
 			String.class, Long.class, CustomIdentifier.class, __ -> true, null
 		).addCustomRoute(
 			POST_CUSTOM_ROUTE, this::_testAndReturnTwoParameterCustomRoute,
-			String.class, Long.class, CustomIdentifier.class, __ -> true,
-			FORM_BUILDER_FUNCTION
+			String.class, Long.class, CustomIdentifier.class,
+			__ -> true, FORM_BUILDER_FUNCTION
 		).addGetter(
 			this::_testAndReturnTwoParameterGetterRoute, String.class,
 			Long.class
@@ -225,8 +225,8 @@ public class CollectionRoutesImplTest {
 			String.class, CustomIdentifier.class, __ -> true, null
 		).addCustomRoute(
 			POST_CUSTOM_ROUTE, this::_testAndReturnOneParameterCustomRoute,
-			String.class, CustomIdentifier.class, __ -> true,
-			FORM_BUILDER_FUNCTION
+			String.class, CustomIdentifier.class,
+			__ -> true, FORM_BUILDER_FUNCTION
 		).addGetter(
 			this::_testAndReturnOneParameterGetterRoute, String.class
 		).build();

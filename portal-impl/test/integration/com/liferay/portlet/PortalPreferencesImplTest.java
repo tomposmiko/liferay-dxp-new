@@ -15,7 +15,6 @@
 package com.liferay.portlet;
 
 import com.liferay.petra.reflect.ReflectionUtil;
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.exception.NoSuchPreferencesException;
@@ -31,6 +30,8 @@ import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.spring.aop.AopInvocationHandler;
+import com.liferay.portal.spring.aop.AopMethodInvocation;
 import com.liferay.portal.spring.transaction.DefaultTransactionExecutor;
 import com.liferay.portal.spring.transaction.TransactionAttributeAdapter;
 import com.liferay.portal.spring.transaction.TransactionInterceptor;
@@ -68,20 +69,31 @@ public class PortalPreferencesImplTest {
 
 	@BeforeClass
 	public static void setUpClass() throws NoSuchMethodException {
-		_transactionInterceptor =
-			(TransactionInterceptor)PortalBeanLocatorUtil.locate(
-				"transactionAdvice");
-
-		_originalTransactionExecutor = ReflectionTestUtil.getFieldValue(
-			_transactionInterceptor, "transactionExecutor");
-
-		_originalPortalPreferencesLocalService =
-			PortalPreferencesLocalServiceUtil.getService();
-
 		_updatePreferencesMethod =
 			PortalPreferencesLocalService.class.getMethod(
 				"updatePortalPreferences",
 				com.liferay.portal.kernel.model.PortalPreferences.class);
+
+		_originalPortalPreferencesLocalService =
+			PortalPreferencesLocalServiceUtil.getService();
+
+		AopInvocationHandler aopInvocationHandler =
+			ProxyUtil.fetchInvocationHandler(
+				_originalPortalPreferencesLocalService,
+				AopInvocationHandler.class);
+
+		AopMethodInvocation aopMethodInvocation = ReflectionTestUtil.invoke(
+			aopInvocationHandler, "_getAopMethodInvocation",
+			new Class<?>[] {Method.class}, _updatePreferencesMethod);
+
+		aopMethodInvocation = ReflectionTestUtil.getFieldValue(
+			aopMethodInvocation, "_nextAopMethodInvocation");
+
+		_transactionInterceptor = ReflectionTestUtil.getFieldValue(
+			aopMethodInvocation, "_nextChainableMethodAdvice");
+
+		_originalTransactionExecutor = ReflectionTestUtil.getFieldValue(
+			_transactionInterceptor, "transactionExecutor");
 
 		_platformTransactionManager = ReflectionTestUtil.getFieldValue(
 			_originalTransactionExecutor, "_platformTransactionManager");

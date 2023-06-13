@@ -29,6 +29,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class DDMFormRenderingContext {
 
+	public DDMFormRenderingContext() {
+		setReturnFullContext(true);
+	}
+
 	public void addProperty(String key, Object value) {
 		_properties.put(key, value);
 	}
@@ -71,6 +75,10 @@ public class DDMFormRenderingContext {
 
 	public boolean isReadOnly() {
 		return _readOnly;
+	}
+
+	public boolean isReturnFullContext() {
+		return MapUtil.getBoolean(_properties, "returnFullContext");
 	}
 
 	public boolean isSharedURL() {
@@ -121,6 +129,10 @@ public class DDMFormRenderingContext {
 
 	public void setReadOnly(boolean readOnly) {
 		_readOnly = readOnly;
+	}
+
+	public void setReturnFullContext(boolean fullContext) {
+		_properties.put("returnFullContext", fullContext);
 	}
 
 	public void setSharedURL(boolean sharedURL) {

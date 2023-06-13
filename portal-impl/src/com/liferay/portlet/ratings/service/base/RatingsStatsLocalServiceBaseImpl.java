@@ -16,7 +16,6 @@ package com.liferay.portlet.ratings.service.base;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.counter.kernel.service.persistence.CounterPersistence;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -42,6 +41,7 @@ import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
+
 import com.liferay.ratings.kernel.model.RatingsStats;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
 import com.liferay.ratings.kernel.service.persistence.RatingsEntryFinder;
@@ -64,17 +64,17 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.portlet.ratings.service.impl.RatingsStatsLocalServiceImpl
+ * @see com.liferay.ratings.kernel.service.RatingsStatsLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class RatingsStatsLocalServiceBaseImpl
-	extends BaseLocalServiceImpl
-	implements RatingsStatsLocalService, IdentifiableOSGiService {
-
+	extends BaseLocalServiceImpl implements RatingsStatsLocalService,
+		IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>RatingsStatsLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.ratings.kernel.service.RatingsStatsLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.ratings.kernel.service.RatingsStatsLocalServiceUtil} to access the ratings stats local service.
 	 */
 
 	/**
@@ -114,7 +114,6 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	@Override
 	public RatingsStats deleteRatingsStats(long statsId)
 		throws PortalException {
-
 		return ratingsStatsPersistence.remove(statsId);
 	}
 
@@ -134,8 +133,8 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(
-			RatingsStats.class, clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(RatingsStats.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -153,7 +152,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portlet.ratings.model.impl.RatingsStatsModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.ratings.model.impl.RatingsStatsModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -162,18 +161,17 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(
-		DynamicQuery dynamicQuery, int start, int end) {
-
-		return ratingsStatsPersistence.findWithDynamicQuery(
-			dynamicQuery, start, end);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end) {
+		return ratingsStatsPersistence.findWithDynamicQuery(dynamicQuery,
+			start, end);
 	}
 
 	/**
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portlet.ratings.model.impl.RatingsStatsModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.ratings.model.impl.RatingsStatsModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -183,12 +181,10 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(
-		DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator<T> orderByComparator) {
-
-		return ratingsStatsPersistence.findWithDynamicQuery(
-			dynamicQuery, start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator) {
+		return ratingsStatsPersistence.findWithDynamicQuery(dynamicQuery,
+			start, end, orderByComparator);
 	}
 
 	/**
@@ -210,11 +206,10 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(
-		DynamicQuery dynamicQuery, Projection projection) {
-
-		return ratingsStatsPersistence.countWithDynamicQuery(
-			dynamicQuery, projection);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery,
+		Projection projection) {
+		return ratingsStatsPersistence.countWithDynamicQuery(dynamicQuery,
+			projection);
 	}
 
 	@Override
@@ -236,8 +231,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery =
-			new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(ratingsStatsLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -249,14 +243,10 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery
-		getIndexableActionableDynamicQuery() {
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
 
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
-			new IndexableActionableDynamicQuery();
-
-		indexableActionableDynamicQuery.setBaseLocalService(
-			ratingsStatsLocalService);
+		indexableActionableDynamicQuery.setBaseLocalService(ratingsStatsLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(RatingsStats.class);
 
@@ -267,7 +257,6 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-
 		actionableDynamicQuery.setBaseLocalService(ratingsStatsLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(RatingsStats.class);
@@ -281,15 +270,12 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
-		return ratingsStatsLocalService.deleteRatingsStats(
-			(RatingsStats)persistedModel);
+		return ratingsStatsLocalService.deleteRatingsStats((RatingsStats)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
-
 		return ratingsStatsPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -297,7 +283,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * Returns a range of all the ratings statses.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portlet.ratings.model.impl.RatingsStatsModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.ratings.model.impl.RatingsStatsModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of ratings statses
@@ -336,9 +322,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 *
 	 * @return the ratings entry local service
 	 */
-	public com.liferay.ratings.kernel.service.RatingsEntryLocalService
-		getRatingsEntryLocalService() {
-
+	public com.liferay.ratings.kernel.service.RatingsEntryLocalService getRatingsEntryLocalService() {
 		return ratingsEntryLocalService;
 	}
 
@@ -348,9 +332,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @param ratingsEntryLocalService the ratings entry local service
 	 */
 	public void setRatingsEntryLocalService(
-		com.liferay.ratings.kernel.service.RatingsEntryLocalService
-			ratingsEntryLocalService) {
-
+		com.liferay.ratings.kernel.service.RatingsEntryLocalService ratingsEntryLocalService) {
 		this.ratingsEntryLocalService = ratingsEntryLocalService;
 	}
 
@@ -370,7 +352,6 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 */
 	public void setRatingsEntryPersistence(
 		RatingsEntryPersistence ratingsEntryPersistence) {
-
 		this.ratingsEntryPersistence = ratingsEntryPersistence;
 	}
 
@@ -408,7 +389,6 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 */
 	public void setRatingsStatsLocalService(
 		RatingsStatsLocalService ratingsStatsLocalService) {
-
 		this.ratingsStatsLocalService = ratingsStatsLocalService;
 	}
 
@@ -428,7 +408,6 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 */
 	public void setRatingsStatsPersistence(
 		RatingsStatsPersistence ratingsStatsPersistence) {
-
 		this.ratingsStatsPersistence = ratingsStatsPersistence;
 	}
 
@@ -455,9 +434,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -467,28 +444,8 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
-	}
-
-	/**
-	 * Returns the counter persistence.
-	 *
-	 * @return the counter persistence
-	 */
-	public CounterPersistence getCounterPersistence() {
-		return counterPersistence;
-	}
-
-	/**
-	 * Sets the counter persistence.
-	 *
-	 * @param counterPersistence the counter persistence
-	 */
-	public void setCounterPersistence(CounterPersistence counterPersistence) {
-		this.counterPersistence = counterPersistence;
 	}
 
 	/**
@@ -496,9 +453,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 *
 	 * @return the class name local service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService
-		getClassNameLocalService() {
-
+	public com.liferay.portal.kernel.service.ClassNameLocalService getClassNameLocalService() {
 		return classNameLocalService;
 	}
 
@@ -508,9 +463,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @param classNameLocalService the class name local service
 	 */
 	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService
-			classNameLocalService) {
-
+		com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService) {
 		this.classNameLocalService = classNameLocalService;
 	}
 
@@ -530,7 +483,6 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 */
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
-
 		this.classNamePersistence = classNamePersistence;
 	}
 
@@ -539,9 +491,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService
-		getResourceLocalService() {
-
+	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
 		return resourceLocalService;
 	}
 
@@ -551,9 +501,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService
-			resourceLocalService) {
-
+		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -562,9 +510,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -575,7 +521,6 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -616,8 +561,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register(
-			"com.liferay.ratings.kernel.model.RatingsStats",
+		persistedModelLocalServiceRegistry.register("com.liferay.ratings.kernel.model.RatingsStats",
 			ratingsStatsLocalService);
 	}
 
@@ -658,8 +602,8 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -668,65 +612,32 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(
-		type = com.liferay.ratings.kernel.service.RatingsEntryLocalService.class
-	)
-	protected com.liferay.ratings.kernel.service.RatingsEntryLocalService
-		ratingsEntryLocalService;
-
+	@BeanReference(type = com.liferay.ratings.kernel.service.RatingsEntryLocalService.class)
+	protected com.liferay.ratings.kernel.service.RatingsEntryLocalService ratingsEntryLocalService;
 	@BeanReference(type = RatingsEntryPersistence.class)
 	protected RatingsEntryPersistence ratingsEntryPersistence;
-
 	@BeanReference(type = RatingsEntryFinder.class)
 	protected RatingsEntryFinder ratingsEntryFinder;
-
 	@BeanReference(type = RatingsStatsLocalService.class)
 	protected RatingsStatsLocalService ratingsStatsLocalService;
-
 	@BeanReference(type = RatingsStatsPersistence.class)
 	protected RatingsStatsPersistence ratingsStatsPersistence;
-
 	@BeanReference(type = RatingsStatsFinder.class)
 	protected RatingsStatsFinder ratingsStatsFinder;
-
-	@BeanReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@BeanReference(type = CounterPersistence.class)
-	protected CounterPersistence counterPersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ClassNameLocalService
-		classNameLocalService;
-
+	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ResourceLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
+	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry
-		persistedModelLocalServiceRegistry;
-
+	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }

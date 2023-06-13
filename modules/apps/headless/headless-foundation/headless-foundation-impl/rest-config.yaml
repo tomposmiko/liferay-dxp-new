@@ -1,0 +1,3 @@
+apiDir: "../headless-foundation-api/src/main/java"
+apiPackagePath: "com.liferay.headless.foundation"
+author: "Javier Gamarra"

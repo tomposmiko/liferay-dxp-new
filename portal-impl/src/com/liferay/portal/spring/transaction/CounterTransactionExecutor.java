@@ -14,7 +14,7 @@
 
 package com.liferay.portal.spring.transaction;
 
-import org.aopalliance.intercept.MethodInvocation;
+import com.liferay.petra.function.UnsafeSupplier;
 
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -24,33 +24,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class CounterTransactionExecutor
 	implements TransactionExecutor, TransactionHandler {
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #CounterTransactionExecutor(PlatformTransactionManager)}
-	 */
-	@Deprecated
-	public CounterTransactionExecutor() {
-		_platformTransactionManager = null;
-	}
-
 	public CounterTransactionExecutor(
 		PlatformTransactionManager platformTransactionManager) {
 
 		_platformTransactionManager = platformTransactionManager;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #commit(
-	 *             TransactionAttributeAdapter, TransactionStatusAdapter)}
-	 */
-	@Deprecated
-	@Override
-	public void commit(
-		PlatformTransactionManager platformTransactionManager,
-		TransactionAttributeAdapter transactionAttributeAdapter,
-		TransactionStatusAdapter transactionStatusAdapter) {
-
-		_commit(platformTransactionManager, transactionStatusAdapter);
 	}
 
 	@Override
@@ -61,56 +38,20 @@ public class CounterTransactionExecutor
 		_commit(_platformTransactionManager, transactionStatusAdapter);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #execute(
-	 *             TransactionAttributeAdapter, MethodInvocation)}
-	 */
-	@Deprecated
 	@Override
-	public Object execute(
-			PlatformTransactionManager platformTransactionManager,
+	public <T> T execute(
 			TransactionAttributeAdapter transactionAttributeAdapter,
-			MethodInvocation methodInvocation)
-		throws Throwable {
-
-		return _execute(
-			platformTransactionManager, transactionAttributeAdapter,
-			methodInvocation);
-	}
-
-	@Override
-	public Object execute(
-			TransactionAttributeAdapter transactionAttributeAdapter,
-			MethodInvocation methodInvocation)
+			UnsafeSupplier<T, Throwable> unsafeSupplier)
 		throws Throwable {
 
 		return _execute(
 			_platformTransactionManager, transactionAttributeAdapter,
-			methodInvocation);
+			unsafeSupplier);
 	}
 
 	@Override
 	public PlatformTransactionManager getPlatformTransactionManager() {
 		return _platformTransactionManager;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #rollback(
-	 *             Throwable, TransactionAttributeAdapter,
-	 *             TransactionStatusAdapter)}
-	 */
-	@Deprecated
-	@Override
-	public void rollback(
-			PlatformTransactionManager platformTransactionManager,
-			Throwable throwable,
-			TransactionAttributeAdapter transactionAttributeAdapter,
-			TransactionStatusAdapter transactionStatusAdapter)
-		throws Throwable {
-
-		throw _rollback(
-			platformTransactionManager, throwable, transactionAttributeAdapter,
-			transactionStatusAdapter);
 	}
 
 	@Override
@@ -123,19 +64,6 @@ public class CounterTransactionExecutor
 		throw _rollback(
 			_platformTransactionManager, throwable, transactionAttributeAdapter,
 			transactionStatusAdapter);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #start(
-	 *             TransactionAttributeAdapter)}
-	 */
-	@Deprecated
-	@Override
-	public TransactionStatusAdapter start(
-		PlatformTransactionManager platformTransactionManager,
-		TransactionAttributeAdapter transactionAttributeAdapter) {
-
-		return _start(platformTransactionManager, transactionAttributeAdapter);
 	}
 
 	@Override
@@ -153,19 +81,19 @@ public class CounterTransactionExecutor
 			transactionStatusAdapter.getTransactionStatus());
 	}
 
-	private Object _execute(
+	private <T> T _execute(
 			PlatformTransactionManager platformTransactionManager,
 			TransactionAttributeAdapter transactionAttributeAdapter,
-			MethodInvocation methodInvocation)
+			UnsafeSupplier<T, Throwable> unsafeSupplier)
 		throws Throwable {
 
 		TransactionStatusAdapter transactionStatusAdapter = _start(
 			platformTransactionManager, transactionAttributeAdapter);
 
-		Object returnValue = null;
+		T returnValue = null;
 
 		try {
-			returnValue = methodInvocation.proceed();
+			returnValue = unsafeSupplier.get();
 		}
 		catch (Throwable throwable) {
 			throw _rollback(
@@ -179,11 +107,10 @@ public class CounterTransactionExecutor
 	}
 
 	private Throwable _rollback(
-			PlatformTransactionManager platformTransactionManager,
-			Throwable throwable,
-			TransactionAttributeAdapter transactionAttributeAdapter,
-			TransactionStatusAdapter transactionStatusAdapter)
-		throws Throwable {
+		PlatformTransactionManager platformTransactionManager,
+		Throwable throwable,
+		TransactionAttributeAdapter transactionAttributeAdapter,
+		TransactionStatusAdapter transactionStatusAdapter) {
 
 		if (transactionAttributeAdapter.rollbackOn(throwable)) {
 			try {

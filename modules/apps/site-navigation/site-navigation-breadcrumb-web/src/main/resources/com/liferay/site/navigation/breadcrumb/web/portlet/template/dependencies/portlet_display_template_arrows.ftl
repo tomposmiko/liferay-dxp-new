@@ -110,7 +110,7 @@
 		</style>
 	</@>
 
-	<div class="breadcrumb breadcrumb-arrows">
+	<div aria-label="${portletDisplay.getTitle()}" class="breadcrumb breadcrumb-arrows" role="navigation">
 		<#assign cssClass = "" />
 
 		<#list entries as entry>

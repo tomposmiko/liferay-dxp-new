@@ -49,7 +49,7 @@ import java.util.Optional;
  */
 @SuppressWarnings("unused")
 public interface PageMessageMapper<T>
-	extends ActionMapper, MessageMapper<Page<T>> {
+	extends MessageMapper<Page<T>>, ActionMapper {
 
 	/**
 	 * Returns the {@link SingleModelMessageMapper} used by the item methods.

@@ -26,14 +26,13 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.mobile.device.rules.service.http.MDRRuleGroupInstanceServiceSoap}.
  *
  * @author Edward C. Han
+ * @see com.liferay.mobile.device.rules.service.http.MDRRuleGroupInstanceServiceSoap
  * @generated
  */
 @ProviderType
 public class MDRRuleGroupInstanceSoap implements Serializable {
-
 	public static MDRRuleGroupInstanceSoap toSoapModel(
 		MDRRuleGroupInstance model) {
-
 		MDRRuleGroupInstanceSoap soapModel = new MDRRuleGroupInstanceSoap();
 
 		soapModel.setUuid(model.getUuid());
@@ -55,9 +54,7 @@ public class MDRRuleGroupInstanceSoap implements Serializable {
 
 	public static MDRRuleGroupInstanceSoap[] toSoapModels(
 		MDRRuleGroupInstance[] models) {
-
-		MDRRuleGroupInstanceSoap[] soapModels =
-			new MDRRuleGroupInstanceSoap[models.length];
+		MDRRuleGroupInstanceSoap[] soapModels = new MDRRuleGroupInstanceSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -68,12 +65,10 @@ public class MDRRuleGroupInstanceSoap implements Serializable {
 
 	public static MDRRuleGroupInstanceSoap[][] toSoapModels(
 		MDRRuleGroupInstance[][] models) {
-
 		MDRRuleGroupInstanceSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels =
-				new MDRRuleGroupInstanceSoap[models.length][models[0].length];
+			soapModels = new MDRRuleGroupInstanceSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new MDRRuleGroupInstanceSoap[0][0];
@@ -88,16 +83,13 @@ public class MDRRuleGroupInstanceSoap implements Serializable {
 
 	public static MDRRuleGroupInstanceSoap[] toSoapModels(
 		List<MDRRuleGroupInstance> models) {
-
-		List<MDRRuleGroupInstanceSoap> soapModels =
-			new ArrayList<MDRRuleGroupInstanceSoap>(models.size());
+		List<MDRRuleGroupInstanceSoap> soapModels = new ArrayList<MDRRuleGroupInstanceSoap>(models.size());
 
 		for (MDRRuleGroupInstance model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(
-			new MDRRuleGroupInstanceSoap[soapModels.size()]);
+		return soapModels.toArray(new MDRRuleGroupInstanceSoap[soapModels.size()]);
 	}
 
 	public MDRRuleGroupInstanceSoap() {
@@ -228,5 +220,4 @@ public class MDRRuleGroupInstanceSoap implements Serializable {
 	private long _ruleGroupId;
 	private int _priority;
 	private Date _lastPublishDate;
-
 }

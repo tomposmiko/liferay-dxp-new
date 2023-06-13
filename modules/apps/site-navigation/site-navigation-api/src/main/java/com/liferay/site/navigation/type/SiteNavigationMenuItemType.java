@@ -41,10 +41,9 @@ import javax.servlet.http.HttpServletResponse;
 public interface SiteNavigationMenuItemType {
 
 	public default boolean exportData(
-			PortletDataContext portletDataContext,
-			Element siteNavigationMenuItemElement,
-			SiteNavigationMenuItem siteNavigationMenuItem)
-		throws PortalException {
+		PortletDataContext portletDataContext,
+		Element siteNavigationMenuItemElement,
+		SiteNavigationMenuItem siteNavigationMenuItem) {
 
 		return true;
 	}
@@ -147,10 +146,9 @@ public interface SiteNavigationMenuItemType {
 	}
 
 	public default boolean importData(
-			PortletDataContext portletDataContext,
-			SiteNavigationMenuItem siteNavigationMenuItem,
-			SiteNavigationMenuItem importedSiteNavigationMenuItem)
-		throws PortalException {
+		PortletDataContext portletDataContext,
+		SiteNavigationMenuItem siteNavigationMenuItem,
+		SiteNavigationMenuItem importedSiteNavigationMenuItem) {
 
 		return true;
 	}

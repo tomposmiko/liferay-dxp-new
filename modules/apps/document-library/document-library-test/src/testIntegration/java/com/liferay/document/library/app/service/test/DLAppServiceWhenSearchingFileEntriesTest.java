@@ -16,6 +16,7 @@ package com.liferay.document.library.app.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -85,7 +86,8 @@ public class DLAppServiceWhenSearchingFileEntriesTest
 
 		fileEntry = DLAppServiceUtil.updateFileEntry(
 			fileEntry.getFileEntryId(), fileName, ContentTypes.TEXT_PLAIN,
-			fileName, description, changeLog, false, bytes, serviceContext);
+			fileName, description, changeLog, DLVersionNumberIncrease.MINOR,
+			bytes, serviceContext);
 
 		DLAppServiceTestUtil.search(fileEntry, "hello", true);
 		DLAppServiceTestUtil.search(fileEntry, "world", true);

@@ -29,15 +29,15 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.screens.service.base.ScreensCommentServiceBaseImpl;
 
 import java.util.Date;
+import java.util.function.Function;
 
 /**
- * @author Alejandro Hernández Malillos
+ * @author Alejandro Hernández
  */
 public class ScreensCommentServiceImpl extends ScreensCommentServiceBaseImpl {
 

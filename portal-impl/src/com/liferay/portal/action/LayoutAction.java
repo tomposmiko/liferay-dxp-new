@@ -41,7 +41,10 @@ import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.security.sso.SSOUtil;
+import com.liferay.portal.struts.Action;
 import com.liferay.portal.struts.ActionConstants;
+import com.liferay.portal.struts.model.ActionForward;
+import com.liferay.portal.struts.model.ActionMapping;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.LiferayPortletUtil;
 import com.liferay.portlet.RenderParametersPool;
@@ -64,22 +67,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
 /**
  * @author Brian Wing Shun Chan
  * @author Shuyang Zhou
  * @author Neil Griffin
  */
-public class LayoutAction extends Action {
+public class LayoutAction implements Action {
 
 	@Override
 	public ActionForward execute(
-			ActionMapping actionMapping, ActionForm actionForm,
-			HttpServletRequest request, HttpServletResponse response)
+			ActionMapping actionMapping, HttpServletRequest request,
+			HttpServletResponse response)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
@@ -171,13 +169,16 @@ public class LayoutAction extends Action {
 				plid = layout.getPlid();
 			}
 
-			return processLayout(actionMapping, request, response, plid);
+			ActionForward actionForward = processLayout(
+				actionMapping, request, response, plid);
+
+			return actionForward;
 		}
 
 		try {
 			forwardLayout(request);
 
-			return actionMapping.findForward(
+			return actionMapping.getActionForward(
 				ActionConstants.COMMON_FORWARD_JSP);
 		}
 		catch (Exception e) {
@@ -406,7 +407,7 @@ public class LayoutAction extends Action {
 				}
 			}
 
-			return actionMapping.findForward("portal.layout");
+			return actionMapping.getActionForward("portal.layout");
 		}
 		catch (Exception e) {
 			PortalUtil.sendError(e, request, response);

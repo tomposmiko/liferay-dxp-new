@@ -327,8 +327,8 @@ definition {
 		AssertTextEquals.assertPartialText(locator1 = "Icon#PRINT", value1 = "Print");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "Comments#SUBSCRIBE_TO_COMMENTS_LINK",
-			value1 = "Subscribe to Comments"
+			locator1 = "Button#SUBSCRIBE",
+			value1 = "Subscribe"
 		);
 
 		var key_assetTitle = "${relatedAssetTitle}";
@@ -351,13 +351,13 @@ definition {
 		var key_portletName = "Web Content Display";
 
 		if ("${scopeSelectionDefault}" == "true") {
-			AssertTextEquals(
+			AssertTextEquals.assertTextCaseInsensitive(
 				locator1 = "Portlet#TITLE",
 				value1 = "Web Content Display"
 			);
 		}
 		else {
-			AssertTextEquals(
+			AssertTextEquals.assertTextCaseInsensitive(
 				locator1 = "Portlet#TITLE",
 				value1 = "Web Content Display (${scopeSelection})"
 			);
@@ -420,7 +420,7 @@ definition {
 	}
 
 	macro viewImageFieldViaWCD {
-		AssertElementPresent(locator1 = "WCD#WEB_CONTENT_IMAGE_PNG");
+		SikuliAssertElementPresent(locator1 = "WCD#WEB_CONTENT_IMAGE_PNG");
 	}
 
 	macro viewRecycleBinMessage {

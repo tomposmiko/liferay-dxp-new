@@ -17,9 +17,11 @@ package com.liferay.portlet.asset.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.kernel.model.AssetTag;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,11 @@ import java.util.Date;
  * The cache model class for representing AssetTag in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see AssetTag
  * @generated
  */
 @ProviderType
-public class AssetTagCacheModel
-	implements CacheModel<AssetTag>, Externalizable {
-
+public class AssetTagCacheModel implements CacheModel<AssetTag>, Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -172,7 +173,8 @@ public class AssetTagCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -220,5 +222,4 @@ public class AssetTagCacheModel
 	public String name;
 	public int assetCount;
 	public long lastPublishDate;
-
 }

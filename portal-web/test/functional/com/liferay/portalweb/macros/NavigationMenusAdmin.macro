@@ -134,6 +134,10 @@ definition {
 			menuItem = "Primary Navigation",
 			rowEntry = "${newMenuName}"
 		);
+
+		AssertConfirm(
+			value1 = "Do you want to replace ${newMenuName} for ${oldMenuName} as primary navigation? This action will affect all the pages using primary navigation."
+		);
 	}
 
 	macro openItemSidebar {
@@ -154,6 +158,22 @@ definition {
 		Navigator.openWithAppendToBaseURL(
 			urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_site_navigation_admin_web_portlet_SiteNavigationAdminPortlet"
 		);
+	}
+
+	macro toggleAutomaticallyAddNewPagesToMenu {
+		Click(locator1 = "SiteNavigationMenu#SIDEBAR_COG");
+
+		if ("${toggleValue}" == "enable") {
+			Check(locator1 = "Checkbox#ANY_CHECKBOX", checkboxName = "Offer New Pages");
+		}
+		else if ("${toggleValue}" == "disable") {
+			Uncheck(locator1 = "Checkbox#ANY_CHECKBOX", checkboxName = "Offer New Pages");
+		}
+		else {
+			fail("Set ${toggleValue} to enable or disable");
+		}
+
+		Button.clickSave();
 	}
 
 	macro viewItem {
@@ -195,6 +215,13 @@ definition {
 			value1 = "${menuType}",
 			key_markedAs = "${menuType}",
 			key_rowEntry = "${rowEntry}"
+		);
+	}
+
+	macro viewNoItem {
+		AssertElementNotPresent(
+			locator1 = "SiteNavigationMenu#ITEM_ENTRY",
+			key_itemName = "${itemName}"
 		);
 	}
 }

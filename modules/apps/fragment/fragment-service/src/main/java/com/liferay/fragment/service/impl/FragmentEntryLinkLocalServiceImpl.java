@@ -14,16 +14,21 @@
 
 package com.liferay.fragment.service.impl;
 
+import com.liferay.document.library.kernel.util.DLUtil;
+import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.service.base.FragmentEntryLinkLocalServiceBaseImpl;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -39,6 +44,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Eudaldo Alonso
@@ -76,7 +83,11 @@ public class FragmentEntryLinkLocalServiceImpl
 		fragmentEntryLink.setClassNameId(classNameId);
 		fragmentEntryLink.setClassPK(classPK);
 		fragmentEntryLink.setCss(css);
+
+		html = _replaceResources(fragmentEntryId, html);
+
 		fragmentEntryLink.setHtml(html);
+
 		fragmentEntryLink.setJs(js);
 
 		if (Validator.isNull(editableValues)) {
@@ -93,8 +104,6 @@ public class FragmentEntryLinkLocalServiceImpl
 		fragmentEntryLink.setLastPropagationDate(
 			serviceContext.getCreateDate(new Date()));
 		fragmentEntryLink.setNamespace(StringUtil.randomId());
-
-		_updateClassModel(classNameId, classPK);
 
 		fragmentEntryLinkPersistence.update(fragmentEntryLink);
 
@@ -131,6 +140,16 @@ public class FragmentEntryLinkLocalServiceImpl
 		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
 			fragmentEntryLinkLocalService.deleteFragmentEntryLink(
 				fragmentEntryLink);
+		}
+	}
+
+	@Override
+	public void deleteFragmentEntryLinks(long[] fragmentEntryLinkIds)
+		throws PortalException {
+
+		for (long fragmentEntryLinkId : fragmentEntryLinkIds) {
+			fragmentEntryLinkLocalService.deleteFragmentEntryLink(
+				fragmentEntryLinkId);
 		}
 	}
 
@@ -219,6 +238,25 @@ public class FragmentEntryLinkLocalServiceImpl
 	}
 
 	@Override
+	public void updateClassModel(long classNameId, long classPK)
+		throws PortalException {
+
+		if (classNameId != _portal.getClassNameId(Layout.class)) {
+			return;
+		}
+
+		Layout layout = _layoutLocalService.fetchLayout(classPK);
+
+		if (layout == null) {
+			return;
+		}
+
+		_layoutLocalService.updateLayout(
+			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
+			layout.getTypeSettings());
+	}
+
+	@Override
 	public FragmentEntryLink updateFragmentEntryLink(
 			long fragmentEntryLinkId, int position)
 		throws PortalException {
@@ -227,9 +265,6 @@ public class FragmentEntryLinkLocalServiceImpl
 			fragmentEntryLinkId);
 
 		fragmentEntryLink.setPosition(position);
-
-		_updateClassModel(
-			fragmentEntryLink.getClassNameId(), fragmentEntryLink.getClassPK());
 
 		fragmentEntryLinkPersistence.update(fragmentEntryLink);
 
@@ -279,7 +314,7 @@ public class FragmentEntryLinkLocalServiceImpl
 
 		fragmentEntryLink.setEditableValues(editableValues);
 
-		_updateClassModel(
+		updateClassModel(
 			fragmentEntryLink.getClassNameId(), fragmentEntryLink.getClassPK());
 
 		fragmentEntryLinkPersistence.update(fragmentEntryLink);
@@ -342,7 +377,7 @@ public class FragmentEntryLinkLocalServiceImpl
 
 			fragmentEntryLink.setLastPropagationDate(new Date());
 
-			_updateClassModel(
+			updateClassModel(
 				fragmentEntryLink.getClassNameId(),
 				fragmentEntryLink.getClassPK());
 
@@ -350,23 +385,45 @@ public class FragmentEntryLinkLocalServiceImpl
 		}
 	}
 
-	private void _updateClassModel(long classNameId, long classPK)
+	private String _replaceResources(long fragmentEntryId, String html)
 		throws PortalException {
 
-		if (classNameId != _portal.getClassNameId(Layout.class)) {
-			return;
+		FragmentEntry fragmentEntry =
+			fragmentEntryLocalService.fetchFragmentEntry(fragmentEntryId);
+
+		if (fragmentEntry == null) {
+			return html;
 		}
 
-		Layout layout = _layoutLocalService.fetchLayout(classPK);
+		FragmentCollection fragmentCollection =
+			fragmentCollectionLocalService.fetchFragmentCollection(
+				fragmentEntry.getFragmentCollectionId());
 
-		if (layout == null) {
-			return;
+		Matcher matcher = _pattern.matcher(html);
+
+		while (matcher.find()) {
+			FileEntry fileEntry =
+				PortletFileRepositoryUtil.fetchPortletFileEntry(
+					fragmentEntry.getGroupId(),
+					fragmentCollection.getResourcesFolderId(),
+					matcher.group(1));
+
+			String fileEntryURL = StringPool.BLANK;
+
+			if (fileEntry != null) {
+				fileEntryURL = DLUtil.getPreviewURL(
+					fileEntry, fileEntry.getFileVersion(), null,
+					StringPool.BLANK, false, false);
+			}
+
+			html = html.replace(matcher.group(), fileEntryURL);
 		}
 
-		_layoutLocalService.updateLayout(
-			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
-			layout.getTypeSettings());
+		return html;
 	}
+
+	private static final Pattern _pattern = Pattern.compile(
+		"\\[resources:(.+?)\\]");
 
 	@ServiceReference(type = FragmentEntryProcessorRegistry.class)
 	private FragmentEntryProcessorRegistry _fragmentEntryProcessorRegistry;

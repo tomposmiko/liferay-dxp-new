@@ -397,8 +397,8 @@ if (portletTitleBasedNavigation) {
 	</aui:form>
 </div>
 
-<aui:script require="wiki-web/wiki/js/WikiPortlet.es">
-	new wikiWebWikiJsWikiPortletEs.default(
+<aui:script require='<%= npmResolvedPackageName + "/wiki/js/WikiPortlet.es as WikiPortletJs" %>'>
+	new WikiPortletJs.default(
 		{
 			constants: {
 				'ACTION_PUBLISH': '<%= WorkflowConstants.ACTION_PUBLISH %>',

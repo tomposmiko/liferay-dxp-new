@@ -342,7 +342,11 @@ public class AssetCategoriesSearchFacetDisplayContextTest {
 		assetCategoriesSearchFacetDisplayBuilder.setParameterValue(
 			parameterValue);
 
-		return assetCategoriesSearchFacetDisplayBuilder.build();
+		AssetCategoriesSearchFacetDisplayContext
+			assetCategoriesSearchFacetDisplayContext =
+				assetCategoriesSearchFacetDisplayBuilder.build();
+
+		return assetCategoriesSearchFacetDisplayContext;
 	}
 
 	protected TermCollector createTermCollector(

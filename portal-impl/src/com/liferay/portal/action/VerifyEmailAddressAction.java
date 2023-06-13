@@ -34,7 +34,10 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.struts.Action;
 import com.liferay.portal.struts.ActionConstants;
+import com.liferay.portal.struts.model.ActionForward;
+import com.liferay.portal.struts.model.ActionMapping;
 
 import java.util.List;
 
@@ -44,20 +47,15 @@ import javax.portlet.PortletURL;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
 /**
  * @author Mika Koivisto
  */
-public class VerifyEmailAddressAction extends Action {
+public class VerifyEmailAddressAction implements Action {
 
 	@Override
 	public ActionForward execute(
-			ActionMapping actionMapping, ActionForm actionForm,
-			HttpServletRequest request, HttpServletResponse response)
+			ActionMapping actionMapping, HttpServletRequest request,
+			HttpServletResponse response)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
@@ -66,13 +64,15 @@ public class VerifyEmailAddressAction extends Action {
 		String cmd = ParamUtil.getString(request, Constants.CMD);
 
 		if (Validator.isNull(cmd)) {
-			return actionMapping.findForward("portal.verify_email_address");
+			return actionMapping.getActionForward(
+				"portal.verify_email_address");
 		}
 
 		if (themeDisplay.isSignedIn() && cmd.equals(Constants.SEND)) {
 			sendEmailAddressVerification(request, response, themeDisplay);
 
-			return actionMapping.findForward("portal.verify_email_address");
+			return actionMapping.getActionForward(
+				"portal.verify_email_address");
 		}
 
 		try {
@@ -87,14 +87,15 @@ public class VerifyEmailAddressAction extends Action {
 				return null;
 			}
 
-			return actionMapping.findForward(
+			return actionMapping.getActionForward(
 				ActionConstants.COMMON_REFERER_JSP);
 		}
 		catch (Exception e) {
 			if (e instanceof PortalException || e instanceof SystemException) {
 				SessionErrors.add(request, e.getClass());
 
-				return actionMapping.findForward("portal.verify_email_address");
+				return actionMapping.getActionForward(
+					"portal.verify_email_address");
 			}
 
 			PortalUtil.sendError(e, request, response);

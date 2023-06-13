@@ -59,12 +59,11 @@ public class DocumentsAndMediaURLEditorConfigContributor
 		fileItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			desiredItemSelectorReturnTypes);
 
-		LayoutItemSelectorCriterion layoutItemSelectorCriterion =
+		ItemSelectorCriterion layoutItemSelectorCriterion =
 			new LayoutItemSelectorCriterion();
 
 		layoutItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			desiredItemSelectorReturnTypes);
-		layoutItemSelectorCriterion.setShowHiddenPages(true);
 
 		String namespace = GetterUtil.getString(
 			inputEditorTaglibAttributes.get(

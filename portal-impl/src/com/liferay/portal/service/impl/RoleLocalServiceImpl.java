@@ -17,7 +17,6 @@ package com.liferay.portal.service.impl;
 import com.liferay.admin.kernel.util.PortalMyAccountApplicationType;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCachable;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCache;
@@ -53,7 +52,6 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -65,9 +63,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.permission.PermissionCacheUtil;
 import com.liferay.portal.service.base.RoleLocalServiceBaseImpl;
@@ -447,32 +443,6 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		if ((role.getType() == RoleConstants.TYPE_ORGANIZATION) ||
 			(role.getType() == RoleConstants.TYPE_SITE)) {
 
-			List<Group> groups = groupPersistence.findByC_S(
-				role.getCompanyId(), true);
-
-			for (Group group : groups) {
-				UnicodeProperties typeSettingsProperties =
-					group.getTypeSettingsProperties();
-
-				List<Long> defaultSiteRoleIds = ListUtil.toList(
-					StringUtil.split(
-						typeSettingsProperties.getProperty(
-							"defaultSiteRoleIds"),
-						0L));
-
-				if (defaultSiteRoleIds.contains(role.getRoleId())) {
-					defaultSiteRoleIds.remove(role.getRoleId());
-
-					typeSettingsProperties.setProperty(
-						"defaultSiteRoleIds",
-						ListUtil.toString(
-							defaultSiteRoleIds, StringPool.BLANK));
-
-					groupLocalService.updateGroup(
-						group.getGroupId(), typeSettingsProperties.toString());
-				}
-			}
-
 			userGroupRoleLocalService.deleteUserGroupRolesByRoleId(
 				role.getRoleId());
 
@@ -575,7 +545,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         with the name could not be found in the company
 	 */
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public Role fetchRole(long companyId, String name) {
 		String companyIdHexString = StringUtil.toHexString(companyId);
 
@@ -817,7 +787,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @return the role with the name
 	 */
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public Role getRole(long companyId, String name) throws PortalException {
 		String companyIdHexString = StringUtil.toHexString(companyId);
 
@@ -1127,13 +1097,6 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		Role role = rolePersistence.fetchByC_N(companyId, name);
 
 		if (role == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					StringBundler.concat(
-						"Role ", name, " with company ID ",
-						String.valueOf(companyId), " does not exist"));
-			}
-
 			return false;
 		}
 
@@ -1160,9 +1123,11 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 				ThreadLocalCacheManager.getThreadLocalCache(
 					Lifecycle.REQUEST, RoleLocalServiceImpl.class.getName());
 
-			String roleId = String.valueOf(role.getRoleId());
-
-			String key = roleId.concat(String.valueOf(userId));
+			String key = String.valueOf(
+				role.getRoleId()
+			).concat(
+				String.valueOf(userId)
+			);
 
 			Boolean value = threadLocalCache.get(key);
 

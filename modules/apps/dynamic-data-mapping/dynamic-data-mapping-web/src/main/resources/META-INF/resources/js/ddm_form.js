@@ -185,22 +185,6 @@ AUI.add(
 				return root || instance;
 			},
 
-			getReadOnly: function() {
-				var instance = this;
-
-				if (instance.get('readOnly')) {
-					return true;
-				}
-
-				var form = instance.getForm();
-
-				if (!instance.get('localizable') && form.getDefaultLocale() != instance.get('displayLocale')) {
-					return true;
-				}
-
-				return false;
-			},
-
 			_getField: function(fieldNode) {
 				var instance = this;
 
@@ -631,22 +615,6 @@ AUI.add(
 							function(fieldTemplate) {
 								var field = instance.createField(fieldTemplate);
 
-								var displayLocale = instance.get('displayLocale');
-
-								field.addLocaleToLocalizationMap(displayLocale);
-								field.set('displayLocale', displayLocale);
-
-								if (instance.originalField) {
-									field.originalField = instance.originalField;
-								}
-								else {
-									field.originalField = instance;
-								}
-
-								var form = field.getForm();
-
-								form.newRepeatableInstances.push(field);
-
 								field.renderUI();
 
 								instance._addFieldValidation(field, instance);
@@ -689,12 +657,10 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
-						var readOnly = instance.getReadOnly();
-
 						var inputNode = instance.getInputNode();
 
 						if (inputNode) {
-							inputNode.attr('disabled', readOnly);
+							inputNode.attr('disabled', instance.get('readOnly'));
 						}
 
 						var container = instance.get('container');
@@ -703,13 +669,13 @@ AUI.add(
 							var selectorInput = container.one('.selector-input');
 
 							if (selectorInput) {
-								selectorInput.attr('disabled', readOnly);
+								selectorInput.attr('disabled', instance.get('readOnly'));
 							}
 
 							var checkboxInput = container.one('input[type="checkbox"]');
 
 							if (checkboxInput) {
-								checkboxInput.attr('disabled', readOnly);
+								checkboxInput.attr('disabled', instance.get('readOnly'));
 							}
 
 							var disableCheckboxInput = container.one('input[type="checkbox"][name$="disable"]');
@@ -1274,22 +1240,20 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
-						var readOnly = instance.getReadOnly();
-
 						var container = instance.get('container');
 
 						var selectButtonNode = container.one('#' + instance.getInputName() + 'SelectButton');
 
-						selectButtonNode.attr('disabled', readOnly);
+						selectButtonNode.attr('disabled', instance.get('readOnly'));
 
 						var clearButtonNode = container.one('#' + instance.getInputName() + 'ClearButton');
 
-						clearButtonNode.attr('disabled', readOnly);
+						clearButtonNode.attr('disabled', instance.get('readOnly'));
 
 						var altNode = container.one('#' + instance.getInputName() + 'Alt');
 
 						if (altNode) {
-							altNode.set('readOnly', readOnly);
+							altNode.set('readOnly', instance.get('readOnly'));
 						}
 					},
 
@@ -1331,7 +1295,6 @@ AUI.add(
 
 											instance.setValue(
 												{
-													classPK: itemValue.fileEntryId,
 													groupId: itemValue.groupId,
 													title: itemValue.title,
 													type: itemValue.type,
@@ -1453,17 +1416,15 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
-						var readOnly = instance.getReadOnly();
-
 						var container = instance.get('container');
 
 						var selectButtonNode = container.one('#' + instance.getInputName() + 'SelectButton');
 
-						selectButtonNode.attr('disabled', readOnly);
+						selectButtonNode.attr('disabled', instance.get('readOnly'));
 
 						var clearButtonNode = container.one('#' + instance.getInputName() + 'ClearButton');
 
-						clearButtonNode.attr('disabled', readOnly);
+						clearButtonNode.attr('disabled', instance.get('readOnly'));
 					},
 
 					_handleButtonsClick: function(event) {
@@ -1660,17 +1621,15 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
-						var readOnly = instance.getReadOnly();
-
 						var container = instance.get('container');
 
 						var selectButtonNode = container.one('#' + instance.getInputName() + 'SelectButton');
 
-						selectButtonNode.attr('disabled', readOnly);
+						selectButtonNode.attr('disabled', instance.get('readOnly'));
 
 						var clearButtonNode = container.one('#' + instance.getInputName() + 'ClearButton');
 
-						clearButtonNode.attr('disabled', readOnly);
+						clearButtonNode.attr('disabled', instance.get('readOnly'));
 					},
 
 					_addBreadcrumbElement: function(label, layoutId, groupId, privateLayout) {
@@ -2858,7 +2817,7 @@ AUI.add(
 						instance.readOnlyLabel.html(instance.getLabelNode().getHTML());
 						instance.readOnlyText.html('<p>' + instance.getValue() + '</p>');
 
-						var readOnly = instance.getReadOnly();
+						var readOnly = instance.get('readOnly');
 
 						instance.readOnlyLabel.toggle(readOnly);
 						instance.readOnlyText.toggle(readOnly);
@@ -2952,11 +2911,9 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
-						var readOnly = instance.getReadOnly();
-
 						var radioNodes = instance.getRadioNodes();
 
-						radioNodes.attr('disabled', readOnly);
+						radioNodes.attr('disabled', instance.get('readOnly'));
 					}
 				}
 			}
@@ -3123,7 +3080,6 @@ AUI.add(
 						var instance = this;
 
 						instance.eventHandlers = [];
-						instance.newRepeatableInstances = [];
 						instance.repeatableInstances = {};
 
 						instance.bindUI();
@@ -3149,7 +3105,8 @@ AUI.add(
 									instance._afterUpdateRepeatableFields,
 									instance
 								),
-								Liferay.after('form:registered', instance._afterFormRegistered, instance)
+								Liferay.after('form:registered', instance._afterFormRegistered, instance),
+								Liferay.after('inputLocalized:defaultLocaleChanged', A.bind('_onDefaultLocaleChanged', instance))
 							);
 
 							if (instance.get('synchronousFormSubmission')) {
@@ -3159,6 +3116,16 @@ AUI.add(
 								);
 							}
 						}
+					},
+
+					_onDefaultLocaleChanged: function(event) {
+						var instance = this;
+
+						var definition = instance.get('definition');
+
+						definition.defaultLanguageId = event.item.getAttribute('data-value');
+
+						instance.set('definition', definition);
 					},
 
 					destructor: function() {
@@ -3193,47 +3160,6 @@ AUI.add(
 								}
 							}
 						);
-					},
-
-					finalizeRepeatableFieldLocalizations: function() {
-						var instance = this;
-
-						var defaultLocale = instance.getDefaultLocale();
-
-						for (x in instance.newRepeatableInstances) {
-							var field = instance.newRepeatableInstances[x];
-
-							if (!field.get('localizable')) {
-								continue;
-							}
-
-							var currentLocale = field.get('displayLocale');
-							var originalField = field.originalField;
-
-							var newFieldLocalizations = field.get('localizationMap');
-							var totalLocalizations = originalField.get('localizationMap');
-
-							for (var localization in totalLocalizations) {
-								if (localization === currentLocale) {
-									continue;
-								}
-
-								if (!newFieldLocalizations[localization]) {
-									var localizationValue = '';
-
-									if (newFieldLocalizations[defaultLocale]) {
-										localizationValue = newFieldLocalizations[defaultLocale];
-									}
-									else if (defaultLocale === field.get('displayLocale') && field.getValue()) {
-										localizationValue = field.getValue();
-									}
-
-									newFieldLocalizations[localization] = localizationValue;
-								}
-							}
-
-							field.set('localizationMap', newFieldLocalizations);
-						}
 					},
 
 					moveField: function(parentField, oldIndex, newIndex) {
@@ -3340,11 +3266,13 @@ AUI.add(
 					toJSON: function() {
 						var instance = this;
 
+						var definition = instance.get('definition');
+
 						var fieldValues = AArray.invoke(instance.get('fields'), 'toJSON');
 
 						return {
 							availableLanguageIds: instance.get('availableLanguageIds'),
-							defaultLanguageId: themeDisplay.getDefaultLanguageId(),
+							defaultLanguageId: definition.defaultLanguageId || themeDisplay.getDefaultLanguageId(),
 							fieldValues: fieldValues
 						};
 					},
@@ -3461,8 +3389,6 @@ AUI.add(
 
 					_onSubmitForm: function(event) {
 						var instance = this;
-
-						instance.finalizeRepeatableFieldLocalizations();
 
 						instance.updateDDMFormInputValue();
 					},

@@ -58,10 +58,7 @@ public class ThrowableHexaConsumerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterThrowsException() {
-		ThrowableHexaConsumer.empty(
-		).andThen(
-			null
-		);
+		ThrowableHexaConsumer.empty().andThen(null);
 	}
 
 }

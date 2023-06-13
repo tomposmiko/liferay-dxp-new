@@ -16,7 +16,10 @@ package com.liferay.dynamic.data.mapping.web.internal.exportimport.data.handler.
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProvider;
-import com.liferay.dynamic.data.mapping.io.DDMFormValuesJSONDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerTracker;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstanceLink;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
@@ -30,38 +33,28 @@ import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
-import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.test.util.lar.BaseStagedModelDataHandlerTestCase;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.StagedModel;
-import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -86,124 +79,7 @@ public class DDMStructureStagedModelDataHandlerTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_availableLocales = LanguageUtil.getAvailableLocales(
-			TestPropsValues.getCompanyId());
-		_defaultLocale = LocaleUtil.getDefault();
-
 		setUpDDMDataProvider();
-		setUpDDMFormValuesJSONDeserializer();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		LanguageUtil.init();
-
-		CompanyTestUtil.resetCompanyLocales(
-			TestPropsValues.getCompanyId(), _availableLocales, _defaultLocale);
-	}
-
-	@Test
-	public void testImportStructureToGlobalSite() throws Exception {
-		long companyId = stagingGroup.getCompanyId();
-
-		Company company = CompanyLocalServiceUtil.getCompany(companyId);
-
-		Group companyGroup = company.getGroup();
-
-		DDMStructure structure = DDMStructureTestUtil.addStructure(
-			companyGroup.getGroupId(), _CLASS_NAME);
-
-		initExport(companyGroup);
-
-		try {
-			ExportImportThreadLocal.setPortletExportInProcess(true);
-
-			StagedModelDataHandlerUtil.exportStagedModel(
-				portletDataContext, structure);
-		}
-		finally {
-			ExportImportThreadLocal.setPortletExportInProcess(false);
-		}
-
-		_targetCompany = CompanyTestUtil.addCompany();
-
-		User targetDefaultUser = _targetCompany.getDefaultUser();
-
-		initImport(companyGroup, _targetCompany.getGroup());
-
-		portletDataContext.setUserIdStrategy(
-			new TestUserIdStrategy(targetDefaultUser));
-
-		StagedModel exportedStagedModel = readExportedStagedModel(structure);
-
-		Assert.assertNotNull(exportedStagedModel);
-
-		try {
-			ExportImportThreadLocal.setPortletImportInProcess(true);
-
-			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, exportedStagedModel);
-		}
-		finally {
-			ExportImportThreadLocal.setPortletImportInProcess(false);
-		}
-
-		StagedModel importedStagedModel = getStagedModel(
-			exportedStagedModel.getUuid(), _targetCompany.getGroup());
-
-		Assert.assertNotNull(importedStagedModel);
-	}
-
-	@Test
-	public void testImportStructureWithDisabledDefaultLocale()
-		throws Exception {
-
-		DDMStructure structure = DDMStructureTestUtil.addStructure(
-			stagingGroup.getGroupId(), _CLASS_NAME);
-
-		Locale newLocale = LocaleUtil.BRAZIL;
-
-		if (newLocale.equals(_defaultLocale)) {
-			newLocale = LocaleUtil.CHINA;
-		}
-
-		LanguageUtil.init();
-
-		CompanyTestUtil.resetCompanyLocales(
-			stagingGroup.getCompanyId(), Arrays.asList(newLocale), newLocale);
-
-		initExport();
-
-		try {
-			ExportImportThreadLocal.setPortletExportInProcess(true);
-
-			StagedModelDataHandlerUtil.exportStagedModel(
-				portletDataContext, structure);
-		}
-		finally {
-			ExportImportThreadLocal.setPortletExportInProcess(false);
-		}
-
-		initImport();
-
-		StagedModel exportedStagedModel = readExportedStagedModel(structure);
-
-		Assert.assertNotNull(exportedStagedModel);
-
-		try {
-			ExportImportThreadLocal.setPortletImportInProcess(true);
-
-			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, exportedStagedModel);
-		}
-		finally {
-			ExportImportThreadLocal.setPortletImportInProcess(false);
-		}
-
-		StagedModel importedStagedModel = getStagedModel(
-			exportedStagedModel.getUuid(), liveGroup);
-
-		Assert.assertNotNull(importedStagedModel);
 	}
 
 	@Test
@@ -384,15 +260,25 @@ public class DDMStructureStagedModelDataHandlerTest
 	}
 
 	protected DDMFormValues getDDMDataProviderInstanceFormValues(
-			DDMDataProviderInstance ddmDataProviderInstance)
-		throws PortalException {
+		DDMDataProviderInstance ddmDataProviderInstance) {
 
 		Class<?> ddmDataProviderSettings = _ddmDataProvider.getSettings();
 
 		DDMForm ddmForm = DDMFormFactory.create(ddmDataProviderSettings);
 
-		return _ddmFormValuesJSONDeserializer.deserialize(
-			ddmForm, ddmDataProviderInstance.getDefinition());
+		DDMFormValuesDeserializer ddmFormValuesDeserializer =
+			_ddmFormValuesDeserializerTracker.getDDMFormValuesDeserializer(
+				"json");
+
+		DDMFormValuesDeserializerDeserializeRequest.Builder builder =
+			DDMFormValuesDeserializerDeserializeRequest.Builder.newBuilder(
+				ddmDataProviderInstance.getDefinition(), ddmForm);
+
+		DDMFormValuesDeserializerDeserializeResponse
+			ddmFormValuesDeserializerDeserializeResponse =
+				ddmFormValuesDeserializer.deserialize(builder.build());
+
+		return ddmFormValuesDeserializerDeserializeResponse.getDDMFormValues();
 	}
 
 	@Override
@@ -434,13 +320,6 @@ public class DDMStructureStagedModelDataHandlerTest
 			"(ddm.data.provider.type=rest)");
 
 		_ddmDataProvider = ddmDataProviders[0];
-	}
-
-	protected void setUpDDMFormValuesJSONDeserializer() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_ddmFormValuesJSONDeserializer = registry.getService(
-			DDMFormValuesJSONDeserializer.class);
 	}
 
 	@Override
@@ -555,13 +434,9 @@ public class DDMStructureStagedModelDataHandlerTest
 	private static final String _CLASS_NAME =
 		"com.liferay.dynamic.data.lists.model.DDLRecordSet";
 
-	private static Set<Locale> _availableLocales;
-	private static Locale _defaultLocale;
-
 	private DDMDataProvider _ddmDataProvider;
-	private DDMFormValuesJSONDeserializer _ddmFormValuesJSONDeserializer;
 
-	@DeleteAfterTestRun
-	private Company _targetCompany;
+	@Inject
+	private DDMFormValuesDeserializerTracker _ddmFormValuesDeserializerTracker;
 
 }

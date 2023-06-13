@@ -18,12 +18,7 @@
 
 <%
 User selUser = userDisplayContext.getSelectedUser();
-
-List<Group> groups = new ArrayList<>();
-
-groups.addAll(userDisplayContext.getGroups());
-groups.addAll(userDisplayContext.getInheritedSites());
-
+List<Group> groups = userDisplayContext.getGroups();
 List<Organization> organizations = userDisplayContext.getOrganizations();
 Long[] organizationIds = UsersAdminUtil.getOrganizationIds(organizations);
 List<Role> roles = userDisplayContext.getRoles();
@@ -64,16 +59,14 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 <aui:input name="deleteRoleIds" type="hidden" />
 
 <div class="sheet-section">
-	<h3 class="sheet-subtitle">
-		<span class="autofit-padded-no-gutters autofit-row">
-			<span class="autofit-col autofit-col-expand">
-				<span class="heading-text">
-					<liferay-ui:message key="regular-roles" />
-				</span>
-			</span>
+	<h3 class="autofit-row sheet-subtitle">
+		<span class="autofit-col autofit-col-expand">
+			<span class="heading-text"><liferay-ui:message key="regular-roles" /></span>
+		</span>
 
-			<c:if test="<%= !portletName.equals(myAccountPortletId) %>">
-				<span class="autofit-col">
+		<c:if test="<%= !portletName.equals(myAccountPortletId) %>">
+			<span class="autofit-col">
+				<span class="heading-end">
 					<liferay-ui:icon
 						cssClass="modify-link"
 						id="selectRegularRoleLink"
@@ -84,8 +77,8 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 						url="javascript:;"
 					/>
 				</span>
-			</c:if>
-		</span>
+			</span>
+		</c:if>
 	</h3>
 
 	<liferay-ui:search-container
@@ -234,16 +227,14 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 </div>
 
 <div class="sheet-section">
-	<h3 class="sheet-subtitle">
-		<span class="autofit-padded-no-gutters autofit-row">
-			<span class="autofit-col autofit-col-expand">
-				<span class="heading-text">
-					<liferay-ui:message key="organization-roles" />
-				</span>
-			</span>
+	<h3 class="autofit-row sheet-subtitle">
+		<span class="autofit-col autofit-col-expand">
+			<span class="heading-text"><liferay-ui:message key="organization-roles" /></span>
+		</span>
 
-			<c:if test="<%= !organizations.isEmpty() && !portletName.equals(myAccountPortletId) %>">
-				<span class="autofit-col">
+		<c:if test="<%= !portletName.equals(myAccountPortletId) %>">
+			<span class="autofit-col">
+				<span class="heading-end">
 					<liferay-ui:icon
 						cssClass="modify-link"
 						id="selectOrganizationRoleLink"
@@ -254,8 +245,8 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 						url="javascript:;"
 					/>
 				</span>
-			</c:if>
-		</span>
+			</span>
+		</c:if>
 	</h3>
 
 	<c:if test="<%= organizations.isEmpty() && organizationRoles.isEmpty() %>">
@@ -374,8 +365,8 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 									}
 								}
 
-								for (var i = 0; i < <portlet:namespace />deleteGroupRolesGroupIds.length; i++) {
-									if ((<portlet:namespace />deleteGroupRolesGroupIds[i] == groupId) && (<portlet:namespace />deleteGroupRolesRoleIds[i] == roleId)) {
+								for (var j = 0; j < <portlet:namespace />deleteGroupRolesGroupIds.length; j++) {
+									if ((<portlet:namespace />deleteGroupRolesGroupIds[j] == groupId) && (<portlet:namespace />deleteGroupRolesRoleIds[j] == roleId)) {
 										Util.toggleDisabled(item, false);
 
 										break;
@@ -434,16 +425,14 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 </div>
 
 <div class="sheet-section">
-	<h3 class="sheet-subtitle">
-		<span class="autofit-padded-no-gutters autofit-row">
-			<span class="autofit-col autofit-col-expand">
-				<span class="heading-text">
-					<liferay-ui:message key="site-roles" />
-				</span>
-			</span>
+	<h3 class="autofit-row sheet-subtitle">
+		<span class="autofit-col autofit-col-expand">
+			<span class="heading-text"><liferay-ui:message key="site-roles" /></span>
+		</span>
 
-			<c:if test="<%= !groups.isEmpty() && !portletName.equals(myAccountPortletId) %>">
-				<span class="autofit-col">
+		<c:if test="<%= !portletName.equals(myAccountPortletId) %>">
+			<span class="autofit-col">
+				<span class="heading-end">
 					<liferay-ui:icon
 						cssClass="modify-link"
 						id="selectSiteRoleLink"
@@ -454,11 +443,11 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 						url="javascript:;"
 					/>
 				</span>
-			</c:if>
-		</span>
+			</span>
+		</c:if>
 	</h3>
 
-	<c:if test="<%= groups.isEmpty() && siteRoles.isEmpty() %>">
+	<c:if test="<%= organizations.isEmpty() && organizationRoles.isEmpty() %>">
 		<div class="text-muted"><liferay-ui:message key="this-user-does-not-belong-to-a-site-to-which-a-site-role-can-be-assigned" /></div>
 	</c:if>
 
@@ -569,16 +558,16 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 								var groupId = item.attr('data-groupid');
 								var roleId = item.attr('data-entityid');
 
-								for (var i = 0; i < <portlet:namespace />addGroupRolesGroupIds.length; i++) {
-									if ((<portlet:namespace />addGroupRolesGroupIds[i] == groupId) && (<portlet:namespace />addGroupRolesRoleIds[i] == roleId)) {
+								for (var k = 0; k < <portlet:namespace />addGroupRolesGroupIds.length; k++) {
+									if ((<portlet:namespace />addGroupRolesGroupIds[k] == groupId) && (<portlet:namespace />addGroupRolesRoleIds[k] == roleId)) {
 										Util.toggleDisabled(item, true);
 
 										break;
 									}
 								}
 
-								for (var i = 0; i < <portlet:namespace />deleteGroupRolesGroupIds.length; i++) {
-									if ((<portlet:namespace />deleteGroupRolesGroupIds[i] == groupId) && (<portlet:namespace />deleteGroupRolesRoleIds[i] == roleId)) {
+								for (var n = 0; n < <portlet:namespace />deleteGroupRolesGroupIds.length; n++) {
+									if ((<portlet:namespace />deleteGroupRolesGroupIds[n] == groupId) && (<portlet:namespace />deleteGroupRolesRoleIds[n] == roleId)) {
 										Util.toggleDisabled(item, false);
 
 										break;

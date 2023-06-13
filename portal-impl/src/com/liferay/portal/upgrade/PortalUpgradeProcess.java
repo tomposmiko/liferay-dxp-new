@@ -14,10 +14,11 @@
 
 package com.liferay.portal.upgrade;
 
+import aQute.bnd.version.Version;
+
 import com.liferay.portal.kernel.model.ReleaseConstants;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.version.Version;
 import com.liferay.portal.upgrade.util.PortalUpgradeProcessRegistry;
 import com.liferay.portal.upgrade.v7_1_x.PortalUpgradeProcessRegistryImpl;
 
@@ -50,7 +51,9 @@ public class PortalUpgradeProcess extends UpgradeProcess {
 				while (rs.next()) {
 					String schemaVersion = rs.getString("schemaVersion");
 
-					return Version.parseVersion(schemaVersion);
+					if (Version.isVersion(schemaVersion)) {
+						return new Version(schemaVersion);
+					}
 				}
 			}
 		}
@@ -156,18 +159,21 @@ public class PortalUpgradeProcess extends UpgradeProcess {
 				"update Release_ set schemaVersion = ? where " +
 					"servletContextName = ? and buildNumber < 7100")) {
 
-			ps.setString(1, _initialSchemaVersion.toString());
+			ps.setString(1, _INITIAL_SCHEMA_VERSION);
 			ps.setString(2, ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME);
 
 			ps.execute();
 		}
 	}
 
-	private static final Version _initialSchemaVersion = new Version(0, 1, 0);
+	private static final String _INITIAL_SCHEMA_VERSION = "0.1.0";
+
 	private static final TreeMap<Version, UpgradeProcess> _upgradeProcesses =
 		new TreeMap<Version, UpgradeProcess>() {
 			{
-				put(_initialSchemaVersion, new DummyUpgradeProcess());
+				put(
+					new Version(_INITIAL_SCHEMA_VERSION),
+					new DummyUpgradeProcess());
 			}
 		};
 
@@ -176,6 +182,13 @@ public class PortalUpgradeProcess extends UpgradeProcess {
 			new PortalUpgradeProcessRegistryImpl();
 
 		portalUpgradeProcessRegistry.registerUpgradeProcesses(
+			_upgradeProcesses);
+
+		PortalUpgradeProcessRegistry v72xPortalUpgradeProcessRegistry =
+			new com.liferay.portal.upgrade.v7_2_x.
+				PortalUpgradeProcessRegistryImpl();
+
+		v72xPortalUpgradeProcessRegistry.registerUpgradeProcesses(
 			_upgradeProcesses);
 	}
 

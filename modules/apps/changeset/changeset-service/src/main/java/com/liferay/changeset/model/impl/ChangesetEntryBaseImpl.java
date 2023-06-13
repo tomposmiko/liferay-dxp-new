@@ -32,13 +32,12 @@ import com.liferay.changeset.service.ChangesetEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class ChangesetEntryBaseImpl
-	extends ChangesetEntryModelImpl implements ChangesetEntry {
-
+public abstract class ChangesetEntryBaseImpl extends ChangesetEntryModelImpl
+	implements ChangesetEntry {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a changeset entry model instance should use the <code>ChangesetEntry</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a changeset entry model instance should use the {@link ChangesetEntry} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class ChangesetEntryBaseImpl
 			ChangesetEntryLocalServiceUtil.updateChangesetEntry(this);
 		}
 	}
-
 }

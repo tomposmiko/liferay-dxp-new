@@ -94,9 +94,12 @@ public class ItemSelectorImpl implements ItemSelector {
 			Class<? extends ItemSelectorCriterion> itemSelectorCriterionClass =
 				itemSelectorCriterionClasses.get(i);
 
-			String countValue = String.valueOf(i);
-
-			String json = parameters.get(countValue.concat(JSON))[0];
+			String json = parameters.get(
+				String.valueOf(
+					i
+				).concat(
+					JSON
+				))[0];
 
 			itemSelectorCriteria.add(
 				_itemSelectionCriterionSerializer.deserialize(
@@ -296,10 +299,12 @@ public class ItemSelectorImpl implements ItemSelector {
 			ItemSelectorCriterion itemSelectorCriterion =
 				itemSelectorCriteria[i];
 
-			String countValue = String.valueOf(i);
-
 			parameters.put(
-				countValue.concat(JSON),
+				String.valueOf(
+					i
+				).concat(
+					JSON
+				),
 				new String[] {
 					_itemSelectionCriterionSerializer.serialize(
 						itemSelectorCriterion)

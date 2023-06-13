@@ -75,19 +75,13 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 
 		builder = authorize(webTarget.request(), tokenString);
 
-		Assert.assertEquals(
-			403,
-			builder.get(
-			).getStatus());
+		Assert.assertEquals(403, builder.get().getStatus());
 
 		webTarget = getWebTarget("/annotated");
 
 		builder = authorize(webTarget.request(), tokenString);
 
-		Assert.assertEquals(
-			403,
-			builder.get(
-			).getStatus());
+		Assert.assertEquals(403, builder.get().getStatus());
 	}
 
 	public static class AnnotationsAndHttpPrefixTestPreparatorBundleActivator
@@ -110,7 +104,7 @@ public class AnnotationsAndHttpPrefixApplicationClientTest
 				new HashMapDictionary<>();
 
 			annotatedApplicationProperties.put(
-				"oauth2.scope.checker.type", "annotations");
+				"oauth2.scopechecker.type", "annotations");
 			annotatedApplicationProperties.put("prefix", "annotations");
 			annotatedApplicationProperties.put(
 				"osgi.jaxrs.name", TestAnnotatedApplication.class.getName());

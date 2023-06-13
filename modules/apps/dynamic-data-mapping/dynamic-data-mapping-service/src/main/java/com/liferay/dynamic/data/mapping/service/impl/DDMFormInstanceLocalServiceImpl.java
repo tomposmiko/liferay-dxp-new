@@ -16,8 +16,14 @@ package com.liferay.dynamic.data.mapping.service.impl;
 
 import com.liferay.dynamic.data.mapping.exception.FormInstanceNameException;
 import com.liferay.dynamic.data.mapping.exception.FormInstanceStructureIdException;
-import com.liferay.dynamic.data.mapping.io.DDMFormValuesJSONDeserializer;
-import com.liferay.dynamic.data.mapping.io.DDMFormValuesJSONSerializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerTracker;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializerSerializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializerSerializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializerTracker;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
@@ -38,6 +44,7 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -84,8 +91,7 @@ public class DDMFormInstanceLocalServiceImpl
 		ddmFormInstance.setVersion(_VERSION_DEFAULT);
 		ddmFormInstance.setNameMap(nameMap, defaultLocale);
 		ddmFormInstance.setDescriptionMap(descriptionMap, defaultLocale);
-		ddmFormInstance.setSettings(
-			ddmFormValuesJSONSerializer.serialize(settingsDDMFormValues));
+		ddmFormInstance.setSettings(serialize(settingsDDMFormValues));
 
 		DDMFormInstance updatedDDMFormInstance =
 			ddmFormInstancePersistence.update(ddmFormInstance);
@@ -102,8 +108,7 @@ public class DDMFormInstanceLocalServiceImpl
 		}
 		else {
 			addFormInstanceResources(
-				ddmFormInstance, serviceContext.getGroupPermissions(),
-				serviceContext.getGuestPermissions());
+				ddmFormInstance, serviceContext.getModelPermissions());
 		}
 
 		long structureVersionId = getStructureVersionId(ddmStructureId);
@@ -164,6 +169,22 @@ public class DDMFormInstanceLocalServiceImpl
 			addGuestPermissions);
 	}
 
+	@Override
+	public void addFormInstanceResources(
+			DDMFormInstance ddmFormInstance, ModelPermissions modelPermissions)
+		throws PortalException {
+
+		resourceLocalService.addModelResources(
+			ddmFormInstance.getCompanyId(), ddmFormInstance.getGroupId(),
+			ddmFormInstance.getUserId(), DDMFormInstance.class.getName(),
+			ddmFormInstance.getFormInstanceId(), modelPermissions);
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 *             #addFormInstanceResources(DDMFormInstance, ModelPermissions)}
+	 */
+	@Deprecated
 	@Override
 	public void addFormInstanceResources(
 			DDMFormInstance ddmFormInstance, String[] groupPermissions,
@@ -327,8 +348,7 @@ public class DDMFormInstanceLocalServiceImpl
 			ddmFormInstancePersistence.findByPrimaryKey(formInstanceId);
 
 		formInstance.setModifiedDate(now);
-		formInstance.setSettings(
-			ddmFormValuesJSONSerializer.serialize(settingsDDMFormValues));
+		formInstance.setSettings(serialize(settingsDDMFormValues));
 
 		return ddmFormInstancePersistence.update(formInstance);
 	}
@@ -452,8 +472,7 @@ public class DDMFormInstanceLocalServiceImpl
 
 		ddmFormInstance.setNameMap(nameMap, defaultLocale);
 		ddmFormInstance.setDescriptionMap(descriptionMap, defaultLocale);
-		ddmFormInstance.setSettings(
-			ddmFormValuesJSONSerializer.serialize(settingsDDMFormValues));
+		ddmFormInstance.setSettings(serialize(settingsDDMFormValues));
 
 		DDMFormInstance updatedDDMFormInstance =
 			ddmFormInstancePersistence.update(ddmFormInstance);
@@ -498,13 +517,23 @@ public class DDMFormInstanceLocalServiceImpl
 	}
 
 	protected DDMFormValues getFormInstanceSettingsFormValues(
-			String serializedSettingsDDMFormValues)
-		throws PortalException {
+		String serializedSettingsDDMFormValues) {
 
-		DDMForm form = DDMFormFactory.create(DDMFormInstanceSettings.class);
+		DDMForm ddmForm = DDMFormFactory.create(DDMFormInstanceSettings.class);
 
-		return ddmFormValuesJSONDeserializer.deserialize(
-			form, serializedSettingsDDMFormValues);
+		DDMFormValuesDeserializer ddmFormValuesDeserializer =
+			ddmFormValuesDeserializerTracker.getDDMFormValuesDeserializer(
+				"json");
+
+		DDMFormValuesDeserializerDeserializeRequest.Builder builder =
+			DDMFormValuesDeserializerDeserializeRequest.Builder.newBuilder(
+				serializedSettingsDDMFormValues, ddmForm);
+
+		DDMFormValuesDeserializerDeserializeResponse
+			ddmFormValuesDeserializerDeserializeResponse =
+				ddmFormValuesDeserializer.deserialize(builder.build());
+
+		return ddmFormValuesDeserializerDeserializeResponse.getDDMFormValues();
 	}
 
 	protected String getNextVersion(String version, boolean majorVersion) {
@@ -555,6 +584,21 @@ public class DDMFormInstanceLocalServiceImpl
 				DDMFormInstanceSettings.class, ddmFormValues);
 
 		return ddmFormInstanceSettings.workflowDefinition();
+	}
+
+	protected String serialize(DDMFormValues ddmFormValues) {
+		DDMFormValuesSerializer ddmFormValuesSerializer =
+			ddmFormValuesSerializerTracker.getDDMFormValuesSerializer("json");
+
+		DDMFormValuesSerializerSerializeRequest.Builder builder =
+			DDMFormValuesSerializerSerializeRequest.Builder.newBuilder(
+				ddmFormValues);
+
+		DDMFormValuesSerializerSerializeResponse
+			ddmFormValuesSerializerSerializeResponse =
+				ddmFormValuesSerializer.serialize(builder.build());
+
+		return ddmFormValuesSerializerSerializeResponse.getContent();
 	}
 
 	protected void updateFormInstanceVersion(
@@ -640,11 +684,11 @@ public class DDMFormInstanceLocalServiceImpl
 		}
 	}
 
-	@ServiceReference(type = DDMFormValuesJSONDeserializer.class)
-	protected DDMFormValuesJSONDeserializer ddmFormValuesJSONDeserializer;
+	@ServiceReference(type = DDMFormValuesDeserializerTracker.class)
+	protected DDMFormValuesDeserializerTracker ddmFormValuesDeserializerTracker;
 
-	@ServiceReference(type = DDMFormValuesJSONSerializer.class)
-	protected DDMFormValuesJSONSerializer ddmFormValuesJSONSerializer;
+	@ServiceReference(type = DDMFormValuesSerializerTracker.class)
+	protected DDMFormValuesSerializerTracker ddmFormValuesSerializerTracker;
 
 	@ServiceReference(type = DDMFormValuesValidator.class)
 	protected DDMFormValuesValidator ddmFormValuesValidator;

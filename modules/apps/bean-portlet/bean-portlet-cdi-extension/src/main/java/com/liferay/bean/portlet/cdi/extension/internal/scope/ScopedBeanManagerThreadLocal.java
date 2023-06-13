@@ -18,12 +18,12 @@ import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.Supplier;
 
 import java.io.Closeable;
 
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.function.Supplier;
 
 /**
  * @author Neil Griffin
@@ -72,16 +72,18 @@ public class ScopedBeanManagerThreadLocal {
 
 		Deque<ScopedBeanManager> scopedBeanManagers = _instance.get();
 
-		scopedBeanManagers.push(supplier.get());
+		boolean empty = scopedBeanManagers.isEmpty();
+
+		if (empty) {
+			scopedBeanManagers.push(supplier.get());
+		}
 
 		try {
 			unsafeRunnable.run();
 		}
 		finally {
-			ScopedBeanManager scopedBeanManager = scopedBeanManagers.pop();
-
-			if (scopedBeanManagers.isEmpty()) {
-				scopedBeanManager.destroyScopedBeans();
+			if (empty) {
+				scopedBeanManagers.pop();
 			}
 		}
 	}

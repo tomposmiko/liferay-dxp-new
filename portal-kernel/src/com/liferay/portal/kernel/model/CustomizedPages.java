@@ -28,9 +28,7 @@ public class CustomizedPages {
 	}
 
 	public static String namespacePlid(long plid) {
-		String className = CustomizedPages.class.getName();
-
-		return className.concat(String.valueOf(plid));
+		return CustomizedPages.class.getName().concat(String.valueOf(plid));
 	}
 
 	private static final String _CUSTOMIZABLE_SUFFIX = "-customizable";

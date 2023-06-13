@@ -23,6 +23,7 @@ import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstanceRecor
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstanceVersionPersistence;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureFinder;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMStructurePersistence;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -48,16 +49,15 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.dynamic.data.mapping.service.impl.DDMFormInstanceServiceImpl
+ * @see com.liferay.dynamic.data.mapping.service.DDMFormInstanceServiceUtil
  * @generated
  */
-public abstract class DDMFormInstanceServiceBaseImpl
-	extends BaseServiceImpl
+public abstract class DDMFormInstanceServiceBaseImpl extends BaseServiceImpl
 	implements DDMFormInstanceService, IdentifiableOSGiService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>DDMFormInstanceService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.mapping.service.DDMFormInstanceServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.dynamic.data.mapping.service.DDMFormInstanceServiceUtil} to access the ddm form instance remote service.
 	 */
 
 	/**
@@ -65,9 +65,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the ddm form instance local service
 	 */
-	public com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService
-		getDDMFormInstanceLocalService() {
-
+	public com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService getDDMFormInstanceLocalService() {
 		return ddmFormInstanceLocalService;
 	}
 
@@ -77,9 +75,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 * @param ddmFormInstanceLocalService the ddm form instance local service
 	 */
 	public void setDDMFormInstanceLocalService(
-		com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService
-			ddmFormInstanceLocalService) {
-
+		com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService ddmFormInstanceLocalService) {
 		this.ddmFormInstanceLocalService = ddmFormInstanceLocalService;
 	}
 
@@ -99,7 +95,6 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setDDMFormInstanceService(
 		DDMFormInstanceService ddmFormInstanceService) {
-
 		this.ddmFormInstanceService = ddmFormInstanceService;
 	}
 
@@ -119,7 +114,6 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setDDMFormInstancePersistence(
 		DDMFormInstancePersistence ddmFormInstancePersistence) {
-
 		this.ddmFormInstancePersistence = ddmFormInstancePersistence;
 	}
 
@@ -139,7 +133,6 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setDDMFormInstanceFinder(
 		DDMFormInstanceFinder ddmFormInstanceFinder) {
-
 		this.ddmFormInstanceFinder = ddmFormInstanceFinder;
 	}
 
@@ -148,9 +141,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -160,9 +151,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -171,9 +160,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the class name local service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService
-		getClassNameLocalService() {
-
+	public com.liferay.portal.kernel.service.ClassNameLocalService getClassNameLocalService() {
 		return classNameLocalService;
 	}
 
@@ -183,9 +170,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 * @param classNameLocalService the class name local service
 	 */
 	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService
-			classNameLocalService) {
-
+		com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService) {
 		this.classNameLocalService = classNameLocalService;
 	}
 
@@ -194,9 +179,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the class name remote service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameService
-		getClassNameService() {
-
+	public com.liferay.portal.kernel.service.ClassNameService getClassNameService() {
 		return classNameService;
 	}
 
@@ -207,7 +190,6 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setClassNameService(
 		com.liferay.portal.kernel.service.ClassNameService classNameService) {
-
 		this.classNameService = classNameService;
 	}
 
@@ -227,7 +209,6 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
-
 		this.classNamePersistence = classNamePersistence;
 	}
 
@@ -236,9 +217,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService
-		getResourceLocalService() {
-
+	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
 		return resourceLocalService;
 	}
 
@@ -248,9 +227,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService
-			resourceLocalService) {
-
+		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -259,9 +236,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -272,7 +247,6 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -292,7 +266,6 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
-
 		this.userService = userService;
 	}
 
@@ -319,9 +292,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the workflow definition link local service
 	 */
-	public com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService
-		getWorkflowDefinitionLinkLocalService() {
-
+	public com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService getWorkflowDefinitionLinkLocalService() {
 		return workflowDefinitionLinkLocalService;
 	}
 
@@ -331,11 +302,8 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 * @param workflowDefinitionLinkLocalService the workflow definition link local service
 	 */
 	public void setWorkflowDefinitionLinkLocalService(
-		com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService
-			workflowDefinitionLinkLocalService) {
-
-		this.workflowDefinitionLinkLocalService =
-			workflowDefinitionLinkLocalService;
+		com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService) {
+		this.workflowDefinitionLinkLocalService = workflowDefinitionLinkLocalService;
 	}
 
 	/**
@@ -343,9 +311,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the workflow definition link persistence
 	 */
-	public WorkflowDefinitionLinkPersistence
-		getWorkflowDefinitionLinkPersistence() {
-
+	public WorkflowDefinitionLinkPersistence getWorkflowDefinitionLinkPersistence() {
 		return workflowDefinitionLinkPersistence;
 	}
 
@@ -356,9 +322,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setWorkflowDefinitionLinkPersistence(
 		WorkflowDefinitionLinkPersistence workflowDefinitionLinkPersistence) {
-
-		this.workflowDefinitionLinkPersistence =
-			workflowDefinitionLinkPersistence;
+		this.workflowDefinitionLinkPersistence = workflowDefinitionLinkPersistence;
 	}
 
 	/**
@@ -366,11 +330,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the ddm form instance record local service
 	 */
-	public
-		com.liferay.dynamic.data.mapping.service.
-			DDMFormInstanceRecordLocalService
-				getDDMFormInstanceRecordLocalService() {
-
+	public com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService getDDMFormInstanceRecordLocalService() {
 		return ddmFormInstanceRecordLocalService;
 	}
 
@@ -380,12 +340,8 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 * @param ddmFormInstanceRecordLocalService the ddm form instance record local service
 	 */
 	public void setDDMFormInstanceRecordLocalService(
-		com.liferay.dynamic.data.mapping.service.
-			DDMFormInstanceRecordLocalService
-				ddmFormInstanceRecordLocalService) {
-
-		this.ddmFormInstanceRecordLocalService =
-			ddmFormInstanceRecordLocalService;
+		com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService ddmFormInstanceRecordLocalService) {
+		this.ddmFormInstanceRecordLocalService = ddmFormInstanceRecordLocalService;
 	}
 
 	/**
@@ -393,9 +349,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the ddm form instance record remote service
 	 */
-	public com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService
-		getDDMFormInstanceRecordService() {
-
+	public com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService getDDMFormInstanceRecordService() {
 		return ddmFormInstanceRecordService;
 	}
 
@@ -405,9 +359,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 * @param ddmFormInstanceRecordService the ddm form instance record remote service
 	 */
 	public void setDDMFormInstanceRecordService(
-		com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService
-			ddmFormInstanceRecordService) {
-
+		com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService ddmFormInstanceRecordService) {
 		this.ddmFormInstanceRecordService = ddmFormInstanceRecordService;
 	}
 
@@ -416,9 +368,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the ddm form instance record persistence
 	 */
-	public DDMFormInstanceRecordPersistence
-		getDDMFormInstanceRecordPersistence() {
-
+	public DDMFormInstanceRecordPersistence getDDMFormInstanceRecordPersistence() {
 		return ddmFormInstanceRecordPersistence;
 	}
 
@@ -429,9 +379,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setDDMFormInstanceRecordPersistence(
 		DDMFormInstanceRecordPersistence ddmFormInstanceRecordPersistence) {
-
-		this.ddmFormInstanceRecordPersistence =
-			ddmFormInstanceRecordPersistence;
+		this.ddmFormInstanceRecordPersistence = ddmFormInstanceRecordPersistence;
 	}
 
 	/**
@@ -450,7 +398,6 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setDDMFormInstanceRecordFinder(
 		DDMFormInstanceRecordFinder ddmFormInstanceRecordFinder) {
-
 		this.ddmFormInstanceRecordFinder = ddmFormInstanceRecordFinder;
 	}
 
@@ -459,11 +406,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the ddm form instance version local service
 	 */
-	public
-		com.liferay.dynamic.data.mapping.service.
-			DDMFormInstanceVersionLocalService
-				getDDMFormInstanceVersionLocalService() {
-
+	public com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService getDDMFormInstanceVersionLocalService() {
 		return ddmFormInstanceVersionLocalService;
 	}
 
@@ -473,12 +416,8 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 * @param ddmFormInstanceVersionLocalService the ddm form instance version local service
 	 */
 	public void setDDMFormInstanceVersionLocalService(
-		com.liferay.dynamic.data.mapping.service.
-			DDMFormInstanceVersionLocalService
-				ddmFormInstanceVersionLocalService) {
-
-		this.ddmFormInstanceVersionLocalService =
-			ddmFormInstanceVersionLocalService;
+		com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService) {
+		this.ddmFormInstanceVersionLocalService = ddmFormInstanceVersionLocalService;
 	}
 
 	/**
@@ -486,10 +425,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the ddm form instance version remote service
 	 */
-	public
-		com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionService
-			getDDMFormInstanceVersionService() {
-
+	public com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionService getDDMFormInstanceVersionService() {
 		return ddmFormInstanceVersionService;
 	}
 
@@ -499,9 +435,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 * @param ddmFormInstanceVersionService the ddm form instance version remote service
 	 */
 	public void setDDMFormInstanceVersionService(
-		com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionService
-			ddmFormInstanceVersionService) {
-
+		com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionService ddmFormInstanceVersionService) {
 		this.ddmFormInstanceVersionService = ddmFormInstanceVersionService;
 	}
 
@@ -510,9 +444,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the ddm form instance version persistence
 	 */
-	public DDMFormInstanceVersionPersistence
-		getDDMFormInstanceVersionPersistence() {
-
+	public DDMFormInstanceVersionPersistence getDDMFormInstanceVersionPersistence() {
 		return ddmFormInstanceVersionPersistence;
 	}
 
@@ -523,9 +455,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setDDMFormInstanceVersionPersistence(
 		DDMFormInstanceVersionPersistence ddmFormInstanceVersionPersistence) {
-
-		this.ddmFormInstanceVersionPersistence =
-			ddmFormInstanceVersionPersistence;
+		this.ddmFormInstanceVersionPersistence = ddmFormInstanceVersionPersistence;
 	}
 
 	/**
@@ -533,9 +463,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the ddm structure local service
 	 */
-	public com.liferay.dynamic.data.mapping.service.DDMStructureLocalService
-		getDDMStructureLocalService() {
-
+	public com.liferay.dynamic.data.mapping.service.DDMStructureLocalService getDDMStructureLocalService() {
 		return ddmStructureLocalService;
 	}
 
@@ -545,9 +473,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 * @param ddmStructureLocalService the ddm structure local service
 	 */
 	public void setDDMStructureLocalService(
-		com.liferay.dynamic.data.mapping.service.DDMStructureLocalService
-			ddmStructureLocalService) {
-
+		com.liferay.dynamic.data.mapping.service.DDMStructureLocalService ddmStructureLocalService) {
 		this.ddmStructureLocalService = ddmStructureLocalService;
 	}
 
@@ -556,9 +482,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 *
 	 * @return the ddm structure remote service
 	 */
-	public com.liferay.dynamic.data.mapping.service.DDMStructureService
-		getDDMStructureService() {
-
+	public com.liferay.dynamic.data.mapping.service.DDMStructureService getDDMStructureService() {
 		return ddmStructureService;
 	}
 
@@ -568,9 +492,7 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 * @param ddmStructureService the ddm structure remote service
 	 */
 	public void setDDMStructureService(
-		com.liferay.dynamic.data.mapping.service.DDMStructureService
-			ddmStructureService) {
-
+		com.liferay.dynamic.data.mapping.service.DDMStructureService ddmStructureService) {
 		this.ddmStructureService = ddmStructureService;
 	}
 
@@ -590,7 +512,6 @@ public abstract class DDMFormInstanceServiceBaseImpl
 	 */
 	public void setDDMStructurePersistence(
 		DDMStructurePersistence ddmStructurePersistence) {
-
 		this.ddmStructurePersistence = ddmStructurePersistence;
 	}
 
@@ -650,8 +571,8 @@ public abstract class DDMFormInstanceServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -660,129 +581,54 @@ public abstract class DDMFormInstanceServiceBaseImpl
 		}
 	}
 
-	@BeanReference(
-		type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService.class
-	)
-	protected
-		com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService
-			ddmFormInstanceLocalService;
-
+	@BeanReference(type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService.class)
+	protected com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService ddmFormInstanceLocalService;
 	@BeanReference(type = DDMFormInstanceService.class)
 	protected DDMFormInstanceService ddmFormInstanceService;
-
 	@BeanReference(type = DDMFormInstancePersistence.class)
 	protected DDMFormInstancePersistence ddmFormInstancePersistence;
-
 	@BeanReference(type = DDMFormInstanceFinder.class)
 	protected DDMFormInstanceFinder ddmFormInstanceFinder;
-
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ClassNameLocalService
-		classNameLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ClassNameService.class
-	)
-	protected com.liferay.portal.kernel.service.ClassNameService
-		classNameService;
-
+	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameService.class)
+	protected com.liferay.portal.kernel.service.ClassNameService classNameService;
 	@ServiceReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ResourceLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserService.class
-	)
+	@ServiceReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
+	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserService.class)
 	protected com.liferay.portal.kernel.service.UserService userService;
-
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService.class
-	)
-	protected
-		com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService
-			workflowDefinitionLinkLocalService;
-
+	@ServiceReference(type = com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService.class)
+	protected com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService;
 	@ServiceReference(type = WorkflowDefinitionLinkPersistence.class)
-	protected WorkflowDefinitionLinkPersistence
-		workflowDefinitionLinkPersistence;
-
-	@BeanReference(
-		type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService.class
-	)
-	protected
-		com.liferay.dynamic.data.mapping.service.
-			DDMFormInstanceRecordLocalService ddmFormInstanceRecordLocalService;
-
-	@BeanReference(
-		type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService.class
-	)
-	protected
-		com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService
-			ddmFormInstanceRecordService;
-
+	protected WorkflowDefinitionLinkPersistence workflowDefinitionLinkPersistence;
+	@BeanReference(type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService.class)
+	protected com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService ddmFormInstanceRecordLocalService;
+	@BeanReference(type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService.class)
+	protected com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService ddmFormInstanceRecordService;
 	@BeanReference(type = DDMFormInstanceRecordPersistence.class)
 	protected DDMFormInstanceRecordPersistence ddmFormInstanceRecordPersistence;
-
 	@BeanReference(type = DDMFormInstanceRecordFinder.class)
 	protected DDMFormInstanceRecordFinder ddmFormInstanceRecordFinder;
-
-	@BeanReference(
-		type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService.class
-	)
-	protected
-		com.liferay.dynamic.data.mapping.service.
-			DDMFormInstanceVersionLocalService
-				ddmFormInstanceVersionLocalService;
-
-	@BeanReference(
-		type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionService.class
-	)
-	protected
-		com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionService
-			ddmFormInstanceVersionService;
-
+	@BeanReference(type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService.class)
+	protected com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService;
+	@BeanReference(type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionService.class)
+	protected com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionService ddmFormInstanceVersionService;
 	@BeanReference(type = DDMFormInstanceVersionPersistence.class)
-	protected DDMFormInstanceVersionPersistence
-		ddmFormInstanceVersionPersistence;
-
-	@BeanReference(
-		type = com.liferay.dynamic.data.mapping.service.DDMStructureLocalService.class
-	)
-	protected com.liferay.dynamic.data.mapping.service.DDMStructureLocalService
-		ddmStructureLocalService;
-
-	@BeanReference(
-		type = com.liferay.dynamic.data.mapping.service.DDMStructureService.class
-	)
-	protected com.liferay.dynamic.data.mapping.service.DDMStructureService
-		ddmStructureService;
-
+	protected DDMFormInstanceVersionPersistence ddmFormInstanceVersionPersistence;
+	@BeanReference(type = com.liferay.dynamic.data.mapping.service.DDMStructureLocalService.class)
+	protected com.liferay.dynamic.data.mapping.service.DDMStructureLocalService ddmStructureLocalService;
+	@BeanReference(type = com.liferay.dynamic.data.mapping.service.DDMStructureService.class)
+	protected com.liferay.dynamic.data.mapping.service.DDMStructureService ddmStructureService;
 	@BeanReference(type = DDMStructurePersistence.class)
 	protected DDMStructurePersistence ddmStructurePersistence;
-
 	@BeanReference(type = DDMStructureFinder.class)
 	protected DDMStructureFinder ddmStructureFinder;
-
 }

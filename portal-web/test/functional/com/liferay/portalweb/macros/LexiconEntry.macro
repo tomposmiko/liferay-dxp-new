@@ -86,7 +86,7 @@ definition {
 		}
 		else {
 			AssertClick(
-				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
+				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
 				value1 = "${rowEntry}",
 				key_rowEntry = "${rowEntry}"
 			);

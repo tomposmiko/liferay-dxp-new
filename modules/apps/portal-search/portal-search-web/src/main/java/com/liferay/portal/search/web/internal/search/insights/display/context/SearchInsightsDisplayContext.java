@@ -21,14 +21,23 @@ import java.io.Serializable;
  */
 public class SearchInsightsDisplayContext implements Serializable {
 
-	public String getQueryString() {
-		return _queryString;
+	public String getRequestString() {
+		return _requestString;
 	}
 
-	public void setQueryString(String queryString) {
-		_queryString = queryString;
+	public String getResponseString() {
+		return _responseString;
 	}
 
-	private String _queryString;
+	public void setRequestString(String queryString) {
+		_requestString = queryString;
+	}
+
+	public void setResponseString(String responseString) {
+		_responseString = responseString;
+	}
+
+	private String _requestString;
+	private String _responseString;
 
 }

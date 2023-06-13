@@ -14,10 +14,10 @@
 
 package com.liferay.portal.tools;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.xml.Dom4jUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;

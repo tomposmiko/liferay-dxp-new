@@ -49,6 +49,7 @@ import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
@@ -87,6 +88,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestDataConstants;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -101,25 +103,52 @@ import com.liferay.portal.kernel.workflow.WorkflowTaskManagerUtil;
 import com.liferay.portal.security.permission.SimplePermissionChecker;
 import com.liferay.portal.test.log.CaptureAppender;
 import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.rule.Inject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Level;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
+
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 /**
  * @author Inácio Nery
  */
 public abstract class BaseWorkflowTaskManagerTestCase {
+
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_configuration = _configurationAdmin.getConfiguration(
+			"com.liferay.portal.workflow.configuration." +
+				"WorkflowDefinitionConfiguration",
+			StringPool.QUESTION);
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		properties.put("company.administrator.can.publish", true);
+
+		ConfigurationTestUtil.saveConfiguration(_configuration, properties);
+	}
+
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+		ConfigurationTestUtil.deleteConfiguration(_configuration);
+	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -656,17 +685,7 @@ public abstract class BaseWorkflowTaskManagerTestCase {
 			long classPK)
 		throws Exception {
 
-		List<WorkflowTask> workflowTasks = new ArrayList<>();
-
-		workflowTasks.addAll(
-			WorkflowTaskManagerUtil.getWorkflowTasksByUserRoles(
-				user.getCompanyId(), user.getUserId(), completed,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
-
-		workflowTasks.addAll(
-			WorkflowTaskManagerUtil.getWorkflowTasksByUser(
-				user.getCompanyId(), user.getUserId(), completed,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+		List<WorkflowTask> workflowTasks = _getWorkflowTasks(user, completed);
 
 		WorkflowInstance workflowInstance = null;
 
@@ -728,6 +747,7 @@ public abstract class BaseWorkflowTaskManagerTestCase {
 
 		PermissionThreadLocal.setPermissionChecker(
 			new SimplePermissionChecker() {
+
 				{
 					init(companyAdminUser);
 				}
@@ -846,11 +866,45 @@ public abstract class BaseWorkflowTaskManagerTestCase {
 	protected User siteAdminUser;
 	protected User siteContentReviewerUser;
 
+	private List<WorkflowTask> _getWorkflowTasks(User user, boolean completed)
+		throws Exception {
+
+		List<WorkflowTask> workflowTasks = new ArrayList<>();
+
+		long deadline =
+			System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(10);
+
+		while (workflowTasks.isEmpty()) {
+			workflowTasks.addAll(
+				WorkflowTaskManagerUtil.getWorkflowTasksByUserRoles(
+					user.getCompanyId(), user.getUserId(), completed,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+
+			workflowTasks.addAll(
+				WorkflowTaskManagerUtil.getWorkflowTasksByUser(
+					user.getCompanyId(), user.getUserId(), completed,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+
+			if (System.currentTimeMillis() > deadline) {
+				break;
+			}
+
+			Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+		}
+
+		return workflowTasks;
+	}
+
 	private static final String _MAIL_ENGINE_CLASS_NAME =
 		"com.liferay.util.mail.MailEngine";
 
 	private static final String _PROXY_MESSAGE_LISTENER_CLASS_NAME =
 		"com.liferay.portal.kernel.messaging.proxy.ProxyMessageListener";
+
+	private static Configuration _configuration;
+
+	@Inject
+	private static ConfigurationAdmin _configurationAdmin;
 
 	@DeleteAfterTestRun
 	private final List<DLFileEntry> _dlFileEntries = new ArrayList<>();

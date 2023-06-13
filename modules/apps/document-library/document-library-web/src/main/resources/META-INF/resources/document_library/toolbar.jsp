@@ -16,10 +16,6 @@
 
 <%@ include file="/document_library/init.jsp" %>
 
-<%
-DLAdminManagementToolbarDisplayContext dlAdminManagementToolbarDisplayContext = new DLAdminManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, dlAdminDisplayContext);
-%>
-
 <clay:management-toolbar
 	actionDropdownItems="<%= dlAdminManagementToolbarDisplayContext.getActionDropdownItems() %>"
 	clearResultsURL="<%= dlAdminManagementToolbarDisplayContext.getClearResultsURL() %>"
@@ -27,6 +23,7 @@ DLAdminManagementToolbarDisplayContext dlAdminManagementToolbarDisplayContext = 
 	defaultEventHandler='<%= renderResponse.getNamespace() + "DocumentLibrary" %>'
 	disabled="<%= dlAdminManagementToolbarDisplayContext.isDisabled() %>"
 	filterDropdownItems="<%= dlAdminManagementToolbarDisplayContext.getFilterDropdownItems() %>"
+	filterLabelItems="<%= dlAdminManagementToolbarDisplayContext.getFilterLabelItems() %>"
 	infoPanelId="infoPanelId"
 	itemsTotal="<%= dlAdminManagementToolbarDisplayContext.getTotalItems() %>"
 	searchActionURL="<%= String.valueOf(dlAdminManagementToolbarDisplayContext.getSearchURL()) %>"

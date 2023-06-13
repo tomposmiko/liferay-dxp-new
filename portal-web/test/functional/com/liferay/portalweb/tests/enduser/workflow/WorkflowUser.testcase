@@ -31,12 +31,12 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
-		Navigator.gotoNavItem(navItem = "Schemes");
+		Navigator.gotoNavItem(navItem = "Configuration");
 
 		Workflow.configureWorkflow(
 			workflowDefinition = "Single Approver",
@@ -110,12 +110,12 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
-		Navigator.gotoNavItem(navItem = "Schemes");
+		Navigator.gotoNavItem(navItem = "Configuration");
 
 		Workflow.configureWorkflow(
 			workflowDefinition = "Single Approver",

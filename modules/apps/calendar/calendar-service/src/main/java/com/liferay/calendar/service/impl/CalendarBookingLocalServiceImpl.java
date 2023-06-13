@@ -74,7 +74,6 @@ import com.liferay.portal.kernel.service.SystemEventLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -175,17 +174,8 @@ public class CalendarBookingLocalServiceImpl
 		calendarBooking.setCompanyId(user.getCompanyId());
 		calendarBooking.setUserId(user.getUserId());
 		calendarBooking.setUserName(user.getFullName());
-
-		Date createDate = serviceContext.getCreateDate(now);
-
-		calendarBooking.setCreateDate(createDate);
-		serviceContext.setCreateDate(createDate);
-
-		Date modifiedDate = serviceContext.getModifiedDate(now);
-
-		calendarBooking.setModifiedDate(modifiedDate);
-		serviceContext.setModifiedDate(modifiedDate);
-
+		calendarBooking.setCreateDate(serviceContext.getCreateDate(now));
+		calendarBooking.setModifiedDate(serviceContext.getModifiedDate(now));
 		calendarBooking.setCalendarId(calendarId);
 		calendarBooking.setCalendarResourceId(calendar.getCalendarResourceId());
 
@@ -211,9 +201,8 @@ public class CalendarBookingLocalServiceImpl
 		}
 
 		calendarBooking.setVEventUid(vEventUid);
-		calendarBooking.setTitleMap(titleMap, serviceContext.getLocale());
-		calendarBooking.setDescriptionMap(
-			descriptionMap, serviceContext.getLocale());
+		calendarBooking.setTitleMap(titleMap);
+		calendarBooking.setDescriptionMap(descriptionMap);
 		calendarBooking.setLocation(location);
 		calendarBooking.setStartTime(startTimeJCalendar.getTimeInMillis());
 		calendarBooking.setEndTime(endTimeJCalendar.getTimeInMillis());
@@ -1342,16 +1331,14 @@ public class CalendarBookingLocalServiceImpl
 
 		updatedTitleMap.putAll(titleMap);
 
-		calendarBooking.setTitleMap(
-			updatedTitleMap, serviceContext.getLocale());
+		calendarBooking.setTitleMap(updatedTitleMap);
 
 		Map<Locale, String> updatedDescriptionMap =
 			calendarBooking.getDescriptionMap();
 
 		updatedDescriptionMap.putAll(descriptionMap);
 
-		calendarBooking.setDescriptionMap(
-			updatedDescriptionMap, serviceContext.getLocale());
+		calendarBooking.setDescriptionMap(updatedDescriptionMap);
 
 		calendarBooking.setLocation(location);
 		calendarBooking.setStartTime(startTimeJCalendar.getTimeInMillis());
@@ -1622,7 +1609,6 @@ public class CalendarBookingLocalServiceImpl
 		User user = userLocalService.getUser(userId);
 		Date now = new Date();
 
-		Date oldModifiedDate = calendarBooking.getModifiedDate();
 		int oldStatus = calendarBooking.getStatus();
 
 		calendarBooking.setModifiedDate(serviceContext.getModifiedDate(now));
@@ -1693,43 +1679,10 @@ public class CalendarBookingLocalServiceImpl
 						calendarBooking.getUuid(), null,
 						WorkflowConstants.STATUS_PENDING, null, null);
 				}
-			}
-		}
 
-		if (calendarBooking.isMasterBooking()) {
-			Date createDate = calendarBooking.getCreateDate();
-
-			NotificationTemplateType notificationTemplateType =
-				NotificationTemplateType.INVITE;
-
-			if (!DateUtil.equals(createDate, oldModifiedDate)) {
-				notificationTemplateType = NotificationTemplateType.UPDATE;
-			}
-
-			for (CalendarBooking childCalendarBooking : childCalendarBookings) {
-				if (childCalendarBooking.equals(calendarBooking)) {
-					continue;
-				}
-
-				if (childCalendarBooking.isDenied()) {
-					notificationTemplateType = NotificationTemplateType.DECLINE;
-				}
-
-				if (calendarBooking.isApproved()) {
-					sendNotification(
-						childCalendarBooking, notificationTemplateType,
-						serviceContext);
-				}
-				else if ((oldStatus == WorkflowConstants.STATUS_APPROVED) &&
-						 (status == WorkflowConstants.STATUS_IN_TRASH)) {
-
-					notificationTemplateType =
-						NotificationTemplateType.MOVED_TO_TRASH;
-
-					sendNotification(
-						childCalendarBooking, notificationTemplateType,
-						serviceContext);
-				}
+				sendNotification(
+					calendarBooking, NotificationTemplateType.MOVED_TO_TRASH,
+					serviceContext);
 			}
 		}
 
@@ -1863,6 +1816,21 @@ public class CalendarBookingLocalServiceImpl
 						oldChildCalendarBooking.getStatus(), serviceContext);
 				}
 			}
+
+			NotificationTemplateType notificationTemplateType =
+				NotificationTemplateType.INVITE;
+
+			if (childCalendarBooking.isDenied()) {
+				notificationTemplateType = NotificationTemplateType.DECLINE;
+			}
+			else if (childCalendarBookingMap.containsKey(
+						childCalendarBooking.getCalendarId())) {
+
+				notificationTemplateType = NotificationTemplateType.UPDATE;
+			}
+
+			sendNotification(
+				childCalendarBooking, notificationTemplateType, serviceContext);
 		}
 	}
 

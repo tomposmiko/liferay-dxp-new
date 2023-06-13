@@ -553,6 +553,9 @@ create table Layout (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
+	parentPlid LONG,
+	leftPlid LONG,
+	rightPlid LONG,
 	privateLayout BOOLEAN,
 	layoutId LONG,
 	parentLayoutId LONG,
@@ -564,6 +567,7 @@ create table Layout (
 	type_ VARCHAR(75) null,
 	typeSettings TEXT null,
 	hidden_ BOOLEAN,
+	system BOOLEAN,
 	friendlyURL VARCHAR(255) null,
 	iconImageId LONG,
 	themeId VARCHAR(75) null,
@@ -1319,7 +1323,7 @@ create table UserGroup (
 	createDate DATE null,
 	modifiedDate DATE null,
 	parentUserGroupId LONG,
-	name VARCHAR(255) null,
+	name VARCHAR(75) null,
 	description STRING null,
 	addedByLDAPImport BOOLEAN
 );

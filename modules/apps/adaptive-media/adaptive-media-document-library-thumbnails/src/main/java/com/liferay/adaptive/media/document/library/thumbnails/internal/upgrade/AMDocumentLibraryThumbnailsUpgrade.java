@@ -47,14 +47,14 @@ public class AMDocumentLibraryThumbnailsUpgrade
 				_companyLocalService));
 	}
 
-	@Reference
+	@Reference(unbind = "-")
 	private AMCompanyThumbnailConfigurationInitializer
 		_amCompanyThumbnailConfigurationInitializer;
 
-	@Reference
+	@Reference(unbind = "-")
 	private AMImageConfigurationHelper _amImageConfigurationHelper;
 
-	@Reference
+	@Reference(unbind = "-")
 	private CompanyLocalService _companyLocalService;
 
 }

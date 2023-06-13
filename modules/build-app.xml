@@ -58,15 +58,7 @@
 					dir="${modules.dir}"
 				>
 					<include name="apps/*" />
-					<include name="private/apps/*" />
 					<exclude name="${build.exclude.dirs}" />
-					<present targetdir="${modules.dir}">
-						<mapper
-							from="*"
-							to="*/app.bnd"
-							type="glob"
-						/>
-					</present>
 				</dirset>
 			</path>
 
@@ -79,12 +71,9 @@
 				<property file="@{app.dir}/app.bnd" />
 
 				<if>
-					<and>
-						<available file="@{app.dir}/app.bnd" />
-						<not>
-							<equals arg1="${Liferay-Releng-Bundle}" arg2="true" />
-						</not>
-					</and>
+					<not>
+						<equals arg1="${Liferay-Releng-Bundle}" arg2="true" />
+					</not>
 					<then>
 						<ant inheritAll="false" target="delete-app">
 							<property name="app.name" value="${app.name}" />
@@ -184,8 +173,6 @@
 				</antcall>
 			</sequential>
 		</for>
-
-		<antcall target="index-modules-and-app-lpkgs" />
 	</target>
 
 	<target name="build-app-lpkg-base">
@@ -488,7 +475,6 @@
 					<filetokenizer />
 					<replacestring from="${line.separator}" to=" " />
 					<replaceregex pattern="^ | $" replace="" />
-					<replaceregex pattern=".*(.{1000})" replace="[[trimmed]]\1" />
 				</tokenfilter>
 			</filterchain>
 		</loadfile>
@@ -514,16 +500,12 @@
 	</target>
 
 	<target depends="get-app-names-core" name="get-app-names" unless="app.names">
-		<condition else="Liferay-Releng-Suite:\s*[\w-]+$" property="liferay.releng.suite.pattern" value=".">
-			<istrue value="${include.standalone.apps}" />
-		</condition>
-
 		<pathconvert pathsep="," property="app.names">
 			<fileset
 				dir="${modules.dir}"
 			>
 				<contains casesensitive="false" ignorewhitespace="true" text="Liferay-Releng-Bundle: true" />
-				<containsregexp casesensitive="false" expression="${liferay.releng.suite.pattern}" multiline="true" />
+				<containsregexp casesensitive="false" expression="Liferay-Releng-Suite:\s*[\w-]+$" multiline="true" />
 				<include name="apps/**/app.bnd" />
 				<include name="private/apps/**/app.bnd" />
 				<present targetdir="${modules.dir}/.releng">
@@ -663,54 +645,6 @@
 			<arg value="-m" />
 			<arg value="${git.commit.app.ticket} Release Apps: ${app.names.spaced}" />
 		</exec>
-	</target>
-
-	<target name="index-modules-and-app-lpkgs">
-		<tstamp>
-			<format pattern="yyMMddHHmmssSSS" property="lpkg.timestamp" />
-		</tstamp>
-
-		<if>
-			<equals arg1="${lpkg.index.tar.enabled}" arg2="true" />
-			<then>
-				<tar baseDir="${liferay.home}" destfile="/tmp/lpkg-index-tomcat-${lpkg.timestamp}.tar" longfile="gnu" />
-			</then>
-		</if>
-
-		<path id="target.platform.indexer.classpath">
-
-			<!-- Order is important -->
-
-			<fileset
-				dir="${liferay.home}/tools/portal-tools-target-platform-indexer-client"
-				includes="com.liferay.portal.target.platform.indexer.api.jar,com.liferay.portal.target.platform.indexer.impl.jar,com.liferay.portal.tools.target.platform.indexer.client.jar,slf4j-api.jar,slf4j-simple.jar"
-			/>
-			<fileset
-				dir="${osgi.dir}/core"
-				includes="com.liferay.portal.bootstrap.jar,org.eclipse.osgi.jar"
-			/>
-		</path>
-
-		<if>
-			<equals arg1="${jvm.debug}" arg2="true" />
-			<then>
-				<var name="junit.debug.jpda" value="-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=y" />
-			</then>
-		</if>
-
-		<property name="junit.debug.jpda" value="" />
-
-		<java
-			classname="com.liferay.portal.tools.target.platform.indexer.client.TargetPlatformIndexerClient"
-			classpathref="target.platform.indexer.classpath"
-			failonerror="true"
-			fork="true"
-			newenvironment="true"
-		>
-			<jvmarg value="-Dliferay.home=${liferay.home}" />
-			<jvmarg value="-Dportal.lib.dir=${portal.lib.dir}" />
-			<jvmarg line="${junit.debug.jpda}" />
-		</java>
 	</target>
 
 	<target depends="checkout-public-modules-releng" name="init-build-app">
@@ -1052,21 +986,12 @@
 		<echo append="true" file="${lpkg.dir}/liferay-marketplace.properties" message="icon-url=https://www.liferay.com/web/guest/marketplace/-/mp/asset/icon/71985553" />
 	</target>
 
-	<target depends="dist-module-artifacts,get-app-change-log,zip-app-sources-init" if="zip.app.sources" name="zip-app-sources">
+	<target depends="dist-module-artifacts,get-app-change-log" if="app.ticket.list" name="zip-app-sources">
 		<zip
 			basedir="${dist.dir}/sources"
 			destfile="${dist.dir}/${app.name}-${app.version}-sources.zip"
 		/>
 
 		<delete dir="${dist.dir}/sources" />
-	</target>
-
-	<target depends="get-app-change-log,init-build-app" name="zip-app-sources-init">
-		<condition property="zip.app.sources">
-			<and>
-				<isset property="app.ticket.list" />
-				<istrue value="${download.app.sources}" />
-			</and>
-		</condition>
 	</target>
 </project>

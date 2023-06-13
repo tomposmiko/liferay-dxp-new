@@ -30,19 +30,17 @@ public class MyWorkflowTasksControlPanelEntry
 			PermissionChecker permissionChecker, Group group, Portlet portlet)
 		throws Exception {
 
-		int count = WorkflowTaskManagerUtil.getWorkflowTaskCountByUser(
-			permissionChecker.getCompanyId(), permissionChecker.getUserId(),
-			null);
+		if (WorkflowTaskManagerUtil.getWorkflowTaskCountByUser(
+				permissionChecker.getCompanyId(), permissionChecker.getUserId(),
+				null) > 0) {
 
-		if (count > 0) {
 			return true;
 		}
 
-		count = WorkflowTaskManagerUtil.getWorkflowTaskCountByUserRoles(
-			permissionChecker.getCompanyId(), permissionChecker.getUserId(),
-			null);
+		if (WorkflowTaskManagerUtil.getWorkflowTaskCountByUserRoles(
+				permissionChecker.getCompanyId(), permissionChecker.getUserId(),
+				null) > 0) {
 
-		if (count > 0) {
 			return true;
 		}
 

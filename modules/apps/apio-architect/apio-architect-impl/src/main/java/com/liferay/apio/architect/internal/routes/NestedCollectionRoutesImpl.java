@@ -126,8 +126,8 @@ public class NestedCollectionRoutesImpl<T, S, U>
 			FormBuilderFunction<R> formBuilderFunction) {
 
 			ThrowableHexaFunction<U, List<R>, A, B, C, D, List<S>>
-				batchCreatorThrowableHexaFunction =
-					(u, formList, a, b, c, d) -> _transformList(
+				batchCreatorThrowableHexaFunction = (u, formList, a, b, c, d) ->
+					_transformList(
 						formList,
 						r -> creatorThrowableHexaFunction.apply(
 							u, r, a, b, c, d));
@@ -185,8 +185,10 @@ public class NestedCollectionRoutesImpl<T, S, U>
 				).returns(
 					BatchResult.class
 				).permissionFunction(
-					params -> hasNestedAddingPermissionFunction.apply(
-						unsafeCast(params.get(0)), unsafeCast(params.get(1)))
+					params ->
+						hasNestedAddingPermissionFunction.apply(
+							unsafeCast(params.get(0)),
+							unsafeCast(params.get(1)))
 				).permissionProvidedClasses(
 					Credentials.class, _getIdClass()
 				).executeFunction(

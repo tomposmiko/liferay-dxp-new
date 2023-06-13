@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.ArrayList;
@@ -120,7 +119,7 @@ public class PollsQuestionLocalServiceTest {
 	protected Map<Locale, String> createLocalizedMap(String localizedValue) {
 		Map<Locale, String> localizedMap = new HashMap<>();
 
-		localizedMap.put(LocaleUtil.US, localizedValue);
+		localizedMap.put(Locale.US, localizedValue);
 
 		return localizedMap;
 	}

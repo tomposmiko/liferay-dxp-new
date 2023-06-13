@@ -59,42 +59,36 @@ public class InvokerFilterTest {
 	public void testGetURIWithDoubleSlash() {
 		InvokerFilter invokerFilter = new InvokerFilter();
 
-		MockHttpServletRequest mockHttpServletRequest =
-			new MockHttpServletRequest(
-				HttpMethods.GET,
-				"/c///portal/%2e/login;jsessionid=ae01b0f2af.worker1");
-
-		String originalURI = invokerFilter.getOriginalRequestURI(
-			mockHttpServletRequest);
+		Assert.assertEquals(
+			"/c/portal/login",
+			invokerFilter.getURI(
+				invokerFilter.getOriginalRequestURI(
+					new MockHttpServletRequest(
+						HttpMethods.GET,
+						"/c///portal/%2e/login;jsessionid=ae01b0f2af." +
+							"worker1"))));
 
 		Assert.assertEquals(
 			"/c/portal/login",
-			invokerFilter.getURI(mockHttpServletRequest, originalURI));
-
-		mockHttpServletRequest = new MockHttpServletRequest(
-			HttpMethods.GET,
-			"/c///portal/%2e/../login;jsessionid=ae01b0f2af.worker1");
-
-		Assert.assertEquals(
-			"/c/portal/login",
-			invokerFilter.getURI(mockHttpServletRequest, originalURI));
+			invokerFilter.getURI(
+				invokerFilter.getOriginalRequestURI(
+					new MockHttpServletRequest(
+						HttpMethods.GET,
+						"/c///portal/%2e/../login;jsessionid=ae01b0f2af." +
+							"worker1"))));
 	}
 
 	@Test
 	public void testGetURIWithJSessionId() {
 		InvokerFilter invokerFilter = new InvokerFilter();
 
-		MockHttpServletRequest mockHttpServletRequest =
-			new MockHttpServletRequest(
-				HttpMethods.GET,
-				"/c/portal/login;jsessionid=ae01b0f2af.worker1");
-
-		String originalURI = invokerFilter.getOriginalRequestURI(
-			mockHttpServletRequest);
-
 		Assert.assertEquals(
 			"/c/portal/login",
-			invokerFilter.getURI(mockHttpServletRequest, originalURI));
+			invokerFilter.getURI(
+				invokerFilter.getOriginalRequestURI(
+					new MockHttpServletRequest(
+						HttpMethods.GET,
+						"/c/portal/login;jsessionid=ae01b0f2af.worker1"))));
 	}
 
 	@Test
@@ -153,9 +147,8 @@ public class InvokerFilterTest {
 
 			LogRecord logRecord = logRecords.get(0);
 
-			String message = logRecord.getMessage();
-
-			Assert.assertTrue(message.startsWith("Rejected " + urlPrefix));
+			Assert.assertTrue(
+				logRecord.getMessage().startsWith("Rejected " + urlPrefix));
 		}
 	}
 

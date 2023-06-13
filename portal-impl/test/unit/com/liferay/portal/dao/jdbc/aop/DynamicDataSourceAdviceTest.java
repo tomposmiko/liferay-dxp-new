@@ -14,7 +14,6 @@
 
 package com.liferay.portal.dao.jdbc.aop;
 
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.jdbc.aop.DynamicDataSourceTargetSource;
 import com.liferay.portal.kernel.dao.jdbc.aop.MasterDataSource;
 import com.liferay.portal.kernel.dao.jdbc.aop.Operation;
@@ -22,23 +21,15 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.spring.aop.AnnotationChainableMethodAdvice;
-import com.liferay.portal.spring.aop.ServiceBeanAopCacheManager;
-import com.liferay.portal.spring.aop.ServiceBeanMethodInvocation;
-import com.liferay.portal.spring.transaction.TransactionInterceptor;
+import com.liferay.portal.spring.aop.AopInvocationHandler;
+import com.liferay.portal.spring.aop.AopMethodInvocation;
+import com.liferay.portal.spring.aop.ChainableMethodAdvice;
 
-import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Stack;
-
 import javax.sql.DataSource;
-
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,8 +46,9 @@ public class DynamicDataSourceAdviceTest {
 		CodeCoverageAssertor.INSTANCE;
 
 	@Before
-	public void setUp() {
-		_dynamicDataSourceAdvice = new DynamicDataSourceAdvice();
+	public void setUp() throws Exception {
+		DynamicDataSourceAdvice dynamicDataSourceAdvice =
+			new DynamicDataSourceAdvice();
 
 		_dynamicDataSourceTargetSource =
 			new DefaultDynamicDataSourceTargetSource();
@@ -85,83 +77,44 @@ public class DynamicDataSourceAdviceTest {
 
 		_dynamicDataSourceTargetSource.setWriteDataSource(_writeDataSource);
 
-		_dynamicDataSourceAdvice.setDynamicDataSourceTargetSource(
+		dynamicDataSourceAdvice.setDynamicDataSourceTargetSource(
 			_dynamicDataSourceTargetSource);
 
-		_serviceBeanAopCacheManager = new ServiceBeanAopCacheManager(
-			_dynamicDataSourceAdvice);
+		Constructor<AopInvocationHandler> constructor =
+			AopInvocationHandler.class.getDeclaredConstructor(
+				Object.class, ChainableMethodAdvice[].class);
 
-		Map<Class<? extends Annotation>, AnnotationChainableMethodAdvice<?>[]>
-			registeredAnnotationChainableMethodAdvices =
-				ReflectionTestUtil.getFieldValue(
-					_serviceBeanAopCacheManager,
-					"_annotationChainableMethodAdvices");
+		constructor.setAccessible(true);
 
-		AnnotationChainableMethodAdvice<?>[] annotationChainableMethodAdvices =
-			registeredAnnotationChainableMethodAdvices.get(
-				MasterDataSource.class);
-
-		Assert.assertEquals(
-			Arrays.toString(annotationChainableMethodAdvices), 1,
-			annotationChainableMethodAdvices.length);
-		Assert.assertSame(
-			_dynamicDataSourceAdvice, annotationChainableMethodAdvices[0]);
-		Assert.assertSame(
-			annotationChainableMethodAdvices,
-			registeredAnnotationChainableMethodAdvices.get(
-				MasterDataSource.class));
-
-		_dynamicDataSourceAdvice.setTransactionInterceptor(
-			new TransactionInterceptor());
-	}
-
-	@Test
-	public void testAnnotationType() {
-		MasterDataSource masterDataSource = ReflectionTestUtil.getFieldValue(
-			DynamicDataSourceAdvice.class, "_nullMasterDataSource");
-
-		Assert.assertSame(
-			MasterDataSource.class, masterDataSource.annotationType());
-	}
-
-	@Test
-	public void testDeprecatedMethods() {
-		_dynamicDataSourceAdvice.setTransactionAttributeSource(null);
+		_aopInvocationHandler = constructor.newInstance(
+			_testClass, new ChainableMethodAdvice[] {dynamicDataSourceAdvice});
 	}
 
 	@Test
 	public void testDynamicDataSourceAdvice() throws Throwable {
-		TestClass testClass = new TestClass();
-
 		for (int i = 1; i <= 6; i++) {
-			MethodInvocation methodInvocation = createMethodInvocation(
-				testClass, "method" + i);
+			AopMethodInvocation aopMethodInvocation = createMethodInvocation(
+				"method" + i);
 
-			methodInvocation.proceed();
+			aopMethodInvocation.proceed(null);
 		}
 
-		testClass.assertExecutions();
+		_testClass.assertExecutions();
 	}
 
-	protected MethodInvocation createMethodInvocation(
-			TestClass testClass, String methodName)
+	protected AopMethodInvocation createMethodInvocation(String methodName)
 		throws Exception {
 
-		Method method = TestClass.class.getMethod(methodName);
-
-		ServiceBeanMethodInvocation serviceBeanMethodInvocation =
-			new ServiceBeanMethodInvocation(testClass, method, new Object[0]);
-
-		serviceBeanMethodInvocation.setMethodInterceptors(
-			new MethodInterceptor[] {_dynamicDataSourceAdvice});
-
-		return serviceBeanMethodInvocation;
+		return ReflectionTestUtil.invoke(
+			_aopInvocationHandler, "_getAopMethodInvocation",
+			new Class<?>[] {Method.class},
+			TestClass.class.getMethod(methodName));
 	}
 
-	private DynamicDataSourceAdvice _dynamicDataSourceAdvice;
+	private AopInvocationHandler _aopInvocationHandler;
 	private DynamicDataSourceTargetSource _dynamicDataSourceTargetSource;
 	private DataSource _readDataSource;
-	private ServiceBeanAopCacheManager _serviceBeanAopCacheManager;
+	private final TestClass _testClass = new TestClass();
 	private DataSource _writeDataSource;
 
 	private class TestClass {
@@ -177,13 +130,24 @@ public class DynamicDataSourceAdviceTest {
 
 		@SuppressWarnings("unused")
 		public void method1() throws Exception {
-			Assert.assertEquals(
-				Operation.WRITE, _dynamicDataSourceTargetSource.getOperation());
-			Assert.assertSame(
-				_writeDataSource, _dynamicDataSourceTargetSource.getTarget());
-			Assert.assertEquals(
-				TestClass.class.getName() + StringPool.PERIOD + "method1",
-				_getCurrentMethod());
+			Operation operation = _callerOperation.get();
+
+			if (operation == Operation.READ) {
+				Assert.assertEquals(
+					Operation.READ,
+					_dynamicDataSourceTargetSource.getOperation());
+				Assert.assertSame(
+					_readDataSource,
+					_dynamicDataSourceTargetSource.getTarget());
+			}
+			else {
+				Assert.assertEquals(
+					Operation.WRITE,
+					_dynamicDataSourceTargetSource.getOperation());
+				Assert.assertSame(
+					_writeDataSource,
+					_dynamicDataSourceTargetSource.getTarget());
+			}
 
 			_testMethod1 = true;
 		}
@@ -194,9 +158,6 @@ public class DynamicDataSourceAdviceTest {
 				Operation.WRITE, _dynamicDataSourceTargetSource.getOperation());
 			Assert.assertSame(
 				_writeDataSource, _dynamicDataSourceTargetSource.getTarget());
-			Assert.assertEquals(
-				TestClass.class.getName() + StringPool.PERIOD + "method2",
-				_getCurrentMethod());
 
 			_testMethod2 = true;
 		}
@@ -207,9 +168,6 @@ public class DynamicDataSourceAdviceTest {
 				Operation.READ, _dynamicDataSourceTargetSource.getOperation());
 			Assert.assertSame(
 				_readDataSource, _dynamicDataSourceTargetSource.getTarget());
-			Assert.assertEquals(
-				TestClass.class.getName() + StringPool.PERIOD + "method3",
-				_getCurrentMethod());
 
 			_testMethod3 = true;
 		}
@@ -221,9 +179,6 @@ public class DynamicDataSourceAdviceTest {
 				Operation.WRITE, _dynamicDataSourceTargetSource.getOperation());
 			Assert.assertSame(
 				_writeDataSource, _dynamicDataSourceTargetSource.getTarget());
-			Assert.assertEquals(
-				TestClass.class.getName() + StringPool.PERIOD + "method4",
-				_getCurrentMethod());
 
 			_testMethod4 = true;
 		}
@@ -235,50 +190,58 @@ public class DynamicDataSourceAdviceTest {
 				Operation.WRITE, _dynamicDataSourceTargetSource.getOperation());
 			Assert.assertSame(
 				_writeDataSource, _dynamicDataSourceTargetSource.getTarget());
-			Assert.assertEquals(
-				TestClass.class.getName() + StringPool.PERIOD + "method5",
-				_getCurrentMethod());
 
 			_testMethod5 = true;
 		}
 
 		@Transactional(readOnly = true)
 		public void method6() throws Throwable {
-			MethodInvocation methodInvocation = createMethodInvocation(
-				this, "method3");
+			AopMethodInvocation aopMethodInvocation = createMethodInvocation(
+				"method3");
 
-			methodInvocation.proceed();
+			aopMethodInvocation.proceed(null);
 
 			Assert.assertEquals(
 				Operation.READ, _dynamicDataSourceTargetSource.getOperation());
 			Assert.assertSame(
 				_readDataSource, _dynamicDataSourceTargetSource.getTarget());
+
+			aopMethodInvocation = createMethodInvocation("method1");
+
+			_callerOperation.set(Operation.READ);
+
+			aopMethodInvocation.proceed(null);
+
+			_callerOperation.remove();
+
 			Assert.assertEquals(
-				TestClass.class.getName() + StringPool.PERIOD + "method6",
-				_getCurrentMethod());
-
-			methodInvocation = createMethodInvocation(this, "method1");
-
-			methodInvocation.proceed();
-
-			Assert.assertEquals(
-				Operation.WRITE, _dynamicDataSourceTargetSource.getOperation());
+				Operation.READ, _dynamicDataSourceTargetSource.getOperation());
 			Assert.assertSame(
-				_writeDataSource, _dynamicDataSourceTargetSource.getTarget());
+				_readDataSource, _dynamicDataSourceTargetSource.getTarget());
+
+			aopMethodInvocation = createMethodInvocation("method2");
+
+			aopMethodInvocation.proceed(null);
+
 			Assert.assertEquals(
-				TestClass.class.getName() + StringPool.PERIOD + "method6",
-				_getCurrentMethod());
+				Operation.READ, _dynamicDataSourceTargetSource.getOperation());
+			Assert.assertSame(
+				_readDataSource, _dynamicDataSourceTargetSource.getTarget());
+
+			aopMethodInvocation = createMethodInvocation("method4");
+
+			aopMethodInvocation.proceed(null);
+
+			Assert.assertEquals(
+				Operation.READ, _dynamicDataSourceTargetSource.getOperation());
+			Assert.assertSame(
+				_readDataSource, _dynamicDataSourceTargetSource.getTarget());
 
 			_testMethod6 = true;
 		}
 
-		private String _getCurrentMethod() {
-			Stack<String> stack =
-				_dynamicDataSourceTargetSource.getMethodStack();
-
-			return stack.peek();
-		}
-
+		private final ThreadLocal<Operation> _callerOperation =
+			new ThreadLocal<>();
 		private boolean _testMethod1;
 		private boolean _testMethod2;
 		private boolean _testMethod3;

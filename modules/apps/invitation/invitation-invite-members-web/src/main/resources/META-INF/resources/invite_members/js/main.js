@@ -5,8 +5,6 @@ AUI.add(
 
 		var Language = Liferay.Language;
 
-		var LString = Lang.String;
-
 		var Util = Liferay.Util;
 
 		var CSS_INVITED = 'invited';
@@ -329,8 +327,8 @@ AUI.add(
 											TPL_USER,
 											{
 												cssClass: cssClass,
-												userEmailAddress: LString.escapeHTML(result.userEmailAddress),
-												userFullName: LString.escapeHTML(result.userFullName),
+												userEmailAddress: result.userEmailAddress,
+												userFullName: result.userFullName,
 												userId: result.userId
 											}
 										);

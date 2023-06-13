@@ -111,19 +111,7 @@
 	</listener>
 	<servlet>
 		<servlet-name>Main Servlet</servlet-name>
-		<servlet-class>com.liferay.portal.servlet.MainServlet</servlet-class>
-		<init-param>
-			<param-name>config</param-name>
-			<param-value>/WEB-INF/struts-config.xml,/WEB-INF/struts-config-ext.xml</param-value>
-		</init-param>
-		<init-param>
-			<param-name>debug</param-name>
-			<param-value>0</param-value>
-		</init-param>
-		<init-param>
-			<param-name>detail</param-name>
-			<param-value>0</param-value>
-		</init-param>
+		<servlet-class>com.liferay.portal.internal.servlet.MainServlet</servlet-class>
 		<load-on-startup>0</load-on-startup>
 		<async-supported>true</async-supported>
 	</servlet>
@@ -651,6 +639,18 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
+		<url-pattern>/kk/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>I18n Servlet</servlet-name>
+		<url-pattern>/kk-KZ/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>I18n Servlet</servlet-name>
+		<url-pattern>/kk_KZ/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>I18n Servlet</servlet-name>
 		<url-pattern>/ko/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
@@ -1159,6 +1159,9 @@
 			<url-pattern>/ja/c/portal/protected</url-pattern>
 			<url-pattern>/ja-JP/c/portal/protected</url-pattern>
 			<url-pattern>/ja_JP/c/portal/protected</url-pattern>
+			<url-pattern>/kk/c/portal/protected</url-pattern>
+			<url-pattern>/kk-KZ/c/portal/protected</url-pattern>
+			<url-pattern>/kk_KZ/c/portal/protected</url-pattern>
 			<url-pattern>/ko/c/portal/protected</url-pattern>
 			<url-pattern>/ko-KR/c/portal/protected</url-pattern>
 			<url-pattern>/ko_KR/c/portal/protected</url-pattern>

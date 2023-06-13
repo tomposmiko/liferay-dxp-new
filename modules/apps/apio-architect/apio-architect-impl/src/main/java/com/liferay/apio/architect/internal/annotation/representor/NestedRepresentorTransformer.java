@@ -47,7 +47,9 @@ public class NestedRepresentorTransformer {
 
 		Type type = parsedType.getType();
 
-		NestedRepresentor.FirstStep<?> firstStep = builder.types(type.value());
+		NestedRepresentor.FirstStep<?> firstStep = builder.types(
+			type.value()
+		);
 
 		_processFields(parsedType, firstStep);
 

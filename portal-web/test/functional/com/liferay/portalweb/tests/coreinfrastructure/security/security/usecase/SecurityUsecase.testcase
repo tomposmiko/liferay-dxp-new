@@ -23,7 +23,7 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-83566."
+	@description = "This is a use case for LPS-69372."
 	@priority = "5"
 	test EscapeUrlRedirectWithGroovyScript {
 		property test.name.skip.portal.instance = "SecurityUsecase#EscapeUrlRedirectWithGroovyScript";
@@ -227,7 +227,7 @@ out.println(PortalUtil.escapeRedirect("/"));
 
 		AssertElementPresent(locator1 = "Home#PAGE", key_pageName = "Welcome");
 
-		AssertTextEquals(
+		AssertTextEquals.assertTextCaseInsensitive(
 			locator1 = "HelloWorld#PORTLET_TITLE",
 			value1 = "Hello World"
 		);
@@ -266,6 +266,7 @@ out.println(PortalUtil.escapeRedirect("/"));
 	}
 
 	@description = "This is a use case for LPS-55622."
+	@ignore = "true"
 	@priority = "5"
 	test ViewNoInvokedPortletViaURL {
 		var portalURL = PropsUtil.get("portal.url");

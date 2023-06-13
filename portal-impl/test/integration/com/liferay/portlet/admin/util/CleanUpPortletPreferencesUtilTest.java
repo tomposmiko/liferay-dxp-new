@@ -41,8 +41,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portlet.util.test.PortletKeys;
 
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -114,9 +112,7 @@ public class CleanUpPortletPreferencesUtilTest {
 		LayoutTypePortlet layoutTypePortlet =
 			(LayoutTypePortlet)layout.getLayoutType();
 
-		List<String> portletIds = layoutTypePortlet.getPortletIds();
-
-		Assert.assertTrue(portletIds.isEmpty());
+		Assert.assertTrue(layoutTypePortlet.getPortletIds().isEmpty());
 
 		CleanUpPortletPreferencesUtil.cleanUpLayoutRevisionPortletPreferences();
 

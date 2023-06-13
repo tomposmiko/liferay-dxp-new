@@ -28,7 +28,6 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
-import com.liferay.dynamic.data.mapping.storage.StorageEngine;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
@@ -46,7 +45,6 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -59,6 +57,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
@@ -76,8 +75,7 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 			RenderRequest renderRequest, RenderResponse renderResponse,
 			DDMFormInstance formInstance,
 			DDMFormInstanceRecordLocalService formInstanceRecordLocalService,
-			DDMFormFieldTypeServicesTracker formFieldTypeServicesTracker,
-			StorageEngine storageEngine)
+			DDMFormFieldTypeServicesTracker formFieldTypeServicesTracker)
 		throws PortalException {
 
 		_renderRequest = renderRequest;
@@ -85,7 +83,6 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 		_ddmFormInstance = formInstance;
 		_ddmFormInstanceRecordLocalService = formInstanceRecordLocalService;
 		_ddmFormFieldTypeServicesTracker = formFieldTypeServicesTracker;
-		_storageEngine = storageEngine;
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -108,7 +105,7 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 				add(
 					dropdownItem -> {
 						dropdownItem.putData("action", "deleteRecords");
-						dropdownItem.setIcon("trash");
+						dropdownItem.setIcon("times-circle");
 						dropdownItem.setLabel(
 							LanguageUtil.get(request, "delete"));
 						dropdownItem.setQuickAction(true);
@@ -174,8 +171,7 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 		DDMFormInstanceRecordVersion formInstanceRecordVersion =
 			formInstanceRecord.getFormInstanceRecordVersion();
 
-		return _storageEngine.getDDMFormValues(
-			formInstanceRecordVersion.getStorageId());
+		return formInstanceRecordVersion.getDDMFormValues();
 	}
 
 	public String getDisplayStyle() {
@@ -591,6 +587,5 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 		_ddmFormInstanceRecordLocalService;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final StorageEngine _storageEngine;
 
 }

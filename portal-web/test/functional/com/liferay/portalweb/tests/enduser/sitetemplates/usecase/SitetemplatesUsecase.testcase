@@ -64,23 +64,7 @@ definition {
 
 		Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-		PageTemplatesAdmin.add(
-			pageTemplateName = "Test",
-			siteTemplate = "true"
-		);
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates"
-		);
-
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Manage",
-			rowEntry = "Site Template Name"
-		);
+		PageTemplatesAdmin.add(pageTemplateName = "Test");
 
 		ProductMenu.gotoPortlet(
 			category = "Build",
@@ -94,7 +78,7 @@ definition {
 
 		PageTemplatesAdmin.add(
 			pageTemplateName = "Test",
-			siteTemplate = "true"
+			pageTemplateType = "Widget Page Template"
 		);
 
 		AssertTextEquals(
@@ -518,8 +502,10 @@ definition {
 
 		WebContent.addCP(
 			webContentTitle = "Web Content Title",
-			webContentContent ='''<a href="${page2URL}">${page2URL}</a>'''
+			webContentContent = "${page2URL}"
 		);
+
+		BlogsEntry.addEntryExternalURL(entryExternalURL = "${page2URL}");
 
 		PortletEntry.publish();
 
@@ -546,13 +532,11 @@ definition {
 
 		Pause(locator1 = "5000");
 
-		AssertLocation(value1 = "${portalURL}/web/site-name/page2-name");
+		AssertLocation(value1 = "http://${portalURL}/web/site-name/page2-name");
 	}
 
 	@priority = "3"
 	test SitesTemplateResourceInheritance {
-		property portal.release = "false";
-
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
@@ -714,19 +698,15 @@ definition {
 
 		LAR.exportSiteCP(larFileName = "Export");
 
-		Pause(locator1 = "3000");
-
-		var larFileName = LAR.getLarFileName();
-
 		LAR.downloadLar();
-
-		Refresh();
 
 		ProductMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
 			portlet = "Site Templates"
 		);
+
+		Refresh();
 
 		SiteTemplates.addCP(siteTemplateName = "Template Site");
 
@@ -739,9 +719,11 @@ definition {
 		Site.addCP(siteName = "New Site", siteType = "Template");
 
 		LAR.importSiteCP(
-			larFileName = "${larFileName}",
+			larFileName = "Export",
 			siteName = "New Site"
 		);
+
+		Refresh();
 
 		ProductMenu.gotoPortlet(
 			category = "Build",

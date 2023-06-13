@@ -22,6 +22,7 @@ import com.liferay.document.library.kernel.exception.NoSuchFileVersionException;
 import com.liferay.document.library.kernel.exception.NoSuchFolderException;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelCreateDateComparator;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelModifiedDateComparator;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelSizeComparator;
@@ -279,7 +280,8 @@ public class CMISRepository extends BaseCmisRepository {
 
 	@Override
 	public void checkInFileEntry(
-		long userId, long fileEntryId, boolean major, String changeLog,
+		long userId, long fileEntryId,
+		DLVersionNumberIncrease dlVersionNumberIncrease, String changeLog,
 		ServiceContext serviceContext) {
 
 		try {
@@ -297,7 +299,12 @@ public class CMISRepository extends BaseCmisRepository {
 				document.getVersionSeriesCheckedOutId();
 
 			if (Validator.isNotNull(versionSeriesCheckedOutId)) {
-				if (!isSupportsMinorVersions()) {
+				boolean major = false;
+
+				if (!isSupportsMinorVersions() ||
+					(dlVersionNumberIncrease ==
+						DLVersionNumberIncrease.MAJOR)) {
+
 					major = true;
 				}
 
@@ -325,7 +332,8 @@ public class CMISRepository extends BaseCmisRepository {
 		ServiceContext serviceContext) {
 
 		checkInFileEntry(
-			userId, fileEntryId, false, StringPool.BLANK, serviceContext);
+			userId, fileEntryId, DLVersionNumberIncrease.MINOR,
+			StringPool.BLANK, serviceContext);
 	}
 
 	@Override
@@ -1198,9 +1206,9 @@ public class CMISRepository extends BaseCmisRepository {
 
 			updateFileEntry(
 				userId, fileEntryId, contentStream.getFileName(), mimeType,
-				title, StringPool.BLANK, changeLog, true,
-				contentStream.getStream(), contentStream.getLength(),
-				serviceContext);
+				title, StringPool.BLANK, changeLog,
+				DLVersionNumberIncrease.MAJOR, contentStream.getStream(),
+				contentStream.getLength(), serviceContext);
 		}
 		catch (PortalException | SystemException e) {
 			throw e;
@@ -1306,8 +1314,8 @@ public class CMISRepository extends BaseCmisRepository {
 	public FileEntry updateFileEntry(
 			long userId, long fileEntryId, String sourceFileName,
 			String mimeType, String title, String description, String changeLog,
-			boolean majorVersion, InputStream is, long size,
-			ServiceContext serviceContext)
+			DLVersionNumberIncrease dlVersionNumberIncrease, InputStream is,
+			long size, ServiceContext serviceContext)
 		throws PortalException {
 
 		Document document = null;
@@ -1361,7 +1369,12 @@ public class CMISRepository extends BaseCmisRepository {
 			checkUpdatable(allowableActionsSet, properties, contentStream);
 
 			if (checkOutDocumentObjectId != null) {
-				if (!isSupportsMinorVersions()) {
+				boolean majorVersion = false;
+
+				if (!isSupportsMinorVersions() ||
+					(dlVersionNumberIncrease ==
+						DLVersionNumberIncrease.MAJOR)) {
+
 					majorVersion = true;
 				}
 
@@ -1854,8 +1867,10 @@ public class CMISRepository extends BaseCmisRepository {
 
 		Folder folder = getFolder(session, folderId);
 
-		return (org.apache.chemistry.opencmis.client.api.Folder)
-			folder.getModel();
+		org.apache.chemistry.opencmis.client.api.Folder cmisFolder =
+			(org.apache.chemistry.opencmis.client.api.Folder)folder.getModel();
+
+		return cmisFolder;
 	}
 
 	protected List<String> getCmisFolderIds(Session session, long folderId)
@@ -2165,7 +2180,7 @@ public class CMISRepository extends BaseCmisRepository {
 	protected void processException(Exception e) throws PortalException {
 		String message = e.getMessage();
 
-		if (((e instanceof CmisRuntimeException) &&
+		if ((e instanceof CmisRuntimeException &&
 			 message.contains("authorized")) ||
 			(e instanceof CmisPermissionDeniedException)) {
 
@@ -2185,10 +2200,10 @@ public class CMISRepository extends BaseCmisRepository {
 		List<E> list, int start, int end, OrderByComparator<E> obc) {
 
 		if ((obc != null) &&
-			(obc instanceof RepositoryModelCreateDateComparator ||
-			 obc instanceof RepositoryModelModifiedDateComparator ||
-			 obc instanceof RepositoryModelSizeComparator ||
-			 obc instanceof RepositoryModelTitleComparator)) {
+			((obc instanceof RepositoryModelCreateDateComparator) ||
+			 (obc instanceof RepositoryModelModifiedDateComparator) ||
+			 (obc instanceof RepositoryModelSizeComparator) ||
+			 (obc instanceof RepositoryModelTitleComparator))) {
 
 			list = ListUtil.sort(list, obc);
 		}

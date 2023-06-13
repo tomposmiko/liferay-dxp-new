@@ -67,7 +67,6 @@ import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
-import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -142,7 +141,7 @@ import javax.servlet.ServletContext;
 public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public void addPortletCategory(long companyId, String categoryName) {
 		PortletCategory portletCategory = (PortletCategory)WebAppPool.get(
 			companyId, WebKeys.PORTLET_CATEGORY);
@@ -198,7 +197,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public void clearCache() {
 
 		// Refresh the combo servlet cache
@@ -234,7 +233,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public Portlet clonePortlet(String portletId) {
 		Portlet portlet = getPortletById(portletId);
 
@@ -286,7 +285,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public void deployPortlet(Portlet portlet) throws Exception {
 		PortletApp portletApp = portlet.getPortletApp();
 
@@ -383,7 +382,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public void destroyPortlet(Portlet portlet) {
 		_portletsMap.remove(portlet.getRootPortletId());
 
@@ -402,13 +401,13 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public void destroyRemotePortlet(Portlet portlet) {
 		destroyPortlet(portlet);
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public Portlet fetchPortletById(long companyId, String portletId) {
 		portletId = PortalUtil.getJsSafePortletId(portletId);
 
@@ -430,7 +429,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public List<CustomAttributesDisplay> getCustomAttributesDisplays() {
 		List<CustomAttributesDisplay> customAttributesDisplays =
 			new ArrayList<>();
@@ -457,7 +456,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public PortletCategory getEARDisplay(String xml) {
 		try {
 			return readLiferayDisplayXML(xml);
@@ -468,7 +467,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public List<Portlet> getFriendlyURLMapperPortlets() {
 		String[] friendlyURLMapperRootPortletIds =
 			_friendlyURLMapperRootPortletIds.get();
@@ -493,7 +492,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public List<FriendlyURLMapper> getFriendlyURLMappers() {
 		List<FriendlyURLMapper> friendlyURLMappers = new ArrayList<>();
 
@@ -516,7 +515,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public PortletApp getPortletApp(String servletContextName) {
 		PortletApp portletApp = _portletApps.get(servletContextName);
 
@@ -530,7 +529,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public Portlet getPortletById(long companyId, String portletId) {
 		Portlet portlet = fetchPortletById(companyId, portletId);
 
@@ -598,13 +597,13 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public Portlet getPortletById(String portletId) {
 		return _portletsMap.get(PortletIdCodec.decodePortletName(portletId));
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public Portlet getPortletByStrutsPath(long companyId, String strutsPath) {
 		String portletId = getPortletId(strutsPath);
 
@@ -616,19 +615,19 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public List<Portlet> getPortlets() {
 		return ListUtil.fromMapValues(_portletsMap);
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public List<Portlet> getPortlets(long companyId) {
 		return getPortlets(companyId, true, true);
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public List<Portlet> getPortlets(
 		long companyId, boolean showSystem, boolean showPortal) {
 
@@ -666,7 +665,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public List<Portlet> getScopablePortlets() {
 		List<Portlet> portlets = ListUtil.fromMapValues(_portletsMap);
 
@@ -684,7 +683,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public PortletCategory getWARDisplay(
 		String servletContextName, String xml) {
 
@@ -697,7 +696,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public boolean hasPortlet(long companyId, String portletId) {
 		portletId = PortalUtil.getJsSafePortletId(portletId);
 
@@ -722,7 +721,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public void initEAR(
 		ServletContext servletContext, String[] xmls,
 		PluginPackage pluginPackage) {
@@ -759,16 +758,14 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			Map<String, String> portletIdsByStrutsPath =
 				new ConcurrentHashMap<>();
 
-			Configuration configuration = _getConfiguration(portletApp);
-
 			Set<String> liferayPortletIds = readLiferayPortletXML(
 				StringPool.BLANK, servletContext, xmls[2], portletsMap,
-				portletIdsByStrutsPath, configuration);
+				portletIdsByStrutsPath);
 
 			liferayPortletIds.addAll(
 				readLiferayPortletXML(
 					StringPool.BLANK, servletContext, xmls[3], portletsMap,
-					portletIdsByStrutsPath, configuration));
+					portletIdsByStrutsPath));
 
 			_portletIdsByStrutsPath = portletIdsByStrutsPath;
 
@@ -836,7 +833,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public List<Portlet> initWAR(
 		String servletContextName, ServletContext servletContext, String[] xmls,
 		PluginPackage pluginPackage) {
@@ -844,8 +841,6 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		Map<String, Portlet> portletsMap = null;
 
 		Set<String> liferayPortletIds = null;
-
-		PortletApp portletApp = getPortletApp(servletContextName);
 
 		try {
 			Set<String> servletURLPatterns = readWebXML(xmls[3]);
@@ -873,7 +868,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 			liferayPortletIds = readLiferayPortletXML(
 				servletContextName, servletContext, xmls[2], portletsMap,
-				portletIdsByStrutsPath, _getConfiguration(portletApp));
+				portletIdsByStrutsPath);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -935,6 +930,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			}
 
 			// Sprite images
+
+			PortletApp portletApp = getPortletApp(servletContextName);
 
 			setSpriteImages(servletContext, portletApp, "/icons/");
 
@@ -1040,7 +1037,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public void visitPortlets(long companyId, Consumer<Portlet> consumer) {
 		Map<String, Portlet> portletsMap = getPortletsMap(companyId);
 
@@ -1172,6 +1169,32 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		return portletsMap;
 	}
 
+	protected String getTriggerValue(Portlet portlet, String propertyKey) {
+		PortletApp portletApp = portlet.getPortletApp();
+
+		ServletContext servletContext = portletApp.getServletContext();
+
+		ClassLoader classLoader = servletContext.getClassLoader();
+
+		Configuration configuration = _propertiesConfigurations.get(
+			classLoader);
+
+		if (configuration == null) {
+			String propertyFileName = "portal";
+
+			if (portletApp.isWARFile()) {
+				propertyFileName = "portlet";
+			}
+
+			configuration = ConfigurationFactoryUtil.getConfiguration(
+				classLoader, propertyFileName);
+
+			_propertiesConfigurations.put(classLoader, configuration);
+		}
+
+		return configuration.get(propertyKey);
+	}
+
 	protected void initPortletAddToPagePermissions(Portlet portlet)
 		throws PortalException {
 
@@ -1208,22 +1231,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 					continue;
 				}
 
-				Role role = roleLocalService.fetchRole(
+				Role role = roleLocalService.getRole(
 					portlet.getCompanyId(), roleName);
-
-				if (role == null) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							StringBundler.concat(
-								"Portlet ", portlet.getPortletName(),
-								" requires role with company ID ",
-								String.valueOf(portlet.getCompanyId()),
-								" and name ", roleName,
-								". Create the role and redeploy the portlet."));
-					}
-
-					continue;
-				}
 
 				resourcePermissionLocalService.addResourcePermission(
 					portlet.getCompanyId(), portlet.getRootPortletId(),
@@ -1345,8 +1354,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		String servletContextName, ServletContext servletContext,
 		Set<String> liferayPortletIds, Map<String, String> roleMappers,
 		Element portletElement, Map<String, Portlet> portletsMap,
-		Map<String, String> portletIdsByStrutsPath,
-		Configuration configuration) {
+		Map<String, String> portletIdsByStrutsPath) {
 
 		String portletId = portletElement.elementText("portlet-name");
 
@@ -1454,8 +1462,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				String cronException = null;
 
 				if (propertyKeyElement != null) {
-					cronException = configuration.get(
-						propertyKeyElement.getTextTrim());
+					cronException = getTriggerValue(
+						portletModel, propertyKeyElement.getTextTrim());
 				}
 				else {
 					cronException = cronElement.elementText(
@@ -1472,8 +1480,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				String intervalString = null;
 
 				if (propertyKeyElement != null) {
-					intervalString = configuration.get(
-						propertyKeyElement.getTextTrim());
+					intervalString = getTriggerValue(
+						portletModel, propertyKeyElement.getTextTrim());
 				}
 				else {
 					Element simpleTriggerValueElement = simpleElement.element(
@@ -1959,8 +1967,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	protected Set<String> readLiferayPortletXML(
 			String servletContextName, ServletContext servletContext,
 			String xml, Map<String, Portlet> portletsMap,
-			Map<String, String> portletIdsByStrutsPath,
-			Configuration configuration)
+			Map<String, String> portletIdsByStrutsPath)
 		throws Exception {
 
 		Set<String> liferayPortletIds = new HashSet<>();
@@ -2006,7 +2013,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			readLiferayPortletXML(
 				servletContextName, servletContext, liferayPortletIds,
 				roleMappers, portletElement, portletsMap,
-				portletIdsByStrutsPath, configuration);
+				portletIdsByStrutsPath);
 		}
 
 		return liferayPortletIds;
@@ -2724,25 +2731,6 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		return updatePortlet(companyId, portletId, roles, active);
 	}
 
-	private Configuration _getConfiguration(PortletApp portletApp) {
-		String propertyFileName = "portal";
-
-		if (portletApp.isWARFile()) {
-			propertyFileName = "portlet";
-		}
-
-		ServletContext servletContext = portletApp.getServletContext();
-
-		ClassLoader classLoader = servletContext.getClassLoader();
-
-		if (classLoader.getResource(propertyFileName + ".properties") == null) {
-			return null;
-		}
-
-		return ConfigurationFactoryUtil.getConfiguration(
-			classLoader, propertyFileName);
-	}
-
 	private ClassLoader _getServletContextClassLoader(
 		String servletContextName) {
 
@@ -2804,6 +2792,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		new ConcurrentHashMap<>();
 	private static final Map<Long, Map<String, Portlet>> _portletsMaps =
 		new ConcurrentHashMap<>();
+	private static final Map<ClassLoader, Configuration>
+		_propertiesConfigurations = new ConcurrentHashMap<>();
 
 	private final AtomicReference<String[]> _friendlyURLMapperRootPortletIds =
 		new AtomicReference<>(new String[0]);

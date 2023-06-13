@@ -19,11 +19,13 @@
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 
+redirect = PortalUtil.escapeRedirect(redirect);
+
 if (Validator.isNull(redirect)) {
 	redirect = ParamUtil.getString(PortalUtil.getOriginalServletRequest(request), "redirect");
-}
 
-redirect = PortalUtil.escapeRedirect(redirect);
+	redirect = PortalUtil.escapeRedirect(redirect);
+}
 
 boolean showBackURL = GetterUtil.getBoolean(request.getAttribute("view.jsp-showBackURL"));
 
@@ -169,7 +171,8 @@ request.setAttribute("view.jsp-showIconLabel", true);
 					classPK="<%= assetEntry.getClassPK() %>"
 					contentTitle="<%= title %>"
 					enabled="<%= !inTrash %>"
-					message='<%= inTrash ? "flags-are-disabled-because-this-entry-is-in-the-recycle-bin" : StringPool.BLANK %>'
+					label="<%= false %>"
+					message='<%= inTrash ? "flags-are-disabled-because-this-entry-is-in-the-recycle-bin" : null %>'
 					reportedUserId="<%= assetRenderer.getUserId() %>"
 				/>
 			</div>

@@ -17,6 +17,7 @@ package com.liferay.fragment.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.fragment.model.FragmentEntry;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -38,49 +39,59 @@ import java.util.List;
  *
  * @author Brian Wing Shun Chan
  * @see FragmentEntryServiceUtil
+ * @see com.liferay.fragment.service.base.FragmentEntryServiceBaseImpl
+ * @see com.liferay.fragment.service.impl.FragmentEntryServiceImpl
  * @generated
  */
 @AccessControlled
 @JSONWebService
-@OSGiBeanProperties(
-	property = {
-		"json.web.service.context.name=fragment",
-		"json.web.service.context.path=FragmentEntry"
-	},
-	service = FragmentEntryService.class
-)
+@OSGiBeanProperties(property =  {
+	"json.web.service.context.name=fragment", "json.web.service.context.path=FragmentEntry"}, service = FragmentEntryService.class)
 @ProviderType
-@Transactional(
-	isolation = Isolation.PORTAL,
-	rollbackFor = {PortalException.class, SystemException.class}
-)
+@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
+	PortalException.class, SystemException.class})
 public interface FragmentEntryService extends BaseService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link FragmentEntryServiceUtil} to access the fragment entry remote service. Add custom service methods to <code>com.liferay.fragment.service.impl.FragmentEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link FragmentEntryServiceUtil} to access the fragment entry remote service. Add custom service methods to {@link com.liferay.fragment.service.impl.FragmentEntryServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public FragmentEntry addFragmentEntry(
-			long groupId, long fragmentCollectionId, String name, int status,
-			ServiceContext serviceContext)
+	public FragmentEntry addFragmentEntry(long groupId,
+		long fragmentCollectionId, String name, int type, int status,
+		ServiceContext serviceContext) throws PortalException;
+
+	public FragmentEntry addFragmentEntry(long groupId,
+		long fragmentCollectionId, String name, int status,
+		ServiceContext serviceContext) throws PortalException;
+
+	public FragmentEntry addFragmentEntry(long groupId,
+		long fragmentCollectionId, String fragmentEntryKey, String name,
+		int type, int status, ServiceContext serviceContext)
 		throws PortalException;
 
-	public FragmentEntry addFragmentEntry(
-			long groupId, long fragmentCollectionId, String fragmentEntryKey,
-			String name, int status, ServiceContext serviceContext)
+	public FragmentEntry addFragmentEntry(long groupId,
+		long fragmentCollectionId, String fragmentEntryKey, String name,
+		int status, ServiceContext serviceContext) throws PortalException;
+
+	public FragmentEntry addFragmentEntry(long groupId,
+		long fragmentCollectionId, String name, String css, String html,
+		String js, int type, int status, ServiceContext serviceContext)
 		throws PortalException;
 
-	public FragmentEntry addFragmentEntry(
-			long groupId, long fragmentCollectionId, String name, String css,
-			String html, String js, int status, ServiceContext serviceContext)
+	public FragmentEntry addFragmentEntry(long groupId,
+		long fragmentCollectionId, String name, String css, String html,
+		String js, int status, ServiceContext serviceContext)
 		throws PortalException;
 
-	public FragmentEntry addFragmentEntry(
-			long groupId, long fragmentCollectionId, String fragmentEntryKey,
-			String name, String css, String html, String js, int status,
-			ServiceContext serviceContext)
-		throws PortalException;
+	public FragmentEntry addFragmentEntry(long groupId,
+		long fragmentCollectionId, String fragmentEntryKey, String name,
+		String css, String html, String js, int type, int status,
+		ServiceContext serviceContext) throws PortalException;
+
+	public FragmentEntry addFragmentEntry(long groupId,
+		long fragmentCollectionId, String fragmentEntryKey, String name,
+		String css, String html, String js, int status,
+		ServiceContext serviceContext) throws PortalException;
 
 	public void deleteFragmentEntries(long[] fragmentEntriesIds)
 		throws PortalException;
@@ -93,78 +104,90 @@ public interface FragmentEntryService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getFragmentCollectionsCount(
-		long groupId, long fragmentCollectionId);
+	public int getFragmentCollectionsCount(long groupId,
+		long fragmentCollectionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getFragmentCollectionsCount(
-		long groupId, long fragmentCollectionId, int status);
+	public int getFragmentCollectionsCount(long groupId,
+		long fragmentCollectionId, int status);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getFragmentCollectionsCount(
-		long groupId, long fragmentCollectionId, String name);
+	public int getFragmentCollectionsCount(long groupId,
+		long fragmentCollectionId, String name);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getFragmentCollectionsCount(
-		long groupId, long fragmentCollectionId, String name, int status);
+	public int getFragmentCollectionsCount(long groupId,
+		long fragmentCollectionId, String name, int status);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getFragmentCollectionsCountByType(long groupId,
+		long fragmentCollectionId, int type);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<FragmentEntry> getFragmentEntries(long fragmentCollectionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<FragmentEntry> getFragmentEntries(
-		long groupId, long fragmentCollectionId, int status);
+	public List<FragmentEntry> getFragmentEntries(long groupId,
+		long fragmentCollectionId, int status);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<FragmentEntry> getFragmentEntries(
-		long groupId, long fragmentCollectionId, int start, int end);
+	public List<FragmentEntry> getFragmentEntries(long groupId,
+		long fragmentCollectionId, int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<FragmentEntry> getFragmentEntries(
-		long groupId, long fragmentCollectionId, int status, int start, int end,
+	public List<FragmentEntry> getFragmentEntries(long groupId,
+		long fragmentCollectionId, int status, int start, int end,
 		OrderByComparator<FragmentEntry> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<FragmentEntry> getFragmentEntries(
-		long groupId, long fragmentCollectionId, int start, int end,
+	public List<FragmentEntry> getFragmentEntries(long groupId,
+		long fragmentCollectionId, int start, int end,
 		OrderByComparator<FragmentEntry> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<FragmentEntry> getFragmentEntries(
-		long groupId, long fragmentCollectionId, String name, int status,
-		int start, int end, OrderByComparator<FragmentEntry> orderByComparator);
+	public List<FragmentEntry> getFragmentEntries(long groupId,
+		long fragmentCollectionId, String name, int status, int start, int end,
+		OrderByComparator<FragmentEntry> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<FragmentEntry> getFragmentEntries(
-		long groupId, long fragmentCollectionId, String name, int start,
-		int end, OrderByComparator<FragmentEntry> orderByComparator);
+	public List<FragmentEntry> getFragmentEntries(long groupId,
+		long fragmentCollectionId, String name, int start, int end,
+		OrderByComparator<FragmentEntry> orderByComparator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<FragmentEntry> getFragmentEntriesByType(long groupId,
+		long fragmentCollectionId, int type, int status);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<FragmentEntry> getFragmentEntriesByType(long groupId,
+		long fragmentCollectionId, int type, int start, int end,
+		OrderByComparator<FragmentEntry> orderByComparator);
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public String getOSGiServiceIdentifier();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public String[] getTempFileNames(long groupId, String folderName)
 		throws PortalException;
 
-	public FragmentEntry updateFragmentEntry(
-			long fragmentEntryId, long previewFileEntryId)
-		throws PortalException;
+	public FragmentEntry moveFragmentEntry(long fragmentEntryId,
+		long fragmentCollectionId) throws PortalException;
+
+	public FragmentEntry updateFragmentEntry(long fragmentEntryId,
+		long previewFileEntryId) throws PortalException;
 
 	public FragmentEntry updateFragmentEntry(long fragmentEntryId, String name)
 		throws PortalException;
 
-	public FragmentEntry updateFragmentEntry(
-			long fragmentEntryId, String name, String css, String html,
-			String js, int status)
+	public FragmentEntry updateFragmentEntry(long fragmentEntryId, String name,
+		String css, String html, String js, int status)
 		throws PortalException;
 
-	public FragmentEntry updateFragmentEntry(
-			long fragmentEntryId, String name, String css, String html,
-			String js, long previewFileEntryId, int status)
+	public FragmentEntry updateFragmentEntry(long fragmentEntryId, String name,
+		String css, String html, String js, long previewFileEntryId, int status)
 		throws PortalException;
-
 }

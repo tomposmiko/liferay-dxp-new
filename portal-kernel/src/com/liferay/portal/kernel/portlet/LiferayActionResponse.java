@@ -23,5 +23,5 @@ import javax.portlet.ActionResponse;
  */
 @ProviderType
 public interface LiferayActionResponse
-	extends ActionResponse, LiferayStateAwareResponse {
+	extends LiferayStateAwareResponse, ActionResponse {
 }

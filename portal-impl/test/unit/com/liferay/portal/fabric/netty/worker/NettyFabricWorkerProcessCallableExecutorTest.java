@@ -88,8 +88,8 @@ public class NettyFabricWorkerProcessCallableExecutorTest {
 
 				});
 
-		embeddedChannel.writeOneInbound(embeddedChannel.readOutbound());
-		embeddedChannel.writeOneInbound(embeddedChannel.readOutbound());
+		embeddedChannel.writeInbound(embeddedChannel.readOutbound());
+		embeddedChannel.writeInbound(embeddedChannel.readOutbound());
 
 		Assert.assertEquals(StringPool.BLANK, noticeableFuture.get());
 
@@ -105,8 +105,8 @@ public class NettyFabricWorkerProcessCallableExecutorTest {
 
 			});
 
-		embeddedChannel.writeOneInbound(embeddedChannel.readOutbound());
-		embeddedChannel.writeOneInbound(embeddedChannel.readOutbound());
+		embeddedChannel.writeInbound(embeddedChannel.readOutbound());
+		embeddedChannel.writeInbound(embeddedChannel.readOutbound());
 
 		try {
 			noticeableFuture.get();

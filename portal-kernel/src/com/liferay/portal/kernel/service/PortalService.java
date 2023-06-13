@@ -31,21 +31,20 @@ import com.liferay.portal.kernel.transaction.Transactional;
  *
  * @author Brian Wing Shun Chan
  * @see PortalServiceUtil
+ * @see com.liferay.portal.service.base.PortalServiceBaseImpl
+ * @see com.liferay.portal.service.impl.PortalServiceImpl
  * @generated
  */
 @AccessControlled
 @JSONWebService
 @ProviderType
-@Transactional(
-	isolation = Isolation.PORTAL,
-	rollbackFor = {PortalException.class, SystemException.class}
-)
+@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
+	PortalException.class, SystemException.class})
 public interface PortalService extends BaseService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link PortalServiceUtil} to access the portal remote service. Add custom service methods to <code>com.liferay.portal.service.impl.PortalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link PortalServiceUtil} to access the portal remote service. Add custom service methods to {@link com.liferay.portal.service.impl.PortalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public String getAutoDeployDirectory();
@@ -55,10 +54,10 @@ public interface PortalService extends BaseService {
 	public int getBuildNumber();
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public String getOSGiServiceIdentifier();
 
 	@JSONWebService
@@ -88,5 +87,4 @@ public interface PortalService extends BaseService {
 	public void testGetUserId();
 
 	public boolean testHasClassName();
-
 }

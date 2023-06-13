@@ -17,8 +17,10 @@
 <%@ include file="/init.jsp" %>
 
 <%
+int aspectRatio = ParamUtil.getInteger(request, "aspectRatio");
 String currentImageURL = ParamUtil.getString(request, "currentLogoURL");
 long maxFileSize = ParamUtil.getLong(request, "maxFileSize");
+boolean preserveRatio = ParamUtil.getBoolean(request, "preserveRatio");
 String tempImageFileName = ParamUtil.getString(request, "tempImageFileName");
 String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 %>
@@ -114,7 +116,7 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 			<aui:button-row>
 				<aui:button name="submitButton" type="submit" value="done" />
 
-				<aui:button onClick="window.close();" type="cancel" value="close" />
+				<aui:button onClick="window.close();" type="cancel" value="cancel" />
 			</aui:button-row>
 		</aui:form>
 
@@ -137,13 +139,16 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 			<portlet:actionURL name="/image_uploader/view" var="addTempImageURL">
 				<portlet:param name="mvcRenderCommandName" value="/image_uploader/view" />
 				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_TEMP %>" />
+				<portlet:param name="aspectRatio" value="<%= String.valueOf(aspectRatio) %>" />
 				<portlet:param name="maxFileSize" value="<%= String.valueOf(maxFileSize) %>" />
+				<portlet:param name="preserveRatio" value="<%= String.valueOf(preserveRatio) %>" />
 			</portlet:actionURL>
 
 			var imageUploadedInput = A.one('#<portlet:namespace />imageUploaded');
 
 			var logoEditor = new Liferay.LogoEditor(
 				{
+					aspectRatio: <%= aspectRatio %>,
 
 					<%
 					DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance(locale);
@@ -156,6 +161,7 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 					on: {
 						uploadComplete: A.bind('val', imageUploadedInput, true)
 					},
+					preserveRatio: <%= preserveRatio %>,
 					previewURL: '<%= previewURL %>',
 					uploadURL: '<%= addTempImageURL %>'
 				}

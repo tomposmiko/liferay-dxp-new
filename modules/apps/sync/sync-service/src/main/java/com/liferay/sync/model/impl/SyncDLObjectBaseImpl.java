@@ -32,13 +32,12 @@ import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class SyncDLObjectBaseImpl
-	extends SyncDLObjectModelImpl implements SyncDLObject {
-
+public abstract class SyncDLObjectBaseImpl extends SyncDLObjectModelImpl
+	implements SyncDLObject {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a sync dl object model instance should use the <code>SyncDLObject</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a sync dl object model instance should use the {@link SyncDLObject} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -58,5 +57,4 @@ public abstract class SyncDLObjectBaseImpl
 
 		SyncDLObjectLocalServiceUtil.updateSyncDLObject(syncDLObject);
 	}
-
 }

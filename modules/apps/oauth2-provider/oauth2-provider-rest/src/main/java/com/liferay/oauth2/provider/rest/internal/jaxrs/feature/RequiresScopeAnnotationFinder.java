@@ -15,10 +15,8 @@
 package com.liferay.oauth2.provider.rest.internal.jaxrs.feature;
 
 import com.liferay.oauth2.provider.scope.RequiresScope;
-import com.liferay.petra.reflect.AnnotationLocator;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
@@ -46,49 +44,12 @@ public class RequiresScopeAnnotationFinder {
 		return scopes;
 	}
 
-	public static <T extends Annotation> T getScopeAnnotation(
-		AnnotatedElement annotatedElement, Class<T> annotationClass) {
-
-		T t = annotatedElement.getAnnotation(annotationClass);
-
-		if (t != null) {
-			return t;
-		}
-
-		List<Annotation> annotations = Collections.emptyList();
-
-		if (annotatedElement instanceof Class<?>) {
-			annotations = AnnotationLocator.locate((Class<?>)annotatedElement);
-		}
-		else if (annotatedElement instanceof Method) {
-			annotations = AnnotationLocator.locate(
-				(Method)annotatedElement, null);
-		}
-
-		for (Annotation annotation : annotations) {
-			Class<? extends Annotation> curAnnotationClass =
-				annotation.annotationType();
-
-			if (curAnnotationClass.equals(annotationClass)) {
-				return (T)annotation;
-			}
-
-			t = curAnnotationClass.getAnnotation(annotationClass);
-
-			if (t != null) {
-				return t;
-			}
-		}
-
-		return null;
-	}
-
 	private static void _find(
 		Set<Class<?>> classes, Set<String> scopes, boolean recurse,
 		Class<?> clazz) {
 
-		RequiresScope requiresScope = getScopeAnnotation(
-			clazz, RequiresScope.class);
+		RequiresScope requiresScope = clazz.getDeclaredAnnotation(
+			RequiresScope.class);
 
 		if (requiresScope != null) {
 			Collections.addAll(scopes, requiresScope.value());
@@ -113,8 +74,8 @@ public class RequiresScopeAnnotationFinder {
 		Set<Class<?>> visited, Set<String> scopes, boolean recurse,
 		Method method) {
 
-		RequiresScope requiresScope = getScopeAnnotation(
-			method, RequiresScope.class);
+		RequiresScope requiresScope = method.getDeclaredAnnotation(
+			RequiresScope.class);
 
 		if (requiresScope != null) {
 			Collections.addAll(scopes, requiresScope.value());
@@ -128,10 +89,9 @@ public class RequiresScopeAnnotationFinder {
 	}
 
 	private static boolean _isAnnotatedMethod(Method method) {
-		List<Annotation> annotations = AnnotationLocator.locate(
-			method, Path.class);
+		if ((method.getDeclaredAnnotation(Path.class) != null) ||
+			_isHttpMethod(method)) {
 
-		if (!annotations.isEmpty() || _isHttpMethod(method)) {
 			return true;
 		}
 
@@ -139,7 +99,7 @@ public class RequiresScopeAnnotationFinder {
 	}
 
 	private static boolean _isHttpMethod(Method method) {
-		List<Annotation> annotations = AnnotationLocator.locate(method, null);
+		Annotation[] annotations = method.getAnnotations();
 
 		for (Annotation annotation : annotations) {
 			Class<? extends Annotation> annotationType =

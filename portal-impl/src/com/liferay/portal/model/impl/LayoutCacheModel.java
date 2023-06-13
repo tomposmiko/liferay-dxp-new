@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.MVCCModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -33,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing Layout in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see Layout
  * @generated
  */
 @ProviderType
-public class LayoutCacheModel
-	implements CacheModel<Layout>, Externalizable, MVCCModel {
-
+public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
+	MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,8 +53,7 @@ public class LayoutCacheModel
 		LayoutCacheModel layoutCacheModel = (LayoutCacheModel)obj;
 
 		if ((plid == layoutCacheModel.plid) &&
-			(mvccVersion == layoutCacheModel.mvccVersion)) {
-
+				(mvccVersion == layoutCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -79,7 +79,7 @@ public class LayoutCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(61);
+		StringBundler sb = new StringBundler(69);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -99,6 +99,12 @@ public class LayoutCacheModel
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
+		sb.append(", parentPlid=");
+		sb.append(parentPlid);
+		sb.append(", leftPlid=");
+		sb.append(leftPlid);
+		sb.append(", rightPlid=");
+		sb.append(rightPlid);
 		sb.append(", privateLayout=");
 		sb.append(privateLayout);
 		sb.append(", layoutId=");
@@ -121,6 +127,8 @@ public class LayoutCacheModel
 		sb.append(typeSettings);
 		sb.append(", hidden=");
 		sb.append(hidden);
+		sb.append(", system=");
+		sb.append(system);
 		sb.append(", friendlyURL=");
 		sb.append(friendlyURL);
 		sb.append(", iconImageId=");
@@ -185,6 +193,9 @@ public class LayoutCacheModel
 			layoutImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
+		layoutImpl.setParentPlid(parentPlid);
+		layoutImpl.setLeftPlid(leftPlid);
+		layoutImpl.setRightPlid(rightPlid);
 		layoutImpl.setPrivateLayout(privateLayout);
 		layoutImpl.setLayoutId(layoutId);
 		layoutImpl.setParentLayoutId(parentLayoutId);
@@ -239,6 +250,7 @@ public class LayoutCacheModel
 		}
 
 		layoutImpl.setHidden(hidden);
+		layoutImpl.setSystem(system);
 
 		if (friendlyURL == null) {
 			layoutImpl.setFriendlyURL("");
@@ -316,6 +328,12 @@ public class LayoutCacheModel
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
 
+		parentPlid = objectInput.readLong();
+
+		leftPlid = objectInput.readLong();
+
+		rightPlid = objectInput.readLong();
+
 		privateLayout = objectInput.readBoolean();
 
 		layoutId = objectInput.readLong();
@@ -330,6 +348,8 @@ public class LayoutCacheModel
 		typeSettings = objectInput.readUTF();
 
 		hidden = objectInput.readBoolean();
+
+		system = objectInput.readBoolean();
 		friendlyURL = objectInput.readUTF();
 
 		iconImageId = objectInput.readLong();
@@ -346,7 +366,8 @@ public class LayoutCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		if (uuid == null) {
@@ -373,6 +394,12 @@ public class LayoutCacheModel
 
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
+
+		objectOutput.writeLong(parentPlid);
+
+		objectOutput.writeLong(leftPlid);
+
+		objectOutput.writeLong(rightPlid);
 
 		objectOutput.writeBoolean(privateLayout);
 
@@ -430,6 +457,8 @@ public class LayoutCacheModel
 		}
 
 		objectOutput.writeBoolean(hidden);
+
+		objectOutput.writeBoolean(system);
 
 		if (friendlyURL == null) {
 			objectOutput.writeUTF("");
@@ -491,6 +520,9 @@ public class LayoutCacheModel
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
+	public long parentPlid;
+	public long leftPlid;
+	public long rightPlid;
 	public boolean privateLayout;
 	public long layoutId;
 	public long parentLayoutId;
@@ -502,6 +534,7 @@ public class LayoutCacheModel
 	public String type;
 	public String typeSettings;
 	public boolean hidden;
+	public boolean system;
 	public String friendlyURL;
 	public long iconImageId;
 	public String themeId;
@@ -512,5 +545,4 @@ public class LayoutCacheModel
 	public boolean layoutPrototypeLinkEnabled;
 	public String sourcePrototypeLayoutUuid;
 	public long lastPublishDate;
-
 }

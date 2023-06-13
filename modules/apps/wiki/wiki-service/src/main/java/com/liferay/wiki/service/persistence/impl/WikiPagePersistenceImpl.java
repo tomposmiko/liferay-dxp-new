@@ -16,6 +16,8 @@ package com.liferay.wiki.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -42,11 +44,11 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+
 import com.liferay.wiki.exception.NoSuchPageException;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.model.impl.WikiPageImpl;
@@ -55,14 +57,10 @@ import com.liferay.wiki.service.persistence.WikiPagePersistence;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,26 +74,23 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see WikiPagePersistence
+ * @see com.liferay.wiki.service.persistence.WikiPageUtil
  * @generated
  */
 @ProviderType
-public class WikiPagePersistenceImpl
-	extends BasePersistenceImpl<WikiPage> implements WikiPagePersistence {
-
+public class WikiPagePersistenceImpl extends BasePersistenceImpl<WikiPage>
+	implements WikiPagePersistence {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use <code>WikiPageUtil</code> to access the wiki page persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use {@link WikiPageUtil} to access the wiki page persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY =
-		WikiPageImpl.class.getName();
-
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List1";
-
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List2";
-
+	public static final String FINDER_CLASS_NAME_ENTITY = WikiPageImpl.class.getName();
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -111,15 +106,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByResourcePrimKey(long resourcePrimKey) {
-		return findByResourcePrimKey(
-			resourcePrimKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByResourcePrimKey(resourcePrimKey, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where resourcePrimKey = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -128,9 +123,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByResourcePrimKey(
-		long resourcePrimKey, int start, int end) {
-
+	public List<WikiPage> findByResourcePrimKey(long resourcePrimKey,
+		int start, int end) {
 		return findByResourcePrimKey(resourcePrimKey, start, end, null);
 	}
 
@@ -138,7 +132,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where resourcePrimKey = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -148,19 +142,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByResourcePrimKey(
-		long resourcePrimKey, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByResourcePrimKey(
-			resourcePrimKey, start, end, orderByComparator, true);
+	public List<WikiPage> findByResourcePrimKey(long resourcePrimKey,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByResourcePrimKey(resourcePrimKey, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where resourcePrimKey = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -171,34 +163,33 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByResourcePrimKey(
-		long resourcePrimKey, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByResourcePrimKey(long resourcePrimKey,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByResourcePrimKey;
-			finderArgs = new Object[] {resourcePrimKey};
+			finderArgs = new Object[] { resourcePrimKey };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByResourcePrimKey;
 			finderArgs = new Object[] {
-				resourcePrimKey, start, end, orderByComparator
-			};
+					resourcePrimKey,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
@@ -215,8 +206,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -227,10 +218,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_RESOURCEPRIMKEY_RESOURCEPRIMKEY_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -248,16 +240,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(resourcePrimKey);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -286,12 +278,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByResourcePrimKey_First(
-			long resourcePrimKey, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByResourcePrimKey_First(long resourcePrimKey,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByResourcePrimKey_First(
-			resourcePrimKey, orderByComparator);
+		WikiPage wikiPage = fetchByResourcePrimKey_First(resourcePrimKey,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -317,11 +308,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByResourcePrimKey_First(
-		long resourcePrimKey, OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByResourcePrimKey(
-			resourcePrimKey, 0, 1, orderByComparator);
+	public WikiPage fetchByResourcePrimKey_First(long resourcePrimKey,
+		OrderByComparator<WikiPage> orderByComparator) {
+		List<WikiPage> list = findByResourcePrimKey(resourcePrimKey, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -339,12 +329,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByResourcePrimKey_Last(
-			long resourcePrimKey, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByResourcePrimKey_Last(long resourcePrimKey,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByResourcePrimKey_Last(
-			resourcePrimKey, orderByComparator);
+		WikiPage wikiPage = fetchByResourcePrimKey_Last(resourcePrimKey,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -370,17 +359,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByResourcePrimKey_Last(
-		long resourcePrimKey, OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByResourcePrimKey_Last(long resourcePrimKey,
+		OrderByComparator<WikiPage> orderByComparator) {
 		int count = countByResourcePrimKey(resourcePrimKey);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByResourcePrimKey(
-			resourcePrimKey, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByResourcePrimKey(resourcePrimKey, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -399,11 +387,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByResourcePrimKey_PrevAndNext(
-			long pageId, long resourcePrimKey,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByResourcePrimKey_PrevAndNext(long pageId,
+		long resourcePrimKey, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -413,13 +399,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByResourcePrimKey_PrevAndNext(
-				session, wikiPage, resourcePrimKey, orderByComparator, true);
+			array[0] = getByResourcePrimKey_PrevAndNext(session, wikiPage,
+					resourcePrimKey, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByResourcePrimKey_PrevAndNext(
-				session, wikiPage, resourcePrimKey, orderByComparator, false);
+			array[2] = getByResourcePrimKey_PrevAndNext(session, wikiPage,
+					resourcePrimKey, orderByComparator, false);
 
 			return array;
 		}
@@ -431,15 +417,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByResourcePrimKey_PrevAndNext(
-		Session session, WikiPage wikiPage, long resourcePrimKey,
+	protected WikiPage getByResourcePrimKey_PrevAndNext(Session session,
+		WikiPage wikiPage, long resourcePrimKey,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -451,8 +436,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_RESOURCEPRIMKEY_RESOURCEPRIMKEY_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -522,9 +506,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(resourcePrimKey);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -546,11 +529,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByResourcePrimKey(long resourcePrimKey) {
-		for (WikiPage wikiPage :
-				findByResourcePrimKey(
-					resourcePrimKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (WikiPage wikiPage : findByResourcePrimKey(resourcePrimKey,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -565,7 +545,7 @@ public class WikiPagePersistenceImpl
 	public int countByResourcePrimKey(long resourcePrimKey) {
 		FinderPath finderPath = _finderPathCountByResourcePrimKey;
 
-		Object[] finderArgs = new Object[] {resourcePrimKey};
+		Object[] finderArgs = new Object[] { resourcePrimKey };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -606,10 +586,8 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String
-		_FINDER_COLUMN_RESOURCEPRIMKEY_RESOURCEPRIMKEY_2 =
-			"wikiPage.resourcePrimKey = ?";
-
+	private static final String _FINDER_COLUMN_RESOURCEPRIMKEY_RESOURCEPRIMKEY_2 =
+		"wikiPage.resourcePrimKey = ?";
 	private FinderPath _finderPathWithPaginationFindByUuid;
 	private FinderPath _finderPathWithoutPaginationFindByUuid;
 	private FinderPath _finderPathCountByUuid;
@@ -629,7 +607,7 @@ public class WikiPagePersistenceImpl
 	 * Returns a range of all the wiki pages where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -646,7 +624,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -656,10 +634,8 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByUuid(
-		String uuid, int start, int end,
+	public List<WikiPage> findByUuid(String uuid, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		return findByUuid(uuid, start, end, orderByComparator, true);
 	}
 
@@ -667,7 +643,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -678,11 +654,8 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByUuid(
-		String uuid, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByUuid(String uuid, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -690,22 +663,21 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid;
-			finderArgs = new Object[] {uuid};
+			finderArgs = new Object[] { uuid };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid;
-			finderArgs = new Object[] {uuid, start, end, orderByComparator};
+			finderArgs = new Object[] { uuid, start, end, orderByComparator };
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
@@ -722,8 +694,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -743,10 +715,11 @@ public class WikiPagePersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -766,16 +739,16 @@ public class WikiPagePersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -804,10 +777,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByUuid_First(
-			String uuid, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByUuid_First(String uuid,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByUuid_First(uuid, orderByComparator);
 
 		if (wikiPage != null) {
@@ -834,9 +806,8 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByUuid_First(
-		String uuid, OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByUuid_First(String uuid,
+		OrderByComparator<WikiPage> orderByComparator) {
 		List<WikiPage> list = findByUuid(uuid, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -855,10 +826,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByUuid_Last(
-			String uuid, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByUuid_Last(String uuid,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByUuid_Last(uuid, orderByComparator);
 
 		if (wikiPage != null) {
@@ -885,17 +855,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByUuid_Last(
-		String uuid, OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByUuid_Last(String uuid,
+		OrderByComparator<WikiPage> orderByComparator) {
 		int count = countByUuid(uuid);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByUuid(
-			uuid, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByUuid(uuid, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -914,11 +883,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByUuid_PrevAndNext(
-			long pageId, String uuid,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByUuid_PrevAndNext(long pageId, String uuid,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		uuid = Objects.toString(uuid, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -930,13 +897,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByUuid_PrevAndNext(
-				session, wikiPage, uuid, orderByComparator, true);
+			array[0] = getByUuid_PrevAndNext(session, wikiPage, uuid,
+					orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByUuid_PrevAndNext(
-				session, wikiPage, uuid, orderByComparator, false);
+			array[2] = getByUuid_PrevAndNext(session, wikiPage, uuid,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -948,15 +915,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByUuid_PrevAndNext(
-		Session session, WikiPage wikiPage, String uuid,
+	protected WikiPage getByUuid_PrevAndNext(Session session,
+		WikiPage wikiPage, String uuid,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -977,8 +943,7 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1050,9 +1015,8 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1074,9 +1038,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByUuid(String uuid) {
-		for (WikiPage wikiPage :
-				findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByUuid(uuid, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -1093,7 +1056,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByUuid;
 
-		Object[] finderArgs = new Object[] {uuid};
+		Object[] finderArgs = new Object[] { uuid };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1145,17 +1108,13 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_UUID_2 =
-		"wikiPage.uuid = ?";
-
-	private static final String _FINDER_COLUMN_UUID_UUID_3 =
-		"(wikiPage.uuid IS NULL OR wikiPage.uuid = '')";
-
+	private static final String _FINDER_COLUMN_UUID_UUID_2 = "wikiPage.uuid = ?";
+	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(wikiPage.uuid IS NULL OR wikiPage.uuid = '')";
 	private FinderPath _finderPathFetchByUUID_G;
 	private FinderPath _finderPathCountByUUID_G;
 
 	/**
-	 * Returns the wiki page where uuid = &#63; and groupId = &#63; or throws a <code>NoSuchPageException</code> if it could not be found.
+	 * Returns the wiki page where uuid = &#63; and groupId = &#63; or throws a {@link NoSuchPageException} if it could not be found.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
@@ -1165,7 +1124,6 @@ public class WikiPagePersistenceImpl
 	@Override
 	public WikiPage findByUUID_G(String uuid, long groupId)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByUUID_G(uuid, groupId);
 
 		if (wikiPage == null) {
@@ -1212,26 +1170,24 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByUUID_G(
-		String uuid, long groupId, boolean retrieveFromCache) {
-
+	public WikiPage fetchByUUID_G(String uuid, long groupId,
+		boolean retrieveFromCache) {
 		uuid = Objects.toString(uuid, "");
 
-		Object[] finderArgs = new Object[] {uuid, groupId};
+		Object[] finderArgs = new Object[] { uuid, groupId };
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByUUID_G,
+					finderArgs, this);
 		}
 
 		if (result instanceof WikiPage) {
 			WikiPage wikiPage = (WikiPage)result;
 
 			if (!Objects.equals(uuid, wikiPage.getUuid()) ||
-				(groupId != wikiPage.getGroupId())) {
-
+					(groupId != wikiPage.getGroupId())) {
 				result = null;
 			}
 		}
@@ -1274,8 +1230,8 @@ public class WikiPagePersistenceImpl
 				List<WikiPage> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByUUID_G, finderArgs, list);
+					finderCache.putResult(_finderPathFetchByUUID_G, finderArgs,
+						list);
 				}
 				else {
 					WikiPage wikiPage = list.get(0);
@@ -1313,7 +1269,6 @@ public class WikiPagePersistenceImpl
 	@Override
 	public WikiPage removeByUUID_G(String uuid, long groupId)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByUUID_G(uuid, groupId);
 
 		return remove(wikiPage);
@@ -1332,7 +1287,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByUUID_G;
 
-		Object[] finderArgs = new Object[] {uuid, groupId};
+		Object[] finderArgs = new Object[] { uuid, groupId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1388,15 +1343,9 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_G_UUID_2 =
-		"wikiPage.uuid = ? AND ";
-
-	private static final String _FINDER_COLUMN_UUID_G_UUID_3 =
-		"(wikiPage.uuid IS NULL OR wikiPage.uuid = '') AND ";
-
-	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 =
-		"wikiPage.groupId = ?";
-
+	private static final String _FINDER_COLUMN_UUID_G_UUID_2 = "wikiPage.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(wikiPage.uuid IS NULL OR wikiPage.uuid = '') AND ";
+	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "wikiPage.groupId = ?";
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
 	private FinderPath _finderPathCountByUuid_C;
@@ -1410,15 +1359,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByUuid_C(String uuid, long companyId) {
-		return findByUuid_C(
-			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1428,9 +1377,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByUuid_C(
-		String uuid, long companyId, int start, int end) {
-
+	public List<WikiPage> findByUuid_C(String uuid, long companyId, int start,
+		int end) {
 		return findByUuid_C(uuid, companyId, start, end, null);
 	}
 
@@ -1438,7 +1386,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1449,19 +1397,16 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByUuid_C(
-			uuid, companyId, start, end, orderByComparator, true);
+	public List<WikiPage> findByUuid_C(String uuid, long companyId, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByUuid_C(uuid, companyId, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1473,11 +1418,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByUuid_C(String uuid, long companyId, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -1485,30 +1428,30 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid_C;
-			finderArgs = new Object[] {uuid, companyId};
+			finderArgs = new Object[] { uuid, companyId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
-				uuid, companyId, start, end, orderByComparator
-			};
+					uuid, companyId,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if (!uuid.equals(wikiPage.getUuid()) ||
-						(companyId != wikiPage.getCompanyId())) {
-
+							(companyId != wikiPage.getCompanyId())) {
 						list = null;
 
 						break;
@@ -1521,8 +1464,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1544,10 +1487,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1569,16 +1513,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -1608,13 +1552,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByUuid_C_First(
-			String uuid, long companyId,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByUuid_C_First(String uuid, long companyId,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByUuid_C_First(
-			uuid, companyId, orderByComparator);
+		WikiPage wikiPage = fetchByUuid_C_First(uuid, companyId,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -1644,12 +1586,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByUuid_C_First(
-		String uuid, long companyId,
+	public WikiPage fetchByUuid_C_First(String uuid, long companyId,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByUuid_C(
-			uuid, companyId, 0, 1, orderByComparator);
+		List<WikiPage> list = findByUuid_C(uuid, companyId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1668,13 +1608,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByUuid_C_Last(
-			String uuid, long companyId,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByUuid_C_Last(
-			uuid, companyId, orderByComparator);
+		WikiPage wikiPage = fetchByUuid_C_Last(uuid, companyId,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -1704,18 +1642,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByUuid_C_Last(
-		String uuid, long companyId,
+	public WikiPage fetchByUuid_C_Last(String uuid, long companyId,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByUuid_C(uuid, companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByUuid_C(
-			uuid, companyId, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByUuid_C(uuid, companyId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1735,11 +1671,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByUuid_C_PrevAndNext(
-			long pageId, String uuid, long companyId,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByUuid_C_PrevAndNext(long pageId, String uuid,
+		long companyId, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		uuid = Objects.toString(uuid, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -1751,13 +1685,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByUuid_C_PrevAndNext(
-				session, wikiPage, uuid, companyId, orderByComparator, true);
+			array[0] = getByUuid_C_PrevAndNext(session, wikiPage, uuid,
+					companyId, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByUuid_C_PrevAndNext(
-				session, wikiPage, uuid, companyId, orderByComparator, false);
+			array[2] = getByUuid_C_PrevAndNext(session, wikiPage, uuid,
+					companyId, orderByComparator, false);
 
 			return array;
 		}
@@ -1769,15 +1703,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByUuid_C_PrevAndNext(
-		Session session, WikiPage wikiPage, String uuid, long companyId,
+	protected WikiPage getByUuid_C_PrevAndNext(Session session,
+		WikiPage wikiPage, String uuid, long companyId,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1800,8 +1733,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1875,9 +1807,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1900,11 +1831,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByUuid_C(String uuid, long companyId) {
-		for (WikiPage wikiPage :
-				findByUuid_C(
-					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (WikiPage wikiPage : findByUuid_C(uuid, companyId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -1922,7 +1850,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByUuid_C;
 
-		Object[] finderArgs = new Object[] {uuid, companyId};
+		Object[] finderArgs = new Object[] { uuid, companyId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1978,15 +1906,9 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
-		"wikiPage.uuid = ? AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
-		"(wikiPage.uuid IS NULL OR wikiPage.uuid = '') AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
-		"wikiPage.companyId = ?";
-
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "wikiPage.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(wikiPage.uuid IS NULL OR wikiPage.uuid = '') AND ";
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "wikiPage.companyId = ?";
 	private FinderPath _finderPathWithPaginationFindByNodeId;
 	private FinderPath _finderPathWithoutPaginationFindByNodeId;
 	private FinderPath _finderPathCountByNodeId;
@@ -2006,7 +1928,7 @@ public class WikiPagePersistenceImpl
 	 * Returns a range of all the wiki pages where nodeId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -2023,7 +1945,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -2033,10 +1955,8 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByNodeId(
-		long nodeId, int start, int end,
+	public List<WikiPage> findByNodeId(long nodeId, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		return findByNodeId(nodeId, start, end, orderByComparator, true);
 	}
 
@@ -2044,7 +1964,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -2055,32 +1975,28 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByNodeId(
-		long nodeId, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByNodeId(long nodeId, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByNodeId;
-			finderArgs = new Object[] {nodeId};
+			finderArgs = new Object[] { nodeId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByNodeId;
-			finderArgs = new Object[] {nodeId, start, end, orderByComparator};
+			finderArgs = new Object[] { nodeId, start, end, orderByComparator };
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
@@ -2097,8 +2013,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -2109,10 +2025,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_NODEID_NODEID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2130,16 +2047,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(nodeId);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -2168,10 +2085,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByNodeId_First(
-			long nodeId, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByNodeId_First(long nodeId,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByNodeId_First(nodeId, orderByComparator);
 
 		if (wikiPage != null) {
@@ -2198,9 +2114,8 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByNodeId_First(
-		long nodeId, OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByNodeId_First(long nodeId,
+		OrderByComparator<WikiPage> orderByComparator) {
 		List<WikiPage> list = findByNodeId(nodeId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -2219,10 +2134,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByNodeId_Last(
-			long nodeId, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByNodeId_Last(long nodeId,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByNodeId_Last(nodeId, orderByComparator);
 
 		if (wikiPage != null) {
@@ -2249,17 +2163,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByNodeId_Last(
-		long nodeId, OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByNodeId_Last(long nodeId,
+		OrderByComparator<WikiPage> orderByComparator) {
 		int count = countByNodeId(nodeId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByNodeId(
-			nodeId, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByNodeId(nodeId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2278,11 +2191,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByNodeId_PrevAndNext(
-			long pageId, long nodeId,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByNodeId_PrevAndNext(long pageId, long nodeId,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -2292,13 +2203,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByNodeId_PrevAndNext(
-				session, wikiPage, nodeId, orderByComparator, true);
+			array[0] = getByNodeId_PrevAndNext(session, wikiPage, nodeId,
+					orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByNodeId_PrevAndNext(
-				session, wikiPage, nodeId, orderByComparator, false);
+			array[2] = getByNodeId_PrevAndNext(session, wikiPage, nodeId,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -2310,15 +2221,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByNodeId_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId,
+	protected WikiPage getByNodeId_PrevAndNext(Session session,
+		WikiPage wikiPage, long nodeId,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2330,8 +2240,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_NODEID_NODEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2401,9 +2310,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(nodeId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2425,10 +2333,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByNodeId(long nodeId) {
-		for (WikiPage wikiPage :
-				findByNodeId(
-					nodeId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByNodeId(nodeId, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -2443,7 +2349,7 @@ public class WikiPagePersistenceImpl
 	public int countByNodeId(long nodeId) {
 		FinderPath finderPath = _finderPathCountByNodeId;
 
-		Object[] finderArgs = new Object[] {nodeId};
+		Object[] finderArgs = new Object[] { nodeId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2484,9 +2390,7 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_NODEID_NODEID_2 =
-		"wikiPage.nodeId = ?";
-
+	private static final String _FINDER_COLUMN_NODEID_NODEID_2 = "wikiPage.nodeId = ?";
 	private FinderPath _finderPathWithPaginationFindByFormat;
 	private FinderPath _finderPathWithoutPaginationFindByFormat;
 	private FinderPath _finderPathCountByFormat;
@@ -2506,7 +2410,7 @@ public class WikiPagePersistenceImpl
 	 * Returns a range of all the wiki pages where format = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param format the format
@@ -2523,7 +2427,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where format = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param format the format
@@ -2533,10 +2437,8 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByFormat(
-		String format, int start, int end,
+	public List<WikiPage> findByFormat(String format, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		return findByFormat(format, start, end, orderByComparator, true);
 	}
 
@@ -2544,7 +2446,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where format = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param format the format
@@ -2555,11 +2457,8 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByFormat(
-		String format, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByFormat(String format, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		format = Objects.toString(format, "");
 
 		boolean pagination = true;
@@ -2567,22 +2466,21 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByFormat;
-			finderArgs = new Object[] {format};
+			finderArgs = new Object[] { format };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByFormat;
-			finderArgs = new Object[] {format, start, end, orderByComparator};
+			finderArgs = new Object[] { format, start, end, orderByComparator };
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
@@ -2599,8 +2497,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -2620,10 +2518,11 @@ public class WikiPagePersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2643,16 +2542,16 @@ public class WikiPagePersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -2681,10 +2580,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByFormat_First(
-			String format, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByFormat_First(String format,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByFormat_First(format, orderByComparator);
 
 		if (wikiPage != null) {
@@ -2711,9 +2609,8 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByFormat_First(
-		String format, OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByFormat_First(String format,
+		OrderByComparator<WikiPage> orderByComparator) {
 		List<WikiPage> list = findByFormat(format, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -2732,10 +2629,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByFormat_Last(
-			String format, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByFormat_Last(String format,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByFormat_Last(format, orderByComparator);
 
 		if (wikiPage != null) {
@@ -2762,17 +2658,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByFormat_Last(
-		String format, OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByFormat_Last(String format,
+		OrderByComparator<WikiPage> orderByComparator) {
 		int count = countByFormat(format);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByFormat(
-			format, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByFormat(format, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2791,11 +2686,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByFormat_PrevAndNext(
-			long pageId, String format,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByFormat_PrevAndNext(long pageId, String format,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		format = Objects.toString(format, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -2807,13 +2700,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByFormat_PrevAndNext(
-				session, wikiPage, format, orderByComparator, true);
+			array[0] = getByFormat_PrevAndNext(session, wikiPage, format,
+					orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByFormat_PrevAndNext(
-				session, wikiPage, format, orderByComparator, false);
+			array[2] = getByFormat_PrevAndNext(session, wikiPage, format,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -2825,15 +2718,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByFormat_PrevAndNext(
-		Session session, WikiPage wikiPage, String format,
+	protected WikiPage getByFormat_PrevAndNext(Session session,
+		WikiPage wikiPage, String format,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2854,8 +2746,7 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2927,9 +2818,8 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2951,10 +2841,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByFormat(String format) {
-		for (WikiPage wikiPage :
-				findByFormat(
-					format, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByFormat(format, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -2971,7 +2859,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByFormat;
 
-		Object[] finderArgs = new Object[] {format};
+		Object[] finderArgs = new Object[] { format };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -3023,12 +2911,8 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_FORMAT_FORMAT_2 =
-		"wikiPage.format = ?";
-
-	private static final String _FINDER_COLUMN_FORMAT_FORMAT_3 =
-		"(wikiPage.format IS NULL OR wikiPage.format = '')";
-
+	private static final String _FINDER_COLUMN_FORMAT_FORMAT_2 = "wikiPage.format = ?";
+	private static final String _FINDER_COLUMN_FORMAT_FORMAT_3 = "(wikiPage.format IS NULL OR wikiPage.format = '')";
 	private FinderPath _finderPathWithPaginationFindByR_N;
 	private FinderPath _finderPathWithoutPaginationFindByR_N;
 	private FinderPath _finderPathCountByR_N;
@@ -3042,16 +2926,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByR_N(long resourcePrimKey, long nodeId) {
-		return findByR_N(
-			resourcePrimKey, nodeId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByR_N(resourcePrimKey, nodeId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where resourcePrimKey = &#63; and nodeId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -3061,9 +2944,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_N(
-		long resourcePrimKey, long nodeId, int start, int end) {
-
+	public List<WikiPage> findByR_N(long resourcePrimKey, long nodeId,
+		int start, int end) {
 		return findByR_N(resourcePrimKey, nodeId, start, end, null);
 	}
 
@@ -3071,7 +2953,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where resourcePrimKey = &#63; and nodeId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -3082,19 +2964,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_N(
-		long resourcePrimKey, long nodeId, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByR_N(
-			resourcePrimKey, nodeId, start, end, orderByComparator, true);
+	public List<WikiPage> findByR_N(long resourcePrimKey, long nodeId,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByR_N(resourcePrimKey, nodeId, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where resourcePrimKey = &#63; and nodeId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -3106,40 +2986,38 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_N(
-		long resourcePrimKey, long nodeId, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByR_N(long resourcePrimKey, long nodeId,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByR_N;
-			finderArgs = new Object[] {resourcePrimKey, nodeId};
+			finderArgs = new Object[] { resourcePrimKey, nodeId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByR_N;
 			finderArgs = new Object[] {
-				resourcePrimKey, nodeId, start, end, orderByComparator
-			};
+					resourcePrimKey, nodeId,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((resourcePrimKey != wikiPage.getResourcePrimKey()) ||
-						(nodeId != wikiPage.getNodeId())) {
-
+							(nodeId != wikiPage.getNodeId())) {
 						list = null;
 
 						break;
@@ -3152,8 +3030,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -3166,10 +3044,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_R_N_NODEID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3189,16 +3068,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(nodeId);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -3228,13 +3107,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByR_N_First(
-			long resourcePrimKey, long nodeId,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByR_N_First(long resourcePrimKey, long nodeId,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByR_N_First(
-			resourcePrimKey, nodeId, orderByComparator);
+		WikiPage wikiPage = fetchByR_N_First(resourcePrimKey, nodeId,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -3264,12 +3141,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByR_N_First(
-		long resourcePrimKey, long nodeId,
+	public WikiPage fetchByR_N_First(long resourcePrimKey, long nodeId,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByR_N(
-			resourcePrimKey, nodeId, 0, 1, orderByComparator);
+		List<WikiPage> list = findByR_N(resourcePrimKey, nodeId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3288,13 +3163,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByR_N_Last(
-			long resourcePrimKey, long nodeId,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByR_N_Last(long resourcePrimKey, long nodeId,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByR_N_Last(
-			resourcePrimKey, nodeId, orderByComparator);
+		WikiPage wikiPage = fetchByR_N_Last(resourcePrimKey, nodeId,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -3324,18 +3197,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByR_N_Last(
-		long resourcePrimKey, long nodeId,
+	public WikiPage fetchByR_N_Last(long resourcePrimKey, long nodeId,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByR_N(resourcePrimKey, nodeId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByR_N(
-			resourcePrimKey, nodeId, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByR_N(resourcePrimKey, nodeId, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3355,11 +3226,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByR_N_PrevAndNext(
-			long pageId, long resourcePrimKey, long nodeId,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByR_N_PrevAndNext(long pageId, long resourcePrimKey,
+		long nodeId, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -3369,15 +3238,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByR_N_PrevAndNext(
-				session, wikiPage, resourcePrimKey, nodeId, orderByComparator,
-				true);
+			array[0] = getByR_N_PrevAndNext(session, wikiPage, resourcePrimKey,
+					nodeId, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByR_N_PrevAndNext(
-				session, wikiPage, resourcePrimKey, nodeId, orderByComparator,
-				false);
+			array[2] = getByR_N_PrevAndNext(session, wikiPage, resourcePrimKey,
+					nodeId, orderByComparator, false);
 
 			return array;
 		}
@@ -3389,15 +3256,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByR_N_PrevAndNext(
-		Session session, WikiPage wikiPage, long resourcePrimKey, long nodeId,
+	protected WikiPage getByR_N_PrevAndNext(Session session, WikiPage wikiPage,
+		long resourcePrimKey, long nodeId,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3411,8 +3277,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_R_N_NODEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3484,9 +3349,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(nodeId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3509,11 +3373,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByR_N(long resourcePrimKey, long nodeId) {
-		for (WikiPage wikiPage :
-				findByR_N(
-					resourcePrimKey, nodeId, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByR_N(resourcePrimKey, nodeId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -3529,7 +3390,7 @@ public class WikiPagePersistenceImpl
 	public int countByR_N(long resourcePrimKey, long nodeId) {
 		FinderPath finderPath = _finderPathCountByR_N;
 
-		Object[] finderArgs = new Object[] {resourcePrimKey, nodeId};
+		Object[] finderArgs = new Object[] { resourcePrimKey, nodeId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -3574,12 +3435,8 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_R_N_RESOURCEPRIMKEY_2 =
-		"wikiPage.resourcePrimKey = ? AND ";
-
-	private static final String _FINDER_COLUMN_R_N_NODEID_2 =
-		"wikiPage.nodeId = ?";
-
+	private static final String _FINDER_COLUMN_R_N_RESOURCEPRIMKEY_2 = "wikiPage.resourcePrimKey = ? AND ";
+	private static final String _FINDER_COLUMN_R_N_NODEID_2 = "wikiPage.nodeId = ?";
 	private FinderPath _finderPathWithPaginationFindByR_S;
 	private FinderPath _finderPathWithoutPaginationFindByR_S;
 	private FinderPath _finderPathCountByR_S;
@@ -3593,16 +3450,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByR_S(long resourcePrimKey, int status) {
-		return findByR_S(
-			resourcePrimKey, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByR_S(resourcePrimKey, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where resourcePrimKey = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -3612,9 +3468,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_S(
-		long resourcePrimKey, int status, int start, int end) {
-
+	public List<WikiPage> findByR_S(long resourcePrimKey, int status,
+		int start, int end) {
 		return findByR_S(resourcePrimKey, status, start, end, null);
 	}
 
@@ -3622,7 +3477,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where resourcePrimKey = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -3633,19 +3488,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_S(
-		long resourcePrimKey, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByR_S(
-			resourcePrimKey, status, start, end, orderByComparator, true);
+	public List<WikiPage> findByR_S(long resourcePrimKey, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByR_S(resourcePrimKey, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where resourcePrimKey = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -3657,40 +3510,38 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_S(
-		long resourcePrimKey, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByR_S(long resourcePrimKey, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByR_S;
-			finderArgs = new Object[] {resourcePrimKey, status};
+			finderArgs = new Object[] { resourcePrimKey, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByR_S;
 			finderArgs = new Object[] {
-				resourcePrimKey, status, start, end, orderByComparator
-			};
+					resourcePrimKey, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((resourcePrimKey != wikiPage.getResourcePrimKey()) ||
-						(status != wikiPage.getStatus())) {
-
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -3703,8 +3554,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -3717,10 +3568,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_R_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3740,16 +3592,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -3779,13 +3631,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByR_S_First(
-			long resourcePrimKey, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByR_S_First(long resourcePrimKey, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByR_S_First(
-			resourcePrimKey, status, orderByComparator);
+		WikiPage wikiPage = fetchByR_S_First(resourcePrimKey, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -3815,12 +3665,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByR_S_First(
-		long resourcePrimKey, int status,
+	public WikiPage fetchByR_S_First(long resourcePrimKey, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByR_S(
-			resourcePrimKey, status, 0, 1, orderByComparator);
+		List<WikiPage> list = findByR_S(resourcePrimKey, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3839,13 +3687,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByR_S_Last(
-			long resourcePrimKey, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByR_S_Last(long resourcePrimKey, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByR_S_Last(
-			resourcePrimKey, status, orderByComparator);
+		WikiPage wikiPage = fetchByR_S_Last(resourcePrimKey, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -3875,18 +3721,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByR_S_Last(
-		long resourcePrimKey, int status,
+	public WikiPage fetchByR_S_Last(long resourcePrimKey, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByR_S(resourcePrimKey, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByR_S(
-			resourcePrimKey, status, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByR_S(resourcePrimKey, status, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3906,11 +3750,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByR_S_PrevAndNext(
-			long pageId, long resourcePrimKey, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByR_S_PrevAndNext(long pageId, long resourcePrimKey,
+		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -3920,15 +3762,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByR_S_PrevAndNext(
-				session, wikiPage, resourcePrimKey, status, orderByComparator,
-				true);
+			array[0] = getByR_S_PrevAndNext(session, wikiPage, resourcePrimKey,
+					status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByR_S_PrevAndNext(
-				session, wikiPage, resourcePrimKey, status, orderByComparator,
-				false);
+			array[2] = getByR_S_PrevAndNext(session, wikiPage, resourcePrimKey,
+					status, orderByComparator, false);
 
 			return array;
 		}
@@ -3940,15 +3780,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByR_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long resourcePrimKey, int status,
+	protected WikiPage getByR_S_PrevAndNext(Session session, WikiPage wikiPage,
+		long resourcePrimKey, int status,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3962,8 +3801,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_R_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -4035,9 +3873,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4060,11 +3897,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByR_S(long resourcePrimKey, int status) {
-		for (WikiPage wikiPage :
-				findByR_S(
-					resourcePrimKey, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByR_S(resourcePrimKey, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -4080,7 +3914,7 @@ public class WikiPagePersistenceImpl
 	public int countByR_S(long resourcePrimKey, int status) {
 		FinderPath finderPath = _finderPathCountByR_S;
 
-		Object[] finderArgs = new Object[] {resourcePrimKey, status};
+		Object[] finderArgs = new Object[] { resourcePrimKey, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -4125,12 +3959,8 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_R_S_RESOURCEPRIMKEY_2 =
-		"wikiPage.resourcePrimKey = ? AND ";
-
-	private static final String _FINDER_COLUMN_R_S_STATUS_2 =
-		"wikiPage.status = ?";
-
+	private static final String _FINDER_COLUMN_R_S_RESOURCEPRIMKEY_2 = "wikiPage.resourcePrimKey = ? AND ";
+	private static final String _FINDER_COLUMN_R_S_STATUS_2 = "wikiPage.status = ?";
 	private FinderPath _finderPathWithPaginationFindByN_T;
 	private FinderPath _finderPathWithoutPaginationFindByN_T;
 	private FinderPath _finderPathCountByN_T;
@@ -4144,15 +3974,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByN_T(long nodeId, String title) {
-		return findByN_T(
-			nodeId, title, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByN_T(nodeId, title, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and title = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -4162,9 +3992,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_T(
-		long nodeId, String title, int start, int end) {
-
+	public List<WikiPage> findByN_T(long nodeId, String title, int start,
+		int end) {
 		return findByN_T(nodeId, title, start, end, null);
 	}
 
@@ -4172,7 +4001,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and title = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -4183,10 +4012,8 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_T(
-		long nodeId, String title, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
+	public List<WikiPage> findByN_T(long nodeId, String title, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator) {
 		return findByN_T(nodeId, title, start, end, orderByComparator, true);
 	}
 
@@ -4194,7 +4021,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and title = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -4206,11 +4033,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_T(
-		long nodeId, String title, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByN_T(long nodeId, String title, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		title = Objects.toString(title, "");
 
 		boolean pagination = true;
@@ -4218,30 +4043,30 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_T;
-			finderArgs = new Object[] {nodeId, title};
+			finderArgs = new Object[] { nodeId, title };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_T;
 			finderArgs = new Object[] {
-				nodeId, title, start, end, orderByComparator
-			};
+					nodeId, title,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						!title.equals(wikiPage.getTitle())) {
-
+							!title.equals(wikiPage.getTitle())) {
 						list = null;
 
 						break;
@@ -4254,8 +4079,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -4277,10 +4102,11 @@ public class WikiPagePersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4302,16 +4128,16 @@ public class WikiPagePersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -4341,11 +4167,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_T_First(
-			long nodeId, String title,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_T_First(long nodeId, String title,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByN_T_First(nodeId, title, orderByComparator);
 
 		if (wikiPage != null) {
@@ -4376,10 +4200,8 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_T_First(
-		long nodeId, String title,
+	public WikiPage fetchByN_T_First(long nodeId, String title,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		List<WikiPage> list = findByN_T(nodeId, title, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -4399,11 +4221,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_T_Last(
-			long nodeId, String title,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_T_Last(long nodeId, String title,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByN_T_Last(nodeId, title, orderByComparator);
 
 		if (wikiPage != null) {
@@ -4434,18 +4254,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_T_Last(
-		long nodeId, String title,
+	public WikiPage fetchByN_T_Last(long nodeId, String title,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_T(nodeId, title);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_T(
-			nodeId, title, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByN_T(nodeId, title, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -4465,11 +4283,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_T_PrevAndNext(
-			long pageId, long nodeId, String title,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_T_PrevAndNext(long pageId, long nodeId,
+		String title, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		title = Objects.toString(title, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -4481,13 +4297,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_T_PrevAndNext(
-				session, wikiPage, nodeId, title, orderByComparator, true);
+			array[0] = getByN_T_PrevAndNext(session, wikiPage, nodeId, title,
+					orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_T_PrevAndNext(
-				session, wikiPage, nodeId, title, orderByComparator, false);
+			array[2] = getByN_T_PrevAndNext(session, wikiPage, nodeId, title,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -4499,15 +4315,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_T_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, String title,
+	protected WikiPage getByN_T_PrevAndNext(Session session, WikiPage wikiPage,
+		long nodeId, String title,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -4530,8 +4345,7 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -4605,9 +4419,8 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4630,11 +4443,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByN_T(long nodeId, String title) {
-		for (WikiPage wikiPage :
-				findByN_T(
-					nodeId, title, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (WikiPage wikiPage : findByN_T(nodeId, title, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -4652,7 +4462,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByN_T;
 
-		Object[] finderArgs = new Object[] {nodeId, title};
+		Object[] finderArgs = new Object[] { nodeId, title };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -4708,15 +4518,9 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_T_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_T_TITLE_2 =
-		"lower(wikiPage.title) = ?";
-
-	private static final String _FINDER_COLUMN_N_T_TITLE_3 =
-		"(wikiPage.title IS NULL OR wikiPage.title = '')";
-
+	private static final String _FINDER_COLUMN_N_T_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_T_TITLE_2 = "lower(wikiPage.title) = ?";
+	private static final String _FINDER_COLUMN_N_T_TITLE_3 = "(wikiPage.title IS NULL OR wikiPage.title = '')";
 	private FinderPath _finderPathWithPaginationFindByN_H;
 	private FinderPath _finderPathWithoutPaginationFindByN_H;
 	private FinderPath _finderPathCountByN_H;
@@ -4730,15 +4534,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByN_H(long nodeId, boolean head) {
-		return findByN_H(
-			nodeId, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByN_H(nodeId, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -4748,9 +4552,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H(
-		long nodeId, boolean head, int start, int end) {
-
+	public List<WikiPage> findByN_H(long nodeId, boolean head, int start,
+		int end) {
 		return findByN_H(nodeId, head, start, end, null);
 	}
 
@@ -4758,7 +4561,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -4769,10 +4572,8 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H(
-		long nodeId, boolean head, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
+	public List<WikiPage> findByN_H(long nodeId, boolean head, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator) {
 		return findByN_H(nodeId, head, start, end, orderByComparator, true);
 	}
 
@@ -4780,7 +4581,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -4792,40 +4593,38 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H(
-		long nodeId, boolean head, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByN_H(long nodeId, boolean head, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_H;
-			finderArgs = new Object[] {nodeId, head};
+			finderArgs = new Object[] { nodeId, head };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_H;
 			finderArgs = new Object[] {
-				nodeId, head, start, end, orderByComparator
-			};
+					nodeId, head,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead())) {
-
+							(head != wikiPage.isHead())) {
 						list = null;
 
 						break;
@@ -4838,8 +4637,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -4852,10 +4651,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_N_H_HEAD_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4875,16 +4675,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(head);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -4914,11 +4714,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_First(
-			long nodeId, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_First(long nodeId, boolean head,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByN_H_First(nodeId, head, orderByComparator);
 
 		if (wikiPage != null) {
@@ -4949,10 +4747,8 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_First(
-		long nodeId, boolean head,
+	public WikiPage fetchByN_H_First(long nodeId, boolean head,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		List<WikiPage> list = findByN_H(nodeId, head, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -4972,11 +4768,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_Last(
-			long nodeId, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_Last(long nodeId, boolean head,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByN_H_Last(nodeId, head, orderByComparator);
 
 		if (wikiPage != null) {
@@ -5007,18 +4801,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_Last(
-		long nodeId, boolean head,
+	public WikiPage fetchByN_H_Last(long nodeId, boolean head,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_H(nodeId, head);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_H(
-			nodeId, head, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByN_H(nodeId, head, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5038,11 +4830,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_H_PrevAndNext(
-			long pageId, long nodeId, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_H_PrevAndNext(long pageId, long nodeId,
+		boolean head, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -5052,13 +4842,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_H_PrevAndNext(
-				session, wikiPage, nodeId, head, orderByComparator, true);
+			array[0] = getByN_H_PrevAndNext(session, wikiPage, nodeId, head,
+					orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_H_PrevAndNext(
-				session, wikiPage, nodeId, head, orderByComparator, false);
+			array[2] = getByN_H_PrevAndNext(session, wikiPage, nodeId, head,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -5070,15 +4860,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_H_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, boolean head,
+	protected WikiPage getByN_H_PrevAndNext(Session session, WikiPage wikiPage,
+		long nodeId, boolean head,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -5092,8 +4881,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_N_H_HEAD_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -5165,9 +4953,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(head);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -5190,10 +4977,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByN_H(long nodeId, boolean head) {
-		for (WikiPage wikiPage :
-				findByN_H(
-					nodeId, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByN_H(nodeId, head, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -5209,7 +4994,7 @@ public class WikiPagePersistenceImpl
 	public int countByN_H(long nodeId, boolean head) {
 		FinderPath finderPath = _finderPathCountByN_H;
 
-		Object[] finderArgs = new Object[] {nodeId, head};
+		Object[] finderArgs = new Object[] { nodeId, head };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -5254,11 +5039,8 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_H_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
+	private static final String _FINDER_COLUMN_N_H_NODEID_2 = "wikiPage.nodeId = ? AND ";
 	private static final String _FINDER_COLUMN_N_H_HEAD_2 = "wikiPage.head = ?";
-
 	private FinderPath _finderPathWithPaginationFindByN_P;
 	private FinderPath _finderPathWithoutPaginationFindByN_P;
 	private FinderPath _finderPathCountByN_P;
@@ -5272,15 +5054,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByN_P(long nodeId, String parentTitle) {
-		return findByN_P(
-			nodeId, parentTitle, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByN_P(nodeId, parentTitle, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and parentTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -5290,9 +5072,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_P(
-		long nodeId, String parentTitle, int start, int end) {
-
+	public List<WikiPage> findByN_P(long nodeId, String parentTitle, int start,
+		int end) {
 		return findByN_P(nodeId, parentTitle, start, end, null);
 	}
 
@@ -5300,7 +5081,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and parentTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -5311,19 +5092,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_P(
-		long nodeId, String parentTitle, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_P(
-			nodeId, parentTitle, start, end, orderByComparator, true);
+	public List<WikiPage> findByN_P(long nodeId, String parentTitle, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByN_P(nodeId, parentTitle, start, end, orderByComparator,
+			true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and parentTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -5335,11 +5114,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_P(
-		long nodeId, String parentTitle, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByN_P(long nodeId, String parentTitle, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		parentTitle = Objects.toString(parentTitle, "");
 
 		boolean pagination = true;
@@ -5347,30 +5124,30 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_P;
-			finderArgs = new Object[] {nodeId, parentTitle};
+			finderArgs = new Object[] { nodeId, parentTitle };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_P;
 			finderArgs = new Object[] {
-				nodeId, parentTitle, start, end, orderByComparator
-			};
+					nodeId, parentTitle,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						!parentTitle.equals(wikiPage.getParentTitle())) {
-
+							!parentTitle.equals(wikiPage.getParentTitle())) {
 						list = null;
 
 						break;
@@ -5383,8 +5160,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -5406,10 +5183,11 @@ public class WikiPagePersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -5431,16 +5209,16 @@ public class WikiPagePersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -5470,13 +5248,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_P_First(
-			long nodeId, String parentTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_P_First(long nodeId, String parentTitle,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_P_First(
-			nodeId, parentTitle, orderByComparator);
+		WikiPage wikiPage = fetchByN_P_First(nodeId, parentTitle,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -5506,12 +5282,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_P_First(
-		long nodeId, String parentTitle,
+	public WikiPage fetchByN_P_First(long nodeId, String parentTitle,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_P(
-			nodeId, parentTitle, 0, 1, orderByComparator);
+		List<WikiPage> list = findByN_P(nodeId, parentTitle, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5530,13 +5304,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_P_Last(
-			long nodeId, String parentTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_P_Last(long nodeId, String parentTitle,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_P_Last(
-			nodeId, parentTitle, orderByComparator);
+		WikiPage wikiPage = fetchByN_P_Last(nodeId, parentTitle,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -5566,18 +5338,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_P_Last(
-		long nodeId, String parentTitle,
+	public WikiPage fetchByN_P_Last(long nodeId, String parentTitle,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_P(nodeId, parentTitle);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_P(
-			nodeId, parentTitle, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByN_P(nodeId, parentTitle, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5597,11 +5367,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_P_PrevAndNext(
-			long pageId, long nodeId, String parentTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_P_PrevAndNext(long pageId, long nodeId,
+		String parentTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		parentTitle = Objects.toString(parentTitle, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -5613,15 +5381,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_P_PrevAndNext(
-				session, wikiPage, nodeId, parentTitle, orderByComparator,
-				true);
+			array[0] = getByN_P_PrevAndNext(session, wikiPage, nodeId,
+					parentTitle, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_P_PrevAndNext(
-				session, wikiPage, nodeId, parentTitle, orderByComparator,
-				false);
+			array[2] = getByN_P_PrevAndNext(session, wikiPage, nodeId,
+					parentTitle, orderByComparator, false);
 
 			return array;
 		}
@@ -5633,15 +5399,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_P_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, String parentTitle,
+	protected WikiPage getByN_P_PrevAndNext(Session session, WikiPage wikiPage,
+		long nodeId, String parentTitle,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -5664,8 +5429,7 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -5739,9 +5503,8 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -5764,11 +5527,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByN_P(long nodeId, String parentTitle) {
-		for (WikiPage wikiPage :
-				findByN_P(
-					nodeId, parentTitle, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (WikiPage wikiPage : findByN_P(nodeId, parentTitle,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -5786,7 +5546,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByN_P;
 
-		Object[] finderArgs = new Object[] {nodeId, parentTitle};
+		Object[] finderArgs = new Object[] { nodeId, parentTitle };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -5842,15 +5602,9 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_P_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_P_PARENTTITLE_2 =
-		"lower(wikiPage.parentTitle) = ?";
-
-	private static final String _FINDER_COLUMN_N_P_PARENTTITLE_3 =
-		"(wikiPage.parentTitle IS NULL OR wikiPage.parentTitle = '')";
-
+	private static final String _FINDER_COLUMN_N_P_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_P_PARENTTITLE_2 = "lower(wikiPage.parentTitle) = ?";
+	private static final String _FINDER_COLUMN_N_P_PARENTTITLE_3 = "(wikiPage.parentTitle IS NULL OR wikiPage.parentTitle = '')";
 	private FinderPath _finderPathWithPaginationFindByN_R;
 	private FinderPath _finderPathWithoutPaginationFindByN_R;
 	private FinderPath _finderPathCountByN_R;
@@ -5864,15 +5618,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByN_R(long nodeId, String redirectTitle) {
-		return findByN_R(
-			nodeId, redirectTitle, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByN_R(nodeId, redirectTitle, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and redirectTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -5882,9 +5636,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_R(
-		long nodeId, String redirectTitle, int start, int end) {
-
+	public List<WikiPage> findByN_R(long nodeId, String redirectTitle,
+		int start, int end) {
 		return findByN_R(nodeId, redirectTitle, start, end, null);
 	}
 
@@ -5892,7 +5645,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and redirectTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -5903,19 +5656,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_R(
-		long nodeId, String redirectTitle, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_R(
-			nodeId, redirectTitle, start, end, orderByComparator, true);
+	public List<WikiPage> findByN_R(long nodeId, String redirectTitle,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByN_R(nodeId, redirectTitle, start, end, orderByComparator,
+			true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and redirectTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -5927,11 +5678,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_R(
-		long nodeId, String redirectTitle, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByN_R(long nodeId, String redirectTitle,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		redirectTitle = Objects.toString(redirectTitle, "");
 
 		boolean pagination = true;
@@ -5939,30 +5688,30 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_R;
-			finderArgs = new Object[] {nodeId, redirectTitle};
+			finderArgs = new Object[] { nodeId, redirectTitle };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_R;
 			finderArgs = new Object[] {
-				nodeId, redirectTitle, start, end, orderByComparator
-			};
+					nodeId, redirectTitle,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						!redirectTitle.equals(wikiPage.getRedirectTitle())) {
-
+							!redirectTitle.equals(wikiPage.getRedirectTitle())) {
 						list = null;
 
 						break;
@@ -5975,8 +5724,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -5998,10 +5747,11 @@ public class WikiPagePersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6023,16 +5773,16 @@ public class WikiPagePersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -6062,13 +5812,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_R_First(
-			long nodeId, String redirectTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_R_First(long nodeId, String redirectTitle,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_R_First(
-			nodeId, redirectTitle, orderByComparator);
+		WikiPage wikiPage = fetchByN_R_First(nodeId, redirectTitle,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -6098,12 +5846,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_R_First(
-		long nodeId, String redirectTitle,
+	public WikiPage fetchByN_R_First(long nodeId, String redirectTitle,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_R(
-			nodeId, redirectTitle, 0, 1, orderByComparator);
+		List<WikiPage> list = findByN_R(nodeId, redirectTitle, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6122,13 +5868,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_R_Last(
-			long nodeId, String redirectTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_R_Last(long nodeId, String redirectTitle,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_R_Last(
-			nodeId, redirectTitle, orderByComparator);
+		WikiPage wikiPage = fetchByN_R_Last(nodeId, redirectTitle,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -6158,18 +5902,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_R_Last(
-		long nodeId, String redirectTitle,
+	public WikiPage fetchByN_R_Last(long nodeId, String redirectTitle,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_R(nodeId, redirectTitle);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_R(
-			nodeId, redirectTitle, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByN_R(nodeId, redirectTitle, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6189,11 +5931,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_R_PrevAndNext(
-			long pageId, long nodeId, String redirectTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_R_PrevAndNext(long pageId, long nodeId,
+		String redirectTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		redirectTitle = Objects.toString(redirectTitle, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -6205,15 +5945,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_R_PrevAndNext(
-				session, wikiPage, nodeId, redirectTitle, orderByComparator,
-				true);
+			array[0] = getByN_R_PrevAndNext(session, wikiPage, nodeId,
+					redirectTitle, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_R_PrevAndNext(
-				session, wikiPage, nodeId, redirectTitle, orderByComparator,
-				false);
+			array[2] = getByN_R_PrevAndNext(session, wikiPage, nodeId,
+					redirectTitle, orderByComparator, false);
 
 			return array;
 		}
@@ -6225,15 +5963,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_R_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, String redirectTitle,
+	protected WikiPage getByN_R_PrevAndNext(Session session, WikiPage wikiPage,
+		long nodeId, String redirectTitle,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -6256,8 +5993,7 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -6331,9 +6067,8 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -6356,11 +6091,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByN_R(long nodeId, String redirectTitle) {
-		for (WikiPage wikiPage :
-				findByN_R(
-					nodeId, redirectTitle, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (WikiPage wikiPage : findByN_R(nodeId, redirectTitle,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -6378,7 +6110,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByN_R;
 
-		Object[] finderArgs = new Object[] {nodeId, redirectTitle};
+		Object[] finderArgs = new Object[] { nodeId, redirectTitle };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -6434,15 +6166,9 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_R_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_R_REDIRECTTITLE_2 =
-		"lower(wikiPage.redirectTitle) = ?";
-
-	private static final String _FINDER_COLUMN_N_R_REDIRECTTITLE_3 =
-		"(wikiPage.redirectTitle IS NULL OR wikiPage.redirectTitle = '')";
-
+	private static final String _FINDER_COLUMN_N_R_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_R_REDIRECTTITLE_2 = "lower(wikiPage.redirectTitle) = ?";
+	private static final String _FINDER_COLUMN_N_R_REDIRECTTITLE_3 = "(wikiPage.redirectTitle IS NULL OR wikiPage.redirectTitle = '')";
 	private FinderPath _finderPathWithPaginationFindByN_S;
 	private FinderPath _finderPathWithoutPaginationFindByN_S;
 	private FinderPath _finderPathCountByN_S;
@@ -6456,15 +6182,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByN_S(long nodeId, int status) {
-		return findByN_S(
-			nodeId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByN_S(nodeId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -6474,9 +6200,7 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_S(
-		long nodeId, int status, int start, int end) {
-
+	public List<WikiPage> findByN_S(long nodeId, int status, int start, int end) {
 		return findByN_S(nodeId, status, start, end, null);
 	}
 
@@ -6484,7 +6208,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -6495,10 +6219,8 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_S(
-		long nodeId, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
+	public List<WikiPage> findByN_S(long nodeId, int status, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator) {
 		return findByN_S(nodeId, status, start, end, orderByComparator, true);
 	}
 
@@ -6506,7 +6228,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -6518,40 +6240,38 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_S(
-		long nodeId, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByN_S(long nodeId, int status, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_S;
-			finderArgs = new Object[] {nodeId, status};
+			finderArgs = new Object[] { nodeId, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_S;
 			finderArgs = new Object[] {
-				nodeId, status, start, end, orderByComparator
-			};
+					nodeId, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						(status != wikiPage.getStatus())) {
-
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -6564,8 +6284,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -6578,10 +6298,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_N_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6601,16 +6322,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -6640,11 +6361,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_S_First(
-			long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_S_First(long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByN_S_First(nodeId, status, orderByComparator);
 
 		if (wikiPage != null) {
@@ -6675,12 +6394,9 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_S_First(
-		long nodeId, int status,
+	public WikiPage fetchByN_S_First(long nodeId, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_S(
-			nodeId, status, 0, 1, orderByComparator);
+		List<WikiPage> list = findByN_S(nodeId, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6699,11 +6415,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_S_Last(
-			long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_S_Last(long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByN_S_Last(nodeId, status, orderByComparator);
 
 		if (wikiPage != null) {
@@ -6734,18 +6448,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_S_Last(
-		long nodeId, int status,
+	public WikiPage fetchByN_S_Last(long nodeId, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_S(nodeId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_S(
-			nodeId, status, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByN_S(nodeId, status, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6765,11 +6477,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_S_PrevAndNext(
-			long pageId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_S_PrevAndNext(long pageId, long nodeId,
+		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -6779,13 +6489,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_S_PrevAndNext(
-				session, wikiPage, nodeId, status, orderByComparator, true);
+			array[0] = getByN_S_PrevAndNext(session, wikiPage, nodeId, status,
+					orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_S_PrevAndNext(
-				session, wikiPage, nodeId, status, orderByComparator, false);
+			array[2] = getByN_S_PrevAndNext(session, wikiPage, nodeId, status,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -6797,15 +6507,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, int status,
-		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
+	protected WikiPage getByN_S_PrevAndNext(Session session, WikiPage wikiPage,
+		long nodeId, int status, OrderByComparator<WikiPage> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -6819,8 +6528,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_N_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -6892,9 +6600,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -6917,11 +6624,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByN_S(long nodeId, int status) {
-		for (WikiPage wikiPage :
-				findByN_S(
-					nodeId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (WikiPage wikiPage : findByN_S(nodeId, status, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -6937,7 +6641,7 @@ public class WikiPagePersistenceImpl
 	public int countByN_S(long nodeId, int status) {
 		FinderPath finderPath = _finderPathCountByN_S;
 
-		Object[] finderArgs = new Object[] {nodeId, status};
+		Object[] finderArgs = new Object[] { nodeId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -6982,17 +6686,13 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_S_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_S_STATUS_2 =
-		"wikiPage.status = ?";
-
+	private static final String _FINDER_COLUMN_N_S_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_S_STATUS_2 = "wikiPage.status = ?";
 	private FinderPath _finderPathFetchByR_N_V;
 	private FinderPath _finderPathCountByR_N_V;
 
 	/**
-	 * Returns the wiki page where resourcePrimKey = &#63; and nodeId = &#63; and version = &#63; or throws a <code>NoSuchPageException</code> if it could not be found.
+	 * Returns the wiki page where resourcePrimKey = &#63; and nodeId = &#63; and version = &#63; or throws a {@link NoSuchPageException} if it could not be found.
 	 *
 	 * @param resourcePrimKey the resource prim key
 	 * @param nodeId the node ID
@@ -7001,10 +6701,8 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByR_N_V(
-			long resourcePrimKey, long nodeId, double version)
-		throws NoSuchPageException {
-
+	public WikiPage findByR_N_V(long resourcePrimKey, long nodeId,
+		double version) throws NoSuchPageException {
 		WikiPage wikiPage = fetchByR_N_V(resourcePrimKey, nodeId, version);
 
 		if (wikiPage == null) {
@@ -7042,9 +6740,8 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByR_N_V(
-		long resourcePrimKey, long nodeId, double version) {
-
+	public WikiPage fetchByR_N_V(long resourcePrimKey, long nodeId,
+		double version) {
 		return fetchByR_N_V(resourcePrimKey, nodeId, version, true);
 	}
 
@@ -7058,26 +6755,23 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByR_N_V(
-		long resourcePrimKey, long nodeId, double version,
-		boolean retrieveFromCache) {
-
-		Object[] finderArgs = new Object[] {resourcePrimKey, nodeId, version};
+	public WikiPage fetchByR_N_V(long resourcePrimKey, long nodeId,
+		double version, boolean retrieveFromCache) {
+		Object[] finderArgs = new Object[] { resourcePrimKey, nodeId, version };
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByR_N_V, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByR_N_V, finderArgs,
+					this);
 		}
 
 		if (result instanceof WikiPage) {
 			WikiPage wikiPage = (WikiPage)result;
 
 			if ((resourcePrimKey != wikiPage.getResourcePrimKey()) ||
-				(nodeId != wikiPage.getNodeId()) ||
-				(version != wikiPage.getVersion())) {
-
+					(nodeId != wikiPage.getNodeId()) ||
+					(version != wikiPage.getVersion())) {
 				result = null;
 			}
 		}
@@ -7113,8 +6807,8 @@ public class WikiPagePersistenceImpl
 				List<WikiPage> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByR_N_V, finderArgs, list);
+					finderCache.putResult(_finderPathFetchByR_N_V, finderArgs,
+						list);
 				}
 				else {
 					WikiPage wikiPage = list.get(0);
@@ -7151,10 +6845,8 @@ public class WikiPagePersistenceImpl
 	 * @return the wiki page that was removed
 	 */
 	@Override
-	public WikiPage removeByR_N_V(
-			long resourcePrimKey, long nodeId, double version)
-		throws NoSuchPageException {
-
+	public WikiPage removeByR_N_V(long resourcePrimKey, long nodeId,
+		double version) throws NoSuchPageException {
 		WikiPage wikiPage = findByR_N_V(resourcePrimKey, nodeId, version);
 
 		return remove(wikiPage);
@@ -7172,7 +6864,7 @@ public class WikiPagePersistenceImpl
 	public int countByR_N_V(long resourcePrimKey, long nodeId, double version) {
 		FinderPath finderPath = _finderPathCountByR_N_V;
 
-		Object[] finderArgs = new Object[] {resourcePrimKey, nodeId, version};
+		Object[] finderArgs = new Object[] { resourcePrimKey, nodeId, version };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -7221,15 +6913,9 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_R_N_V_RESOURCEPRIMKEY_2 =
-		"wikiPage.resourcePrimKey = ? AND ";
-
-	private static final String _FINDER_COLUMN_R_N_V_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_R_N_V_VERSION_2 =
-		"wikiPage.version = ?";
-
+	private static final String _FINDER_COLUMN_R_N_V_RESOURCEPRIMKEY_2 = "wikiPage.resourcePrimKey = ? AND ";
+	private static final String _FINDER_COLUMN_R_N_V_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_R_N_V_VERSION_2 = "wikiPage.version = ?";
 	private FinderPath _finderPathWithPaginationFindByR_N_H;
 	private FinderPath _finderPathWithoutPaginationFindByR_N_H;
 	private FinderPath _finderPathCountByR_N_H;
@@ -7243,19 +6929,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_N_H(
-		long resourcePrimKey, long nodeId, boolean head) {
-
-		return findByR_N_H(
-			resourcePrimKey, nodeId, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<WikiPage> findByR_N_H(long resourcePrimKey, long nodeId,
+		boolean head) {
+		return findByR_N_H(resourcePrimKey, nodeId, head, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where resourcePrimKey = &#63; and nodeId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -7266,9 +6950,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_N_H(
-		long resourcePrimKey, long nodeId, boolean head, int start, int end) {
-
+	public List<WikiPage> findByR_N_H(long resourcePrimKey, long nodeId,
+		boolean head, int start, int end) {
 		return findByR_N_H(resourcePrimKey, nodeId, head, start, end, null);
 	}
 
@@ -7276,7 +6959,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where resourcePrimKey = &#63; and nodeId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -7288,19 +6971,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_N_H(
-		long resourcePrimKey, long nodeId, boolean head, int start, int end,
+	public List<WikiPage> findByR_N_H(long resourcePrimKey, long nodeId,
+		boolean head, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByR_N_H(
-			resourcePrimKey, nodeId, head, start, end, orderByComparator, true);
+		return findByR_N_H(resourcePrimKey, nodeId, head, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where resourcePrimKey = &#63; and nodeId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -7313,41 +6995,39 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_N_H(
-		long resourcePrimKey, long nodeId, boolean head, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByR_N_H(long resourcePrimKey, long nodeId,
+		boolean head, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByR_N_H;
-			finderArgs = new Object[] {resourcePrimKey, nodeId, head};
+			finderArgs = new Object[] { resourcePrimKey, nodeId, head };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByR_N_H;
 			finderArgs = new Object[] {
-				resourcePrimKey, nodeId, head, start, end, orderByComparator
-			};
+					resourcePrimKey, nodeId, head,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((resourcePrimKey != wikiPage.getResourcePrimKey()) ||
-						(nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead())) {
-
+							(nodeId != wikiPage.getNodeId()) ||
+							(head != wikiPage.isHead())) {
 						list = null;
 
 						break;
@@ -7360,8 +7040,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -7376,10 +7056,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_R_N_H_HEAD_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -7401,16 +7082,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(head);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -7441,13 +7122,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByR_N_H_First(
-			long resourcePrimKey, long nodeId, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByR_N_H_First(long resourcePrimKey, long nodeId,
+		boolean head, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByR_N_H_First(
-			resourcePrimKey, nodeId, head, orderByComparator);
+		WikiPage wikiPage = fetchByR_N_H_First(resourcePrimKey, nodeId, head,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -7481,12 +7160,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByR_N_H_First(
-		long resourcePrimKey, long nodeId, boolean head,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByR_N_H(
-			resourcePrimKey, nodeId, head, 0, 1, orderByComparator);
+	public WikiPage fetchByR_N_H_First(long resourcePrimKey, long nodeId,
+		boolean head, OrderByComparator<WikiPage> orderByComparator) {
+		List<WikiPage> list = findByR_N_H(resourcePrimKey, nodeId, head, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -7506,13 +7183,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByR_N_H_Last(
-			long resourcePrimKey, long nodeId, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByR_N_H_Last(long resourcePrimKey, long nodeId,
+		boolean head, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByR_N_H_Last(
-			resourcePrimKey, nodeId, head, orderByComparator);
+		WikiPage wikiPage = fetchByR_N_H_Last(resourcePrimKey, nodeId, head,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -7546,18 +7221,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByR_N_H_Last(
-		long resourcePrimKey, long nodeId, boolean head,
-		OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByR_N_H_Last(long resourcePrimKey, long nodeId,
+		boolean head, OrderByComparator<WikiPage> orderByComparator) {
 		int count = countByR_N_H(resourcePrimKey, nodeId, head);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByR_N_H(
-			resourcePrimKey, nodeId, head, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByR_N_H(resourcePrimKey, nodeId, head,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -7578,11 +7251,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByR_N_H_PrevAndNext(
-			long pageId, long resourcePrimKey, long nodeId, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByR_N_H_PrevAndNext(long pageId,
+		long resourcePrimKey, long nodeId, boolean head,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -7592,15 +7264,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByR_N_H_PrevAndNext(
-				session, wikiPage, resourcePrimKey, nodeId, head,
-				orderByComparator, true);
+			array[0] = getByR_N_H_PrevAndNext(session, wikiPage,
+					resourcePrimKey, nodeId, head, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByR_N_H_PrevAndNext(
-				session, wikiPage, resourcePrimKey, nodeId, head,
-				orderByComparator, false);
+			array[2] = getByR_N_H_PrevAndNext(session, wikiPage,
+					resourcePrimKey, nodeId, head, orderByComparator, false);
 
 			return array;
 		}
@@ -7612,16 +7282,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByR_N_H_PrevAndNext(
-		Session session, WikiPage wikiPage, long resourcePrimKey, long nodeId,
-		boolean head, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByR_N_H_PrevAndNext(Session session,
+		WikiPage wikiPage, long resourcePrimKey, long nodeId, boolean head,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -7637,8 +7305,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_R_N_H_HEAD_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -7712,9 +7379,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(head);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -7738,11 +7404,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByR_N_H(long resourcePrimKey, long nodeId, boolean head) {
-		for (WikiPage wikiPage :
-				findByR_N_H(
-					resourcePrimKey, nodeId, head, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByR_N_H(resourcePrimKey, nodeId, head,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -7759,7 +7422,7 @@ public class WikiPagePersistenceImpl
 	public int countByR_N_H(long resourcePrimKey, long nodeId, boolean head) {
 		FinderPath finderPath = _finderPathCountByR_N_H;
 
-		Object[] finderArgs = new Object[] {resourcePrimKey, nodeId, head};
+		Object[] finderArgs = new Object[] { resourcePrimKey, nodeId, head };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -7808,15 +7471,9 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_R_N_H_RESOURCEPRIMKEY_2 =
-		"wikiPage.resourcePrimKey = ? AND ";
-
-	private static final String _FINDER_COLUMN_R_N_H_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_R_N_H_HEAD_2 =
-		"wikiPage.head = ?";
-
+	private static final String _FINDER_COLUMN_R_N_H_RESOURCEPRIMKEY_2 = "wikiPage.resourcePrimKey = ? AND ";
+	private static final String _FINDER_COLUMN_R_N_H_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_R_N_H_HEAD_2 = "wikiPage.head = ?";
 	private FinderPath _finderPathWithPaginationFindByR_N_S;
 	private FinderPath _finderPathWithoutPaginationFindByR_N_S;
 	private FinderPath _finderPathCountByR_N_S;
@@ -7830,11 +7487,9 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_N_S(
-		long resourcePrimKey, long nodeId, int status) {
-
-		return findByR_N_S(
-			resourcePrimKey, nodeId, status, QueryUtil.ALL_POS,
+	public List<WikiPage> findByR_N_S(long resourcePrimKey, long nodeId,
+		int status) {
+		return findByR_N_S(resourcePrimKey, nodeId, status, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
 	}
 
@@ -7842,7 +7497,7 @@ public class WikiPagePersistenceImpl
 	 * Returns a range of all the wiki pages where resourcePrimKey = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -7853,9 +7508,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_N_S(
-		long resourcePrimKey, long nodeId, int status, int start, int end) {
-
+	public List<WikiPage> findByR_N_S(long resourcePrimKey, long nodeId,
+		int status, int start, int end) {
 		return findByR_N_S(resourcePrimKey, nodeId, status, start, end, null);
 	}
 
@@ -7863,7 +7517,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where resourcePrimKey = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -7875,20 +7529,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_N_S(
-		long resourcePrimKey, long nodeId, int status, int start, int end,
+	public List<WikiPage> findByR_N_S(long resourcePrimKey, long nodeId,
+		int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByR_N_S(
-			resourcePrimKey, nodeId, status, start, end, orderByComparator,
-			true);
+		return findByR_N_S(resourcePrimKey, nodeId, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where resourcePrimKey = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param resourcePrimKey the resource prim key
@@ -7901,41 +7553,39 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByR_N_S(
-		long resourcePrimKey, long nodeId, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByR_N_S(long resourcePrimKey, long nodeId,
+		int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByR_N_S;
-			finderArgs = new Object[] {resourcePrimKey, nodeId, status};
+			finderArgs = new Object[] { resourcePrimKey, nodeId, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByR_N_S;
 			finderArgs = new Object[] {
-				resourcePrimKey, nodeId, status, start, end, orderByComparator
-			};
+					resourcePrimKey, nodeId, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((resourcePrimKey != wikiPage.getResourcePrimKey()) ||
-						(nodeId != wikiPage.getNodeId()) ||
-						(status != wikiPage.getStatus())) {
-
+							(nodeId != wikiPage.getNodeId()) ||
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -7948,8 +7598,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -7964,10 +7614,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_R_N_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -7989,16 +7640,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -8029,13 +7680,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByR_N_S_First(
-			long resourcePrimKey, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByR_N_S_First(long resourcePrimKey, long nodeId,
+		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByR_N_S_First(
-			resourcePrimKey, nodeId, status, orderByComparator);
+		WikiPage wikiPage = fetchByR_N_S_First(resourcePrimKey, nodeId, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -8069,12 +7718,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByR_N_S_First(
-		long resourcePrimKey, long nodeId, int status,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByR_N_S(
-			resourcePrimKey, nodeId, status, 0, 1, orderByComparator);
+	public WikiPage fetchByR_N_S_First(long resourcePrimKey, long nodeId,
+		int status, OrderByComparator<WikiPage> orderByComparator) {
+		List<WikiPage> list = findByR_N_S(resourcePrimKey, nodeId, status, 0,
+				1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -8094,13 +7741,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByR_N_S_Last(
-			long resourcePrimKey, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByR_N_S_Last(long resourcePrimKey, long nodeId,
+		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByR_N_S_Last(
-			resourcePrimKey, nodeId, status, orderByComparator);
+		WikiPage wikiPage = fetchByR_N_S_Last(resourcePrimKey, nodeId, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -8134,19 +7779,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByR_N_S_Last(
-		long resourcePrimKey, long nodeId, int status,
-		OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByR_N_S_Last(long resourcePrimKey, long nodeId,
+		int status, OrderByComparator<WikiPage> orderByComparator) {
 		int count = countByR_N_S(resourcePrimKey, nodeId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByR_N_S(
-			resourcePrimKey, nodeId, status, count - 1, count,
-			orderByComparator);
+		List<WikiPage> list = findByR_N_S(resourcePrimKey, nodeId, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -8167,11 +7809,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByR_N_S_PrevAndNext(
-			long pageId, long resourcePrimKey, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByR_N_S_PrevAndNext(long pageId,
+		long resourcePrimKey, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -8181,15 +7822,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByR_N_S_PrevAndNext(
-				session, wikiPage, resourcePrimKey, nodeId, status,
-				orderByComparator, true);
+			array[0] = getByR_N_S_PrevAndNext(session, wikiPage,
+					resourcePrimKey, nodeId, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByR_N_S_PrevAndNext(
-				session, wikiPage, resourcePrimKey, nodeId, status,
-				orderByComparator, false);
+			array[2] = getByR_N_S_PrevAndNext(session, wikiPage,
+					resourcePrimKey, nodeId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -8201,16 +7840,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByR_N_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long resourcePrimKey, long nodeId,
-		int status, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByR_N_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long resourcePrimKey, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -8226,8 +7863,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_R_N_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -8301,9 +7937,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -8327,11 +7962,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByR_N_S(long resourcePrimKey, long nodeId, int status) {
-		for (WikiPage wikiPage :
-				findByR_N_S(
-					resourcePrimKey, nodeId, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByR_N_S(resourcePrimKey, nodeId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -8348,7 +7980,7 @@ public class WikiPagePersistenceImpl
 	public int countByR_N_S(long resourcePrimKey, long nodeId, int status) {
 		FinderPath finderPath = _finderPathCountByR_N_S;
 
-		Object[] finderArgs = new Object[] {resourcePrimKey, nodeId, status};
+		Object[] finderArgs = new Object[] { resourcePrimKey, nodeId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -8397,15 +8029,9 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_R_N_S_RESOURCEPRIMKEY_2 =
-		"wikiPage.resourcePrimKey = ? AND ";
-
-	private static final String _FINDER_COLUMN_R_N_S_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_R_N_S_STATUS_2 =
-		"wikiPage.status = ?";
-
+	private static final String _FINDER_COLUMN_R_N_S_RESOURCEPRIMKEY_2 = "wikiPage.resourcePrimKey = ? AND ";
+	private static final String _FINDER_COLUMN_R_N_S_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_R_N_S_STATUS_2 = "wikiPage.status = ?";
 	private FinderPath _finderPathWithPaginationFindByG_N_H;
 	private FinderPath _finderPathWithoutPaginationFindByG_N_H;
 	private FinderPath _finderPathCountByG_N_H;
@@ -8420,15 +8046,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByG_N_H(long groupId, long nodeId, boolean head) {
-		return findByG_N_H(
-			groupId, nodeId, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByG_N_H(groupId, nodeId, head, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where groupId = &#63; and nodeId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -8439,9 +8065,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_H(
-		long groupId, long nodeId, boolean head, int start, int end) {
-
+	public List<WikiPage> findByG_N_H(long groupId, long nodeId, boolean head,
+		int start, int end) {
 		return findByG_N_H(groupId, nodeId, head, start, end, null);
 	}
 
@@ -8449,7 +8074,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and nodeId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -8461,19 +8086,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_H(
-		long groupId, long nodeId, boolean head, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByG_N_H(
-			groupId, nodeId, head, start, end, orderByComparator, true);
+	public List<WikiPage> findByG_N_H(long groupId, long nodeId, boolean head,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByG_N_H(groupId, nodeId, head, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and nodeId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -8486,41 +8109,39 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_H(
-		long groupId, long nodeId, boolean head, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByG_N_H(long groupId, long nodeId, boolean head,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_N_H;
-			finderArgs = new Object[] {groupId, nodeId, head};
+			finderArgs = new Object[] { groupId, nodeId, head };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_N_H;
 			finderArgs = new Object[] {
-				groupId, nodeId, head, start, end, orderByComparator
-			};
+					groupId, nodeId, head,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((groupId != wikiPage.getGroupId()) ||
-						(nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead())) {
-
+							(nodeId != wikiPage.getNodeId()) ||
+							(head != wikiPage.isHead())) {
 						list = null;
 
 						break;
@@ -8533,8 +8154,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -8549,10 +8170,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_G_N_H_HEAD_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -8574,16 +8196,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(head);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -8614,13 +8236,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_N_H_First(
-			long groupId, long nodeId, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_N_H_First(long groupId, long nodeId, boolean head,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_N_H_First(
-			groupId, nodeId, head, orderByComparator);
+		WikiPage wikiPage = fetchByG_N_H_First(groupId, nodeId, head,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -8654,12 +8274,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_N_H_First(
-		long groupId, long nodeId, boolean head,
+	public WikiPage fetchByG_N_H_First(long groupId, long nodeId, boolean head,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByG_N_H(
-			groupId, nodeId, head, 0, 1, orderByComparator);
+		List<WikiPage> list = findByG_N_H(groupId, nodeId, head, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -8679,13 +8297,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_N_H_Last(
-			long groupId, long nodeId, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_N_H_Last(long groupId, long nodeId, boolean head,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_N_H_Last(
-			groupId, nodeId, head, orderByComparator);
+		WikiPage wikiPage = fetchByG_N_H_Last(groupId, nodeId, head,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -8719,18 +8335,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_N_H_Last(
-		long groupId, long nodeId, boolean head,
+	public WikiPage fetchByG_N_H_Last(long groupId, long nodeId, boolean head,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByG_N_H(groupId, nodeId, head);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByG_N_H(
-			groupId, nodeId, head, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByG_N_H(groupId, nodeId, head, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -8751,11 +8365,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByG_N_H_PrevAndNext(
-			long pageId, long groupId, long nodeId, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByG_N_H_PrevAndNext(long pageId, long groupId,
+		long nodeId, boolean head, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -8765,15 +8377,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByG_N_H_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, orderByComparator,
-				true);
+			array[0] = getByG_N_H_PrevAndNext(session, wikiPage, groupId,
+					nodeId, head, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByG_N_H_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, orderByComparator,
-				false);
+			array[2] = getByG_N_H_PrevAndNext(session, wikiPage, groupId,
+					nodeId, head, orderByComparator, false);
 
 			return array;
 		}
@@ -8785,16 +8395,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByG_N_H_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long nodeId,
-		boolean head, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByG_N_H_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long nodeId, boolean head,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -8810,8 +8418,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_H_HEAD_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -8885,9 +8492,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(head);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -8911,18 +8517,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_H(
-		long groupId, long nodeId, boolean head) {
-
-		return filterFindByG_N_H(
-			groupId, nodeId, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<WikiPage> filterFindByG_N_H(long groupId, long nodeId,
+		boolean head) {
+		return filterFindByG_N_H(groupId, nodeId, head, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages that the user has permission to view where groupId = &#63; and nodeId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -8933,9 +8538,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_H(
-		long groupId, long nodeId, boolean head, int start, int end) {
-
+	public List<WikiPage> filterFindByG_N_H(long groupId, long nodeId,
+		boolean head, int start, int end) {
 		return filterFindByG_N_H(groupId, nodeId, head, start, end, null);
 	}
 
@@ -8943,7 +8547,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages that the user has permissions to view where groupId = &#63; and nodeId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -8955,20 +8559,19 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_H(
-		long groupId, long nodeId, boolean head, int start, int end,
+	public List<WikiPage> filterFindByG_N_H(long groupId, long nodeId,
+		boolean head, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_N_H(
-				groupId, nodeId, head, start, end, orderByComparator);
+			return findByG_N_H(groupId, nodeId, head, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -8978,8 +8581,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_N_H_GROUPID_2);
@@ -8989,18 +8591,17 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_H_HEAD_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -9012,9 +8613,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -9060,14 +8661,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] filterFindByG_N_H_PrevAndNext(
-			long pageId, long groupId, long nodeId, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] filterFindByG_N_H_PrevAndNext(long pageId, long groupId,
+		long nodeId, boolean head, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_N_H_PrevAndNext(
-				pageId, groupId, nodeId, head, orderByComparator);
+			return findByG_N_H_PrevAndNext(pageId, groupId, nodeId, head,
+				orderByComparator);
 		}
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -9079,15 +8678,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = filterGetByG_N_H_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, orderByComparator,
-				true);
+			array[0] = filterGetByG_N_H_PrevAndNext(session, wikiPage, groupId,
+					nodeId, head, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = filterGetByG_N_H_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, orderByComparator,
-				false);
+			array[2] = filterGetByG_N_H_PrevAndNext(session, wikiPage, groupId,
+					nodeId, head, orderByComparator, false);
 
 			return array;
 		}
@@ -9099,16 +8696,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage filterGetByG_N_H_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long nodeId,
-		boolean head, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage filterGetByG_N_H_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long nodeId, boolean head,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -9119,8 +8714,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_N_H_GROUPID_2);
@@ -9130,13 +8724,11 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_H_HEAD_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -9144,17 +8736,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -9180,15 +8768,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -9217,9 +8803,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -9242,9 +8828,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(head);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -9268,11 +8853,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByG_N_H(long groupId, long nodeId, boolean head) {
-		for (WikiPage wikiPage :
-				findByG_N_H(
-					groupId, nodeId, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (WikiPage wikiPage : findByG_N_H(groupId, nodeId, head,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -9289,7 +8871,7 @@ public class WikiPagePersistenceImpl
 	public int countByG_N_H(long groupId, long nodeId, boolean head) {
 		FinderPath finderPath = _finderPathCountByG_N_H;
 
-		Object[] finderArgs = new Object[] {groupId, nodeId, head};
+		Object[] finderArgs = new Object[] { groupId, nodeId, head };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -9362,9 +8944,9 @@ public class WikiPagePersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_N_H_HEAD_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -9373,8 +8955,8 @@ public class WikiPagePersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -9396,15 +8978,9 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_N_H_GROUPID_2 =
-		"wikiPage.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_H_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_H_HEAD_2 =
-		"wikiPage.head = ?";
-
+	private static final String _FINDER_COLUMN_G_N_H_GROUPID_2 = "wikiPage.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_H_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_H_HEAD_2 = "wikiPage.head = ?";
 	private FinderPath _finderPathWithPaginationFindByG_N_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_N_S;
 	private FinderPath _finderPathCountByG_N_S;
@@ -9419,16 +8995,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByG_N_S(long groupId, long nodeId, int status) {
-		return findByG_N_S(
-			groupId, nodeId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByG_N_S(groupId, nodeId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where groupId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -9439,9 +9014,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_S(
-		long groupId, long nodeId, int status, int start, int end) {
-
+	public List<WikiPage> findByG_N_S(long groupId, long nodeId, int status,
+		int start, int end) {
 		return findByG_N_S(groupId, nodeId, status, start, end, null);
 	}
 
@@ -9449,7 +9023,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -9461,19 +9035,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_S(
-		long groupId, long nodeId, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByG_N_S(
-			groupId, nodeId, status, start, end, orderByComparator, true);
+	public List<WikiPage> findByG_N_S(long groupId, long nodeId, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByG_N_S(groupId, nodeId, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -9486,41 +9058,39 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_S(
-		long groupId, long nodeId, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByG_N_S(long groupId, long nodeId, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_N_S;
-			finderArgs = new Object[] {groupId, nodeId, status};
+			finderArgs = new Object[] { groupId, nodeId, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_N_S;
 			finderArgs = new Object[] {
-				groupId, nodeId, status, start, end, orderByComparator
-			};
+					groupId, nodeId, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((groupId != wikiPage.getGroupId()) ||
-						(nodeId != wikiPage.getNodeId()) ||
-						(status != wikiPage.getStatus())) {
-
+							(nodeId != wikiPage.getNodeId()) ||
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -9533,8 +9103,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -9549,10 +9119,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_G_N_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -9574,16 +9145,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -9614,13 +9185,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_N_S_First(
-			long groupId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_N_S_First(long groupId, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_N_S_First(
-			groupId, nodeId, status, orderByComparator);
+		WikiPage wikiPage = fetchByG_N_S_First(groupId, nodeId, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -9654,12 +9223,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_N_S_First(
-		long groupId, long nodeId, int status,
+	public WikiPage fetchByG_N_S_First(long groupId, long nodeId, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByG_N_S(
-			groupId, nodeId, status, 0, 1, orderByComparator);
+		List<WikiPage> list = findByG_N_S(groupId, nodeId, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -9679,13 +9246,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_N_S_Last(
-			long groupId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_N_S_Last(long groupId, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_N_S_Last(
-			groupId, nodeId, status, orderByComparator);
+		WikiPage wikiPage = fetchByG_N_S_Last(groupId, nodeId, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -9719,18 +9284,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_N_S_Last(
-		long groupId, long nodeId, int status,
+	public WikiPage fetchByG_N_S_Last(long groupId, long nodeId, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByG_N_S(groupId, nodeId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByG_N_S(
-			groupId, nodeId, status, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByG_N_S(groupId, nodeId, status, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -9751,11 +9314,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByG_N_S_PrevAndNext(
-			long pageId, long groupId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByG_N_S_PrevAndNext(long pageId, long groupId,
+		long nodeId, int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -9765,15 +9326,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByG_N_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, status, orderByComparator,
-				true);
+			array[0] = getByG_N_S_PrevAndNext(session, wikiPage, groupId,
+					nodeId, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByG_N_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, status, orderByComparator,
-				false);
+			array[2] = getByG_N_S_PrevAndNext(session, wikiPage, groupId,
+					nodeId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -9785,16 +9344,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByG_N_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long nodeId,
-		int status, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByG_N_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -9810,8 +9367,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -9885,9 +9441,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -9911,19 +9466,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_S(
-		long groupId, long nodeId, int status) {
-
-		return filterFindByG_N_S(
-			groupId, nodeId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<WikiPage> filterFindByG_N_S(long groupId, long nodeId,
+		int status) {
+		return filterFindByG_N_S(groupId, nodeId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages that the user has permission to view where groupId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -9934,9 +9487,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_S(
-		long groupId, long nodeId, int status, int start, int end) {
-
+	public List<WikiPage> filterFindByG_N_S(long groupId, long nodeId,
+		int status, int start, int end) {
 		return filterFindByG_N_S(groupId, nodeId, status, start, end, null);
 	}
 
@@ -9944,7 +9496,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages that the user has permissions to view where groupId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -9956,20 +9508,19 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_S(
-		long groupId, long nodeId, int status, int start, int end,
+	public List<WikiPage> filterFindByG_N_S(long groupId, long nodeId,
+		int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_N_S(
-				groupId, nodeId, status, start, end, orderByComparator);
+			return findByG_N_S(groupId, nodeId, status, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -9979,8 +9530,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_N_S_GROUPID_2);
@@ -9990,18 +9540,17 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -10013,9 +9562,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -10061,14 +9610,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] filterFindByG_N_S_PrevAndNext(
-			long pageId, long groupId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] filterFindByG_N_S_PrevAndNext(long pageId, long groupId,
+		long nodeId, int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_N_S_PrevAndNext(
-				pageId, groupId, nodeId, status, orderByComparator);
+			return findByG_N_S_PrevAndNext(pageId, groupId, nodeId, status,
+				orderByComparator);
 		}
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -10080,15 +9627,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = filterGetByG_N_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, status, orderByComparator,
-				true);
+			array[0] = filterGetByG_N_S_PrevAndNext(session, wikiPage, groupId,
+					nodeId, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = filterGetByG_N_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, status, orderByComparator,
-				false);
+			array[2] = filterGetByG_N_S_PrevAndNext(session, wikiPage, groupId,
+					nodeId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -10100,16 +9645,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage filterGetByG_N_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long nodeId,
-		int status, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage filterGetByG_N_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -10120,8 +9663,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_N_S_GROUPID_2);
@@ -10131,13 +9673,11 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -10145,17 +9685,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -10181,15 +9717,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -10218,9 +9752,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -10243,9 +9777,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -10269,11 +9802,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByG_N_S(long groupId, long nodeId, int status) {
-		for (WikiPage wikiPage :
-				findByG_N_S(
-					groupId, nodeId, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByG_N_S(groupId, nodeId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -10290,7 +9820,7 @@ public class WikiPagePersistenceImpl
 	public int countByG_N_S(long groupId, long nodeId, int status) {
 		FinderPath finderPath = _finderPathCountByG_N_S;
 
-		Object[] finderArgs = new Object[] {groupId, nodeId, status};
+		Object[] finderArgs = new Object[] { groupId, nodeId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -10363,9 +9893,9 @@ public class WikiPagePersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_N_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -10374,8 +9904,8 @@ public class WikiPagePersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -10397,15 +9927,9 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_N_S_GROUPID_2 =
-		"wikiPage.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_S_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_S_STATUS_2 =
-		"wikiPage.status = ?";
-
+	private static final String _FINDER_COLUMN_G_N_S_GROUPID_2 = "wikiPage.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_S_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_S_STATUS_2 = "wikiPage.status = ?";
 	private FinderPath _finderPathWithPaginationFindByU_N_S;
 	private FinderPath _finderPathWithoutPaginationFindByU_N_S;
 	private FinderPath _finderPathCountByU_N_S;
@@ -10420,15 +9944,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByU_N_S(long userId, long nodeId, int status) {
-		return findByU_N_S(
-			userId, nodeId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByU_N_S(userId, nodeId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where userId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -10439,9 +9963,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByU_N_S(
-		long userId, long nodeId, int status, int start, int end) {
-
+	public List<WikiPage> findByU_N_S(long userId, long nodeId, int status,
+		int start, int end) {
 		return findByU_N_S(userId, nodeId, status, start, end, null);
 	}
 
@@ -10449,7 +9972,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where userId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -10461,19 +9984,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByU_N_S(
-		long userId, long nodeId, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByU_N_S(
-			userId, nodeId, status, start, end, orderByComparator, true);
+	public List<WikiPage> findByU_N_S(long userId, long nodeId, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByU_N_S(userId, nodeId, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where userId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -10486,41 +10007,39 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByU_N_S(
-		long userId, long nodeId, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByU_N_S(long userId, long nodeId, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByU_N_S;
-			finderArgs = new Object[] {userId, nodeId, status};
+			finderArgs = new Object[] { userId, nodeId, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByU_N_S;
 			finderArgs = new Object[] {
-				userId, nodeId, status, start, end, orderByComparator
-			};
+					userId, nodeId, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((userId != wikiPage.getUserId()) ||
-						(nodeId != wikiPage.getNodeId()) ||
-						(status != wikiPage.getStatus())) {
-
+							(nodeId != wikiPage.getNodeId()) ||
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -10533,8 +10052,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -10549,10 +10068,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_U_N_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -10574,16 +10094,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -10614,13 +10134,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByU_N_S_First(
-			long userId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByU_N_S_First(long userId, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByU_N_S_First(
-			userId, nodeId, status, orderByComparator);
+		WikiPage wikiPage = fetchByU_N_S_First(userId, nodeId, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -10654,12 +10172,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByU_N_S_First(
-		long userId, long nodeId, int status,
+	public WikiPage fetchByU_N_S_First(long userId, long nodeId, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByU_N_S(
-			userId, nodeId, status, 0, 1, orderByComparator);
+		List<WikiPage> list = findByU_N_S(userId, nodeId, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -10679,13 +10195,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByU_N_S_Last(
-			long userId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByU_N_S_Last(long userId, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByU_N_S_Last(
-			userId, nodeId, status, orderByComparator);
+		WikiPage wikiPage = fetchByU_N_S_Last(userId, nodeId, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -10719,18 +10233,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByU_N_S_Last(
-		long userId, long nodeId, int status,
+	public WikiPage fetchByU_N_S_Last(long userId, long nodeId, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByU_N_S(userId, nodeId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByU_N_S(
-			userId, nodeId, status, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByU_N_S(userId, nodeId, status, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -10751,11 +10263,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByU_N_S_PrevAndNext(
-			long pageId, long userId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByU_N_S_PrevAndNext(long pageId, long userId,
+		long nodeId, int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -10765,15 +10275,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByU_N_S_PrevAndNext(
-				session, wikiPage, userId, nodeId, status, orderByComparator,
-				true);
+			array[0] = getByU_N_S_PrevAndNext(session, wikiPage, userId,
+					nodeId, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByU_N_S_PrevAndNext(
-				session, wikiPage, userId, nodeId, status, orderByComparator,
-				false);
+			array[2] = getByU_N_S_PrevAndNext(session, wikiPage, userId,
+					nodeId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -10785,16 +10293,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByU_N_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long userId, long nodeId,
-		int status, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByU_N_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long userId, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -10810,8 +10316,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_U_N_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -10885,9 +10390,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -10911,11 +10415,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByU_N_S(long userId, long nodeId, int status) {
-		for (WikiPage wikiPage :
-				findByU_N_S(
-					userId, nodeId, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByU_N_S(userId, nodeId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -10932,7 +10433,7 @@ public class WikiPagePersistenceImpl
 	public int countByU_N_S(long userId, long nodeId, int status) {
 		FinderPath finderPath = _finderPathCountByU_N_S;
 
-		Object[] finderArgs = new Object[] {userId, nodeId, status};
+		Object[] finderArgs = new Object[] { userId, nodeId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -10981,20 +10482,14 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_U_N_S_USERID_2 =
-		"wikiPage.userId = ? AND ";
-
-	private static final String _FINDER_COLUMN_U_N_S_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_U_N_S_STATUS_2 =
-		"wikiPage.status = ?";
-
+	private static final String _FINDER_COLUMN_U_N_S_USERID_2 = "wikiPage.userId = ? AND ";
+	private static final String _FINDER_COLUMN_U_N_S_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_U_N_S_STATUS_2 = "wikiPage.status = ?";
 	private FinderPath _finderPathFetchByN_T_V;
 	private FinderPath _finderPathCountByN_T_V;
 
 	/**
-	 * Returns the wiki page where nodeId = &#63; and title = &#63; and version = &#63; or throws a <code>NoSuchPageException</code> if it could not be found.
+	 * Returns the wiki page where nodeId = &#63; and title = &#63; and version = &#63; or throws a {@link NoSuchPageException} if it could not be found.
 	 *
 	 * @param nodeId the node ID
 	 * @param title the title
@@ -11005,7 +10500,6 @@ public class WikiPagePersistenceImpl
 	@Override
 	public WikiPage findByN_T_V(long nodeId, String title, double version)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByN_T_V(nodeId, title, version);
 
 		if (wikiPage == null) {
@@ -11057,27 +10551,25 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_T_V(
-		long nodeId, String title, double version, boolean retrieveFromCache) {
-
+	public WikiPage fetchByN_T_V(long nodeId, String title, double version,
+		boolean retrieveFromCache) {
 		title = Objects.toString(title, "");
 
-		Object[] finderArgs = new Object[] {nodeId, title, version};
+		Object[] finderArgs = new Object[] { nodeId, title, version };
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByN_T_V, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByN_T_V, finderArgs,
+					this);
 		}
 
 		if (result instanceof WikiPage) {
 			WikiPage wikiPage = (WikiPage)result;
 
 			if ((nodeId != wikiPage.getNodeId()) ||
-				!Objects.equals(title, wikiPage.getTitle()) ||
-				(version != wikiPage.getVersion())) {
-
+					!Objects.equals(title, wikiPage.getTitle()) ||
+					(version != wikiPage.getVersion())) {
 				result = null;
 			}
 		}
@@ -11124,8 +10616,8 @@ public class WikiPagePersistenceImpl
 				List<WikiPage> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByN_T_V, finderArgs, list);
+					finderCache.putResult(_finderPathFetchByN_T_V, finderArgs,
+						list);
 				}
 				else {
 					WikiPage wikiPage = list.get(0);
@@ -11164,7 +10656,6 @@ public class WikiPagePersistenceImpl
 	@Override
 	public WikiPage removeByN_T_V(long nodeId, String title, double version)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByN_T_V(nodeId, title, version);
 
 		return remove(wikiPage);
@@ -11184,7 +10675,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByN_T_V;
 
-		Object[] finderArgs = new Object[] {nodeId, title, version};
+		Object[] finderArgs = new Object[] { nodeId, title, version };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -11244,18 +10735,10 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_T_V_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_T_V_TITLE_2 =
-		"lower(wikiPage.title) = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_T_V_TITLE_3 =
-		"(wikiPage.title IS NULL OR wikiPage.title = '') AND ";
-
-	private static final String _FINDER_COLUMN_N_T_V_VERSION_2 =
-		"wikiPage.version = ?";
-
+	private static final String _FINDER_COLUMN_N_T_V_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_T_V_TITLE_2 = "lower(wikiPage.title) = ? AND ";
+	private static final String _FINDER_COLUMN_N_T_V_TITLE_3 = "(wikiPage.title IS NULL OR wikiPage.title = '') AND ";
+	private static final String _FINDER_COLUMN_N_T_V_VERSION_2 = "wikiPage.version = ?";
 	private FinderPath _finderPathWithPaginationFindByN_T_H;
 	private FinderPath _finderPathWithoutPaginationFindByN_T_H;
 	private FinderPath _finderPathCountByN_T_H;
@@ -11270,15 +10753,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByN_T_H(long nodeId, String title, boolean head) {
-		return findByN_T_H(
-			nodeId, title, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByN_T_H(nodeId, title, head, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and title = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -11289,9 +10772,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_T_H(
-		long nodeId, String title, boolean head, int start, int end) {
-
+	public List<WikiPage> findByN_T_H(long nodeId, String title, boolean head,
+		int start, int end) {
 		return findByN_T_H(nodeId, title, head, start, end, null);
 	}
 
@@ -11299,7 +10781,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and title = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -11311,19 +10793,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_T_H(
-		long nodeId, String title, boolean head, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_T_H(
-			nodeId, title, head, start, end, orderByComparator, true);
+	public List<WikiPage> findByN_T_H(long nodeId, String title, boolean head,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByN_T_H(nodeId, title, head, start, end, orderByComparator,
+			true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and title = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -11336,11 +10816,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_T_H(
-		long nodeId, String title, boolean head, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByN_T_H(long nodeId, String title, boolean head,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		title = Objects.toString(title, "");
 
 		boolean pagination = true;
@@ -11348,31 +10826,31 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_T_H;
-			finderArgs = new Object[] {nodeId, title, head};
+			finderArgs = new Object[] { nodeId, title, head };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_T_H;
 			finderArgs = new Object[] {
-				nodeId, title, head, start, end, orderByComparator
-			};
+					nodeId, title, head,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						!title.equals(wikiPage.getTitle()) ||
-						(head != wikiPage.isHead())) {
-
+							!title.equals(wikiPage.getTitle()) ||
+							(head != wikiPage.isHead())) {
 						list = null;
 
 						break;
@@ -11385,8 +10863,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -11410,10 +10888,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_N_T_H_HEAD_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -11437,16 +10916,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(head);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -11477,13 +10956,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_T_H_First(
-			long nodeId, String title, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_T_H_First(long nodeId, String title, boolean head,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_T_H_First(
-			nodeId, title, head, orderByComparator);
+		WikiPage wikiPage = fetchByN_T_H_First(nodeId, title, head,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -11517,12 +10994,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_T_H_First(
-		long nodeId, String title, boolean head,
+	public WikiPage fetchByN_T_H_First(long nodeId, String title, boolean head,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_T_H(
-			nodeId, title, head, 0, 1, orderByComparator);
+		List<WikiPage> list = findByN_T_H(nodeId, title, head, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -11542,13 +11017,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_T_H_Last(
-			long nodeId, String title, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_T_H_Last(long nodeId, String title, boolean head,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_T_H_Last(
-			nodeId, title, head, orderByComparator);
+		WikiPage wikiPage = fetchByN_T_H_Last(nodeId, title, head,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -11582,18 +11055,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_T_H_Last(
-		long nodeId, String title, boolean head,
+	public WikiPage fetchByN_T_H_Last(long nodeId, String title, boolean head,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_T_H(nodeId, title, head);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_T_H(
-			nodeId, title, head, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByN_T_H(nodeId, title, head, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -11614,11 +11085,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_T_H_PrevAndNext(
-			long pageId, long nodeId, String title, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_T_H_PrevAndNext(long pageId, long nodeId,
+		String title, boolean head,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		title = Objects.toString(title, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -11630,15 +11100,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_T_H_PrevAndNext(
-				session, wikiPage, nodeId, title, head, orderByComparator,
-				true);
+			array[0] = getByN_T_H_PrevAndNext(session, wikiPage, nodeId, title,
+					head, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_T_H_PrevAndNext(
-				session, wikiPage, nodeId, title, head, orderByComparator,
-				false);
+			array[2] = getByN_T_H_PrevAndNext(session, wikiPage, nodeId, title,
+					head, orderByComparator, false);
 
 			return array;
 		}
@@ -11650,16 +11118,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_T_H_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, String title,
-		boolean head, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByN_T_H_PrevAndNext(Session session,
+		WikiPage wikiPage, long nodeId, String title, boolean head,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -11684,8 +11150,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_N_T_H_HEAD_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -11761,9 +11226,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(head);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -11787,11 +11251,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByN_T_H(long nodeId, String title, boolean head) {
-		for (WikiPage wikiPage :
-				findByN_T_H(
-					nodeId, title, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (WikiPage wikiPage : findByN_T_H(nodeId, title, head,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -11810,7 +11271,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByN_T_H;
 
-		Object[] finderArgs = new Object[] {nodeId, title, head};
+		Object[] finderArgs = new Object[] { nodeId, title, head };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -11870,18 +11331,10 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_T_H_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_T_H_TITLE_2 =
-		"lower(wikiPage.title) = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_T_H_TITLE_3 =
-		"(wikiPage.title IS NULL OR wikiPage.title = '') AND ";
-
-	private static final String _FINDER_COLUMN_N_T_H_HEAD_2 =
-		"wikiPage.head = ?";
-
+	private static final String _FINDER_COLUMN_N_T_H_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_T_H_TITLE_2 = "lower(wikiPage.title) = ? AND ";
+	private static final String _FINDER_COLUMN_N_T_H_TITLE_3 = "(wikiPage.title IS NULL OR wikiPage.title = '') AND ";
+	private static final String _FINDER_COLUMN_N_T_H_HEAD_2 = "wikiPage.head = ?";
 	private FinderPath _finderPathWithPaginationFindByN_T_S;
 	private FinderPath _finderPathWithoutPaginationFindByN_T_S;
 	private FinderPath _finderPathCountByN_T_S;
@@ -11896,15 +11349,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByN_T_S(long nodeId, String title, int status) {
-		return findByN_T_S(
-			nodeId, title, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByN_T_S(nodeId, title, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and title = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -11915,9 +11368,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_T_S(
-		long nodeId, String title, int status, int start, int end) {
-
+	public List<WikiPage> findByN_T_S(long nodeId, String title, int status,
+		int start, int end) {
 		return findByN_T_S(nodeId, title, status, start, end, null);
 	}
 
@@ -11925,7 +11377,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and title = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -11937,19 +11389,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_T_S(
-		long nodeId, String title, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_T_S(
-			nodeId, title, status, start, end, orderByComparator, true);
+	public List<WikiPage> findByN_T_S(long nodeId, String title, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByN_T_S(nodeId, title, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and title = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -11962,11 +11412,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_T_S(
-		long nodeId, String title, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByN_T_S(long nodeId, String title, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		title = Objects.toString(title, "");
 
 		boolean pagination = true;
@@ -11974,31 +11422,31 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_T_S;
-			finderArgs = new Object[] {nodeId, title, status};
+			finderArgs = new Object[] { nodeId, title, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_T_S;
 			finderArgs = new Object[] {
-				nodeId, title, status, start, end, orderByComparator
-			};
+					nodeId, title, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						!title.equals(wikiPage.getTitle()) ||
-						(status != wikiPage.getStatus())) {
-
+							!title.equals(wikiPage.getTitle()) ||
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -12011,8 +11459,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -12036,10 +11484,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_N_T_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -12063,16 +11512,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -12103,13 +11552,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_T_S_First(
-			long nodeId, String title, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_T_S_First(long nodeId, String title, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_T_S_First(
-			nodeId, title, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_T_S_First(nodeId, title, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -12143,12 +11590,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_T_S_First(
-		long nodeId, String title, int status,
+	public WikiPage fetchByN_T_S_First(long nodeId, String title, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_T_S(
-			nodeId, title, status, 0, 1, orderByComparator);
+		List<WikiPage> list = findByN_T_S(nodeId, title, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -12168,13 +11613,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_T_S_Last(
-			long nodeId, String title, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_T_S_Last(long nodeId, String title, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_T_S_Last(
-			nodeId, title, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_T_S_Last(nodeId, title, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -12208,18 +11651,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_T_S_Last(
-		long nodeId, String title, int status,
+	public WikiPage fetchByN_T_S_Last(long nodeId, String title, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_T_S(nodeId, title, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_T_S(
-			nodeId, title, status, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByN_T_S(nodeId, title, status, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -12240,11 +11681,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_T_S_PrevAndNext(
-			long pageId, long nodeId, String title, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_T_S_PrevAndNext(long pageId, long nodeId,
+		String title, int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		title = Objects.toString(title, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -12256,15 +11695,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_T_S_PrevAndNext(
-				session, wikiPage, nodeId, title, status, orderByComparator,
-				true);
+			array[0] = getByN_T_S_PrevAndNext(session, wikiPage, nodeId, title,
+					status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_T_S_PrevAndNext(
-				session, wikiPage, nodeId, title, status, orderByComparator,
-				false);
+			array[2] = getByN_T_S_PrevAndNext(session, wikiPage, nodeId, title,
+					status, orderByComparator, false);
 
 			return array;
 		}
@@ -12276,16 +11713,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_T_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, String title,
-		int status, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByN_T_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long nodeId, String title, int status,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -12310,8 +11745,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_N_T_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -12387,9 +11821,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -12413,11 +11846,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByN_T_S(long nodeId, String title, int status) {
-		for (WikiPage wikiPage :
-				findByN_T_S(
-					nodeId, title, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (WikiPage wikiPage : findByN_T_S(nodeId, title, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -12436,7 +11866,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByN_T_S;
 
-		Object[] finderArgs = new Object[] {nodeId, title, status};
+		Object[] finderArgs = new Object[] { nodeId, title, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -12496,18 +11926,10 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_T_S_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_T_S_TITLE_2 =
-		"lower(wikiPage.title) = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_T_S_TITLE_3 =
-		"(wikiPage.title IS NULL OR wikiPage.title = '') AND ";
-
-	private static final String _FINDER_COLUMN_N_T_S_STATUS_2 =
-		"wikiPage.status = ?";
-
+	private static final String _FINDER_COLUMN_N_T_S_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_T_S_TITLE_2 = "lower(wikiPage.title) = ? AND ";
+	private static final String _FINDER_COLUMN_N_T_S_TITLE_3 = "(wikiPage.title IS NULL OR wikiPage.title = '') AND ";
+	private static final String _FINDER_COLUMN_N_T_S_STATUS_2 = "wikiPage.status = ?";
 	private FinderPath _finderPathWithPaginationFindByN_H_P;
 	private FinderPath _finderPathWithoutPaginationFindByN_H_P;
 	private FinderPath _finderPathCountByN_H_P;
@@ -12521,19 +11943,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P(
-		long nodeId, boolean head, String parentTitle) {
-
-		return findByN_H_P(
-			nodeId, head, parentTitle, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<WikiPage> findByN_H_P(long nodeId, boolean head,
+		String parentTitle) {
+		return findByN_H_P(nodeId, head, parentTitle, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and head = &#63; and parentTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -12544,9 +11964,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P(
-		long nodeId, boolean head, String parentTitle, int start, int end) {
-
+	public List<WikiPage> findByN_H_P(long nodeId, boolean head,
+		String parentTitle, int start, int end) {
 		return findByN_H_P(nodeId, head, parentTitle, start, end, null);
 	}
 
@@ -12554,7 +11973,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and parentTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -12566,19 +11985,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P(
-		long nodeId, boolean head, String parentTitle, int start, int end,
+	public List<WikiPage> findByN_H_P(long nodeId, boolean head,
+		String parentTitle, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_H_P(
-			nodeId, head, parentTitle, start, end, orderByComparator, true);
+		return findByN_H_P(nodeId, head, parentTitle, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and parentTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -12591,11 +12009,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P(
-		long nodeId, boolean head, String parentTitle, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByN_H_P(long nodeId, boolean head,
+		String parentTitle, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		parentTitle = Objects.toString(parentTitle, "");
 
 		boolean pagination = true;
@@ -12603,31 +12019,31 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_H_P;
-			finderArgs = new Object[] {nodeId, head, parentTitle};
+			finderArgs = new Object[] { nodeId, head, parentTitle };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_H_P;
 			finderArgs = new Object[] {
-				nodeId, head, parentTitle, start, end, orderByComparator
-			};
+					nodeId, head, parentTitle,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead()) ||
-						!parentTitle.equals(wikiPage.getParentTitle())) {
-
+							(head != wikiPage.isHead()) ||
+							!parentTitle.equals(wikiPage.getParentTitle())) {
 						list = null;
 
 						break;
@@ -12640,8 +12056,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -12665,10 +12081,11 @@ public class WikiPagePersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -12692,16 +12109,16 @@ public class WikiPagePersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -12732,13 +12149,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_P_First(
-			long nodeId, boolean head, String parentTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_P_First(long nodeId, boolean head,
+		String parentTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_P_First(
-			nodeId, head, parentTitle, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_P_First(nodeId, head, parentTitle,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -12772,12 +12187,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_P_First(
-		long nodeId, boolean head, String parentTitle,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_H_P(
-			nodeId, head, parentTitle, 0, 1, orderByComparator);
+	public WikiPage fetchByN_H_P_First(long nodeId, boolean head,
+		String parentTitle, OrderByComparator<WikiPage> orderByComparator) {
+		List<WikiPage> list = findByN_H_P(nodeId, head, parentTitle, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -12797,13 +12210,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_P_Last(
-			long nodeId, boolean head, String parentTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_P_Last(long nodeId, boolean head,
+		String parentTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_P_Last(
-			nodeId, head, parentTitle, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_P_Last(nodeId, head, parentTitle,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -12837,18 +12248,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_P_Last(
-		long nodeId, boolean head, String parentTitle,
-		OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByN_H_P_Last(long nodeId, boolean head,
+		String parentTitle, OrderByComparator<WikiPage> orderByComparator) {
 		int count = countByN_H_P(nodeId, head, parentTitle);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_H_P(
-			nodeId, head, parentTitle, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByN_H_P(nodeId, head, parentTitle, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -12869,11 +12278,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_H_P_PrevAndNext(
-			long pageId, long nodeId, boolean head, String parentTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_H_P_PrevAndNext(long pageId, long nodeId,
+		boolean head, String parentTitle,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		parentTitle = Objects.toString(parentTitle, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -12885,15 +12293,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_H_P_PrevAndNext(
-				session, wikiPage, nodeId, head, parentTitle, orderByComparator,
-				true);
+			array[0] = getByN_H_P_PrevAndNext(session, wikiPage, nodeId, head,
+					parentTitle, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_H_P_PrevAndNext(
-				session, wikiPage, nodeId, head, parentTitle, orderByComparator,
-				false);
+			array[2] = getByN_H_P_PrevAndNext(session, wikiPage, nodeId, head,
+					parentTitle, orderByComparator, false);
 
 			return array;
 		}
@@ -12905,16 +12311,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_H_P_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, boolean head,
-		String parentTitle, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByN_H_P_PrevAndNext(Session session,
+		WikiPage wikiPage, long nodeId, boolean head, String parentTitle,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -12939,8 +12343,7 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -13016,9 +12419,8 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -13042,11 +12444,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByN_H_P(long nodeId, boolean head, String parentTitle) {
-		for (WikiPage wikiPage :
-				findByN_H_P(
-					nodeId, head, parentTitle, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByN_H_P(nodeId, head, parentTitle,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -13065,7 +12464,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByN_H_P;
 
-		Object[] finderArgs = new Object[] {nodeId, head, parentTitle};
+		Object[] finderArgs = new Object[] { nodeId, head, parentTitle };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -13125,18 +12524,10 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_H_P_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_P_HEAD_2 =
-		"wikiPage.head = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_P_PARENTTITLE_2 =
-		"lower(wikiPage.parentTitle) = ?";
-
-	private static final String _FINDER_COLUMN_N_H_P_PARENTTITLE_3 =
-		"(wikiPage.parentTitle IS NULL OR wikiPage.parentTitle = '')";
-
+	private static final String _FINDER_COLUMN_N_H_P_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_P_HEAD_2 = "wikiPage.head = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_P_PARENTTITLE_2 = "lower(wikiPage.parentTitle) = ?";
+	private static final String _FINDER_COLUMN_N_H_P_PARENTTITLE_3 = "(wikiPage.parentTitle IS NULL OR wikiPage.parentTitle = '')";
 	private FinderPath _finderPathWithPaginationFindByN_H_R;
 	private FinderPath _finderPathWithoutPaginationFindByN_H_R;
 	private FinderPath _finderPathCountByN_H_R;
@@ -13150,19 +12541,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R(
-		long nodeId, boolean head, String redirectTitle) {
-
-		return findByN_H_R(
-			nodeId, head, redirectTitle, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<WikiPage> findByN_H_R(long nodeId, boolean head,
+		String redirectTitle) {
+		return findByN_H_R(nodeId, head, redirectTitle, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and head = &#63; and redirectTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -13173,9 +12562,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R(
-		long nodeId, boolean head, String redirectTitle, int start, int end) {
-
+	public List<WikiPage> findByN_H_R(long nodeId, boolean head,
+		String redirectTitle, int start, int end) {
 		return findByN_H_R(nodeId, head, redirectTitle, start, end, null);
 	}
 
@@ -13183,7 +12571,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and redirectTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -13195,19 +12583,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R(
-		long nodeId, boolean head, String redirectTitle, int start, int end,
+	public List<WikiPage> findByN_H_R(long nodeId, boolean head,
+		String redirectTitle, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_H_R(
-			nodeId, head, redirectTitle, start, end, orderByComparator, true);
+		return findByN_H_R(nodeId, head, redirectTitle, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and redirectTitle = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -13220,11 +12607,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R(
-		long nodeId, boolean head, String redirectTitle, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByN_H_R(long nodeId, boolean head,
+		String redirectTitle, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		redirectTitle = Objects.toString(redirectTitle, "");
 
 		boolean pagination = true;
@@ -13232,31 +12617,31 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_H_R;
-			finderArgs = new Object[] {nodeId, head, redirectTitle};
+			finderArgs = new Object[] { nodeId, head, redirectTitle };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_H_R;
 			finderArgs = new Object[] {
-				nodeId, head, redirectTitle, start, end, orderByComparator
-			};
+					nodeId, head, redirectTitle,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead()) ||
-						!redirectTitle.equals(wikiPage.getRedirectTitle())) {
-
+							(head != wikiPage.isHead()) ||
+							!redirectTitle.equals(wikiPage.getRedirectTitle())) {
 						list = null;
 
 						break;
@@ -13269,8 +12654,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -13294,10 +12679,11 @@ public class WikiPagePersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -13321,16 +12707,16 @@ public class WikiPagePersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -13361,13 +12747,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_R_First(
-			long nodeId, boolean head, String redirectTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_R_First(long nodeId, boolean head,
+		String redirectTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_R_First(
-			nodeId, head, redirectTitle, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_R_First(nodeId, head, redirectTitle,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -13401,12 +12785,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_R_First(
-		long nodeId, boolean head, String redirectTitle,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_H_R(
-			nodeId, head, redirectTitle, 0, 1, orderByComparator);
+	public WikiPage fetchByN_H_R_First(long nodeId, boolean head,
+		String redirectTitle, OrderByComparator<WikiPage> orderByComparator) {
+		List<WikiPage> list = findByN_H_R(nodeId, head, redirectTitle, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -13426,13 +12808,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_R_Last(
-			long nodeId, boolean head, String redirectTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_R_Last(long nodeId, boolean head,
+		String redirectTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_R_Last(
-			nodeId, head, redirectTitle, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_R_Last(nodeId, head, redirectTitle,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -13466,18 +12846,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_R_Last(
-		long nodeId, boolean head, String redirectTitle,
-		OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByN_H_R_Last(long nodeId, boolean head,
+		String redirectTitle, OrderByComparator<WikiPage> orderByComparator) {
 		int count = countByN_H_R(nodeId, head, redirectTitle);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_H_R(
-			nodeId, head, redirectTitle, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByN_H_R(nodeId, head, redirectTitle,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -13498,11 +12876,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_H_R_PrevAndNext(
-			long pageId, long nodeId, boolean head, String redirectTitle,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_H_R_PrevAndNext(long pageId, long nodeId,
+		boolean head, String redirectTitle,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		redirectTitle = Objects.toString(redirectTitle, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -13514,15 +12891,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_H_R_PrevAndNext(
-				session, wikiPage, nodeId, head, redirectTitle,
-				orderByComparator, true);
+			array[0] = getByN_H_R_PrevAndNext(session, wikiPage, nodeId, head,
+					redirectTitle, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_H_R_PrevAndNext(
-				session, wikiPage, nodeId, head, redirectTitle,
-				orderByComparator, false);
+			array[2] = getByN_H_R_PrevAndNext(session, wikiPage, nodeId, head,
+					redirectTitle, orderByComparator, false);
 
 			return array;
 		}
@@ -13534,16 +12909,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_H_R_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, boolean head,
-		String redirectTitle, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByN_H_R_PrevAndNext(Session session,
+		WikiPage wikiPage, long nodeId, boolean head, String redirectTitle,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -13568,8 +12941,7 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -13645,9 +13017,8 @@ public class WikiPagePersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -13671,11 +13042,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByN_H_R(long nodeId, boolean head, String redirectTitle) {
-		for (WikiPage wikiPage :
-				findByN_H_R(
-					nodeId, head, redirectTitle, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (WikiPage wikiPage : findByN_H_R(nodeId, head, redirectTitle,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -13694,7 +13062,7 @@ public class WikiPagePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByN_H_R;
 
-		Object[] finderArgs = new Object[] {nodeId, head, redirectTitle};
+		Object[] finderArgs = new Object[] { nodeId, head, redirectTitle };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -13754,18 +13122,10 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_H_R_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_R_HEAD_2 =
-		"wikiPage.head = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_R_REDIRECTTITLE_2 =
-		"lower(wikiPage.redirectTitle) = ?";
-
-	private static final String _FINDER_COLUMN_N_H_R_REDIRECTTITLE_3 =
-		"(wikiPage.redirectTitle IS NULL OR wikiPage.redirectTitle = '')";
-
+	private static final String _FINDER_COLUMN_N_H_R_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_R_HEAD_2 = "wikiPage.head = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_R_REDIRECTTITLE_2 = "lower(wikiPage.redirectTitle) = ?";
+	private static final String _FINDER_COLUMN_N_H_R_REDIRECTTITLE_3 = "(wikiPage.redirectTitle IS NULL OR wikiPage.redirectTitle = '')";
 	private FinderPath _finderPathWithPaginationFindByN_H_S;
 	private FinderPath _finderPathWithoutPaginationFindByN_H_S;
 	private FinderPath _finderPathCountByN_H_S;
@@ -13780,15 +13140,15 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public List<WikiPage> findByN_H_S(long nodeId, boolean head, int status) {
-		return findByN_H_S(
-			nodeId, head, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByN_H_S(nodeId, head, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and head = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -13799,9 +13159,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_S(
-		long nodeId, boolean head, int status, int start, int end) {
-
+	public List<WikiPage> findByN_H_S(long nodeId, boolean head, int status,
+		int start, int end) {
 		return findByN_H_S(nodeId, head, status, start, end, null);
 	}
 
@@ -13809,7 +13168,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -13821,19 +13180,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_S(
-		long nodeId, boolean head, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_H_S(
-			nodeId, head, status, start, end, orderByComparator, true);
+	public List<WikiPage> findByN_H_S(long nodeId, boolean head, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByN_H_S(nodeId, head, status, start, end, orderByComparator,
+			true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -13846,41 +13203,39 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_S(
-		long nodeId, boolean head, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByN_H_S(long nodeId, boolean head, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_H_S;
-			finderArgs = new Object[] {nodeId, head, status};
+			finderArgs = new Object[] { nodeId, head, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_H_S;
 			finderArgs = new Object[] {
-				nodeId, head, status, start, end, orderByComparator
-			};
+					nodeId, head, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead()) ||
-						(status != wikiPage.getStatus())) {
-
+							(head != wikiPage.isHead()) ||
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -13893,8 +13248,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -13909,10 +13264,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_N_H_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -13934,16 +13290,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -13974,13 +13330,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_S_First(
-			long nodeId, boolean head, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_S_First(long nodeId, boolean head, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_S_First(
-			nodeId, head, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_S_First(nodeId, head, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -14014,12 +13368,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_S_First(
-		long nodeId, boolean head, int status,
+	public WikiPage fetchByN_H_S_First(long nodeId, boolean head, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_H_S(
-			nodeId, head, status, 0, 1, orderByComparator);
+		List<WikiPage> list = findByN_H_S(nodeId, head, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -14039,13 +13391,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_S_Last(
-			long nodeId, boolean head, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_S_Last(long nodeId, boolean head, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_S_Last(
-			nodeId, head, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_S_Last(nodeId, head, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -14079,18 +13429,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_S_Last(
-		long nodeId, boolean head, int status,
+	public WikiPage fetchByN_H_S_Last(long nodeId, boolean head, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_H_S(nodeId, head, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_H_S(
-			nodeId, head, status, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByN_H_S(nodeId, head, status, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -14111,11 +13459,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_H_S_PrevAndNext(
-			long pageId, long nodeId, boolean head, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_H_S_PrevAndNext(long pageId, long nodeId,
+		boolean head, int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -14125,15 +13471,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_H_S_PrevAndNext(
-				session, wikiPage, nodeId, head, status, orderByComparator,
-				true);
+			array[0] = getByN_H_S_PrevAndNext(session, wikiPage, nodeId, head,
+					status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_H_S_PrevAndNext(
-				session, wikiPage, nodeId, head, status, orderByComparator,
-				false);
+			array[2] = getByN_H_S_PrevAndNext(session, wikiPage, nodeId, head,
+					status, orderByComparator, false);
 
 			return array;
 		}
@@ -14145,16 +13489,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_H_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, boolean head,
-		int status, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByN_H_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long nodeId, boolean head, int status,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -14170,8 +13512,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_N_H_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -14245,9 +13586,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -14271,11 +13611,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByN_H_S(long nodeId, boolean head, int status) {
-		for (WikiPage wikiPage :
-				findByN_H_S(
-					nodeId, head, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (WikiPage wikiPage : findByN_H_S(nodeId, head, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -14292,7 +13629,7 @@ public class WikiPagePersistenceImpl
 	public int countByN_H_S(long nodeId, boolean head, int status) {
 		FinderPath finderPath = _finderPathCountByN_H_S;
 
-		Object[] finderArgs = new Object[] {nodeId, head, status};
+		Object[] finderArgs = new Object[] { nodeId, head, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -14341,15 +13678,9 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_H_S_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_S_HEAD_2 =
-		"wikiPage.head = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_S_STATUS_2 =
-		"wikiPage.status = ?";
-
+	private static final String _FINDER_COLUMN_N_H_S_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_S_HEAD_2 = "wikiPage.head = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_S_STATUS_2 = "wikiPage.status = ?";
 	private FinderPath _finderPathWithPaginationFindByN_H_NotS;
 	private FinderPath _finderPathWithPaginationCountByN_H_NotS;
 
@@ -14362,18 +13693,16 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_NotS(
-		long nodeId, boolean head, int status) {
-
-		return findByN_H_NotS(
-			nodeId, head, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<WikiPage> findByN_H_NotS(long nodeId, boolean head, int status) {
+		return findByN_H_NotS(nodeId, head, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and head = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -14384,9 +13713,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_NotS(
-		long nodeId, boolean head, int status, int start, int end) {
-
+	public List<WikiPage> findByN_H_NotS(long nodeId, boolean head, int status,
+		int start, int end) {
 		return findByN_H_NotS(nodeId, head, status, start, end, null);
 	}
 
@@ -14394,7 +13722,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -14406,19 +13734,17 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_NotS(
-		long nodeId, boolean head, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_H_NotS(
-			nodeId, head, status, start, end, orderByComparator, true);
+	public List<WikiPage> findByN_H_NotS(long nodeId, boolean head, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		return findByN_H_NotS(nodeId, head, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -14431,32 +13757,31 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_NotS(
-		long nodeId, boolean head, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
+	public List<WikiPage> findByN_H_NotS(long nodeId, boolean head, int status,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByN_H_NotS;
 		finderArgs = new Object[] {
-			nodeId, head, status, start, end, orderByComparator
-		};
+				nodeId, head, status,
+				
+				start, end, orderByComparator
+			};
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead()) ||
-						(status == wikiPage.getStatus())) {
-
+							(head != wikiPage.isHead()) ||
+							(status == wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -14469,8 +13794,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -14485,10 +13810,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_N_H_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -14510,16 +13836,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -14550,13 +13876,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_NotS_First(
-			long nodeId, boolean head, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_NotS_First(long nodeId, boolean head, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_NotS_First(
-			nodeId, head, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_NotS_First(nodeId, head, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -14590,12 +13914,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_NotS_First(
-		long nodeId, boolean head, int status,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_H_NotS(
-			nodeId, head, status, 0, 1, orderByComparator);
+	public WikiPage fetchByN_H_NotS_First(long nodeId, boolean head,
+		int status, OrderByComparator<WikiPage> orderByComparator) {
+		List<WikiPage> list = findByN_H_NotS(nodeId, head, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -14615,13 +13937,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_NotS_Last(
-			long nodeId, boolean head, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_NotS_Last(long nodeId, boolean head, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_NotS_Last(
-			nodeId, head, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_NotS_Last(nodeId, head, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -14655,18 +13975,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_NotS_Last(
-		long nodeId, boolean head, int status,
+	public WikiPage fetchByN_H_NotS_Last(long nodeId, boolean head, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_H_NotS(nodeId, head, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_H_NotS(
-			nodeId, head, status, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByN_H_NotS(nodeId, head, status, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -14687,11 +14005,9 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_H_NotS_PrevAndNext(
-			long pageId, long nodeId, boolean head, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_H_NotS_PrevAndNext(long pageId, long nodeId,
+		boolean head, int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -14701,15 +14017,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_H_NotS_PrevAndNext(
-				session, wikiPage, nodeId, head, status, orderByComparator,
-				true);
+			array[0] = getByN_H_NotS_PrevAndNext(session, wikiPage, nodeId,
+					head, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_H_NotS_PrevAndNext(
-				session, wikiPage, nodeId, head, status, orderByComparator,
-				false);
+			array[2] = getByN_H_NotS_PrevAndNext(session, wikiPage, nodeId,
+					head, status, orderByComparator, false);
 
 			return array;
 		}
@@ -14721,16 +14035,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_H_NotS_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, boolean head,
-		int status, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByN_H_NotS_PrevAndNext(Session session,
+		WikiPage wikiPage, long nodeId, boolean head, int status,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -14746,8 +14058,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_N_H_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -14821,9 +14132,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -14847,11 +14157,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void removeByN_H_NotS(long nodeId, boolean head, int status) {
-		for (WikiPage wikiPage :
-				findByN_H_NotS(
-					nodeId, head, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (WikiPage wikiPage : findByN_H_NotS(nodeId, head, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -14868,7 +14175,7 @@ public class WikiPagePersistenceImpl
 	public int countByN_H_NotS(long nodeId, boolean head, int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByN_H_NotS;
 
-		Object[] finderArgs = new Object[] {nodeId, head, status};
+		Object[] finderArgs = new Object[] { nodeId, head, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -14917,15 +14224,9 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_H_NOTS_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_NOTS_HEAD_2 =
-		"wikiPage.head = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_NOTS_STATUS_2 =
-		"wikiPage.status != ?";
-
+	private static final String _FINDER_COLUMN_N_H_NOTS_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_NOTS_HEAD_2 = "wikiPage.head = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_NOTS_STATUS_2 = "wikiPage.status != ?";
 	private FinderPath _finderPathWithPaginationFindByG_U_N_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_U_N_S;
 	private FinderPath _finderPathCountByG_U_N_S;
@@ -14940,19 +14241,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_U_N_S(
-		long groupId, long userId, long nodeId, int status) {
-
-		return findByG_U_N_S(
-			groupId, userId, nodeId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<WikiPage> findByG_U_N_S(long groupId, long userId, long nodeId,
+		int status) {
+		return findByG_U_N_S(groupId, userId, nodeId, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where groupId = &#63; and userId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14964,10 +14263,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_U_N_S(
-		long groupId, long userId, long nodeId, int status, int start,
-		int end) {
-
+	public List<WikiPage> findByG_U_N_S(long groupId, long userId, long nodeId,
+		int status, int start, int end) {
 		return findByG_U_N_S(groupId, userId, nodeId, status, start, end, null);
 	}
 
@@ -14975,7 +14272,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and userId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14988,20 +14285,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_U_N_S(
-		long groupId, long userId, long nodeId, int status, int start, int end,
+	public List<WikiPage> findByG_U_N_S(long groupId, long userId, long nodeId,
+		int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByG_U_N_S(
-			groupId, userId, nodeId, status, start, end, orderByComparator,
-			true);
+		return findByG_U_N_S(groupId, userId, nodeId, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and userId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -15015,42 +14310,40 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_U_N_S(
-		long groupId, long userId, long nodeId, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByG_U_N_S(long groupId, long userId, long nodeId,
+		int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_U_N_S;
-			finderArgs = new Object[] {groupId, userId, nodeId, status};
+			finderArgs = new Object[] { groupId, userId, nodeId, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_U_N_S;
 			finderArgs = new Object[] {
-				groupId, userId, nodeId, status, start, end, orderByComparator
-			};
+					groupId, userId, nodeId, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((groupId != wikiPage.getGroupId()) ||
-						(userId != wikiPage.getUserId()) ||
-						(nodeId != wikiPage.getNodeId()) ||
-						(status != wikiPage.getStatus())) {
-
+							(userId != wikiPage.getUserId()) ||
+							(nodeId != wikiPage.getNodeId()) ||
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -15063,8 +14356,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					6 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -15081,10 +14374,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_G_U_N_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -15108,16 +14402,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -15149,13 +14443,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_U_N_S_First(
-			long groupId, long userId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_U_N_S_First(long groupId, long userId, long nodeId,
+		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_U_N_S_First(
-			groupId, userId, nodeId, status, orderByComparator);
+		WikiPage wikiPage = fetchByG_U_N_S_First(groupId, userId, nodeId,
+				status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -15193,12 +14485,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_U_N_S_First(
-		long groupId, long userId, long nodeId, int status,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByG_U_N_S(
-			groupId, userId, nodeId, status, 0, 1, orderByComparator);
+	public WikiPage fetchByG_U_N_S_First(long groupId, long userId,
+		long nodeId, int status, OrderByComparator<WikiPage> orderByComparator) {
+		List<WikiPage> list = findByG_U_N_S(groupId, userId, nodeId, status, 0,
+				1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -15219,13 +14509,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_U_N_S_Last(
-			long groupId, long userId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_U_N_S_Last(long groupId, long userId, long nodeId,
+		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_U_N_S_Last(
-			groupId, userId, nodeId, status, orderByComparator);
+		WikiPage wikiPage = fetchByG_U_N_S_Last(groupId, userId, nodeId,
+				status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -15263,19 +14551,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_U_N_S_Last(
-		long groupId, long userId, long nodeId, int status,
-		OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByG_U_N_S_Last(long groupId, long userId, long nodeId,
+		int status, OrderByComparator<WikiPage> orderByComparator) {
 		int count = countByG_U_N_S(groupId, userId, nodeId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByG_U_N_S(
-			groupId, userId, nodeId, status, count - 1, count,
-			orderByComparator);
+		List<WikiPage> list = findByG_U_N_S(groupId, userId, nodeId, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -15297,11 +14582,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByG_U_N_S_PrevAndNext(
-			long pageId, long groupId, long userId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByG_U_N_S_PrevAndNext(long pageId, long groupId,
+		long userId, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -15311,15 +14595,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByG_U_N_S_PrevAndNext(
-				session, wikiPage, groupId, userId, nodeId, status,
-				orderByComparator, true);
+			array[0] = getByG_U_N_S_PrevAndNext(session, wikiPage, groupId,
+					userId, nodeId, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByG_U_N_S_PrevAndNext(
-				session, wikiPage, groupId, userId, nodeId, status,
-				orderByComparator, false);
+			array[2] = getByG_U_N_S_PrevAndNext(session, wikiPage, groupId,
+					userId, nodeId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -15331,16 +14613,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByG_U_N_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long userId,
-		long nodeId, int status, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByG_U_N_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long userId, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -15358,8 +14638,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_N_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -15435,9 +14714,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -15462,19 +14740,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_U_N_S(
-		long groupId, long userId, long nodeId, int status) {
-
-		return filterFindByG_U_N_S(
-			groupId, userId, nodeId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<WikiPage> filterFindByG_U_N_S(long groupId, long userId,
+		long nodeId, int status) {
+		return filterFindByG_U_N_S(groupId, userId, nodeId, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages that the user has permission to view where groupId = &#63; and userId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -15486,19 +14762,17 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_U_N_S(
-		long groupId, long userId, long nodeId, int status, int start,
-		int end) {
-
-		return filterFindByG_U_N_S(
-			groupId, userId, nodeId, status, start, end, null);
+	public List<WikiPage> filterFindByG_U_N_S(long groupId, long userId,
+		long nodeId, int status, int start, int end) {
+		return filterFindByG_U_N_S(groupId, userId, nodeId, status, start, end,
+			null);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages that the user has permissions to view where groupId = &#63; and userId = &#63; and nodeId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -15511,20 +14785,19 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_U_N_S(
-		long groupId, long userId, long nodeId, int status, int start, int end,
+	public List<WikiPage> filterFindByG_U_N_S(long groupId, long userId,
+		long nodeId, int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_N_S(
-				groupId, userId, nodeId, status, start, end, orderByComparator);
+			return findByG_U_N_S(groupId, userId, nodeId, status, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -15534,8 +14807,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_N_S_GROUPID_2);
@@ -15547,18 +14819,17 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_N_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -15570,9 +14841,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -15621,14 +14892,13 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] filterFindByG_U_N_S_PrevAndNext(
-			long pageId, long groupId, long userId, long nodeId, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] filterFindByG_U_N_S_PrevAndNext(long pageId,
+		long groupId, long userId, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_N_S_PrevAndNext(
-				pageId, groupId, userId, nodeId, status, orderByComparator);
+			return findByG_U_N_S_PrevAndNext(pageId, groupId, userId, nodeId,
+				status, orderByComparator);
 		}
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -15640,15 +14910,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = filterGetByG_U_N_S_PrevAndNext(
-				session, wikiPage, groupId, userId, nodeId, status,
-				orderByComparator, true);
+			array[0] = filterGetByG_U_N_S_PrevAndNext(session, wikiPage,
+					groupId, userId, nodeId, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = filterGetByG_U_N_S_PrevAndNext(
-				session, wikiPage, groupId, userId, nodeId, status,
-				orderByComparator, false);
+			array[2] = filterGetByG_U_N_S_PrevAndNext(session, wikiPage,
+					groupId, userId, nodeId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -15660,16 +14928,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage filterGetByG_U_N_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long userId,
-		long nodeId, int status, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage filterGetByG_U_N_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long userId, long nodeId, int status,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(8 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -15680,8 +14946,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_N_S_GROUPID_2);
@@ -15693,13 +14958,11 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_N_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -15707,17 +14970,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -15743,15 +15002,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -15780,9 +15037,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -15807,9 +15064,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -15833,14 +15089,10 @@ public class WikiPagePersistenceImpl
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_U_N_S(
-		long groupId, long userId, long nodeId, int status) {
-
-		for (WikiPage wikiPage :
-				findByG_U_N_S(
-					groupId, userId, nodeId, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+	public void removeByG_U_N_S(long groupId, long userId, long nodeId,
+		int status) {
+		for (WikiPage wikiPage : findByG_U_N_S(groupId, userId, nodeId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -15855,12 +15107,10 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages
 	 */
 	@Override
-	public int countByG_U_N_S(
-		long groupId, long userId, long nodeId, int status) {
-
+	public int countByG_U_N_S(long groupId, long userId, long nodeId, int status) {
 		FinderPath finderPath = _finderPathCountByG_U_N_S;
 
-		Object[] finderArgs = new Object[] {groupId, userId, nodeId, status};
+		Object[] finderArgs = new Object[] { groupId, userId, nodeId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -15923,9 +15173,8 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_U_N_S(
-		long groupId, long userId, long nodeId, int status) {
-
+	public int filterCountByG_U_N_S(long groupId, long userId, long nodeId,
+		int status) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_U_N_S(groupId, userId, nodeId, status);
 		}
@@ -15942,9 +15191,9 @@ public class WikiPagePersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_U_N_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -15953,8 +15202,8 @@ public class WikiPagePersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -15978,18 +15227,10 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_U_N_S_GROUPID_2 =
-		"wikiPage.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_N_S_USERID_2 =
-		"wikiPage.userId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_N_S_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_N_S_STATUS_2 =
-		"wikiPage.status = ?";
-
+	private static final String _FINDER_COLUMN_G_U_N_S_GROUPID_2 = "wikiPage.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_N_S_USERID_2 = "wikiPage.userId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_N_S_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_N_S_STATUS_2 = "wikiPage.status = ?";
 	private FinderPath _finderPathWithPaginationFindByG_N_T_H;
 	private FinderPath _finderPathWithoutPaginationFindByG_N_T_H;
 	private FinderPath _finderPathCountByG_N_T_H;
@@ -16004,19 +15245,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_T_H(
-		long groupId, long nodeId, String title, boolean head) {
-
-		return findByG_N_T_H(
-			groupId, nodeId, title, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<WikiPage> findByG_N_T_H(long groupId, long nodeId,
+		String title, boolean head) {
+		return findByG_N_T_H(groupId, nodeId, title, head, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where groupId = &#63; and nodeId = &#63; and title = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -16028,10 +15267,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_T_H(
-		long groupId, long nodeId, String title, boolean head, int start,
-		int end) {
-
+	public List<WikiPage> findByG_N_T_H(long groupId, long nodeId,
+		String title, boolean head, int start, int end) {
 		return findByG_N_T_H(groupId, nodeId, title, head, start, end, null);
 	}
 
@@ -16039,7 +15276,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and nodeId = &#63; and title = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -16052,19 +15289,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_T_H(
-		long groupId, long nodeId, String title, boolean head, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByG_N_T_H(
-			groupId, nodeId, title, head, start, end, orderByComparator, true);
+	public List<WikiPage> findByG_N_T_H(long groupId, long nodeId,
+		String title, boolean head, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator) {
+		return findByG_N_T_H(groupId, nodeId, title, head, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and nodeId = &#63; and title = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -16078,11 +15314,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_T_H(
-		long groupId, long nodeId, String title, boolean head, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByG_N_T_H(long groupId, long nodeId,
+		String title, boolean head, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		title = Objects.toString(title, "");
 
 		boolean pagination = true;
@@ -16090,32 +15324,32 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_N_T_H;
-			finderArgs = new Object[] {groupId, nodeId, title, head};
+			finderArgs = new Object[] { groupId, nodeId, title, head };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_N_T_H;
 			finderArgs = new Object[] {
-				groupId, nodeId, title, head, start, end, orderByComparator
-			};
+					groupId, nodeId, title, head,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((groupId != wikiPage.getGroupId()) ||
-						(nodeId != wikiPage.getNodeId()) ||
-						!title.equals(wikiPage.getTitle()) ||
-						(head != wikiPage.isHead())) {
-
+							(nodeId != wikiPage.getNodeId()) ||
+							!title.equals(wikiPage.getTitle()) ||
+							(head != wikiPage.isHead())) {
 						list = null;
 
 						break;
@@ -16128,8 +15362,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					6 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -16155,10 +15389,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_G_N_T_H_HEAD_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -16184,16 +15419,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(head);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -16225,13 +15460,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_N_T_H_First(
-			long groupId, long nodeId, String title, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_N_T_H_First(long groupId, long nodeId,
+		String title, boolean head,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_N_T_H_First(
-			groupId, nodeId, title, head, orderByComparator);
+		WikiPage wikiPage = fetchByG_N_T_H_First(groupId, nodeId, title, head,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -16269,12 +15503,11 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_N_T_H_First(
-		long groupId, long nodeId, String title, boolean head,
+	public WikiPage fetchByG_N_T_H_First(long groupId, long nodeId,
+		String title, boolean head,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByG_N_T_H(
-			groupId, nodeId, title, head, 0, 1, orderByComparator);
+		List<WikiPage> list = findByG_N_T_H(groupId, nodeId, title, head, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -16295,13 +15528,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_N_T_H_Last(
-			long groupId, long nodeId, String title, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_N_T_H_Last(long groupId, long nodeId, String title,
+		boolean head, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_N_T_H_Last(
-			groupId, nodeId, title, head, orderByComparator);
+		WikiPage wikiPage = fetchByG_N_T_H_Last(groupId, nodeId, title, head,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -16339,18 +15570,17 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_N_T_H_Last(
-		long groupId, long nodeId, String title, boolean head,
+	public WikiPage fetchByG_N_T_H_Last(long groupId, long nodeId,
+		String title, boolean head,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByG_N_T_H(groupId, nodeId, title, head);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByG_N_T_H(
-			groupId, nodeId, title, head, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByG_N_T_H(groupId, nodeId, title, head,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -16372,11 +15602,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByG_N_T_H_PrevAndNext(
-			long pageId, long groupId, long nodeId, String title, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByG_N_T_H_PrevAndNext(long pageId, long groupId,
+		long nodeId, String title, boolean head,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		title = Objects.toString(title, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -16388,15 +15617,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByG_N_T_H_PrevAndNext(
-				session, wikiPage, groupId, nodeId, title, head,
-				orderByComparator, true);
+			array[0] = getByG_N_T_H_PrevAndNext(session, wikiPage, groupId,
+					nodeId, title, head, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByG_N_T_H_PrevAndNext(
-				session, wikiPage, groupId, nodeId, title, head,
-				orderByComparator, false);
+			array[2] = getByG_N_T_H_PrevAndNext(session, wikiPage, groupId,
+					nodeId, title, head, orderByComparator, false);
 
 			return array;
 		}
@@ -16408,16 +15635,15 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByG_N_T_H_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long nodeId,
-		String title, boolean head,
-		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
+	protected WikiPage getByG_N_T_H_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long nodeId, String title,
+		boolean head, OrderByComparator<WikiPage> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -16444,8 +15670,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_T_H_HEAD_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -16523,9 +15748,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(head);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -16550,19 +15774,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_T_H(
-		long groupId, long nodeId, String title, boolean head) {
-
-		return filterFindByG_N_T_H(
-			groupId, nodeId, title, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<WikiPage> filterFindByG_N_T_H(long groupId, long nodeId,
+		String title, boolean head) {
+		return filterFindByG_N_T_H(groupId, nodeId, title, head,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages that the user has permission to view where groupId = &#63; and nodeId = &#63; and title = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -16574,19 +15796,17 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_T_H(
-		long groupId, long nodeId, String title, boolean head, int start,
-		int end) {
-
-		return filterFindByG_N_T_H(
-			groupId, nodeId, title, head, start, end, null);
+	public List<WikiPage> filterFindByG_N_T_H(long groupId, long nodeId,
+		String title, boolean head, int start, int end) {
+		return filterFindByG_N_T_H(groupId, nodeId, title, head, start, end,
+			null);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages that the user has permissions to view where groupId = &#63; and nodeId = &#63; and title = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -16599,13 +15819,12 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_T_H(
-		long groupId, long nodeId, String title, boolean head, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator) {
-
+	public List<WikiPage> filterFindByG_N_T_H(long groupId, long nodeId,
+		String title, boolean head, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_N_T_H(
-				groupId, nodeId, title, head, start, end, orderByComparator);
+			return findByG_N_T_H(groupId, nodeId, title, head, start, end,
+				orderByComparator);
 		}
 
 		title = Objects.toString(title, "");
@@ -16613,8 +15832,8 @@ public class WikiPagePersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -16624,8 +15843,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_N_T_H_GROUPID_2);
@@ -16646,18 +15864,17 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_T_H_HEAD_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -16669,9 +15886,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -16722,14 +15939,13 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] filterFindByG_N_T_H_PrevAndNext(
-			long pageId, long groupId, long nodeId, String title, boolean head,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] filterFindByG_N_T_H_PrevAndNext(long pageId,
+		long groupId, long nodeId, String title, boolean head,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_N_T_H_PrevAndNext(
-				pageId, groupId, nodeId, title, head, orderByComparator);
+			return findByG_N_T_H_PrevAndNext(pageId, groupId, nodeId, title,
+				head, orderByComparator);
 		}
 
 		title = Objects.toString(title, "");
@@ -16743,15 +15959,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = filterGetByG_N_T_H_PrevAndNext(
-				session, wikiPage, groupId, nodeId, title, head,
-				orderByComparator, true);
+			array[0] = filterGetByG_N_T_H_PrevAndNext(session, wikiPage,
+					groupId, nodeId, title, head, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = filterGetByG_N_T_H_PrevAndNext(
-				session, wikiPage, groupId, nodeId, title, head,
-				orderByComparator, false);
+			array[2] = filterGetByG_N_T_H_PrevAndNext(session, wikiPage,
+					groupId, nodeId, title, head, orderByComparator, false);
 
 			return array;
 		}
@@ -16763,16 +15977,15 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage filterGetByG_N_T_H_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long nodeId,
-		String title, boolean head,
-		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
+	protected WikiPage filterGetByG_N_T_H_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long nodeId, String title,
+		boolean head, OrderByComparator<WikiPage> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(8 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -16783,8 +15996,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_N_T_H_GROUPID_2);
@@ -16805,13 +16017,11 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_T_H_HEAD_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -16819,17 +16029,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -16855,15 +16061,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -16892,9 +16096,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -16921,9 +16125,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(head);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -16947,14 +16150,10 @@ public class WikiPagePersistenceImpl
 	 * @param head the head
 	 */
 	@Override
-	public void removeByG_N_T_H(
-		long groupId, long nodeId, String title, boolean head) {
-
-		for (WikiPage wikiPage :
-				findByG_N_T_H(
-					groupId, nodeId, title, head, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+	public void removeByG_N_T_H(long groupId, long nodeId, String title,
+		boolean head) {
+		for (WikiPage wikiPage : findByG_N_T_H(groupId, nodeId, title, head,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -16969,14 +16168,13 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages
 	 */
 	@Override
-	public int countByG_N_T_H(
-		long groupId, long nodeId, String title, boolean head) {
-
+	public int countByG_N_T_H(long groupId, long nodeId, String title,
+		boolean head) {
 		title = Objects.toString(title, "");
 
 		FinderPath finderPath = _finderPathCountByG_N_T_H;
 
-		Object[] finderArgs = new Object[] {groupId, nodeId, title, head};
+		Object[] finderArgs = new Object[] { groupId, nodeId, title, head };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -17050,9 +16248,8 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_N_T_H(
-		long groupId, long nodeId, String title, boolean head) {
-
+	public int filterCountByG_N_T_H(long groupId, long nodeId, String title,
+		boolean head) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_N_T_H(groupId, nodeId, title, head);
 		}
@@ -17080,9 +16277,9 @@ public class WikiPagePersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_N_T_H_HEAD_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -17091,8 +16288,8 @@ public class WikiPagePersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -17118,21 +16315,11 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_N_T_H_GROUPID_2 =
-		"wikiPage.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_T_H_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_T_H_TITLE_2 =
-		"lower(wikiPage.title) = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_T_H_TITLE_3 =
-		"(wikiPage.title IS NULL OR wikiPage.title = '') AND ";
-
-	private static final String _FINDER_COLUMN_G_N_T_H_HEAD_2 =
-		"wikiPage.head = ?";
-
+	private static final String _FINDER_COLUMN_G_N_T_H_GROUPID_2 = "wikiPage.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_T_H_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_T_H_TITLE_2 = "lower(wikiPage.title) = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_T_H_TITLE_3 = "(wikiPage.title IS NULL OR wikiPage.title = '') AND ";
+	private static final String _FINDER_COLUMN_G_N_T_H_HEAD_2 = "wikiPage.head = ?";
 	private FinderPath _finderPathWithPaginationFindByG_N_H_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_N_H_S;
 	private FinderPath _finderPathCountByG_N_H_S;
@@ -17147,19 +16334,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_H_S(
-		long groupId, long nodeId, boolean head, int status) {
-
-		return findByG_N_H_S(
-			groupId, nodeId, head, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<WikiPage> findByG_N_H_S(long groupId, long nodeId,
+		boolean head, int status) {
+		return findByG_N_H_S(groupId, nodeId, head, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where groupId = &#63; and nodeId = &#63; and head = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -17171,10 +16356,8 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_H_S(
-		long groupId, long nodeId, boolean head, int status, int start,
-		int end) {
-
+	public List<WikiPage> findByG_N_H_S(long groupId, long nodeId,
+		boolean head, int status, int start, int end) {
 		return findByG_N_H_S(groupId, nodeId, head, status, start, end, null);
 	}
 
@@ -17182,7 +16365,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and nodeId = &#63; and head = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -17195,19 +16378,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_H_S(
-		long groupId, long nodeId, boolean head, int status, int start, int end,
+	public List<WikiPage> findByG_N_H_S(long groupId, long nodeId,
+		boolean head, int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByG_N_H_S(
-			groupId, nodeId, head, status, start, end, orderByComparator, true);
+		return findByG_N_H_S(groupId, nodeId, head, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and nodeId = &#63; and head = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -17221,42 +16403,40 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_H_S(
-		long groupId, long nodeId, boolean head, int status, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByG_N_H_S(long groupId, long nodeId,
+		boolean head, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_N_H_S;
-			finderArgs = new Object[] {groupId, nodeId, head, status};
+			finderArgs = new Object[] { groupId, nodeId, head, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_N_H_S;
 			finderArgs = new Object[] {
-				groupId, nodeId, head, status, start, end, orderByComparator
-			};
+					groupId, nodeId, head, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((groupId != wikiPage.getGroupId()) ||
-						(nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead()) ||
-						(status != wikiPage.getStatus())) {
-
+							(nodeId != wikiPage.getNodeId()) ||
+							(head != wikiPage.isHead()) ||
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -17269,8 +16449,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					6 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -17287,10 +16467,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_G_N_H_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -17314,16 +16495,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -17355,13 +16536,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_N_H_S_First(
-			long groupId, long nodeId, boolean head, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_N_H_S_First(long groupId, long nodeId,
+		boolean head, int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_N_H_S_First(
-			groupId, nodeId, head, status, orderByComparator);
+		WikiPage wikiPage = fetchByG_N_H_S_First(groupId, nodeId, head, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -17399,12 +16578,10 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_N_H_S_First(
-		long groupId, long nodeId, boolean head, int status,
-		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByG_N_H_S(
-			groupId, nodeId, head, status, 0, 1, orderByComparator);
+	public WikiPage fetchByG_N_H_S_First(long groupId, long nodeId,
+		boolean head, int status, OrderByComparator<WikiPage> orderByComparator) {
+		List<WikiPage> list = findByG_N_H_S(groupId, nodeId, head, status, 0,
+				1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -17425,13 +16602,11 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_N_H_S_Last(
-			long groupId, long nodeId, boolean head, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_N_H_S_Last(long groupId, long nodeId, boolean head,
+		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_N_H_S_Last(
-			groupId, nodeId, head, status, orderByComparator);
+		WikiPage wikiPage = fetchByG_N_H_S_Last(groupId, nodeId, head, status,
+				orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -17469,18 +16644,16 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_N_H_S_Last(
-		long groupId, long nodeId, boolean head, int status,
-		OrderByComparator<WikiPage> orderByComparator) {
-
+	public WikiPage fetchByG_N_H_S_Last(long groupId, long nodeId,
+		boolean head, int status, OrderByComparator<WikiPage> orderByComparator) {
 		int count = countByG_N_H_S(groupId, nodeId, head, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByG_N_H_S(
-			groupId, nodeId, head, status, count - 1, count, orderByComparator);
+		List<WikiPage> list = findByG_N_H_S(groupId, nodeId, head, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -17502,11 +16675,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByG_N_H_S_PrevAndNext(
-			long pageId, long groupId, long nodeId, boolean head, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByG_N_H_S_PrevAndNext(long pageId, long groupId,
+		long nodeId, boolean head, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = findByPrimaryKey(pageId);
 
 		Session session = null;
@@ -17516,15 +16688,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByG_N_H_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, status,
-				orderByComparator, true);
+			array[0] = getByG_N_H_S_PrevAndNext(session, wikiPage, groupId,
+					nodeId, head, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByG_N_H_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, status,
-				orderByComparator, false);
+			array[2] = getByG_N_H_S_PrevAndNext(session, wikiPage, groupId,
+					nodeId, head, status, orderByComparator, false);
 
 			return array;
 		}
@@ -17536,16 +16706,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByG_N_H_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long nodeId,
-		boolean head, int status, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage getByG_N_H_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long nodeId, boolean head, int status,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -17563,8 +16731,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_H_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -17640,9 +16807,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -17667,19 +16833,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_H_S(
-		long groupId, long nodeId, boolean head, int status) {
-
-		return filterFindByG_N_H_S(
-			groupId, nodeId, head, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<WikiPage> filterFindByG_N_H_S(long groupId, long nodeId,
+		boolean head, int status) {
+		return filterFindByG_N_H_S(groupId, nodeId, head, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages that the user has permission to view where groupId = &#63; and nodeId = &#63; and head = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -17691,19 +16855,17 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_H_S(
-		long groupId, long nodeId, boolean head, int status, int start,
-		int end) {
-
-		return filterFindByG_N_H_S(
-			groupId, nodeId, head, status, start, end, null);
+	public List<WikiPage> filterFindByG_N_H_S(long groupId, long nodeId,
+		boolean head, int status, int start, int end) {
+		return filterFindByG_N_H_S(groupId, nodeId, head, status, start, end,
+			null);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages that the user has permissions to view where groupId = &#63; and nodeId = &#63; and head = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -17716,20 +16878,19 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_H_S(
-		long groupId, long nodeId, boolean head, int status, int start, int end,
+	public List<WikiPage> filterFindByG_N_H_S(long groupId, long nodeId,
+		boolean head, int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_N_H_S(
-				groupId, nodeId, head, status, start, end, orderByComparator);
+			return findByG_N_H_S(groupId, nodeId, head, status, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -17739,8 +16900,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_N_H_S_GROUPID_2);
@@ -17752,18 +16912,17 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_H_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -17775,9 +16934,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -17826,14 +16985,13 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] filterFindByG_N_H_S_PrevAndNext(
-			long pageId, long groupId, long nodeId, boolean head, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] filterFindByG_N_H_S_PrevAndNext(long pageId,
+		long groupId, long nodeId, boolean head, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_N_H_S_PrevAndNext(
-				pageId, groupId, nodeId, head, status, orderByComparator);
+			return findByG_N_H_S_PrevAndNext(pageId, groupId, nodeId, head,
+				status, orderByComparator);
 		}
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -17845,15 +17003,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = filterGetByG_N_H_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, status,
-				orderByComparator, true);
+			array[0] = filterGetByG_N_H_S_PrevAndNext(session, wikiPage,
+					groupId, nodeId, head, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = filterGetByG_N_H_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, status,
-				orderByComparator, false);
+			array[2] = filterGetByG_N_H_S_PrevAndNext(session, wikiPage,
+					groupId, nodeId, head, status, orderByComparator, false);
 
 			return array;
 		}
@@ -17865,16 +17021,14 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage filterGetByG_N_H_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long nodeId,
-		boolean head, int status, OrderByComparator<WikiPage> orderByComparator,
-		boolean previous) {
-
+	protected WikiPage filterGetByG_N_H_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long nodeId, boolean head, int status,
+		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(8 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -17885,8 +17039,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_N_H_S_GROUPID_2);
@@ -17898,13 +17051,11 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_H_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -17912,17 +17063,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -17948,15 +17095,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -17985,9 +17130,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -18012,9 +17157,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -18038,14 +17182,10 @@ public class WikiPagePersistenceImpl
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_N_H_S(
-		long groupId, long nodeId, boolean head, int status) {
-
-		for (WikiPage wikiPage :
-				findByG_N_H_S(
-					groupId, nodeId, head, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+	public void removeByG_N_H_S(long groupId, long nodeId, boolean head,
+		int status) {
+		for (WikiPage wikiPage : findByG_N_H_S(groupId, nodeId, head, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -18060,12 +17200,11 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages
 	 */
 	@Override
-	public int countByG_N_H_S(
-		long groupId, long nodeId, boolean head, int status) {
-
+	public int countByG_N_H_S(long groupId, long nodeId, boolean head,
+		int status) {
 		FinderPath finderPath = _finderPathCountByG_N_H_S;
 
-		Object[] finderArgs = new Object[] {groupId, nodeId, head, status};
+		Object[] finderArgs = new Object[] { groupId, nodeId, head, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -18128,9 +17267,8 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_N_H_S(
-		long groupId, long nodeId, boolean head, int status) {
-
+	public int filterCountByG_N_H_S(long groupId, long nodeId, boolean head,
+		int status) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_N_H_S(groupId, nodeId, head, status);
 		}
@@ -18147,9 +17285,9 @@ public class WikiPagePersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_N_H_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -18158,8 +17296,8 @@ public class WikiPagePersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -18183,18 +17321,10 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_N_H_S_GROUPID_2 =
-		"wikiPage.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_H_S_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_H_S_HEAD_2 =
-		"wikiPage.head = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_H_S_STATUS_2 =
-		"wikiPage.status = ?";
-
+	private static final String _FINDER_COLUMN_G_N_H_S_GROUPID_2 = "wikiPage.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_H_S_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_H_S_HEAD_2 = "wikiPage.head = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_H_S_STATUS_2 = "wikiPage.status = ?";
 	private FinderPath _finderPathWithPaginationFindByN_H_P_S;
 	private FinderPath _finderPathWithoutPaginationFindByN_H_P_S;
 	private FinderPath _finderPathCountByN_H_P_S;
@@ -18209,19 +17339,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P_S(
-		long nodeId, boolean head, String parentTitle, int status) {
-
-		return findByN_H_P_S(
-			nodeId, head, parentTitle, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<WikiPage> findByN_H_P_S(long nodeId, boolean head,
+		String parentTitle, int status) {
+		return findByN_H_P_S(nodeId, head, parentTitle, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and head = &#63; and parentTitle = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -18233,19 +17361,16 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P_S(
-		long nodeId, boolean head, String parentTitle, int status, int start,
-		int end) {
-
-		return findByN_H_P_S(
-			nodeId, head, parentTitle, status, start, end, null);
+	public List<WikiPage> findByN_H_P_S(long nodeId, boolean head,
+		String parentTitle, int status, int start, int end) {
+		return findByN_H_P_S(nodeId, head, parentTitle, status, start, end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and parentTitle = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -18258,20 +17383,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P_S(
-		long nodeId, boolean head, String parentTitle, int status, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_H_P_S(
-			nodeId, head, parentTitle, status, start, end, orderByComparator,
-			true);
+	public List<WikiPage> findByN_H_P_S(long nodeId, boolean head,
+		String parentTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator) {
+		return findByN_H_P_S(nodeId, head, parentTitle, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and parentTitle = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -18285,11 +17408,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P_S(
-		long nodeId, boolean head, String parentTitle, int status, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByN_H_P_S(long nodeId, boolean head,
+		String parentTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		parentTitle = Objects.toString(parentTitle, "");
 
 		boolean pagination = true;
@@ -18297,32 +17418,32 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_H_P_S;
-			finderArgs = new Object[] {nodeId, head, parentTitle, status};
+			finderArgs = new Object[] { nodeId, head, parentTitle, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_H_P_S;
 			finderArgs = new Object[] {
-				nodeId, head, parentTitle, status, start, end, orderByComparator
-			};
+					nodeId, head, parentTitle, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead()) ||
-						!parentTitle.equals(wikiPage.getParentTitle()) ||
-						(status != wikiPage.getStatus())) {
-
+							(head != wikiPage.isHead()) ||
+							!parentTitle.equals(wikiPage.getParentTitle()) ||
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -18335,8 +17456,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					6 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -18362,10 +17483,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_N_H_P_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -18391,16 +17513,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -18432,13 +17554,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_P_S_First(
-			long nodeId, boolean head, String parentTitle, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_P_S_First(long nodeId, boolean head,
+		String parentTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_P_S_First(
-			nodeId, head, parentTitle, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_P_S_First(nodeId, head, parentTitle,
+				status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -18476,12 +17597,11 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_P_S_First(
-		long nodeId, boolean head, String parentTitle, int status,
+	public WikiPage fetchByN_H_P_S_First(long nodeId, boolean head,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_H_P_S(
-			nodeId, head, parentTitle, status, 0, 1, orderByComparator);
+		List<WikiPage> list = findByN_H_P_S(nodeId, head, parentTitle, status,
+				0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -18502,13 +17622,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_P_S_Last(
-			long nodeId, boolean head, String parentTitle, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_P_S_Last(long nodeId, boolean head,
+		String parentTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_P_S_Last(
-			nodeId, head, parentTitle, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_P_S_Last(nodeId, head, parentTitle,
+				status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -18546,19 +17665,17 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_P_S_Last(
-		long nodeId, boolean head, String parentTitle, int status,
+	public WikiPage fetchByN_H_P_S_Last(long nodeId, boolean head,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_H_P_S(nodeId, head, parentTitle, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_H_P_S(
-			nodeId, head, parentTitle, status, count - 1, count,
-			orderByComparator);
+		List<WikiPage> list = findByN_H_P_S(nodeId, head, parentTitle, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -18580,11 +17697,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_H_P_S_PrevAndNext(
-			long pageId, long nodeId, boolean head, String parentTitle,
-			int status, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_H_P_S_PrevAndNext(long pageId, long nodeId,
+		boolean head, String parentTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		parentTitle = Objects.toString(parentTitle, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -18596,15 +17712,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_H_P_S_PrevAndNext(
-				session, wikiPage, nodeId, head, parentTitle, status,
-				orderByComparator, true);
+			array[0] = getByN_H_P_S_PrevAndNext(session, wikiPage, nodeId,
+					head, parentTitle, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_H_P_S_PrevAndNext(
-				session, wikiPage, nodeId, head, parentTitle, status,
-				orderByComparator, false);
+			array[2] = getByN_H_P_S_PrevAndNext(session, wikiPage, nodeId,
+					head, parentTitle, status, orderByComparator, false);
 
 			return array;
 		}
@@ -18616,16 +17730,15 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_H_P_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, boolean head,
-		String parentTitle, int status,
-		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
+	protected WikiPage getByN_H_P_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long nodeId, boolean head, String parentTitle,
+		int status, OrderByComparator<WikiPage> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -18652,8 +17765,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_N_H_P_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -18731,9 +17843,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -18757,14 +17868,10 @@ public class WikiPagePersistenceImpl
 	 * @param status the status
 	 */
 	@Override
-	public void removeByN_H_P_S(
-		long nodeId, boolean head, String parentTitle, int status) {
-
-		for (WikiPage wikiPage :
-				findByN_H_P_S(
-					nodeId, head, parentTitle, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+	public void removeByN_H_P_S(long nodeId, boolean head, String parentTitle,
+		int status) {
+		for (WikiPage wikiPage : findByN_H_P_S(nodeId, head, parentTitle,
+				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -18779,14 +17886,13 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages
 	 */
 	@Override
-	public int countByN_H_P_S(
-		long nodeId, boolean head, String parentTitle, int status) {
-
+	public int countByN_H_P_S(long nodeId, boolean head, String parentTitle,
+		int status) {
 		parentTitle = Objects.toString(parentTitle, "");
 
 		FinderPath finderPath = _finderPathCountByN_H_P_S;
 
-		Object[] finderArgs = new Object[] {nodeId, head, parentTitle, status};
+		Object[] finderArgs = new Object[] { nodeId, head, parentTitle, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -18850,21 +17956,11 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_H_P_S_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_P_S_HEAD_2 =
-		"wikiPage.head = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_P_S_PARENTTITLE_2 =
-		"lower(wikiPage.parentTitle) = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_P_S_PARENTTITLE_3 =
-		"(wikiPage.parentTitle IS NULL OR wikiPage.parentTitle = '') AND ";
-
-	private static final String _FINDER_COLUMN_N_H_P_S_STATUS_2 =
-		"wikiPage.status = ?";
-
+	private static final String _FINDER_COLUMN_N_H_P_S_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_P_S_HEAD_2 = "wikiPage.head = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_P_S_PARENTTITLE_2 = "lower(wikiPage.parentTitle) = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_P_S_PARENTTITLE_3 = "(wikiPage.parentTitle IS NULL OR wikiPage.parentTitle = '') AND ";
+	private static final String _FINDER_COLUMN_N_H_P_S_STATUS_2 = "wikiPage.status = ?";
 	private FinderPath _finderPathWithPaginationFindByN_H_P_NotS;
 	private FinderPath _finderPathWithPaginationCountByN_H_P_NotS;
 
@@ -18878,19 +17974,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P_NotS(
-		long nodeId, boolean head, String parentTitle, int status) {
-
-		return findByN_H_P_NotS(
-			nodeId, head, parentTitle, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<WikiPage> findByN_H_P_NotS(long nodeId, boolean head,
+		String parentTitle, int status) {
+		return findByN_H_P_NotS(nodeId, head, parentTitle, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and head = &#63; and parentTitle = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -18902,19 +17996,17 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P_NotS(
-		long nodeId, boolean head, String parentTitle, int status, int start,
-		int end) {
-
-		return findByN_H_P_NotS(
-			nodeId, head, parentTitle, status, start, end, null);
+	public List<WikiPage> findByN_H_P_NotS(long nodeId, boolean head,
+		String parentTitle, int status, int start, int end) {
+		return findByN_H_P_NotS(nodeId, head, parentTitle, status, start, end,
+			null);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and parentTitle = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -18927,20 +18019,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P_NotS(
-		long nodeId, boolean head, String parentTitle, int status, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_H_P_NotS(
-			nodeId, head, parentTitle, status, start, end, orderByComparator,
-			true);
+	public List<WikiPage> findByN_H_P_NotS(long nodeId, boolean head,
+		String parentTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator) {
+		return findByN_H_P_NotS(nodeId, head, parentTitle, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and parentTitle = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -18954,11 +18044,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_P_NotS(
-		long nodeId, boolean head, String parentTitle, int status, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByN_H_P_NotS(long nodeId, boolean head,
+		String parentTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		parentTitle = Objects.toString(parentTitle, "");
 
 		boolean pagination = true;
@@ -18967,22 +18055,23 @@ public class WikiPagePersistenceImpl
 
 		finderPath = _finderPathWithPaginationFindByN_H_P_NotS;
 		finderArgs = new Object[] {
-			nodeId, head, parentTitle, status, start, end, orderByComparator
-		};
+				nodeId, head, parentTitle, status,
+				
+				start, end, orderByComparator
+			};
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead()) ||
-						!parentTitle.equals(wikiPage.getParentTitle()) ||
-						(status == wikiPage.getStatus())) {
-
+							(head != wikiPage.isHead()) ||
+							!parentTitle.equals(wikiPage.getParentTitle()) ||
+							(status == wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -18995,8 +18084,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					6 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -19022,10 +18111,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_N_H_P_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -19051,16 +18141,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -19092,13 +18182,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_P_NotS_First(
-			long nodeId, boolean head, String parentTitle, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_P_NotS_First(long nodeId, boolean head,
+		String parentTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_P_NotS_First(
-			nodeId, head, parentTitle, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_P_NotS_First(nodeId, head, parentTitle,
+				status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -19136,12 +18225,11 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_P_NotS_First(
-		long nodeId, boolean head, String parentTitle, int status,
+	public WikiPage fetchByN_H_P_NotS_First(long nodeId, boolean head,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_H_P_NotS(
-			nodeId, head, parentTitle, status, 0, 1, orderByComparator);
+		List<WikiPage> list = findByN_H_P_NotS(nodeId, head, parentTitle,
+				status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -19162,13 +18250,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_P_NotS_Last(
-			long nodeId, boolean head, String parentTitle, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_P_NotS_Last(long nodeId, boolean head,
+		String parentTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_P_NotS_Last(
-			nodeId, head, parentTitle, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_P_NotS_Last(nodeId, head, parentTitle,
+				status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -19206,19 +18293,17 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_P_NotS_Last(
-		long nodeId, boolean head, String parentTitle, int status,
+	public WikiPage fetchByN_H_P_NotS_Last(long nodeId, boolean head,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_H_P_NotS(nodeId, head, parentTitle, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_H_P_NotS(
-			nodeId, head, parentTitle, status, count - 1, count,
-			orderByComparator);
+		List<WikiPage> list = findByN_H_P_NotS(nodeId, head, parentTitle,
+				status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -19240,11 +18325,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_H_P_NotS_PrevAndNext(
-			long pageId, long nodeId, boolean head, String parentTitle,
-			int status, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_H_P_NotS_PrevAndNext(long pageId, long nodeId,
+		boolean head, String parentTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		parentTitle = Objects.toString(parentTitle, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -19256,15 +18340,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_H_P_NotS_PrevAndNext(
-				session, wikiPage, nodeId, head, parentTitle, status,
-				orderByComparator, true);
+			array[0] = getByN_H_P_NotS_PrevAndNext(session, wikiPage, nodeId,
+					head, parentTitle, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_H_P_NotS_PrevAndNext(
-				session, wikiPage, nodeId, head, parentTitle, status,
-				orderByComparator, false);
+			array[2] = getByN_H_P_NotS_PrevAndNext(session, wikiPage, nodeId,
+					head, parentTitle, status, orderByComparator, false);
 
 			return array;
 		}
@@ -19276,16 +18358,15 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_H_P_NotS_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, boolean head,
-		String parentTitle, int status,
-		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
+	protected WikiPage getByN_H_P_NotS_PrevAndNext(Session session,
+		WikiPage wikiPage, long nodeId, boolean head, String parentTitle,
+		int status, OrderByComparator<WikiPage> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -19312,8 +18393,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_N_H_P_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -19391,9 +18471,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -19417,14 +18496,10 @@ public class WikiPagePersistenceImpl
 	 * @param status the status
 	 */
 	@Override
-	public void removeByN_H_P_NotS(
-		long nodeId, boolean head, String parentTitle, int status) {
-
-		for (WikiPage wikiPage :
-				findByN_H_P_NotS(
-					nodeId, head, parentTitle, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+	public void removeByN_H_P_NotS(long nodeId, boolean head,
+		String parentTitle, int status) {
+		for (WikiPage wikiPage : findByN_H_P_NotS(nodeId, head, parentTitle,
+				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -19439,14 +18514,13 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages
 	 */
 	@Override
-	public int countByN_H_P_NotS(
-		long nodeId, boolean head, String parentTitle, int status) {
-
+	public int countByN_H_P_NotS(long nodeId, boolean head, String parentTitle,
+		int status) {
 		parentTitle = Objects.toString(parentTitle, "");
 
 		FinderPath finderPath = _finderPathWithPaginationCountByN_H_P_NotS;
 
-		Object[] finderArgs = new Object[] {nodeId, head, parentTitle, status};
+		Object[] finderArgs = new Object[] { nodeId, head, parentTitle, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -19510,21 +18584,11 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_H_P_NOTS_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_P_NOTS_HEAD_2 =
-		"wikiPage.head = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_P_NOTS_PARENTTITLE_2 =
-		"lower(wikiPage.parentTitle) = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_P_NOTS_PARENTTITLE_3 =
-		"(wikiPage.parentTitle IS NULL OR wikiPage.parentTitle = '') AND ";
-
-	private static final String _FINDER_COLUMN_N_H_P_NOTS_STATUS_2 =
-		"wikiPage.status != ?";
-
+	private static final String _FINDER_COLUMN_N_H_P_NOTS_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_P_NOTS_HEAD_2 = "wikiPage.head = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_P_NOTS_PARENTTITLE_2 = "lower(wikiPage.parentTitle) = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_P_NOTS_PARENTTITLE_3 = "(wikiPage.parentTitle IS NULL OR wikiPage.parentTitle = '') AND ";
+	private static final String _FINDER_COLUMN_N_H_P_NOTS_STATUS_2 = "wikiPage.status != ?";
 	private FinderPath _finderPathWithPaginationFindByN_H_R_S;
 	private FinderPath _finderPathWithoutPaginationFindByN_H_R_S;
 	private FinderPath _finderPathCountByN_H_R_S;
@@ -19539,19 +18603,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R_S(
-		long nodeId, boolean head, String redirectTitle, int status) {
-
-		return findByN_H_R_S(
-			nodeId, head, redirectTitle, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<WikiPage> findByN_H_R_S(long nodeId, boolean head,
+		String redirectTitle, int status) {
+		return findByN_H_R_S(nodeId, head, redirectTitle, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and head = &#63; and redirectTitle = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -19563,19 +18625,17 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R_S(
-		long nodeId, boolean head, String redirectTitle, int status, int start,
-		int end) {
-
-		return findByN_H_R_S(
-			nodeId, head, redirectTitle, status, start, end, null);
+	public List<WikiPage> findByN_H_R_S(long nodeId, boolean head,
+		String redirectTitle, int status, int start, int end) {
+		return findByN_H_R_S(nodeId, head, redirectTitle, status, start, end,
+			null);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and redirectTitle = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -19588,20 +18648,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R_S(
-		long nodeId, boolean head, String redirectTitle, int status, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_H_R_S(
-			nodeId, head, redirectTitle, status, start, end, orderByComparator,
-			true);
+	public List<WikiPage> findByN_H_R_S(long nodeId, boolean head,
+		String redirectTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator) {
+		return findByN_H_R_S(nodeId, head, redirectTitle, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and redirectTitle = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -19615,11 +18673,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R_S(
-		long nodeId, boolean head, String redirectTitle, int status, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByN_H_R_S(long nodeId, boolean head,
+		String redirectTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		redirectTitle = Objects.toString(redirectTitle, "");
 
 		boolean pagination = true;
@@ -19627,33 +18683,32 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByN_H_R_S;
-			finderArgs = new Object[] {nodeId, head, redirectTitle, status};
+			finderArgs = new Object[] { nodeId, head, redirectTitle, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByN_H_R_S;
 			finderArgs = new Object[] {
-				nodeId, head, redirectTitle, status, start, end,
-				orderByComparator
-			};
+					nodeId, head, redirectTitle, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead()) ||
-						!redirectTitle.equals(wikiPage.getRedirectTitle()) ||
-						(status != wikiPage.getStatus())) {
-
+							(head != wikiPage.isHead()) ||
+							!redirectTitle.equals(wikiPage.getRedirectTitle()) ||
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -19666,8 +18721,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					6 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -19693,10 +18748,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_N_H_R_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -19722,16 +18778,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -19763,13 +18819,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_R_S_First(
-			long nodeId, boolean head, String redirectTitle, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_R_S_First(long nodeId, boolean head,
+		String redirectTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_R_S_First(
-			nodeId, head, redirectTitle, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_R_S_First(nodeId, head, redirectTitle,
+				status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -19807,12 +18862,11 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_R_S_First(
-		long nodeId, boolean head, String redirectTitle, int status,
+	public WikiPage fetchByN_H_R_S_First(long nodeId, boolean head,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_H_R_S(
-			nodeId, head, redirectTitle, status, 0, 1, orderByComparator);
+		List<WikiPage> list = findByN_H_R_S(nodeId, head, redirectTitle,
+				status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -19833,13 +18887,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_R_S_Last(
-			long nodeId, boolean head, String redirectTitle, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_R_S_Last(long nodeId, boolean head,
+		String redirectTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_R_S_Last(
-			nodeId, head, redirectTitle, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_R_S_Last(nodeId, head, redirectTitle,
+				status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -19877,19 +18930,17 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_R_S_Last(
-		long nodeId, boolean head, String redirectTitle, int status,
+	public WikiPage fetchByN_H_R_S_Last(long nodeId, boolean head,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_H_R_S(nodeId, head, redirectTitle, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_H_R_S(
-			nodeId, head, redirectTitle, status, count - 1, count,
-			orderByComparator);
+		List<WikiPage> list = findByN_H_R_S(nodeId, head, redirectTitle,
+				status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -19911,11 +18962,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_H_R_S_PrevAndNext(
-			long pageId, long nodeId, boolean head, String redirectTitle,
-			int status, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_H_R_S_PrevAndNext(long pageId, long nodeId,
+		boolean head, String redirectTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		redirectTitle = Objects.toString(redirectTitle, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -19927,15 +18977,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_H_R_S_PrevAndNext(
-				session, wikiPage, nodeId, head, redirectTitle, status,
-				orderByComparator, true);
+			array[0] = getByN_H_R_S_PrevAndNext(session, wikiPage, nodeId,
+					head, redirectTitle, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_H_R_S_PrevAndNext(
-				session, wikiPage, nodeId, head, redirectTitle, status,
-				orderByComparator, false);
+			array[2] = getByN_H_R_S_PrevAndNext(session, wikiPage, nodeId,
+					head, redirectTitle, status, orderByComparator, false);
 
 			return array;
 		}
@@ -19947,16 +18995,15 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_H_R_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, boolean head,
-		String redirectTitle, int status,
-		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
+	protected WikiPage getByN_H_R_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long nodeId, boolean head, String redirectTitle,
+		int status, OrderByComparator<WikiPage> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -19983,8 +19030,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_N_H_R_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -20062,9 +19108,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -20088,14 +19133,10 @@ public class WikiPagePersistenceImpl
 	 * @param status the status
 	 */
 	@Override
-	public void removeByN_H_R_S(
-		long nodeId, boolean head, String redirectTitle, int status) {
-
-		for (WikiPage wikiPage :
-				findByN_H_R_S(
-					nodeId, head, redirectTitle, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+	public void removeByN_H_R_S(long nodeId, boolean head,
+		String redirectTitle, int status) {
+		for (WikiPage wikiPage : findByN_H_R_S(nodeId, head, redirectTitle,
+				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -20110,16 +19151,13 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages
 	 */
 	@Override
-	public int countByN_H_R_S(
-		long nodeId, boolean head, String redirectTitle, int status) {
-
+	public int countByN_H_R_S(long nodeId, boolean head, String redirectTitle,
+		int status) {
 		redirectTitle = Objects.toString(redirectTitle, "");
 
 		FinderPath finderPath = _finderPathCountByN_H_R_S;
 
-		Object[] finderArgs = new Object[] {
-			nodeId, head, redirectTitle, status
-		};
+		Object[] finderArgs = new Object[] { nodeId, head, redirectTitle, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -20183,21 +19221,11 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_H_R_S_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_R_S_HEAD_2 =
-		"wikiPage.head = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_R_S_REDIRECTTITLE_2 =
-		"lower(wikiPage.redirectTitle) = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_R_S_REDIRECTTITLE_3 =
-		"(wikiPage.redirectTitle IS NULL OR wikiPage.redirectTitle = '') AND ";
-
-	private static final String _FINDER_COLUMN_N_H_R_S_STATUS_2 =
-		"wikiPage.status = ?";
-
+	private static final String _FINDER_COLUMN_N_H_R_S_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_R_S_HEAD_2 = "wikiPage.head = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_R_S_REDIRECTTITLE_2 = "lower(wikiPage.redirectTitle) = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_R_S_REDIRECTTITLE_3 = "(wikiPage.redirectTitle IS NULL OR wikiPage.redirectTitle = '') AND ";
+	private static final String _FINDER_COLUMN_N_H_R_S_STATUS_2 = "wikiPage.status = ?";
 	private FinderPath _finderPathWithPaginationFindByN_H_R_NotS;
 	private FinderPath _finderPathWithPaginationCountByN_H_R_NotS;
 
@@ -20211,19 +19239,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R_NotS(
-		long nodeId, boolean head, String redirectTitle, int status) {
-
-		return findByN_H_R_NotS(
-			nodeId, head, redirectTitle, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<WikiPage> findByN_H_R_NotS(long nodeId, boolean head,
+		String redirectTitle, int status) {
+		return findByN_H_R_NotS(nodeId, head, redirectTitle, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where nodeId = &#63; and head = &#63; and redirectTitle = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -20235,19 +19261,17 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R_NotS(
-		long nodeId, boolean head, String redirectTitle, int status, int start,
-		int end) {
-
-		return findByN_H_R_NotS(
-			nodeId, head, redirectTitle, status, start, end, null);
+	public List<WikiPage> findByN_H_R_NotS(long nodeId, boolean head,
+		String redirectTitle, int status, int start, int end) {
+		return findByN_H_R_NotS(nodeId, head, redirectTitle, status, start,
+			end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and redirectTitle = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -20260,20 +19284,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R_NotS(
-		long nodeId, boolean head, String redirectTitle, int status, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByN_H_R_NotS(
-			nodeId, head, redirectTitle, status, start, end, orderByComparator,
-			true);
+	public List<WikiPage> findByN_H_R_NotS(long nodeId, boolean head,
+		String redirectTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator) {
+		return findByN_H_R_NotS(nodeId, head, redirectTitle, status, start,
+			end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where nodeId = &#63; and head = &#63; and redirectTitle = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param nodeId the node ID
@@ -20287,11 +19309,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByN_H_R_NotS(
-		long nodeId, boolean head, String redirectTitle, int status, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByN_H_R_NotS(long nodeId, boolean head,
+		String redirectTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		redirectTitle = Objects.toString(redirectTitle, "");
 
 		boolean pagination = true;
@@ -20300,22 +19320,23 @@ public class WikiPagePersistenceImpl
 
 		finderPath = _finderPathWithPaginationFindByN_H_R_NotS;
 		finderArgs = new Object[] {
-			nodeId, head, redirectTitle, status, start, end, orderByComparator
-		};
+				nodeId, head, redirectTitle, status,
+				
+				start, end, orderByComparator
+			};
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead()) ||
-						!redirectTitle.equals(wikiPage.getRedirectTitle()) ||
-						(status == wikiPage.getStatus())) {
-
+							(head != wikiPage.isHead()) ||
+							!redirectTitle.equals(wikiPage.getRedirectTitle()) ||
+							(status == wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -20328,8 +19349,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					6 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -20355,10 +19376,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_N_H_R_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -20384,16 +19406,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -20425,13 +19447,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_R_NotS_First(
-			long nodeId, boolean head, String redirectTitle, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_R_NotS_First(long nodeId, boolean head,
+		String redirectTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_R_NotS_First(
-			nodeId, head, redirectTitle, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_R_NotS_First(nodeId, head,
+				redirectTitle, status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -20469,12 +19490,11 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_R_NotS_First(
-		long nodeId, boolean head, String redirectTitle, int status,
+	public WikiPage fetchByN_H_R_NotS_First(long nodeId, boolean head,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByN_H_R_NotS(
-			nodeId, head, redirectTitle, status, 0, 1, orderByComparator);
+		List<WikiPage> list = findByN_H_R_NotS(nodeId, head, redirectTitle,
+				status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -20495,13 +19515,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByN_H_R_NotS_Last(
-			long nodeId, boolean head, String redirectTitle, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByN_H_R_NotS_Last(long nodeId, boolean head,
+		String redirectTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByN_H_R_NotS_Last(
-			nodeId, head, redirectTitle, status, orderByComparator);
+		WikiPage wikiPage = fetchByN_H_R_NotS_Last(nodeId, head, redirectTitle,
+				status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -20539,19 +19558,17 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByN_H_R_NotS_Last(
-		long nodeId, boolean head, String redirectTitle, int status,
+	public WikiPage fetchByN_H_R_NotS_Last(long nodeId, boolean head,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
 		int count = countByN_H_R_NotS(nodeId, head, redirectTitle, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByN_H_R_NotS(
-			nodeId, head, redirectTitle, status, count - 1, count,
-			orderByComparator);
+		List<WikiPage> list = findByN_H_R_NotS(nodeId, head, redirectTitle,
+				status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -20573,11 +19590,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByN_H_R_NotS_PrevAndNext(
-			long pageId, long nodeId, boolean head, String redirectTitle,
-			int status, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByN_H_R_NotS_PrevAndNext(long pageId, long nodeId,
+		boolean head, String redirectTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		redirectTitle = Objects.toString(redirectTitle, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -20589,15 +19605,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByN_H_R_NotS_PrevAndNext(
-				session, wikiPage, nodeId, head, redirectTitle, status,
-				orderByComparator, true);
+			array[0] = getByN_H_R_NotS_PrevAndNext(session, wikiPage, nodeId,
+					head, redirectTitle, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByN_H_R_NotS_PrevAndNext(
-				session, wikiPage, nodeId, head, redirectTitle, status,
-				orderByComparator, false);
+			array[2] = getByN_H_R_NotS_PrevAndNext(session, wikiPage, nodeId,
+					head, redirectTitle, status, orderByComparator, false);
 
 			return array;
 		}
@@ -20609,16 +19623,15 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByN_H_R_NotS_PrevAndNext(
-		Session session, WikiPage wikiPage, long nodeId, boolean head,
-		String redirectTitle, int status,
-		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
+	protected WikiPage getByN_H_R_NotS_PrevAndNext(Session session,
+		WikiPage wikiPage, long nodeId, boolean head, String redirectTitle,
+		int status, OrderByComparator<WikiPage> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -20645,8 +19658,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_N_H_R_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -20724,9 +19736,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -20750,14 +19761,10 @@ public class WikiPagePersistenceImpl
 	 * @param status the status
 	 */
 	@Override
-	public void removeByN_H_R_NotS(
-		long nodeId, boolean head, String redirectTitle, int status) {
-
-		for (WikiPage wikiPage :
-				findByN_H_R_NotS(
-					nodeId, head, redirectTitle, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+	public void removeByN_H_R_NotS(long nodeId, boolean head,
+		String redirectTitle, int status) {
+		for (WikiPage wikiPage : findByN_H_R_NotS(nodeId, head, redirectTitle,
+				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -20772,16 +19779,13 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages
 	 */
 	@Override
-	public int countByN_H_R_NotS(
-		long nodeId, boolean head, String redirectTitle, int status) {
-
+	public int countByN_H_R_NotS(long nodeId, boolean head,
+		String redirectTitle, int status) {
 		redirectTitle = Objects.toString(redirectTitle, "");
 
 		FinderPath finderPath = _finderPathWithPaginationCountByN_H_R_NotS;
 
-		Object[] finderArgs = new Object[] {
-			nodeId, head, redirectTitle, status
-		};
+		Object[] finderArgs = new Object[] { nodeId, head, redirectTitle, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -20845,21 +19849,11 @@ public class WikiPagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_H_R_NOTS_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_R_NOTS_HEAD_2 =
-		"wikiPage.head = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_R_NOTS_REDIRECTTITLE_2 =
-		"lower(wikiPage.redirectTitle) = ? AND ";
-
-	private static final String _FINDER_COLUMN_N_H_R_NOTS_REDIRECTTITLE_3 =
-		"(wikiPage.redirectTitle IS NULL OR wikiPage.redirectTitle = '') AND ";
-
-	private static final String _FINDER_COLUMN_N_H_R_NOTS_STATUS_2 =
-		"wikiPage.status != ?";
-
+	private static final String _FINDER_COLUMN_N_H_R_NOTS_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_R_NOTS_HEAD_2 = "wikiPage.head = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_R_NOTS_REDIRECTTITLE_2 = "lower(wikiPage.redirectTitle) = ? AND ";
+	private static final String _FINDER_COLUMN_N_H_R_NOTS_REDIRECTTITLE_3 = "(wikiPage.redirectTitle IS NULL OR wikiPage.redirectTitle = '') AND ";
+	private static final String _FINDER_COLUMN_N_H_R_NOTS_STATUS_2 = "wikiPage.status != ?";
 	private FinderPath _finderPathWithPaginationFindByG_N_H_P_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_N_H_P_S;
 	private FinderPath _finderPathCountByG_N_H_P_S;
@@ -20875,20 +19869,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_H_P_S(
-		long groupId, long nodeId, boolean head, String parentTitle,
-		int status) {
-
-		return findByG_N_H_P_S(
-			groupId, nodeId, head, parentTitle, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<WikiPage> findByG_N_H_P_S(long groupId, long nodeId,
+		boolean head, String parentTitle, int status) {
+		return findByG_N_H_P_S(groupId, nodeId, head, parentTitle, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages where groupId = &#63; and nodeId = &#63; and head = &#63; and parentTitle = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -20901,19 +19892,17 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_H_P_S(
-		long groupId, long nodeId, boolean head, String parentTitle, int status,
-		int start, int end) {
-
-		return findByG_N_H_P_S(
-			groupId, nodeId, head, parentTitle, status, start, end, null);
+	public List<WikiPage> findByG_N_H_P_S(long groupId, long nodeId,
+		boolean head, String parentTitle, int status, int start, int end) {
+		return findByG_N_H_P_S(groupId, nodeId, head, parentTitle, status,
+			start, end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and nodeId = &#63; and head = &#63; and parentTitle = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -20927,20 +19916,18 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_H_P_S(
-		long groupId, long nodeId, boolean head, String parentTitle, int status,
-		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
-
-		return findByG_N_H_P_S(
-			groupId, nodeId, head, parentTitle, status, start, end,
-			orderByComparator, true);
+	public List<WikiPage> findByG_N_H_P_S(long groupId, long nodeId,
+		boolean head, String parentTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator) {
+		return findByG_N_H_P_S(groupId, nodeId, head, parentTitle, status,
+			start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages where groupId = &#63; and nodeId = &#63; and head = &#63; and parentTitle = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -20955,11 +19942,9 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages
 	 */
 	@Override
-	public List<WikiPage> findByG_N_H_P_S(
-		long groupId, long nodeId, boolean head, String parentTitle, int status,
-		int start, int end, OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findByG_N_H_P_S(long groupId, long nodeId,
+		boolean head, String parentTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		parentTitle = Objects.toString(parentTitle, "");
 
 		boolean pagination = true;
@@ -20967,36 +19952,33 @@ public class WikiPagePersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_N_H_P_S;
-			finderArgs = new Object[] {
-				groupId, nodeId, head, parentTitle, status
-			};
+			finderArgs = new Object[] { groupId, nodeId, head, parentTitle, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_N_H_P_S;
 			finderArgs = new Object[] {
-				groupId, nodeId, head, parentTitle, status, start, end,
-				orderByComparator
-			};
+					groupId, nodeId, head, parentTitle, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
 					if ((groupId != wikiPage.getGroupId()) ||
-						(nodeId != wikiPage.getNodeId()) ||
-						(head != wikiPage.isHead()) ||
-						!parentTitle.equals(wikiPage.getParentTitle()) ||
-						(status != wikiPage.getStatus())) {
-
+							(nodeId != wikiPage.getNodeId()) ||
+							(head != wikiPage.isHead()) ||
+							!parentTitle.equals(wikiPage.getParentTitle()) ||
+							(status != wikiPage.getStatus())) {
 						list = null;
 
 						break;
@@ -21009,8 +19991,8 @@ public class WikiPagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					7 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(7 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(7);
@@ -21038,10 +20020,11 @@ public class WikiPagePersistenceImpl
 			query.append(_FINDER_COLUMN_G_N_H_P_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(WikiPageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -21069,16 +20052,16 @@ public class WikiPagePersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -21111,13 +20094,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_N_H_P_S_First(
-			long groupId, long nodeId, boolean head, String parentTitle,
-			int status, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_N_H_P_S_First(long groupId, long nodeId,
+		boolean head, String parentTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_N_H_P_S_First(
-			groupId, nodeId, head, parentTitle, status, orderByComparator);
+		WikiPage wikiPage = fetchByG_N_H_P_S_First(groupId, nodeId, head,
+				parentTitle, status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -21159,13 +20141,11 @@ public class WikiPagePersistenceImpl
 	 * @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_N_H_P_S_First(
-		long groupId, long nodeId, boolean head, String parentTitle, int status,
+	public WikiPage fetchByG_N_H_P_S_First(long groupId, long nodeId,
+		boolean head, String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		List<WikiPage> list = findByG_N_H_P_S(
-			groupId, nodeId, head, parentTitle, status, 0, 1,
-			orderByComparator);
+		List<WikiPage> list = findByG_N_H_P_S(groupId, nodeId, head,
+				parentTitle, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -21187,13 +20167,12 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage findByG_N_H_P_S_Last(
-			long groupId, long nodeId, boolean head, String parentTitle,
-			int status, OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage findByG_N_H_P_S_Last(long groupId, long nodeId,
+		boolean head, String parentTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
-		WikiPage wikiPage = fetchByG_N_H_P_S_Last(
-			groupId, nodeId, head, parentTitle, status, orderByComparator);
+		WikiPage wikiPage = fetchByG_N_H_P_S_Last(groupId, nodeId, head,
+				parentTitle, status, orderByComparator);
 
 		if (wikiPage != null) {
 			return wikiPage;
@@ -21235,20 +20214,17 @@ public class WikiPagePersistenceImpl
 	 * @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	 */
 	@Override
-	public WikiPage fetchByG_N_H_P_S_Last(
-		long groupId, long nodeId, boolean head, String parentTitle, int status,
+	public WikiPage fetchByG_N_H_P_S_Last(long groupId, long nodeId,
+		boolean head, String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
-
-		int count = countByG_N_H_P_S(
-			groupId, nodeId, head, parentTitle, status);
+		int count = countByG_N_H_P_S(groupId, nodeId, head, parentTitle, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<WikiPage> list = findByG_N_H_P_S(
-			groupId, nodeId, head, parentTitle, status, count - 1, count,
-			orderByComparator);
+		List<WikiPage> list = findByG_N_H_P_S(groupId, nodeId, head,
+				parentTitle, status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -21271,12 +20247,10 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] findByG_N_H_P_S_PrevAndNext(
-			long pageId, long groupId, long nodeId, boolean head,
-			String parentTitle, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] findByG_N_H_P_S_PrevAndNext(long pageId, long groupId,
+		long nodeId, boolean head, String parentTitle, int status,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		parentTitle = Objects.toString(parentTitle, "");
 
 		WikiPage wikiPage = findByPrimaryKey(pageId);
@@ -21288,15 +20262,13 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = getByG_N_H_P_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, parentTitle, status,
-				orderByComparator, true);
+			array[0] = getByG_N_H_P_S_PrevAndNext(session, wikiPage, groupId,
+					nodeId, head, parentTitle, status, orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = getByG_N_H_P_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, parentTitle, status,
-				orderByComparator, false);
+			array[2] = getByG_N_H_P_S_PrevAndNext(session, wikiPage, groupId,
+					nodeId, head, parentTitle, status, orderByComparator, false);
 
 			return array;
 		}
@@ -21308,16 +20280,15 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage getByG_N_H_P_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long nodeId,
-		boolean head, String parentTitle, int status,
+	protected WikiPage getByG_N_H_P_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long nodeId, boolean head,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(8 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -21346,8 +20317,7 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_H_P_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -21427,9 +20397,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -21455,20 +20424,17 @@ public class WikiPagePersistenceImpl
 	 * @return the matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_H_P_S(
-		long groupId, long nodeId, boolean head, String parentTitle,
-		int status) {
-
-		return filterFindByG_N_H_P_S(
-			groupId, nodeId, head, parentTitle, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<WikiPage> filterFindByG_N_H_P_S(long groupId, long nodeId,
+		boolean head, String parentTitle, int status) {
+		return filterFindByG_N_H_P_S(groupId, nodeId, head, parentTitle,
+			status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the wiki pages that the user has permission to view where groupId = &#63; and nodeId = &#63; and head = &#63; and parentTitle = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -21481,19 +20447,17 @@ public class WikiPagePersistenceImpl
 	 * @return the range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_H_P_S(
-		long groupId, long nodeId, boolean head, String parentTitle, int status,
-		int start, int end) {
-
-		return filterFindByG_N_H_P_S(
-			groupId, nodeId, head, parentTitle, status, start, end, null);
+	public List<WikiPage> filterFindByG_N_H_P_S(long groupId, long nodeId,
+		boolean head, String parentTitle, int status, int start, int end) {
+		return filterFindByG_N_H_P_S(groupId, nodeId, head, parentTitle,
+			status, start, end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the wiki pages that the user has permissions to view where groupId = &#63; and nodeId = &#63; and head = &#63; and parentTitle = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -21507,14 +20471,12 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public List<WikiPage> filterFindByG_N_H_P_S(
-		long groupId, long nodeId, boolean head, String parentTitle, int status,
-		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
-
+	public List<WikiPage> filterFindByG_N_H_P_S(long groupId, long nodeId,
+		boolean head, String parentTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_N_H_P_S(
-				groupId, nodeId, head, parentTitle, status, start, end,
-				orderByComparator);
+			return findByG_N_H_P_S(groupId, nodeId, head, parentTitle, status,
+				start, end, orderByComparator);
 		}
 
 		parentTitle = Objects.toString(parentTitle, "");
@@ -21522,8 +20484,8 @@ public class WikiPagePersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(8);
@@ -21533,8 +20495,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_N_H_P_S_GROUPID_2);
@@ -21557,18 +20518,17 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_H_P_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -21580,9 +20540,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -21636,16 +20596,13 @@ public class WikiPagePersistenceImpl
 	 * @throws NoSuchPageException if a wiki page with the primary key could not be found
 	 */
 	@Override
-	public WikiPage[] filterFindByG_N_H_P_S_PrevAndNext(
-			long pageId, long groupId, long nodeId, boolean head,
-			String parentTitle, int status,
-			OrderByComparator<WikiPage> orderByComparator)
+	public WikiPage[] filterFindByG_N_H_P_S_PrevAndNext(long pageId,
+		long groupId, long nodeId, boolean head, String parentTitle,
+		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws NoSuchPageException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_N_H_P_S_PrevAndNext(
-				pageId, groupId, nodeId, head, parentTitle, status,
-				orderByComparator);
+			return findByG_N_H_P_S_PrevAndNext(pageId, groupId, nodeId, head,
+				parentTitle, status, orderByComparator);
 		}
 
 		parentTitle = Objects.toString(parentTitle, "");
@@ -21659,15 +20616,15 @@ public class WikiPagePersistenceImpl
 
 			WikiPage[] array = new WikiPageImpl[3];
 
-			array[0] = filterGetByG_N_H_P_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, parentTitle, status,
-				orderByComparator, true);
+			array[0] = filterGetByG_N_H_P_S_PrevAndNext(session, wikiPage,
+					groupId, nodeId, head, parentTitle, status,
+					orderByComparator, true);
 
 			array[1] = wikiPage;
 
-			array[2] = filterGetByG_N_H_P_S_PrevAndNext(
-				session, wikiPage, groupId, nodeId, head, parentTitle, status,
-				orderByComparator, false);
+			array[2] = filterGetByG_N_H_P_S_PrevAndNext(session, wikiPage,
+					groupId, nodeId, head, parentTitle, status,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -21679,16 +20636,15 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	protected WikiPage filterGetByG_N_H_P_S_PrevAndNext(
-		Session session, WikiPage wikiPage, long groupId, long nodeId,
-		boolean head, String parentTitle, int status,
+	protected WikiPage filterGetByG_N_H_P_S_PrevAndNext(Session session,
+		WikiPage wikiPage, long groupId, long nodeId, boolean head,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				9 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(9 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -21699,8 +20655,7 @@ public class WikiPagePersistenceImpl
 			query.append(_FILTER_SQL_SELECT_WIKIPAGE_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_N_H_P_S_GROUPID_2);
@@ -21723,13 +20678,11 @@ public class WikiPagePersistenceImpl
 		query.append(_FINDER_COLUMN_G_N_H_P_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -21737,17 +20690,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -21773,15 +20722,13 @@ public class WikiPagePersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -21810,9 +20757,9 @@ public class WikiPagePersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -21841,9 +20788,8 @@ public class WikiPagePersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(wikiPage)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					wikiPage)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -21868,15 +20814,10 @@ public class WikiPagePersistenceImpl
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_N_H_P_S(
-		long groupId, long nodeId, boolean head, String parentTitle,
-		int status) {
-
-		for (WikiPage wikiPage :
-				findByG_N_H_P_S(
-					groupId, nodeId, head, parentTitle, status,
-					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+	public void removeByG_N_H_P_S(long groupId, long nodeId, boolean head,
+		String parentTitle, int status) {
+		for (WikiPage wikiPage : findByG_N_H_P_S(groupId, nodeId, head,
+				parentTitle, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(wikiPage);
 		}
 	}
@@ -21892,17 +20833,15 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages
 	 */
 	@Override
-	public int countByG_N_H_P_S(
-		long groupId, long nodeId, boolean head, String parentTitle,
-		int status) {
-
+	public int countByG_N_H_P_S(long groupId, long nodeId, boolean head,
+		String parentTitle, int status) {
 		parentTitle = Objects.toString(parentTitle, "");
 
 		FinderPath finderPath = _finderPathCountByG_N_H_P_S;
 
 		Object[] finderArgs = new Object[] {
-			groupId, nodeId, head, parentTitle, status
-		};
+				groupId, nodeId, head, parentTitle, status
+			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -21981,10 +20920,8 @@ public class WikiPagePersistenceImpl
 	 * @return the number of matching wiki pages that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_N_H_P_S(
-		long groupId, long nodeId, boolean head, String parentTitle,
-		int status) {
-
+	public int filterCountByG_N_H_P_S(long groupId, long nodeId, boolean head,
+		String parentTitle, int status) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_N_H_P_S(groupId, nodeId, head, parentTitle, status);
 		}
@@ -22014,9 +20951,9 @@ public class WikiPagePersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_N_H_P_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), WikiPage.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				WikiPage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -22025,8 +20962,8 @@ public class WikiPagePersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -22054,44 +20991,19 @@ public class WikiPagePersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_N_H_P_S_GROUPID_2 =
-		"wikiPage.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_H_P_S_NODEID_2 =
-		"wikiPage.nodeId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_H_P_S_HEAD_2 =
-		"wikiPage.head = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_H_P_S_PARENTTITLE_2 =
-		"lower(wikiPage.parentTitle) = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_N_H_P_S_PARENTTITLE_3 =
-		"(wikiPage.parentTitle IS NULL OR wikiPage.parentTitle = '') AND ";
-
-	private static final String _FINDER_COLUMN_G_N_H_P_S_STATUS_2 =
-		"wikiPage.status = ?";
+	private static final String _FINDER_COLUMN_G_N_H_P_S_GROUPID_2 = "wikiPage.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_H_P_S_NODEID_2 = "wikiPage.nodeId = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_H_P_S_HEAD_2 = "wikiPage.head = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_H_P_S_PARENTTITLE_2 = "lower(wikiPage.parentTitle) = ? AND ";
+	private static final String _FINDER_COLUMN_G_N_H_P_S_PARENTTITLE_3 = "(wikiPage.parentTitle IS NULL OR wikiPage.parentTitle = '') AND ";
+	private static final String _FINDER_COLUMN_G_N_H_P_S_STATUS_2 = "wikiPage.status = ?";
 
 	public WikiPagePersistenceImpl() {
 		setModelClass(WikiPage.class);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("uuid", "uuid_");
-
-		try {
-			Field field = BasePersistenceImpl.class.getDeclaredField(
-				"_dbColumnNames");
-
-			field.setAccessible(true);
-
-			field.set(this, dbColumnNames);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
+		setModelImplClass(WikiPageImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(WikiPageModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -22101,28 +21013,22 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public void cacheResult(WikiPage wikiPage) {
-		entityCache.putResult(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED, WikiPageImpl.class,
-			wikiPage.getPrimaryKey(), wikiPage);
+		entityCache.putResult(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+			WikiPageImpl.class, wikiPage.getPrimaryKey(), wikiPage);
 
-		finderCache.putResult(
-			_finderPathFetchByUUID_G,
-			new Object[] {wikiPage.getUuid(), wikiPage.getGroupId()}, wikiPage);
+		finderCache.putResult(_finderPathFetchByUUID_G,
+			new Object[] { wikiPage.getUuid(), wikiPage.getGroupId() }, wikiPage);
 
-		finderCache.putResult(
-			_finderPathFetchByR_N_V,
+		finderCache.putResult(_finderPathFetchByR_N_V,
 			new Object[] {
 				wikiPage.getResourcePrimKey(), wikiPage.getNodeId(),
 				wikiPage.getVersion()
-			},
-			wikiPage);
+			}, wikiPage);
 
-		finderCache.putResult(
-			_finderPathFetchByN_T_V,
+		finderCache.putResult(_finderPathFetchByN_T_V,
 			new Object[] {
 				wikiPage.getNodeId(), wikiPage.getTitle(), wikiPage.getVersion()
-			},
-			wikiPage);
+			}, wikiPage);
 
 		wikiPage.resetOriginalValues();
 	}
@@ -22135,10 +21041,8 @@ public class WikiPagePersistenceImpl
 	@Override
 	public void cacheResult(List<WikiPage> wikiPages) {
 		for (WikiPage wikiPage : wikiPages) {
-			if (entityCache.getResult(
-					WikiPageModelImpl.ENTITY_CACHE_ENABLED, WikiPageImpl.class,
-					wikiPage.getPrimaryKey()) == null) {
-
+			if (entityCache.getResult(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+						WikiPageImpl.class, wikiPage.getPrimaryKey()) == null) {
 				cacheResult(wikiPage);
 			}
 			else {
@@ -22151,7 +21055,7 @@ public class WikiPagePersistenceImpl
 	 * Clears the cache for all wiki pages.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -22167,14 +21071,13 @@ public class WikiPagePersistenceImpl
 	 * Clears the cache for the wiki page.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(WikiPage wikiPage) {
-		entityCache.removeResult(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED, WikiPageImpl.class,
-			wikiPage.getPrimaryKey());
+		entityCache.removeResult(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+			WikiPageImpl.class, wikiPage.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -22188,89 +21091,84 @@ public class WikiPagePersistenceImpl
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (WikiPage wikiPage : wikiPages) {
-			entityCache.removeResult(
-				WikiPageModelImpl.ENTITY_CACHE_ENABLED, WikiPageImpl.class,
-				wikiPage.getPrimaryKey());
+			entityCache.removeResult(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageImpl.class, wikiPage.getPrimaryKey());
 
 			clearUniqueFindersCache((WikiPageModelImpl)wikiPage, true);
 		}
 	}
 
-	protected void cacheUniqueFindersCache(
-		WikiPageModelImpl wikiPageModelImpl) {
-
+	protected void cacheUniqueFindersCache(WikiPageModelImpl wikiPageModelImpl) {
 		Object[] args = new Object[] {
-			wikiPageModelImpl.getUuid(), wikiPageModelImpl.getGroupId()
-		};
-
-		finderCache.putResult(
-			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByUUID_G, args, wikiPageModelImpl, false);
-
-		args = new Object[] {
-			wikiPageModelImpl.getResourcePrimKey(),
-			wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getVersion()
-		};
-
-		finderCache.putResult(
-			_finderPathCountByR_N_V, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByR_N_V, args, wikiPageModelImpl, false);
-
-		args = new Object[] {
-			wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getTitle(),
-			wikiPageModelImpl.getVersion()
-		};
-
-		finderCache.putResult(
-			_finderPathCountByN_T_V, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByN_T_V, args, wikiPageModelImpl, false);
-	}
-
-	protected void clearUniqueFindersCache(
-		WikiPageModelImpl wikiPageModelImpl, boolean clearCurrent) {
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
 				wikiPageModelImpl.getUuid(), wikiPageModelImpl.getGroupId()
 			};
 
-			finderCache.removeResult(_finderPathCountByUUID_G, args);
-			finderCache.removeResult(_finderPathFetchByUUID_G, args);
-		}
+		finderCache.putResult(_finderPathCountByUUID_G, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(_finderPathFetchByUUID_G, args,
+			wikiPageModelImpl, false);
 
-		if ((wikiPageModelImpl.getColumnBitmask() &
-			 _finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
-
-			Object[] args = new Object[] {
-				wikiPageModelImpl.getOriginalUuid(),
-				wikiPageModelImpl.getOriginalGroupId()
-			};
-
-			finderCache.removeResult(_finderPathCountByUUID_G, args);
-			finderCache.removeResult(_finderPathFetchByUUID_G, args);
-		}
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
+		args = new Object[] {
 				wikiPageModelImpl.getResourcePrimKey(),
 				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getVersion()
 			};
 
+		finderCache.putResult(_finderPathCountByR_N_V, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(_finderPathFetchByR_N_V, args, wikiPageModelImpl,
+			false);
+
+		args = new Object[] {
+				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getTitle(),
+				wikiPageModelImpl.getVersion()
+			};
+
+		finderCache.putResult(_finderPathCountByN_T_V, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(_finderPathFetchByN_T_V, args, wikiPageModelImpl,
+			false);
+	}
+
+	protected void clearUniqueFindersCache(
+		WikiPageModelImpl wikiPageModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					wikiPageModelImpl.getUuid(), wikiPageModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(_finderPathCountByUUID_G, args);
+			finderCache.removeResult(_finderPathFetchByUUID_G, args);
+		}
+
+		if ((wikiPageModelImpl.getColumnBitmask() &
+				_finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] {
+					wikiPageModelImpl.getOriginalUuid(),
+					wikiPageModelImpl.getOriginalGroupId()
+				};
+
+			finderCache.removeResult(_finderPathCountByUUID_G, args);
+			finderCache.removeResult(_finderPathFetchByUUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					wikiPageModelImpl.getResourcePrimKey(),
+					wikiPageModelImpl.getNodeId(),
+					wikiPageModelImpl.getVersion()
+				};
+
 			finderCache.removeResult(_finderPathCountByR_N_V, args);
 			finderCache.removeResult(_finderPathFetchByR_N_V, args);
 		}
 
 		if ((wikiPageModelImpl.getColumnBitmask() &
-			 _finderPathFetchByR_N_V.getColumnBitmask()) != 0) {
-
+				_finderPathFetchByR_N_V.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
-				wikiPageModelImpl.getOriginalResourcePrimKey(),
-				wikiPageModelImpl.getOriginalNodeId(),
-				wikiPageModelImpl.getOriginalVersion()
-			};
+					wikiPageModelImpl.getOriginalResourcePrimKey(),
+					wikiPageModelImpl.getOriginalNodeId(),
+					wikiPageModelImpl.getOriginalVersion()
+				};
 
 			finderCache.removeResult(_finderPathCountByR_N_V, args);
 			finderCache.removeResult(_finderPathFetchByR_N_V, args);
@@ -22278,22 +21176,21 @@ public class WikiPagePersistenceImpl
 
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getTitle(),
-				wikiPageModelImpl.getVersion()
-			};
+					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getTitle(),
+					wikiPageModelImpl.getVersion()
+				};
 
 			finderCache.removeResult(_finderPathCountByN_T_V, args);
 			finderCache.removeResult(_finderPathFetchByN_T_V, args);
 		}
 
 		if ((wikiPageModelImpl.getColumnBitmask() &
-			 _finderPathFetchByN_T_V.getColumnBitmask()) != 0) {
-
+				_finderPathFetchByN_T_V.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
-				wikiPageModelImpl.getOriginalNodeId(),
-				wikiPageModelImpl.getOriginalTitle(),
-				wikiPageModelImpl.getOriginalVersion()
-			};
+					wikiPageModelImpl.getOriginalNodeId(),
+					wikiPageModelImpl.getOriginalTitle(),
+					wikiPageModelImpl.getOriginalVersion()
+				};
 
 			finderCache.removeResult(_finderPathCountByN_T_V, args);
 			finderCache.removeResult(_finderPathFetchByN_T_V, args);
@@ -22348,16 +21245,16 @@ public class WikiPagePersistenceImpl
 		try {
 			session = openSession();
 
-			WikiPage wikiPage = (WikiPage)session.get(
-				WikiPageImpl.class, primaryKey);
+			WikiPage wikiPage = (WikiPage)session.get(WikiPageImpl.class,
+					primaryKey);
 
 			if (wikiPage == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchPageException(
-					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				throw new NoSuchPageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
 			}
 
 			return remove(wikiPage);
@@ -22381,8 +21278,8 @@ public class WikiPagePersistenceImpl
 			session = openSession();
 
 			if (!session.contains(wikiPage)) {
-				wikiPage = (WikiPage)session.get(
-					WikiPageImpl.class, wikiPage.getPrimaryKeyObj());
+				wikiPage = (WikiPage)session.get(WikiPageImpl.class,
+						wikiPage.getPrimaryKeyObj());
 			}
 
 			if (wikiPage != null) {
@@ -22415,12 +21312,12 @@ public class WikiPagePersistenceImpl
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in wikiPage proxy " +
-						invocationHandler.getClass());
+					invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom WikiPage implementation " +
-					wikiPage.getClass());
+				wikiPage.getClass());
 		}
 
 		WikiPageModelImpl wikiPageModelImpl = (WikiPageModelImpl)wikiPage;
@@ -22431,8 +21328,7 @@ public class WikiPagePersistenceImpl
 			wikiPage.setUuid(uuid);
 		}
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -22468,10 +21364,9 @@ public class WikiPagePersistenceImpl
 			}
 
 			try {
-				wikiPage.setTitle(
-					SanitizerUtil.sanitize(
-						companyId, groupId, userId, WikiPage.class.getName(),
-						pageId, ContentTypes.TEXT_PLAIN, Sanitizer.MODE_ALL,
+				wikiPage.setTitle(SanitizerUtil.sanitize(companyId, groupId,
+						userId, WikiPage.class.getName(), pageId,
+						ContentTypes.TEXT_PLAIN, Sanitizer.MODE_ALL,
 						wikiPage.getTitle(), null));
 			}
 			catch (SanitizerException se) {
@@ -22505,914 +21400,868 @@ public class WikiPagePersistenceImpl
 		if (!WikiPageModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else if (isNew) {
-			Object[] args = new Object[] {
-				wikiPageModelImpl.getResourcePrimKey()
-			};
+		else
+		 if (isNew) {
+			Object[] args = new Object[] { wikiPageModelImpl.getResourcePrimKey() };
 
 			finderCache.removeResult(_finderPathCountByResourcePrimKey, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByResourcePrimKey, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByResourcePrimKey,
+				args);
 
-			args = new Object[] {wikiPageModelImpl.getUuid()};
+			args = new Object[] { wikiPageModelImpl.getUuid() };
 
 			finderCache.removeResult(_finderPathCountByUuid, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByUuid, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
+				args);
 
 			args = new Object[] {
-				wikiPageModelImpl.getUuid(), wikiPageModelImpl.getCompanyId()
-			};
-
-			finderCache.removeResult(_finderPathCountByUuid_C, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByUuid_C, args);
-
-			args = new Object[] {wikiPageModelImpl.getNodeId()};
-
-			finderCache.removeResult(_finderPathCountByNodeId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByNodeId, args);
-
-			args = new Object[] {wikiPageModelImpl.getFormat()};
-
-			finderCache.removeResult(_finderPathCountByFormat, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByFormat, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getResourcePrimKey(),
-				wikiPageModelImpl.getNodeId()
-			};
-
-			finderCache.removeResult(_finderPathCountByR_N, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByR_N, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getResourcePrimKey(),
-				wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByR_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByR_S, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getTitle()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_T, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_T, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_H, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_H, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(),
-				wikiPageModelImpl.getParentTitle()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_P, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_P, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(),
-				wikiPageModelImpl.getRedirectTitle()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_R, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_R, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_S, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getResourcePrimKey(),
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead()
-			};
-
-			finderCache.removeResult(_finderPathCountByR_N_H, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByR_N_H, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getResourcePrimKey(),
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByR_N_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByR_N_S, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getGroupId(), wikiPageModelImpl.getNodeId(),
-				wikiPageModelImpl.isHead()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_N_H, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_N_H, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getGroupId(), wikiPageModelImpl.getNodeId(),
-				wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_N_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_N_S, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getUserId(), wikiPageModelImpl.getNodeId(),
-				wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByU_N_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByU_N_S, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getTitle(),
-				wikiPageModelImpl.isHead()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_T_H, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_T_H, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getTitle(),
-				wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_T_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_T_S, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
-				wikiPageModelImpl.getParentTitle()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_H_P, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_H_P, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
-				wikiPageModelImpl.getRedirectTitle()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_H_R, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_H_R, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
-				wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_H_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_H_S, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getGroupId(), wikiPageModelImpl.getUserId(),
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_U_N_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_U_N_S, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getGroupId(), wikiPageModelImpl.getNodeId(),
-				wikiPageModelImpl.getTitle(), wikiPageModelImpl.isHead()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_N_T_H, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_N_T_H, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getGroupId(), wikiPageModelImpl.getNodeId(),
-				wikiPageModelImpl.isHead(), wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_N_H_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_N_H_S, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
-				wikiPageModelImpl.getParentTitle(),
-				wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_H_P_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_H_P_S, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
-				wikiPageModelImpl.getRedirectTitle(),
-				wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByN_H_R_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByN_H_R_S, args);
-
-			args = new Object[] {
-				wikiPageModelImpl.getGroupId(), wikiPageModelImpl.getNodeId(),
-				wikiPageModelImpl.isHead(), wikiPageModelImpl.getParentTitle(),
-				wikiPageModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_N_H_P_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_N_H_P_S, args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
-		}
-		else {
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByResourcePrimKey.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalResourcePrimKey()
-				};
-
-				finderCache.removeResult(
-					_finderPathCountByResourcePrimKey, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByResourcePrimKey, args);
-
-				args = new Object[] {wikiPageModelImpl.getResourcePrimKey()};
-
-				finderCache.removeResult(
-					_finderPathCountByResourcePrimKey, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByResourcePrimKey, args);
-			}
-
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUuid.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalUuid()
-				};
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid, args);
-
-				args = new Object[] {wikiPageModelImpl.getUuid()};
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid, args);
-			}
-
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalUuid(),
-					wikiPageModelImpl.getOriginalCompanyId()
-				};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid_C, args);
-
-				args = new Object[] {
 					wikiPageModelImpl.getUuid(),
 					wikiPageModelImpl.getCompanyId()
 				};
 
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid_C, args);
-			}
+			finderCache.removeResult(_finderPathCountByUuid_C, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByNodeId.getColumnBitmask()) !=
-					 0) {
+			args = new Object[] { wikiPageModelImpl.getNodeId() };
 
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId()
-				};
+			finderCache.removeResult(_finderPathCountByNodeId, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByNodeId,
+				args);
 
-				finderCache.removeResult(_finderPathCountByNodeId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByNodeId, args);
+			args = new Object[] { wikiPageModelImpl.getFormat() };
 
-				args = new Object[] {wikiPageModelImpl.getNodeId()};
+			finderCache.removeResult(_finderPathCountByFormat, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByFormat,
+				args);
 
-				finderCache.removeResult(_finderPathCountByNodeId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByNodeId, args);
-			}
-
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByFormat.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalFormat()
-				};
-
-				finderCache.removeResult(_finderPathCountByFormat, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByFormat, args);
-
-				args = new Object[] {wikiPageModelImpl.getFormat()};
-
-				finderCache.removeResult(_finderPathCountByFormat, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByFormat, args);
-			}
-
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByR_N.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalResourcePrimKey(),
-					wikiPageModelImpl.getOriginalNodeId()
-				};
-
-				finderCache.removeResult(_finderPathCountByR_N, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByR_N, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getResourcePrimKey(),
 					wikiPageModelImpl.getNodeId()
 				};
 
-				finderCache.removeResult(_finderPathCountByR_N, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByR_N, args);
-			}
+			finderCache.removeResult(_finderPathCountByR_N, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByR_N, args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByR_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalResourcePrimKey(),
-					wikiPageModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByR_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByR_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getResourcePrimKey(),
 					wikiPageModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByR_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByR_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByR_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByR_S, args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_T.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalTitle()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_T, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_T, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getTitle()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_T, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_T, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_T, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_T, args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_H.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalHead()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_H, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_H, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_H, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_H, args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_P.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalParentTitle()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_P, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_P, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(),
 					wikiPageModelImpl.getParentTitle()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_P, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_P, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_P, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_P, args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_R.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalRedirectTitle()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_R, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_R, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(),
 					wikiPageModelImpl.getRedirectTitle()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_R, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_R, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_R, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_R, args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_S, args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByR_N_H.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalResourcePrimKey(),
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalHead()
-				};
-
-				finderCache.removeResult(_finderPathCountByR_N_H, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByR_N_H, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getResourcePrimKey(),
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead()
 				};
 
-				finderCache.removeResult(_finderPathCountByR_N_H, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByR_N_H, args);
-			}
+			finderCache.removeResult(_finderPathCountByR_N_H, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByR_N_H,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByR_N_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalResourcePrimKey(),
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByR_N_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByR_N_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getResourcePrimKey(),
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByR_N_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByR_N_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByR_N_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByR_N_S,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_N_H.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalGroupId(),
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalHead()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_N_H, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_N_H, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getGroupId(),
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead()
 				};
 
-				finderCache.removeResult(_finderPathCountByG_N_H, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_N_H, args);
-			}
+			finderCache.removeResult(_finderPathCountByG_N_H, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_H,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_N_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalGroupId(),
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_N_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_N_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getGroupId(),
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByG_N_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_N_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByG_N_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_S,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByU_N_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalUserId(),
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalStatus()
+			args = new Object[] {
+					wikiPageModelImpl.getUserId(), wikiPageModelImpl.getNodeId(),
+					wikiPageModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByU_N_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByU_N_S, args);
+			finderCache.removeResult(_finderPathCountByU_N_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByU_N_S,
+				args);
 
-				args = new Object[] {
-					wikiPageModelImpl.getUserId(),
-					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByU_N_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByU_N_S, args);
-			}
-
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_T_H.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalTitle(),
-					wikiPageModelImpl.getOriginalHead()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_T_H, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_T_H, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getTitle(),
 					wikiPageModelImpl.isHead()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_T_H, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_T_H, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_T_H, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_T_H,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_T_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalTitle(),
-					wikiPageModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_T_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_T_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getTitle(),
 					wikiPageModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_T_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_T_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_T_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_T_S,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_H_P.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalHead(),
-					wikiPageModelImpl.getOriginalParentTitle()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_H_P, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H_P, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
 					wikiPageModelImpl.getParentTitle()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_H_P, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H_P, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_H_P, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_P,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_H_R.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalHead(),
-					wikiPageModelImpl.getOriginalRedirectTitle()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_H_R, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H_R, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
 					wikiPageModelImpl.getRedirectTitle()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_H_R, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H_R, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_H_R, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_R,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_H_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalHead(),
-					wikiPageModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_H_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
 					wikiPageModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_H_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_H_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_S,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_U_N_S.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalGroupId(),
-					wikiPageModelImpl.getOriginalUserId(),
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_U_N_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_U_N_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getGroupId(),
-					wikiPageModelImpl.getUserId(),
-					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getStatus()
+					wikiPageModelImpl.getUserId(), wikiPageModelImpl.getNodeId(),
+					wikiPageModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByG_U_N_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_U_N_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByG_U_N_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_N_S,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_N_T_H.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalGroupId(),
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalTitle(),
-					wikiPageModelImpl.getOriginalHead()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_N_T_H, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_N_T_H, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getGroupId(),
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.getTitle(),
 					wikiPageModelImpl.isHead()
 				};
 
-				finderCache.removeResult(_finderPathCountByG_N_T_H, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_N_T_H, args);
-			}
+			finderCache.removeResult(_finderPathCountByG_N_T_H, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_T_H,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_N_H_S.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalGroupId(),
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalHead(),
-					wikiPageModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_N_H_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_N_H_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getGroupId(),
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
 					wikiPageModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByG_N_H_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_N_H_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByG_N_H_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_H_S,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_H_P_S.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalHead(),
-					wikiPageModelImpl.getOriginalParentTitle(),
-					wikiPageModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_H_P_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H_P_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
 					wikiPageModelImpl.getParentTitle(),
 					wikiPageModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_H_P_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H_P_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_H_P_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_P_S,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByN_H_R_S.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalHead(),
-					wikiPageModelImpl.getOriginalRedirectTitle(),
-					wikiPageModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByN_H_R_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H_R_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
 					wikiPageModelImpl.getRedirectTitle(),
 					wikiPageModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByN_H_R_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByN_H_R_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByN_H_R_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_R_S,
+				args);
 
-			if ((wikiPageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_N_H_P_S.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					wikiPageModelImpl.getOriginalGroupId(),
-					wikiPageModelImpl.getOriginalNodeId(),
-					wikiPageModelImpl.getOriginalHead(),
-					wikiPageModelImpl.getOriginalParentTitle(),
-					wikiPageModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_N_H_P_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_N_H_P_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					wikiPageModelImpl.getGroupId(),
 					wikiPageModelImpl.getNodeId(), wikiPageModelImpl.isHead(),
 					wikiPageModelImpl.getParentTitle(),
 					wikiPageModelImpl.getStatus()
 				};
 
+			finderCache.removeResult(_finderPathCountByG_N_H_P_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_H_P_S,
+				args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
+				FINDER_ARGS_EMPTY);
+		}
+
+		else {
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByResourcePrimKey.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalResourcePrimKey()
+					};
+
+				finderCache.removeResult(_finderPathCountByResourcePrimKey, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByResourcePrimKey,
+					args);
+
+				args = new Object[] { wikiPageModelImpl.getResourcePrimKey() };
+
+				finderCache.removeResult(_finderPathCountByResourcePrimKey, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByResourcePrimKey,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByUuid.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] { wikiPageModelImpl.getOriginalUuid() };
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
+					args);
+
+				args = new Object[] { wikiPageModelImpl.getUuid() };
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalUuid(),
+						wikiPageModelImpl.getOriginalCompanyId()
+					};
+
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getUuid(),
+						wikiPageModelImpl.getCompanyId()
+					};
+
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByNodeId.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId()
+					};
+
+				finderCache.removeResult(_finderPathCountByNodeId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByNodeId,
+					args);
+
+				args = new Object[] { wikiPageModelImpl.getNodeId() };
+
+				finderCache.removeResult(_finderPathCountByNodeId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByNodeId,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByFormat.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalFormat()
+					};
+
+				finderCache.removeResult(_finderPathCountByFormat, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByFormat,
+					args);
+
+				args = new Object[] { wikiPageModelImpl.getFormat() };
+
+				finderCache.removeResult(_finderPathCountByFormat, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByFormat,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByR_N.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalResourcePrimKey(),
+						wikiPageModelImpl.getOriginalNodeId()
+					};
+
+				finderCache.removeResult(_finderPathCountByR_N, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByR_N,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getResourcePrimKey(),
+						wikiPageModelImpl.getNodeId()
+					};
+
+				finderCache.removeResult(_finderPathCountByR_N, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByR_N,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByR_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalResourcePrimKey(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByR_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByR_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getResourcePrimKey(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByR_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByR_S,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_T.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalTitle()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_T, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_T,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.getTitle()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_T, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_T,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_H.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalHead()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.isHead()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_P.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalParentTitle()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_P, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_P,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.getParentTitle()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_P, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_P,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_R.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalRedirectTitle()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_R, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_R,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.getRedirectTitle()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_R, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_R,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_S,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByR_N_H.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalResourcePrimKey(),
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalHead()
+					};
+
+				finderCache.removeResult(_finderPathCountByR_N_H, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByR_N_H,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getResourcePrimKey(),
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.isHead()
+					};
+
+				finderCache.removeResult(_finderPathCountByR_N_H, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByR_N_H,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByR_N_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalResourcePrimKey(),
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByR_N_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByR_N_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getResourcePrimKey(),
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByR_N_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByR_N_S,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_N_H.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalGroupId(),
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalHead()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_N_H, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_H,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getGroupId(),
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.isHead()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_N_H, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_H,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_N_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalGroupId(),
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_N_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getGroupId(),
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_N_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_S,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByU_N_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalUserId(),
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByU_N_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByU_N_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getUserId(),
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByU_N_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByU_N_S,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_T_H.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalTitle(),
+						wikiPageModelImpl.getOriginalHead()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_T_H, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_T_H,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.getTitle(), wikiPageModelImpl.isHead()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_T_H, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_T_H,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_T_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalTitle(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_T_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_T_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.getTitle(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_T_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_T_S,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_H_P.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalHead(),
+						wikiPageModelImpl.getOriginalParentTitle()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H_P, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_P,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.isHead(),
+						wikiPageModelImpl.getParentTitle()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H_P, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_P,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_H_R.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalHead(),
+						wikiPageModelImpl.getOriginalRedirectTitle()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H_R, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_R,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.isHead(),
+						wikiPageModelImpl.getRedirectTitle()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H_R, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_R,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_H_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalHead(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.isHead(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_S,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_U_N_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalGroupId(),
+						wikiPageModelImpl.getOriginalUserId(),
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_U_N_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_N_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getGroupId(),
+						wikiPageModelImpl.getUserId(),
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_U_N_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_N_S,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_N_T_H.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalGroupId(),
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalTitle(),
+						wikiPageModelImpl.getOriginalHead()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_N_T_H, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_T_H,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getGroupId(),
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.getTitle(), wikiPageModelImpl.isHead()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_N_T_H, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_T_H,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_N_H_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalGroupId(),
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalHead(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_N_H_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_H_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getGroupId(),
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.isHead(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_N_H_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_H_S,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_H_P_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalHead(),
+						wikiPageModelImpl.getOriginalParentTitle(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H_P_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_P_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.isHead(),
+						wikiPageModelImpl.getParentTitle(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H_P_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_P_S,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByN_H_R_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalHead(),
+						wikiPageModelImpl.getOriginalRedirectTitle(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H_R_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_R_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.isHead(),
+						wikiPageModelImpl.getRedirectTitle(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByN_H_R_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByN_H_R_S,
+					args);
+			}
+
+			if ((wikiPageModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_N_H_P_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						wikiPageModelImpl.getOriginalGroupId(),
+						wikiPageModelImpl.getOriginalNodeId(),
+						wikiPageModelImpl.getOriginalHead(),
+						wikiPageModelImpl.getOriginalParentTitle(),
+						wikiPageModelImpl.getOriginalStatus()
+					};
+
 				finderCache.removeResult(_finderPathCountByG_N_H_P_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_N_H_P_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_H_P_S,
+					args);
+
+				args = new Object[] {
+						wikiPageModelImpl.getGroupId(),
+						wikiPageModelImpl.getNodeId(),
+						wikiPageModelImpl.isHead(),
+						wikiPageModelImpl.getParentTitle(),
+						wikiPageModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_N_H_P_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_N_H_P_S,
+					args);
 			}
 		}
 
-		entityCache.putResult(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED, WikiPageImpl.class,
-			wikiPage.getPrimaryKey(), wikiPage, false);
+		entityCache.putResult(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+			WikiPageImpl.class, wikiPage.getPrimaryKey(), wikiPage, false);
 
 		clearUniqueFindersCache(wikiPageModelImpl, false);
 		cacheUniqueFindersCache(wikiPageModelImpl);
@@ -23423,7 +22272,7 @@ public class WikiPagePersistenceImpl
 	}
 
 	/**
-	 * Returns the wiki page with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
+	 * Returns the wiki page with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the wiki page
 	 * @return the wiki page
@@ -23432,7 +22281,6 @@ public class WikiPagePersistenceImpl
 	@Override
 	public WikiPage findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchPageException {
-
 		WikiPage wikiPage = fetchByPrimaryKey(primaryKey);
 
 		if (wikiPage == null) {
@@ -23440,15 +22288,15 @@ public class WikiPagePersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchPageException(
-				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			throw new NoSuchPageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
 		}
 
 		return wikiPage;
 	}
 
 	/**
-	 * Returns the wiki page with the primary key or throws a <code>NoSuchPageException</code> if it could not be found.
+	 * Returns the wiki page with the primary key or throws a {@link NoSuchPageException} if it could not be found.
 	 *
 	 * @param pageId the primary key of the wiki page
 	 * @return the wiki page
@@ -23462,160 +22310,12 @@ public class WikiPagePersistenceImpl
 	/**
 	 * Returns the wiki page with the primary key or returns <code>null</code> if it could not be found.
 	 *
-	 * @param primaryKey the primary key of the wiki page
-	 * @return the wiki page, or <code>null</code> if a wiki page with the primary key could not be found
-	 */
-	@Override
-	public WikiPage fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED, WikiPageImpl.class,
-			primaryKey);
-
-		if (serializable == nullModel) {
-			return null;
-		}
-
-		WikiPage wikiPage = (WikiPage)serializable;
-
-		if (wikiPage == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				wikiPage = (WikiPage)session.get(
-					WikiPageImpl.class, primaryKey);
-
-				if (wikiPage != null) {
-					cacheResult(wikiPage);
-				}
-				else {
-					entityCache.putResult(
-						WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-						WikiPageImpl.class, primaryKey, nullModel);
-				}
-			}
-			catch (Exception e) {
-				entityCache.removeResult(
-					WikiPageModelImpl.ENTITY_CACHE_ENABLED, WikiPageImpl.class,
-					primaryKey);
-
-				throw processException(e);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return wikiPage;
-	}
-
-	/**
-	 * Returns the wiki page with the primary key or returns <code>null</code> if it could not be found.
-	 *
 	 * @param pageId the primary key of the wiki page
 	 * @return the wiki page, or <code>null</code> if a wiki page with the primary key could not be found
 	 */
 	@Override
 	public WikiPage fetchByPrimaryKey(long pageId) {
 		return fetchByPrimaryKey((Serializable)pageId);
-	}
-
-	@Override
-	public Map<Serializable, WikiPage> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, WikiPage> map = new HashMap<Serializable, WikiPage>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			WikiPage wikiPage = fetchByPrimaryKey(primaryKey);
-
-			if (wikiPage != null) {
-				map.put(primaryKey, wikiPage);
-			}
-
-			return map;
-		}
-
-		Set<Serializable> uncachedPrimaryKeys = null;
-
-		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(
-				WikiPageModelImpl.ENTITY_CACHE_ENABLED, WikiPageImpl.class,
-				primaryKey);
-
-			if (serializable != nullModel) {
-				if (serializable == null) {
-					if (uncachedPrimaryKeys == null) {
-						uncachedPrimaryKeys = new HashSet<Serializable>();
-					}
-
-					uncachedPrimaryKeys.add(primaryKey);
-				}
-				else {
-					map.put(primaryKey, (WikiPage)serializable);
-				}
-			}
-		}
-
-		if (uncachedPrimaryKeys == null) {
-			return map;
-		}
-
-		StringBundler query = new StringBundler(
-			uncachedPrimaryKeys.size() * 2 + 1);
-
-		query.append(_SQL_SELECT_WIKIPAGE_WHERE_PKS_IN);
-
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
-
-			query.append(",");
-		}
-
-		query.setIndex(query.index() - 1);
-
-		query.append(")");
-
-		String sql = query.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query q = session.createQuery(sql);
-
-			for (WikiPage wikiPage : (List<WikiPage>)q.list()) {
-				map.put(wikiPage.getPrimaryKeyObj(), wikiPage);
-
-				cacheResult(wikiPage);
-
-				uncachedPrimaryKeys.remove(wikiPage.getPrimaryKeyObj());
-			}
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(
-					WikiPageModelImpl.ENTITY_CACHE_ENABLED, WikiPageImpl.class,
-					primaryKey, nullModel);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -23632,7 +22332,7 @@ public class WikiPagePersistenceImpl
 	 * Returns a range of all the wiki pages.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of wiki pages
@@ -23648,7 +22348,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of wiki pages
@@ -23657,9 +22357,8 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of wiki pages
 	 */
 	@Override
-	public List<WikiPage> findAll(
-		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
-
+	public List<WikiPage> findAll(int start, int end,
+		OrderByComparator<WikiPage> orderByComparator) {
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -23667,7 +22366,7 @@ public class WikiPagePersistenceImpl
 	 * Returns an ordered range of all the wiki pages.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WikiPageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WikiPageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of wiki pages
@@ -23677,31 +22376,28 @@ public class WikiPagePersistenceImpl
 	 * @return the ordered range of wiki pages
 	 */
 	@Override
-	public List<WikiPage> findAll(
-		int start, int end, OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<WikiPage> findAll(int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] {start, end, orderByComparator};
+			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
 		List<WikiPage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WikiPage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<WikiPage>)finderCache.getResult(finderPath,
+					finderArgs, this);
 		}
 
 		if (list == null) {
@@ -23709,13 +22405,13 @@ public class WikiPagePersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					2 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_WIKIPAGE);
 
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 
 				sql = query.toString();
 			}
@@ -23735,16 +22431,16 @@ public class WikiPagePersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WikiPage>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<WikiPage>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -23782,8 +22478,8 @@ public class WikiPagePersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(_finderPathCountAll,
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -23795,12 +22491,11 @@ public class WikiPagePersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
+					count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -23818,6 +22513,21 @@ public class WikiPagePersistenceImpl
 	}
 
 	@Override
+	protected EntityCache getEntityCache() {
+		return entityCache;
+	}
+
+	@Override
+	protected String getPKDBName() {
+		return "pageId";
+	}
+
+	@Override
+	protected String getSelectSQL() {
+		return _SQL_SELECT_WIKIPAGE;
+	}
+
+	@Override
 	protected Map<String, Integer> getTableColumnsMap() {
 		return WikiPageModelImpl.TABLE_COLUMNS_MAP;
 	}
@@ -23826,985 +22536,934 @@ public class WikiPagePersistenceImpl
 	 * Initializes the wiki page persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-			new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+				new String[0]);
 
-		_finderPathCountAll = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+		_finderPathCountAll = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+				new String[0]);
 
-		_finderPathWithPaginationFindByResourcePrimKey = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByResourcePrimKey",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByResourcePrimKey = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByResourcePrimKey",
-			new String[] {Long.class.getName()},
-			WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
-
-		_finderPathCountByResourcePrimKey = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByResourcePrimKey",
-			new String[] {Long.class.getName()});
-
-		_finderPathWithPaginationFindByUuid = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
-			new String[] {
-				String.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByUuid = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-			new String[] {String.class.getName()},
-			WikiPageModelImpl.UUID_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
-
-		_finderPathCountByUuid = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
-			new String[] {String.class.getName()});
-
-		_finderPathFetchByUUID_G = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
-			new String[] {String.class.getName(), Long.class.getName()},
-			WikiPageModelImpl.UUID_COLUMN_BITMASK |
-			WikiPageModelImpl.GROUPID_COLUMN_BITMASK);
-
-		_finderPathCountByUUID_G = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
-			new String[] {String.class.getName(), Long.class.getName()});
-
-		_finderPathWithPaginationFindByUuid_C = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
-			new String[] {
-				String.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByResourcePrimKey = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+				"findByResourcePrimKey",
+				new String[] {
+					Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			WikiPageModelImpl.UUID_COLUMN_BITMASK |
-			WikiPageModelImpl.COMPANYID_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByResourcePrimKey = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+				"findByResourcePrimKey", new String[] { Long.class.getName() },
+				WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByUuid_C = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
-			new String[] {String.class.getName(), Long.class.getName()});
+		_finderPathCountByResourcePrimKey = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+				"countByResourcePrimKey", new String[] { Long.class.getName() });
 
-		_finderPathWithPaginationFindByNodeId = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByNodeId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByNodeId = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByNodeId",
-			new String[] {Long.class.getName()},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
-
-		_finderPathCountByNodeId = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByNodeId",
-			new String[] {Long.class.getName()});
-
-		_finderPathWithPaginationFindByFormat = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFormat",
-			new String[] {
-				String.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByFormat = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFormat",
-			new String[] {String.class.getName()},
-			WikiPageModelImpl.FORMAT_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
-
-		_finderPathCountByFormat = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFormat",
-			new String[] {String.class.getName()});
-
-		_finderPathWithPaginationFindByR_N = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByR_N",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByUuid = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
+				new String[] {
+					String.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByR_N = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByR_N",
-			new String[] {Long.class.getName(), Long.class.getName()},
-			WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+				new String[] { String.class.getName() },
+				WikiPageModelImpl.UUID_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByR_N = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByR_N",
-			new String[] {Long.class.getName(), Long.class.getName()});
+		_finderPathCountByUuid = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
+				new String[] { String.class.getName() });
 
-		_finderPathWithPaginationFindByR_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByR_S",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
+		_finderPathFetchByUUID_G = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
+				new String[] { String.class.getName(), Long.class.getName() },
+				WikiPageModelImpl.UUID_COLUMN_BITMASK |
+				WikiPageModelImpl.GROUPID_COLUMN_BITMASK);
+
+		_finderPathCountByUUID_G = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
+				new String[] { String.class.getName(), Long.class.getName() });
+
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+				new String[] {
+					String.class.getName(), Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByR_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByR_S",
-			new String[] {Long.class.getName(), Integer.class.getName()},
-			WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+				new String[] { String.class.getName(), Long.class.getName() },
+				WikiPageModelImpl.UUID_COLUMN_BITMASK |
+				WikiPageModelImpl.COMPANYID_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByR_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByR_S",
-			new String[] {Long.class.getName(), Integer.class.getName()});
+		_finderPathCountByUuid_C = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+				new String[] { String.class.getName(), Long.class.getName() });
 
-		_finderPathWithPaginationFindByN_T = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_T",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
+		_finderPathWithPaginationFindByNodeId = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByNodeId",
+				new String[] {
+					Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByN_T = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_T",
-			new String[] {Long.class.getName(), String.class.getName()},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByNodeId = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByNodeId",
+				new String[] { Long.class.getName() },
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByN_T = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_T",
-			new String[] {Long.class.getName(), String.class.getName()});
+		_finderPathCountByNodeId = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByNodeId",
+				new String[] { Long.class.getName() });
 
-		_finderPathWithPaginationFindByN_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
+		_finderPathWithPaginationFindByFormat = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFormat",
+				new String[] {
+					String.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByN_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H",
-			new String[] {Long.class.getName(), Boolean.class.getName()},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByFormat = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFormat",
+				new String[] { String.class.getName() },
+				WikiPageModelImpl.FORMAT_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByN_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H",
-			new String[] {Long.class.getName(), Boolean.class.getName()});
+		_finderPathCountByFormat = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFormat",
+				new String[] { String.class.getName() });
 
-		_finderPathWithPaginationFindByN_P = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_P",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
+		_finderPathWithPaginationFindByR_N = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByR_N",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByN_P = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_P",
-			new String[] {Long.class.getName(), String.class.getName()},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.PARENTTITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByR_N = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByR_N",
+				new String[] { Long.class.getName(), Long.class.getName() },
+				WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByN_P = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_P",
-			new String[] {Long.class.getName(), String.class.getName()});
+		_finderPathCountByR_N = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByR_N",
+				new String[] { Long.class.getName(), Long.class.getName() });
 
-		_finderPathWithPaginationFindByN_R = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_R",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
+		_finderPathWithPaginationFindByR_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByR_S",
+				new String[] {
+					Long.class.getName(), Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByN_R = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_R",
-			new String[] {Long.class.getName(), String.class.getName()},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.REDIRECTTITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByR_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByR_S",
+				new String[] { Long.class.getName(), Integer.class.getName() },
+				WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByN_R = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_R",
-			new String[] {Long.class.getName(), String.class.getName()});
+		_finderPathCountByR_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByR_S",
+				new String[] { Long.class.getName(), Integer.class.getName() });
 
-		_finderPathWithPaginationFindByN_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_S",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
+		_finderPathWithPaginationFindByN_T = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_T",
+				new String[] {
+					Long.class.getName(), String.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByN_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_S",
-			new String[] {Long.class.getName(), Integer.class.getName()},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByN_T = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_T",
+				new String[] { Long.class.getName(), String.class.getName() },
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByN_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_S",
-			new String[] {Long.class.getName(), Integer.class.getName()});
+		_finderPathCountByN_T = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_T",
+				new String[] { Long.class.getName(), String.class.getName() });
 
-		_finderPathFetchByR_N_V = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByR_N_V",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Double.class.getName()
-			},
-			WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
-
-		_finderPathCountByR_N_V = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByR_N_V",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Double.class.getName()
-			});
-
-		_finderPathWithPaginationFindByR_N_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByR_N_H",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByR_N_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByR_N_H",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName()
-			},
-			WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
-
-		_finderPathCountByR_N_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByR_N_H",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName()
-			});
-
-		_finderPathWithPaginationFindByR_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByR_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByN_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByR_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByR_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			},
-			WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByN_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H",
+				new String[] { Long.class.getName(), Boolean.class.getName() },
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByR_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByR_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathCountByN_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H",
+				new String[] { Long.class.getName(), Boolean.class.getName() });
 
-		_finderPathWithPaginationFindByG_N_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_H",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByG_N_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_H",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName()
-			},
-			WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
-
-		_finderPathCountByG_N_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_H",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName()
-			});
-
-		_finderPathWithPaginationFindByG_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByN_P = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_P",
+				new String[] {
+					Long.class.getName(), String.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByG_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			},
-			WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByN_P = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_P",
+				new String[] { Long.class.getName(), String.class.getName() },
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.PARENTTITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByG_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathCountByN_P = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_P",
+				new String[] { Long.class.getName(), String.class.getName() });
 
-		_finderPathWithPaginationFindByU_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByN_R = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_R",
+				new String[] {
+					Long.class.getName(), String.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByU_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			},
-			WikiPageModelImpl.USERID_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByN_R = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_R",
+				new String[] { Long.class.getName(), String.class.getName() },
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.REDIRECTTITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByU_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathCountByN_R = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_R",
+				new String[] { Long.class.getName(), String.class.getName() });
 
-		_finderPathFetchByN_T_V = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByN_T_V",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
-				Double.class.getName()
-			},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
-
-		_finderPathCountByN_T_V = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_T_V",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
-				Double.class.getName()
-			});
-
-		_finderPathWithPaginationFindByN_T_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_T_H",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
-				Boolean.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByN_T_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_T_H",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
-				Boolean.class.getName()
-			},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
-
-		_finderPathCountByN_T_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_T_H",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
-				Boolean.class.getName()
-			});
-
-		_finderPathWithPaginationFindByN_T_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_T_S",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
+		_finderPathWithPaginationFindByN_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_S",
+				new String[] {
+					Long.class.getName(), Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByN_T_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_T_S",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
-				Integer.class.getName()
-			},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByN_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_S",
+				new String[] { Long.class.getName(), Integer.class.getName() },
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByN_T_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_T_S",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathCountByN_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_S",
+				new String[] { Long.class.getName(), Integer.class.getName() });
 
-		_finderPathWithPaginationFindByN_H_P = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_P",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+		_finderPathFetchByR_N_V = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_ENTITY, "fetchByR_N_V",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Double.class.getName()
+				},
+				WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathWithoutPaginationFindByN_H_P = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H_P",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName()
-			},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.PARENTTITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathCountByR_N_V = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByR_N_V",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Double.class.getName()
+				});
 
-		_finderPathCountByN_H_P = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H_P",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName()
-			});
-
-		_finderPathWithPaginationFindByN_H_R = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_R",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByN_H_R = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H_R",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName()
-			},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.REDIRECTTITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
-
-		_finderPathCountByN_H_R = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H_R",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName()
-			});
-
-		_finderPathWithPaginationFindByN_H_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_S",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
+		_finderPathWithPaginationFindByR_N_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByR_N_H",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByN_H_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H_S",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				Integer.class.getName()
-			},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByR_N_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByR_N_H",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName()
+				},
+				WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByN_H_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H_S",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathCountByR_N_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByR_N_H",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName()
+				});
 
-		_finderPathWithPaginationFindByN_H_NotS = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_NotS",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
+		_finderPathWithPaginationFindByR_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByR_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByN_H_NotS = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByN_H_NotS",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathWithoutPaginationFindByR_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByR_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				},
+				WikiPageModelImpl.RESOURCEPRIMKEY_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByG_U_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Long.class.getName(), Integer.class.getName(),
+		_finderPathCountByR_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByR_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByG_N_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_H",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByG_U_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Long.class.getName(), Integer.class.getName()
-			},
-			WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
-			WikiPageModelImpl.USERID_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_N_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_H",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName()
+				},
+				WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByG_U_N_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_N_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Long.class.getName(), Integer.class.getName()
-			});
+		_finderPathCountByG_N_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_H",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName()
+				});
 
-		_finderPathWithPaginationFindByG_N_T_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_T_H",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				String.class.getName(), Boolean.class.getName(),
+		_finderPathWithPaginationFindByG_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByG_N_T_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_T_H",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				String.class.getName(), Boolean.class.getName()
-			},
-			WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				},
+				WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByG_N_T_H = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_T_H",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				String.class.getName(), Boolean.class.getName()
-			});
+		_finderPathCountByG_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				});
 
-		_finderPathWithPaginationFindByG_N_H_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_H_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName(), Integer.class.getName(),
+		_finderPathWithPaginationFindByU_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByG_N_H_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_H_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName(), Integer.class.getName()
-			},
-			WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByU_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				},
+				WikiPageModelImpl.USERID_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByG_N_H_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_H_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName(), Integer.class.getName()
-			});
+		_finderPathCountByU_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				});
 
-		_finderPathWithPaginationFindByN_H_P_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_P_S",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName(),
+		_finderPathFetchByN_T_V = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_ENTITY, "fetchByN_T_V",
+				new String[] {
+					Long.class.getName(), String.class.getName(),
+					Double.class.getName()
+				},
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByN_T_V = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_T_V",
+				new String[] {
+					Long.class.getName(), String.class.getName(),
+					Double.class.getName()
+				});
+
+		_finderPathWithPaginationFindByN_T_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_T_H",
+				new String[] {
+					Long.class.getName(), String.class.getName(),
+					Boolean.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByN_H_P_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H_P_S",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName()
-			},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.PARENTTITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByN_T_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_T_H",
+				new String[] {
+					Long.class.getName(), String.class.getName(),
+					Boolean.class.getName()
+				},
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByN_H_P_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H_P_S",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName()
-			});
+		_finderPathCountByN_T_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_T_H",
+				new String[] {
+					Long.class.getName(), String.class.getName(),
+					Boolean.class.getName()
+				});
 
-		_finderPathWithPaginationFindByN_H_P_NotS = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_P_NotS",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName(),
+		_finderPathWithPaginationFindByN_T_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_T_S",
+				new String[] {
+					Long.class.getName(), String.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByN_H_P_NotS = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByN_H_P_NotS",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName()
-			});
+		_finderPathWithoutPaginationFindByN_T_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_T_S",
+				new String[] {
+					Long.class.getName(), String.class.getName(),
+					Integer.class.getName()
+				},
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByN_H_R_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_R_S",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName(),
+		_finderPathCountByN_T_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_T_S",
+				new String[] {
+					Long.class.getName(), String.class.getName(),
+					Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByN_H_P = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_P",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByN_H_R_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H_R_S",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName()
-			},
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.REDIRECTTITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByN_H_P = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H_P",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName()
+				},
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.PARENTTITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByN_H_R_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H_R_S",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName()
-			});
+		_finderPathCountByN_H_P = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H_P",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName()
+				});
 
-		_finderPathWithPaginationFindByN_H_R_NotS = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_R_NotS",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName(),
+		_finderPathWithPaginationFindByN_H_R = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_R",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByN_H_R_NotS = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByN_H_R_NotS",
-			new String[] {
-				Long.class.getName(), Boolean.class.getName(),
-				String.class.getName(), Integer.class.getName()
-			});
+		_finderPathWithoutPaginationFindByN_H_R = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H_R",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName()
+				},
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.REDIRECTTITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByG_N_H_P_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_H_P_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName(), String.class.getName(),
+		_finderPathCountByN_H_R = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H_R",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName()
+				});
+
+		_finderPathWithPaginationFindByN_H_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_S",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByG_N_H_P_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_H_P_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName(), String.class.getName(),
-				Integer.class.getName()
-			},
-			WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
-			WikiPageModelImpl.NODEID_COLUMN_BITMASK |
-			WikiPageModelImpl.HEAD_COLUMN_BITMASK |
-			WikiPageModelImpl.PARENTTITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.STATUS_COLUMN_BITMASK |
-			WikiPageModelImpl.TITLE_COLUMN_BITMASK |
-			WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByN_H_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H_S",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					Integer.class.getName()
+				},
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
 
-		_finderPathCountByG_N_H_P_S = new FinderPath(
-			WikiPageModelImpl.ENTITY_CACHE_ENABLED,
-			WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_H_P_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName(), String.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathCountByN_H_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H_S",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByN_H_NotS = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_NotS",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithPaginationCountByN_H_NotS = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByN_H_NotS",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByG_U_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName(), Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByG_U_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName(), Integer.class.getName()
+				},
+				WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
+				WikiPageModelImpl.USERID_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByG_U_N_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_N_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName(), Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByG_N_T_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_T_H",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					String.class.getName(), Boolean.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByG_N_T_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_T_H",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					String.class.getName(), Boolean.class.getName()
+				},
+				WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByG_N_T_H = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_T_H",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					String.class.getName(), Boolean.class.getName()
+				});
+
+		_finderPathWithPaginationFindByG_N_H_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_H_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName(), Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByG_N_H_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_H_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName(), Integer.class.getName()
+				},
+				WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByG_N_H_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_H_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName(), Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByN_H_P_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_P_S",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(), Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByN_H_P_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H_P_S",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(), Integer.class.getName()
+				},
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.PARENTTITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByN_H_P_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H_P_S",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(), Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByN_H_P_NotS = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_P_NotS",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(), Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithPaginationCountByN_H_P_NotS = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByN_H_P_NotS",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(), Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByN_H_R_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_R_S",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(), Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByN_H_R_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByN_H_R_S",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(), Integer.class.getName()
+				},
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.REDIRECTTITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByN_H_R_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByN_H_R_S",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(), Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByN_H_R_NotS = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByN_H_R_NotS",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(), Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithPaginationCountByN_H_R_NotS = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByN_H_R_NotS",
+				new String[] {
+					Long.class.getName(), Boolean.class.getName(),
+					String.class.getName(), Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByG_N_H_P_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_H_P_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName(), String.class.getName(),
+					Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByG_N_H_P_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, WikiPageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_H_P_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName(), String.class.getName(),
+					Integer.class.getName()
+				},
+				WikiPageModelImpl.GROUPID_COLUMN_BITMASK |
+				WikiPageModelImpl.NODEID_COLUMN_BITMASK |
+				WikiPageModelImpl.HEAD_COLUMN_BITMASK |
+				WikiPageModelImpl.PARENTTITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.STATUS_COLUMN_BITMASK |
+				WikiPageModelImpl.TITLE_COLUMN_BITMASK |
+				WikiPageModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByG_N_H_P_S = new FinderPath(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
+				WikiPageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_H_P_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName(), String.class.getName(),
+					Integer.class.getName()
+				});
 	}
 
 	public void destroy() {
@@ -24816,63 +23475,29 @@ public class WikiPagePersistenceImpl
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
-
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-
-	private static final String _SQL_SELECT_WIKIPAGE =
-		"SELECT wikiPage FROM WikiPage wikiPage";
-
-	private static final String _SQL_SELECT_WIKIPAGE_WHERE_PKS_IN =
-		"SELECT wikiPage FROM WikiPage wikiPage WHERE pageId IN (";
-
-	private static final String _SQL_SELECT_WIKIPAGE_WHERE =
-		"SELECT wikiPage FROM WikiPage wikiPage WHERE ";
-
-	private static final String _SQL_COUNT_WIKIPAGE =
-		"SELECT COUNT(wikiPage) FROM WikiPage wikiPage";
-
-	private static final String _SQL_COUNT_WIKIPAGE_WHERE =
-		"SELECT COUNT(wikiPage) FROM WikiPage wikiPage WHERE ";
-
-	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN =
-		"wikiPage.resourcePrimKey";
-
-	private static final String _FILTER_SQL_SELECT_WIKIPAGE_WHERE =
-		"SELECT DISTINCT {wikiPage.*} FROM WikiPage wikiPage WHERE ";
-
-	private static final String
-		_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1 =
-			"SELECT {WikiPage.*} FROM (SELECT DISTINCT wikiPage.pageId FROM WikiPage wikiPage WHERE ";
-
-	private static final String
-		_FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2 =
-			") TEMP_TABLE INNER JOIN WikiPage ON TEMP_TABLE.pageId = WikiPage.pageId";
-
-	private static final String _FILTER_SQL_COUNT_WIKIPAGE_WHERE =
-		"SELECT COUNT(DISTINCT wikiPage.pageId) AS COUNT_VALUE FROM WikiPage wikiPage WHERE ";
-
+	private static final String _SQL_SELECT_WIKIPAGE = "SELECT wikiPage FROM WikiPage wikiPage";
+	private static final String _SQL_SELECT_WIKIPAGE_WHERE = "SELECT wikiPage FROM WikiPage wikiPage WHERE ";
+	private static final String _SQL_COUNT_WIKIPAGE = "SELECT COUNT(wikiPage) FROM WikiPage wikiPage";
+	private static final String _SQL_COUNT_WIKIPAGE_WHERE = "SELECT COUNT(wikiPage) FROM WikiPage wikiPage WHERE ";
+	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "wikiPage.resourcePrimKey";
+	private static final String _FILTER_SQL_SELECT_WIKIPAGE_WHERE = "SELECT DISTINCT {wikiPage.*} FROM WikiPage wikiPage WHERE ";
+	private static final String _FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_1 =
+		"SELECT {WikiPage.*} FROM (SELECT DISTINCT wikiPage.pageId FROM WikiPage wikiPage WHERE ";
+	private static final String _FILTER_SQL_SELECT_WIKIPAGE_NO_INLINE_DISTINCT_WHERE_2 =
+		") TEMP_TABLE INNER JOIN WikiPage ON TEMP_TABLE.pageId = WikiPage.pageId";
+	private static final String _FILTER_SQL_COUNT_WIKIPAGE_WHERE = "SELECT COUNT(DISTINCT wikiPage.pageId) AS COUNT_VALUE FROM WikiPage wikiPage WHERE ";
 	private static final String _FILTER_ENTITY_ALIAS = "wikiPage";
-
 	private static final String _FILTER_ENTITY_TABLE = "WikiPage";
-
 	private static final String _ORDER_BY_ENTITY_ALIAS = "wikiPage.";
-
 	private static final String _ORDER_BY_ENTITY_TABLE = "WikiPage.";
-
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
-		"No WikiPage exists with the primary key ";
-
-	private static final String _NO_SUCH_ENTITY_WITH_KEY =
-		"No WikiPage exists with the key {";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		WikiPagePersistenceImpl.class);
-
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"uuid"});
-
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No WikiPage exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No WikiPage exists with the key {";
+	private static final Log _log = LogFactoryUtil.getLog(WikiPagePersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+				"uuid"
+			});
 }

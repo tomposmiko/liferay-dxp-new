@@ -20,7 +20,6 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.test.util.search.FileEntryBlueprint;
 import com.liferay.document.library.test.util.search.FileEntrySearchFixture;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
@@ -117,14 +116,12 @@ public class AssetTagNamesMultiLanguageSearchTest {
 				}
 			});
 
-		String[] tags = {StringPool.BLANK, tag};
-
-		assertSearch(tag, tags, locale);
+		assertSearch(tag, locale);
 	}
 
 	@Test
 	public void testEnglishTags() throws Exception {
-		Locale locale = LocaleUtil.US;
+		Locale locale = Locale.US;
 		String title1 = "title should not match";
 		String tag = "searchtag";
 
@@ -146,9 +143,7 @@ public class AssetTagNamesMultiLanguageSearchTest {
 				}
 			});
 
-		String[] tags = {StringPool.BLANK, tag};
-
-		assertSearch(tag, tags, locale);
+		assertSearch(tag, locale);
 	}
 
 	@Test
@@ -188,13 +183,8 @@ public class AssetTagNamesMultiLanguageSearchTest {
 				}
 			});
 
-		String[] tags1 = {StringPool.BLANK, StringPool.BLANK, tag1};
-
-		assertSearch(tag1, tags1, locale);
-
-		String[] tags2 = {StringPool.BLANK, StringPool.BLANK, tag2};
-
-		assertSearch(tag2, tags2, locale);
+		assertSearch(tag1, locale);
+		assertSearch(tag2, locale);
 	}
 
 	protected void assertDLFileEntryIndexer(String tagName, Locale locale)
@@ -210,8 +200,7 @@ public class AssetTagNamesMultiLanguageSearchTest {
 		assertHits(tagName, hits, searchContext);
 	}
 
-	protected void assertFacetedSearcher(
-			String tagName, String[] tagNames, Locale locale)
+	protected void assertFacetedSearcher(String tagName, Locale locale)
 		throws Exception {
 
 		FacetedSearcher facetedSearcher =
@@ -221,7 +210,7 @@ public class AssetTagNamesMultiLanguageSearchTest {
 
 		Hits hits = facetedSearcher.search(searchContext);
 
-		assertHits(tagNames, hits, searchContext);
+		assertHits(tagName, hits, searchContext);
 	}
 
 	protected void assertHits(
@@ -232,20 +221,11 @@ public class AssetTagNamesMultiLanguageSearchTest {
 			Field.ASSET_TAG_NAMES, Arrays.asList(tagName));
 	}
 
-	protected void assertHits(
-		String[] tagNames, Hits hits, SearchContext searchContext) {
-
-		DocumentsAssert.assertValuesIgnoreRelevance(
-			(String)searchContext.getAttribute("queryString"), hits.getDocs(),
-			Field.ASSET_TAG_NAMES, Arrays.asList(tagNames));
-	}
-
-	protected void assertSearch(
-			String tagName, String[] tagNames, Locale locale)
+	protected void assertSearch(String tagName, Locale locale)
 		throws Exception {
 
 		assertDLFileEntryIndexer(tagName, locale);
-		assertFacetedSearcher(tagName, tagNames, locale);
+		assertFacetedSearcher(tagName, locale);
 	}
 
 	protected long getAdminUserId(Group group) {

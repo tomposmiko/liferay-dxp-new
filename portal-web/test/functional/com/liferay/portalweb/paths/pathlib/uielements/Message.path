@@ -44,6 +44,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EMPTY_INFO_TAGLIB</td>
+	<td>//div[contains(@class,'taglib-empty-result-message')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ERROR</td>
 	<td>//div[contains(@class,'alert') and (contains(@class,'alert-error') or contains(@class,'alert-danger'))]</td>
 	<td></td>
@@ -181,6 +186,11 @@
 <tr>
 	<td>INFO_SPECIFIC</td>
 	<td>//div[contains(@class,'alert alert-info') and not(contains(@class,'hide'))][contains(.,'${key_infoMessage}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INFO_SPECIFIC_WIDGET</td>
+	<td>//section[contains(.,'${key_widgetName}')]//div[contains(@class,'alert alert-info') and not(contains(@class,'hide'))]</td>
 	<td></td>
 </tr>
 <tr>

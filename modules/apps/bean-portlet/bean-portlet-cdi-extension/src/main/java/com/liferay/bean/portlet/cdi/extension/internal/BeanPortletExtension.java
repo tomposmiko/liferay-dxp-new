@@ -22,7 +22,6 @@ import com.liferay.bean.portlet.cdi.extension.internal.scope.PortletRequestBeanC
 import com.liferay.bean.portlet.cdi.extension.internal.scope.PortletSessionBeanContext;
 import com.liferay.bean.portlet.cdi.extension.internal.scope.RenderStateBeanContext;
 import com.liferay.bean.portlet.cdi.extension.internal.scope.ScopedBean;
-import com.liferay.bean.portlet.cdi.extension.internal.scope.ServletContextProducer;
 import com.liferay.bean.portlet.cdi.extension.internal.util.BeanMethodIndexUtil;
 import com.liferay.bean.portlet.cdi.extension.internal.util.PortletScannerUtil;
 import com.liferay.bean.portlet.cdi.extension.internal.xml.DisplayDescriptorParser;
@@ -70,7 +69,6 @@ import javax.enterprise.context.Initialized;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
-import javax.enterprise.event.ObservesAsync;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
@@ -153,12 +151,10 @@ public class BeanPortletExtension implements Extension {
 		beforeBeanDiscovery.addScope(PortletSessionScoped.class, true, true);
 		beforeBeanDiscovery.addScope(RenderStateScoped.class, true, false);
 
-		beforeBeanDiscovery.addAnnotatedType(
-			beanManager.createAnnotatedType(JSR362BeanProducer.class), null);
+		AnnotatedType<?> beanAnnotatedType = beanManager.createAnnotatedType(
+			JSR362BeanProducer.class);
 
-		beforeBeanDiscovery.addAnnotatedType(
-			beanManager.createAnnotatedType(ServletContextProducer.class),
-			null);
+		beforeBeanDiscovery.addAnnotatedType(beanAnnotatedType, null);
 	}
 
 	public <T> void step2ProcessAnnotatedType(
@@ -171,14 +167,14 @@ public class BeanPortletExtension implements Extension {
 		AnnotatedType<T> annotatedType =
 			processAnnotatedType.getAnnotatedType();
 
-		Class<T> discoveredClass = annotatedType.getJavaClass();
+		Class<T> annotatedClass = annotatedType.getJavaClass();
 
 		if (annotatedType.isAnnotationPresent(RenderStateScoped.class) &&
-			!PortletSerializable.class.isAssignableFrom(discoveredClass)) {
+			!PortletSerializable.class.isAssignableFrom(annotatedClass)) {
 
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					discoveredClass.getName() + " does not implement " +
+					annotatedClass.getName() + " does not implement " +
 						PortletSerializable.class.getName());
 			}
 		}
@@ -217,7 +213,7 @@ public class BeanPortletExtension implements Extension {
 			annotations.add(_portletSessionScoped);
 		}
 
-		if (Portlet.class.isAssignableFrom(discoveredClass) &&
+		if (Portlet.class.isAssignableFrom(annotatedClass) &&
 			!annotatedType.isAnnotationPresent(ApplicationScoped.class)) {
 
 			annotations.remove(
@@ -236,7 +232,7 @@ public class BeanPortletExtension implements Extension {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Automatically added @ApplicationScoped to " +
-						discoveredClass);
+						annotatedClass);
 			}
 		}
 
@@ -252,7 +248,7 @@ public class BeanPortletExtension implements Extension {
 
 		if (annotatedType.isAnnotationPresent(PortletApplication.class)) {
 			if (_portletApplicationClass == null) {
-				_portletApplicationClass = discoveredClass;
+				_portletApplicationClass = annotatedClass;
 			}
 			else {
 				_log.error(
@@ -260,14 +256,14 @@ public class BeanPortletExtension implements Extension {
 			}
 		}
 
-		_discoveredClasses.add(discoveredClass);
+		_annotatedClasses.add(annotatedClass);
 
-		for (Method method : discoveredClass.getMethods()) {
+		for (Method method : annotatedClass.getMethods()) {
 			for (MethodType methodType : MethodType.values()) {
 				if (methodType.isMatch(method)) {
 					_beanMethodFactories.add(
 						new BeanMethodFactory(
-							discoveredClass, method, methodType));
+							annotatedClass, method, methodType));
 				}
 			}
 		}
@@ -282,9 +278,13 @@ public class BeanPortletExtension implements Extension {
 	}
 
 	@SuppressWarnings({"serial", "unchecked"})
-	public void step4ApplicationScopedInitializedAsync(
-		@ObservesAsync ServletContext servletContext, BeanManager beanManager,
-		BundleContext bundleContext) {
+	public void step4ApplicationScopedInitialized(
+		@Initialized(ApplicationScoped.class) @Observes ServletContext
+			servletContext,
+		BeanManager beanManager) {
+
+		BundleContext bundleContext =
+			(BundleContext)servletContext.getAttribute("osgi-bundlecontext");
 
 		Bundle bundle = bundleContext.getBundle();
 
@@ -341,9 +341,9 @@ public class BeanPortletExtension implements Extension {
 			}
 		}
 
-		_addBeanFiltersFromDiscoveredClasses();
+		_addBeanFiltersFromAnnotatedClasses();
 
-		_addBeanPortletsFromDiscoveredClasses(
+		_addBeanPortletsFromAnnotatedClasses(
 			beanManager, portletBeanMethodsFunction,
 			preferencesValidatorFunction, descriptorDisplayCategories,
 			descriptorLiferayConfigurations);
@@ -481,15 +481,6 @@ public class BeanPortletExtension implements Extension {
 				properties));
 	}
 
-	public void step4ApplicationScopedInitializedSync(
-		@Initialized(ApplicationScoped.class) @Observes
-			ServletContext servletContext,
-		BeanManager beanManager,
-		javax.enterprise.event.Event<ServletContext> servletContextEvent) {
-
-		servletContextEvent.fireAsync(servletContext);
-	}
-
 	public void step5SessionScopeBeforeDestroyed(
 		@Destroyed(SessionScoped.class) @Observes Object httpSessionObject) {
 
@@ -540,19 +531,19 @@ public class BeanPortletExtension implements Extension {
 		}
 	}
 
-	private void _addBeanFiltersFromDiscoveredClasses() {
-		for (Class<?> discoveredClass : _discoveredClasses) {
+	private void _addBeanFiltersFromAnnotatedClasses() {
+		for (Class<?> annotatedClass : _annotatedClasses) {
 			PortletLifecycleFilter portletLifecycleFilter =
-				discoveredClass.getAnnotation(PortletLifecycleFilter.class);
+				annotatedClass.getAnnotation(PortletLifecycleFilter.class);
 
 			if (portletLifecycleFilter == null) {
 				continue;
 			}
 
-			if (!PortletFilter.class.isAssignableFrom(discoveredClass)) {
+			if (!PortletFilter.class.isAssignableFrom(annotatedClass)) {
 				_log.error(
 					StringBundler.concat(
-						"Ignoring ", discoveredClass, ". It has ",
+						"Ignoring ", annotatedClass, ". It has ",
 						PortletLifecycleFilter.class,
 						" but does not implement ", PortletFilter.class));
 
@@ -569,23 +560,23 @@ public class BeanPortletExtension implements Extension {
 
 			Set<String> lifecycles = new LinkedHashSet<>();
 
-			if (ActionFilter.class.isAssignableFrom(discoveredClass)) {
+			if (ActionFilter.class.isAssignableFrom(annotatedClass)) {
 				lifecycles.add(PortletRequest.ACTION_PHASE);
 			}
 
-			if (EventFilter.class.isAssignableFrom(discoveredClass)) {
+			if (EventFilter.class.isAssignableFrom(annotatedClass)) {
 				lifecycles.add(PortletRequest.EVENT_PHASE);
 			}
 
-			if (HeaderFilter.class.isAssignableFrom(discoveredClass)) {
+			if (HeaderFilter.class.isAssignableFrom(annotatedClass)) {
 				lifecycles.add(PortletRequest.HEADER_PHASE);
 			}
 
-			if (RenderFilter.class.isAssignableFrom(discoveredClass)) {
+			if (RenderFilter.class.isAssignableFrom(annotatedClass)) {
 				lifecycles.add(PortletRequest.RENDER_PHASE);
 			}
 
-			if (ResourceFilter.class.isAssignableFrom(discoveredClass)) {
+			if (ResourceFilter.class.isAssignableFrom(annotatedClass)) {
 				lifecycles.add(PortletRequest.RESOURCE_PHASE);
 			}
 
@@ -598,7 +589,7 @@ public class BeanPortletExtension implements Extension {
 
 			if (beanFilter == null) {
 				beanFilter = new BeanFilterImpl(
-					filterName, discoveredClass.asSubclass(PortletFilter.class),
+					filterName, annotatedClass.asSubclass(PortletFilter.class),
 					portletLifecycleFilter.ordinal(), portletNames, lifecycles,
 					initParams);
 			}
@@ -728,8 +719,8 @@ public class BeanPortletExtension implements Extension {
 
 		List<Map.Entry<Integer, String>> portletListeners = new ArrayList<>();
 
-		for (Class<?> discoveredClass : _discoveredClasses) {
-			PortletListener portletListener = discoveredClass.getAnnotation(
+		for (Class<?> annotatedClass : _annotatedClasses) {
+			PortletListener portletListener = annotatedClass.getAnnotation(
 				PortletListener.class);
 
 			if (portletListener == null) {
@@ -738,7 +729,7 @@ public class BeanPortletExtension implements Extension {
 
 			portletListeners.add(
 				new AbstractMap.SimpleImmutableEntry<>(
-					portletListener.ordinal(), discoveredClass.getName()));
+					portletListener.ordinal(), annotatedClass.getName()));
 		}
 
 		portletListeners.addAll(_beanApp.getPortletListeners());
@@ -1088,16 +1079,16 @@ public class BeanPortletExtension implements Extension {
 		_beanPortlets.put(configuredPortletName, mergedBeanPortlet);
 	}
 
-	private void _addBeanPortletsFromDiscoveredClasses(
+	private void _addBeanPortletsFromAnnotatedClasses(
 		BeanManager beanManager,
 		Function<String, Set<BeanMethod>> portletBeanMethodsFunction,
 		Function<String, String> preferencesValidatorFunction,
 		Map<String, String> descriptorDisplayCategories,
 		Map<String, Map<String, Set<String>>> descriptorLiferayConfigurations) {
 
-		for (Class<?> discoveredClass : _discoveredClasses) {
+		for (Class<?> annotatedClass : _annotatedClasses) {
 			PortletConfigurations portletConfigurations =
-				discoveredClass.getAnnotation(PortletConfigurations.class);
+				annotatedClass.getAnnotation(PortletConfigurations.class);
 
 			if (portletConfigurations == null) {
 				continue;
@@ -1111,21 +1102,21 @@ public class BeanPortletExtension implements Extension {
 						portletConfiguration.portletName()));
 
 				PortletScannerUtil.scanNonannotatedBeanMethods(
-					beanManager, discoveredClass, beanMethods);
+					beanManager, annotatedClass, beanMethods);
 
 				Map<MethodType, List<BeanMethod>> beanMethodMap =
 					BeanMethodIndexUtil.indexBeanMethods(beanMethods);
 
 				_addBeanPortlet(
-					discoveredClass, beanMethodMap, portletConfiguration,
+					annotatedClass, beanMethodMap, portletConfiguration,
 					preferencesValidatorFunction, descriptorDisplayCategories,
 					descriptorLiferayConfigurations);
 			}
 		}
 
-		for (Class<?> discoveredClass : _discoveredClasses) {
+		for (Class<?> annotatedClass : _annotatedClasses) {
 			PortletConfiguration portletConfiguration =
-				discoveredClass.getAnnotation(PortletConfiguration.class);
+				annotatedClass.getAnnotation(PortletConfiguration.class);
 
 			if (portletConfiguration == null) {
 				continue;
@@ -1136,13 +1127,13 @@ public class BeanPortletExtension implements Extension {
 					portletConfiguration.portletName()));
 
 			PortletScannerUtil.scanNonannotatedBeanMethods(
-				beanManager, discoveredClass, beanMethods);
+				beanManager, annotatedClass, beanMethods);
 
 			Map<MethodType, List<BeanMethod>> beanMethodMap =
 				BeanMethodIndexUtil.indexBeanMethods(beanMethods);
 
 			_addBeanPortlet(
-				discoveredClass, beanMethodMap, portletConfiguration,
+				annotatedClass, beanMethodMap, portletConfiguration,
 				preferencesValidatorFunction, descriptorDisplayCategories,
 				descriptorLiferayConfigurations);
 		}
@@ -1280,10 +1271,9 @@ public class BeanPortletExtension implements Extension {
 
 		Map<String, String> preferencesValidators = new HashMap<>();
 
-		for (Class<?> discoveredClass : _discoveredClasses) {
+		for (Class<?> annotatedClass : _annotatedClasses) {
 			PortletPreferencesValidator portletPreferencesValidator =
-				discoveredClass.getAnnotation(
-					PortletPreferencesValidator.class);
+				annotatedClass.getAnnotation(PortletPreferencesValidator.class);
 
 			if (portletPreferencesValidator == null) {
 				continue;
@@ -1294,8 +1284,7 @@ public class BeanPortletExtension implements Extension {
 			for (String portletName : portletNames) {
 				if (Objects.equals(portletName, "*")) {
 					if (wildcardPreferencesValidator == null) {
-						wildcardPreferencesValidator =
-							discoveredClass.getName();
+						wildcardPreferencesValidator = annotatedClass.getName();
 					}
 				}
 				else {
@@ -1309,7 +1298,7 @@ public class BeanPortletExtension implements Extension {
 					}
 					else {
 						preferencesValidators.put(
-							portletName, discoveredClass.getName());
+							portletName, annotatedClass.getName());
 					}
 				}
 			}
@@ -1317,17 +1306,18 @@ public class BeanPortletExtension implements Extension {
 
 		String defaultPreferencesValidator = wildcardPreferencesValidator;
 
-		return portletName -> preferencesValidators.getOrDefault(
-			portletName, defaultPreferencesValidator);
+		return portletName -> {
+			return preferencesValidators.getOrDefault(
+				portletName, defaultPreferencesValidator);
+		};
 	}
 
 	private LiferayPortletConfiguration _getAnnotatedLiferayConfiguration(
 		String portletName) {
 
-		for (Class<?> discoveredClass : _discoveredClasses) {
+		for (Class<?> annotatedClass : _annotatedClasses) {
 			LiferayPortletConfiguration liferayPortletConfiguration =
-				discoveredClass.getAnnotation(
-					LiferayPortletConfiguration.class);
+				annotatedClass.getAnnotation(LiferayPortletConfiguration.class);
 
 			if (liferayPortletConfiguration == null) {
 				continue;
@@ -1338,9 +1328,9 @@ public class BeanPortletExtension implements Extension {
 			}
 		}
 
-		for (Class<?> discoveredClass : _discoveredClasses) {
+		for (Class<?> annotatedClass : _annotatedClasses) {
 			LiferayPortletConfigurations liferayPortletConfigurations =
-				discoveredClass.getAnnotation(
+				annotatedClass.getAnnotation(
 					LiferayPortletConfigurations.class);
 
 			if (liferayPortletConfigurations == null) {
@@ -1462,6 +1452,7 @@ public class BeanPortletExtension implements Extension {
 
 		};
 
+	private final List<Class<?>> _annotatedClasses = new ArrayList<>();
 	private BeanApp _beanApp = new BeanAppImpl(
 		"3.0", null, Collections.emptyList(), Collections.emptyMap(),
 		Collections.emptyMap(), Collections.emptySet(),
@@ -1470,7 +1461,6 @@ public class BeanPortletExtension implements Extension {
 	private final List<BeanMethodFactory> _beanMethodFactories =
 		new ArrayList<>();
 	private final Map<String, BeanPortlet> _beanPortlets = new HashMap<>();
-	private final List<Class<?>> _discoveredClasses = new ArrayList<>();
 	private Class<?> _portletApplicationClass;
 	private final List<ServiceRegistration<?>> _serviceRegistrations =
 		new ArrayList<>();

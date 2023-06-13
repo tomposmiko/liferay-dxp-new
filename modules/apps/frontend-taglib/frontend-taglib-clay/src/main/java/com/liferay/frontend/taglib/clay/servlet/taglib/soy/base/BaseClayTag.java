@@ -44,9 +44,9 @@ public abstract class BaseClayTag extends TemplateRendererTag {
 			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-			String pathThemeImages = themeDisplay.getPathThemeImages();
-
-			putValue("spritemap", pathThemeImages.concat("/clay/icons.svg"));
+			putValue(
+				"spritemap",
+				themeDisplay.getPathThemeImages().concat("/clay/icons.svg"));
 		}
 
 		String namespace = getNamespace();

@@ -25,21 +25,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Eduardo Lundgren
  * @see CalendarResourceModel
+ * @see com.liferay.calendar.model.impl.CalendarResourceImpl
+ * @see com.liferay.calendar.model.impl.CalendarResourceModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.calendar.model.impl.CalendarResourceImpl")
 @ProviderType
-public interface CalendarResource
-	extends CalendarResourceModel, PersistedModel {
-
+public interface CalendarResource extends CalendarResourceModel, PersistedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to <code>com.liferay.calendar.model.impl.CalendarResourceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.calendar.model.impl.CalendarResourceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<CalendarResource, Long>
-		CALENDAR_RESOURCE_ID_ACCESSOR = new Accessor<CalendarResource, Long>() {
-
+	public static final Accessor<CalendarResource, Long> CALENDAR_RESOURCE_ID_ACCESSOR =
+		new Accessor<CalendarResource, Long>() {
 			@Override
 			public Long get(CalendarResource calendarResource) {
 				return calendarResource.getCalendarResourceId();
@@ -54,7 +53,6 @@ public interface CalendarResource
 			public Class<CalendarResource> getTypeClass() {
 				return CalendarResource.class;
 			}
-
 		};
 
 	public java.util.List<Calendar> getCalendars();
@@ -72,5 +70,4 @@ public interface CalendarResource
 	public boolean isGroup();
 
 	public boolean isUser();
-
 }

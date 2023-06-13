@@ -17,9 +17,11 @@ package com.liferay.dynamic.data.mapping.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing DDMDataProviderInstance in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see DDMDataProviderInstance
  * @generated
  */
 @ProviderType
-public class DDMDataProviderInstanceCacheModel
-	implements CacheModel<DDMDataProviderInstance>, Externalizable {
-
+public class DDMDataProviderInstanceCacheModel implements CacheModel<DDMDataProviderInstance>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,12 +50,9 @@ public class DDMDataProviderInstanceCacheModel
 			return false;
 		}
 
-		DDMDataProviderInstanceCacheModel ddmDataProviderInstanceCacheModel =
-			(DDMDataProviderInstanceCacheModel)obj;
+		DDMDataProviderInstanceCacheModel ddmDataProviderInstanceCacheModel = (DDMDataProviderInstanceCacheModel)obj;
 
-		if (dataProviderInstanceId ==
-				ddmDataProviderInstanceCacheModel.dataProviderInstanceId) {
-
+		if (dataProviderInstanceId == ddmDataProviderInstanceCacheModel.dataProviderInstanceId) {
 			return true;
 		}
 
@@ -100,8 +99,7 @@ public class DDMDataProviderInstanceCacheModel
 
 	@Override
 	public DDMDataProviderInstance toEntityModel() {
-		DDMDataProviderInstanceImpl ddmDataProviderInstanceImpl =
-			new DDMDataProviderInstanceImpl();
+		DDMDataProviderInstanceImpl ddmDataProviderInstanceImpl = new DDMDataProviderInstanceImpl();
 
 		if (uuid == null) {
 			ddmDataProviderInstanceImpl.setUuid("");
@@ -110,8 +108,7 @@ public class DDMDataProviderInstanceCacheModel
 			ddmDataProviderInstanceImpl.setUuid(uuid);
 		}
 
-		ddmDataProviderInstanceImpl.setDataProviderInstanceId(
-			dataProviderInstanceId);
+		ddmDataProviderInstanceImpl.setDataProviderInstanceId(dataProviderInstanceId);
 		ddmDataProviderInstanceImpl.setGroupId(groupId);
 		ddmDataProviderInstanceImpl.setCompanyId(companyId);
 		ddmDataProviderInstanceImpl.setUserId(userId);
@@ -191,7 +188,8 @@ public class DDMDataProviderInstanceCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -258,5 +256,4 @@ public class DDMDataProviderInstanceCacheModel
 	public String description;
 	public String definition;
 	public String type;
-
 }

@@ -26,22 +26,19 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see DLFolderModel
+ * @see com.liferay.portlet.documentlibrary.model.impl.DLFolderImpl
+ * @see com.liferay.portlet.documentlibrary.model.impl.DLFolderModelImpl
  * @generated
  */
-@ImplementationClassName(
-	"com.liferay.portlet.documentlibrary.model.impl.DLFolderImpl"
-)
+@ImplementationClassName("com.liferay.portlet.documentlibrary.model.impl.DLFolderImpl")
 @ProviderType
 public interface DLFolder extends DLFolderModel, PersistedModel, TreeModel {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.documentlibrary.model.impl.DLFolderImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.documentlibrary.model.impl.DLFolderImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<DLFolder, Long> FOLDER_ID_ACCESSOR =
-		new Accessor<DLFolder, Long>() {
-
+	public static final Accessor<DLFolder, Long> FOLDER_ID_ACCESSOR = new Accessor<DLFolder, Long>() {
 			@Override
 			public Long get(DLFolder dlFolder) {
 				return dlFolder.getFolderId();
@@ -56,7 +53,6 @@ public interface DLFolder extends DLFolderModel, PersistedModel, TreeModel {
 			public Class<DLFolder> getTypeClass() {
 				return DLFolder.class;
 			}
-
 		};
 
 	public java.util.List<Long> getAncestorFolderIds()
@@ -83,5 +79,4 @@ public interface DLFolder extends DLFolderModel, PersistedModel, TreeModel {
 	public boolean isLocked();
 
 	public boolean isRoot();
-
 }

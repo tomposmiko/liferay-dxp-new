@@ -16,15 +16,11 @@ package com.liferay.dynamic.data.mapping.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -36,21 +32,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class DDMTemplateLinkWrapper
+public class DDMTemplateLinkWrapper extends BaseModelWrapper<DDMTemplateLink>
 	implements DDMTemplateLink, ModelWrapper<DDMTemplateLink> {
-
 	public DDMTemplateLinkWrapper(DDMTemplateLink ddmTemplateLink) {
-		_ddmTemplateLink = ddmTemplateLink;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return DDMTemplateLink.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return DDMTemplateLink.class.getName();
+		super(ddmTemplateLink);
 	}
 
 	@Override
@@ -99,295 +84,154 @@ public class DDMTemplateLinkWrapper
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new DDMTemplateLinkWrapper(
-			(DDMTemplateLink)_ddmTemplateLink.clone());
-	}
-
-	@Override
-	public int compareTo(DDMTemplateLink ddmTemplateLink) {
-		return _ddmTemplateLink.compareTo(ddmTemplateLink);
-	}
-
 	/**
-	 * Returns the fully qualified class name of this ddm template link.
-	 *
-	 * @return the fully qualified class name of this ddm template link
-	 */
+	* Returns the fully qualified class name of this ddm template link.
+	*
+	* @return the fully qualified class name of this ddm template link
+	*/
 	@Override
 	public String getClassName() {
-		return _ddmTemplateLink.getClassName();
+		return model.getClassName();
 	}
 
 	/**
-	 * Returns the class name ID of this ddm template link.
-	 *
-	 * @return the class name ID of this ddm template link
-	 */
+	* Returns the class name ID of this ddm template link.
+	*
+	* @return the class name ID of this ddm template link
+	*/
 	@Override
 	public long getClassNameId() {
-		return _ddmTemplateLink.getClassNameId();
+		return model.getClassNameId();
 	}
 
 	/**
-	 * Returns the class pk of this ddm template link.
-	 *
-	 * @return the class pk of this ddm template link
-	 */
+	* Returns the class pk of this ddm template link.
+	*
+	* @return the class pk of this ddm template link
+	*/
 	@Override
 	public long getClassPK() {
-		return _ddmTemplateLink.getClassPK();
+		return model.getClassPK();
 	}
 
 	/**
-	 * Returns the company ID of this ddm template link.
-	 *
-	 * @return the company ID of this ddm template link
-	 */
+	* Returns the company ID of this ddm template link.
+	*
+	* @return the company ID of this ddm template link
+	*/
 	@Override
 	public long getCompanyId() {
-		return _ddmTemplateLink.getCompanyId();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _ddmTemplateLink.getExpandoBridge();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the primary key of this ddm template link.
-	 *
-	 * @return the primary key of this ddm template link
-	 */
+	* Returns the primary key of this ddm template link.
+	*
+	* @return the primary key of this ddm template link
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _ddmTemplateLink.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _ddmTemplateLink.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	@Override
 	public DDMTemplate getTemplate()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddmTemplateLink.getTemplate();
+		return model.getTemplate();
 	}
 
 	/**
-	 * Returns the template ID of this ddm template link.
-	 *
-	 * @return the template ID of this ddm template link
-	 */
+	* Returns the template ID of this ddm template link.
+	*
+	* @return the template ID of this ddm template link
+	*/
 	@Override
 	public long getTemplateId() {
-		return _ddmTemplateLink.getTemplateId();
+		return model.getTemplateId();
 	}
 
 	/**
-	 * Returns the template link ID of this ddm template link.
-	 *
-	 * @return the template link ID of this ddm template link
-	 */
+	* Returns the template link ID of this ddm template link.
+	*
+	* @return the template link ID of this ddm template link
+	*/
 	@Override
 	public long getTemplateLinkId() {
-		return _ddmTemplateLink.getTemplateLinkId();
-	}
-
-	@Override
-	public int hashCode() {
-		return _ddmTemplateLink.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _ddmTemplateLink.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _ddmTemplateLink.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _ddmTemplateLink.isNew();
+		return model.getTemplateLinkId();
 	}
 
 	@Override
 	public void persist() {
-		_ddmTemplateLink.persist();
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_ddmTemplateLink.setCachedModel(cachedModel);
+		model.persist();
 	}
 
 	@Override
 	public void setClassName(String className) {
-		_ddmTemplateLink.setClassName(className);
+		model.setClassName(className);
 	}
 
 	/**
-	 * Sets the class name ID of this ddm template link.
-	 *
-	 * @param classNameId the class name ID of this ddm template link
-	 */
+	* Sets the class name ID of this ddm template link.
+	*
+	* @param classNameId the class name ID of this ddm template link
+	*/
 	@Override
 	public void setClassNameId(long classNameId) {
-		_ddmTemplateLink.setClassNameId(classNameId);
+		model.setClassNameId(classNameId);
 	}
 
 	/**
-	 * Sets the class pk of this ddm template link.
-	 *
-	 * @param classPK the class pk of this ddm template link
-	 */
+	* Sets the class pk of this ddm template link.
+	*
+	* @param classPK the class pk of this ddm template link
+	*/
 	@Override
 	public void setClassPK(long classPK) {
-		_ddmTemplateLink.setClassPK(classPK);
+		model.setClassPK(classPK);
 	}
 
 	/**
-	 * Sets the company ID of this ddm template link.
-	 *
-	 * @param companyId the company ID of this ddm template link
-	 */
+	* Sets the company ID of this ddm template link.
+	*
+	* @param companyId the company ID of this ddm template link
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_ddmTemplateLink.setCompanyId(companyId);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_ddmTemplateLink.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_ddmTemplateLink.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_ddmTemplateLink.setExpandoBridgeAttributes(serviceContext);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_ddmTemplateLink.setNew(n);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the primary key of this ddm template link.
-	 *
-	 * @param primaryKey the primary key of this ddm template link
-	 */
+	* Sets the primary key of this ddm template link.
+	*
+	* @param primaryKey the primary key of this ddm template link
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_ddmTemplateLink.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_ddmTemplateLink.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the template ID of this ddm template link.
-	 *
-	 * @param templateId the template ID of this ddm template link
-	 */
+	* Sets the template ID of this ddm template link.
+	*
+	* @param templateId the template ID of this ddm template link
+	*/
 	@Override
 	public void setTemplateId(long templateId) {
-		_ddmTemplateLink.setTemplateId(templateId);
+		model.setTemplateId(templateId);
 	}
 
 	/**
-	 * Sets the template link ID of this ddm template link.
-	 *
-	 * @param templateLinkId the template link ID of this ddm template link
-	 */
+	* Sets the template link ID of this ddm template link.
+	*
+	* @param templateLinkId the template link ID of this ddm template link
+	*/
 	@Override
 	public void setTemplateLinkId(long templateLinkId) {
-		_ddmTemplateLink.setTemplateLinkId(templateLinkId);
+		model.setTemplateLinkId(templateLinkId);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<DDMTemplateLink>
-		toCacheModel() {
-
-		return _ddmTemplateLink.toCacheModel();
+	protected DDMTemplateLinkWrapper wrap(DDMTemplateLink ddmTemplateLink) {
+		return new DDMTemplateLinkWrapper(ddmTemplateLink);
 	}
-
-	@Override
-	public DDMTemplateLink toEscapedModel() {
-		return new DDMTemplateLinkWrapper(_ddmTemplateLink.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _ddmTemplateLink.toString();
-	}
-
-	@Override
-	public DDMTemplateLink toUnescapedModel() {
-		return new DDMTemplateLinkWrapper(_ddmTemplateLink.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _ddmTemplateLink.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof DDMTemplateLinkWrapper)) {
-			return false;
-		}
-
-		DDMTemplateLinkWrapper ddmTemplateLinkWrapper =
-			(DDMTemplateLinkWrapper)obj;
-
-		if (Objects.equals(
-				_ddmTemplateLink, ddmTemplateLinkWrapper._ddmTemplateLink)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public DDMTemplateLink getWrappedModel() {
-		return _ddmTemplateLink;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _ddmTemplateLink.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _ddmTemplateLink.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_ddmTemplateLink.resetOriginalValues();
-	}
-
-	private final DDMTemplateLink _ddmTemplateLink;
-
 }

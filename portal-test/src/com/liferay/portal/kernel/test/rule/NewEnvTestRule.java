@@ -548,8 +548,8 @@ public class NewEnvTestRule implements TestRule {
 			catch (ExecutionException ee) {
 				Throwable cause = ee.getCause();
 
-				while (cause instanceof InvocationTargetException ||
-					   cause instanceof ProcessException) {
+				while ((cause instanceof ProcessException) ||
+					   (cause instanceof InvocationTargetException)) {
 
 					cause = cause.getCause();
 				}

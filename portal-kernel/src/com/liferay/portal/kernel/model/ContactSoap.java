@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.ContactServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.portal.service.http.ContactServiceSoap
  * @generated
  */
 @ProviderType
 public class ContactSoap implements Serializable {
-
 	public static ContactSoap toSoapModel(Contact model) {
 		ContactSoap soapModel = new ContactSoap();
 
@@ -95,8 +95,7 @@ public class ContactSoap implements Serializable {
 	}
 
 	public static ContactSoap[] toSoapModels(List<Contact> models) {
-		List<ContactSoap> soapModels = new ArrayList<ContactSoap>(
-			models.size());
+		List<ContactSoap> soapModels = new ArrayList<ContactSoap>(models.size());
 
 		for (Contact model : models) {
 			soapModels.add(toSoapModel(model));
@@ -381,5 +380,4 @@ public class ContactSoap implements Serializable {
 	private String _jobTitle;
 	private String _jobClass;
 	private String _hoursOfOperation;
-
 }

@@ -131,13 +131,13 @@ public class CalendarBookingLocalServiceTest {
 
 	@Test
 	public void testAddCalendarBooking() throws Exception {
+		Locale siteDefault = LocaleUtil.getSiteDefault();
+
 		ServiceContext serviceContext = createServiceContext();
 
 		Calendar calendar = CalendarTestUtil.addCalendar(_user, serviceContext);
 
 		long startTime = System.currentTimeMillis();
-
-		serviceContext.setLanguageId("fr_FR");
 
 		CalendarBooking calendarBooking =
 			CalendarBookingTestUtil.addRegularCalendarBooking(
@@ -145,7 +145,7 @@ public class CalendarBookingLocalServiceTest {
 				serviceContext);
 
 		Assert.assertEquals(
-			"fr_FR",
+			LocaleUtil.toLanguageId(siteDefault),
 			LocalizationUtil.getDefaultLanguageId(calendarBooking.getTitle()));
 	}
 
@@ -1119,13 +1119,13 @@ public class CalendarBookingLocalServiceTest {
 
 		_invitingUser = UserTestUtil.addUser();
 
-		Calendar invitingCalendar = CalendarTestUtil.addCalendar(_invitingUser);
+		Calendar invitingcalendar = CalendarTestUtil.addCalendar(_invitingUser);
 
 		Calendar invitedCalendar = CalendarTestUtil.addCalendar(_user);
 
 		CalendarBooking calendarBooking =
 			CalendarBookingTestUtil.addMasterCalendarBookingWithWorkflow(
-				invitingCalendar, invitedCalendar,
+				invitingcalendar, invitedCalendar,
 				WorkflowConstants.ACTION_PUBLISH);
 
 		String mailMessageSubject =
@@ -1323,37 +1323,6 @@ public class CalendarBookingLocalServiceTest {
 		assertStatus(
 			childCalendarBooking,
 			CalendarBookingWorkflowConstants.STATUS_MASTER_PENDING);
-	}
-
-	@Test
-	public void testInviteUserCalendarWithWorkflowShouldNotifieInviteCalendarBookingOnlyAfterApprovedAndPublished()
-		throws Exception {
-
-		_group = GroupTestUtil.addGroup();
-
-		CalendarWorkflowTestUtil.activateWorkflow(_group);
-
-		_invitingUser = UserTestUtil.addUser();
-
-		Calendar invitedCalendar = CalendarTestUtil.addCalendar(_invitingUser);
-
-		Calendar invitingCalendar = CalendarTestUtil.getDefaultCalendar(_group);
-
-		CalendarBooking calendarBooking =
-			CalendarBookingTestUtil.addMasterCalendarBookingWithWorkflow(
-				invitingCalendar, invitedCalendar,
-				WorkflowConstants.ACTION_PUBLISH);
-
-		String mailMessageSubject =
-			"Calendar: Event Notification for " + StringPool.QUOTE +
-				calendarBooking.getTitle(LocaleUtil.getDefault()) +
-					StringPool.QUOTE;
-
-		assertMailSubjectCount(mailMessageSubject, 0);
-
-		CalendarWorkflowTestUtil.completeWorkflow(_group);
-
-		assertMailSubjectCount(mailMessageSubject, 1);
 	}
 
 	@Test

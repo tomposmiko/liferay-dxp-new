@@ -26,14 +26,15 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.dynamic.data.lists.service.http.DDLRecordSetServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.dynamic.data.lists.service.http.DDLRecordSetServiceSoap
  * @generated
  */
 @ProviderType
 public class DDLRecordSetSoap implements Serializable {
-
 	public static DDLRecordSetSoap toSoapModel(DDLRecordSet model) {
 		DDLRecordSetSoap soapModel = new DDLRecordSetSoap();
 
+		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setUuid(model.getUuid());
 		soapModel.setRecordSetId(model.getRecordSetId());
 		soapModel.setGroupId(model.getGroupId());
@@ -85,8 +86,7 @@ public class DDLRecordSetSoap implements Serializable {
 	}
 
 	public static DDLRecordSetSoap[] toSoapModels(List<DDLRecordSet> models) {
-		List<DDLRecordSetSoap> soapModels = new ArrayList<DDLRecordSetSoap>(
-			models.size());
+		List<DDLRecordSetSoap> soapModels = new ArrayList<DDLRecordSetSoap>(models.size());
 
 		for (DDLRecordSet model : models) {
 			soapModels.add(toSoapModel(model));
@@ -104,6 +104,14 @@ public class DDLRecordSetSoap implements Serializable {
 
 	public void setPrimaryKey(long pk) {
 		setRecordSetId(pk);
+	}
+
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
 	}
 
 	public String getUuid() {
@@ -258,6 +266,7 @@ public class DDLRecordSetSoap implements Serializable {
 		_lastPublishDate = lastPublishDate;
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private long _recordSetId;
 	private long _groupId;
@@ -277,5 +286,4 @@ public class DDLRecordSetSoap implements Serializable {
 	private int _scope;
 	private String _settings;
 	private Date _lastPublishDate;
-
 }

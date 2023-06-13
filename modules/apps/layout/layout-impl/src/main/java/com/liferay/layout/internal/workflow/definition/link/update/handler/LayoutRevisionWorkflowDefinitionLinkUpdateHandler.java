@@ -47,7 +47,7 @@ public class LayoutRevisionWorkflowDefinitionLinkUpdateHandler
 			return;
 		}
 
-		// Workflow definition link has been deleted
+		// Workflow definition link was deleted
 
 		List<LayoutRevision> pendingLayoutRevisions =
 			_layoutRevisionLocalService.getLayoutRevisionsByStatus(

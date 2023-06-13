@@ -69,7 +69,6 @@ public @interface Vocabulary {
 	@Retention(RUNTIME)
 	@Target(METHOD)
 	public @interface Field {
-
 		/**
 		 * Returns the field description, if the field is a custom field;
 		 * otherwise returns an empty string.

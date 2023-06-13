@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.service.BaseService;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
+
 import com.liferay.sync.model.SyncDevice;
 
 /**
@@ -33,41 +34,33 @@ import com.liferay.sync.model.SyncDevice;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDeviceServiceUtil
+ * @see com.liferay.sync.service.base.SyncDeviceServiceBaseImpl
+ * @see com.liferay.sync.service.impl.SyncDeviceServiceImpl
  * @generated
  */
 @AccessControlled
 @JSONWebService
-@OSGiBeanProperties(
-	property = {
-		"json.web.service.context.name=sync",
-		"json.web.service.context.path=SyncDevice"
-	},
-	service = SyncDeviceService.class
-)
+@OSGiBeanProperties(property =  {
+	"json.web.service.context.name=sync", "json.web.service.context.path=SyncDevice"}, service = SyncDeviceService.class)
 @ProviderType
-@Transactional(
-	isolation = Isolation.PORTAL,
-	rollbackFor = {PortalException.class, SystemException.class}
-)
+@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
+	PortalException.class, SystemException.class})
 public interface SyncDeviceService extends BaseService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link SyncDeviceServiceUtil} to access the sync device remote service. Add custom service methods to <code>com.liferay.sync.service.impl.SyncDeviceServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link SyncDeviceServiceUtil} to access the sync device remote service. Add custom service methods to {@link com.liferay.sync.service.impl.SyncDeviceServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public String getOSGiServiceIdentifier();
 
-	public SyncDevice registerSyncDevice(
-			String type, long buildNumber, int featureSet, String uuid)
-		throws PortalException;
+	public SyncDevice registerSyncDevice(String type, long buildNumber,
+		int featureSet, String uuid) throws PortalException;
 
 	public void unregisterSyncDevice(String uuid) throws PortalException;
-
 }

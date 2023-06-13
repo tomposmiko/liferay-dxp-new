@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.index;
 
-import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexResponse;
 
@@ -43,13 +43,16 @@ public class IndicesExistsIndexRequestExecutorImpl
 		IndicesExistsResponse indicesExistsResponse =
 			indicesExistsRequestBuilder.get();
 
-		return new IndicesExistsIndexResponse(indicesExistsResponse.isExists());
+		IndicesExistsIndexResponse indicesExistsIndexResponse =
+			new IndicesExistsIndexResponse(indicesExistsResponse.isExists());
+
+		return indicesExistsIndexResponse;
 	}
 
 	protected IndicesExistsRequestBuilder createIndicesExistsRequestBuilder(
 		IndicesExistsIndexRequest indicesExistsIndexRequest) {
 
-		Client client = elasticsearchConnectionManager.getClient();
+		Client client = elasticsearchClientResolver.getClient();
 
 		IndicesExistsRequestBuilder indicesExistsRequestBuilder =
 			IndicesExistsAction.INSTANCE.newRequestBuilder(client);
@@ -61,6 +64,6 @@ public class IndicesExistsIndexRequestExecutorImpl
 	}
 
 	@Reference
-	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
+	protected ElasticsearchClientResolver elasticsearchClientResolver;
 
 }

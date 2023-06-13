@@ -14,19 +14,16 @@
 
 package com.liferay.portal.template.velocity.internal;
 
-import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PortalImpl;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.ExtendedProperties;
@@ -52,6 +49,17 @@ public class LiferaySecureUberspector extends SecureUberspector {
 
 		_restrictedClasses = new ArrayList<>(restrictedClassNames.length);
 
+		AggregateClassLoader aggregateClassLoader = new AggregateClassLoader(
+			LiferaySecureUberspector.class.getClassLoader());
+
+		aggregateClassLoader.addClassLoader(PortalImpl.class.getClassLoader());
+
+		Thread thread = Thread.currentThread();
+
+		if (thread.getContextClassLoader() != null) {
+			aggregateClassLoader.addClassLoader(thread.getContextClassLoader());
+		}
+
 		for (String restrictedClassName : restrictedClassNames) {
 			restrictedClassName = StringUtil.trim(restrictedClassName);
 
@@ -60,49 +68,13 @@ public class LiferaySecureUberspector extends SecureUberspector {
 			}
 
 			try {
-				_restrictedClasses.add(Class.forName(restrictedClassName));
+				_restrictedClasses.add(
+					aggregateClassLoader.loadClass(restrictedClassName));
 			}
 			catch (ClassNotFoundException cnfe) {
 				super.log.error(
 					"Unable to find restricted class " + restrictedClassName,
 					cnfe);
-			}
-		}
-
-		String[] restrictedMethodNames = (String[])extendedProperties.get(
-			"liferay." + RuntimeConstants.INTROSPECTOR_RESTRICT_CLASSES +
-				".methods");
-
-		if (restrictedMethodNames == null) {
-			_restrictedMethodNames = Collections.emptyMap();
-		}
-		else {
-			_restrictedMethodNames = new HashMap<>(
-				restrictedMethodNames.length);
-
-			for (String restrictedMethodName : restrictedMethodNames) {
-				int index = restrictedMethodName.indexOf(CharPool.POUND);
-
-				if (index < 0) {
-					super.log.error(
-						StringBundler.concat(
-							"\"", restrictedMethodName,
-							"\" does not match format ",
-							"\"className#methodName\""));
-
-					continue;
-				}
-
-				String className = StringUtil.trim(
-					restrictedMethodName.substring(0, index));
-				String methodName = StringUtil.trim(
-					restrictedMethodName.substring(index + 1));
-
-				Set<String> methodNames =
-					_restrictedMethodNames.computeIfAbsent(
-						className, key -> new HashSet<>());
-
-				methodNames.add(StringUtil.toLowerCase(methodName));
 			}
 		}
 
@@ -182,28 +154,12 @@ public class LiferaySecureUberspector extends SecureUberspector {
 		}
 	}
 
-	private void _checkMethodIsRestricted(Class clazz, String methodName) {
-		String className = clazz.getName();
-
-		if (_restrictedMethodNames.containsKey(className)) {
-			Set<String> methodNames = _restrictedMethodNames.get(className);
-
-			if (methodNames.contains(StringUtil.toLowerCase(methodName))) {
-				throw new IllegalArgumentException(
-					StringBundler.concat(
-						"Denied access to method ", methodName, " of ",
-						clazz.getName()));
-			}
-		}
-	}
-
 	private static final ClassRestrictionInformation _nullInstance =
 		new ClassRestrictionInformation(null);
 
 	private final Map<String, ClassRestrictionInformation>
 		_classRestrictionInformations = new ConcurrentHashMap<>();
 	private List<Class<?>> _restrictedClasses;
-	private Map<String, Set<String>> _restrictedMethodNames;
 	private List<String> _restrictedPackageNames;
 	private RuntimeServices _runtimeServices;
 
@@ -244,8 +200,6 @@ public class LiferaySecureUberspector extends SecureUberspector {
 			}
 
 			_checkClassIsRestricted(clazz);
-
-			_checkMethodIsRestricted(clazz, methodName);
 
 			return true;
 		}

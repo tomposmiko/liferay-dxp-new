@@ -17,9 +17,11 @@ package com.liferay.fragment.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.fragment.model.FragmentEntry;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing FragmentEntry in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see FragmentEntry
  * @generated
  */
 @ProviderType
-public class FragmentEntryCacheModel
-	implements CacheModel<FragmentEntry>, Externalizable {
-
+public class FragmentEntryCacheModel implements CacheModel<FragmentEntry>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,8 +50,7 @@ public class FragmentEntryCacheModel
 			return false;
 		}
 
-		FragmentEntryCacheModel fragmentEntryCacheModel =
-			(FragmentEntryCacheModel)obj;
+		FragmentEntryCacheModel fragmentEntryCacheModel = (FragmentEntryCacheModel)obj;
 
 		if (fragmentEntryId == fragmentEntryCacheModel.fragmentEntryId) {
 			return true;
@@ -65,7 +66,7 @@ public class FragmentEntryCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(41);
+		StringBundler sb = new StringBundler(43);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -97,6 +98,8 @@ public class FragmentEntryCacheModel
 		sb.append(js);
 		sb.append(", previewFileEntryId=");
 		sb.append(previewFileEntryId);
+		sb.append(", type=");
+		sb.append(type);
 		sb.append(", lastPublishDate=");
 		sb.append(lastPublishDate);
 		sb.append(", status=");
@@ -187,6 +190,7 @@ public class FragmentEntryCacheModel
 		}
 
 		fragmentEntryImpl.setPreviewFileEntryId(previewFileEntryId);
+		fragmentEntryImpl.setType(type);
 
 		if (lastPublishDate == Long.MIN_VALUE) {
 			fragmentEntryImpl.setLastPublishDate(null);
@@ -240,6 +244,8 @@ public class FragmentEntryCacheModel
 		js = objectInput.readUTF();
 
 		previewFileEntryId = objectInput.readLong();
+
+		type = objectInput.readInt();
 		lastPublishDate = objectInput.readLong();
 
 		status = objectInput.readInt();
@@ -250,7 +256,8 @@ public class FragmentEntryCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -314,6 +321,8 @@ public class FragmentEntryCacheModel
 		}
 
 		objectOutput.writeLong(previewFileEntryId);
+
+		objectOutput.writeInt(type);
 		objectOutput.writeLong(lastPublishDate);
 
 		objectOutput.writeInt(status);
@@ -345,10 +354,10 @@ public class FragmentEntryCacheModel
 	public String html;
 	public String js;
 	public long previewFileEntryId;
+	public int type;
 	public long lastPublishDate;
 	public int status;
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
-
 }

@@ -16,9 +16,10 @@ package com.liferay.portal.workflow.kaleo.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.workflow.kaleo.model.KaleoTimer;
 
 import java.io.Externalizable;
@@ -32,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing KaleoTimer in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see KaleoTimer
  * @generated
  */
 @ProviderType
-public class KaleoTimerCacheModel
-	implements CacheModel<KaleoTimer>, Externalizable {
-
+public class KaleoTimerCacheModel implements CacheModel<KaleoTimer>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -214,7 +215,8 @@ public class KaleoTimerCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(kaleoTimerId);
 
 		objectOutput.writeLong(groupId);
@@ -296,5 +298,4 @@ public class KaleoTimerCacheModel
 	public String scale;
 	public double recurrenceDuration;
 	public String recurrenceScale;
-
 }

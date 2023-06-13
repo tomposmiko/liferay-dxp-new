@@ -49,9 +49,9 @@ definition {
 	}
 
 	macro gotoFormBuilder {
-		var key_assetTitle = "Builder";
+		var key_assetTitle = "Form";
 
-		AssertClick(locator1 = "NavBar#ASSET_TITLE_LINK", value1 = "Builder");
+		AssertClick(locator1 = "NavBar#ASSET_TITLE_LINK", value1 = "Form");
 	}
 
 	macro gotoPermissions {

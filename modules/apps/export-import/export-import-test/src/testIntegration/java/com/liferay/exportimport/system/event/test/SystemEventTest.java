@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerTestRule;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.Serializable;
@@ -75,6 +76,7 @@ public class SystemEventTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
+			PermissionCheckerTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE);
 
 	public long doTestRemoteStaging() throws Exception {
@@ -251,12 +253,12 @@ public class SystemEventTest {
 			JournalArticleLocalServiceUtil.getArticlesCount(
 				_liveGroup.getGroupId()));
 
-		JournalArticle firstJournalArticle = articles.get(0);
-
 		systemEvent = SystemEventLocalServiceUtil.fetchSystemEvent(
 			_liveGroup.getGroupId(),
 			ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
-			firstJournalArticle.getResourcePrimKey(),
+			articles.get(
+				0
+			).getResourcePrimKey(),
 			SystemEventConstants.TYPE_DELETE);
 
 		Assert.assertNull(systemEvent);

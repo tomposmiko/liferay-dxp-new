@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.1.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_1_0.dtd">
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.2.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_2_0.dtd">
 
 <service-builder auto-import-default-references="false" auto-namespace-tables="false" package-path="com.liferay.fragment">
 	<namespace>Fragment</namespace>
@@ -51,6 +51,7 @@
 		<!-- References -->
 
 		<reference entity="FragmentEntry" package-path="com.liferay.fragment" />
+		<reference entity="Resource" package-path="com.liferay.portal" />
 		<reference entity="User" package-path="com.liferay.portal" />
 	</entity>
 	<entity local-service="true" name="FragmentEntry" remote-service="true" uuid="true">
@@ -80,6 +81,7 @@
 		<column name="html" type="String" />
 		<column name="js" type="String" />
 		<column name="previewFileEntryId" type="long" />
+		<column name="type" type="int" />
 		<column name="lastPublishDate" type="Date" />
 		<column name="status" type="int" />
 		<column name="statusByUserId" type="long" />
@@ -113,6 +115,11 @@
 			<finder-column name="fragmentCollectionId" />
 			<finder-column case-sensitive="false" comparator="LIKE" name="name" />
 		</finder>
+		<finder name="G_FCI_T" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="fragmentCollectionId" />
+			<finder-column name="type" />
+		</finder>
 		<finder name="G_FCI_S" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="fragmentCollectionId" />
@@ -124,10 +131,17 @@
 			<finder-column case-sensitive="false" comparator="LIKE" name="name" />
 			<finder-column name="status" />
 		</finder>
+		<finder name="G_FCI_T_S" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="fragmentCollectionId" />
+			<finder-column name="type" />
+			<finder-column name="status" />
+		</finder>
 
 		<!-- References -->
 
 		<reference entity="FragmentEntryLink" package-path="com.liferay.fragment" />
+		<reference entity="Resource" package-path="com.liferay.portal" />
 		<reference entity="User" package-path="com.liferay.portal" />
 	</entity>
 	<entity local-service="true" name="FragmentEntryLink" remote-service="false" uuid="true">
@@ -199,6 +213,7 @@
 
 		<!-- References -->
 
+		<reference entity="FragmentCollection" package-path="com.liferay.fragment" />
 		<reference entity="FragmentEntry" package-path="com.liferay.fragment" />
 		<reference entity="User" package-path="com.liferay.portal" />
 	</entity>

@@ -16,17 +16,14 @@ package com.liferay.dynamic.data.mapping.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
 
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -38,21 +35,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class DDMStructureLayoutWrapper
+public class DDMStructureLayoutWrapper extends BaseModelWrapper<DDMStructureLayout>
 	implements DDMStructureLayout, ModelWrapper<DDMStructureLayout> {
-
 	public DDMStructureLayoutWrapper(DDMStructureLayout ddmStructureLayout) {
-		_ddmStructureLayout = ddmStructureLayout;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return DDMStructureLayout.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return DDMStructureLayout.class.getName();
+		super(ddmStructureLayout);
 	}
 
 	@Override
@@ -136,406 +122,264 @@ public class DDMStructureLayoutWrapper
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new DDMStructureLayoutWrapper(
-			(DDMStructureLayout)_ddmStructureLayout.clone());
-	}
-
-	@Override
-	public int compareTo(DDMStructureLayout ddmStructureLayout) {
-		return _ddmStructureLayout.compareTo(ddmStructureLayout);
-	}
-
 	/**
-	 * Returns the company ID of this ddm structure layout.
-	 *
-	 * @return the company ID of this ddm structure layout
-	 */
+	* Returns the company ID of this ddm structure layout.
+	*
+	* @return the company ID of this ddm structure layout
+	*/
 	@Override
 	public long getCompanyId() {
-		return _ddmStructureLayout.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the create date of this ddm structure layout.
-	 *
-	 * @return the create date of this ddm structure layout
-	 */
+	* Returns the create date of this ddm structure layout.
+	*
+	* @return the create date of this ddm structure layout
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _ddmStructureLayout.getCreateDate();
+		return model.getCreateDate();
 	}
 
 	@Override
 	public DDMFormLayout getDDMFormLayout() {
-		return _ddmStructureLayout.getDDMFormLayout();
+		return model.getDDMFormLayout();
 	}
 
 	/**
-	 * Returns the definition of this ddm structure layout.
-	 *
-	 * @return the definition of this ddm structure layout
-	 */
+	* Returns the definition of this ddm structure layout.
+	*
+	* @return the definition of this ddm structure layout
+	*/
 	@Override
 	public String getDefinition() {
-		return _ddmStructureLayout.getDefinition();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _ddmStructureLayout.getExpandoBridge();
+		return model.getDefinition();
 	}
 
 	/**
-	 * Returns the group ID of this ddm structure layout.
-	 *
-	 * @return the group ID of this ddm structure layout
-	 */
+	* Returns the group ID of this ddm structure layout.
+	*
+	* @return the group ID of this ddm structure layout
+	*/
 	@Override
 	public long getGroupId() {
-		return _ddmStructureLayout.getGroupId();
+		return model.getGroupId();
 	}
 
 	/**
-	 * Returns the modified date of this ddm structure layout.
-	 *
-	 * @return the modified date of this ddm structure layout
-	 */
+	* Returns the modified date of this ddm structure layout.
+	*
+	* @return the modified date of this ddm structure layout
+	*/
 	@Override
 	public Date getModifiedDate() {
-		return _ddmStructureLayout.getModifiedDate();
+		return model.getModifiedDate();
 	}
 
 	/**
-	 * Returns the primary key of this ddm structure layout.
-	 *
-	 * @return the primary key of this ddm structure layout
-	 */
+	* Returns the primary key of this ddm structure layout.
+	*
+	* @return the primary key of this ddm structure layout
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _ddmStructureLayout.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _ddmStructureLayout.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the structure layout ID of this ddm structure layout.
-	 *
-	 * @return the structure layout ID of this ddm structure layout
-	 */
+	* Returns the structure layout ID of this ddm structure layout.
+	*
+	* @return the structure layout ID of this ddm structure layout
+	*/
 	@Override
 	public long getStructureLayoutId() {
-		return _ddmStructureLayout.getStructureLayoutId();
+		return model.getStructureLayoutId();
 	}
 
 	/**
-	 * Returns the structure version ID of this ddm structure layout.
-	 *
-	 * @return the structure version ID of this ddm structure layout
-	 */
+	* Returns the structure version ID of this ddm structure layout.
+	*
+	* @return the structure version ID of this ddm structure layout
+	*/
 	@Override
 	public long getStructureVersionId() {
-		return _ddmStructureLayout.getStructureVersionId();
+		return model.getStructureVersionId();
 	}
 
 	/**
-	 * Returns the user ID of this ddm structure layout.
-	 *
-	 * @return the user ID of this ddm structure layout
-	 */
+	* Returns the user ID of this ddm structure layout.
+	*
+	* @return the user ID of this ddm structure layout
+	*/
 	@Override
 	public long getUserId() {
-		return _ddmStructureLayout.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this ddm structure layout.
-	 *
-	 * @return the user name of this ddm structure layout
-	 */
+	* Returns the user name of this ddm structure layout.
+	*
+	* @return the user name of this ddm structure layout
+	*/
 	@Override
 	public String getUserName() {
-		return _ddmStructureLayout.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this ddm structure layout.
-	 *
-	 * @return the user uuid of this ddm structure layout
-	 */
+	* Returns the user uuid of this ddm structure layout.
+	*
+	* @return the user uuid of this ddm structure layout
+	*/
 	@Override
 	public String getUserUuid() {
-		return _ddmStructureLayout.getUserUuid();
+		return model.getUserUuid();
 	}
 
 	/**
-	 * Returns the uuid of this ddm structure layout.
-	 *
-	 * @return the uuid of this ddm structure layout
-	 */
+	* Returns the uuid of this ddm structure layout.
+	*
+	* @return the uuid of this ddm structure layout
+	*/
 	@Override
 	public String getUuid() {
-		return _ddmStructureLayout.getUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _ddmStructureLayout.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _ddmStructureLayout.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _ddmStructureLayout.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _ddmStructureLayout.isNew();
+		return model.getUuid();
 	}
 
 	@Override
 	public void persist() {
-		_ddmStructureLayout.persist();
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_ddmStructureLayout.setCachedModel(cachedModel);
+		model.persist();
 	}
 
 	/**
-	 * Sets the company ID of this ddm structure layout.
-	 *
-	 * @param companyId the company ID of this ddm structure layout
-	 */
+	* Sets the company ID of this ddm structure layout.
+	*
+	* @param companyId the company ID of this ddm structure layout
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_ddmStructureLayout.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this ddm structure layout.
-	 *
-	 * @param createDate the create date of this ddm structure layout
-	 */
+	* Sets the create date of this ddm structure layout.
+	*
+	* @param createDate the create date of this ddm structure layout
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_ddmStructureLayout.setCreateDate(createDate);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the definition of this ddm structure layout.
-	 *
-	 * @param definition the definition of this ddm structure layout
-	 */
+	* Sets the definition of this ddm structure layout.
+	*
+	* @param definition the definition of this ddm structure layout
+	*/
 	@Override
 	public void setDefinition(String definition) {
-		_ddmStructureLayout.setDefinition(definition);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_ddmStructureLayout.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_ddmStructureLayout.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_ddmStructureLayout.setExpandoBridgeAttributes(serviceContext);
+		model.setDefinition(definition);
 	}
 
 	/**
-	 * Sets the group ID of this ddm structure layout.
-	 *
-	 * @param groupId the group ID of this ddm structure layout
-	 */
+	* Sets the group ID of this ddm structure layout.
+	*
+	* @param groupId the group ID of this ddm structure layout
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_ddmStructureLayout.setGroupId(groupId);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the modified date of this ddm structure layout.
-	 *
-	 * @param modifiedDate the modified date of this ddm structure layout
-	 */
+	* Sets the modified date of this ddm structure layout.
+	*
+	* @param modifiedDate the modified date of this ddm structure layout
+	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
-		_ddmStructureLayout.setModifiedDate(modifiedDate);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_ddmStructureLayout.setNew(n);
+		model.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	 * Sets the primary key of this ddm structure layout.
-	 *
-	 * @param primaryKey the primary key of this ddm structure layout
-	 */
+	* Sets the primary key of this ddm structure layout.
+	*
+	* @param primaryKey the primary key of this ddm structure layout
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_ddmStructureLayout.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_ddmStructureLayout.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the structure layout ID of this ddm structure layout.
-	 *
-	 * @param structureLayoutId the structure layout ID of this ddm structure layout
-	 */
+	* Sets the structure layout ID of this ddm structure layout.
+	*
+	* @param structureLayoutId the structure layout ID of this ddm structure layout
+	*/
 	@Override
 	public void setStructureLayoutId(long structureLayoutId) {
-		_ddmStructureLayout.setStructureLayoutId(structureLayoutId);
+		model.setStructureLayoutId(structureLayoutId);
 	}
 
 	/**
-	 * Sets the structure version ID of this ddm structure layout.
-	 *
-	 * @param structureVersionId the structure version ID of this ddm structure layout
-	 */
+	* Sets the structure version ID of this ddm structure layout.
+	*
+	* @param structureVersionId the structure version ID of this ddm structure layout
+	*/
 	@Override
 	public void setStructureVersionId(long structureVersionId) {
-		_ddmStructureLayout.setStructureVersionId(structureVersionId);
+		model.setStructureVersionId(structureVersionId);
 	}
 
 	/**
-	 * Sets the user ID of this ddm structure layout.
-	 *
-	 * @param userId the user ID of this ddm structure layout
-	 */
+	* Sets the user ID of this ddm structure layout.
+	*
+	* @param userId the user ID of this ddm structure layout
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_ddmStructureLayout.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this ddm structure layout.
-	 *
-	 * @param userName the user name of this ddm structure layout
-	 */
+	* Sets the user name of this ddm structure layout.
+	*
+	* @param userName the user name of this ddm structure layout
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_ddmStructureLayout.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this ddm structure layout.
-	 *
-	 * @param userUuid the user uuid of this ddm structure layout
-	 */
+	* Sets the user uuid of this ddm structure layout.
+	*
+	* @param userUuid the user uuid of this ddm structure layout
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_ddmStructureLayout.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	/**
-	 * Sets the uuid of this ddm structure layout.
-	 *
-	 * @param uuid the uuid of this ddm structure layout
-	 */
+	* Sets the uuid of this ddm structure layout.
+	*
+	* @param uuid the uuid of this ddm structure layout
+	*/
 	@Override
 	public void setUuid(String uuid) {
-		_ddmStructureLayout.setUuid(uuid);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.CacheModel<DDMStructureLayout>
-		toCacheModel() {
-
-		return _ddmStructureLayout.toCacheModel();
-	}
-
-	@Override
-	public DDMStructureLayout toEscapedModel() {
-		return new DDMStructureLayoutWrapper(
-			_ddmStructureLayout.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _ddmStructureLayout.toString();
-	}
-
-	@Override
-	public DDMStructureLayout toUnescapedModel() {
-		return new DDMStructureLayoutWrapper(
-			_ddmStructureLayout.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _ddmStructureLayout.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof DDMStructureLayoutWrapper)) {
-			return false;
-		}
-
-		DDMStructureLayoutWrapper ddmStructureLayoutWrapper =
-			(DDMStructureLayoutWrapper)obj;
-
-		if (Objects.equals(
-				_ddmStructureLayout,
-				ddmStructureLayoutWrapper._ddmStructureLayout)) {
-
-			return true;
-		}
-
-		return false;
+		model.setUuid(uuid);
 	}
 
 	@Override
 	public StagedModelType getStagedModelType() {
-		return _ddmStructureLayout.getStagedModelType();
+		return model.getStagedModelType();
 	}
 
 	@Override
-	public DDMStructureLayout getWrappedModel() {
-		return _ddmStructureLayout;
+	protected DDMStructureLayoutWrapper wrap(
+		DDMStructureLayout ddmStructureLayout) {
+		return new DDMStructureLayoutWrapper(ddmStructureLayout);
 	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _ddmStructureLayout.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _ddmStructureLayout.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_ddmStructureLayout.resetOriginalValues();
-	}
-
-	private final DDMStructureLayout _ddmStructureLayout;
-
 }

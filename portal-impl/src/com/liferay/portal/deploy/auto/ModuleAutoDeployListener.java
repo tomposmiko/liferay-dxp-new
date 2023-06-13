@@ -14,15 +14,21 @@
 
 package com.liferay.portal.deploy.auto;
 
-import com.liferay.petra.string.CharPool;
+import aQute.bnd.header.OSGiHeader;
+import aQute.bnd.header.Parameters;
+import aQute.bnd.osgi.Constants;
+
 import com.liferay.portal.kernel.deploy.auto.AutoDeployException;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployer;
 import com.liferay.portal.kernel.deploy.auto.BaseAutoDeployListener;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import java.util.Iterator;
+import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
@@ -78,19 +84,24 @@ public class ModuleAutoDeployListener extends BaseAutoDeployListener {
 
 		Attributes attributes = manifest.getMainAttributes();
 
-		String bundleSymbolicName = attributes.getValue("Bundle-SymbolicName");
+		String bundleSymbolicNameAttributeValue = attributes.getValue(
+			Constants.BUNDLE_SYMBOLICNAME);
 
-		if (bundleSymbolicName == null) {
+		Parameters bundleSymbolicNameMap = OSGiHeader.parseHeader(
+			bundleSymbolicNameAttributeValue);
+
+		Set<String> bundleSymbolicNameSet = bundleSymbolicNameMap.keySet();
+
+		if (bundleSymbolicNameSet.isEmpty()) {
 			return false;
 		}
 
-		int index = bundleSymbolicName.indexOf(CharPool.SEMICOLON);
+		Iterator<String> bundleSymbolicNameIterator =
+			bundleSymbolicNameSet.iterator();
 
-		if (index != -1) {
-			bundleSymbolicName = bundleSymbolicName.substring(0, index);
-		}
+		String bundleSymbolicName = bundleSymbolicNameIterator.next();
 
-		return !bundleSymbolicName.isEmpty();
+		return Validator.isNotNull(bundleSymbolicName);
 	}
 
 }

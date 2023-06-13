@@ -16,6 +16,7 @@ package com.liferay.trash.web.internal.portlet;
 
 import com.liferay.petra.model.adapter.util.ModelAdapterUtil;
 import com.liferay.portal.kernel.exception.TrashPermissionException;
+import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
@@ -41,7 +42,6 @@ import com.liferay.trash.service.TrashEntryService;
 import com.liferay.trash.web.internal.constants.TrashPortletKeys;
 import com.liferay.trash.web.internal.constants.TrashWebKeys;
 import com.liferay.trash.web.internal.util.TrashUndoUtil;
-import com.liferay.trash.web.internal.util.TrashUtil;
 
 import java.io.IOException;
 
@@ -178,7 +178,6 @@ public class TrashPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		renderRequest.setAttribute(TrashWebKeys.TRASH_HELPER, _trashHelper);
-		renderRequest.setAttribute(TrashWebKeys.TRASH_UTIL, _trashUtil);
 
 		super.render(renderRequest, renderResponse);
 	}
@@ -341,6 +340,13 @@ public class TrashPortlet extends MVCPortlet {
 		return false;
 	}
 
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.trash.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=1.1.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
 	@Reference(unbind = "-")
 	protected void setTrashEntryLocalService(
 		TrashEntryLocalService trashEntryLocalService) {
@@ -361,8 +367,5 @@ public class TrashPortlet extends MVCPortlet {
 
 	@Reference
 	private TrashHelper _trashHelper;
-
-	@Reference
-	private TrashUtil _trashUtil;
 
 }

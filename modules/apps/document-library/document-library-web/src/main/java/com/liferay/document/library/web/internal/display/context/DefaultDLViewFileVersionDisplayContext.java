@@ -20,10 +20,11 @@ import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
 import com.liferay.document.library.kernel.model.DLFileVersion;
 import com.liferay.document.library.kernel.service.DLFileEntryMetadataLocalServiceUtil;
-import com.liferay.document.library.kernel.util.AudioProcessorUtil;
-import com.liferay.document.library.kernel.util.ImageProcessorUtil;
-import com.liferay.document.library.kernel.util.PDFProcessorUtil;
-import com.liferay.document.library.kernel.util.VideoProcessorUtil;
+import com.liferay.document.library.kernel.versioning.VersioningStrategy;
+import com.liferay.document.library.preview.DLPreviewRenderer;
+import com.liferay.document.library.preview.DLPreviewRendererProvider;
+import com.liferay.document.library.preview.exception.DLPreviewGenerationInProcessException;
+import com.liferay.document.library.web.internal.constants.DLWebKeys;
 import com.liferay.document.library.web.internal.display.context.logic.DLPortletInstanceSettingsHelper;
 import com.liferay.document.library.web.internal.display.context.logic.FileEntryDisplayContextHelper;
 import com.liferay.document.library.web.internal.display.context.logic.FileVersionDisplayContextHelper;
@@ -38,6 +39,8 @@ import com.liferay.dynamic.data.mapping.storage.StorageEngine;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
@@ -52,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -70,13 +74,15 @@ public class DefaultDLViewFileVersionDisplayContext
 			FileShortcut fileShortcut,
 			DLMimeTypeDisplayContext dlMimeTypeDisplayContext,
 			ResourceBundle resourceBundle, StorageEngine storageEngine,
-			DLTrashUtil dlTrashUtil)
+			DLTrashUtil dlTrashUtil,
+			DLPreviewRendererProvider dlPreviewRendererProvider,
+			VersioningStrategy versioningStrategy)
 		throws PortalException {
 
 		this(
 			request, fileShortcut.getFileVersion(), fileShortcut,
 			dlMimeTypeDisplayContext, resourceBundle, storageEngine,
-			dlTrashUtil);
+			dlTrashUtil, dlPreviewRendererProvider, versioningStrategy);
 	}
 
 	public DefaultDLViewFileVersionDisplayContext(
@@ -84,11 +90,14 @@ public class DefaultDLViewFileVersionDisplayContext
 		FileVersion fileVersion,
 		DLMimeTypeDisplayContext dlMimeTypeDisplayContext,
 		ResourceBundle resourceBundle, StorageEngine storageEngine,
-		DLTrashUtil dlTrashUtil) {
+		DLTrashUtil dlTrashUtil,
+		DLPreviewRendererProvider dlPreviewRendererProvider,
+		VersioningStrategy versioningStrategy) {
 
 		this(
 			request, fileVersion, null, dlMimeTypeDisplayContext,
-			resourceBundle, storageEngine, dlTrashUtil);
+			resourceBundle, storageEngine, dlTrashUtil,
+			dlPreviewRendererProvider, versioningStrategy);
 	}
 
 	@Override
@@ -207,12 +216,34 @@ public class DefaultDLViewFileVersionDisplayContext
 	}
 
 	@Override
-	public boolean hasPreview() {
-		if (AudioProcessorUtil.hasAudio(_fileVersion) ||
-			ImageProcessorUtil.hasImages(_fileVersion) ||
-			PDFProcessorUtil.hasImages(_fileVersion) ||
-			VideoProcessorUtil.hasVideo(_fileVersion)) {
+	public boolean hasCustomThumbnail() {
+		if (_dlPreviewRendererProvider != null) {
+			Optional<DLPreviewRenderer> dlPreviewRendererOptional =
+				_dlPreviewRendererProvider.
+					getThumbnailDLPreviewRendererOptional(_fileVersion);
 
+			return dlPreviewRendererOptional.isPresent();
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean hasPreview() {
+		if (_dlPreviewRendererProvider != null) {
+			Optional<DLPreviewRenderer> dlPreviewRendererOptional =
+				_dlPreviewRendererProvider.getPreviewDLPreviewRendererOptional(
+					_fileVersion);
+
+			return dlPreviewRendererOptional.isPresent();
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isActionsVisible() {
+		if (_dlPortletInstanceSettingsHelper.isShowActions()) {
 			return true;
 		}
 
@@ -230,17 +261,29 @@ public class DefaultDLViewFileVersionDisplayContext
 	}
 
 	@Override
+	public void renderCustomThumbnail(
+			HttpServletRequest request, HttpServletResponse response)
+		throws IOException, ServletException {
+
+		if (_dlPreviewRendererProvider != null) {
+			_renderPreview(
+				request, response,
+				_dlPreviewRendererProvider.
+					getThumbnailDLPreviewRendererOptional(_fileVersion));
+		}
+	}
+
+	@Override
 	public void renderPreview(
 			HttpServletRequest request, HttpServletResponse response)
 		throws IOException, ServletException {
 
-		JSPRenderer jspRenderer = new JSPRenderer(
-			"/document_library/view_file_entry_preview.jsp");
-
-		jspRenderer.setAttribute(
-			WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
-
-		jspRenderer.render(request, response);
+		if (_dlPreviewRendererProvider != null) {
+			_renderPreview(
+				request, response,
+				_dlPreviewRendererProvider.getPreviewDLPreviewRendererOptional(
+					_fileVersion));
+		}
 	}
 
 	private DefaultDLViewFileVersionDisplayContext(
@@ -248,13 +291,16 @@ public class DefaultDLViewFileVersionDisplayContext
 		FileShortcut fileShortcut,
 		DLMimeTypeDisplayContext dlMimeTypeDisplayContext,
 		ResourceBundle resourceBundle, StorageEngine storageEngine,
-		DLTrashUtil dlTrashUtil) {
+		DLTrashUtil dlTrashUtil,
+		DLPreviewRendererProvider dlPreviewRendererProvider,
+		VersioningStrategy versioningStrategy) {
 
 		try {
 			_fileVersion = fileVersion;
 			_dlMimeTypeDisplayContext = dlMimeTypeDisplayContext;
 			_resourceBundle = resourceBundle;
 			_storageEngine = storageEngine;
+			_dlPreviewRendererProvider = dlPreviewRendererProvider;
 
 			DLRequestHelper dlRequestHelper = new DLRequestHelper(request);
 
@@ -270,11 +316,13 @@ public class DefaultDLViewFileVersionDisplayContext
 
 			if (fileShortcut == null) {
 				_uiItemsBuilder = new UIItemsBuilder(
-					request, fileVersion, _resourceBundle, dlTrashUtil);
+					request, fileVersion, _resourceBundle, dlTrashUtil,
+					versioningStrategy);
 			}
 			else {
 				_uiItemsBuilder = new UIItemsBuilder(
-					request, fileShortcut, _resourceBundle, dlTrashUtil);
+					request, fileShortcut, _resourceBundle, dlTrashUtil,
+					versioningStrategy);
 			}
 		}
 		catch (PortalException pe) {
@@ -298,7 +346,7 @@ public class DefaultDLViewFileVersionDisplayContext
 	private List<MenuItem> _getMenuItems() throws PortalException {
 		List<MenuItem> menuItems = new ArrayList<>();
 
-		if (_dlPortletInstanceSettingsHelper.isShowActions()) {
+		if (isActionsVisible()) {
 			_uiItemsBuilder.addDownloadMenuItem(menuItems);
 
 			_uiItemsBuilder.addOpenInMsOfficeMenuItem(menuItems);
@@ -325,13 +373,50 @@ public class DefaultDLViewFileVersionDisplayContext
 		return menuItems;
 	}
 
+	private void _renderPreview(
+			HttpServletRequest request, HttpServletResponse response,
+			Optional<DLPreviewRenderer> dlPreviewRendererOptional)
+		throws IOException, ServletException {
+
+		if (dlPreviewRendererOptional.isPresent()) {
+			DLPreviewRenderer dlPreviewRenderer =
+				dlPreviewRendererOptional.get();
+
+			try {
+				dlPreviewRenderer.render(request, response);
+			}
+			catch (Exception e) {
+				if (!(e instanceof DLPreviewGenerationInProcessException)) {
+					_log.error(
+						"Unable to render preview for file version: " +
+							_fileVersion.getTitle(),
+						e);
+				}
+
+				JSPRenderer jspRenderer = new JSPRenderer(
+					"/document_library/view_file_entry_preview_error.jsp");
+
+				jspRenderer.setAttribute(
+					WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
+				jspRenderer.setAttribute(
+					DLWebKeys.DOCUMENT_LIBRARY_PREVIEW_EXCEPTION, e);
+
+				jspRenderer.render(request, response);
+			}
+		}
+	}
+
 	private static final UUID _UUID = UUID.fromString(
 		"85F6C50E-3893-4E32-9D63-208528A503FA");
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DefaultDLViewFileVersionDisplayContext.class);
 
 	private List<DDMStructure> _ddmStructures;
 	private final DLMimeTypeDisplayContext _dlMimeTypeDisplayContext;
 	private final DLPortletInstanceSettingsHelper
 		_dlPortletInstanceSettingsHelper;
+	private DLPreviewRendererProvider _dlPreviewRendererProvider;
 	private final FileEntryDisplayContextHelper _fileEntryDisplayContextHelper;
 	private final FileVersion _fileVersion;
 	private final FileVersionDisplayContextHelper

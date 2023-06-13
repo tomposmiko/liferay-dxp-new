@@ -17,12 +17,9 @@ package com.liferay.dynamic.data.mapping.web.internal.exportimport.data.handler;
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
-import com.liferay.dynamic.data.mapping.model.DDMTemplateConstants;
-import com.liferay.dynamic.data.mapping.model.DDMTemplateVersion;
 import com.liferay.dynamic.data.mapping.security.permission.DDMPermissionSupport;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionLocalService;
 import com.liferay.dynamic.data.mapping.web.internal.exportimport.content.processor.DDMTemplateExportImportContentProcessor;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
@@ -138,9 +135,13 @@ public class DDMTemplateStagedModelDataHandler
 			return referenceAttributes;
 		}
 
-		referenceAttributes.put(
-			"preloaded",
-			String.valueOf(isPreloadedTemplate(defaultUserId, template)));
+		boolean preloaded = false;
+
+		if (defaultUserId == template.getUserId()) {
+			preloaded = true;
+		}
+
+		referenceAttributes.put("preloaded", String.valueOf(preloaded));
 
 		return referenceAttributes;
 	}
@@ -260,7 +261,7 @@ public class DDMTemplateStagedModelDataHandler
 		long defaultUserId = _userLocalService.getDefaultUserId(
 			template.getCompanyId());
 
-		if (isPreloadedTemplate(defaultUserId, template)) {
+		if (defaultUserId == template.getUserId()) {
 			templateElement.addAttribute("preloaded", "true");
 		}
 
@@ -546,34 +547,6 @@ public class DDMTemplateStagedModelDataHandler
 			template.getResourceClassName());
 	}
 
-	protected boolean isPreloadedTemplate(
-		long defaultUserId, DDMTemplate template) {
-
-		if (defaultUserId == template.getUserId()) {
-			return true;
-		}
-
-		DDMTemplateVersion ddmTemplateVersion = null;
-
-		try {
-			ddmTemplateVersion =
-				_ddmTemplateVersionLocalService.getTemplateVersion(
-					template.getTemplateId(),
-					DDMTemplateConstants.VERSION_DEFAULT);
-		}
-		catch (PortalException pe) {
-			_log.error(pe, pe);
-		}
-
-		if ((ddmTemplateVersion != null) &&
-			(defaultUserId == ddmTemplateVersion.getUserId())) {
-
-			return true;
-		}
-
-		return false;
-	}
-
 	@Reference(unbind = "-")
 	protected void setDDMStructureLocalService(
 		DDMStructureLocalService ddmStructureLocalService) {
@@ -598,13 +571,6 @@ public class DDMTemplateStagedModelDataHandler
 	}
 
 	@Reference(unbind = "-")
-	protected void setDDMTemplateVersionLocalService(
-		DDMTemplateVersionLocalService ddmTemplateVersionLocalService) {
-
-		_ddmTemplateVersionLocalService = ddmTemplateVersionLocalService;
-	}
-
-	@Reference(unbind = "-")
 	protected void setImageLocalService(ImageLocalService imageLocalService) {
 		_imageLocalService = imageLocalService;
 	}
@@ -624,7 +590,6 @@ public class DDMTemplateStagedModelDataHandler
 	private DDMTemplateExportImportContentProcessor
 		_ddmTemplateExportImportContentProcessor;
 	private DDMTemplateLocalService _ddmTemplateLocalService;
-	private DDMTemplateVersionLocalService _ddmTemplateVersionLocalService;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

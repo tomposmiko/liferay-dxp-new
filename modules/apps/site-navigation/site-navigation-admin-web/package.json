@@ -1,4 +1,16 @@
 {
+	"csfConfig": {
+		"path:**/edit_site_navigation_menu.jsp": {
+			"js": {
+				"lint": {
+					"globals": {
+						"siteNavigationMenuEditorModule": true,
+						"siteNavigationMenuItemDOMHandlerModule": true
+					}
+				}
+			}
+		}
+	},
 	"dependencies": {
 		"metal-dom": "^2.0.0",
 		"metal-drag-drop": "~3.0.1",
@@ -6,19 +18,19 @@
 		"metal-state": "^2.13.2"
 	},
 	"devDependencies": {
-		"babel-cli": "6.26.0",
-		"babel-preset-env": "^1.6.1",
+		"babel-cli": "^6.26.0",
+		"babel-preset-env": "^1.7.0",
 		"check-source-formatting": "^2.0.10",
-		"liferay-npm-bundler": "^2.1.0",
-		"metal-tools-soy": "^4.2.1"
+		"cross-env": "^5.2.0",
+		"liferay-npm-bundler": "^2.6.1",
+		"liferay-npm-bundler-preset-liferay-dev": "^1.1.0"
 	},
-	"name": "site-navigation-menu-web",
+	"name": "site-navigation-admin-web",
 	"scripts": {
-		"build": "metalsoy && babel -d classes/META-INF/resources src/main/resources/META-INF/resources && liferay-npm-bundler && npm run cleanSoy",
+		"build": "cross-env NODE_ENV=production babel --source-maps -d classes/META-INF/resources src/main/resources/META-INF/resources && liferay-npm-bundler",
 		"checkFormat": "npm run csf",
-		"cleanSoy": "rimraf src/**/*.soy.js",
 		"csf": "csf src/**/*.es.js src/**/*.scss src/**/*.jsp",
 		"format": "npm run csf -- -i"
 	},
-	"version": "1.0.24"
+	"version": "2.0.0"
 }

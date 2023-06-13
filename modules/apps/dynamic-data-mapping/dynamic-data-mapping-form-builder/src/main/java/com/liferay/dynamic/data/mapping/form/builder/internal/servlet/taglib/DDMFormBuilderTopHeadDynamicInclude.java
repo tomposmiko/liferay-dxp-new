@@ -67,7 +67,7 @@ public class DDMFormBuilderTopHeadDynamicInclude extends BaseDynamicInclude {
 			cdnBaseURL.concat(
 				_postfix
 			).concat(
-				"/css/main.css"
+				"/alloy/css/main.css"
 			));
 
 		String content = "<link href=\"".concat(staticResourceURL);

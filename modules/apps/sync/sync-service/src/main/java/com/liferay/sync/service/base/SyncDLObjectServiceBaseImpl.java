@@ -17,6 +17,7 @@ package com.liferay.sync.service.base;
 import com.liferay.document.library.kernel.service.persistence.DLFileEntryPersistence;
 import com.liferay.document.library.kernel.service.persistence.DLFileVersionPersistence;
 import com.liferay.document.library.kernel.service.persistence.DLFolderPersistence;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -33,6 +34,7 @@ import com.liferay.portal.kernel.service.persistence.ResourcePermissionPersisten
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+
 import com.liferay.sync.model.SyncDLObject;
 import com.liferay.sync.service.SyncDLObjectService;
 import com.liferay.sync.service.persistence.SyncDLFileVersionDiffPersistence;
@@ -51,16 +53,15 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.sync.service.impl.SyncDLObjectServiceImpl
+ * @see com.liferay.sync.service.SyncDLObjectServiceUtil
  * @generated
  */
-public abstract class SyncDLObjectServiceBaseImpl
-	extends BaseServiceImpl
+public abstract class SyncDLObjectServiceBaseImpl extends BaseServiceImpl
 	implements SyncDLObjectService, IdentifiableOSGiService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>SyncDLObjectService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.sync.service.SyncDLObjectServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.sync.service.SyncDLObjectServiceUtil} to access the sync dl object remote service.
 	 */
 
 	/**
@@ -68,9 +69,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the sync device local service
 	 */
-	public com.liferay.sync.service.SyncDeviceLocalService
-		getSyncDeviceLocalService() {
-
+	public com.liferay.sync.service.SyncDeviceLocalService getSyncDeviceLocalService() {
 		return syncDeviceLocalService;
 	}
 
@@ -80,9 +79,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param syncDeviceLocalService the sync device local service
 	 */
 	public void setSyncDeviceLocalService(
-		com.liferay.sync.service.SyncDeviceLocalService
-			syncDeviceLocalService) {
-
+		com.liferay.sync.service.SyncDeviceLocalService syncDeviceLocalService) {
 		this.syncDeviceLocalService = syncDeviceLocalService;
 	}
 
@@ -102,7 +99,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setSyncDeviceService(
 		com.liferay.sync.service.SyncDeviceService syncDeviceService) {
-
 		this.syncDeviceService = syncDeviceService;
 	}
 
@@ -122,7 +118,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setSyncDevicePersistence(
 		SyncDevicePersistence syncDevicePersistence) {
-
 		this.syncDevicePersistence = syncDevicePersistence;
 	}
 
@@ -131,9 +126,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the sync dl file version diff local service
 	 */
-	public com.liferay.sync.service.SyncDLFileVersionDiffLocalService
-		getSyncDLFileVersionDiffLocalService() {
-
+	public com.liferay.sync.service.SyncDLFileVersionDiffLocalService getSyncDLFileVersionDiffLocalService() {
 		return syncDLFileVersionDiffLocalService;
 	}
 
@@ -143,11 +136,8 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param syncDLFileVersionDiffLocalService the sync dl file version diff local service
 	 */
 	public void setSyncDLFileVersionDiffLocalService(
-		com.liferay.sync.service.SyncDLFileVersionDiffLocalService
-			syncDLFileVersionDiffLocalService) {
-
-		this.syncDLFileVersionDiffLocalService =
-			syncDLFileVersionDiffLocalService;
+		com.liferay.sync.service.SyncDLFileVersionDiffLocalService syncDLFileVersionDiffLocalService) {
+		this.syncDLFileVersionDiffLocalService = syncDLFileVersionDiffLocalService;
 	}
 
 	/**
@@ -155,9 +145,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the sync dl file version diff persistence
 	 */
-	public SyncDLFileVersionDiffPersistence
-		getSyncDLFileVersionDiffPersistence() {
-
+	public SyncDLFileVersionDiffPersistence getSyncDLFileVersionDiffPersistence() {
 		return syncDLFileVersionDiffPersistence;
 	}
 
@@ -168,9 +156,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setSyncDLFileVersionDiffPersistence(
 		SyncDLFileVersionDiffPersistence syncDLFileVersionDiffPersistence) {
-
-		this.syncDLFileVersionDiffPersistence =
-			syncDLFileVersionDiffPersistence;
+		this.syncDLFileVersionDiffPersistence = syncDLFileVersionDiffPersistence;
 	}
 
 	/**
@@ -178,9 +164,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the sync dl object local service
 	 */
-	public com.liferay.sync.service.SyncDLObjectLocalService
-		getSyncDLObjectLocalService() {
-
+	public com.liferay.sync.service.SyncDLObjectLocalService getSyncDLObjectLocalService() {
 		return syncDLObjectLocalService;
 	}
 
@@ -190,9 +174,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param syncDLObjectLocalService the sync dl object local service
 	 */
 	public void setSyncDLObjectLocalService(
-		com.liferay.sync.service.SyncDLObjectLocalService
-			syncDLObjectLocalService) {
-
+		com.liferay.sync.service.SyncDLObjectLocalService syncDLObjectLocalService) {
 		this.syncDLObjectLocalService = syncDLObjectLocalService;
 	}
 
@@ -210,9 +192,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @param syncDLObjectService the sync dl object remote service
 	 */
-	public void setSyncDLObjectService(
-		SyncDLObjectService syncDLObjectService) {
-
+	public void setSyncDLObjectService(SyncDLObjectService syncDLObjectService) {
 		this.syncDLObjectService = syncDLObjectService;
 	}
 
@@ -232,7 +212,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setSyncDLObjectPersistence(
 		SyncDLObjectPersistence syncDLObjectPersistence) {
-
 		this.syncDLObjectPersistence = syncDLObjectPersistence;
 	}
 
@@ -259,9 +238,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -271,9 +248,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -282,9 +257,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the class name local service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService
-		getClassNameLocalService() {
-
+	public com.liferay.portal.kernel.service.ClassNameLocalService getClassNameLocalService() {
 		return classNameLocalService;
 	}
 
@@ -294,9 +267,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param classNameLocalService the class name local service
 	 */
 	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService
-			classNameLocalService) {
-
+		com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService) {
 		this.classNameLocalService = classNameLocalService;
 	}
 
@@ -305,9 +276,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the class name remote service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameService
-		getClassNameService() {
-
+	public com.liferay.portal.kernel.service.ClassNameService getClassNameService() {
 		return classNameService;
 	}
 
@@ -318,7 +287,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setClassNameService(
 		com.liferay.portal.kernel.service.ClassNameService classNameService) {
-
 		this.classNameService = classNameService;
 	}
 
@@ -338,7 +306,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
-
 		this.classNamePersistence = classNamePersistence;
 	}
 
@@ -347,9 +314,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the group local service
 	 */
-	public com.liferay.portal.kernel.service.GroupLocalService
-		getGroupLocalService() {
-
+	public com.liferay.portal.kernel.service.GroupLocalService getGroupLocalService() {
 		return groupLocalService;
 	}
 
@@ -360,7 +325,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setGroupLocalService(
 		com.liferay.portal.kernel.service.GroupLocalService groupLocalService) {
-
 		this.groupLocalService = groupLocalService;
 	}
 
@@ -380,7 +344,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setGroupService(
 		com.liferay.portal.kernel.service.GroupService groupService) {
-
 		this.groupService = groupService;
 	}
 
@@ -407,9 +370,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the organization local service
 	 */
-	public com.liferay.portal.kernel.service.OrganizationLocalService
-		getOrganizationLocalService() {
-
+	public com.liferay.portal.kernel.service.OrganizationLocalService getOrganizationLocalService() {
 		return organizationLocalService;
 	}
 
@@ -419,9 +380,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param organizationLocalService the organization local service
 	 */
 	public void setOrganizationLocalService(
-		com.liferay.portal.kernel.service.OrganizationLocalService
-			organizationLocalService) {
-
+		com.liferay.portal.kernel.service.OrganizationLocalService organizationLocalService) {
 		this.organizationLocalService = organizationLocalService;
 	}
 
@@ -430,9 +389,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the organization remote service
 	 */
-	public com.liferay.portal.kernel.service.OrganizationService
-		getOrganizationService() {
-
+	public com.liferay.portal.kernel.service.OrganizationService getOrganizationService() {
 		return organizationService;
 	}
 
@@ -442,9 +399,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param organizationService the organization remote service
 	 */
 	public void setOrganizationService(
-		com.liferay.portal.kernel.service.OrganizationService
-			organizationService) {
-
+		com.liferay.portal.kernel.service.OrganizationService organizationService) {
 		this.organizationService = organizationService;
 	}
 
@@ -464,7 +419,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setOrganizationPersistence(
 		OrganizationPersistence organizationPersistence) {
-
 		this.organizationPersistence = organizationPersistence;
 	}
 
@@ -473,9 +427,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the repository local service
 	 */
-	public com.liferay.portal.kernel.service.RepositoryLocalService
-		getRepositoryLocalService() {
-
+	public com.liferay.portal.kernel.service.RepositoryLocalService getRepositoryLocalService() {
 		return repositoryLocalService;
 	}
 
@@ -485,9 +437,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param repositoryLocalService the repository local service
 	 */
 	public void setRepositoryLocalService(
-		com.liferay.portal.kernel.service.RepositoryLocalService
-			repositoryLocalService) {
-
+		com.liferay.portal.kernel.service.RepositoryLocalService repositoryLocalService) {
 		this.repositoryLocalService = repositoryLocalService;
 	}
 
@@ -496,9 +446,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the repository remote service
 	 */
-	public com.liferay.portal.kernel.service.RepositoryService
-		getRepositoryService() {
-
+	public com.liferay.portal.kernel.service.RepositoryService getRepositoryService() {
 		return repositoryService;
 	}
 
@@ -509,7 +457,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setRepositoryService(
 		com.liferay.portal.kernel.service.RepositoryService repositoryService) {
-
 		this.repositoryService = repositoryService;
 	}
 
@@ -529,7 +476,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setRepositoryPersistence(
 		RepositoryPersistence repositoryPersistence) {
-
 		this.repositoryPersistence = repositoryPersistence;
 	}
 
@@ -538,9 +484,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService
-		getResourceLocalService() {
-
+	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
 		return resourceLocalService;
 	}
 
@@ -550,9 +494,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService
-			resourceLocalService) {
-
+		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -561,9 +503,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the resource permission local service
 	 */
-	public com.liferay.portal.kernel.service.ResourcePermissionLocalService
-		getResourcePermissionLocalService() {
-
+	public com.liferay.portal.kernel.service.ResourcePermissionLocalService getResourcePermissionLocalService() {
 		return resourcePermissionLocalService;
 	}
 
@@ -573,9 +513,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param resourcePermissionLocalService the resource permission local service
 	 */
 	public void setResourcePermissionLocalService(
-		com.liferay.portal.kernel.service.ResourcePermissionLocalService
-			resourcePermissionLocalService) {
-
+		com.liferay.portal.kernel.service.ResourcePermissionLocalService resourcePermissionLocalService) {
 		this.resourcePermissionLocalService = resourcePermissionLocalService;
 	}
 
@@ -584,9 +522,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the resource permission remote service
 	 */
-	public com.liferay.portal.kernel.service.ResourcePermissionService
-		getResourcePermissionService() {
-
+	public com.liferay.portal.kernel.service.ResourcePermissionService getResourcePermissionService() {
 		return resourcePermissionService;
 	}
 
@@ -596,9 +532,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param resourcePermissionService the resource permission remote service
 	 */
 	public void setResourcePermissionService(
-		com.liferay.portal.kernel.service.ResourcePermissionService
-			resourcePermissionService) {
-
+		com.liferay.portal.kernel.service.ResourcePermissionService resourcePermissionService) {
 		this.resourcePermissionService = resourcePermissionService;
 	}
 
@@ -618,7 +552,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setResourcePermissionPersistence(
 		ResourcePermissionPersistence resourcePermissionPersistence) {
-
 		this.resourcePermissionPersistence = resourcePermissionPersistence;
 	}
 
@@ -627,9 +560,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -640,7 +571,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -660,7 +590,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
-
 		this.userService = userService;
 	}
 
@@ -687,9 +616,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the dl app local service
 	 */
-	public com.liferay.document.library.kernel.service.DLAppLocalService
-		getDLAppLocalService() {
-
+	public com.liferay.document.library.kernel.service.DLAppLocalService getDLAppLocalService() {
 		return dlAppLocalService;
 	}
 
@@ -699,9 +626,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param dlAppLocalService the dl app local service
 	 */
 	public void setDLAppLocalService(
-		com.liferay.document.library.kernel.service.DLAppLocalService
-			dlAppLocalService) {
-
+		com.liferay.document.library.kernel.service.DLAppLocalService dlAppLocalService) {
 		this.dlAppLocalService = dlAppLocalService;
 	}
 
@@ -710,9 +635,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the dl app remote service
 	 */
-	public com.liferay.document.library.kernel.service.DLAppService
-		getDLAppService() {
-
+	public com.liferay.document.library.kernel.service.DLAppService getDLAppService() {
 		return dlAppService;
 	}
 
@@ -723,7 +646,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setDLAppService(
 		com.liferay.document.library.kernel.service.DLAppService dlAppService) {
-
 		this.dlAppService = dlAppService;
 	}
 
@@ -732,9 +654,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the document library file entry local service
 	 */
-	public com.liferay.document.library.kernel.service.DLFileEntryLocalService
-		getDLFileEntryLocalService() {
-
+	public com.liferay.document.library.kernel.service.DLFileEntryLocalService getDLFileEntryLocalService() {
 		return dlFileEntryLocalService;
 	}
 
@@ -744,9 +664,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param dlFileEntryLocalService the document library file entry local service
 	 */
 	public void setDLFileEntryLocalService(
-		com.liferay.document.library.kernel.service.DLFileEntryLocalService
-			dlFileEntryLocalService) {
-
+		com.liferay.document.library.kernel.service.DLFileEntryLocalService dlFileEntryLocalService) {
 		this.dlFileEntryLocalService = dlFileEntryLocalService;
 	}
 
@@ -755,9 +673,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the document library file entry remote service
 	 */
-	public com.liferay.document.library.kernel.service.DLFileEntryService
-		getDLFileEntryService() {
-
+	public com.liferay.document.library.kernel.service.DLFileEntryService getDLFileEntryService() {
 		return dlFileEntryService;
 	}
 
@@ -767,9 +683,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param dlFileEntryService the document library file entry remote service
 	 */
 	public void setDLFileEntryService(
-		com.liferay.document.library.kernel.service.DLFileEntryService
-			dlFileEntryService) {
-
+		com.liferay.document.library.kernel.service.DLFileEntryService dlFileEntryService) {
 		this.dlFileEntryService = dlFileEntryService;
 	}
 
@@ -789,7 +703,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setDLFileEntryPersistence(
 		DLFileEntryPersistence dlFileEntryPersistence) {
-
 		this.dlFileEntryPersistence = dlFileEntryPersistence;
 	}
 
@@ -798,9 +711,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the document library file version local service
 	 */
-	public com.liferay.document.library.kernel.service.DLFileVersionLocalService
-		getDLFileVersionLocalService() {
-
+	public com.liferay.document.library.kernel.service.DLFileVersionLocalService getDLFileVersionLocalService() {
 		return dlFileVersionLocalService;
 	}
 
@@ -810,9 +721,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param dlFileVersionLocalService the document library file version local service
 	 */
 	public void setDLFileVersionLocalService(
-		com.liferay.document.library.kernel.service.DLFileVersionLocalService
-			dlFileVersionLocalService) {
-
+		com.liferay.document.library.kernel.service.DLFileVersionLocalService dlFileVersionLocalService) {
 		this.dlFileVersionLocalService = dlFileVersionLocalService;
 	}
 
@@ -821,9 +730,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the document library file version remote service
 	 */
-	public com.liferay.document.library.kernel.service.DLFileVersionService
-		getDLFileVersionService() {
-
+	public com.liferay.document.library.kernel.service.DLFileVersionService getDLFileVersionService() {
 		return dlFileVersionService;
 	}
 
@@ -833,9 +740,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param dlFileVersionService the document library file version remote service
 	 */
 	public void setDLFileVersionService(
-		com.liferay.document.library.kernel.service.DLFileVersionService
-			dlFileVersionService) {
-
+		com.liferay.document.library.kernel.service.DLFileVersionService dlFileVersionService) {
 		this.dlFileVersionService = dlFileVersionService;
 	}
 
@@ -855,7 +760,6 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	public void setDLFileVersionPersistence(
 		DLFileVersionPersistence dlFileVersionPersistence) {
-
 		this.dlFileVersionPersistence = dlFileVersionPersistence;
 	}
 
@@ -864,9 +768,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the document library folder local service
 	 */
-	public com.liferay.document.library.kernel.service.DLFolderLocalService
-		getDLFolderLocalService() {
-
+	public com.liferay.document.library.kernel.service.DLFolderLocalService getDLFolderLocalService() {
 		return dlFolderLocalService;
 	}
 
@@ -876,9 +778,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param dlFolderLocalService the document library folder local service
 	 */
 	public void setDLFolderLocalService(
-		com.liferay.document.library.kernel.service.DLFolderLocalService
-			dlFolderLocalService) {
-
+		com.liferay.document.library.kernel.service.DLFolderLocalService dlFolderLocalService) {
 		this.dlFolderLocalService = dlFolderLocalService;
 	}
 
@@ -887,9 +787,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the document library folder remote service
 	 */
-	public com.liferay.document.library.kernel.service.DLFolderService
-		getDLFolderService() {
-
+	public com.liferay.document.library.kernel.service.DLFolderService getDLFolderService() {
 		return dlFolderService;
 	}
 
@@ -899,9 +797,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param dlFolderService the document library folder remote service
 	 */
 	public void setDLFolderService(
-		com.liferay.document.library.kernel.service.DLFolderService
-			dlFolderService) {
-
+		com.liferay.document.library.kernel.service.DLFolderService dlFolderService) {
 		this.dlFolderService = dlFolderService;
 	}
 
@@ -919,9 +815,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @param dlFolderPersistence the document library folder persistence
 	 */
-	public void setDLFolderPersistence(
-		DLFolderPersistence dlFolderPersistence) {
-
+	public void setDLFolderPersistence(DLFolderPersistence dlFolderPersistence) {
 		this.dlFolderPersistence = dlFolderPersistence;
 	}
 
@@ -930,9 +824,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the dl trash local service
 	 */
-	public com.liferay.document.library.kernel.service.DLTrashLocalService
-		getDLTrashLocalService() {
-
+	public com.liferay.document.library.kernel.service.DLTrashLocalService getDLTrashLocalService() {
 		return dlTrashLocalService;
 	}
 
@@ -942,9 +834,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param dlTrashLocalService the dl trash local service
 	 */
 	public void setDLTrashLocalService(
-		com.liferay.document.library.kernel.service.DLTrashLocalService
-			dlTrashLocalService) {
-
+		com.liferay.document.library.kernel.service.DLTrashLocalService dlTrashLocalService) {
 		this.dlTrashLocalService = dlTrashLocalService;
 	}
 
@@ -953,9 +843,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 *
 	 * @return the dl trash remote service
 	 */
-	public com.liferay.document.library.kernel.service.DLTrashService
-		getDLTrashService() {
-
+	public com.liferay.document.library.kernel.service.DLTrashService getDLTrashService() {
 		return dlTrashService;
 	}
 
@@ -965,9 +853,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 * @param dlTrashService the dl trash remote service
 	 */
 	public void setDLTrashService(
-		com.liferay.document.library.kernel.service.DLTrashService
-			dlTrashService) {
-
+		com.liferay.document.library.kernel.service.DLTrashService dlTrashService) {
 		this.dlTrashService = dlTrashService;
 	}
 
@@ -1009,8 +895,8 @@ public abstract class SyncDLObjectServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -1020,208 +906,87 @@ public abstract class SyncDLObjectServiceBaseImpl
 	}
 
 	@BeanReference(type = com.liferay.sync.service.SyncDeviceLocalService.class)
-	protected com.liferay.sync.service.SyncDeviceLocalService
-		syncDeviceLocalService;
-
+	protected com.liferay.sync.service.SyncDeviceLocalService syncDeviceLocalService;
 	@BeanReference(type = com.liferay.sync.service.SyncDeviceService.class)
 	protected com.liferay.sync.service.SyncDeviceService syncDeviceService;
-
 	@BeanReference(type = SyncDevicePersistence.class)
 	protected SyncDevicePersistence syncDevicePersistence;
-
-	@BeanReference(
-		type = com.liferay.sync.service.SyncDLFileVersionDiffLocalService.class
-	)
-	protected com.liferay.sync.service.SyncDLFileVersionDiffLocalService
-		syncDLFileVersionDiffLocalService;
-
+	@BeanReference(type = com.liferay.sync.service.SyncDLFileVersionDiffLocalService.class)
+	protected com.liferay.sync.service.SyncDLFileVersionDiffLocalService syncDLFileVersionDiffLocalService;
 	@BeanReference(type = SyncDLFileVersionDiffPersistence.class)
 	protected SyncDLFileVersionDiffPersistence syncDLFileVersionDiffPersistence;
-
-	@BeanReference(
-		type = com.liferay.sync.service.SyncDLObjectLocalService.class
-	)
-	protected com.liferay.sync.service.SyncDLObjectLocalService
-		syncDLObjectLocalService;
-
+	@BeanReference(type = com.liferay.sync.service.SyncDLObjectLocalService.class)
+	protected com.liferay.sync.service.SyncDLObjectLocalService syncDLObjectLocalService;
 	@BeanReference(type = SyncDLObjectService.class)
 	protected SyncDLObjectService syncDLObjectService;
-
 	@BeanReference(type = SyncDLObjectPersistence.class)
 	protected SyncDLObjectPersistence syncDLObjectPersistence;
-
 	@BeanReference(type = SyncDLObjectFinder.class)
 	protected SyncDLObjectFinder syncDLObjectFinder;
-
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ClassNameLocalService
-		classNameLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ClassNameService.class
-	)
-	protected com.liferay.portal.kernel.service.ClassNameService
-		classNameService;
-
+	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameService.class)
+	protected com.liferay.portal.kernel.service.ClassNameService classNameService;
 	@ServiceReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.GroupLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.GroupLocalService
-		groupLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.GroupService.class
-	)
+	@ServiceReference(type = com.liferay.portal.kernel.service.GroupLocalService.class)
+	protected com.liferay.portal.kernel.service.GroupLocalService groupLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.GroupService.class)
 	protected com.liferay.portal.kernel.service.GroupService groupService;
-
 	@ServiceReference(type = GroupPersistence.class)
 	protected GroupPersistence groupPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.OrganizationLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.OrganizationLocalService
-		organizationLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.OrganizationService.class
-	)
-	protected com.liferay.portal.kernel.service.OrganizationService
-		organizationService;
-
+	@ServiceReference(type = com.liferay.portal.kernel.service.OrganizationLocalService.class)
+	protected com.liferay.portal.kernel.service.OrganizationLocalService organizationLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.OrganizationService.class)
+	protected com.liferay.portal.kernel.service.OrganizationService organizationService;
 	@ServiceReference(type = OrganizationPersistence.class)
 	protected OrganizationPersistence organizationPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.RepositoryLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.RepositoryLocalService
-		repositoryLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.RepositoryService.class
-	)
-	protected com.liferay.portal.kernel.service.RepositoryService
-		repositoryService;
-
+	@ServiceReference(type = com.liferay.portal.kernel.service.RepositoryLocalService.class)
+	protected com.liferay.portal.kernel.service.RepositoryLocalService repositoryLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.RepositoryService.class)
+	protected com.liferay.portal.kernel.service.RepositoryService repositoryService;
 	@ServiceReference(type = RepositoryPersistence.class)
 	protected RepositoryPersistence repositoryPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ResourceLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ResourcePermissionLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourcePermissionLocalService
-		resourcePermissionLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ResourcePermissionService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourcePermissionService
-		resourcePermissionService;
-
+	@ServiceReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
+	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.ResourcePermissionLocalService.class)
+	protected com.liferay.portal.kernel.service.ResourcePermissionLocalService resourcePermissionLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.ResourcePermissionService.class)
+	protected com.liferay.portal.kernel.service.ResourcePermissionService resourcePermissionService;
 	@ServiceReference(type = ResourcePermissionPersistence.class)
 	protected ResourcePermissionPersistence resourcePermissionPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserService.class
-	)
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserService.class)
 	protected com.liferay.portal.kernel.service.UserService userService;
-
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLAppLocalService.class
-	)
-	protected com.liferay.document.library.kernel.service.DLAppLocalService
-		dlAppLocalService;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLAppService.class
-	)
-	protected com.liferay.document.library.kernel.service.DLAppService
-		dlAppService;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLFileEntryLocalService.class
-	)
-	protected
-		com.liferay.document.library.kernel.service.DLFileEntryLocalService
-			dlFileEntryLocalService;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLFileEntryService.class
-	)
-	protected com.liferay.document.library.kernel.service.DLFileEntryService
-		dlFileEntryService;
-
+	@ServiceReference(type = com.liferay.document.library.kernel.service.DLAppLocalService.class)
+	protected com.liferay.document.library.kernel.service.DLAppLocalService dlAppLocalService;
+	@ServiceReference(type = com.liferay.document.library.kernel.service.DLAppService.class)
+	protected com.liferay.document.library.kernel.service.DLAppService dlAppService;
+	@ServiceReference(type = com.liferay.document.library.kernel.service.DLFileEntryLocalService.class)
+	protected com.liferay.document.library.kernel.service.DLFileEntryLocalService dlFileEntryLocalService;
+	@ServiceReference(type = com.liferay.document.library.kernel.service.DLFileEntryService.class)
+	protected com.liferay.document.library.kernel.service.DLFileEntryService dlFileEntryService;
 	@ServiceReference(type = DLFileEntryPersistence.class)
 	protected DLFileEntryPersistence dlFileEntryPersistence;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLFileVersionLocalService.class
-	)
-	protected
-		com.liferay.document.library.kernel.service.DLFileVersionLocalService
-			dlFileVersionLocalService;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLFileVersionService.class
-	)
-	protected com.liferay.document.library.kernel.service.DLFileVersionService
-		dlFileVersionService;
-
+	@ServiceReference(type = com.liferay.document.library.kernel.service.DLFileVersionLocalService.class)
+	protected com.liferay.document.library.kernel.service.DLFileVersionLocalService dlFileVersionLocalService;
+	@ServiceReference(type = com.liferay.document.library.kernel.service.DLFileVersionService.class)
+	protected com.liferay.document.library.kernel.service.DLFileVersionService dlFileVersionService;
 	@ServiceReference(type = DLFileVersionPersistence.class)
 	protected DLFileVersionPersistence dlFileVersionPersistence;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLFolderLocalService.class
-	)
-	protected com.liferay.document.library.kernel.service.DLFolderLocalService
-		dlFolderLocalService;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLFolderService.class
-	)
-	protected com.liferay.document.library.kernel.service.DLFolderService
-		dlFolderService;
-
+	@ServiceReference(type = com.liferay.document.library.kernel.service.DLFolderLocalService.class)
+	protected com.liferay.document.library.kernel.service.DLFolderLocalService dlFolderLocalService;
+	@ServiceReference(type = com.liferay.document.library.kernel.service.DLFolderService.class)
+	protected com.liferay.document.library.kernel.service.DLFolderService dlFolderService;
 	@ServiceReference(type = DLFolderPersistence.class)
 	protected DLFolderPersistence dlFolderPersistence;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLTrashLocalService.class
-	)
-	protected com.liferay.document.library.kernel.service.DLTrashLocalService
-		dlTrashLocalService;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLTrashService.class
-	)
-	protected com.liferay.document.library.kernel.service.DLTrashService
-		dlTrashService;
-
+	@ServiceReference(type = com.liferay.document.library.kernel.service.DLTrashLocalService.class)
+	protected com.liferay.document.library.kernel.service.DLTrashLocalService dlTrashLocalService;
+	@ServiceReference(type = com.liferay.document.library.kernel.service.DLTrashService.class)
+	protected com.liferay.document.library.kernel.service.DLTrashService dlTrashService;
 }

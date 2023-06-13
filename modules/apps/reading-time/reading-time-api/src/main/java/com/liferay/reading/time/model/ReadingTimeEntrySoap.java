@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.reading.time.service.http.ReadingTimeEntryServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.reading.time.service.http.ReadingTimeEntryServiceSoap
  * @generated
  */
 @ProviderType
 public class ReadingTimeEntrySoap implements Serializable {
-
 	public static ReadingTimeEntrySoap toSoapModel(ReadingTimeEntry model) {
 		ReadingTimeEntrySoap soapModel = new ReadingTimeEntrySoap();
 
@@ -47,11 +47,8 @@ public class ReadingTimeEntrySoap implements Serializable {
 		return soapModel;
 	}
 
-	public static ReadingTimeEntrySoap[] toSoapModels(
-		ReadingTimeEntry[] models) {
-
-		ReadingTimeEntrySoap[] soapModels =
-			new ReadingTimeEntrySoap[models.length];
+	public static ReadingTimeEntrySoap[] toSoapModels(ReadingTimeEntry[] models) {
+		ReadingTimeEntrySoap[] soapModels = new ReadingTimeEntrySoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -62,12 +59,10 @@ public class ReadingTimeEntrySoap implements Serializable {
 
 	public static ReadingTimeEntrySoap[][] toSoapModels(
 		ReadingTimeEntry[][] models) {
-
 		ReadingTimeEntrySoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels =
-				new ReadingTimeEntrySoap[models.length][models[0].length];
+			soapModels = new ReadingTimeEntrySoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new ReadingTimeEntrySoap[0][0];
@@ -82,9 +77,7 @@ public class ReadingTimeEntrySoap implements Serializable {
 
 	public static ReadingTimeEntrySoap[] toSoapModels(
 		List<ReadingTimeEntry> models) {
-
-		List<ReadingTimeEntrySoap> soapModels =
-			new ArrayList<ReadingTimeEntrySoap>(models.size());
+		List<ReadingTimeEntrySoap> soapModels = new ArrayList<ReadingTimeEntrySoap>(models.size());
 
 		for (ReadingTimeEntry model : models) {
 			soapModels.add(toSoapModel(model));
@@ -185,5 +178,4 @@ public class ReadingTimeEntrySoap implements Serializable {
 	private long _classNameId;
 	private long _classPK;
 	private long _readingTime;
-
 }

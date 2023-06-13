@@ -417,7 +417,8 @@ public class DocumentationWriter {
 
 		entryPointOptional.ifPresent(
 			entryPoint -> _documentationMessageMapper.mapEntryPoint(
-				jsonObjectBuilder, entryPoint));
+				jsonObjectBuilder, entryPoint)
+		);
 	}
 
 	private void _writeFields(

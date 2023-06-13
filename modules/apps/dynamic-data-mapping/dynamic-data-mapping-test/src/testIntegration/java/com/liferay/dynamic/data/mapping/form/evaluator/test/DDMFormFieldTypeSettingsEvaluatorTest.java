@@ -16,10 +16,10 @@ package com.liferay.dynamic.data.mapping.form.evaluator.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderOutputParametersSettings;
-import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluationResult;
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluator;
-import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluatorContext;
-import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormFieldEvaluationResult;
+import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluatorEvaluateRequest;
+import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluatorEvaluateResponse;
+import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluatorFieldContextKey;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
@@ -33,14 +33,12 @@ import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
-import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerTestRule;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
 
 import java.util.List;
 import java.util.Locale;
@@ -92,12 +90,12 @@ public class DDMFormFieldTypeSettingsEvaluatorTest {
 					}
 				});
 
-		DDMFormFieldEvaluationResult
-			ddmDataProviderInstanceOutputFieldEvaluationResult =
-				evaluateCallFunctionExpression(outputParametersSettings);
+		Map<String, Object> ddmDataProviderInstanceOutputFielPropertyChanges =
+			evaluateCallFunctionExpression(outputParametersSettings);
 
 		JSONArray jsonArray =
-			ddmDataProviderInstanceOutputFieldEvaluationResult.getValue();
+			(JSONArray)ddmDataProviderInstanceOutputFielPropertyChanges.get(
+				"value");
 
 		Assert.assertEquals(1, jsonArray.length());
 
@@ -105,175 +103,9 @@ public class DDMFormFieldTypeSettingsEvaluatorTest {
 	}
 
 	@Test
-	public void testSelectCallGetDataProviderInstanceOutputParameters2()
-		throws Exception {
-
-		List<DDMDataProviderOutputParametersSettings> outputParametersSettings =
-			ListUtil.fromArray(
-				new DDMDataProviderOutputParametersSettings[] {
-					new DDMDataProviderOutputParametersSettings() {
-
-						@Override
-						public String outputParameterName() {
-							return "Countries";
-						}
-
-						@Override
-						public String outputParameterPath() {
-							return "nameCurrentValue";
-						}
-
-						@Override
-						public String outputParameterType() {
-							return "[\"list\"]";
-						}
-
-					},
-					new DDMDataProviderOutputParametersSettings() {
-
-						@Override
-						public String outputParameterName() {
-							return "Countries2";
-						}
-
-						@Override
-						public String outputParameterPath() {
-							return "nameCurrentValue";
-						}
-
-						@Override
-						public String outputParameterType() {
-							return "[\"list\"]";
-						}
-
-					}
-				});
-
-		DDMFormFieldEvaluationResult
-			ddmDataProviderInstanceOutputFieldEvaluationResult =
-				evaluateCallFunctionExpression(outputParametersSettings);
-
-		List<KeyValuePair> options =
-			ddmDataProviderInstanceOutputFieldEvaluationResult.getProperty(
-				"options");
-
-		Assert.assertEquals(options.toString(), 2, options.size());
-
-		KeyValuePair keyValuePair = options.get(0);
-
-		Assert.assertEquals("Countries", keyValuePair.getKey());
-
-		keyValuePair = options.get(1);
-
-		Assert.assertEquals("Countries2", keyValuePair.getKey());
-	}
-
-	@Test
-	public void testSelectDataSourceTypeDataProvider() throws Exception {
-		Registry registry = RegistryUtil.getRegistry();
-
-		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker =
-			registry.getService(DDMFormFieldTypeServicesTracker.class);
-
-		DDMFormFieldType ddmFormFieldType =
-			ddmFormFieldTypeServicesTracker.getDDMFormFieldType("select");
-
-		DDMForm ddmForm = DDMFormFactory.create(
-			ddmFormFieldType.getDDMFormFieldTypeSettings());
-
-		DDMFormValues ddmFormValues =
-			DDMFormValuesTestUtil.createDDMFormValuesWithDefaultFieldValues(
-				ddmForm, SetUtil.fromArray(new Locale[] {LocaleUtil.US}),
-				LocaleUtil.US);
-
-		Map<String, List<DDMFormFieldValue>> ddmFormFieldValueMap =
-			ddmFormValues.getDDMFormFieldValuesMap();
-
-		List<DDMFormFieldValue> ddmFormFieldValues = ddmFormFieldValueMap.get(
-			"dataSourceType");
-
-		DDMFormFieldValue dataSourceTypeFormFieldValue = ddmFormFieldValues.get(
-			0);
-
-		dataSourceTypeFormFieldValue.setValue(
-			new UnlocalizedValue("data-provider"));
-
-		DDMFormEvaluator ddmFormEvaluator = registry.getService(
-			DDMFormEvaluator.class);
-
-		DDMFormEvaluatorContext ddmFormEvaluatorContext =
-			new DDMFormEvaluatorContext(ddmForm, ddmFormValues, LocaleUtil.US);
-
-		ddmFormEvaluatorContext.addProperty("groupId", 1L);
-
-		DDMFormEvaluationResult ddmFormEvaluationResult =
-			ddmFormEvaluator.evaluate(ddmFormEvaluatorContext);
-
-		Map<String, DDMFormFieldEvaluationResult>
-			ddmFormFieldEvaluationResultsMap =
-				ddmFormEvaluationResult.getDDMFormFieldEvaluationResultsMap();
-
-		ddmFormFieldValues = ddmFormFieldValueMap.get(
-			"ddmDataProviderInstanceId");
-
-		DDMFormFieldValue ddmDataProviderInstanceIdFormFieldValue =
-			ddmFormFieldValues.get(0);
-
-		DDMFormFieldEvaluationResult
-			ddmDataProviderInstanceIdFieldEvaluationResult =
-				ddmFormFieldEvaluationResultsMap.get(
-					String.format(
-						"ddmDataProviderInstanceId_INSTANCE_%s",
-						ddmDataProviderInstanceIdFormFieldValue.
-							getInstanceId()));
-
-		Assert.assertTrue(
-			ddmDataProviderInstanceIdFieldEvaluationResult.isVisible());
-		Assert.assertTrue(
-			ddmDataProviderInstanceIdFieldEvaluationResult.isRequired());
-
-		ddmFormFieldValues = ddmFormFieldValueMap.get(
-			"ddmDataProviderInstanceOutput");
-
-		DDMFormFieldValue ddmDataProviderInstanceOutputFormFieldValue =
-			ddmFormFieldValues.get(0);
-
-		DDMFormFieldEvaluationResult
-			ddmDataProviderInstanceOutputFieldEvaluationResult =
-				ddmFormFieldEvaluationResultsMap.get(
-					String.format(
-						"ddmDataProviderInstanceOutput_INSTANCE_%s",
-						ddmDataProviderInstanceOutputFormFieldValue.
-							getInstanceId()));
-
-		Assert.assertTrue(
-			ddmDataProviderInstanceOutputFieldEvaluationResult.isVisible());
-		Assert.assertTrue(
-			ddmDataProviderInstanceOutputFieldEvaluationResult.isRequired());
-
-		ddmFormFieldValues = ddmFormFieldValueMap.get("options");
-
-		DDMFormFieldValue optionsDDMFormFieldValue = ddmFormFieldValues.get(0);
-
-		DDMFormFieldEvaluationResult optionsFieldEvaluationResult =
-			ddmFormFieldEvaluationResultsMap.get(
-				String.format(
-					"options_INSTANCE_%s",
-					optionsDDMFormFieldValue.getInstanceId()));
-
-		Assert.assertFalse(optionsFieldEvaluationResult.isVisible());
-		Assert.assertFalse(optionsFieldEvaluationResult.isRequired());
-	}
-
-	@Test
 	public void testSelectDataSourceTypeManual() throws Exception {
-		Registry registry = RegistryUtil.getRegistry();
-
-		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker =
-			registry.getService(DDMFormFieldTypeServicesTracker.class);
-
 		DDMFormFieldType ddmFormFieldType =
-			ddmFormFieldTypeServicesTracker.getDDMFormFieldType("select");
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType("select");
 
 		DDMForm ddmForm = DDMFormFactory.create(
 			ddmFormFieldType.getDDMFormFieldTypeSettings());
@@ -294,20 +126,19 @@ public class DDMFormFieldTypeSettingsEvaluatorTest {
 
 		dataSourceTypeFormFieldValue.setValue(new UnlocalizedValue("manual"));
 
-		DDMFormEvaluator ddmFormEvaluator = registry.getService(
-			DDMFormEvaluator.class);
+		DDMFormEvaluatorEvaluateRequest.Builder builder =
+			DDMFormEvaluatorEvaluateRequest.Builder.newBuilder(
+				ddmForm, ddmFormValues, LocaleUtil.US);
 
-		DDMFormEvaluatorContext ddmFormEvaluatorContext =
-			new DDMFormEvaluatorContext(ddmForm, ddmFormValues, LocaleUtil.US);
+		builder.withGroupId(1L);
 
-		ddmFormEvaluatorContext.addProperty("groupId", 1L);
+		DDMFormEvaluatorEvaluateResponse ddmFormEvaluatorEvaluateResponse =
+			_ddmFormEvaluator.evaluate(builder.build());
 
-		DDMFormEvaluationResult ddmFormEvaluationResult =
-			ddmFormEvaluator.evaluate(ddmFormEvaluatorContext);
-
-		Map<String, DDMFormFieldEvaluationResult>
-			ddmFormFieldEvaluationResultsMap =
-				ddmFormEvaluationResult.getDDMFormFieldEvaluationResultsMap();
+		Map<DDMFormEvaluatorFieldContextKey, Map<String, Object>>
+			ddmFormFieldsPropertyChanges =
+				ddmFormEvaluatorEvaluateResponse.
+					getDDMFormFieldsPropertyChanges();
 
 		ddmFormFieldValues = ddmFormFieldValueMap.get(
 			"ddmDataProviderInstanceId");
@@ -315,18 +146,18 @@ public class DDMFormFieldTypeSettingsEvaluatorTest {
 		DDMFormFieldValue ddmDataProviderInstanceIdFormFieldValue =
 			ddmFormFieldValues.get(0);
 
-		DDMFormFieldEvaluationResult
-			ddmDataProviderInstanceIdFieldEvaluationResult =
-				ddmFormFieldEvaluationResultsMap.get(
-					String.format(
-						"ddmDataProviderInstanceId_INSTANCE_%s",
-						ddmDataProviderInstanceIdFormFieldValue.
-							getInstanceId()));
+		Map<String, Object> ddmDataProviderInstanceIdFieldPropertyChanges =
+			ddmFormFieldsPropertyChanges.get(
+				new DDMFormEvaluatorFieldContextKey(
+					"ddmDataProviderInstanceId",
+					ddmDataProviderInstanceIdFormFieldValue.getInstanceId()));
 
 		Assert.assertFalse(
-			ddmDataProviderInstanceIdFieldEvaluationResult.isVisible());
+			(Boolean)ddmDataProviderInstanceIdFieldPropertyChanges.get(
+				"visible"));
 		Assert.assertFalse(
-			ddmDataProviderInstanceIdFieldEvaluationResult.isRequired());
+			(Boolean)ddmDataProviderInstanceIdFieldPropertyChanges.get(
+				"required"));
 
 		ddmFormFieldValues = ddmFormFieldValueMap.get(
 			"ddmDataProviderInstanceOutput");
@@ -334,34 +165,34 @@ public class DDMFormFieldTypeSettingsEvaluatorTest {
 		DDMFormFieldValue ddmDataProviderInstanceOutputFormFieldValue =
 			ddmFormFieldValues.get(0);
 
-		DDMFormFieldEvaluationResult
-			ddmDataProviderInstanceOutputFieldEvaluationResult =
-				ddmFormFieldEvaluationResultsMap.get(
-					String.format(
-						"ddmDataProviderInstanceOutput_INSTANCE_%s",
-						ddmDataProviderInstanceOutputFormFieldValue.
-							getInstanceId()));
+		Map<String, Object> ddmDataProviderInstanceOutputFieldPropertyChanges =
+			ddmFormFieldsPropertyChanges.get(
+				new DDMFormEvaluatorFieldContextKey(
+					"ddmDataProviderInstanceOutput",
+					ddmDataProviderInstanceOutputFormFieldValue.
+						getInstanceId()));
 
 		Assert.assertFalse(
-			ddmDataProviderInstanceOutputFieldEvaluationResult.isVisible());
+			(Boolean)ddmDataProviderInstanceOutputFieldPropertyChanges.get(
+				"visible"));
 		Assert.assertFalse(
-			ddmDataProviderInstanceOutputFieldEvaluationResult.isRequired());
+			(Boolean)ddmDataProviderInstanceOutputFieldPropertyChanges.get(
+				"required"));
 
 		ddmFormFieldValues = ddmFormFieldValueMap.get("options");
 
 		DDMFormFieldValue optionsDDMFormFieldValue = ddmFormFieldValues.get(0);
 
-		DDMFormFieldEvaluationResult optionsFieldEvaluationResult =
-			ddmFormFieldEvaluationResultsMap.get(
-				String.format(
-					"options_INSTANCE_%s",
-					optionsDDMFormFieldValue.getInstanceId()));
+		Map<String, Object> optionsFieldPropertyChanges =
+			ddmFormFieldsPropertyChanges.get(
+				new DDMFormEvaluatorFieldContextKey(
+					"options", optionsDDMFormFieldValue.getInstanceId()));
 
-		Assert.assertTrue(optionsFieldEvaluationResult.isVisible());
-		Assert.assertTrue(optionsFieldEvaluationResult.isRequired());
+		Assert.assertTrue((Boolean)optionsFieldPropertyChanges.get("visible"));
+		Assert.assertTrue((Boolean)optionsFieldPropertyChanges.get("required"));
 	}
 
-	protected DDMFormFieldEvaluationResult evaluateCallFunctionExpression(
+	protected Map<String, Object> evaluateCallFunctionExpression(
 			List<DDMDataProviderOutputParametersSettings>
 				outputParametersSettings)
 		throws Exception {
@@ -370,13 +201,8 @@ public class DDMFormFieldTypeSettingsEvaluatorTest {
 			DDMDataProviderTestUtil.createDDMRestDataProviderInstance(
 				GroupTestUtil.addGroup(), null, outputParametersSettings);
 
-		Registry registry = RegistryUtil.getRegistry();
-
-		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker =
-			registry.getService(DDMFormFieldTypeServicesTracker.class);
-
 		DDMFormFieldType ddmFormFieldType =
-			ddmFormFieldTypeServicesTracker.getDDMFormFieldType("select");
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType("select");
 
 		DDMForm ddmForm = DDMFormFactory.create(
 			ddmFormFieldType.getDDMFormFieldTypeSettings());
@@ -409,16 +235,18 @@ public class DDMFormFieldTypeSettingsEvaluatorTest {
 				String.format(
 					"['%d']", ddmDataProviderInstance.getPrimaryKey())));
 
-		DDMFormEvaluator ddmFormEvaluator = registry.getService(
-			DDMFormEvaluator.class);
+		DDMFormEvaluatorEvaluateRequest.Builder builder =
+			DDMFormEvaluatorEvaluateRequest.Builder.newBuilder(
+				ddmForm, ddmFormValues, LocaleUtil.US);
 
-		DDMFormEvaluatorContext ddmFormEvaluatorContext =
-			new DDMFormEvaluatorContext(ddmForm, ddmFormValues, LocaleUtil.US);
+		builder.withGroupId(
+			1L
+		).withCompanyId(
+			1L
+		);
 
-		ddmFormEvaluatorContext.addProperty("groupId", 1L);
-
-		DDMFormEvaluationResult ddmFormEvaluationResult =
-			ddmFormEvaluator.evaluate(ddmFormEvaluatorContext);
+		DDMFormEvaluatorEvaluateResponse ddmFormEvaluatorEvaluateResponse =
+			_ddmFormEvaluator.evaluate(builder.build());
 
 		ddmFormFieldValues = ddmFormFieldValueMap.get(
 			"ddmDataProviderInstanceOutput");
@@ -426,14 +254,23 @@ public class DDMFormFieldTypeSettingsEvaluatorTest {
 		DDMFormFieldValue ddmDataProviderInstanceOutputFormFieldValue =
 			ddmFormFieldValues.get(0);
 
-		Map<String, DDMFormFieldEvaluationResult>
-			ddmFormFieldEvaluationResultsMap =
-				ddmFormEvaluationResult.getDDMFormFieldEvaluationResultsMap();
+		Map<DDMFormEvaluatorFieldContextKey, Map<String, Object>>
+			ddmFormFieldsPropertyChanges =
+				ddmFormEvaluatorEvaluateResponse.
+					getDDMFormFieldsPropertyChanges();
 
-		return ddmFormFieldEvaluationResultsMap.get(
-			String.format(
-				"ddmDataProviderInstanceOutput_INSTANCE_%s",
-				ddmDataProviderInstanceOutputFormFieldValue.getInstanceId()));
+		DDMFormEvaluatorFieldContextKey ddmFormFieldContextKey =
+			new DDMFormEvaluatorFieldContextKey(
+				ddmDataProviderInstanceOutputFormFieldValue.getName(),
+				ddmDataProviderInstanceOutputFormFieldValue.getInstanceId());
+
+		return ddmFormFieldsPropertyChanges.get(ddmFormFieldContextKey);
 	}
+
+	@Inject(type = DDMFormEvaluator.class)
+	private DDMFormEvaluator _ddmFormEvaluator;
+
+	@Inject(type = DDMFormFieldTypeServicesTracker.class)
+	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 
 }

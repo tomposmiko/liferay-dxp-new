@@ -17,10 +17,11 @@ package com.liferay.portal.service;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.spring.aop.ChainableMethodAdvice;
+import com.liferay.portal.spring.aop.AopMethodInvocation;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-
-import org.aopalliance.intercept.MethodInvocation;
+import java.util.Map;
 
 /**
  * @author Preston Crary
@@ -28,18 +29,12 @@ import org.aopalliance.intercept.MethodInvocation;
 public class ServiceContextAdvice extends ChainableMethodAdvice {
 
 	@Override
-	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-		int index = _getServiceContextParameterIndex(
-			methodInvocation.getMethod());
+	public Object invoke(
+			AopMethodInvocation aopMethodInvocation,
+			Object[] arguments)
+		throws Throwable {
 
-		if (index < 0) {
-			serviceBeanAopCacheManager.removeMethodInterceptor(
-				methodInvocation, this);
-
-			return methodInvocation.proceed();
-		}
-
-		Object[] arguments = methodInvocation.getArguments();
+		int index = aopMethodInvocation.getAdviceMethodContext();
 
 		ServiceContext serviceContext = (ServiceContext)arguments[index];
 
@@ -48,7 +43,7 @@ public class ServiceContextAdvice extends ChainableMethodAdvice {
 		}
 
 		try {
-			return methodInvocation.proceed();
+			return aopMethodInvocation.proceed(arguments);
 		}
 		finally {
 			if (serviceContext != null) {
@@ -57,44 +52,18 @@ public class ServiceContextAdvice extends ChainableMethodAdvice {
 		}
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected boolean hasServiceContextParameter(Method method) {
-		Class<?>[] parameterTypes = method.getParameterTypes();
+	@Override
+	public Object createMethodContext(
+		Class<?> targetClass, Method method,
+		Map<Class<? extends Annotation>, Annotation> annotations) {
 
-		for (int i = parameterTypes.length - 1; i >= 0; i--) {
-			if (ServiceContext.class.isAssignableFrom(parameterTypes[i])) {
-				return true;
-			}
+		int index = _getServiceContextParameterIndex(method);
+
+		if (index == -1) {
+			return null;
 		}
 
-		return false;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected boolean pushServiceContext(MethodInvocation methodInvocation) {
-		Object[] arguments = methodInvocation.getArguments();
-
-		if (arguments == null) {
-			return false;
-		}
-
-		for (int i = arguments.length - 1; i >= 0; i--) {
-			if (arguments[i] instanceof ServiceContext) {
-				ServiceContext serviceContext = (ServiceContext)arguments[i];
-
-				ServiceContextThreadLocal.pushServiceContext(serviceContext);
-
-				return true;
-			}
-		}
-
-		return false;
+		return index;
 	}
 
 	private int _getServiceContextParameterIndex(Method method) {

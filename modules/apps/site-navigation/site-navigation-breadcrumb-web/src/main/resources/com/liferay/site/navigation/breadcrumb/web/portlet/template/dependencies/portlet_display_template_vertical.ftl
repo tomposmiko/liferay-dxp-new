@@ -1,5 +1,5 @@
 <#if entries?has_content>
-	<ul class="breadcrumb breadcrumb-vertical">
+	<ul aria-label="${portletDisplay.getTitle()}" class="breadcrumb breadcrumb-vertical" role="navigation">
 		<#assign cssClass = "" />
 
 		<#list entries as entry>

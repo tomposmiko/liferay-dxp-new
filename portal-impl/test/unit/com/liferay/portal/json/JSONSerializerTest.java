@@ -17,9 +17,11 @@ package com.liferay.portal.json;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONSerializer;
+import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.HitsImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.util.LocalizationImpl;
 
@@ -91,7 +93,13 @@ public class JSONSerializerTest {
 		ServiceContext deserializedServiceContext =
 			(ServiceContext)JSONFactoryUtil.deserialize(json);
 
-		Assert.assertNotNull(deserializedServiceContext.getGroupPermissions());
+		ModelPermissions modelPermissions =
+			deserializedServiceContext.getModelPermissions();
+
+		Assert.assertArrayEquals(
+			groupPermissions,
+			modelPermissions.getActionIds(
+				RoleConstants.PLACEHOLDER_DEFAULT_GROUP_ROLE));
 	}
 
 	@Test

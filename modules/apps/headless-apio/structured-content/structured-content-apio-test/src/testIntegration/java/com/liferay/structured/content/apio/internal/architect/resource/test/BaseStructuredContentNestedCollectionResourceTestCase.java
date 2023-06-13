@@ -18,7 +18,10 @@ import com.liferay.apio.architect.language.AcceptLanguage;
 import com.liferay.apio.architect.pagination.PageItems;
 import com.liferay.apio.architect.pagination.Pagination;
 import com.liferay.apio.architect.resource.NestedCollectionResource;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerTracker;
 import com.liferay.dynamic.data.mapping.kernel.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -118,14 +121,19 @@ public abstract class BaseStructuredContentNestedCollectionResourceTestCase {
 	}
 
 	protected DDMForm deserialize(
-		DDMFormJSONDeserializer ddmFormJSONDeserializer, String content) {
+		DDMFormDeserializerTracker ddmFormDeserializerTracker, String content) {
 
-		try {
-			return ddmFormJSONDeserializer.deserialize(content);
-		}
-		catch (PortalException pe) {
-			throw new RuntimeException(pe);
-		}
+		DDMFormDeserializer ddmFormDeserializer =
+			ddmFormDeserializerTracker.getDDMFormDeserializer("json");
+
+		DDMFormDeserializerDeserializeRequest.Builder builder =
+			DDMFormDeserializerDeserializeRequest.Builder.newBuilder(content);
+
+		DDMFormDeserializerDeserializeResponse
+			ddmFormDeserializerDeserializeResponse =
+				ddmFormDeserializer.deserialize(builder.build());
+
+		return ddmFormDeserializerDeserializeResponse.getDDMForm();
 	}
 
 	protected List<String> getJournalArticleAssetTags(

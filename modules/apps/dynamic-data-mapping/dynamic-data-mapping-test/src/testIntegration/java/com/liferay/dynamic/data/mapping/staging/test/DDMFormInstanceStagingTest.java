@@ -141,7 +141,10 @@ public class DDMFormInstanceStagingTest {
 		DDMFormInstanceTestHelper ddmFormInstanceTestHelper =
 			new DDMFormInstanceTestHelper(group);
 
-		return ddmFormInstanceTestHelper.addDDMFormInstance(_ddmStructure);
+		DDMFormInstance ddmFormInstance =
+			ddmFormInstanceTestHelper.addDDMFormInstance(_ddmStructure);
+
+		return ddmFormInstance;
 	}
 
 	protected void setUpPermissionThreadLocal() throws Exception {

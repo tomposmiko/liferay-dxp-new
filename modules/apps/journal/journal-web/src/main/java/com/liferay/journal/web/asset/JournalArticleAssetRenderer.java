@@ -14,9 +14,7 @@
 
 package com.liferay.journal.web.asset;
 
-import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
-import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
-import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalServiceUtil;
+import com.liferay.asset.display.page.util.AssetDisplayPageHelper;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.BaseJSPAssetRenderer;
@@ -32,8 +30,6 @@ import com.liferay.journal.service.JournalContentSearchLocalServiceUtil;
 import com.liferay.journal.util.JournalContent;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.journal.web.internal.security.permission.resource.JournalArticlePermission;
-import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -44,7 +40,6 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -69,7 +64,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
@@ -109,6 +103,11 @@ public class JournalArticleAssetRenderer
 	@Override
 	public JournalArticle getAssetObject() {
 		return _article;
+	}
+
+	@Override
+	public JournalArticle getAssetObject(long versionClassPK) {
+		return JournalArticleLocalServiceUtil.fetchArticle(versionClassPK);
 	}
 
 	@Override
@@ -229,14 +228,10 @@ public class JournalArticleAssetRenderer
 					WebKeys.THEME_DISPLAY);
 			}
 
-			String ddmTemplateKey = ParamUtil.getString(
-				portletRequest, "ddmTemplateKey");
-
 			JournalArticleDisplay articleDisplay =
 				JournalArticleLocalServiceUtil.getArticleDisplay(
-					_article, ddmTemplateKey, null,
-					LanguageUtil.getLanguageId(locale), 1, portletRequestModel,
-					themeDisplay);
+					_article, null, null, LanguageUtil.getLanguageId(locale), 1,
+					portletRequestModel, themeDisplay);
 
 			summary = HtmlUtil.unescape(
 				HtmlUtil.stripHtml(articleDisplay.getContent()));
@@ -353,10 +348,7 @@ public class JournalArticleAssetRenderer
 		JournalArticle previousApprovedArticle =
 			JournalArticleLocalServiceUtil.getPreviousApprovedArticle(_article);
 
-		if ((previousApprovedArticle.getVersion() == _article.getVersion()) ||
-			(_article.getVersion() ==
-				JournalArticleConstants.VERSION_DEFAULT)) {
-
+		if (previousApprovedArticle.getVersion() == _article.getVersion()) {
 			return null;
 		}
 
@@ -394,39 +386,9 @@ public class JournalArticleAssetRenderer
 			layout = themeDisplay.getLayout();
 		}
 
-		String portletId = (String)liferayPortletRequest.getAttribute(
-			WebKeys.PORTLET_ID);
-
-		PortletPreferences portletSetup =
-			PortletPreferencesFactoryUtil.getStrictLayoutPortletSetup(
-				layout, portletId);
-
-		String linkToLayoutUuid = GetterUtil.getString(
-			portletSetup.getValue("portletSetupLinkToLayoutUuid", null));
-
-		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
-
-		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
-			JournalArticle.class.getName(), getClassPK());
-
-		AssetDisplayPageEntry assetDisplayPageEntry =
-			AssetDisplayPageEntryLocalServiceUtil.fetchAssetDisplayPageEntry(
-				assetEntry.getGroupId(), assetEntry.getClassNameId(),
-				getClassPK());
-
 		Group group = themeDisplay.getScopeGroup();
 
-		LayoutPageTemplateEntry defaultLayoutPageTemplateEntry =
-			LayoutPageTemplateEntryServiceUtil.
-				fetchDefaultLayoutPageTemplateEntry(
-					group.getGroupId(), assetEntry.getClassNameId(),
-					assetEntry.getClassTypeId());
-
-		if (_isShowDisplayPage(
-				_article, assetDisplayPageEntry,
-				defaultLayoutPageTemplateEntry) &&
-			Validator.isNull(linkToLayoutUuid)) {
-
+		if (_isShowDisplayPage(group.getGroupId(), _article)) {
 			if (group.getGroupId() != _article.getGroupId()) {
 				group = GroupLocalServiceUtil.getGroup(_article.getGroupId());
 			}
@@ -564,11 +526,6 @@ public class JournalArticleAssetRenderer
 
 		String ddmTemplateKey = (String)request.getAttribute(
 			WebKeys.JOURNAL_TEMPLATE_ID);
-
-		if (Validator.isNull(ddmTemplateKey)) {
-			ddmTemplateKey = ParamUtil.getString(request, "ddmTemplateKey");
-		}
-
 		String viewMode = ParamUtil.getString(
 			request, "viewMode", Constants.VIEW);
 		String languageId = LanguageUtil.getLanguageId(request);
@@ -636,26 +593,22 @@ public class JournalArticleAssetRenderer
 	protected void setJournalServiceConfiguration() {
 	}
 
-	private boolean _isShowDisplayPage(
-		JournalArticle article, AssetDisplayPageEntry assetDisplayPageEntry,
-		LayoutPageTemplateEntry defaultAssetDisplayPageEntry) {
+	private boolean _isShowDisplayPage(long groupId, JournalArticle article)
+		throws PortalException {
 
-		if (Validator.isNull(article.getLayoutUuid()) &&
-			(assetDisplayPageEntry == null)) {
+		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
 
+		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
+			JournalArticle.class.getName(), getClassPK());
+
+		boolean hasDisplayPage = AssetDisplayPageHelper.hasAssetDisplayPage(
+			groupId, assetEntry);
+
+		if (Validator.isNull(article.getLayoutUuid()) && !hasDisplayPage) {
 			return false;
 		}
 
-		if ((assetDisplayPageEntry != null) &&
-			(Objects.equals(
-				assetDisplayPageEntry.getType(),
-				AssetDisplayPageConstants.TYPE_SPECIFIC) ||
-			 (defaultAssetDisplayPageEntry != null))) {
-
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

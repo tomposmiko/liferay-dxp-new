@@ -180,7 +180,9 @@ public class LayoutSetPrototypeDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		return _renderResponse.createRenderURL();
+		PortletURL portletURL = _renderResponse.createRenderURL();
+
+		return portletURL;
 	}
 
 	public String getSearchActionURL() {

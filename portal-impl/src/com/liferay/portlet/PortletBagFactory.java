@@ -44,7 +44,7 @@ import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListen
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.OpenSearch;
-import com.liferay.portal.kernel.security.permission.PermissionPropagator;
+import com.liferay.portal.kernel.security.permission.propagator.PermissionPropagator;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.URLEncoder;
 import com.liferay.portal.kernel.template.TemplateHandler;
@@ -117,7 +117,7 @@ public class PortletBagFactory {
 
 		Map<String, Object> properties = new HashMap<>();
 
-		properties.put("javax.portlet.name", portlet.getPortletName());
+		properties.put("javax.portlet.name", portlet.getPortletId());
 
 		Registry registry = RegistryUtil.getRegistry();
 
@@ -200,7 +200,7 @@ public class PortletBagFactory {
 			registry, portlet, properties, serviceRegistrations);
 
 		PortletBag portletBag = new PortletBagImpl(
-			portlet.getPortletName(), _servletContext, portletInstance,
+			portlet.getPortletId(), _servletContext, portletInstance,
 			portlet.getResourceBundle(), friendlyURLMapperTracker,
 			serviceRegistrations);
 

@@ -7,7 +7,6 @@
 /development/catalina.jar
 /development/com.liferay.ant.bnd.jar
 /development/com.liferay.jenkins.results.parser.jar
-/development/com.liferay.util.taglib.compat.jar
 /development/db2jcc.jar
 /development/db2jcc_license_cu.jar
 /development/deployment.jar
@@ -17,7 +16,6 @@
 /development/error-prone-ant.jar
 /development/freemarker.jar
 /development/gson.jar
-/development/guava.jar
 /development/hamcrest-core.jar
 /development/hamcrest-library.jar
 /development/hsql.jar
@@ -86,7 +84,6 @@
 /portal/antlr2.jar
 /portal/antlr3-runtime.jar
 /portal/antlr3.jar
-/portal/aopalliance.jar
 /portal/asm-analysis.jar
 /portal/asm-commons.jar
 /portal/asm-tree.jar
@@ -129,7 +126,6 @@
 /portal/commons-io.jar
 /portal/commons-lang.jar
 /portal/commons-logging.jar
-/portal/commons-math3.jar
 /portal/commons-math.jar
 /portal/commons-pool.jar
 /portal/commons-validator.jar
@@ -156,9 +152,6 @@
 /portal/im4java.jar
 /portal/isoparser.jar
 /portal/jabsorb.jar
-/portal/jackson-annotations.jar
-/portal/jackson-core.jar
-/portal/jackson-databind.jar
 /portal/jai_codec.jar
 /portal/jai_core.jar
 /portal/jakarta-regexp.jar
@@ -234,6 +227,7 @@
 /portal/saaj-impl.jar
 /portal/scribe.jar
 /portal/serializer.jar
+/portal/sigar.jar
 /portal/simplecaptcha.jar
 /portal/slf4j-api.jar
 /portal/soap.jar

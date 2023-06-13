@@ -86,6 +86,10 @@ public class UpgradeSocial extends UpgradeProcess {
 		}
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	protected int getCounterIncrement() throws Exception {
 		return (int)_getCounterIncrement();
 	}
@@ -122,8 +126,7 @@ public class UpgradeSocial extends UpgradeProcess {
 
 	protected void updateSocialActivities(long delta) throws Exception {
 		try (PreparedStatement ps = connection.prepareStatement(
-				"update SocialActivity set activitySetId = (activityId + ?) " +
-					"where mirrorActivityId = 0")) {
+				"update SocialActivity set activitySetId = (activityId + ?)")) {
 
 			ps.setLong(1, delta);
 

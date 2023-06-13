@@ -79,8 +79,8 @@ public abstract class BaseAlloyEditorConfigContributor
 
 		jsonObject.put(
 			"removePlugins",
-			"contextmenu,elementspath,image,link,liststyle,resize,table," +
-				"tabletools,toolbar");
+			"contextmenu,elementspath,image,link,liststyle,resize,tabletools," +
+				"toolbar");
 
 		String namespace = GetterUtil.getString(
 			inputEditorTaglibAttributes.get(
@@ -120,7 +120,6 @@ public abstract class BaseAlloyEditorConfigContributor
 
 		layoutItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			desiredItemSelectorReturnTypes);
-		layoutItemSelectorCriterion.setShowHiddenPages(true);
 
 		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
 			requestBackedPortletURLFactory, eventName,

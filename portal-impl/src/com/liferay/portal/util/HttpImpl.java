@@ -1262,37 +1262,19 @@ public class HttpImpl implements Http {
 
 	@Override
 	public String URLtoString(Http.Options options) throws IOException {
-		byte[] bytes = URLtoByteArray(options);
-
-		if (bytes == null) {
-			return null;
-		}
-
-		return new String(bytes);
+		return new String(URLtoByteArray(options));
 	}
 
 	@Override
 	public String URLtoString(String location) throws IOException {
-		byte[] bytes = URLtoByteArray(location);
-
-		if (bytes == null) {
-			return null;
-		}
-
-		return new String(bytes);
+		return new String(URLtoByteArray(location));
 	}
 
 	@Override
 	public String URLtoString(String location, boolean post)
 		throws IOException {
 
-		byte[] bytes = URLtoByteArray(location, post);
-
-		if (bytes == null) {
-			return null;
-		}
-
-		return new String(bytes);
+		return new String(URLtoByteArray(location, post));
 	}
 
 	/**
@@ -1465,8 +1447,8 @@ public class HttpImpl implements Http {
 	}
 
 	protected void processPostMethod(
-		RequestBuilder requestBuilder, Map<String, String> headers,
-		List<Http.FilePart> fileParts, Map<String, String> parts) {
+		RequestBuilder requestBuilder, List<Http.FilePart> fileParts,
+		Map<String, String> parts) {
 
 		if ((fileParts == null) || fileParts.isEmpty()) {
 			if (parts != null) {
@@ -1482,17 +1464,6 @@ public class HttpImpl implements Http {
 		else {
 			MultipartEntityBuilder multipartEntityBuilder =
 				MultipartEntityBuilder.create();
-
-			if (headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
-				ContentType contentType = ContentType.parse(
-					headers.get(HttpHeaders.CONTENT_TYPE));
-
-				String boundary = contentType.getParameter("boundary");
-
-				if (boundary != null) {
-					multipartEntityBuilder.setBoundary(boundary);
-				}
-			}
 
 			if (parts != null) {
 				for (Map.Entry<String, String> entry : parts.entrySet()) {
@@ -1775,13 +1746,10 @@ public class HttpImpl implements Http {
 
 			RequestBuilder requestBuilder = null;
 
-			if (method.equals(Method.PATCH) || method.equals(Method.POST) ||
+			if (method.equals(Http.Method.POST) ||
 				method.equals(Http.Method.PUT)) {
 
-				if (method.equals(Method.PATCH)) {
-					requestBuilder = RequestBuilder.patch(location);
-				}
-				else if (method.equals(Http.Method.POST)) {
+				if (method.equals(Http.Method.POST)) {
 					requestBuilder = RequestBuilder.post(location);
 				}
 				else {
@@ -1810,8 +1778,7 @@ public class HttpImpl implements Http {
 							targetHttpHost, connectionConfigBuilder.build());
 					}
 
-					processPostMethod(
-						requestBuilder, headers, fileParts, parts);
+					processPostMethod(requestBuilder, fileParts, parts);
 				}
 			}
 			else if (method.equals(Http.Method.DELETE)) {
@@ -1831,8 +1798,7 @@ public class HttpImpl implements Http {
 				}
 			}
 
-			if ((method.equals(Method.PATCH) ||
-				 method.equals(Http.Method.POST) ||
+			if ((method.equals(Http.Method.POST) ||
 				 method.equals(Http.Method.PUT)) &&
 				((body != null) ||
 				 ((fileParts != null) && !fileParts.isEmpty()) ||

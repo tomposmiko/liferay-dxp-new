@@ -14,8 +14,6 @@
 
 package com.liferay.comment.taglib.internal.struts;
 
-import com.liferay.asset.kernel.model.AssetEntry;
-import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.message.boards.exception.DiscussionMaxCommentsException;
 import com.liferay.message.boards.exception.MessageBodyException;
 import com.liferay.message.boards.exception.NoSuchMessageException;
@@ -24,7 +22,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.comment.Comment;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.comment.DiscussionPermission;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.User;
@@ -35,20 +32,21 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFunction;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
-import com.liferay.portal.kernel.struts.BaseStrutsAction;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.servlet.NamespaceServletRequest;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
+
+import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,7 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true, property = "path=/portal/comment/discussion/edit",
 	service = StrutsAction.class
 )
-public class EditDiscussionStrutsAction extends BaseStrutsAction {
+public class EditDiscussionStrutsAction implements StrutsAction {
 
 	@Override
 	public String execute(
@@ -145,6 +143,11 @@ public class EditDiscussionStrutsAction extends BaseStrutsAction {
 		_commentManager.deleteComment(commentId);
 	}
 
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	protected void subscribeToComments(
 			HttpServletRequest request, boolean subscribe)
 		throws Exception {
@@ -152,28 +155,24 @@ public class EditDiscussionStrutsAction extends BaseStrutsAction {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		DiscussionPermission discussionPermission = _getDiscussionPermission(
-			themeDisplay);
-
 		String className = ParamUtil.getString(request, "className");
 		long classPK = ParamUtil.getLong(request, "classPK");
 
-		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
-			className, classPK);
+		DiscussionPermission discussionPermission = _getDiscussionPermission(
+			themeDisplay);
 
 		discussionPermission.checkSubscribePermission(
-			assetEntry.getCompanyId(), assetEntry.getGroupId(),
-			assetEntry.getClassName(), assetEntry.getClassPK());
+			themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
+			className, classPK);
 
 		if (subscribe) {
 			_commentManager.subscribeDiscussion(
-				themeDisplay.getUserId(), assetEntry.getGroupId(),
-				assetEntry.getClassName(), assetEntry.getClassPK());
+				themeDisplay.getUserId(), themeDisplay.getScopeGroupId(),
+				className, classPK);
 		}
 		else {
 			_commentManager.unsubscribeDiscussion(
-				themeDisplay.getUserId(), assetEntry.getClassName(),
-				assetEntry.getClassPK());
+				themeDisplay.getUserId(), className, classPK);
 		}
 	}
 
@@ -194,8 +193,6 @@ public class EditDiscussionStrutsAction extends BaseStrutsAction {
 
 		DiscussionPermission discussionPermission = _getDiscussionPermission(
 			themeDisplay);
-
-		AssetEntry assetEntry = _getAssetEntry(commentId, className, classPK);
 
 		if (commentId <= 0) {
 
@@ -226,12 +223,11 @@ public class EditDiscussionStrutsAction extends BaseStrutsAction {
 
 			try {
 				discussionPermission.checkAddPermission(
-					assetEntry.getCompanyId(), assetEntry.getGroupId(),
-					assetEntry.getClassName(), assetEntry.getClassPK());
+					themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
+					className, classPK);
 
 				commentId = _commentManager.addComment(
-					user.getUserId(), assetEntry.getClassName(),
-					assetEntry.getClassPK(), user.getFullName(),
+					user.getUserId(), className, classPK, user.getFullName(),
 					parentCommentId, subject, body, serviceContextFunction);
 			}
 			finally {
@@ -242,22 +238,28 @@ public class EditDiscussionStrutsAction extends BaseStrutsAction {
 
 			// Update message
 
+			if (Validator.isNull(className) || (classPK == 0)) {
+				Comment comment = _commentManager.fetchComment(commentId);
+
+				if (comment != null) {
+					className = comment.getClassName();
+					classPK = comment.getClassPK();
+				}
+			}
+
 			discussionPermission.checkUpdatePermission(commentId);
 
 			commentId = _commentManager.updateComment(
-				themeDisplay.getUserId(), assetEntry.getClassName(),
-				assetEntry.getClassPK(), commentId, subject, body,
-				serviceContextFunction);
+				themeDisplay.getUserId(), className, classPK, commentId,
+				subject, body, serviceContextFunction);
 		}
 
 		// Subscription
 
-		boolean subscribe = ParamUtil.getBoolean(request, "subscribe");
-
-		if (subscribe) {
+		if (PropsValues.DISCUSSION_SUBSCRIBE) {
 			_commentManager.subscribeDiscussion(
-				themeDisplay.getUserId(), assetEntry.getGroupId(),
-				assetEntry.getClassName(), assetEntry.getClassPK());
+				themeDisplay.getUserId(), themeDisplay.getScopeGroupId(),
+				className, classPK);
 		}
 
 		return commentId;
@@ -273,20 +275,6 @@ public class EditDiscussionStrutsAction extends BaseStrutsAction {
 		ServletResponseUtil.write(response, jsonObj.toString());
 
 		response.flushBuffer();
-	}
-
-	private AssetEntry _getAssetEntry(
-			long commentId, String className, long classPK)
-		throws PortalException {
-
-		if (Validator.isNotNull(className) && (classPK > 0)) {
-			return _assetEntryLocalService.getEntry(className, classPK);
-		}
-
-		Comment comment = _commentManager.fetchComment(commentId);
-
-		return _assetEntryLocalService.getEntry(
-			comment.getClassName(), comment.getClassPK());
 	}
 
 	private DiscussionPermission _getDiscussionPermission(
@@ -305,15 +293,11 @@ public class EditDiscussionStrutsAction extends BaseStrutsAction {
 	}
 
 	@Reference
-	private AssetEntryLocalService _assetEntryLocalService;
-
-	@Reference
 	private CommentManager _commentManager;
 
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

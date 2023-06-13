@@ -16,9 +16,10 @@ package com.liferay.portal.workflow.kaleo.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.workflow.kaleo.model.KaleoLog;
 
 import java.io.Externalizable;
@@ -32,12 +33,11 @@ import java.util.Date;
  * The cache model class for representing KaleoLog in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see KaleoLog
  * @generated
  */
 @ProviderType
-public class KaleoLogCacheModel
-	implements CacheModel<KaleoLog>, Externalizable {
-
+public class KaleoLogCacheModel implements CacheModel<KaleoLog>, Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -211,8 +211,7 @@ public class KaleoLogCacheModel
 			kaleoLogImpl.setPreviousAssigneeClassName("");
 		}
 		else {
-			kaleoLogImpl.setPreviousAssigneeClassName(
-				previousAssigneeClassName);
+			kaleoLogImpl.setPreviousAssigneeClassName(previousAssigneeClassName);
 		}
 
 		kaleoLogImpl.setPreviousAssigneeClassPK(previousAssigneeClassPK);
@@ -317,7 +316,8 @@ public class KaleoLogCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(kaleoLogId);
 
 		objectOutput.writeLong(groupId);
@@ -462,5 +462,4 @@ public class KaleoLogCacheModel
 	public long endDate;
 	public long duration;
 	public String workflowContext;
-
 }

@@ -2292,7 +2292,9 @@ public class StringUtil {
 						String.valueOf(classLoader)));
 			}
 
-			return read(is);
+			String s = read(is);
+
+			return s;
 		}
 	}
 
@@ -4221,9 +4223,11 @@ public class StringUtil {
 			return s;
 		}
 
-		String part = s.substring(0, x - 1);
-
-		return part.concat(s.substring(y + 1));
+		return s.substring(
+			0, x - 1
+		).concat(
+			s.substring(y + 1)
+		);
 	}
 
 	/**

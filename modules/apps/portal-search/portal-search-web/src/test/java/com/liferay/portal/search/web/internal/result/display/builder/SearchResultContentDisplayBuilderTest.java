@@ -22,9 +22,10 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.web.internal.result.display.context.SearchResultContentDisplayContext;
+
+import java.util.Locale;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -191,7 +192,7 @@ public class SearchResultContentDisplayBuilderTest {
 			RandomTestUtil.randomLong());
 		searchResultContentDisplayBuilder.setAssetRendererFactoryLookup(
 			_assetRendererFactoryLookup);
-		searchResultContentDisplayBuilder.setLocale(LocaleUtil.US);
+		searchResultContentDisplayBuilder.setLocale(Locale.US);
 		searchResultContentDisplayBuilder.setPermissionChecker(
 			_permissionChecker);
 		searchResultContentDisplayBuilder.setPortal(_portal);

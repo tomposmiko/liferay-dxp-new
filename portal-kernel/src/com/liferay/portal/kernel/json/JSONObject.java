@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.json;
 
-import aQute.bnd.annotation.ProviderType;
-
 import java.io.Externalizable;
 import java.io.Writer;
 
@@ -25,7 +23,6 @@ import java.util.Iterator;
 /**
  * @author Brian Wing Shun Chan
  */
-@ProviderType
 public interface JSONObject extends Externalizable, JSONSerializable {
 
 	public Object get(String key);
@@ -63,8 +60,6 @@ public interface JSONObject extends Externalizable, JSONSerializable {
 	public int length();
 
 	public JSONArray names();
-
-	public Object opt(String key);
 
 	public JSONObject put(String key, boolean value);
 

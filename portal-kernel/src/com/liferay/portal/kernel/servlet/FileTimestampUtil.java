@@ -46,18 +46,7 @@ public class FileTimestampUtil {
 			return 0;
 		}
 
-		String timestampsCacheKey = FileTimestampUtil.class.getName();
-
-		Map<String, Long> timestamps =
-			(Map<String, Long>)servletContext.getAttribute(timestampsCacheKey);
-
-		if (timestamps == null) {
-			timestamps = new ConcurrentHashMap<>();
-
-			servletContext.setAttribute(timestampsCacheKey, timestamps);
-		}
-
-		Long timestamp = timestamps.get(path);
+		Long timestamp = _timestamps.get(path);
 
 		if (timestamp != null) {
 			return timestamp;
@@ -73,7 +62,7 @@ public class FileTimestampUtil {
 			if (uriFile.exists()) {
 				timestamp = uriFile.lastModified();
 
-				timestamps.put(path, timestamp);
+				_timestamps.put(path, timestamp);
 
 				return timestamp;
 			}
@@ -93,26 +82,19 @@ public class FileTimestampUtil {
 			_log.error(ioe, ioe);
 		}
 
-		timestamps.put(path, timestamp);
+		_timestamps.put(path, timestamp);
 
 		return timestamp;
 	}
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 *             #reset(ServletContext)
-	 */
-	@Deprecated
 	public static void reset() {
-	}
-
-	public static void reset(ServletContext servletContext) {
-		String timestampsCacheKey = FileTimestampUtil.class.getName();
-
-		servletContext.removeAttribute(timestampsCacheKey);
+		_timestamps.clear();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		FileTimestampUtil.class);
+
+	private static final Map<String, Long> _timestamps =
+		new ConcurrentHashMap<>();
 
 }

@@ -1,8 +1,8 @@
-import Component from 'metal-component';
 import Soy from 'metal-soy';
 import dom from 'metal-dom';
 import { CancellablePromise } from 'metal-promise';
 import { async, core } from 'metal';
+import PortletBase from 'frontend-js-web/liferay/PortletBase.es';
 
 import 'frontend-js-web/liferay/compat/dropdown/Dropdown.es';
 import ImageEditorHistoryEntry from './ImageEditorHistoryEntry.es';
@@ -23,7 +23,7 @@ import templates from './ImageEditor.soy';
  * to provide UI controls.
  * @review
  */
-class ImageEditor extends Component {
+class ImageEditor extends PortletBase {
 	/**
 	 * @inheritDoc
 	 * @review
@@ -298,7 +298,7 @@ class ImageEditor extends Component {
 	 */
 	setterSaveMimeTypeFn_(saveMimeType) {
 		if (!saveMimeType) {
-			const imageExtensionRegex = /\.(\w+)\/[^?\/]+/;
+			const imageExtensionRegex = /(?:.*:\/\/)?(?:[^\/])*[^.]*.([^?\/$]*)/;
 			const imageExtension = this.image.match(imageExtensionRegex)[1];
 
 			saveMimeType = `image/${imageExtension}`;
@@ -349,18 +349,10 @@ class ImageEditor extends Component {
 
 			formData.append(saveParamName, imageBlob, saveFileName);
 
-			let requestConfig = {
-				contentType: false,
-				data: formData,
-				dataType: "json",
-				processData: false,
-				type: 'POST',
-				url: this.saveURL
-			};
-
-			AUI.$.ajax(requestConfig)
-				.done(resolve)
-				.fail((jqXHR, status, error) => reject(error));
+			this.fetch(this.saveURL, formData)
+				.then(response => response.json())
+				.then(resolve)
+				.catch(error => reject(error));
 		});
 
 		this.components.loading.show = true;

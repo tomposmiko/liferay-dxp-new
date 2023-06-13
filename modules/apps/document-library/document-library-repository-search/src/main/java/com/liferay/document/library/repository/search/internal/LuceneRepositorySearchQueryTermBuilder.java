@@ -176,9 +176,7 @@ public class LuceneRepositorySearchQueryTermBuilder
 
 			Term term = fuzzyQuery.getTerm();
 
-			String termText = term.text();
-
-			String termValue = termText.concat(StringPool.STAR);
+			String termValue = term.text().concat(StringPool.STAR);
 
 			WildcardQuery wildcardQuery = new WildcardQueryImpl(
 				term.field(), termValue);
@@ -207,9 +205,7 @@ public class LuceneRepositorySearchQueryTermBuilder
 
 			Term prefixTerm = prefixQuery.getPrefix();
 
-			String prefixTermText = prefixTerm.text();
-
-			String termValue = prefixTermText.concat(StringPool.STAR);
+			String termValue = prefixTerm.text().concat(StringPool.STAR);
 
 			WildcardQuery wildcardQuery = new WildcardQueryImpl(
 				prefixTerm.field(), termValue);

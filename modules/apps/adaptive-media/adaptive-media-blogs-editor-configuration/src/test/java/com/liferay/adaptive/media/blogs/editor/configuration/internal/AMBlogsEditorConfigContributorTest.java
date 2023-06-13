@@ -29,7 +29,6 @@ import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 
@@ -117,8 +116,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
 
-		ReflectionTestUtil.setFieldValue(
-			amBlogsEditorConfigContributor, "_itemSelector", _itemSelector);
+		amBlogsEditorConfigContributor.setItemSelector(_itemSelector);
 
 		amBlogsEditorConfigContributor.populateConfigJSONObject(
 			jsonObject, _inputEditorTaglibAttributes, _themeDisplay,
@@ -172,8 +170,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
 
-		ReflectionTestUtil.setFieldValue(
-			amBlogsEditorConfigContributor, "_itemSelector", _itemSelector);
+		amBlogsEditorConfigContributor.setItemSelector(_itemSelector);
 
 		amBlogsEditorConfigContributor.populateConfigJSONObject(
 			jsonObject, _inputEditorTaglibAttributes, _themeDisplay,
@@ -228,8 +225,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
 
-		ReflectionTestUtil.setFieldValue(
-			amBlogsEditorConfigContributor, "_itemSelector", _itemSelector);
+		amBlogsEditorConfigContributor.setItemSelector(_itemSelector);
 
 		amBlogsEditorConfigContributor.populateConfigJSONObject(
 			jsonObject, _inputEditorTaglibAttributes, _themeDisplay,
@@ -317,8 +313,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
 
-		ReflectionTestUtil.setFieldValue(
-			amBlogsEditorConfigContributor, "_itemSelector", _itemSelector);
+		amBlogsEditorConfigContributor.setItemSelector(_itemSelector);
 
 		amBlogsEditorConfigContributor.populateConfigJSONObject(
 			jsonObject, _inputEditorTaglibAttributes, _themeDisplay,
@@ -454,8 +449,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
 
-		ReflectionTestUtil.setFieldValue(
-			amBlogsEditorConfigContributor, "_itemSelector", _itemSelector);
+		amBlogsEditorConfigContributor.setItemSelector(_itemSelector);
 
 		amBlogsEditorConfigContributor.populateConfigJSONObject(
 			jsonObject, _inputEditorTaglibAttributes, _themeDisplay,
@@ -498,8 +492,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
 
-		ReflectionTestUtil.setFieldValue(
-			amBlogsEditorConfigContributor, "_itemSelector", _itemSelector);
+		amBlogsEditorConfigContributor.setItemSelector(_itemSelector);
 
 		amBlogsEditorConfigContributor.populateConfigJSONObject(
 			jsonObject, _inputEditorTaglibAttributes, _themeDisplay,
@@ -564,8 +557,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
 
-		ReflectionTestUtil.setFieldValue(
-			amBlogsEditorConfigContributor, "_itemSelector", _itemSelector);
+		amBlogsEditorConfigContributor.setItemSelector(_itemSelector);
 
 		amBlogsEditorConfigContributor.populateConfigJSONObject(
 			jsonObject, _inputEditorTaglibAttributes, _themeDisplay,
@@ -624,8 +616,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
 
-		ReflectionTestUtil.setFieldValue(
-			amBlogsEditorConfigContributor, "_itemSelector", _itemSelector);
+		amBlogsEditorConfigContributor.setItemSelector(_itemSelector);
 
 		amBlogsEditorConfigContributor.populateConfigJSONObject(
 			jsonObject, _inputEditorTaglibAttributes, _themeDisplay,

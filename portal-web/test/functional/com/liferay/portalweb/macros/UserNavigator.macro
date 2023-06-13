@@ -9,6 +9,15 @@ definition {
 		Navigator.gotoNavNested(navNested = "Display Settings");
 	}
 
+	macro gotoEdit {
+		Click.waitForMenuToggleJSClick(
+			locator1 = "Icon#TABLE_VERTICAL_ELLIPSIS",
+			key_rowEntry = "${rowEntry}"
+		);
+
+		MenuItem.click(menuItem = "Edit");
+	}
+
 	macro gotoGeneral {
 		if (IsElementNotPresent(locator1 = "NavUnderline#ACTIVE_NAV_UNDERLINE_LINK")) {
 			Navigator.gotoNavUnderline(navUnderline = "General");

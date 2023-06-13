@@ -60,10 +60,6 @@ AUI.add(
 						value: []
 					},
 
-					showPublishAlert: {
-						value: false
-					},
-
 					translationManager: {
 					},
 
@@ -105,15 +101,6 @@ AUI.add(
 							instance._eventHandlers.push(
 								Liferay.on('RuleBuilderLoaded', A.bind('_onRuleBuilderLoaded', instance))
 							);
-						}
-
-						if (instance.get('showPublishAlert')) {
-							if (instance.get('published')) {
-								instance._showPublishAlert();
-							}
-							else {
-								instance._showUnpublishAlert()
-							}
 						}
 					},
 
@@ -157,9 +144,16 @@ AUI.add(
 							formBuilder._layoutBuilder.after('layout-builder:moveStart', A.bind(instance._afterFormBuilderLayoutBuilderMoveStart, instance)),
 							instance.one('.back-url-link').on('click', A.bind('_onBack', instance)),
 							instance.one('#save').on('click', A.bind('_onSaveButtonClick', instance)),
-							Liferay.on('destroyPortlet', A.bind('_onDestroyPortlet', instance)),
-							instance.get('ruleBuilder').on('*:saveRule', A.bind('_autosave', instance, true))
+							Liferay.on('destroyPortlet', A.bind('_onDestroyPortlet', instance))
 						);
+
+						var ruleBuilder = instance.get('ruleBuilder');
+
+						if (ruleBuilder) {
+							instance._eventHandlers.push(
+								ruleBuilder.on('*:saveRule', A.bind('_autosave', instance, true))
+							);
+						}
 
 						if (instance._isFormView()) {
 							instance.bindNavigationBar();
@@ -335,7 +329,7 @@ AUI.add(
 							availableLanguageIds: translationManager.get('availableLocales'),
 							defaultLanguageId: formBuilder.get('defaultLanguageId'),
 							description: instance.get('localizedDescription'),
-							name: instance._getLocalizedName(),
+							name: instance.get('localizedName'),
 							pages: instance.layoutVisitor.getPages(),
 							paginationMode: pageManager.get('mode')
 						};
@@ -457,7 +451,7 @@ AUI.add(
 
 						var editForm = instance.get('editForm');
 
-						Liferay.Util.submitForm(editForm.formNode);
+						submitForm(editForm.form);
 					},
 
 					syncInputValues: function() {
@@ -602,7 +596,7 @@ AUI.add(
 													}
 												);
 
-												if (callback) {
+												if (A.Lang.isFunction(callback)) {
 													callback.call();
 												}
 											}
@@ -622,10 +616,8 @@ AUI.add(
 									}
 								);
 							}
-							else {
-								if (callback) {
-									callback.call();
-								}
+							else if (A.Lang.isFunction(callback)) {
+								callback.call();
 							}
 						}
 					},
@@ -715,28 +707,13 @@ AUI.add(
 
 						formObject[instance.ns('saveAsDraft')] = saveAsDraft;
 
-						formString = A.QueryString.stringify(formObject);
-
-						return formString;
+						return A.QueryString.stringify(formObject);
 					},
 
 					_getFormInstanceId: function() {
 						var instance = this;
 
 						return instance.byId('formInstanceId').val();
-					},
-
-					_getLocalizedName: function() {
-						var instance = this;
-
-						var defaultLanguageId = instance.get('defaultLanguageId');
-						var localizedName = instance.get('localizedName');
-
-						if (!localizedName[defaultLanguageId].trim()) {
-							localizedName[defaultLanguageId] = instance._isFormView() ? STR_UNTITLED_FORM : STR_UNTITLED_ELEMENT_SET;
-						}
-
-						return localizedName;
 					},
 
 					_getName: function() {
@@ -753,7 +730,7 @@ AUI.add(
 						return window[instance.ns('nameEditor')];
 					},
 
-					_showPublishAlert: function() {
+					_handlePublishAction: function() {
 						var instance = this;
 
 						var publishMessage = Liferay.Language.get('the-form-was-published-successfully-access-it-with-this-url-x');
@@ -765,12 +742,16 @@ AUI.add(
 						publishMessage = publishMessage.replace(/\{0\}/gim, span);
 
 						instance._showAlert(publishMessage, 'success');
+
+						instance.one('#publish').html(Liferay.Language.get('unpublish-form'));
 					},
 
-					_showUnpublishAlert: function() {
+					_handleUnpublishAction: function() {
 						var instance = this;
 
 						instance._showAlert(Liferay.Language.get('the-form-was-unpublished-successfully'), 'success');
+
+						instance.one('#publish').html(Liferay.Language.get('publish-form'));
 					},
 
 					_hideFormBuilder: function() {
@@ -892,21 +873,60 @@ AUI.add(
 						);
 					},
 
-					_onPublishButtonClick: function(event) {
+					_onPublishButtonClick: function() {
 						var instance = this;
 
-						event.preventDefault();
+						instance._autosave(
+							false,
+							function() {
+								var publishedValue = instance.get('published');
 
-						var publishButton = instance.one('#publish');
+								var newPublishedValue = !publishedValue;
 
-						publishButton.html(Liferay.Language.get('publishing'));
+								var payload = instance.ns(
+									{
+										formInstanceId: instance.byId('formInstanceId').val(),
+										published: newPublishedValue
+									}
+								);
 
-						var editForm = instance.get('editForm');
+								A.io.request(
+									Liferay.DDM.FormSettings.publishFormInstanceURL,
+									{
+										after: {
+											success: function(event, id, xhr) {
+												instance.set('published', newPublishedValue);
 
-						editForm.formNode.setAttribute('action', Liferay.DDM.FormSettings.publishFormInstanceURL)
+												instance.syncInputValues();
 
-						instance.submitForm();
+												var responseData = this.get('responseData');
 
+												if (newPublishedValue) {
+													instance._handlePublishAction();
+												}
+												else {
+													instance._handleUnpublishAction();
+												}
+
+												instance._updateAutosaveBar(false, responseData.modifiedDate);
+											}
+										},
+										data: payload,
+										dataType: 'JSON',
+										method: 'POST',
+										on: {
+											failure: function(event, id, xhr) {
+												var sessionStatus = Liferay.Session.get('sessionState');
+
+												if (sessionStatus === 'expired' || xhr.status === 401) {
+													window.location.reload();
+												}
+											}
+										}
+									}
+								);
+							}
+						);
 					},
 
 					_onPublishIconClick: function() {

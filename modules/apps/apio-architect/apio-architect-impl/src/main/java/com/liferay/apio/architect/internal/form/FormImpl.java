@@ -727,8 +727,9 @@ public class FormImpl<T> implements Form<T> {
 		}
 	}
 
-	private <U> BiConsumer<String, Function<U, Consumer<Object>>>
-		_getOptionalNestedModel(Body body, U u) {
+	private <U> BiConsumer
+		<String, Function<U, Consumer<Object>>> _getOptionalNestedModel(
+			Body body, U u) {
 
 		return (key, consumerFunction) -> _getNestedModel(
 			body, u, key, consumerFunction, false);
@@ -741,8 +742,9 @@ public class FormImpl<T> implements Form<T> {
 			body, u, key, consumerFunction, false);
 	}
 
-	private <U> BiConsumer<String, Function<U, Consumer<Object>>>
-		_getRequiredNestedModel(Body body, U u) {
+	private <U> BiConsumer
+		<String, Function<U, Consumer<Object>>> _getRequiredNestedModel(
+			Body body, U u) {
 
 		return (key, consumerFunction) -> _getNestedModel(
 			body, u, key, consumerFunction, true);

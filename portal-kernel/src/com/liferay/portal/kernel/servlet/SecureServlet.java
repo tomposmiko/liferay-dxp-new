@@ -33,7 +33,7 @@ import javax.servlet.ServletResponse;
  * @author Brian Wing Shun Chan
  */
 public class SecureServlet
-	extends BasePortalLifecycle implements Servlet, ServletConfig {
+	extends BasePortalLifecycle implements ServletConfig, Servlet {
 
 	@Override
 	public void destroy() {

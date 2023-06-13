@@ -78,12 +78,7 @@ definition {
 	macro viewAppCP {
 		var key_appName = "${appName}";
 
-		if (isSet(searchTerm)) {
-			Search.searchCP(searchTerm = "${searchTerm}");
-		}
-		else{
-			Search.searchCP(searchTerm = "${appName}");
-		}
+		Search.searchCP(searchTerm = "${appName}");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "AppManager#APP_NAME",

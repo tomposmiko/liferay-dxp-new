@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.service.SystemEventLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.service.persistence.LayoutRevisionUtil;
 import com.liferay.portal.kernel.service.persistence.LayoutUtil;
-import com.liferay.portal.kernel.spring.aop.AdvisedSupport;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntry;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntryThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -49,7 +48,7 @@ import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.spring.aop.ServiceBeanAopProxy;
+import com.liferay.portal.spring.aop.AopInvocationHandler;
 import com.liferay.portlet.exportimport.staging.ProxiedLayoutsThreadLocal;
 import com.liferay.portlet.exportimport.staging.StagingAdvicesThreadLocal;
 
@@ -82,16 +81,18 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		}
 	}
 
-	public void afterPropertiesSet() throws Exception {
-		AdvisedSupport advisedSupport = ServiceBeanAopProxy.getAdvisedSupport(
-			_beanFactory.getBean(LayoutLocalService.class.getName()));
+	public void afterPropertiesSet() throws BeansException {
+		AopInvocationHandler aopInvocationHandler =
+			ProxyUtil.fetchInvocationHandler(
+				_beanFactory.getBean(LayoutLocalService.class.getName()),
+				AopInvocationHandler.class);
 
-		advisedSupport.setTarget(
+		aopInvocationHandler.setTarget(
 			ProxyUtil.newProxyInstance(
 				LayoutLocalServiceStagingAdvice.class.getClassLoader(),
 				new Class<?>[] {LayoutLocalService.class},
 				new LayoutLocalServiceStagingInvocationHandler(
-					this, advisedSupport.getTarget())));
+					this, aopInvocationHandler.getTarget())));
 
 		layoutLocalServiceHelper =
 			(LayoutLocalServiceHelper)_beanFactory.getBean(
@@ -667,7 +668,9 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 				if (arguments.length == 6) {
 					showIncomplete = (Boolean)arguments[3];
 				}
-				else if (arguments.length == 7) {
+				else if ((arguments.length == 7) &&
+						 parameterTypes[3].equals(Boolean.TYPE)) {
+
 					showIncomplete = (Boolean)arguments[3];
 				}
 				else if (Arrays.equals(parameterTypes, _GET_LAYOUTS_TYPES)) {

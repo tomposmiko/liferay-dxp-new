@@ -18,7 +18,6 @@ import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 
 import org.junit.Assert;
@@ -34,18 +33,15 @@ public class AMJournalArticleExportImportContentProcessorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ReflectionTestUtil.setFieldValue(
-			_amJournalArticleExportImportContentProcessor,
-			"_amJournalArticleContentHTMLReplacer",
-			_amJournalArticleContentHTMLReplacer);
-		ReflectionTestUtil.setFieldValue(
-			_amJournalArticleExportImportContentProcessor,
-			"_htmlExportImportContentProcessor",
-			_htmlExportImportContentProcessor);
-		ReflectionTestUtil.setFieldValue(
-			_amJournalArticleExportImportContentProcessor,
-			"_journalArticleExportImportContentProcessor",
-			_journalArticleExportImportContentProcessor);
+		_amJournalArticleExportImportContentProcessor.
+			setAMJournalArticleContentHTMLReplacer(
+				_amJournalArticleContentHTMLReplacer);
+		_amJournalArticleExportImportContentProcessor.
+			setHTMLExportImportContentProcessor(
+				_htmlExportImportContentProcessor);
+		_amJournalArticleExportImportContentProcessor.
+			setJournalArticleExportImportContentProcessor(
+				_journalArticleExportImportContentProcessor);
 
 		Mockito.when(
 			_amJournalArticleContentHTMLReplacer.replace(

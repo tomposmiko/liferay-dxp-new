@@ -24,7 +24,7 @@ import javax.portlet.MimeResponse;
  */
 @ProviderType
 public interface LiferayHeaderResponse
-	extends HeaderResponse, LiferayPortletResponse, MimeResponse {
+	extends LiferayPortletResponse, MimeResponse, HeaderResponse {
 
 	public void writeToHead();
 

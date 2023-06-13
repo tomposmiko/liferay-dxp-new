@@ -17,6 +17,7 @@ package com.liferay.external.reference.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.kernel.model.AssetCategory;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.service.BaseLocalService;
@@ -35,32 +36,29 @@ import java.util.Map;
  *
  * @author Brian Wing Shun Chan
  * @see ERAssetCategoryLocalServiceUtil
+ * @see com.liferay.external.reference.service.base.ERAssetCategoryLocalServiceBaseImpl
+ * @see com.liferay.external.reference.service.impl.ERAssetCategoryLocalServiceImpl
  * @generated
  */
 @ProviderType
-@Transactional(
-	isolation = Isolation.PORTAL,
-	rollbackFor = {PortalException.class, SystemException.class}
-)
+@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
+	PortalException.class, SystemException.class})
 public interface ERAssetCategoryLocalService extends BaseLocalService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link ERAssetCategoryLocalServiceUtil} to access the er asset category local service. Add custom service methods to <code>com.liferay.external.reference.service.impl.ERAssetCategoryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link ERAssetCategoryLocalServiceUtil} to access the er asset category local service. Add custom service methods to {@link com.liferay.external.reference.service.impl.ERAssetCategoryLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public AssetCategory addOrUpdateCategory(
-			String externalReferenceCode, long userId, long groupId,
-			long parentCategoryId, Map<Locale, String> titleMap,
-			Map<Locale, String> descriptionMap, long vocabularyId,
-			String[] categoryProperties, ServiceContext serviceContext)
-		throws PortalException;
+	public AssetCategory addOrUpdateCategory(String externalReferenceCode,
+		long userId, long groupId, long parentCategoryId,
+		Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
+		long vocabularyId, String[] categoryProperties,
+		ServiceContext serviceContext) throws PortalException;
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public String getOSGiServiceIdentifier();
-
 }

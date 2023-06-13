@@ -30,7 +30,7 @@
 </tr>
 <tr>
 	<td>SELECTED_STRUCTURE</td>
-	<td>//span[contains(@id,'structureNameLabel')]</td>
+	<td>//div[contains(@class,'article-structure')]//a</td>
 	<td></td>
 </tr>
 <tr>
@@ -50,7 +50,7 @@
 </tr>
 <tr>
 	<td>SELECT_TEMPLATE</td>
-	<td>//button[contains(@id,'selectTemplate')]</td>
+	<td>//button[contains(@id,'selectDDMTemplate')]</td>
 	<td></td>
 </tr>
 <tr>

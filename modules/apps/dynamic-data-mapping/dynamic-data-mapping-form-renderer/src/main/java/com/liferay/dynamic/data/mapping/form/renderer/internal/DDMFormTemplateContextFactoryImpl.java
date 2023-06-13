@@ -37,7 +37,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.template.soy.utils.SoyHTMLSanitizer;
+import com.liferay.portal.template.soy.util.SoyHTMLSanitizer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +55,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -65,13 +64,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = DDMFormTemplateContextFactory.class)
 public class DDMFormTemplateContextFactoryImpl
 	implements DDMFormTemplateContextFactory {
-
-	@Activate
-	public void activate() {
-		_ddmFormTemplateContextFactoryHelper =
-			new DDMFormTemplateContextFactoryHelper(
-				_ddmDataProviderInstanceService);
-	}
 
 	@Override
 	public Map<String, Object> create(
@@ -127,11 +119,6 @@ public class DDMFormTemplateContextFactoryImpl
 			"1");
 
 		templateContext.put("currentPage", currentPage);
-
-		templateContext.put(
-			"dataProviderSettings",
-			_ddmFormTemplateContextFactoryHelper.getDataProviderSettings(
-				ddmForm));
 
 		setDDMFormFieldsEvaluableProperty(ddmForm);
 
@@ -222,7 +209,6 @@ public class DDMFormTemplateContextFactoryImpl
 			_ddmFormEvaluator);
 		ddmFormPagesTemplateContextFactory.setDDMFormFieldTypeServicesTracker(
 			_ddmFormFieldTypeServicesTracker);
-		ddmFormPagesTemplateContextFactory.setJSONFactory(_jsonFactory);
 
 		return ddmFormPagesTemplateContextFactory.create();
 	}
@@ -359,8 +345,9 @@ public class DDMFormTemplateContextFactoryImpl
 	@Reference
 	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 
-	private DDMFormTemplateContextFactoryHelper
-		_ddmFormTemplateContextFactoryHelper;
+	private final DDMFormTemplateContextFactoryHelper
+		_ddmFormTemplateContextFactoryHelper =
+			new DDMFormTemplateContextFactoryHelper();
 
 	@Reference
 	private JSONFactory _jsonFactory;

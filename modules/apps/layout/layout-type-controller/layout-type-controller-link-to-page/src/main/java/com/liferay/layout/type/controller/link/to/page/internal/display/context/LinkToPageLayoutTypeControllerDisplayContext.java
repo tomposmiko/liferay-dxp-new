@@ -59,7 +59,10 @@ public class LinkToPageLayoutTypeControllerDisplayContext {
 	}
 
 	public String getEventName() {
-		return _liferayPortletResponse.getNamespace() + "selectLinkToPage";
+		String eventName =
+			_liferayPortletResponse.getNamespace() + "selectLinkToPage";
+
+		return eventName;
 	}
 
 	public String getItemSelectorURL() throws Exception {

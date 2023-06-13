@@ -16,17 +16,14 @@ package com.liferay.mobile.device.rules.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
 
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -38,20 +35,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class MDRActionWrapper implements MDRAction, ModelWrapper<MDRAction> {
-
+public class MDRActionWrapper extends BaseModelWrapper<MDRAction>
+	implements MDRAction, ModelWrapper<MDRAction> {
 	public MDRActionWrapper(MDRAction mdrAction) {
-		_mdrAction = mdrAction;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return MDRAction.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return MDRAction.class.getName();
+		super(mdrAction);
 	}
 
 	@Override
@@ -177,811 +164,662 @@ public class MDRActionWrapper implements MDRAction, ModelWrapper<MDRAction> {
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new MDRActionWrapper((MDRAction)_mdrAction.clone());
-	}
-
-	@Override
-	public int compareTo(MDRAction mdrAction) {
-		return _mdrAction.compareTo(mdrAction);
-	}
-
 	/**
-	 * Returns the action ID of this mdr action.
-	 *
-	 * @return the action ID of this mdr action
-	 */
+	* Returns the action ID of this mdr action.
+	*
+	* @return the action ID of this mdr action
+	*/
 	@Override
 	public long getActionId() {
-		return _mdrAction.getActionId();
+		return model.getActionId();
 	}
 
 	@Override
 	public String[] getAvailableLanguageIds() {
-		return _mdrAction.getAvailableLanguageIds();
+		return model.getAvailableLanguageIds();
 	}
 
 	/**
-	 * Returns the fully qualified class name of this mdr action.
-	 *
-	 * @return the fully qualified class name of this mdr action
-	 */
+	* Returns the fully qualified class name of this mdr action.
+	*
+	* @return the fully qualified class name of this mdr action
+	*/
 	@Override
 	public String getClassName() {
-		return _mdrAction.getClassName();
+		return model.getClassName();
 	}
 
 	/**
-	 * Returns the class name ID of this mdr action.
-	 *
-	 * @return the class name ID of this mdr action
-	 */
+	* Returns the class name ID of this mdr action.
+	*
+	* @return the class name ID of this mdr action
+	*/
 	@Override
 	public long getClassNameId() {
-		return _mdrAction.getClassNameId();
+		return model.getClassNameId();
 	}
 
 	/**
-	 * Returns the class pk of this mdr action.
-	 *
-	 * @return the class pk of this mdr action
-	 */
+	* Returns the class pk of this mdr action.
+	*
+	* @return the class pk of this mdr action
+	*/
 	@Override
 	public long getClassPK() {
-		return _mdrAction.getClassPK();
+		return model.getClassPK();
 	}
 
 	/**
-	 * Returns the company ID of this mdr action.
-	 *
-	 * @return the company ID of this mdr action
-	 */
+	* Returns the company ID of this mdr action.
+	*
+	* @return the company ID of this mdr action
+	*/
 	@Override
 	public long getCompanyId() {
-		return _mdrAction.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the create date of this mdr action.
-	 *
-	 * @return the create date of this mdr action
-	 */
+	* Returns the create date of this mdr action.
+	*
+	* @return the create date of this mdr action
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _mdrAction.getCreateDate();
+		return model.getCreateDate();
 	}
 
 	@Override
 	public String getDefaultLanguageId() {
-		return _mdrAction.getDefaultLanguageId();
+		return model.getDefaultLanguageId();
 	}
 
 	/**
-	 * Returns the description of this mdr action.
-	 *
-	 * @return the description of this mdr action
-	 */
+	* Returns the description of this mdr action.
+	*
+	* @return the description of this mdr action
+	*/
 	@Override
 	public String getDescription() {
-		return _mdrAction.getDescription();
+		return model.getDescription();
 	}
 
 	/**
-	 * Returns the localized description of this mdr action in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the locale of the language
-	 * @return the localized description of this mdr action
-	 */
+	* Returns the localized description of this mdr action in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized description of this mdr action
+	*/
 	@Override
 	public String getDescription(java.util.Locale locale) {
-		return _mdrAction.getDescription(locale);
+		return model.getDescription(locale);
 	}
 
 	/**
-	 * Returns the localized description of this mdr action in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the local of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this mdr action. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	 */
+	* Returns the localized description of this mdr action in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this mdr action. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
 	@Override
 	public String getDescription(java.util.Locale locale, boolean useDefault) {
-		return _mdrAction.getDescription(locale, useDefault);
+		return model.getDescription(locale, useDefault);
 	}
 
 	/**
-	 * Returns the localized description of this mdr action in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @return the localized description of this mdr action
-	 */
+	* Returns the localized description of this mdr action in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @return the localized description of this mdr action
+	*/
 	@Override
 	public String getDescription(String languageId) {
-		return _mdrAction.getDescription(languageId);
+		return model.getDescription(languageId);
 	}
 
 	/**
-	 * Returns the localized description of this mdr action in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this mdr action
-	 */
+	* Returns the localized description of this mdr action in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this mdr action
+	*/
 	@Override
 	public String getDescription(String languageId, boolean useDefault) {
-		return _mdrAction.getDescription(languageId, useDefault);
+		return model.getDescription(languageId, useDefault);
 	}
 
 	@Override
 	public String getDescriptionCurrentLanguageId() {
-		return _mdrAction.getDescriptionCurrentLanguageId();
+		return model.getDescriptionCurrentLanguageId();
 	}
 
 	@Override
 	public String getDescriptionCurrentValue() {
-		return _mdrAction.getDescriptionCurrentValue();
+		return model.getDescriptionCurrentValue();
 	}
 
 	/**
-	 * Returns a map of the locales and localized descriptions of this mdr action.
-	 *
-	 * @return the locales and localized descriptions of this mdr action
-	 */
+	* Returns a map of the locales and localized descriptions of this mdr action.
+	*
+	* @return the locales and localized descriptions of this mdr action
+	*/
 	@Override
 	public Map<java.util.Locale, String> getDescriptionMap() {
-		return _mdrAction.getDescriptionMap();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _mdrAction.getExpandoBridge();
+		return model.getDescriptionMap();
 	}
 
 	/**
-	 * Returns the group ID of this mdr action.
-	 *
-	 * @return the group ID of this mdr action
-	 */
+	* Returns the group ID of this mdr action.
+	*
+	* @return the group ID of this mdr action
+	*/
 	@Override
 	public long getGroupId() {
-		return _mdrAction.getGroupId();
+		return model.getGroupId();
 	}
 
 	/**
-	 * Returns the last publish date of this mdr action.
-	 *
-	 * @return the last publish date of this mdr action
-	 */
+	* Returns the last publish date of this mdr action.
+	*
+	* @return the last publish date of this mdr action
+	*/
 	@Override
 	public Date getLastPublishDate() {
-		return _mdrAction.getLastPublishDate();
+		return model.getLastPublishDate();
 	}
 
 	/**
-	 * Returns the modified date of this mdr action.
-	 *
-	 * @return the modified date of this mdr action
-	 */
+	* Returns the modified date of this mdr action.
+	*
+	* @return the modified date of this mdr action
+	*/
 	@Override
 	public Date getModifiedDate() {
-		return _mdrAction.getModifiedDate();
+		return model.getModifiedDate();
 	}
 
 	/**
-	 * Returns the name of this mdr action.
-	 *
-	 * @return the name of this mdr action
-	 */
+	* Returns the name of this mdr action.
+	*
+	* @return the name of this mdr action
+	*/
 	@Override
 	public String getName() {
-		return _mdrAction.getName();
+		return model.getName();
 	}
 
 	/**
-	 * Returns the localized name of this mdr action in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the locale of the language
-	 * @return the localized name of this mdr action
-	 */
+	* Returns the localized name of this mdr action in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized name of this mdr action
+	*/
 	@Override
 	public String getName(java.util.Locale locale) {
-		return _mdrAction.getName(locale);
+		return model.getName(locale);
 	}
 
 	/**
-	 * Returns the localized name of this mdr action in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the local of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized name of this mdr action. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	 */
+	* Returns the localized name of this mdr action in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized name of this mdr action. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
 	@Override
 	public String getName(java.util.Locale locale, boolean useDefault) {
-		return _mdrAction.getName(locale, useDefault);
+		return model.getName(locale, useDefault);
 	}
 
 	/**
-	 * Returns the localized name of this mdr action in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @return the localized name of this mdr action
-	 */
+	* Returns the localized name of this mdr action in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @return the localized name of this mdr action
+	*/
 	@Override
 	public String getName(String languageId) {
-		return _mdrAction.getName(languageId);
+		return model.getName(languageId);
 	}
 
 	/**
-	 * Returns the localized name of this mdr action in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized name of this mdr action
-	 */
+	* Returns the localized name of this mdr action in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized name of this mdr action
+	*/
 	@Override
 	public String getName(String languageId, boolean useDefault) {
-		return _mdrAction.getName(languageId, useDefault);
+		return model.getName(languageId, useDefault);
 	}
 
 	@Override
 	public String getNameCurrentLanguageId() {
-		return _mdrAction.getNameCurrentLanguageId();
+		return model.getNameCurrentLanguageId();
 	}
 
 	@Override
 	public String getNameCurrentValue() {
-		return _mdrAction.getNameCurrentValue();
+		return model.getNameCurrentValue();
 	}
 
 	/**
-	 * Returns a map of the locales and localized names of this mdr action.
-	 *
-	 * @return the locales and localized names of this mdr action
-	 */
+	* Returns a map of the locales and localized names of this mdr action.
+	*
+	* @return the locales and localized names of this mdr action
+	*/
 	@Override
 	public Map<java.util.Locale, String> getNameMap() {
-		return _mdrAction.getNameMap();
+		return model.getNameMap();
 	}
 
 	/**
-	 * Returns the primary key of this mdr action.
-	 *
-	 * @return the primary key of this mdr action
-	 */
+	* Returns the primary key of this mdr action.
+	*
+	* @return the primary key of this mdr action
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _mdrAction.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _mdrAction.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the rule group instance ID of this mdr action.
-	 *
-	 * @return the rule group instance ID of this mdr action
-	 */
+	* Returns the rule group instance ID of this mdr action.
+	*
+	* @return the rule group instance ID of this mdr action
+	*/
 	@Override
 	public long getRuleGroupInstanceId() {
-		return _mdrAction.getRuleGroupInstanceId();
+		return model.getRuleGroupInstanceId();
 	}
 
 	/**
-	 * Returns the type of this mdr action.
-	 *
-	 * @return the type of this mdr action
-	 */
+	* Returns the type of this mdr action.
+	*
+	* @return the type of this mdr action
+	*/
 	@Override
 	public String getType() {
-		return _mdrAction.getType();
+		return model.getType();
 	}
 
 	/**
-	 * Returns the type settings of this mdr action.
-	 *
-	 * @return the type settings of this mdr action
-	 */
+	* Returns the type settings of this mdr action.
+	*
+	* @return the type settings of this mdr action
+	*/
 	@Override
 	public String getTypeSettings() {
-		return _mdrAction.getTypeSettings();
+		return model.getTypeSettings();
 	}
 
 	@Override
-	public com.liferay.portal.kernel.util.UnicodeProperties
-		getTypeSettingsProperties() {
-
-		return _mdrAction.getTypeSettingsProperties();
+	public com.liferay.portal.kernel.util.UnicodeProperties getTypeSettingsProperties() {
+		return model.getTypeSettingsProperties();
 	}
 
 	/**
-	 * Returns the user ID of this mdr action.
-	 *
-	 * @return the user ID of this mdr action
-	 */
+	* Returns the user ID of this mdr action.
+	*
+	* @return the user ID of this mdr action
+	*/
 	@Override
 	public long getUserId() {
-		return _mdrAction.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this mdr action.
-	 *
-	 * @return the user name of this mdr action
-	 */
+	* Returns the user name of this mdr action.
+	*
+	* @return the user name of this mdr action
+	*/
 	@Override
 	public String getUserName() {
-		return _mdrAction.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this mdr action.
-	 *
-	 * @return the user uuid of this mdr action
-	 */
+	* Returns the user uuid of this mdr action.
+	*
+	* @return the user uuid of this mdr action
+	*/
 	@Override
 	public String getUserUuid() {
-		return _mdrAction.getUserUuid();
+		return model.getUserUuid();
 	}
 
 	/**
-	 * Returns the uuid of this mdr action.
-	 *
-	 * @return the uuid of this mdr action
-	 */
+	* Returns the uuid of this mdr action.
+	*
+	* @return the uuid of this mdr action
+	*/
 	@Override
 	public String getUuid() {
-		return _mdrAction.getUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _mdrAction.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _mdrAction.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _mdrAction.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _mdrAction.isNew();
+		return model.getUuid();
 	}
 
 	@Override
 	public void persist() {
-		_mdrAction.persist();
+		model.persist();
 	}
 
 	@Override
 	public void prepareLocalizedFieldsForImport()
 		throws com.liferay.portal.kernel.exception.LocaleException {
-
-		_mdrAction.prepareLocalizedFieldsForImport();
+		model.prepareLocalizedFieldsForImport();
 	}
 
 	@Override
 	public void prepareLocalizedFieldsForImport(
-			java.util.Locale defaultImportLocale)
+		java.util.Locale defaultImportLocale)
 		throws com.liferay.portal.kernel.exception.LocaleException {
-
-		_mdrAction.prepareLocalizedFieldsForImport(defaultImportLocale);
+		model.prepareLocalizedFieldsForImport(defaultImportLocale);
 	}
 
 	/**
-	 * Sets the action ID of this mdr action.
-	 *
-	 * @param actionId the action ID of this mdr action
-	 */
+	* Sets the action ID of this mdr action.
+	*
+	* @param actionId the action ID of this mdr action
+	*/
 	@Override
 	public void setActionId(long actionId) {
-		_mdrAction.setActionId(actionId);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_mdrAction.setCachedModel(cachedModel);
+		model.setActionId(actionId);
 	}
 
 	@Override
 	public void setClassName(String className) {
-		_mdrAction.setClassName(className);
+		model.setClassName(className);
 	}
 
 	/**
-	 * Sets the class name ID of this mdr action.
-	 *
-	 * @param classNameId the class name ID of this mdr action
-	 */
+	* Sets the class name ID of this mdr action.
+	*
+	* @param classNameId the class name ID of this mdr action
+	*/
 	@Override
 	public void setClassNameId(long classNameId) {
-		_mdrAction.setClassNameId(classNameId);
+		model.setClassNameId(classNameId);
 	}
 
 	/**
-	 * Sets the class pk of this mdr action.
-	 *
-	 * @param classPK the class pk of this mdr action
-	 */
+	* Sets the class pk of this mdr action.
+	*
+	* @param classPK the class pk of this mdr action
+	*/
 	@Override
 	public void setClassPK(long classPK) {
-		_mdrAction.setClassPK(classPK);
+		model.setClassPK(classPK);
 	}
 
 	/**
-	 * Sets the company ID of this mdr action.
-	 *
-	 * @param companyId the company ID of this mdr action
-	 */
+	* Sets the company ID of this mdr action.
+	*
+	* @param companyId the company ID of this mdr action
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_mdrAction.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this mdr action.
-	 *
-	 * @param createDate the create date of this mdr action
-	 */
+	* Sets the create date of this mdr action.
+	*
+	* @param createDate the create date of this mdr action
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_mdrAction.setCreateDate(createDate);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the description of this mdr action.
-	 *
-	 * @param description the description of this mdr action
-	 */
+	* Sets the description of this mdr action.
+	*
+	* @param description the description of this mdr action
+	*/
 	@Override
 	public void setDescription(String description) {
-		_mdrAction.setDescription(description);
+		model.setDescription(description);
 	}
 
 	/**
-	 * Sets the localized description of this mdr action in the language.
-	 *
-	 * @param description the localized description of this mdr action
-	 * @param locale the locale of the language
-	 */
+	* Sets the localized description of this mdr action in the language.
+	*
+	* @param description the localized description of this mdr action
+	* @param locale the locale of the language
+	*/
 	@Override
 	public void setDescription(String description, java.util.Locale locale) {
-		_mdrAction.setDescription(description, locale);
+		model.setDescription(description, locale);
 	}
 
 	/**
-	 * Sets the localized description of this mdr action in the language, and sets the default locale.
-	 *
-	 * @param description the localized description of this mdr action
-	 * @param locale the locale of the language
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized description of this mdr action in the language, and sets the default locale.
+	*
+	* @param description the localized description of this mdr action
+	* @param locale the locale of the language
+	* @param defaultLocale the default locale
+	*/
 	@Override
-	public void setDescription(
-		String description, java.util.Locale locale,
+	public void setDescription(String description, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
-
-		_mdrAction.setDescription(description, locale, defaultLocale);
+		model.setDescription(description, locale, defaultLocale);
 	}
 
 	@Override
 	public void setDescriptionCurrentLanguageId(String languageId) {
-		_mdrAction.setDescriptionCurrentLanguageId(languageId);
+		model.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
-	 * Sets the localized descriptions of this mdr action from the map of locales and localized descriptions.
-	 *
-	 * @param descriptionMap the locales and localized descriptions of this mdr action
-	 */
+	* Sets the localized descriptions of this mdr action from the map of locales and localized descriptions.
+	*
+	* @param descriptionMap the locales and localized descriptions of this mdr action
+	*/
 	@Override
-	public void setDescriptionMap(
-		Map<java.util.Locale, String> descriptionMap) {
-
-		_mdrAction.setDescriptionMap(descriptionMap);
+	public void setDescriptionMap(Map<java.util.Locale, String> descriptionMap) {
+		model.setDescriptionMap(descriptionMap);
 	}
 
 	/**
-	 * Sets the localized descriptions of this mdr action from the map of locales and localized descriptions, and sets the default locale.
-	 *
-	 * @param descriptionMap the locales and localized descriptions of this mdr action
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized descriptions of this mdr action from the map of locales and localized descriptions, and sets the default locale.
+	*
+	* @param descriptionMap the locales and localized descriptions of this mdr action
+	* @param defaultLocale the default locale
+	*/
 	@Override
 	public void setDescriptionMap(
 		Map<java.util.Locale, String> descriptionMap,
 		java.util.Locale defaultLocale) {
-
-		_mdrAction.setDescriptionMap(descriptionMap, defaultLocale);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_mdrAction.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_mdrAction.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_mdrAction.setExpandoBridgeAttributes(serviceContext);
+		model.setDescriptionMap(descriptionMap, defaultLocale);
 	}
 
 	/**
-	 * Sets the group ID of this mdr action.
-	 *
-	 * @param groupId the group ID of this mdr action
-	 */
+	* Sets the group ID of this mdr action.
+	*
+	* @param groupId the group ID of this mdr action
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_mdrAction.setGroupId(groupId);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the last publish date of this mdr action.
-	 *
-	 * @param lastPublishDate the last publish date of this mdr action
-	 */
+	* Sets the last publish date of this mdr action.
+	*
+	* @param lastPublishDate the last publish date of this mdr action
+	*/
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
-		_mdrAction.setLastPublishDate(lastPublishDate);
+		model.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	 * Sets the modified date of this mdr action.
-	 *
-	 * @param modifiedDate the modified date of this mdr action
-	 */
+	* Sets the modified date of this mdr action.
+	*
+	* @param modifiedDate the modified date of this mdr action
+	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
-		_mdrAction.setModifiedDate(modifiedDate);
+		model.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	 * Sets the name of this mdr action.
-	 *
-	 * @param name the name of this mdr action
-	 */
+	* Sets the name of this mdr action.
+	*
+	* @param name the name of this mdr action
+	*/
 	@Override
 	public void setName(String name) {
-		_mdrAction.setName(name);
+		model.setName(name);
 	}
 
 	/**
-	 * Sets the localized name of this mdr action in the language.
-	 *
-	 * @param name the localized name of this mdr action
-	 * @param locale the locale of the language
-	 */
+	* Sets the localized name of this mdr action in the language.
+	*
+	* @param name the localized name of this mdr action
+	* @param locale the locale of the language
+	*/
 	@Override
 	public void setName(String name, java.util.Locale locale) {
-		_mdrAction.setName(name, locale);
+		model.setName(name, locale);
 	}
 
 	/**
-	 * Sets the localized name of this mdr action in the language, and sets the default locale.
-	 *
-	 * @param name the localized name of this mdr action
-	 * @param locale the locale of the language
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized name of this mdr action in the language, and sets the default locale.
+	*
+	* @param name the localized name of this mdr action
+	* @param locale the locale of the language
+	* @param defaultLocale the default locale
+	*/
 	@Override
-	public void setName(
-		String name, java.util.Locale locale, java.util.Locale defaultLocale) {
-
-		_mdrAction.setName(name, locale, defaultLocale);
+	public void setName(String name, java.util.Locale locale,
+		java.util.Locale defaultLocale) {
+		model.setName(name, locale, defaultLocale);
 	}
 
 	@Override
 	public void setNameCurrentLanguageId(String languageId) {
-		_mdrAction.setNameCurrentLanguageId(languageId);
+		model.setNameCurrentLanguageId(languageId);
 	}
 
 	/**
-	 * Sets the localized names of this mdr action from the map of locales and localized names.
-	 *
-	 * @param nameMap the locales and localized names of this mdr action
-	 */
+	* Sets the localized names of this mdr action from the map of locales and localized names.
+	*
+	* @param nameMap the locales and localized names of this mdr action
+	*/
 	@Override
 	public void setNameMap(Map<java.util.Locale, String> nameMap) {
-		_mdrAction.setNameMap(nameMap);
+		model.setNameMap(nameMap);
 	}
 
 	/**
-	 * Sets the localized names of this mdr action from the map of locales and localized names, and sets the default locale.
-	 *
-	 * @param nameMap the locales and localized names of this mdr action
-	 * @param defaultLocale the default locale
-	 */
+	* Sets the localized names of this mdr action from the map of locales and localized names, and sets the default locale.
+	*
+	* @param nameMap the locales and localized names of this mdr action
+	* @param defaultLocale the default locale
+	*/
 	@Override
-	public void setNameMap(
-		Map<java.util.Locale, String> nameMap, java.util.Locale defaultLocale) {
-
-		_mdrAction.setNameMap(nameMap, defaultLocale);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_mdrAction.setNew(n);
+	public void setNameMap(Map<java.util.Locale, String> nameMap,
+		java.util.Locale defaultLocale) {
+		model.setNameMap(nameMap, defaultLocale);
 	}
 
 	/**
-	 * Sets the primary key of this mdr action.
-	 *
-	 * @param primaryKey the primary key of this mdr action
-	 */
+	* Sets the primary key of this mdr action.
+	*
+	* @param primaryKey the primary key of this mdr action
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_mdrAction.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_mdrAction.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the rule group instance ID of this mdr action.
-	 *
-	 * @param ruleGroupInstanceId the rule group instance ID of this mdr action
-	 */
+	* Sets the rule group instance ID of this mdr action.
+	*
+	* @param ruleGroupInstanceId the rule group instance ID of this mdr action
+	*/
 	@Override
 	public void setRuleGroupInstanceId(long ruleGroupInstanceId) {
-		_mdrAction.setRuleGroupInstanceId(ruleGroupInstanceId);
+		model.setRuleGroupInstanceId(ruleGroupInstanceId);
 	}
 
 	/**
-	 * Sets the type of this mdr action.
-	 *
-	 * @param type the type of this mdr action
-	 */
+	* Sets the type of this mdr action.
+	*
+	* @param type the type of this mdr action
+	*/
 	@Override
 	public void setType(String type) {
-		_mdrAction.setType(type);
+		model.setType(type);
 	}
 
 	/**
-	 * Sets the type settings of this mdr action.
-	 *
-	 * @param typeSettings the type settings of this mdr action
-	 */
+	* Sets the type settings of this mdr action.
+	*
+	* @param typeSettings the type settings of this mdr action
+	*/
 	@Override
 	public void setTypeSettings(String typeSettings) {
-		_mdrAction.setTypeSettings(typeSettings);
+		model.setTypeSettings(typeSettings);
 	}
 
 	@Override
 	public void setTypeSettingsProperties(
-		com.liferay.portal.kernel.util.UnicodeProperties
-			typeSettingsProperties) {
-
-		_mdrAction.setTypeSettingsProperties(typeSettingsProperties);
+		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties) {
+		model.setTypeSettingsProperties(typeSettingsProperties);
 	}
 
 	/**
-	 * Sets the user ID of this mdr action.
-	 *
-	 * @param userId the user ID of this mdr action
-	 */
+	* Sets the user ID of this mdr action.
+	*
+	* @param userId the user ID of this mdr action
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_mdrAction.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this mdr action.
-	 *
-	 * @param userName the user name of this mdr action
-	 */
+	* Sets the user name of this mdr action.
+	*
+	* @param userName the user name of this mdr action
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_mdrAction.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this mdr action.
-	 *
-	 * @param userUuid the user uuid of this mdr action
-	 */
+	* Sets the user uuid of this mdr action.
+	*
+	* @param userUuid the user uuid of this mdr action
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_mdrAction.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	/**
-	 * Sets the uuid of this mdr action.
-	 *
-	 * @param uuid the uuid of this mdr action
-	 */
+	* Sets the uuid of this mdr action.
+	*
+	* @param uuid the uuid of this mdr action
+	*/
 	@Override
 	public void setUuid(String uuid) {
-		_mdrAction.setUuid(uuid);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.CacheModel<MDRAction>
-		toCacheModel() {
-
-		return _mdrAction.toCacheModel();
-	}
-
-	@Override
-	public MDRAction toEscapedModel() {
-		return new MDRActionWrapper(_mdrAction.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _mdrAction.toString();
-	}
-
-	@Override
-	public MDRAction toUnescapedModel() {
-		return new MDRActionWrapper(_mdrAction.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _mdrAction.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof MDRActionWrapper)) {
-			return false;
-		}
-
-		MDRActionWrapper mdrActionWrapper = (MDRActionWrapper)obj;
-
-		if (Objects.equals(_mdrAction, mdrActionWrapper._mdrAction)) {
-			return true;
-		}
-
-		return false;
+		model.setUuid(uuid);
 	}
 
 	@Override
 	public StagedModelType getStagedModelType() {
-		return _mdrAction.getStagedModelType();
+		return model.getStagedModelType();
 	}
 
 	@Override
-	public MDRAction getWrappedModel() {
-		return _mdrAction;
+	protected MDRActionWrapper wrap(MDRAction mdrAction) {
+		return new MDRActionWrapper(mdrAction);
 	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _mdrAction.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _mdrAction.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_mdrAction.resetOriginalValues();
-	}
-
-	private final MDRAction _mdrAction;
-
 }

@@ -4,7 +4,7 @@
 <project name="build-app-module">
 	<import file="build-common.xml" />
 
-	<pathconvert property="portal.releng.module.dir">
+	<pathconvert property="releng.module.dir">
 		<filtermapper>
 			<replacestring from="modules${file.separator}apps" to="modules${file.separator}.releng${file.separator}apps" />
 			<replacestring from="modules${file.separator}private${file.separator}apps" to="modules${file.separator}.releng${file.separator}private${file.separator}apps" />
@@ -14,20 +14,6 @@
 			<pathelement location="${basedir}" />
 		</path>
 	</pathconvert>
-
-	<pathconvert property="subrepo.releng.module.dir">
-		<filtermapper>
-			<replaceregex pattern="(.+apps${file.separator}[^${file.separator}]+)${file.separator}(.+)" replace="\1${file.separator}.releng${file.separator}\2" />
-		</filtermapper>
-
-		<path>
-			<pathelement location="${basedir}" />
-		</path>
-	</pathconvert>
-
-	<condition else="${portal.releng.module.dir}" property="releng.module.dir" value="${subrepo.releng.module.dir}">
-		<available file="${subrepo.releng.module.dir}" />
-	</condition>
 
 	<condition property="artifact.bnd">
 		<available file="bnd.bnd" />
@@ -259,6 +245,8 @@
 					<regexp pattern="[0-9a-f]{40}\^\.\.[0-9a-f]{40}" />
 				</linecontainsregexp>
 
+				<tailfilter lines="1" />
+
 				<tokenfilter>
 					<filetokenizer />
 					<replaceregex flags="g" pattern="[0-9a-f]{40}\^\.\.[0-9a-f]{40}=" replace="" />
@@ -290,6 +278,8 @@
 				<linecontainsregexp>
 					<regexp pattern="[0-9a-f]{40}\^\.\.[0-9a-f]{40}" />
 				</linecontainsregexp>
+
+				<headfilter lines="1" />
 
 				<tokenfilter>
 					<filetokenizer />

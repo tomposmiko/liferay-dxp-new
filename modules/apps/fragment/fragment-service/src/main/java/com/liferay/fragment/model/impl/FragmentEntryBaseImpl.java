@@ -32,13 +32,12 @@ import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class FragmentEntryBaseImpl
-	extends FragmentEntryModelImpl implements FragmentEntry {
-
+public abstract class FragmentEntryBaseImpl extends FragmentEntryModelImpl
+	implements FragmentEntry {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a fragment entry model instance should use the <code>FragmentEntry</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a fragment entry model instance should use the {@link FragmentEntry} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class FragmentEntryBaseImpl
 			FragmentEntryLocalServiceUtil.updateFragmentEntry(this);
 		}
 	}
-
 }

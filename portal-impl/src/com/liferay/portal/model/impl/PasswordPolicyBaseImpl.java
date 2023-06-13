@@ -32,13 +32,12 @@ import com.liferay.portal.kernel.service.PasswordPolicyLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class PasswordPolicyBaseImpl
-	extends PasswordPolicyModelImpl implements PasswordPolicy {
-
+public abstract class PasswordPolicyBaseImpl extends PasswordPolicyModelImpl
+	implements PasswordPolicy {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a password policy model instance should use the <code>PasswordPolicy</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a password policy model instance should use the {@link PasswordPolicy} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class PasswordPolicyBaseImpl
 			PasswordPolicyLocalServiceUtil.updatePasswordPolicy(this);
 		}
 	}
-
 }

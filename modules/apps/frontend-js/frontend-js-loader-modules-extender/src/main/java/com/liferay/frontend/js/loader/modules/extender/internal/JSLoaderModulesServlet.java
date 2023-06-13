@@ -22,11 +22,7 @@ import com.liferay.frontend.js.loader.modules.extender.npm.NPMRegistry;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -44,6 +40,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.felix.utils.log.Logger;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -89,6 +87,8 @@ public class JSLoaderModulesServlet extends HttpServlet {
 		_details = ConfigurableUtil.createConfigurable(
 			Details.class, properties);
 
+		_logger = new Logger(componentContext.getBundleContext());
+
 		_componentContext = componentContext;
 	}
 
@@ -100,36 +100,6 @@ public class JSLoaderModulesServlet extends HttpServlet {
 	protected void service(
 			HttpServletRequest request, HttpServletResponse response)
 		throws IOException {
-
-		String query = request.getParameter("query");
-
-		if (Validator.isNotNull(query)) {
-			StringWriter stringWriter = new StringWriter();
-
-			PrintWriter printWriter = new PrintWriter(stringWriter);
-
-			_writeModules(printWriter, query, false);
-
-			printWriter.close();
-
-			_writeResponse(response, stringWriter.toString());
-
-			return;
-		}
-
-		if (!_isLastServedContentStale()) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Serving cached js_loader_modules");
-			}
-
-			_writeResponse(response, _lastServedContent.getValue());
-
-			return;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Generating js_loader_modules");
-		}
 
 		StringWriter stringWriter = new StringWriter();
 
@@ -143,17 +113,22 @@ public class JSLoaderModulesServlet extends HttpServlet {
 
 		_writeMaps(printWriter);
 
+		printWriter.println(
+			"Liferay.EXPLAIN_RESOLUTIONS = " + _details.explainResolutions() +
+				";\n");
+
+		printWriter.println(
+			"Liferay.EXPOSE_GLOBAL = " + _details.exposeGlobal() + ";\n");
+
+		printWriter.println(
+			"Liferay.WAIT_TIMEOUT = " + (_details.waitTimeout() * 1000) +
+				";\n");
+
 		printWriter.println("}());");
 
 		printWriter.close();
 
-		String content = _minifier.minify(
-			"/o/js_loader_modules", stringWriter.toString());
-
-		_lastServedContent = new ObjectValuePair<>(
-			_jsLoaderModulesTracker.getLastModified(), content);
-
-		_writeResponse(response, content);
+		_writeResponse(response, stringWriter.toString());
 	}
 
 	protected void setDetails(Details details) {
@@ -180,16 +155,6 @@ public class JSLoaderModulesServlet extends HttpServlet {
 		}
 
 		return dependencyAlias;
-	}
-
-	private boolean _isLastServedContentStale() {
-		if (_jsLoaderModulesTracker.getLastModified() >
-				_lastServedContent.getKey()) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	private void _writeMaps(PrintWriter printWriter) {
@@ -288,30 +253,14 @@ public class JSLoaderModulesServlet extends HttpServlet {
 
 		printWriter.write(";\n");
 
-		printWriter.println("Liferay.MODULES = ");
-
-		_writeModules(printWriter, null, true);
-
-		printWriter.println(";");
-	}
-
-	private void _writeModules(
-		PrintWriter printWriter, String query, boolean applyDependencyAliases) {
-
-		printWriter.println("{");
+		printWriter.println("Liferay.MODULES = {");
 
 		Set<String> processedNames = new HashSet<>();
 
-		String delimiter = "";
+		delimiter = "";
 
 		for (JSLoaderModule jsLoaderModule :
 				_jsLoaderModulesTracker.getJSLoaderModules()) {
-
-			String name = jsLoaderModule.getName();
-
-			if ((query != null) && !name.matches(query)) {
-				continue;
-			}
 
 			String unversionedConfiguration =
 				jsLoaderModule.getUnversionedConfiguration();
@@ -320,8 +269,8 @@ public class JSLoaderModulesServlet extends HttpServlet {
 				continue;
 			}
 
-			if (!processedNames.contains(name)) {
-				processedNames.add(name);
+			if (!processedNames.contains(jsLoaderModule.getName())) {
+				processedNames.add(jsLoaderModule.getName());
 
 				printWriter.write(delimiter);
 				printWriter.write(unversionedConfiguration);
@@ -343,15 +292,9 @@ public class JSLoaderModulesServlet extends HttpServlet {
 		String delimiter2 = "";
 
 		for (JSModule resolvedJSModule : _npmRegistry.getResolvedJSModules()) {
-			String resolvedId = resolvedJSModule.getResolvedId();
-
-			if ((query != null) && !resolvedId.matches(query)) {
-				continue;
-			}
-
 			printWriter.write(delimiter);
 			printWriter.write("\"");
-			printWriter.write(resolvedId);
+			printWriter.write(resolvedJSModule.getResolvedId());
 			printWriter.write("\": {\n");
 
 			delimiter2 = "";
@@ -360,15 +303,7 @@ public class JSLoaderModulesServlet extends HttpServlet {
 
 			for (String dependency : resolvedJSModule.getDependencies()) {
 				printWriter.write(delimiter2);
-
-				if (applyDependencyAliases) {
-					printWriter.write(_applyDependencyAliases(dependency));
-				}
-				else {
-					printWriter.write("\"");
-					printWriter.write(dependency);
-					printWriter.write("\"");
-				}
+				printWriter.write(_applyDependencyAliases(dependency));
 
 				delimiter2 = ", ";
 			}
@@ -451,7 +386,7 @@ public class JSLoaderModulesServlet extends HttpServlet {
 			delimiter = ",\n";
 		}
 
-		printWriter.println("\n}");
+		printWriter.println("\n};");
 	}
 
 	private void _writePaths(PrintWriter printWriter) {
@@ -518,20 +453,16 @@ public class JSLoaderModulesServlet extends HttpServlet {
 
 		PrintWriter printWriter = new PrintWriter(servletOutputStream, true);
 
-		printWriter.write(content);
+		printWriter.write(_minifier.minify("/o/js_loader_modules", content));
 
 		printWriter.close();
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		JSLoaderModulesServlet.class);
 
 	private ComponentContext _componentContext;
 	private final Map<String, String> _dependencyAliases = new HashMap<>();
 	private volatile Details _details;
 	private JSLoaderModulesTracker _jsLoaderModulesTracker;
-	private volatile ObjectValuePair<Long, String> _lastServedContent =
-		new ObjectValuePair<>(0L, null);
+	private Logger _logger;
 
 	@Reference
 	private Minifier _minifier;

@@ -16,16 +16,12 @@ package com.liferay.portal.security.audit.storage.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -37,20 +33,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class AuditEventWrapper implements AuditEvent, ModelWrapper<AuditEvent> {
-
+public class AuditEventWrapper extends BaseModelWrapper<AuditEvent>
+	implements AuditEvent, ModelWrapper<AuditEvent> {
 	public AuditEventWrapper(AuditEvent auditEvent) {
-		_auditEvent = auditEvent;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return AuditEvent.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return AuditEvent.class.getName();
+		super(auditEvent);
 	}
 
 	@Override
@@ -169,489 +155,353 @@ public class AuditEventWrapper implements AuditEvent, ModelWrapper<AuditEvent> {
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new AuditEventWrapper((AuditEvent)_auditEvent.clone());
-	}
-
-	@Override
-	public int compareTo(AuditEvent auditEvent) {
-		return _auditEvent.compareTo(auditEvent);
-	}
-
 	/**
-	 * Returns the additional info of this audit event.
-	 *
-	 * @return the additional info of this audit event
-	 */
+	* Returns the additional info of this audit event.
+	*
+	* @return the additional info of this audit event
+	*/
 	@Override
 	public String getAdditionalInfo() {
-		return _auditEvent.getAdditionalInfo();
+		return model.getAdditionalInfo();
 	}
 
 	/**
-	 * Returns the audit event ID of this audit event.
-	 *
-	 * @return the audit event ID of this audit event
-	 */
+	* Returns the audit event ID of this audit event.
+	*
+	* @return the audit event ID of this audit event
+	*/
 	@Override
 	public long getAuditEventId() {
-		return _auditEvent.getAuditEventId();
+		return model.getAuditEventId();
 	}
 
 	/**
-	 * Returns the class name of this audit event.
-	 *
-	 * @return the class name of this audit event
-	 */
+	* Returns the class name of this audit event.
+	*
+	* @return the class name of this audit event
+	*/
 	@Override
 	public String getClassName() {
-		return _auditEvent.getClassName();
+		return model.getClassName();
 	}
 
 	/**
-	 * Returns the class pk of this audit event.
-	 *
-	 * @return the class pk of this audit event
-	 */
+	* Returns the class pk of this audit event.
+	*
+	* @return the class pk of this audit event
+	*/
 	@Override
 	public String getClassPK() {
-		return _auditEvent.getClassPK();
+		return model.getClassPK();
 	}
 
 	/**
-	 * Returns the client host of this audit event.
-	 *
-	 * @return the client host of this audit event
-	 */
+	* Returns the client host of this audit event.
+	*
+	* @return the client host of this audit event
+	*/
 	@Override
 	public String getClientHost() {
-		return _auditEvent.getClientHost();
+		return model.getClientHost();
 	}
 
 	/**
-	 * Returns the client ip of this audit event.
-	 *
-	 * @return the client ip of this audit event
-	 */
+	* Returns the client ip of this audit event.
+	*
+	* @return the client ip of this audit event
+	*/
 	@Override
 	public String getClientIP() {
-		return _auditEvent.getClientIP();
+		return model.getClientIP();
 	}
 
 	/**
-	 * Returns the company ID of this audit event.
-	 *
-	 * @return the company ID of this audit event
-	 */
+	* Returns the company ID of this audit event.
+	*
+	* @return the company ID of this audit event
+	*/
 	@Override
 	public long getCompanyId() {
-		return _auditEvent.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the create date of this audit event.
-	 *
-	 * @return the create date of this audit event
-	 */
+	* Returns the create date of this audit event.
+	*
+	* @return the create date of this audit event
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _auditEvent.getCreateDate();
+		return model.getCreateDate();
 	}
 
 	/**
-	 * Returns the event type of this audit event.
-	 *
-	 * @return the event type of this audit event
-	 */
+	* Returns the event type of this audit event.
+	*
+	* @return the event type of this audit event
+	*/
 	@Override
 	public String getEventType() {
-		return _auditEvent.getEventType();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _auditEvent.getExpandoBridge();
+		return model.getEventType();
 	}
 
 	/**
-	 * Returns the message of this audit event.
-	 *
-	 * @return the message of this audit event
-	 */
+	* Returns the message of this audit event.
+	*
+	* @return the message of this audit event
+	*/
 	@Override
 	public String getMessage() {
-		return _auditEvent.getMessage();
+		return model.getMessage();
 	}
 
 	/**
-	 * Returns the primary key of this audit event.
-	 *
-	 * @return the primary key of this audit event
-	 */
+	* Returns the primary key of this audit event.
+	*
+	* @return the primary key of this audit event
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _auditEvent.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _auditEvent.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the server name of this audit event.
-	 *
-	 * @return the server name of this audit event
-	 */
+	* Returns the server name of this audit event.
+	*
+	* @return the server name of this audit event
+	*/
 	@Override
 	public String getServerName() {
-		return _auditEvent.getServerName();
+		return model.getServerName();
 	}
 
 	/**
-	 * Returns the server port of this audit event.
-	 *
-	 * @return the server port of this audit event
-	 */
+	* Returns the server port of this audit event.
+	*
+	* @return the server port of this audit event
+	*/
 	@Override
 	public int getServerPort() {
-		return _auditEvent.getServerPort();
+		return model.getServerPort();
 	}
 
 	/**
-	 * Returns the session ID of this audit event.
-	 *
-	 * @return the session ID of this audit event
-	 */
+	* Returns the session ID of this audit event.
+	*
+	* @return the session ID of this audit event
+	*/
 	@Override
 	public String getSessionID() {
-		return _auditEvent.getSessionID();
+		return model.getSessionID();
 	}
 
 	/**
-	 * Returns the user ID of this audit event.
-	 *
-	 * @return the user ID of this audit event
-	 */
+	* Returns the user ID of this audit event.
+	*
+	* @return the user ID of this audit event
+	*/
 	@Override
 	public long getUserId() {
-		return _auditEvent.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this audit event.
-	 *
-	 * @return the user name of this audit event
-	 */
+	* Returns the user name of this audit event.
+	*
+	* @return the user name of this audit event
+	*/
 	@Override
 	public String getUserName() {
-		return _auditEvent.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this audit event.
-	 *
-	 * @return the user uuid of this audit event
-	 */
+	* Returns the user uuid of this audit event.
+	*
+	* @return the user uuid of this audit event
+	*/
 	@Override
 	public String getUserUuid() {
-		return _auditEvent.getUserUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _auditEvent.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _auditEvent.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _auditEvent.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _auditEvent.isNew();
+		return model.getUserUuid();
 	}
 
 	@Override
 	public void persist() {
-		_auditEvent.persist();
+		model.persist();
 	}
 
 	/**
-	 * Sets the additional info of this audit event.
-	 *
-	 * @param additionalInfo the additional info of this audit event
-	 */
+	* Sets the additional info of this audit event.
+	*
+	* @param additionalInfo the additional info of this audit event
+	*/
 	@Override
 	public void setAdditionalInfo(String additionalInfo) {
-		_auditEvent.setAdditionalInfo(additionalInfo);
+		model.setAdditionalInfo(additionalInfo);
 	}
 
 	/**
-	 * Sets the audit event ID of this audit event.
-	 *
-	 * @param auditEventId the audit event ID of this audit event
-	 */
+	* Sets the audit event ID of this audit event.
+	*
+	* @param auditEventId the audit event ID of this audit event
+	*/
 	@Override
 	public void setAuditEventId(long auditEventId) {
-		_auditEvent.setAuditEventId(auditEventId);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_auditEvent.setCachedModel(cachedModel);
+		model.setAuditEventId(auditEventId);
 	}
 
 	/**
-	 * Sets the class name of this audit event.
-	 *
-	 * @param className the class name of this audit event
-	 */
+	* Sets the class name of this audit event.
+	*
+	* @param className the class name of this audit event
+	*/
 	@Override
 	public void setClassName(String className) {
-		_auditEvent.setClassName(className);
+		model.setClassName(className);
 	}
 
 	/**
-	 * Sets the class pk of this audit event.
-	 *
-	 * @param classPK the class pk of this audit event
-	 */
+	* Sets the class pk of this audit event.
+	*
+	* @param classPK the class pk of this audit event
+	*/
 	@Override
 	public void setClassPK(String classPK) {
-		_auditEvent.setClassPK(classPK);
+		model.setClassPK(classPK);
 	}
 
 	/**
-	 * Sets the client host of this audit event.
-	 *
-	 * @param clientHost the client host of this audit event
-	 */
+	* Sets the client host of this audit event.
+	*
+	* @param clientHost the client host of this audit event
+	*/
 	@Override
 	public void setClientHost(String clientHost) {
-		_auditEvent.setClientHost(clientHost);
+		model.setClientHost(clientHost);
 	}
 
 	/**
-	 * Sets the client ip of this audit event.
-	 *
-	 * @param clientIP the client ip of this audit event
-	 */
+	* Sets the client ip of this audit event.
+	*
+	* @param clientIP the client ip of this audit event
+	*/
 	@Override
 	public void setClientIP(String clientIP) {
-		_auditEvent.setClientIP(clientIP);
+		model.setClientIP(clientIP);
 	}
 
 	/**
-	 * Sets the company ID of this audit event.
-	 *
-	 * @param companyId the company ID of this audit event
-	 */
+	* Sets the company ID of this audit event.
+	*
+	* @param companyId the company ID of this audit event
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_auditEvent.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this audit event.
-	 *
-	 * @param createDate the create date of this audit event
-	 */
+	* Sets the create date of this audit event.
+	*
+	* @param createDate the create date of this audit event
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_auditEvent.setCreateDate(createDate);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the event type of this audit event.
-	 *
-	 * @param eventType the event type of this audit event
-	 */
+	* Sets the event type of this audit event.
+	*
+	* @param eventType the event type of this audit event
+	*/
 	@Override
 	public void setEventType(String eventType) {
-		_auditEvent.setEventType(eventType);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_auditEvent.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_auditEvent.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_auditEvent.setExpandoBridgeAttributes(serviceContext);
+		model.setEventType(eventType);
 	}
 
 	/**
-	 * Sets the message of this audit event.
-	 *
-	 * @param message the message of this audit event
-	 */
+	* Sets the message of this audit event.
+	*
+	* @param message the message of this audit event
+	*/
 	@Override
 	public void setMessage(String message) {
-		_auditEvent.setMessage(message);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_auditEvent.setNew(n);
+		model.setMessage(message);
 	}
 
 	/**
-	 * Sets the primary key of this audit event.
-	 *
-	 * @param primaryKey the primary key of this audit event
-	 */
+	* Sets the primary key of this audit event.
+	*
+	* @param primaryKey the primary key of this audit event
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_auditEvent.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_auditEvent.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the server name of this audit event.
-	 *
-	 * @param serverName the server name of this audit event
-	 */
+	* Sets the server name of this audit event.
+	*
+	* @param serverName the server name of this audit event
+	*/
 	@Override
 	public void setServerName(String serverName) {
-		_auditEvent.setServerName(serverName);
+		model.setServerName(serverName);
 	}
 
 	/**
-	 * Sets the server port of this audit event.
-	 *
-	 * @param serverPort the server port of this audit event
-	 */
+	* Sets the server port of this audit event.
+	*
+	* @param serverPort the server port of this audit event
+	*/
 	@Override
 	public void setServerPort(int serverPort) {
-		_auditEvent.setServerPort(serverPort);
+		model.setServerPort(serverPort);
 	}
 
 	/**
-	 * Sets the session ID of this audit event.
-	 *
-	 * @param sessionID the session ID of this audit event
-	 */
+	* Sets the session ID of this audit event.
+	*
+	* @param sessionID the session ID of this audit event
+	*/
 	@Override
 	public void setSessionID(String sessionID) {
-		_auditEvent.setSessionID(sessionID);
+		model.setSessionID(sessionID);
 	}
 
 	/**
-	 * Sets the user ID of this audit event.
-	 *
-	 * @param userId the user ID of this audit event
-	 */
+	* Sets the user ID of this audit event.
+	*
+	* @param userId the user ID of this audit event
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_auditEvent.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this audit event.
-	 *
-	 * @param userName the user name of this audit event
-	 */
+	* Sets the user name of this audit event.
+	*
+	* @param userName the user name of this audit event
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_auditEvent.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this audit event.
-	 *
-	 * @param userUuid the user uuid of this audit event
-	 */
+	* Sets the user uuid of this audit event.
+	*
+	* @param userUuid the user uuid of this audit event
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_auditEvent.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<AuditEvent>
-		toCacheModel() {
-
-		return _auditEvent.toCacheModel();
+	protected AuditEventWrapper wrap(AuditEvent auditEvent) {
+		return new AuditEventWrapper(auditEvent);
 	}
-
-	@Override
-	public AuditEvent toEscapedModel() {
-		return new AuditEventWrapper(_auditEvent.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _auditEvent.toString();
-	}
-
-	@Override
-	public AuditEvent toUnescapedModel() {
-		return new AuditEventWrapper(_auditEvent.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _auditEvent.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof AuditEventWrapper)) {
-			return false;
-		}
-
-		AuditEventWrapper auditEventWrapper = (AuditEventWrapper)obj;
-
-		if (Objects.equals(_auditEvent, auditEventWrapper._auditEvent)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public AuditEvent getWrappedModel() {
-		return _auditEvent;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _auditEvent.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _auditEvent.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_auditEvent.resetOriginalValues();
-	}
-
-	private final AuditEvent _auditEvent;
-
 }

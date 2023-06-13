@@ -59,6 +59,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -138,9 +140,6 @@ public class JournalArticleExportImportContentProcessor
 		DDMStructure ddmStructure = _fetchDDMStructure(
 			portletDataContext, article);
 
-		content = replaceImportJournalArticleReferences(
-			portletDataContext, stagedModel, content);
-
 		Fields fields = _getDDMStructureFields(ddmStructure, content);
 
 		if (fields != null) {
@@ -180,6 +179,9 @@ public class JournalArticleExportImportContentProcessor
 			content = imageImportDDMFormFieldValueTransformer.getContent();
 		}
 
+		content = replaceImportJournalArticleReferences(
+			portletDataContext, stagedModel, content);
+
 		content =
 			_defaultTextExportImportContentProcessor.
 				replaceImportContentReferences(
@@ -191,6 +193,8 @@ public class JournalArticleExportImportContentProcessor
 	@Override
 	public void validateContentReferences(long groupId, String content)
 		throws PortalException {
+
+		content = _excludeHTMLComments(content);
 
 		validateJournalArticleReferences(content);
 
@@ -209,8 +213,8 @@ public class JournalArticleExportImportContentProcessor
 
 					String type = "page";
 
-					if ((e instanceof NoSuchFileEntryException) ||
-						(e.getCause() instanceof NoSuchFileEntryException)) {
+					if (e instanceof NoSuchFileEntryException ||
+						e.getCause() instanceof NoSuchFileEntryException) {
 
 						type = "file entry";
 					}
@@ -519,6 +523,18 @@ public class JournalArticleExportImportContentProcessor
 		}
 	}
 
+	private String _excludeHTMLComments(String content) {
+		Matcher matcher = _htmlCommentRegexPattern.matcher(content);
+
+		while (matcher.find()) {
+			content = matcher.replaceAll(StringPool.BLANK);
+
+			matcher = _htmlCommentRegexPattern.matcher(content);
+		}
+
+		return content;
+	}
+
 	private List<String> _fetchContentsFromDDMFormValues(
 		List<DDMFormFieldValue> ddmFormFieldValues) {
 
@@ -571,7 +587,10 @@ public class JournalArticleExportImportContentProcessor
 		}
 
 		try {
-			return _journalConverter.getDDMFields(ddmStructure, content);
+			Fields fields = _journalConverter.getDDMFields(
+				ddmStructure, content);
+
+			return fields;
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
@@ -584,6 +603,10 @@ public class JournalArticleExportImportContentProcessor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalArticleExportImportContentProcessor.class);
+
+	private static final Pattern _htmlCommentRegexPattern = Pattern.compile(
+		"\\<![ \\r\\n\\t]*(--([^\\-]|[\\r\\n]|-[^\\-])*--" +
+			"[ \\r\\n\\t]*)\\>");
 
 	@Reference(
 		target = "(model.class.name=com.liferay.dynamic.data.mapping.storage.DDMFormValues)"

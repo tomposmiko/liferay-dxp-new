@@ -53,10 +53,7 @@ public class ThrowableBiConsumerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterThrowsException() {
-		ThrowableBiConsumer.empty(
-		).andThen(
-			null
-		);
+		ThrowableBiConsumer.empty().andThen(null);
 	}
 
 }

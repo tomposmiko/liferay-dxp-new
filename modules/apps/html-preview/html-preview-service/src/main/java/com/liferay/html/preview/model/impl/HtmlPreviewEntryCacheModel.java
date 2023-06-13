@@ -17,9 +17,11 @@ package com.liferay.html.preview.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.html.preview.model.HtmlPreviewEntry;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing HtmlPreviewEntry in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see HtmlPreviewEntry
  * @generated
  */
 @ProviderType
-public class HtmlPreviewEntryCacheModel
-	implements CacheModel<HtmlPreviewEntry>, Externalizable {
-
+public class HtmlPreviewEntryCacheModel implements CacheModel<HtmlPreviewEntry>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,12 +50,9 @@ public class HtmlPreviewEntryCacheModel
 			return false;
 		}
 
-		HtmlPreviewEntryCacheModel htmlPreviewEntryCacheModel =
-			(HtmlPreviewEntryCacheModel)obj;
+		HtmlPreviewEntryCacheModel htmlPreviewEntryCacheModel = (HtmlPreviewEntryCacheModel)obj;
 
-		if (htmlPreviewEntryId ==
-				htmlPreviewEntryCacheModel.htmlPreviewEntryId) {
-
+		if (htmlPreviewEntryId == htmlPreviewEntryCacheModel.htmlPreviewEntryId) {
 			return true;
 		}
 
@@ -154,7 +153,8 @@ public class HtmlPreviewEntryCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(htmlPreviewEntryId);
 
 		objectOutput.writeLong(groupId);
@@ -190,5 +190,4 @@ public class HtmlPreviewEntryCacheModel
 	public long classNameId;
 	public long classPK;
 	public long fileEntryId;
-
 }

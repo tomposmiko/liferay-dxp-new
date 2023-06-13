@@ -43,7 +43,7 @@ ConfigurationEntryRetriever configurationEntryRetriever = (ConfigurationEntryRet
 
 			<li class="list-group-header">
 				<h3 class="list-group-header-title text-uppercase">
-					<%= HtmlUtil.escape(configurationCategorySectionDisplay.getConfigurationCategorySectionLabel(locale)) %>
+					<liferay-ui:message key='<%= "category-section." + configurationCategorySectionDisplay.getConfigurationCategorySection() %>' />
 				</h3>
 			</li>
 			<li class="list-group-card">

@@ -52,8 +52,11 @@ public interface FriendlyURLResolver {
 				companyId, groupId, privateLayout, friendlyURL, params,
 				requestContext);
 
-		return new LayoutFriendlyURLSeparatorComposite(
-			layoutFriendlyURLComposite, getURLSeparator());
+		LayoutFriendlyURLSeparatorComposite newLayoutFriendlyURLComposite =
+			new LayoutFriendlyURLSeparatorComposite(
+				layoutFriendlyURLComposite, getURLSeparator());
+
+		return newLayoutFriendlyURLComposite;
 	}
 
 	public String getURLSeparator();

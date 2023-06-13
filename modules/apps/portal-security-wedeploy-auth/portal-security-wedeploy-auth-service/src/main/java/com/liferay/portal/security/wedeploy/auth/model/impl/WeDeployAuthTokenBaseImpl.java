@@ -34,11 +34,10 @@ import com.liferay.portal.security.wedeploy.auth.service.WeDeployAuthTokenLocalS
 @ProviderType
 public abstract class WeDeployAuthTokenBaseImpl
 	extends WeDeployAuthTokenModelImpl implements WeDeployAuthToken {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a we deploy auth token model instance should use the <code>WeDeployAuthToken</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a we deploy auth token model instance should use the {@link WeDeployAuthToken} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class WeDeployAuthTokenBaseImpl
 			WeDeployAuthTokenLocalServiceUtil.updateWeDeployAuthToken(this);
 		}
 	}
-
 }

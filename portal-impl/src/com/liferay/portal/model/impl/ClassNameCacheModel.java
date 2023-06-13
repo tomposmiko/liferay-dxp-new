@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.MVCCModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -31,12 +32,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing ClassName in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see ClassName
  * @generated
  */
 @ProviderType
-public class ClassNameCacheModel
-	implements CacheModel<ClassName>, Externalizable, MVCCModel {
-
+public class ClassNameCacheModel implements CacheModel<ClassName>,
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -50,8 +51,7 @@ public class ClassNameCacheModel
 		ClassNameCacheModel classNameCacheModel = (ClassNameCacheModel)obj;
 
 		if ((classNameId == classNameCacheModel.classNameId) &&
-			(mvccVersion == classNameCacheModel.mvccVersion)) {
-
+				(mvccVersion == classNameCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -118,7 +118,8 @@ public class ClassNameCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(classNameId);
@@ -134,5 +135,4 @@ public class ClassNameCacheModel
 	public long mvccVersion;
 	public long classNameId;
 	public String value;
-
 }

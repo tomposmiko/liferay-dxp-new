@@ -52,10 +52,7 @@ public class TriConsumerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterThrowsException() {
-		TriConsumer.empty(
-		).andThen(
-			null
-		);
+		TriConsumer.empty().andThen(null);
 	}
 
 }

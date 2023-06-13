@@ -248,6 +248,23 @@ else {
 						}
 					},
 					popover: {
+						on: {
+							keydown: function(event) {
+								var instance = this;
+
+								var domEvent = event.domEvent;
+
+								if (domEvent.keyCode == 9 && domEvent.target.hasClass('yui3-calendar-grid')) {
+									instance.hide();
+
+									var trigger = A.one('#<%= nameId %>');
+
+									if (trigger) {
+										Liferay.Util.focusFormField(trigger);
+									}
+								}
+							}
+						},
 						zIndex: Liferay.zIndex.POPOVER
 					},
 					trigger: '#<%= nameId %>'

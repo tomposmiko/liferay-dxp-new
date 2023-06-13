@@ -135,8 +135,11 @@ public class VirtualLayoutFriendlyURLResolver implements FriendlyURLResolver {
 				companyId, groupId, privateLayout, friendlyURL, params,
 				requestContext);
 
-		return new LayoutFriendlyURLSeparatorComposite(
-			layoutFriendlyURLComposite, Portal.FRIENDLY_URL_SEPARATOR);
+		LayoutFriendlyURLSeparatorComposite newLayoutFriendlyURLComposite =
+			new LayoutFriendlyURLSeparatorComposite(
+				layoutFriendlyURLComposite, Portal.FRIENDLY_URL_SEPARATOR);
+
+		return newLayoutFriendlyURLComposite;
 	}
 
 	@Override

@@ -661,6 +661,9 @@
 		<field name="userName" type="String" />
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
+		<field name="parentPlid" type="long" />
+		<field name="leftPlid" type="long" />
+		<field name="rightPlid" type="long" />
 		<field name="privateLayout" type="boolean" />
 		<field name="layoutId" type="long" />
 		<field name="parentLayoutId" type="long" />
@@ -690,6 +693,7 @@
 			<hint-collection name="CLOB" />
 		</field>
 		<field name="hidden" type="boolean" />
+		<field name="system" type="boolean" />
 		<field name="friendlyURL" type="String">
 			<hint name="display-width">210</hint>
 			<hint name="max-length">255</hint>
@@ -1440,7 +1444,6 @@
 		<field name="parentUserGroupId" type="long" />
 		<field name="name" type="String">
 			<hint name="display-width">210</hint>
-			<hint name="max-length">255</hint>
 			<validator name="required" />
 		</field>
 		<field name="description" type="String">

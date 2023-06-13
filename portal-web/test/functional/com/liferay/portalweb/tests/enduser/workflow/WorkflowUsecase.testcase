@@ -48,12 +48,12 @@ definition {
 	@priority = "4"
 	test AddBlogsEntriesWithPortalScopeWorkflowAndAssertWorkflowScope {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
-		Navigator.gotoNavItem(navItem = "Schemes");
+		Navigator.gotoNavItem(navItem = "Configuration");
 
 		Workflow.configureWorkflow(
 			workflowDefinition = "Single Approver",
@@ -389,9 +389,9 @@ definition {
 		property testray.component.names = "Training";
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.uploadDefinition(
@@ -400,9 +400,9 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.viewDefinition(
@@ -599,9 +599,9 @@ definition {
 		property test.name.skip.portal.instance = "WorkflowUsecase#AddWebContentWithCategorySpecificDefinition";
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.uploadDefinition(
@@ -644,7 +644,7 @@ definition {
 			portlet = "Web Content"
 		);
 
-		Workflow.configureWorkflowViaFolderInfo(
+		Workflow.configureWCWorkflowViaFolderInfo(
 			workflowDefinition = "Category Specific"
 		);
 
@@ -869,7 +869,7 @@ definition {
 		WikiNavigator.gotoDraftPagesPG();
 
 		WikiPage.viewPageWithWorkflowPG(
-			wikiPageStatus = "Pending",
+			wikiPageStatus = "PENDING",
 			wikiPageTitle = "Wiki Page Title",
 			wikiPageUsername = "userfn userln"
 		);
@@ -992,9 +992,9 @@ definition {
 		property test.name.skip.portal.instance = "WorkflowUsecase#UnpublishAndDeleteUploadedDefinition";
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.uploadDefinition(
@@ -1011,9 +1011,9 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.viewDefinitionUnpublished(
@@ -1031,9 +1031,9 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.unpublishWorkflowDefinition(
@@ -1041,9 +1041,9 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.viewDefinitionUnpublished(
@@ -1141,9 +1141,9 @@ definition {
 		property test.name.skip.portal.instance = "WorkflowUsecase#ViewInvalidDefinitionAlert";
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Click(locator1 = "Button#PLUS");
@@ -1198,7 +1198,7 @@ definition {
 			portlet = "Web Content"
 		);
 
-		Workflow.configureWorkflowViaFolderInfo(workflowDefinition = "Single Approver");
+		Workflow.configureWCWorkflowViaFolderInfo(workflowDefinition = "Single Approver");
 
 		for (var number : list "1,2,3") {
 			Navigator.openURL();
@@ -1232,9 +1232,9 @@ definition {
 		}
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Navigator.openURL();
@@ -1294,7 +1294,7 @@ definition {
 			portlet = "Web Content"
 		);
 
-		Workflow.configureWorkflowViaFolderInfo(workflowDefinition = "Single Approver");
+		Workflow.configureWCWorkflowViaFolderInfo(workflowDefinition = "Single Approver");
 
 		Navigator.openURL();
 
@@ -1349,12 +1349,12 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
-		Navigator.gotoNavItem(navItem = "Schemes");
+		Navigator.gotoNavItem(navItem = "Configuration");
 
 		Workflow.viewConfigurationSelected(
 			workflowDefinition = "No Workflow",
@@ -1409,12 +1409,12 @@ definition {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
-		Navigator.gotoNavItem(navItem = "Schemes");
+		Navigator.gotoNavItem(navItem = "Configuration");
 
 		Workflow.configureWorkflow(
 			workflowDefinition = "Single Approver",
@@ -1622,7 +1622,7 @@ definition {
 			portlet = "Web Content"
 		);
 
-		Workflow.configureWorkflowViaFolderInfo(workflowDefinition = "Single Approver");
+		Workflow.configureWCWorkflowViaFolderInfo(workflowDefinition = "Single Approver");
 
 		Navigator.openURL();
 

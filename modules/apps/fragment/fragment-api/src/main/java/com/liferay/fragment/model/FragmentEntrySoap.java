@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.fragment.service.http.FragmentEntryServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.fragment.service.http.FragmentEntryServiceSoap
  * @generated
  */
 @ProviderType
 public class FragmentEntrySoap implements Serializable {
-
 	public static FragmentEntrySoap toSoapModel(FragmentEntry model) {
 		FragmentEntrySoap soapModel = new FragmentEntrySoap();
 
@@ -49,6 +49,7 @@ public class FragmentEntrySoap implements Serializable {
 		soapModel.setHtml(model.getHtml());
 		soapModel.setJs(model.getJs());
 		soapModel.setPreviewFileEntryId(model.getPreviewFileEntryId());
+		soapModel.setType(model.getType());
 		soapModel.setLastPublishDate(model.getLastPublishDate());
 		soapModel.setStatus(model.getStatus());
 		soapModel.setStatusByUserId(model.getStatusByUserId());
@@ -86,8 +87,7 @@ public class FragmentEntrySoap implements Serializable {
 	}
 
 	public static FragmentEntrySoap[] toSoapModels(List<FragmentEntry> models) {
-		List<FragmentEntrySoap> soapModels = new ArrayList<FragmentEntrySoap>(
-			models.size());
+		List<FragmentEntrySoap> soapModels = new ArrayList<FragmentEntrySoap>(models.size());
 
 		for (FragmentEntry model : models) {
 			soapModels.add(toSoapModel(model));
@@ -227,6 +227,14 @@ public class FragmentEntrySoap implements Serializable {
 		_previewFileEntryId = previewFileEntryId;
 	}
 
+	public int getType() {
+		return _type;
+	}
+
+	public void setType(int type) {
+		_type = type;
+	}
+
 	public Date getLastPublishDate() {
 		return _lastPublishDate;
 	}
@@ -282,10 +290,10 @@ public class FragmentEntrySoap implements Serializable {
 	private String _html;
 	private String _js;
 	private long _previewFileEntryId;
+	private int _type;
 	private Date _lastPublishDate;
 	private int _status;
 	private long _statusByUserId;
 	private String _statusByUserName;
 	private Date _statusDate;
-
 }

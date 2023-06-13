@@ -14,10 +14,7 @@
 
 package com.liferay.portal.search.web.internal.search.results.portlet;
 
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.search.web.internal.util.PortletPreferencesHelper;
-import com.liferay.portal.util.PropsUtil;
 
 import java.util.Optional;
 
@@ -40,9 +37,7 @@ public class SearchResultsPortletPreferencesImpl
 	public int getPaginationDelta() {
 		return _portletPreferencesHelper.getInteger(
 			SearchResultsPortletPreferences.PREFERENCE_KEY_PAGINATION_DELTA,
-			GetterUtil.getInteger(
-				PropsUtil.get(PropsKeys.SEARCH_CONTAINER_PAGE_DEFAULT_DELTA),
-				20));
+			20);
 	}
 
 	@Override

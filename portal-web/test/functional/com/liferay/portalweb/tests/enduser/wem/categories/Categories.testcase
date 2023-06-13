@@ -17,7 +17,7 @@ definition {
 			layoutName = "Test Page Name"
 		);
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name"
 		);
@@ -38,19 +38,19 @@ definition {
 
 	@priority = "4"
 	test AddCategories {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 2",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 3",
 			vocabularyName = "Vocabulary Name"
@@ -81,7 +81,7 @@ definition {
 	@description = "Ensure that a user can add a category."
 	@priority = "4"
 	test AddCategory {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
@@ -97,7 +97,7 @@ definition {
 
 	@priority = "3"
 	test AddCategoryProperties {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
@@ -140,7 +140,7 @@ definition {
 
 	@priority = "4"
 	test AddCategoryProperty {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
@@ -224,39 +224,39 @@ definition {
 
 	@priority = "4"
 	test AddSubcategories {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 2",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 3",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name 1",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name 1",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name 2",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name 2",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name 3",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name 3",
@@ -290,17 +290,17 @@ definition {
 
 	@priority = "4"
 	test AddVocabularies {
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name 1"
 		);
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name 2"
 		);
 
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name 3"
 		);
@@ -536,19 +536,19 @@ definition {
 
 	@priority = "4"
 	test DeleteCategories {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 2",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 3",
 			vocabularyName = "Vocabulary Name"
@@ -561,7 +561,7 @@ definition {
 
 	@priority = "5"
 	test DeleteCategory {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
@@ -577,7 +577,7 @@ definition {
 
 	@priority = "4"
 	test DeleteCategoryByMenu {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
@@ -593,7 +593,7 @@ definition {
 
 	@priority = "3"
 	test DeleteCategoryProperty2 {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
@@ -641,13 +641,13 @@ definition {
 
 	@priority = "3"
 	test DeleteSubcategoryViaIcon {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name 1",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name 1",
@@ -665,13 +665,13 @@ definition {
 
 	@priority = "5"
 	test DeleteSubcategoryViaMenu {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name 1",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name 1",
@@ -719,7 +719,7 @@ definition {
 
 	@priority = "4"
 	test EditCategoryProperty {
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
@@ -782,13 +782,13 @@ definition {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name 1",
 			vocabularyName = "Vocabulary Name"
 		);
 
-		JSONCategory.addSubcategoryByGroupName(
+		JSONCategory.addSubcategory(
 			categoryName = "Category Name 1",
 			groupName = "Test Site Name",
 			subcategoryName = "Subcategory Name 1",
@@ -817,12 +817,12 @@ definition {
 
 	@priority = "3"
 	test MoveCategoryViaEdit {
-		JSONCategory.addVocabularyByGroupName(
+		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
 			title = "Vocabulary Name 2"
 		);
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Test Site Name",
 			title = "Category Name",
 			vocabularyName = "Vocabulary Name"

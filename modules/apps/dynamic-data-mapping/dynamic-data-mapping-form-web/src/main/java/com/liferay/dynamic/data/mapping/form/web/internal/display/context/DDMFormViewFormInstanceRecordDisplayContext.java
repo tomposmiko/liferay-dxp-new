@@ -157,8 +157,11 @@ public class DDMFormViewFormInstanceRecordDisplayContext {
 				formInstanceRecordId);
 		}
 
-		return (DDMFormInstanceRecord)httpServletRequest.getAttribute(
-			DDMFormWebKeys.DYNAMIC_DATA_MAPPING_FORM_INSTANCE_RECORD);
+		DDMFormInstanceRecord formInstanceRecord =
+			(DDMFormInstanceRecord)httpServletRequest.getAttribute(
+				DDMFormWebKeys.DYNAMIC_DATA_MAPPING_FORM_INSTANCE_RECORD);
+
+		return formInstanceRecord;
 	}
 
 	protected DDMFormValues getDDMFormValues(

@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.form.builder.internal.servlet;
 
+import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLocalService;
 import com.liferay.dynamic.data.mapping.util.comparator.DataProviderInstanceNameComparator;
@@ -85,19 +86,24 @@ public class DDMDataProviderInstancesServlet extends BaseDDMFormBuilderServlet {
 	protected JSONArray getDataProviderInstancesJSONArray(
 		HttpServletRequest request) {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		try {
-			String languageId = ParamUtil.getString(request, "languageId");
+			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+			String languageId = ParamUtil.getString(
+				request, "languageId", themeDisplay.getLanguageId());
 
 			Locale locale = LocaleUtil.fromLanguageId(languageId);
 
-			long scopeGroupId = ParamUtil.getLong(request, "scopeGroupId");
+			long scopeGroupId = ParamUtil.getLong(
+				request, "scopeGroupId", themeDisplay.getScopeGroupId());
 
 			Group scopeGroup = themeDisplay.getScopeGroup();
 
-			if (scopeGroup.isStagingGroup()) {
+			if (scopeGroup.isStagingGroup() &&
+				!scopeGroup.isStagedPortlet(
+					DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN)) {
+
 				scopeGroupId = scopeGroup.getLiveGroupId();
 			}
 

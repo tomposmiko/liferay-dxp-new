@@ -1,8 +1,6 @@
 (function() {
 	var Lang = AUI().Lang;
 
-	var IE9AndLater = AUI.Env.UA.ie >= 9;
-
 	var STR_ADAPTIVE_MEDIA_FILE_ENTRY_RETURN_TYPE = 'com.liferay.adaptive.media.image.item.selector.AMImageFileEntryItemSelectorReturnType';
 
 	var STR_ADAPTIVE_MEDIA_URL_RETURN_TYPE = 'com.liferay.adaptive.media.image.item.selector.AMImageURLItemSelectorReturnType';
@@ -10,6 +8,8 @@
 	var TPL_PICTURE_TAG = '<picture {fileEntryAttributeName}="{fileEntryId}">{sources}<img src="{defaultSrc}"></picture>';
 
 	var TPL_SOURCE_TAG = '<source srcset="{srcset}" media="{media}">';
+
+	var IE9 = AUI.Env.UA.ie >= 9;
 
 	CKEDITOR.plugins.add(
 		'adaptivemedia',
@@ -111,7 +111,7 @@
 
 				var ranges = selection.getRanges();
 
-				return selection.getType() === CKEDITOR.SELECTION_NONE || (ranges.length === 1 && (ranges[0].collapsed || IE9AndLater));
+				return selection.getType() === CKEDITOR.SELECTION_NONE || (ranges.length === 1 && (ranges[0].collapsed || IE9));
 			},
 
 			_onSelectedImageChange: function(editor, imageSrc, selectedItem) {
@@ -128,21 +128,11 @@
 					el = instance._getImgElement(imageSrc, selectedItem, fileEntryAttributeName);
 				}
 
-				var elementOuterHtml = el.getOuterHtml();
-
-				editor.insertHtml(elementOuterHtml);
+				editor.insertHtml(el.getOuterHtml());
 
 				if (instance._isEmptySelection(editor)) {
-					if (IE9AndLater) {
-						var emptySelectionMarkup = '<br />';
-
-						var usingAlloyEditor = typeof AlloyEditor == 'undefined';
-
-						if (!usingAlloyEditor) {
-							emptySelectionMarkup = elementOuterHtml + emptySelectionMarkup;
-						}
-
-						editor.insertHtml(emptySelectionMarkup);
+					if (IE9) {
+						editor.insertHtml('<br />');
 					}
 					else {
 						editor.execCommand('enter');

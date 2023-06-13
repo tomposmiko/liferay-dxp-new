@@ -14,7 +14,10 @@
 
 package com.liferay.dynamic.data.mapping.internal.exportimport.data.handler;
 
-import com.liferay.dynamic.data.mapping.io.DDMFormValuesJSONDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerTracker;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
@@ -57,6 +60,22 @@ public class DDMFormInstanceStagedModelDataHandler
 	@Override
 	public String getDisplayName(DDMFormInstance formInstance) {
 		return formInstance.getNameCurrentValue();
+	}
+
+	protected DDMFormValues deserialize(String content, DDMForm ddmForm) {
+		DDMFormValuesDeserializer ddmFormValuesDeserializer =
+			_ddmFormValuesDeserializerTracker.getDDMFormValuesDeserializer(
+				"json");
+
+		DDMFormValuesDeserializerDeserializeRequest.Builder builder =
+			DDMFormValuesDeserializerDeserializeRequest.Builder.newBuilder(
+				content, ddmForm);
+
+		DDMFormValuesDeserializerDeserializeResponse
+			ddmFormValuesDeserializerDeserializeResponse =
+				ddmFormValuesDeserializer.deserialize(builder.build());
+
+		return ddmFormValuesDeserializerDeserializeResponse.getDDMFormValues();
 	}
 
 	@Override
@@ -186,8 +205,7 @@ public class DDMFormInstanceStagedModelDataHandler
 		String serializedSettingsDDMFormValues =
 			portletDataContext.getZipEntryAsString(settingsDDMFormValuesPath);
 
-		return _ddmFormValuesJSONDeserializer.deserialize(
-			ddmForm, serializedSettingsDDMFormValues);
+		return deserialize(serializedSettingsDDMFormValues, ddmForm);
 	}
 
 	@Override
@@ -205,10 +223,10 @@ public class DDMFormInstanceStagedModelDataHandler
 	}
 
 	@Reference(unbind = "-")
-	protected void setDDMFormValuesJSONDeserializer(
-		DDMFormValuesJSONDeserializer ddmFormValuesJSONDeserializer) {
+	protected void setDDMFormValuesDeserializerTracker(
+		DDMFormValuesDeserializerTracker ddmFormValuesDeserializerTracker) {
 
-		_ddmFormValuesJSONDeserializer = ddmFormValuesJSONDeserializer;
+		_ddmFormValuesDeserializerTracker = ddmFormValuesDeserializerTracker;
 	}
 
 	@Reference(
@@ -222,7 +240,7 @@ public class DDMFormInstanceStagedModelDataHandler
 	}
 
 	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
-	private DDMFormValuesJSONDeserializer _ddmFormValuesJSONDeserializer;
+	private DDMFormValuesDeserializerTracker _ddmFormValuesDeserializerTracker;
 	private StagedModelRepository<DDMFormInstance> _stagedModelRepository;
 
 }

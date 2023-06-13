@@ -41,10 +41,12 @@ definition {
 
 		AssertVisible(locator1 = "Button#SELECT_FILES");
 
+		Click(locator1 = "Button#SELECT_FILES");
+
 		var key_attachmentFileName = "${attachmentFileName}";
 
-		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
-			locator1 = "TextInput#FILE",
+		SikuliUploadCommonFile(
+			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
 			value1 = "${attachmentFileName}"
 		);
 
@@ -637,15 +639,9 @@ definition {
 	macro editComment {
 		var key_entryComment = "${entryComment}";
 
-		AssertTextEquals(
-			locator1 = "Comments#COMMENT_BODY_SPECIFIC",
-			value1 = "${entryComment}"
-		);
+		MouseOver(locator1 = "Comments#COMMENT_BODY_SPECIFIC");
 
-		Click.waitForMenuToggleJSClick(
-			locator1 = "Comments#COMMENT_ACTIONS",
-			key_entryComment = "${entryComment}"
-		);
+		Click(locator1 = "Comments#COMMENT_ACTIONS");
 
 		MenuItem.click(menuItem = "Edit");
 
@@ -654,7 +650,13 @@ definition {
 			value1 = "${entryCommentEdit}"
 		);
 
-		PortletEntry.publish();
+		AssertClick(
+			locator1 = "Comments#ANY_BUTTON_IN_COMMENT",
+			value1 = "Save",
+			key_text = "Save"
+		);
+
+		Alert.viewSuccessMessage();
 	}
 
 	macro editFrontPagePG {
@@ -1073,7 +1075,7 @@ definition {
 
 		AssertElementPresent(locator1 = "Link#ADD_CHILD_PAGE");
 
-		AssertElementPresent(locator1 = "Comments#SUBSCRIBE_TO_COMMENTS_LINK");
+		AssertElementPresent(locator1 = "Button#SUBSCRIBE");
 
 		AssertElementPresent(locator1 = "Link#ATTACHMENTS");
 
@@ -1134,7 +1136,7 @@ definition {
 
 		AssertElementPresent(locator1 = "Comments#PANEL_TOGGLE");
 
-		AssertElementPresent(locator1 = "Comments#SUBSCRIBE_TO_COMMENTS_LINK");
+		AssertElementPresent(locator1 = "Button#SUBSCRIBE");
 
 		AssertElementPresent(locator1 = "Ratings#YOUR_RATING_LABEL");
 
@@ -1200,7 +1202,7 @@ definition {
 			value1 = "${wikiPageTitle}"
 		);
 
-		AssertTextEquals(locator1 = "WikiTable#ALL_PAGES_STATUS", value1 = "Approved");
+		AssertTextEquals(locator1 = "WikiTable#ALL_PAGES_STATUS", value1 = "APPROVED");
 
 		AssertTextEquals(
 			locator1 = "WikiTable#ALL_PAGES_REVISION",

@@ -350,7 +350,6 @@ public class PortletContainerImpl implements PortletContainer {
 			themeDisplay.isLifecycleAction());
 
 		if (themeDisplay.isHubAction() || themeDisplay.isHubPartialAction() ||
-			themeDisplay.isLifecycleAction() ||
 			themeDisplay.isLifecycleRender() ||
 			themeDisplay.isLifecycleResource()) {
 

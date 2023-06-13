@@ -34,13 +34,12 @@ import com.liferay.portal.kernel.service.SubscriptionLocalServiceUtil;
  */
 @Deprecated
 @ProviderType
-public abstract class SubscriptionBaseImpl
-	extends SubscriptionModelImpl implements Subscription {
-
+public abstract class SubscriptionBaseImpl extends SubscriptionModelImpl
+	implements Subscription {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a subscription model instance should use the <code>Subscription</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a subscription model instance should use the {@link Subscription} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -51,5 +50,4 @@ public abstract class SubscriptionBaseImpl
 			SubscriptionLocalServiceUtil.updateSubscription(this);
 		}
 	}
-
 }

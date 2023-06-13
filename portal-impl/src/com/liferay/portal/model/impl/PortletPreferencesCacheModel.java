@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.PortletPreferences;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -31,12 +32,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing PortletPreferences in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see PortletPreferences
  * @generated
  */
 @ProviderType
-public class PortletPreferencesCacheModel
-	implements CacheModel<PortletPreferences>, Externalizable, MVCCModel {
-
+public class PortletPreferencesCacheModel implements CacheModel<PortletPreferences>,
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -47,13 +48,10 @@ public class PortletPreferencesCacheModel
 			return false;
 		}
 
-		PortletPreferencesCacheModel portletPreferencesCacheModel =
-			(PortletPreferencesCacheModel)obj;
+		PortletPreferencesCacheModel portletPreferencesCacheModel = (PortletPreferencesCacheModel)obj;
 
-		if ((portletPreferencesId ==
-				portletPreferencesCacheModel.portletPreferencesId) &&
-			(mvccVersion == portletPreferencesCacheModel.mvccVersion)) {
-
+		if ((portletPreferencesId == portletPreferencesCacheModel.portletPreferencesId) &&
+				(mvccVersion == portletPreferencesCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -104,8 +102,7 @@ public class PortletPreferencesCacheModel
 
 	@Override
 	public PortletPreferences toEntityModel() {
-		PortletPreferencesImpl portletPreferencesImpl =
-			new PortletPreferencesImpl();
+		PortletPreferencesImpl portletPreferencesImpl = new PortletPreferencesImpl();
 
 		portletPreferencesImpl.setMvccVersion(mvccVersion);
 		portletPreferencesImpl.setPortletPreferencesId(portletPreferencesId);
@@ -151,7 +148,8 @@ public class PortletPreferencesCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(portletPreferencesId);
@@ -187,5 +185,4 @@ public class PortletPreferencesCacheModel
 	public long plid;
 	public String portletId;
 	public String preferences;
-
 }

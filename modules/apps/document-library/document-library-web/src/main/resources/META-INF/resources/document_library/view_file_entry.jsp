@@ -117,6 +117,10 @@ if (portletTitleBasedNavigation) {
 
 	<c:if test="<%= !portletTitleBasedNavigation %>">
 		<div class="btn-group">
+			<liferay-frontend:management-bar-sidenav-toggler-button
+				label="info"
+			/>
+
 			<c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() %>">
 
 				<%
@@ -132,10 +136,6 @@ if (portletTitleBasedNavigation) {
 				%>
 
 			</c:if>
-
-			<liferay-frontend:management-bar-sidenav-toggler-button
-				label="info"
-			/>
 		</div>
 	</c:if>
 
@@ -257,7 +257,7 @@ if (portletTitleBasedNavigation) {
 					</c:if>
 
 					<span class="document-description">
-						<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(fileVersion.getDescription())) %>
+						<%= HtmlUtil.escape(fileVersion.getDescription()) %>
 					</span>
 
 					<c:if test="<%= fileEntry.isSupportsSocial() %>">
@@ -311,7 +311,7 @@ if (portletTitleBasedNavigation) {
 						formName="fm2"
 						ratingsEnabled="<%= dlPortletInstanceSettings.isEnableCommentRatings() %>"
 						redirect="<%= currentURL %>"
-						userId="<%= PortalUtil.getValidUserId(fileEntry.getCompanyId(), fileEntry.getUserId()) %>"
+						userId="<%= fileEntry.getUserId() %>"
 					/>
 				</liferay-ui:panel>
 			</c:if>
@@ -319,7 +319,7 @@ if (portletTitleBasedNavigation) {
 	</div>
 </div>
 
-<c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() %>">
+<c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() && dlAdminDisplayContext.isVersioningStrategyOverridable() %>">
 
 	<%
 	request.setAttribute("edit_file_entry.jsp-checkedOut", fileEntry.isCheckedOut());

@@ -15,6 +15,7 @@
 package com.liferay.portal.test.rule.callback;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.internal.servlet.MainServlet;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
 import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.util.PortalLifecycle;
 import com.liferay.portal.kernel.util.PortalLifecycleUtil;
 import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
 import com.liferay.portal.service.test.ServiceTestUtil;
-import com.liferay.portal.servlet.MainServlet;
 import com.liferay.portal.test.mock.AutoDeployMockServletContext;
 
 import javax.servlet.ServletException;
@@ -96,7 +96,10 @@ public class MainServletTestCallback extends BaseTestCallback<Void, Void> {
 			ServletContextPool.put(StringPool.BLANK, mockServletContext);
 
 			MockServletConfig mockServletConfig = new MockServletConfig(
-				mockServletContext);
+				mockServletContext, "Main Servlet");
+
+			mockServletConfig.addInitParameter(
+				"config", "/WEB-INF/struts-config.xml");
 
 			_mainServlet = new MainServlet();
 
@@ -105,7 +108,7 @@ public class MainServletTestCallback extends BaseTestCallback<Void, Void> {
 			}
 			catch (ServletException se) {
 				throw new RuntimeException(
-					"The main servlet could not be initialized");
+					"The main servlet could not be initialized", se);
 			}
 
 			ServiceTestUtil.initStaticServices();

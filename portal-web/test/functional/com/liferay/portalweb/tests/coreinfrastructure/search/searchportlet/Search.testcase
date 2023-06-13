@@ -38,191 +38,24 @@ definition {
 		}
 	}
 
-	test AssertBasicFacetSelection {
-		var webContentserviceContext1 = '''{"assetTagNames": ["fruit"]}''';
-
-		JSONWebcontent.addWebContent(
-			content = "WC WebContent Content 1",
-			groupName = "Guest",
-			serviceContext = "${webContentserviceContext1}",
-			title = "apple"
-		);
-
-		ProductMenu.gotoPortlet(
-			category = "Content",
-			panel = "Site Administration",
-			portlet = "Blogs"
-		);
-
-		Blogs.addEntry(
-			entryContent = "Blog Entry Content",
-			entryTitle = "apple"
-		);
-
-		Navigator.openURL();
-
-		SearchPortlets.searchEmbedded(searchTerm = "apple");
-
-		Portlet.gotoPortletOptions(
-			portletName = "Search Options",
-			portletOption = "Configuration"
-		);
-
-		SelectFrame(locator1 = "IFrame#CONFIGURATION");
-
-		AssertNotChecked(
-			locator1 = "Checkbox#ANY_CHECKBOX",
-			checkboxName = "Basic Facet Selection"
-		);
-
-		IFrame.closeFrame();
-
-		AssertVisible(
-			locator1 = "Checkbox#ANY_CHECKBOX",
-			checkboxName = "fruit"
-		);
-
-		SearchFacetPortlet.checkFacet(facetValueName = "Blogs Entry");
-
-		AssertElementNotPresent(
-			locator1 = "Checkbox#ANY_CHECKBOX",
-			checkboxName = "fruit"
-		);
-
-		Refresh();
-
-		AssertChecked(
-			locator1 = "Checkbox#ANY_CHECKBOX",
-			checkboxName = "Blogs Entry"
-		);
-
-		AssertElementNotPresent(
-			locator1 = "Checkbox#ANY_CHECKBOX",
-			checkboxName = "fruit"
-		);
-
-		SearchFacetPortlet.uncheckFacet(facetValueName = "Blogs Entry");
-
-		AssertVisible(
-			locator1 = "Checkbox#ANY_CHECKBOX",
-			checkboxName = "fruit"
-		);
-
-		SearchPortlets.configureSearchOptions(basicFacetSelection = "true");
-
-		SearchPortlets.searchEmbedded(searchTerm = "apple");
-
-		AssertVisible(
-			locator1 = "Checkbox#ANY_CHECKBOX",
-			checkboxName = "fruit"
-		);
-
-		SearchFacetPortlet.checkFacet(facetValueName = "Blogs Entry");
-
-		AssertVisible(
-			locator1 = "Checkbox#ANY_CHECKBOX",
-			checkboxName = "fruit"
-		);
-
-		SearchFacetPortlet.checkFacet(facetValueName = "fruit");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "apple");
-
-		Refresh();
-
-		AssertChecked(
-			locator1 = "Checkbox#ANY_CHECKBOX",
-			checkboxName = "Blogs Entry"
-		);
-
-		AssertChecked(
-			locator1 = "Checkbox#ANY_CHECKBOX",
-			checkboxName = "fruit"
-		);
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "apple");
-	}
-
-	@priority = "3"
-	test AssertGuestCannotSeeEmptySearchWidgets {
-		// Workaround: Remove assertions for Suggestions, Sort, Search Results, and Modified Facet portlets until LPS-92008 is fixed
-
-		ProductMenu.gotoPortlet(
-			category = "Build",
-			panel = "Site Administration",
-			portlet = "Pages"
-		);
-
-		SitePages.addPublicPage(pageName = "Search Page");
-
-		Navigator.gotoPage(pageName = "Search Page");
-
+	@priority = "4"
+	test AssertSearchInsightsExplain {
 		var portalURL = PropsUtil.get("portal.url");
-
-		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search-page");
-
-		SearchPortlets.addWidgets(searchPortletList = "Category Facet,Custom Facet,Folder Facet,Modified Facet,Search Bar,Search Insights,Search Options,Search Results,Site Facet,Suggestions,Tag Facet,Type Facet,User Facet");
-
-		User.logoutPG();
-
-		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search-page");
-
-		for (var portletName : list "Category Facet,Custom Facet,Folder Facet,Search Insights,Search Options,Site Facet,Tag Facet,Type Facet,User Facet") {
-			Portlet.viewNoSpecificPG(portletName = "${portletName}");
-		}
 
 		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search");
 
-		for (var portletName : list "Category Facet,Custom Facet,Folder Facet,Modified Facet,Search Insights,Search Options,Search Results,Site Facet,Suggestions,Tag Facet,Type Facet,User Facet") {
-			Portlet.viewNoSpecificPG(portletName = "${portletName}");
-		}
-	}
+		Portlet.addPG(portletName = "Search Insights");
 
-	@description = "This is a use case for LPS-90078."
-	@priority = "3"
-	test ModifyPaginationPortalProperties {
-		property custom.properties = "search.container.page.default.delta=10";
+		SearchPortlets.searchEmbedded(searchTerm = "test");
 
-		SearchPortlets.addWidgets(searchPortletList = "Search Results");
+		AssertTextPresent(locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_STRING_QUERY", value1 = "&quot;explain&quot;:true");
 
-		Portlet.gotoPortletOptions(
-			portletName = "Search Results",
-			portletOption = "Configuration"
-		);
-
-		SelectFrame(locator1 = "IFrame#CONFIGURATION");
-
-		AssertTextEquals(
-			locator1 = "SearchResults#RESULTS_PORTLET_PAGINATION_CONFIG",
-			value1 = "10"
-		);
-
-		IFrame.closeFrame();
-
-		JSONWebcontent.addWebContent(
-			content = "WC Content",
-			groupName = "Guest",
-			title = "WC Title"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "WC Title");
-
-		Portlet.gotoPortletOptions(
-			portletName = "Search Results",
-			portletOption = "Configuration"
-		);
-
-		SelectFrame(locator1 = "IFrame#CONFIGURATION");
-
-		AssertTextEquals(
-			locator1 = "SearchResults#RESULTS_PORTLET_PAGINATION_CONFIG",
-			value1 = "10"
-		);
+		AssertTextPresent(locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_STRING_QUERY", value1 = "bucket");
 	}
 
 	@priority = "4"
 	test NavigateToSearchResultsViaURL {
-		property portal.acceptance = "quarantine";
+		property portal.acceptance = "true";
 
 		ProductMenu.gotoPortlet(
 			category = "Content",
@@ -449,8 +282,11 @@ definition {
 		SearchResultPortlet.viewNoSearchResults(searchTerm = "Name1");
 	}
 
+	@ignore = "true"
 	@priority = "4"
 	test SearchBlogsEntryCategoryQuotes {
+		// Ignoring test until LPS-73326 is resolved
+
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
@@ -1142,106 +978,6 @@ definition {
 	}
 
 	@priority = "4"
-	test SearchMessageBoardsThread {
-		ProductMenu.gotoPortlet(
-			category = "Build",
-			panel = "Site Administration",
-			portlet = "Pages"
-		);
-
-		SitePages.addPublicPage(pageName = "Message Boards Page");
-
-		Navigator.gotoPage(pageName = "Message Boards Page");
-
-		Portlet.addPG(portletName = "Message Boards");
-
-		Navigator.gotoPage(pageName = "Message Boards Page");
-
-		MessageboardsThread.addPG(
-			threadBody = "MB Thread Message Body",
-			threadSubject = "MB Thread Message Subject"
-		);
-
-		Navigator.openURL();
-
-		SearchPortlets.searchEmbedded(searchTerm = "MB Thread Message Subject");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "MB Thread Message Body");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "MB");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "Thread");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "Message");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "Subject");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "Body");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "MB1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "MB1");
-
-		SearchPortlets.searchEmbedded(searchTerm = "Thread1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Thread1");
-
-		SearchPortlets.searchEmbedded(searchTerm = "Message1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Message1");
-
-		SearchPortlets.searchEmbedded(searchTerm = "Subject1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Subject1");
-
-		SearchPortlets.searchEmbedded(searchTerm = "Body1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Body1");
-	}
-
-	@priority = "4"
 	test SearchUser {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
@@ -1351,6 +1087,7 @@ definition {
 		);
 	}
 
+	@priority = "4"
 	test SearchUsingCustomFacet {
 		property portal.acceptance = "true";
 
@@ -1668,6 +1405,20 @@ definition {
 	@description = "This is a use case for LPS-74299."
 	@priority = "3"
 	test ViewFacetPersistence {
+		// Workaround for LPS-89026
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search"
+		);
+
+		SearchAdministration.executeSearchActions(
+			actionsDescription = "Reindex all search indexes."
+		);
+
+		Navigator.openURL();
+
 		ProductMenu.gotoPortlet(
 			category = "Build",
 			panel = "Site Administration",
@@ -1710,12 +1461,9 @@ definition {
 		property osgi.app.includes = "bookmarks";
 		var searchPage = "Search Page";
 
-		JSONCategory.addVocabularyByGroupName(
-			groupName = "Guest",
-			title = "Fruit Vocabulary"
-		);
+		JSONCategory.addVocabulary(groupName = "Guest", title = "Fruit Vocabulary");
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Guest",
 			title = "organic",
 			vocabularyName = "Fruit Vocabulary"
@@ -2179,6 +1927,18 @@ definition {
 	test ViewSearchResultDetails {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SearchUsecase#ViewSearchResultDetails";
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search"
+		);
+
+		SearchAdministration.executeSearchActions(
+			actionsDescription = "Reindex all search indexes."
+		);
+
+		Navigator.openURL();
 
 		SearchPortlets.searchEmbedded(searchTerm = "Test Test");
 

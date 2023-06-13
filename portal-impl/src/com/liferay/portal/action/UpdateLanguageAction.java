@@ -28,6 +28,9 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.struts.Action;
+import com.liferay.portal.struts.model.ActionForward;
+import com.liferay.portal.struts.model.ActionMapping;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.admin.util.AdminUtil;
 
@@ -37,21 +40,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.struts.Globals;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
 /**
  * @author Brian Wing Shun Chan
  */
-public class UpdateLanguageAction extends Action {
+public class UpdateLanguageAction implements Action {
 
 	@Override
 	public ActionForward execute(
-			ActionMapping actionMapping, ActionForm actionForm,
-			HttpServletRequest request, HttpServletResponse response)
+			ActionMapping actionMapping, HttpServletRequest request,
+			HttpServletResponse response)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
@@ -83,7 +80,7 @@ public class UpdateLanguageAction extends Action {
 
 			HttpSession session = request.getSession();
 
-			session.setAttribute(Globals.LOCALE_KEY, locale);
+			session.setAttribute(WebKeys.LOCALE, locale);
 
 			LanguageUtil.updateCookie(request, response, locale);
 		}
@@ -126,11 +123,6 @@ public class UpdateLanguageAction extends Action {
 				redirect = PortalUtil.getGroupFriendlyURL(
 					layout.getLayoutSet(), themeDisplay, locale);
 			}
-		}
-		else if (layout.isTypeControlPanel() && themeDisplay.isI18n()) {
-			String i18nPath = themeDisplay.getI18nPath();
-
-			redirect = redirect.substring(i18nPath.length());
 		}
 		else {
 			if (PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 0) {

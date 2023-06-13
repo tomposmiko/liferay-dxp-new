@@ -16,17 +16,14 @@ package com.liferay.reading.time.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
 
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -38,21 +35,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class ReadingTimeEntryWrapper
+public class ReadingTimeEntryWrapper extends BaseModelWrapper<ReadingTimeEntry>
 	implements ReadingTimeEntry, ModelWrapper<ReadingTimeEntry> {
-
 	public ReadingTimeEntryWrapper(ReadingTimeEntry readingTimeEntry) {
-		_readingTimeEntry = readingTimeEntry;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return ReadingTimeEntry.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return ReadingTimeEntry.class.getName();
+		super(readingTimeEntry);
 	}
 
 	@Override
@@ -129,448 +115,306 @@ public class ReadingTimeEntryWrapper
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new ReadingTimeEntryWrapper(
-			(ReadingTimeEntry)_readingTimeEntry.clone());
-	}
-
-	@Override
-	public int compareTo(ReadingTimeEntry readingTimeEntry) {
-		return _readingTimeEntry.compareTo(readingTimeEntry);
-	}
-
 	/**
-	 * Returns the fully qualified class name of this reading time entry.
-	 *
-	 * @return the fully qualified class name of this reading time entry
-	 */
+	* Returns the fully qualified class name of this reading time entry.
+	*
+	* @return the fully qualified class name of this reading time entry
+	*/
 	@Override
 	public String getClassName() {
-		return _readingTimeEntry.getClassName();
+		return model.getClassName();
 	}
 
 	/**
-	 * Returns the class name ID of this reading time entry.
-	 *
-	 * @return the class name ID of this reading time entry
-	 */
+	* Returns the class name ID of this reading time entry.
+	*
+	* @return the class name ID of this reading time entry
+	*/
 	@Override
 	public long getClassNameId() {
-		return _readingTimeEntry.getClassNameId();
+		return model.getClassNameId();
 	}
 
 	/**
-	 * Returns the class pk of this reading time entry.
-	 *
-	 * @return the class pk of this reading time entry
-	 */
+	* Returns the class pk of this reading time entry.
+	*
+	* @return the class pk of this reading time entry
+	*/
 	@Override
 	public long getClassPK() {
-		return _readingTimeEntry.getClassPK();
+		return model.getClassPK();
 	}
 
 	/**
-	 * Returns the company ID of this reading time entry.
-	 *
-	 * @return the company ID of this reading time entry
-	 */
+	* Returns the company ID of this reading time entry.
+	*
+	* @return the company ID of this reading time entry
+	*/
 	@Override
 	public long getCompanyId() {
-		return _readingTimeEntry.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the create date of this reading time entry.
-	 *
-	 * @return the create date of this reading time entry
-	 */
+	* Returns the create date of this reading time entry.
+	*
+	* @return the create date of this reading time entry
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _readingTimeEntry.getCreateDate();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _readingTimeEntry.getExpandoBridge();
+		return model.getCreateDate();
 	}
 
 	/**
-	 * Returns the group ID of this reading time entry.
-	 *
-	 * @return the group ID of this reading time entry
-	 */
+	* Returns the group ID of this reading time entry.
+	*
+	* @return the group ID of this reading time entry
+	*/
 	@Override
 	public long getGroupId() {
-		return _readingTimeEntry.getGroupId();
+		return model.getGroupId();
 	}
 
 	/**
-	 * Returns the modified date of this reading time entry.
-	 *
-	 * @return the modified date of this reading time entry
-	 */
+	* Returns the modified date of this reading time entry.
+	*
+	* @return the modified date of this reading time entry
+	*/
 	@Override
 	public Date getModifiedDate() {
-		return _readingTimeEntry.getModifiedDate();
+		return model.getModifiedDate();
 	}
 
 	/**
-	 * Returns the primary key of this reading time entry.
-	 *
-	 * @return the primary key of this reading time entry
-	 */
+	* Returns the primary key of this reading time entry.
+	*
+	* @return the primary key of this reading time entry
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _readingTimeEntry.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _readingTimeEntry.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the reading time of this reading time entry.
-	 *
-	 * @return the reading time of this reading time entry
-	 */
+	* Returns the reading time of this reading time entry.
+	*
+	* @return the reading time of this reading time entry
+	*/
 	@Override
 	public long getReadingTime() {
-		return _readingTimeEntry.getReadingTime();
+		return model.getReadingTime();
 	}
 
 	/**
-	 * Returns the reading time entry ID of this reading time entry.
-	 *
-	 * @return the reading time entry ID of this reading time entry
-	 */
+	* Returns the reading time entry ID of this reading time entry.
+	*
+	* @return the reading time entry ID of this reading time entry
+	*/
 	@Override
 	public long getReadingTimeEntryId() {
-		return _readingTimeEntry.getReadingTimeEntryId();
+		return model.getReadingTimeEntryId();
 	}
 
 	/**
-	 * Returns the status of this reading time entry.
-	 *
-	 * @return the status of this reading time entry
-	 */
+	* Returns the status of this reading time entry.
+	*
+	* @return the status of this reading time entry
+	*/
 	@Override
 	public int getStatus() {
-		return _readingTimeEntry.getStatus();
+		return model.getStatus();
 	}
 
 	/**
-	 * Returns the trash entry created when this reading time entry was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this reading time entry.
-	 *
-	 * @return the trash entry created when this reading time entry was moved to the Recycle Bin
-	 */
+	* Returns the trash entry created when this reading time entry was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this reading time entry.
+	*
+	* @return the trash entry created when this reading time entry was moved to the Recycle Bin
+	*/
 	@Override
 	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _readingTimeEntry.getTrashEntry();
+		return model.getTrashEntry();
 	}
 
 	/**
-	 * Returns the class primary key of the trash entry for this reading time entry.
-	 *
-	 * @return the class primary key of the trash entry for this reading time entry
-	 */
+	* Returns the class primary key of the trash entry for this reading time entry.
+	*
+	* @return the class primary key of the trash entry for this reading time entry
+	*/
 	@Override
 	public long getTrashEntryClassPK() {
-		return _readingTimeEntry.getTrashEntryClassPK();
+		return model.getTrashEntryClassPK();
 	}
 
 	/**
-	 * Returns the trash handler for this reading time entry.
-	 *
-	 * @return the trash handler for this reading time entry
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
+	* Returns the trash handler for this reading time entry.
+	*
+	* @return the trash handler for this reading time entry
+	* @deprecated As of Judson (7.1.x), with no direct replacement
+	*/
 	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
-		return _readingTimeEntry.getTrashHandler();
+		return model.getTrashHandler();
 	}
 
 	/**
-	 * Returns the uuid of this reading time entry.
-	 *
-	 * @return the uuid of this reading time entry
-	 */
+	* Returns the uuid of this reading time entry.
+	*
+	* @return the uuid of this reading time entry
+	*/
 	@Override
 	public String getUuid() {
-		return _readingTimeEntry.getUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _readingTimeEntry.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _readingTimeEntry.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _readingTimeEntry.isEscapedModel();
+		return model.getUuid();
 	}
 
 	/**
-	 * Returns <code>true</code> if this reading time entry is in the Recycle Bin.
-	 *
-	 * @return <code>true</code> if this reading time entry is in the Recycle Bin; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this reading time entry is in the Recycle Bin.
+	*
+	* @return <code>true</code> if this reading time entry is in the Recycle Bin; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isInTrash() {
-		return _readingTimeEntry.isInTrash();
+		return model.isInTrash();
 	}
 
 	/**
-	 * Returns <code>true</code> if the parent of this reading time entry is in the Recycle Bin.
-	 *
-	 * @return <code>true</code> if the parent of this reading time entry is in the Recycle Bin; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if the parent of this reading time entry is in the Recycle Bin.
+	*
+	* @return <code>true</code> if the parent of this reading time entry is in the Recycle Bin; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isInTrashContainer() {
-		return _readingTimeEntry.isInTrashContainer();
+		return model.isInTrashContainer();
 	}
 
 	@Override
 	public boolean isInTrashExplicitly() {
-		return _readingTimeEntry.isInTrashExplicitly();
+		return model.isInTrashExplicitly();
 	}
 
 	@Override
 	public boolean isInTrashImplicitly() {
-		return _readingTimeEntry.isInTrashImplicitly();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _readingTimeEntry.isNew();
+		return model.isInTrashImplicitly();
 	}
 
 	@Override
 	public void persist() {
-		_readingTimeEntry.persist();
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_readingTimeEntry.setCachedModel(cachedModel);
+		model.persist();
 	}
 
 	@Override
 	public void setClassName(String className) {
-		_readingTimeEntry.setClassName(className);
+		model.setClassName(className);
 	}
 
 	/**
-	 * Sets the class name ID of this reading time entry.
-	 *
-	 * @param classNameId the class name ID of this reading time entry
-	 */
+	* Sets the class name ID of this reading time entry.
+	*
+	* @param classNameId the class name ID of this reading time entry
+	*/
 	@Override
 	public void setClassNameId(long classNameId) {
-		_readingTimeEntry.setClassNameId(classNameId);
+		model.setClassNameId(classNameId);
 	}
 
 	/**
-	 * Sets the class pk of this reading time entry.
-	 *
-	 * @param classPK the class pk of this reading time entry
-	 */
+	* Sets the class pk of this reading time entry.
+	*
+	* @param classPK the class pk of this reading time entry
+	*/
 	@Override
 	public void setClassPK(long classPK) {
-		_readingTimeEntry.setClassPK(classPK);
+		model.setClassPK(classPK);
 	}
 
 	/**
-	 * Sets the company ID of this reading time entry.
-	 *
-	 * @param companyId the company ID of this reading time entry
-	 */
+	* Sets the company ID of this reading time entry.
+	*
+	* @param companyId the company ID of this reading time entry
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_readingTimeEntry.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this reading time entry.
-	 *
-	 * @param createDate the create date of this reading time entry
-	 */
+	* Sets the create date of this reading time entry.
+	*
+	* @param createDate the create date of this reading time entry
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_readingTimeEntry.setCreateDate(createDate);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_readingTimeEntry.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_readingTimeEntry.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_readingTimeEntry.setExpandoBridgeAttributes(serviceContext);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the group ID of this reading time entry.
-	 *
-	 * @param groupId the group ID of this reading time entry
-	 */
+	* Sets the group ID of this reading time entry.
+	*
+	* @param groupId the group ID of this reading time entry
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_readingTimeEntry.setGroupId(groupId);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the modified date of this reading time entry.
-	 *
-	 * @param modifiedDate the modified date of this reading time entry
-	 */
+	* Sets the modified date of this reading time entry.
+	*
+	* @param modifiedDate the modified date of this reading time entry
+	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
-		_readingTimeEntry.setModifiedDate(modifiedDate);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_readingTimeEntry.setNew(n);
+		model.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	 * Sets the primary key of this reading time entry.
-	 *
-	 * @param primaryKey the primary key of this reading time entry
-	 */
+	* Sets the primary key of this reading time entry.
+	*
+	* @param primaryKey the primary key of this reading time entry
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_readingTimeEntry.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_readingTimeEntry.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the reading time of this reading time entry.
-	 *
-	 * @param readingTime the reading time of this reading time entry
-	 */
+	* Sets the reading time of this reading time entry.
+	*
+	* @param readingTime the reading time of this reading time entry
+	*/
 	@Override
 	public void setReadingTime(long readingTime) {
-		_readingTimeEntry.setReadingTime(readingTime);
+		model.setReadingTime(readingTime);
 	}
 
 	/**
-	 * Sets the reading time entry ID of this reading time entry.
-	 *
-	 * @param readingTimeEntryId the reading time entry ID of this reading time entry
-	 */
+	* Sets the reading time entry ID of this reading time entry.
+	*
+	* @param readingTimeEntryId the reading time entry ID of this reading time entry
+	*/
 	@Override
 	public void setReadingTimeEntryId(long readingTimeEntryId) {
-		_readingTimeEntry.setReadingTimeEntryId(readingTimeEntryId);
+		model.setReadingTimeEntryId(readingTimeEntryId);
 	}
 
 	/**
-	 * Sets the uuid of this reading time entry.
-	 *
-	 * @param uuid the uuid of this reading time entry
-	 */
+	* Sets the uuid of this reading time entry.
+	*
+	* @param uuid the uuid of this reading time entry
+	*/
 	@Override
 	public void setUuid(String uuid) {
-		_readingTimeEntry.setUuid(uuid);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.CacheModel<ReadingTimeEntry>
-		toCacheModel() {
-
-		return _readingTimeEntry.toCacheModel();
-	}
-
-	@Override
-	public ReadingTimeEntry toEscapedModel() {
-		return new ReadingTimeEntryWrapper(_readingTimeEntry.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _readingTimeEntry.toString();
-	}
-
-	@Override
-	public ReadingTimeEntry toUnescapedModel() {
-		return new ReadingTimeEntryWrapper(
-			_readingTimeEntry.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _readingTimeEntry.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof ReadingTimeEntryWrapper)) {
-			return false;
-		}
-
-		ReadingTimeEntryWrapper readingTimeEntryWrapper =
-			(ReadingTimeEntryWrapper)obj;
-
-		if (Objects.equals(
-				_readingTimeEntry, readingTimeEntryWrapper._readingTimeEntry)) {
-
-			return true;
-		}
-
-		return false;
+		model.setUuid(uuid);
 	}
 
 	@Override
 	public StagedModelType getStagedModelType() {
-		return _readingTimeEntry.getStagedModelType();
+		return model.getStagedModelType();
 	}
 
 	@Override
-	public ReadingTimeEntry getWrappedModel() {
-		return _readingTimeEntry;
+	protected ReadingTimeEntryWrapper wrap(ReadingTimeEntry readingTimeEntry) {
+		return new ReadingTimeEntryWrapper(readingTimeEntry);
 	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _readingTimeEntry.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _readingTimeEntry.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_readingTimeEntry.resetOriginalValues();
-	}
-
-	private final ReadingTimeEntry _readingTimeEntry;
-
 }

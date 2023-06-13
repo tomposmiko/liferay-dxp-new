@@ -25,23 +25,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see DDLRecordVersionModel
+ * @see com.liferay.dynamic.data.lists.model.impl.DDLRecordVersionImpl
+ * @see com.liferay.dynamic.data.lists.model.impl.DDLRecordVersionModelImpl
  * @generated
  */
-@ImplementationClassName(
-	"com.liferay.dynamic.data.lists.model.impl.DDLRecordVersionImpl"
-)
+@ImplementationClassName("com.liferay.dynamic.data.lists.model.impl.DDLRecordVersionImpl")
 @ProviderType
-public interface DDLRecordVersion
-	extends DDLRecordVersionModel, PersistedModel {
-
+public interface DDLRecordVersion extends DDLRecordVersionModel, PersistedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to <code>com.liferay.dynamic.data.lists.model.impl.DDLRecordVersionImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.dynamic.data.lists.model.impl.DDLRecordVersionImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<DDLRecordVersion, Long>
-		RECORD_VERSION_ID_ACCESSOR = new Accessor<DDLRecordVersion, Long>() {
-
+	public static final Accessor<DDLRecordVersion, Long> RECORD_VERSION_ID_ACCESSOR =
+		new Accessor<DDLRecordVersion, Long>() {
 			@Override
 			public Long get(DDLRecordVersion ddlRecordVersion) {
 				return ddlRecordVersion.getRecordVersionId();
@@ -56,11 +53,9 @@ public interface DDLRecordVersion
 			public Class<DDLRecordVersion> getTypeClass() {
 				return DDLRecordVersion.class;
 			}
-
 		};
 
-	public com.liferay.dynamic.data.mapping.storage.DDMFormValues
-			getDDMFormValues()
+	public com.liferay.dynamic.data.mapping.storage.DDMFormValues getDDMFormValues()
 		throws com.liferay.dynamic.data.mapping.exception.StorageException;
 
 	public DDLRecord getRecord()
@@ -68,5 +63,4 @@ public interface DDLRecordVersion
 
 	public DDLRecordSet getRecordSet()
 		throws com.liferay.portal.kernel.exception.PortalException;
-
 }

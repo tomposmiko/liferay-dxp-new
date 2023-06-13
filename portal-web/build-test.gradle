@@ -17,7 +17,7 @@ poshiRunner {
 	}
 
 	openCVVersion = "2.4.10-0.10"
-	version = "1.0.222"
+	version = "1.0.212"
 }
 
 task updateGradleCache
@@ -39,16 +39,16 @@ dependencies {
 				String portalVersion = matcher.group("portalVersion")
 
 				if (portalVersion.startsWith("6.1")) {
-					poshiRunnerResources group: "com.liferay.poshi.runner.resources", name: "portal-ee-6.1.x", version: "20190325111923-20a286f"
+					poshiRunnerResources group: "com.liferay.poshi.runner.resources", name: "portal-ee-6.1.x", version: "20180516095228-87f131d"
 				}
 				else if (portalVersion.startsWith("6.2")) {
-					poshiRunnerResources group: "com.liferay.poshi.runner.resources", name: "portal-ee-6.2.x", version: "20190325111857-3731418"
+					poshiRunnerResources group: "com.liferay.poshi.runner.resources", name: "portal-ee-6.2.x", version: "20180516095205-e9a6238"
 				}
 				else if (portalVersion.startsWith("7.0")) {
-					poshiRunnerResources group: "com.liferay.poshi.runner.resources", name: "portal-7.0.x", version: "20190325-004214c"
+					poshiRunnerResources group: "com.liferay.poshi.runner.resources", name: "portal-7.0.x", version: "20180516094443-ebc78fb"
 				}
 				else if (portalVersion.startsWith("7.1")) {
-					poshiRunnerResources group: "com.liferay.poshi.runner.resources", name: "portal-7.1.x", version: "20190325-f1ecc02"
+					poshiRunnerResources group: "com.liferay.poshi.runner.resources", name: "portal-7.1.x", version: "20181128102607-5b0ef97"
 				}
 			}
 		}

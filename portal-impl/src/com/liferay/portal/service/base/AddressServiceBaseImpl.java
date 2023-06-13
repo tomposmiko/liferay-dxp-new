@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.base;
 
-import com.liferay.counter.kernel.service.persistence.CounterPersistence;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -44,15 +43,15 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.portal.service.impl.AddressServiceImpl
+ * @see com.liferay.portal.kernel.service.AddressServiceUtil
  * @generated
  */
-public abstract class AddressServiceBaseImpl
-	extends BaseServiceImpl implements AddressService, IdentifiableOSGiService {
-
+public abstract class AddressServiceBaseImpl extends BaseServiceImpl
+	implements AddressService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>AddressService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.AddressServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.portal.kernel.service.AddressServiceUtil} to access the address remote service.
 	 */
 
 	/**
@@ -60,9 +59,7 @@ public abstract class AddressServiceBaseImpl
 	 *
 	 * @return the address local service
 	 */
-	public com.liferay.portal.kernel.service.AddressLocalService
-		getAddressLocalService() {
-
+	public com.liferay.portal.kernel.service.AddressLocalService getAddressLocalService() {
 		return addressLocalService;
 	}
 
@@ -72,9 +69,7 @@ public abstract class AddressServiceBaseImpl
 	 * @param addressLocalService the address local service
 	 */
 	public void setAddressLocalService(
-		com.liferay.portal.kernel.service.AddressLocalService
-			addressLocalService) {
-
+		com.liferay.portal.kernel.service.AddressLocalService addressLocalService) {
 		this.addressLocalService = addressLocalService;
 	}
 
@@ -119,9 +114,7 @@ public abstract class AddressServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -131,28 +124,8 @@ public abstract class AddressServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
-	}
-
-	/**
-	 * Returns the counter persistence.
-	 *
-	 * @return the counter persistence
-	 */
-	public CounterPersistence getCounterPersistence() {
-		return counterPersistence;
-	}
-
-	/**
-	 * Sets the counter persistence.
-	 *
-	 * @param counterPersistence the counter persistence
-	 */
-	public void setCounterPersistence(CounterPersistence counterPersistence) {
-		this.counterPersistence = counterPersistence;
 	}
 
 	/**
@@ -160,9 +133,7 @@ public abstract class AddressServiceBaseImpl
 	 *
 	 * @return the class name local service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService
-		getClassNameLocalService() {
-
+	public com.liferay.portal.kernel.service.ClassNameLocalService getClassNameLocalService() {
 		return classNameLocalService;
 	}
 
@@ -172,9 +143,7 @@ public abstract class AddressServiceBaseImpl
 	 * @param classNameLocalService the class name local service
 	 */
 	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService
-			classNameLocalService) {
-
+		com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService) {
 		this.classNameLocalService = classNameLocalService;
 	}
 
@@ -183,9 +152,7 @@ public abstract class AddressServiceBaseImpl
 	 *
 	 * @return the class name remote service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameService
-		getClassNameService() {
-
+	public com.liferay.portal.kernel.service.ClassNameService getClassNameService() {
 		return classNameService;
 	}
 
@@ -196,7 +163,6 @@ public abstract class AddressServiceBaseImpl
 	 */
 	public void setClassNameService(
 		com.liferay.portal.kernel.service.ClassNameService classNameService) {
-
 		this.classNameService = classNameService;
 	}
 
@@ -216,7 +182,6 @@ public abstract class AddressServiceBaseImpl
 	 */
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
-
 		this.classNamePersistence = classNamePersistence;
 	}
 
@@ -225,9 +190,7 @@ public abstract class AddressServiceBaseImpl
 	 *
 	 * @return the country remote service
 	 */
-	public com.liferay.portal.kernel.service.CountryService
-		getCountryService() {
-
+	public com.liferay.portal.kernel.service.CountryService getCountryService() {
 		return countryService;
 	}
 
@@ -238,7 +201,6 @@ public abstract class AddressServiceBaseImpl
 	 */
 	public void setCountryService(
 		com.liferay.portal.kernel.service.CountryService countryService) {
-
 		this.countryService = countryService;
 	}
 
@@ -265,9 +227,7 @@ public abstract class AddressServiceBaseImpl
 	 *
 	 * @return the list type local service
 	 */
-	public com.liferay.portal.kernel.service.ListTypeLocalService
-		getListTypeLocalService() {
-
+	public com.liferay.portal.kernel.service.ListTypeLocalService getListTypeLocalService() {
 		return listTypeLocalService;
 	}
 
@@ -277,9 +237,7 @@ public abstract class AddressServiceBaseImpl
 	 * @param listTypeLocalService the list type local service
 	 */
 	public void setListTypeLocalService(
-		com.liferay.portal.kernel.service.ListTypeLocalService
-			listTypeLocalService) {
-
+		com.liferay.portal.kernel.service.ListTypeLocalService listTypeLocalService) {
 		this.listTypeLocalService = listTypeLocalService;
 	}
 
@@ -288,9 +246,7 @@ public abstract class AddressServiceBaseImpl
 	 *
 	 * @return the list type remote service
 	 */
-	public com.liferay.portal.kernel.service.ListTypeService
-		getListTypeService() {
-
+	public com.liferay.portal.kernel.service.ListTypeService getListTypeService() {
 		return listTypeService;
 	}
 
@@ -301,7 +257,6 @@ public abstract class AddressServiceBaseImpl
 	 */
 	public void setListTypeService(
 		com.liferay.portal.kernel.service.ListTypeService listTypeService) {
-
 		this.listTypeService = listTypeService;
 	}
 
@@ -319,9 +274,7 @@ public abstract class AddressServiceBaseImpl
 	 *
 	 * @param listTypePersistence the list type persistence
 	 */
-	public void setListTypePersistence(
-		ListTypePersistence listTypePersistence) {
-
+	public void setListTypePersistence(ListTypePersistence listTypePersistence) {
 		this.listTypePersistence = listTypePersistence;
 	}
 
@@ -330,9 +283,7 @@ public abstract class AddressServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -343,7 +294,6 @@ public abstract class AddressServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -363,7 +313,6 @@ public abstract class AddressServiceBaseImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
-
 		this.userService = userService;
 	}
 
@@ -441,8 +390,8 @@ public abstract class AddressServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -451,77 +400,36 @@ public abstract class AddressServiceBaseImpl
 		}
 	}
 
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.AddressLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.AddressLocalService
-		addressLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.AddressLocalService.class)
+	protected com.liferay.portal.kernel.service.AddressLocalService addressLocalService;
 	@BeanReference(type = AddressService.class)
 	protected AddressService addressService;
-
 	@BeanReference(type = AddressPersistence.class)
 	protected AddressPersistence addressPersistence;
-
-	@BeanReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@BeanReference(type = CounterPersistence.class)
-	protected CounterPersistence counterPersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ClassNameLocalService
-		classNameLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ClassNameService.class
-	)
-	protected com.liferay.portal.kernel.service.ClassNameService
-		classNameService;
-
+	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.ClassNameService.class)
+	protected com.liferay.portal.kernel.service.ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.CountryService.class
-	)
+	@BeanReference(type = com.liferay.portal.kernel.service.CountryService.class)
 	protected com.liferay.portal.kernel.service.CountryService countryService;
-
 	@BeanReference(type = CountryPersistence.class)
 	protected CountryPersistence countryPersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ListTypeLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ListTypeLocalService
-		listTypeLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ListTypeService.class
-	)
+	@BeanReference(type = com.liferay.portal.kernel.service.ListTypeLocalService.class)
+	protected com.liferay.portal.kernel.service.ListTypeLocalService listTypeLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.ListTypeService.class)
 	protected com.liferay.portal.kernel.service.ListTypeService listTypeService;
-
 	@BeanReference(type = ListTypePersistence.class)
 	protected ListTypePersistence listTypePersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
 	@BeanReference(type = com.liferay.portal.kernel.service.UserService.class)
 	protected com.liferay.portal.kernel.service.UserService userService;
-
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
 }

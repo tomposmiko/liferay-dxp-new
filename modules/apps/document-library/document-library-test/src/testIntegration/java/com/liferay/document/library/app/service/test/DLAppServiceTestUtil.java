@@ -16,11 +16,10 @@ package com.liferay.document.library.app.service.test;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
+import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
@@ -46,13 +45,10 @@ import java.util.Dictionary;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
 
 /**
  * @author Alexander Chow
  */
-@RunWith(Enclosed.class)
 public class DLAppServiceTestUtil {
 
 	protected static FileEntry addFileEntry(long groupId, long folderId)
@@ -200,7 +196,8 @@ public class DLAppServiceTestUtil {
 
 		return DLAppServiceUtil.updateFileEntry(
 			fileEntryId, fileName, ContentTypes.TEXT_PLAIN, fileName,
-			StringPool.BLANK, StringPool.BLANK, majorVersion,
+			StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.fromMajorVersion(majorVersion),
 			TestDataConstants.TEST_BYTE_ARRAY, serviceContext);
 	}
 
@@ -210,8 +207,5 @@ public class DLAppServiceTestUtil {
 	protected static final String FILE_NAME = "Title.txt";
 
 	protected static final String STRIPPED_FILE_NAME = "Title";
-
-	protected static final Log log = LogFactoryUtil.getLog(
-		DLAppServiceTestUtil.class);
 
 }

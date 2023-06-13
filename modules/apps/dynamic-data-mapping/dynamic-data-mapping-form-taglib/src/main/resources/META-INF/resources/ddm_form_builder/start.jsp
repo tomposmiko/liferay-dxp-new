@@ -17,7 +17,6 @@
 <%@ include file="/ddm_form_builder/init.jsp" %>
 
 <aui:script use="liferay-ddm-form-builder, liferay-ddm-form-builder-fieldset, liferay-ddm-form-builder-rule-builder">
-
 	function initTagLib() {
 		Liferay.namespace('DDM').Settings = {
 			evaluatorURL: '<%= HtmlUtil.escapeJS(evaluatorURL) %>',
@@ -59,37 +58,24 @@
 				);
 			}
 		);
+
+		Liferay.fire('DDMFormBuilderReady');
+		Liferay.DDM.FormBuilder.ready = true;
 	}
 
-	if (Liferay.Loader.version().indexOf('3.') === 0) {
-		var modules = Object.keys(Liferay.MODULES);
-
-		var dependencies = modules.filter(
-			function(item) {
-				return /dynamic-data-mapping-form-builder.*\.es/.test(item);
-			}
-		);
-
-		Liferay.Loader.require.apply(
-			Liferay.Loader,
-			dependencies.concat(initTagLib)
-		);
-	}
-	else {
-		fetch(Liferay.MODULES_PATH + '?query=' + encodeURI('dynamic-data-mapping-form-builder.*\\.es'))
-			.then(
-				function(response) {
-					return response.json();
-				}
-			).then(
-				function(modules) {
-					var dependencies = Object.keys(modules);
-
-					Liferay.Loader.require.apply(
-						Liferay.Loader,
-						dependencies.concat(initTagLib)
-					);
-				}
-			);
-	}
+	Liferay.Loader.require.apply(
+		Liferay.Loader,
+		[
+			'<%= npmPackageName %>/alloy/templates/autocomplete.es',
+			'<%= npmPackageName %>/alloy/templates/calculate.es',
+			'<%= npmPackageName %>/alloy/templates/calculator.es',
+			'<%= npmPackageName %>/alloy/templates/data-provider-parameter.es',
+			'<%= npmPackageName %>/alloy/templates/field-options-toolbar.es',
+			'<%= npmPackageName %>/alloy/templates/field-types-sidebar.es',
+			'<%= npmPackageName %>/alloy/templates/rule-builder.es',
+			'<%= npmPackageName %>/alloy/templates/rule.es',
+			'<%= npmPackageName %>/alloy/templates/sidebar.es',
+			initTagLib
+		]
+	);
 </aui:script>

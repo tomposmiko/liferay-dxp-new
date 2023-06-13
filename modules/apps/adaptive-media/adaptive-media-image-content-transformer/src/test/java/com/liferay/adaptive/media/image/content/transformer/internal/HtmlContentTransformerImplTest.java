@@ -22,7 +22,6 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import org.junit.Assert;
@@ -43,8 +42,7 @@ public class HtmlContentTransformerImplTest {
 
 	@Before
 	public void setUp() throws PortalException {
-		ReflectionTestUtil.setFieldValue(
-			_htmlContentTransformer, "_amImageHTMLTagFactory",
+		_htmlContentTransformer.setAMImageHTMLTagFactory(
 			_amImageHTMLTagFactory);
 
 		Mockito.when(
@@ -53,8 +51,7 @@ public class HtmlContentTransformerImplTest {
 			_fileEntry
 		);
 
-		ReflectionTestUtil.setFieldValue(
-			_htmlContentTransformer, "_dlAppLocalService", _dlAppLocalService);
+		_htmlContentTransformer.setDLAppLocalService(_dlAppLocalService);
 	}
 
 	@Test

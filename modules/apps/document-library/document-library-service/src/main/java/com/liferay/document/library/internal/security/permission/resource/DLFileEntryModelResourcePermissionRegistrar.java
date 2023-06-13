@@ -24,6 +24,7 @@ import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.exportimport.kernel.staging.permission.StagingPermission;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.BaseModelPermissionCheckerUtil;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -158,6 +159,11 @@ public class DLFileEntryModelResourcePermissionRegistrar {
 	)
 	private ModelResourcePermission<DLFolder> _dlFolderModelResourcePermission;
 
+	@Reference(
+		target = ModuleServiceLifecycle.DATABASE_INITIALIZED, unbind = "-"
+	)
+	private ModuleServiceLifecycle _moduleServiceLifecycle;
+
 	@Reference(target = "(resource.name=" + DLConstants.RESOURCE_NAME + ")")
 	private PortletResourcePermission _portletResourcePermission;
 
@@ -195,9 +201,23 @@ public class DLFileEntryModelResourcePermissionRegistrar {
 				}
 			}
 			else if (fileVersion.isPending()) {
-				return _workflowPermission.hasPermission(
+				Boolean hasPermission = _workflowPermission.hasPermission(
 					permissionChecker, fileVersion.getGroupId(), name,
 					fileVersion.getFileVersionId(), actionId);
+
+				if (hasPermission != null) {
+					return hasPermission.booleanValue();
+				}
+
+				boolean hasOwnerPermission =
+					permissionChecker.hasOwnerPermission(
+						dlFileEntry.getCompanyId(), name,
+						dlFileEntry.getFileEntryId(), dlFileEntry.getUserId(),
+						actionId);
+
+				if (!hasOwnerPermission) {
+					return false;
+				}
 			}
 
 			return null;

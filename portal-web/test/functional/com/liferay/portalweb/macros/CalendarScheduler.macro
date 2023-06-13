@@ -140,7 +140,7 @@ definition {
 			value1 = "Edit"
 		);
 
-		SelectFrame(locator1 = "CalendarEditEvent#EDIT_EVENT_IFRAME");
+		SelectFrame(locator1 = "IFrame#METADATA_SETS_IFRAME");
 	}
 
 	macro gotoEditSpecific {
@@ -153,7 +153,7 @@ definition {
 			value1 = "Edit"
 		);
 
-		SelectFrame(locator1 = "CalendarEditEvent#EDIT_EVENT_IFRAME");
+		SelectFrame(locator1 = "IFrame#METADATA_SETS_IFRAME");
 	}
 
 	macro gotoEditViaDialogBox {
@@ -162,7 +162,7 @@ definition {
 			value1 = "Edit"
 		);
 
-		SelectFrame(locator1 = "CalendarEditEvent#EDIT_EVENT_IFRAME");
+		SelectFrame(locator1 = "IFrame#METADATA_SETS_IFRAME");
 	}
 
 	macro saveEvent {
@@ -192,7 +192,6 @@ definition {
 
 	macro selectSpecificEvent {
 		var key_eventTitle = "${eventTitle}";
-		var browserType = PropsUtil.get("browser.type");
 
 		if (contains("${eventTitle}", "All Day")) {
 			AssertClick.assertTextClickNoMouseOver(
@@ -211,16 +210,6 @@ definition {
 
 			AssertClick.assertPartialTextClickAt(
 				locator1 = "Calendar#SCHEDULER_VIEW_EVENT_NOT_TODAY",
-				value1 = "${eventTitle}"
-			);
-		}
-		else if ("${browserType}" == "chrome") {
-			ScrollWebElementIntoView(
-				locator1 = "Calendar#SCHEDULER_VIEW_EVENT_WEEK_VIEW"
-			);
-
-			AssertClick.assertPartialTextClickAt(
-				locator1 = "Calendar#SCHEDULER_VIEW_EVENT_WEEK_VIEW",
 				value1 = "${eventTitle}"
 			);
 		}

@@ -1,6 +1,6 @@
 dependencies {
-	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.33.0"
-	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.test", version: "5.2.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.test", version: "default"
 }
 
 liferay {

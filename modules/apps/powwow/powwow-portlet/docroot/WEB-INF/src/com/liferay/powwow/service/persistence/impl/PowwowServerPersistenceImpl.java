@@ -16,7 +16,10 @@ package com.liferay.powwow.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -34,7 +37,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+
 import com.liferay.powwow.exception.NoSuchServerException;
 import com.liferay.powwow.model.PowwowServer;
 import com.liferay.powwow.model.impl.PowwowServerImpl;
@@ -43,14 +46,10 @@ import com.liferay.powwow.service.persistence.PowwowServerPersistence;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,27 +63,23 @@ import java.util.Set;
  * </p>
  *
  * @author Shinn Lok
+ * @see PowwowServerPersistence
+ * @see com.liferay.powwow.service.persistence.PowwowServerUtil
  * @generated
  */
 @ProviderType
-public class PowwowServerPersistenceImpl
-	extends BasePersistenceImpl<PowwowServer>
+public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServer>
 	implements PowwowServerPersistence {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use <code>PowwowServerUtil</code> to access the powwow server persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use {@link PowwowServerUtil} to access the powwow server persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY =
-		PowwowServerImpl.class.getName();
-
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List1";
-
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List2";
-
+	public static final String FINDER_CLASS_NAME_ENTITY = PowwowServerImpl.class.getName();
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -101,15 +96,15 @@ public class PowwowServerPersistenceImpl
 	 */
 	@Override
 	public List<PowwowServer> findByPT_A(String providerType, boolean active) {
-		return findByPT_A(
-			providerType, active, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByPT_A(providerType, active, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the powwow servers where providerType = &#63; and active = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PowwowServerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PowwowServerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param providerType the provider type
@@ -119,9 +114,8 @@ public class PowwowServerPersistenceImpl
 	 * @return the range of matching powwow servers
 	 */
 	@Override
-	public List<PowwowServer> findByPT_A(
-		String providerType, boolean active, int start, int end) {
-
+	public List<PowwowServer> findByPT_A(String providerType, boolean active,
+		int start, int end) {
 		return findByPT_A(providerType, active, start, end, null);
 	}
 
@@ -129,7 +123,7 @@ public class PowwowServerPersistenceImpl
 	 * Returns an ordered range of all the powwow servers where providerType = &#63; and active = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PowwowServerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PowwowServerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param providerType the provider type
@@ -140,19 +134,17 @@ public class PowwowServerPersistenceImpl
 	 * @return the ordered range of matching powwow servers
 	 */
 	@Override
-	public List<PowwowServer> findByPT_A(
-		String providerType, boolean active, int start, int end,
-		OrderByComparator<PowwowServer> orderByComparator) {
-
-		return findByPT_A(
-			providerType, active, start, end, orderByComparator, true);
+	public List<PowwowServer> findByPT_A(String providerType, boolean active,
+		int start, int end, OrderByComparator<PowwowServer> orderByComparator) {
+		return findByPT_A(providerType, active, start, end, orderByComparator,
+			true);
 	}
 
 	/**
 	 * Returns an ordered range of all the powwow servers where providerType = &#63; and active = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PowwowServerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PowwowServerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param providerType the provider type
@@ -164,11 +156,9 @@ public class PowwowServerPersistenceImpl
 	 * @return the ordered range of matching powwow servers
 	 */
 	@Override
-	public List<PowwowServer> findByPT_A(
-		String providerType, boolean active, int start, int end,
-		OrderByComparator<PowwowServer> orderByComparator,
+	public List<PowwowServer> findByPT_A(String providerType, boolean active,
+		int start, int end, OrderByComparator<PowwowServer> orderByComparator,
 		boolean retrieveFromCache) {
-
 		providerType = Objects.toString(providerType, "");
 
 		boolean pagination = true;
@@ -176,30 +166,30 @@ public class PowwowServerPersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByPT_A;
-			finderArgs = new Object[] {providerType, active};
+			finderArgs = new Object[] { providerType, active };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByPT_A;
 			finderArgs = new Object[] {
-				providerType, active, start, end, orderByComparator
-			};
+					providerType, active,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<PowwowServer> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<PowwowServer>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<PowwowServer>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (PowwowServer powwowServer : list) {
 					if (!providerType.equals(powwowServer.getProviderType()) ||
-						(active != powwowServer.isActive())) {
-
+							(active != powwowServer.isActive())) {
 						list = null;
 
 						break;
@@ -212,8 +202,8 @@ public class PowwowServerPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -235,10 +225,11 @@ public class PowwowServerPersistenceImpl
 			query.append(_FINDER_COLUMN_PT_A_ACTIVE_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(PowwowServerModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -260,16 +251,16 @@ public class PowwowServerPersistenceImpl
 				qPos.add(active);
 
 				if (!pagination) {
-					list = (List<PowwowServer>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<PowwowServer>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<PowwowServer>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<PowwowServer>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -299,13 +290,11 @@ public class PowwowServerPersistenceImpl
 	 * @throws NoSuchServerException if a matching powwow server could not be found
 	 */
 	@Override
-	public PowwowServer findByPT_A_First(
-			String providerType, boolean active,
-			OrderByComparator<PowwowServer> orderByComparator)
+	public PowwowServer findByPT_A_First(String providerType, boolean active,
+		OrderByComparator<PowwowServer> orderByComparator)
 		throws NoSuchServerException {
-
-		PowwowServer powwowServer = fetchByPT_A_First(
-			providerType, active, orderByComparator);
+		PowwowServer powwowServer = fetchByPT_A_First(providerType, active,
+				orderByComparator);
 
 		if (powwowServer != null) {
 			return powwowServer;
@@ -335,12 +324,10 @@ public class PowwowServerPersistenceImpl
 	 * @return the first matching powwow server, or <code>null</code> if a matching powwow server could not be found
 	 */
 	@Override
-	public PowwowServer fetchByPT_A_First(
-		String providerType, boolean active,
+	public PowwowServer fetchByPT_A_First(String providerType, boolean active,
 		OrderByComparator<PowwowServer> orderByComparator) {
-
-		List<PowwowServer> list = findByPT_A(
-			providerType, active, 0, 1, orderByComparator);
+		List<PowwowServer> list = findByPT_A(providerType, active, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -359,13 +346,11 @@ public class PowwowServerPersistenceImpl
 	 * @throws NoSuchServerException if a matching powwow server could not be found
 	 */
 	@Override
-	public PowwowServer findByPT_A_Last(
-			String providerType, boolean active,
-			OrderByComparator<PowwowServer> orderByComparator)
+	public PowwowServer findByPT_A_Last(String providerType, boolean active,
+		OrderByComparator<PowwowServer> orderByComparator)
 		throws NoSuchServerException {
-
-		PowwowServer powwowServer = fetchByPT_A_Last(
-			providerType, active, orderByComparator);
+		PowwowServer powwowServer = fetchByPT_A_Last(providerType, active,
+				orderByComparator);
 
 		if (powwowServer != null) {
 			return powwowServer;
@@ -395,18 +380,16 @@ public class PowwowServerPersistenceImpl
 	 * @return the last matching powwow server, or <code>null</code> if a matching powwow server could not be found
 	 */
 	@Override
-	public PowwowServer fetchByPT_A_Last(
-		String providerType, boolean active,
+	public PowwowServer fetchByPT_A_Last(String providerType, boolean active,
 		OrderByComparator<PowwowServer> orderByComparator) {
-
 		int count = countByPT_A(providerType, active);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<PowwowServer> list = findByPT_A(
-			providerType, active, count - 1, count, orderByComparator);
+		List<PowwowServer> list = findByPT_A(providerType, active, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -426,11 +409,10 @@ public class PowwowServerPersistenceImpl
 	 * @throws NoSuchServerException if a powwow server with the primary key could not be found
 	 */
 	@Override
-	public PowwowServer[] findByPT_A_PrevAndNext(
-			long powwowServerId, String providerType, boolean active,
-			OrderByComparator<PowwowServer> orderByComparator)
+	public PowwowServer[] findByPT_A_PrevAndNext(long powwowServerId,
+		String providerType, boolean active,
+		OrderByComparator<PowwowServer> orderByComparator)
 		throws NoSuchServerException {
-
 		providerType = Objects.toString(providerType, "");
 
 		PowwowServer powwowServer = findByPrimaryKey(powwowServerId);
@@ -442,15 +424,13 @@ public class PowwowServerPersistenceImpl
 
 			PowwowServer[] array = new PowwowServerImpl[3];
 
-			array[0] = getByPT_A_PrevAndNext(
-				session, powwowServer, providerType, active, orderByComparator,
-				true);
+			array[0] = getByPT_A_PrevAndNext(session, powwowServer,
+					providerType, active, orderByComparator, true);
 
 			array[1] = powwowServer;
 
-			array[2] = getByPT_A_PrevAndNext(
-				session, powwowServer, providerType, active, orderByComparator,
-				false);
+			array[2] = getByPT_A_PrevAndNext(session, powwowServer,
+					providerType, active, orderByComparator, false);
 
 			return array;
 		}
@@ -462,16 +442,14 @@ public class PowwowServerPersistenceImpl
 		}
 	}
 
-	protected PowwowServer getByPT_A_PrevAndNext(
-		Session session, PowwowServer powwowServer, String providerType,
-		boolean active, OrderByComparator<PowwowServer> orderByComparator,
-		boolean previous) {
-
+	protected PowwowServer getByPT_A_PrevAndNext(Session session,
+		PowwowServer powwowServer, String providerType, boolean active,
+		OrderByComparator<PowwowServer> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -494,8 +472,7 @@ public class PowwowServerPersistenceImpl
 		query.append(_FINDER_COLUMN_PT_A_ACTIVE_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -569,9 +546,8 @@ public class PowwowServerPersistenceImpl
 		qPos.add(active);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(powwowServer)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					powwowServer)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -594,11 +570,8 @@ public class PowwowServerPersistenceImpl
 	 */
 	@Override
 	public void removeByPT_A(String providerType, boolean active) {
-		for (PowwowServer powwowServer :
-				findByPT_A(
-					providerType, active, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (PowwowServer powwowServer : findByPT_A(providerType, active,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(powwowServer);
 		}
 	}
@@ -616,10 +589,10 @@ public class PowwowServerPersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByPT_A;
 
-		Object[] finderArgs = new Object[] {providerType, active};
+		Object[] finderArgs = new Object[] { providerType, active };
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -673,35 +646,16 @@ public class PowwowServerPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_PT_A_PROVIDERTYPE_2 =
-		"powwowServer.providerType = ? AND ";
-
-	private static final String _FINDER_COLUMN_PT_A_PROVIDERTYPE_3 =
-		"(powwowServer.providerType IS NULL OR powwowServer.providerType = '') AND ";
-
-	private static final String _FINDER_COLUMN_PT_A_ACTIVE_2 =
-		"powwowServer.active = ?";
+	private static final String _FINDER_COLUMN_PT_A_PROVIDERTYPE_2 = "powwowServer.providerType = ? AND ";
+	private static final String _FINDER_COLUMN_PT_A_PROVIDERTYPE_3 = "(powwowServer.providerType IS NULL OR powwowServer.providerType = '') AND ";
+	private static final String _FINDER_COLUMN_PT_A_ACTIVE_2 = "powwowServer.active = ?";
 
 	public PowwowServerPersistenceImpl() {
 		setModelClass(PowwowServer.class);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("active", "active_");
-
-		try {
-			Field field = BasePersistenceImpl.class.getDeclaredField(
-				"_dbColumnNames");
-
-			field.setAccessible(true);
-
-			field.set(this, dbColumnNames);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
+		setModelImplClass(PowwowServerImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(PowwowServerModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -711,9 +665,8 @@ public class PowwowServerPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(PowwowServer powwowServer) {
-		EntityCacheUtil.putResult(
-			PowwowServerModelImpl.ENTITY_CACHE_ENABLED, PowwowServerImpl.class,
-			powwowServer.getPrimaryKey(), powwowServer);
+		EntityCacheUtil.putResult(PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
+			PowwowServerImpl.class, powwowServer.getPrimaryKey(), powwowServer);
 
 		powwowServer.resetOriginalValues();
 	}
@@ -727,10 +680,8 @@ public class PowwowServerPersistenceImpl
 	public void cacheResult(List<PowwowServer> powwowServers) {
 		for (PowwowServer powwowServer : powwowServers) {
 			if (EntityCacheUtil.getResult(
-					PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
-					PowwowServerImpl.class, powwowServer.getPrimaryKey()) ==
-						null) {
-
+						PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
+						PowwowServerImpl.class, powwowServer.getPrimaryKey()) == null) {
 				cacheResult(powwowServer);
 			}
 			else {
@@ -743,7 +694,7 @@ public class PowwowServerPersistenceImpl
 	 * Clears the cache for all powwow servers.
 	 *
 	 * <p>
-	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -759,14 +710,13 @@ public class PowwowServerPersistenceImpl
 	 * Clears the cache for the powwow server.
 	 *
 	 * <p>
-	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(PowwowServer powwowServer) {
-		EntityCacheUtil.removeResult(
-			PowwowServerModelImpl.ENTITY_CACHE_ENABLED, PowwowServerImpl.class,
-			powwowServer.getPrimaryKey());
+		EntityCacheUtil.removeResult(PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
+			PowwowServerImpl.class, powwowServer.getPrimaryKey());
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -778,8 +728,7 @@ public class PowwowServerPersistenceImpl
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (PowwowServer powwowServer : powwowServers) {
-			EntityCacheUtil.removeResult(
-				PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
+			EntityCacheUtil.removeResult(PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
 				PowwowServerImpl.class, powwowServer.getPrimaryKey());
 		}
 	}
@@ -812,7 +761,6 @@ public class PowwowServerPersistenceImpl
 	@Override
 	public PowwowServer remove(long powwowServerId)
 		throws NoSuchServerException {
-
 		return remove((Serializable)powwowServerId);
 	}
 
@@ -826,22 +774,21 @@ public class PowwowServerPersistenceImpl
 	@Override
 	public PowwowServer remove(Serializable primaryKey)
 		throws NoSuchServerException {
-
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			PowwowServer powwowServer = (PowwowServer)session.get(
-				PowwowServerImpl.class, primaryKey);
+			PowwowServer powwowServer = (PowwowServer)session.get(PowwowServerImpl.class,
+					primaryKey);
 
 			if (powwowServer == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchServerException(
-					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				throw new NoSuchServerException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
 			}
 
 			return remove(powwowServer);
@@ -865,8 +812,8 @@ public class PowwowServerPersistenceImpl
 			session = openSession();
 
 			if (!session.contains(powwowServer)) {
-				powwowServer = (PowwowServer)session.get(
-					PowwowServerImpl.class, powwowServer.getPrimaryKeyObj());
+				powwowServer = (PowwowServer)session.get(PowwowServerImpl.class,
+						powwowServer.getPrimaryKeyObj());
 			}
 
 			if (powwowServer != null) {
@@ -895,24 +842,21 @@ public class PowwowServerPersistenceImpl
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(powwowServer.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(
-					powwowServer);
+				invocationHandler = ProxyUtil.getInvocationHandler(powwowServer);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in powwowServer proxy " +
-						invocationHandler.getClass());
+					invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom PowwowServer implementation " +
-					powwowServer.getClass());
+				powwowServer.getClass());
 		}
 
-		PowwowServerModelImpl powwowServerModelImpl =
-			(PowwowServerModelImpl)powwowServer;
+		PowwowServerModelImpl powwowServerModelImpl = (PowwowServerModelImpl)powwowServer;
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -930,8 +874,7 @@ public class PowwowServerPersistenceImpl
 				powwowServer.setModifiedDate(now);
 			}
 			else {
-				powwowServer.setModifiedDate(
-					serviceContext.getModifiedDate(now));
+				powwowServer.setModifiedDate(serviceContext.getModifiedDate(now));
 			}
 		}
 
@@ -959,52 +902,50 @@ public class PowwowServerPersistenceImpl
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
 		if (!PowwowServerModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else if (isNew) {
+		else
+		 if (isNew) {
 			Object[] args = new Object[] {
-				powwowServerModelImpl.getProviderType(),
-				powwowServerModelImpl.isActive()
-			};
-
-			FinderCacheUtil.removeResult(_finderPathCountByPT_A, args);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindByPT_A, args);
-
-			FinderCacheUtil.removeResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
-		}
-		else {
-			if ((powwowServerModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByPT_A.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					powwowServerModelImpl.getOriginalProviderType(),
-					powwowServerModelImpl.getOriginalActive()
-				};
-
-				FinderCacheUtil.removeResult(_finderPathCountByPT_A, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByPT_A, args);
-
-				args = new Object[] {
 					powwowServerModelImpl.getProviderType(),
 					powwowServerModelImpl.isActive()
 				};
 
+			FinderCacheUtil.removeResult(_finderPathCountByPT_A, args);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByPT_A,
+				args);
+
+			FinderCacheUtil.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindAll,
+				FINDER_ARGS_EMPTY);
+		}
+
+		else {
+			if ((powwowServerModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByPT_A.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						powwowServerModelImpl.getOriginalProviderType(),
+						powwowServerModelImpl.getOriginalActive()
+					};
+
 				FinderCacheUtil.removeResult(_finderPathCountByPT_A, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByPT_A, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByPT_A,
+					args);
+
+				args = new Object[] {
+						powwowServerModelImpl.getProviderType(),
+						powwowServerModelImpl.isActive()
+					};
+
+				FinderCacheUtil.removeResult(_finderPathCountByPT_A, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByPT_A,
+					args);
 			}
 		}
 
-		EntityCacheUtil.putResult(
-			PowwowServerModelImpl.ENTITY_CACHE_ENABLED, PowwowServerImpl.class,
-			powwowServer.getPrimaryKey(), powwowServer, false);
+		EntityCacheUtil.putResult(PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
+			PowwowServerImpl.class, powwowServer.getPrimaryKey(), powwowServer,
+			false);
 
 		powwowServer.resetOriginalValues();
 
@@ -1012,7 +953,7 @@ public class PowwowServerPersistenceImpl
 	}
 
 	/**
-	 * Returns the powwow server with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
+	 * Returns the powwow server with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the powwow server
 	 * @return the powwow server
@@ -1021,7 +962,6 @@ public class PowwowServerPersistenceImpl
 	@Override
 	public PowwowServer findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchServerException {
-
 		PowwowServer powwowServer = fetchByPrimaryKey(primaryKey);
 
 		if (powwowServer == null) {
@@ -1029,15 +969,15 @@ public class PowwowServerPersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchServerException(
-				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			throw new NoSuchServerException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
 		}
 
 		return powwowServer;
 	}
 
 	/**
-	 * Returns the powwow server with the primary key or throws a <code>NoSuchServerException</code> if it could not be found.
+	 * Returns the powwow server with the primary key or throws a {@link NoSuchServerException} if it could not be found.
 	 *
 	 * @param powwowServerId the primary key of the powwow server
 	 * @return the powwow server
@@ -1046,59 +986,7 @@ public class PowwowServerPersistenceImpl
 	@Override
 	public PowwowServer findByPrimaryKey(long powwowServerId)
 		throws NoSuchServerException {
-
 		return findByPrimaryKey((Serializable)powwowServerId);
-	}
-
-	/**
-	 * Returns the powwow server with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param primaryKey the primary key of the powwow server
-	 * @return the powwow server, or <code>null</code> if a powwow server with the primary key could not be found
-	 */
-	@Override
-	public PowwowServer fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = EntityCacheUtil.getResult(
-			PowwowServerModelImpl.ENTITY_CACHE_ENABLED, PowwowServerImpl.class,
-			primaryKey);
-
-		if (serializable == nullModel) {
-			return null;
-		}
-
-		PowwowServer powwowServer = (PowwowServer)serializable;
-
-		if (powwowServer == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				powwowServer = (PowwowServer)session.get(
-					PowwowServerImpl.class, primaryKey);
-
-				if (powwowServer != null) {
-					cacheResult(powwowServer);
-				}
-				else {
-					EntityCacheUtil.putResult(
-						PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
-						PowwowServerImpl.class, primaryKey, nullModel);
-				}
-			}
-			catch (Exception e) {
-				EntityCacheUtil.removeResult(
-					PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
-					PowwowServerImpl.class, primaryKey);
-
-				throw processException(e);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return powwowServer;
 	}
 
 	/**
@@ -1110,104 +998,6 @@ public class PowwowServerPersistenceImpl
 	@Override
 	public PowwowServer fetchByPrimaryKey(long powwowServerId) {
 		return fetchByPrimaryKey((Serializable)powwowServerId);
-	}
-
-	@Override
-	public Map<Serializable, PowwowServer> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, PowwowServer> map =
-			new HashMap<Serializable, PowwowServer>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			PowwowServer powwowServer = fetchByPrimaryKey(primaryKey);
-
-			if (powwowServer != null) {
-				map.put(primaryKey, powwowServer);
-			}
-
-			return map;
-		}
-
-		Set<Serializable> uncachedPrimaryKeys = null;
-
-		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = EntityCacheUtil.getResult(
-				PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
-				PowwowServerImpl.class, primaryKey);
-
-			if (serializable != nullModel) {
-				if (serializable == null) {
-					if (uncachedPrimaryKeys == null) {
-						uncachedPrimaryKeys = new HashSet<Serializable>();
-					}
-
-					uncachedPrimaryKeys.add(primaryKey);
-				}
-				else {
-					map.put(primaryKey, (PowwowServer)serializable);
-				}
-			}
-		}
-
-		if (uncachedPrimaryKeys == null) {
-			return map;
-		}
-
-		StringBundler query = new StringBundler(
-			uncachedPrimaryKeys.size() * 2 + 1);
-
-		query.append(_SQL_SELECT_POWWOWSERVER_WHERE_PKS_IN);
-
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
-
-			query.append(",");
-		}
-
-		query.setIndex(query.index() - 1);
-
-		query.append(")");
-
-		String sql = query.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query q = session.createQuery(sql);
-
-			for (PowwowServer powwowServer : (List<PowwowServer>)q.list()) {
-				map.put(powwowServer.getPrimaryKeyObj(), powwowServer);
-
-				cacheResult(powwowServer);
-
-				uncachedPrimaryKeys.remove(powwowServer.getPrimaryKeyObj());
-			}
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				EntityCacheUtil.putResult(
-					PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
-					PowwowServerImpl.class, primaryKey, nullModel);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -1224,7 +1014,7 @@ public class PowwowServerPersistenceImpl
 	 * Returns a range of all the powwow servers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PowwowServerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PowwowServerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of powwow servers
@@ -1240,7 +1030,7 @@ public class PowwowServerPersistenceImpl
 	 * Returns an ordered range of all the powwow servers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PowwowServerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PowwowServerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of powwow servers
@@ -1249,9 +1039,8 @@ public class PowwowServerPersistenceImpl
 	 * @return the ordered range of powwow servers
 	 */
 	@Override
-	public List<PowwowServer> findAll(
-		int start, int end, OrderByComparator<PowwowServer> orderByComparator) {
-
+	public List<PowwowServer> findAll(int start, int end,
+		OrderByComparator<PowwowServer> orderByComparator) {
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -1259,7 +1048,7 @@ public class PowwowServerPersistenceImpl
 	 * Returns an ordered range of all the powwow servers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PowwowServerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PowwowServerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of powwow servers
@@ -1269,31 +1058,29 @@ public class PowwowServerPersistenceImpl
 	 * @return the ordered range of powwow servers
 	 */
 	@Override
-	public List<PowwowServer> findAll(
-		int start, int end, OrderByComparator<PowwowServer> orderByComparator,
+	public List<PowwowServer> findAll(int start, int end,
+		OrderByComparator<PowwowServer> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] {start, end, orderByComparator};
+			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
 		List<PowwowServer> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<PowwowServer>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<PowwowServer>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 		}
 
 		if (list == null) {
@@ -1301,13 +1088,13 @@ public class PowwowServerPersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					2 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_POWWOWSERVER);
 
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 
 				sql = query.toString();
 			}
@@ -1327,16 +1114,16 @@ public class PowwowServerPersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<PowwowServer>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<PowwowServer>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<PowwowServer>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<PowwowServer>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -1374,8 +1161,8 @@ public class PowwowServerPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		Long count = (Long)FinderCacheUtil.getResult(_finderPathCountAll,
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -1387,12 +1174,12 @@ public class PowwowServerPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				FinderCacheUtil.putResult(_finderPathCountAll,
+					FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+				FinderCacheUtil.removeResult(_finderPathCountAll,
+					FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -1410,6 +1197,21 @@ public class PowwowServerPersistenceImpl
 	}
 
 	@Override
+	protected EntityCache getEntityCache() {
+		return EntityCacheUtil.getEntityCache();
+	}
+
+	@Override
+	protected String getPKDBName() {
+		return "powwowServerId";
+	}
+
+	@Override
+	protected String getSelectSQL() {
+		return _SQL_SELECT_POWWOWSERVER;
+	}
+
+	@Override
 	protected Map<String, Integer> getTableColumnsMap() {
 		return PowwowServerModelImpl.TABLE_COLUMNS_MAP;
 	}
@@ -1418,47 +1220,46 @@ public class PowwowServerPersistenceImpl
 	 * Initializes the powwow server persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(
-			PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
-			PowwowServerModelImpl.FINDER_CACHE_ENABLED, PowwowServerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
+				PowwowServerModelImpl.FINDER_CACHE_ENABLED,
+				PowwowServerImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+				"findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
-			PowwowServerModelImpl.FINDER_CACHE_ENABLED, PowwowServerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-			new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
+				PowwowServerModelImpl.FINDER_CACHE_ENABLED,
+				PowwowServerImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+				new String[0]);
 
-		_finderPathCountAll = new FinderPath(
-			PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
-			PowwowServerModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+		_finderPathCountAll = new FinderPath(PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
+				PowwowServerModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+				new String[0]);
 
-		_finderPathWithPaginationFindByPT_A = new FinderPath(
-			PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
-			PowwowServerModelImpl.FINDER_CACHE_ENABLED, PowwowServerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByPT_A",
-			new String[] {
-				String.class.getName(), Boolean.class.getName(),
+		_finderPathWithPaginationFindByPT_A = new FinderPath(PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
+				PowwowServerModelImpl.FINDER_CACHE_ENABLED,
+				PowwowServerImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+				"findByPT_A",
+				new String[] {
+					String.class.getName(), Boolean.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByPT_A = new FinderPath(
-			PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
-			PowwowServerModelImpl.FINDER_CACHE_ENABLED, PowwowServerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByPT_A",
-			new String[] {String.class.getName(), Boolean.class.getName()},
-			PowwowServerModelImpl.PROVIDERTYPE_COLUMN_BITMASK |
-			PowwowServerModelImpl.ACTIVE_COLUMN_BITMASK |
-			PowwowServerModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByPT_A = new FinderPath(PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
+				PowwowServerModelImpl.FINDER_CACHE_ENABLED,
+				PowwowServerImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByPT_A",
+				new String[] { String.class.getName(), Boolean.class.getName() },
+				PowwowServerModelImpl.PROVIDERTYPE_COLUMN_BITMASK |
+				PowwowServerModelImpl.ACTIVE_COLUMN_BITMASK |
+				PowwowServerModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByPT_A = new FinderPath(
-			PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
-			PowwowServerModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByPT_A",
-			new String[] {String.class.getName(), Boolean.class.getName()});
+		_finderPathCountByPT_A = new FinderPath(PowwowServerModelImpl.ENTITY_CACHE_ENABLED,
+				PowwowServerModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByPT_A",
+				new String[] { String.class.getName(), Boolean.class.getName() });
 	}
 
 	public void destroy() {
@@ -1470,34 +1271,15 @@ public class PowwowServerPersistenceImpl
 
 	@BeanReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-
-	private static final String _SQL_SELECT_POWWOWSERVER =
-		"SELECT powwowServer FROM PowwowServer powwowServer";
-
-	private static final String _SQL_SELECT_POWWOWSERVER_WHERE_PKS_IN =
-		"SELECT powwowServer FROM PowwowServer powwowServer WHERE powwowServerId IN (";
-
-	private static final String _SQL_SELECT_POWWOWSERVER_WHERE =
-		"SELECT powwowServer FROM PowwowServer powwowServer WHERE ";
-
-	private static final String _SQL_COUNT_POWWOWSERVER =
-		"SELECT COUNT(powwowServer) FROM PowwowServer powwowServer";
-
-	private static final String _SQL_COUNT_POWWOWSERVER_WHERE =
-		"SELECT COUNT(powwowServer) FROM PowwowServer powwowServer WHERE ";
-
+	private static final String _SQL_SELECT_POWWOWSERVER = "SELECT powwowServer FROM PowwowServer powwowServer";
+	private static final String _SQL_SELECT_POWWOWSERVER_WHERE = "SELECT powwowServer FROM PowwowServer powwowServer WHERE ";
+	private static final String _SQL_COUNT_POWWOWSERVER = "SELECT COUNT(powwowServer) FROM PowwowServer powwowServer";
+	private static final String _SQL_COUNT_POWWOWSERVER_WHERE = "SELECT COUNT(powwowServer) FROM PowwowServer powwowServer WHERE ";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "powwowServer.";
-
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
-		"No PowwowServer exists with the primary key ";
-
-	private static final String _NO_SUCH_ENTITY_WITH_KEY =
-		"No PowwowServer exists with the key {";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PowwowServerPersistenceImpl.class);
-
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"active"});
-
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No PowwowServer exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No PowwowServer exists with the key {";
+	private static final Log _log = LogFactoryUtil.getLog(PowwowServerPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+				"active"
+			});
 }

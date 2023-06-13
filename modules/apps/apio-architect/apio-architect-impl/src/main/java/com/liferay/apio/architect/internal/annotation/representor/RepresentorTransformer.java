@@ -115,8 +115,8 @@ public class RepresentorTransformer {
 			typeClass, nameFunction, biConsumer, relatedCollectionsSupplier);
 	}
 
-	private static <T extends Identifier<?>> void _processFields(
-		ParsedType parsedType, FirstStep<T> firstStep) {
+	private static <T extends Identifier<?>> void
+		_processFields(ParsedType parsedType, FirstStep<T> firstStep) {
 
 		List<FieldData<BidirectionalModel>> bidirectionalFieldDataList =
 			filterWritableFields(parsedType::getBidirectionalFieldDataList);

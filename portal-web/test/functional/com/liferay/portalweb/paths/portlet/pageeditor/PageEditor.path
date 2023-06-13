@@ -30,28 +30,70 @@
 </tr>
 <!--FRAGMENT_SIDEBAR-->
 <tr>
+	<td>FRAGMENT_SIDEBAR</td>
+	<td>//div[contains(@class,'fragments-editor-sidebar')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FRAGMENT_SIDEBAR_COLLECTION_PANEL</td>
-	<td>//div[contains(@class,'sidebar-body')]//a[contains(@href,'fragment-collection')][normalize-space()='${key_collectionName}']</td>
+	<td>//div[contains(@class,'fragments-editor-sidebar-section')]//a[contains(@href,'fragment-collection')][normalize-space()='${key_collectionName}']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COLLECTION_PANEL_COLLAPSED</td>
-	<td>//div[contains(@class,'sidebar-body')]//a[contains(@href,'fragment-collection')][contains(@class,'collapsed')][normalize-space()='${key_collectionName}']</td>
+	<td>//div[contains(@class,'fragments-editor-sidebar-section')]//a[contains(@href,'fragment-collection')][contains(@class,'collapsed')][normalize-space()='${key_collectionName}']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COLLECTION_PANEL_EXPANDED</td>
-	<td>//div[contains(@class,'sidebar-body')]//a[contains(@href,'fragment-collection')][@aria-expanded='true'][normalize-space()='${key_collectionName}']</td>
+	<td>//div[contains(@class,'fragments-editor-sidebar-section')]//a[contains(@href,'fragment-collection')][@aria-expanded='true'][normalize-space()='${key_collectionName}']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>FRAGMENT_SIDEBAR_FRAGMENT</td>
-	<td>//ul[contains(@class,'nav')]//li[contains(.,'${key_collectionName}')]//button[@data-item-name='${key_fragmentName}']</td>
+	<td>FRAGMENT_SIDEBAR_ADD_FRAGMENT_BUTTON</td>
+	<td>//button[@data-item-name='${key_fragmentName}']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>FRAGMENT_SIDEBAR_TAB</td>
-	<td>//ul[contains(@class,'nav')]//li[contains(@class,'nav-item')]//a[contains(.,'${key_tabName}')]</td>
+	<td>FRAGMENT_SIDEBAR_TAB_BUTTON</td>
+	<td>//button[@title='${key_tabName}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--CONTENT_PAGE-->
+<tr>
+	<td>CONTENT_PAGE_DISABLED_HEADER</td>
+	<td>//header[@class='lfr-edit-mode__disabled-area']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTENT_PAGE_DISABLED_FOOTER</td>
+	<td>//footer[@class='lfr-edit-mode__disabled-area']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTENT_PAGE_DISABLED_POPOVER</td>
+	<td>//div[contains(@class,'disabled-area-popover--visible')]//div[@class='popover-body']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SECTION-->
+<tr>
+	<td>SECTION</td>
+	<td>//section[contains(@class,'fragment-entry-link')][${key_position}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SECTION_HEADER_DELETE_BUTTON</td>
+	<td>//section[contains(@class,'fragment-entry-link')][${key_position}]/nav//button</td>
 	<td></td>
 </tr>
 </tbody>

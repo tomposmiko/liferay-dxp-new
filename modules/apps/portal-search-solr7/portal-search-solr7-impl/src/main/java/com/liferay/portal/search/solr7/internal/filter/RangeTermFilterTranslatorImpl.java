@@ -30,10 +30,12 @@ public class RangeTermFilterTranslatorImpl
 
 	@Override
 	public Query translate(RangeTermFilter rangeTermFilter) {
-		return TermRangeQuery.newStringRange(
+		TermRangeQuery termRangeQuery = TermRangeQuery.newStringRange(
 			rangeTermFilter.getField(), rangeTermFilter.getLowerBound(),
 			rangeTermFilter.getUpperBound(), rangeTermFilter.isIncludesLower(),
 			rangeTermFilter.isIncludesUpper());
+
+		return termRangeQuery;
 	}
 
 }

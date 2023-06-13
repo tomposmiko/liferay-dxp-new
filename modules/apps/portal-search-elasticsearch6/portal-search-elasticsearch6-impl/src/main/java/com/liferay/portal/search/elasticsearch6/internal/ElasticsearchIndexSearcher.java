@@ -40,10 +40,17 @@ import com.liferay.portal.search.elasticsearch6.configuration.ElasticsearchConfi
 import com.liferay.portal.search.elasticsearch6.constants.ElasticsearchSearchContextAttributes;
 import com.liferay.portal.search.elasticsearch6.internal.index.IndexNameBuilder;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
+import com.liferay.portal.search.engine.adapter.search.BaseSearchRequest;
+import com.liferay.portal.search.engine.adapter.search.BaseSearchResponse;
 import com.liferay.portal.search.engine.adapter.search.CountSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.CountSearchResponse;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.search.legacy.searcher.SearchResponseBuilderFactory;
+import com.liferay.portal.search.searcher.SearchRequest;
+import com.liferay.portal.search.searcher.SearchRequestBuilder;
+import com.liferay.portal.search.searcher.SearchResponseBuilder;
 
 import java.util.Map;
 
@@ -97,6 +104,9 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 				throw new IllegalArgumentException("Invalid end " + end);
 			}
 
+			SearchResponseBuilder searchResponseBuilder =
+				_getSearchResponseBuilder(searchContext);
+
 			Hits hits = null;
 
 			while (true) {
@@ -115,9 +125,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 							searchSearchResponse.getExecutionTime() + " ms"));
 				}
 
-				searchContext.setAttribute(
-					"queryString",
-					searchSearchResponse.getSearchRequestString());
+				populateResponse(searchSearchResponse, searchResponseBuilder);
 
 				hits = searchSearchResponse.getHits();
 
@@ -173,17 +181,8 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		stopWatch.start();
 
 		try {
-			CountSearchRequest countSearchRequest = new CountSearchRequest();
-
-			QueryConfig queryConfig = searchContext.getQueryConfig();
-
-			String[] indexNames = getSelectedIndexNames(
-				queryConfig, searchContext);
-
-			countSearchRequest.setIndexNames(indexNames);
-
-			countSearchRequest.setPostFilter(query.getPostFilter());
-			countSearchRequest.setQuery(query);
+			CountSearchRequest countSearchRequest = createCountSearchRequest(
+				searchContext, query);
 
 			CountSearchResponse countSearchResponse =
 				searchEngineAdapter.execute(countSearchRequest);
@@ -196,8 +195,8 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 						countSearchResponse.getExecutionTime() + " ms"));
 			}
 
-			searchContext.setAttribute(
-				"queryString", countSearchResponse.getSearchRequestString());
+			populateResponse(
+				countSearchResponse, _getSearchResponseBuilder(searchContext));
 
 			return countSearchResponse.getCount();
 		}
@@ -242,10 +241,22 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		_logExceptionsOnly = _elasticsearchConfiguration.logExceptionsOnly();
 	}
 
+	protected CountSearchRequest createCountSearchRequest(
+		SearchContext searchContext, Query query) {
+
+		CountSearchRequest countSearchRequest = new CountSearchRequest();
+
+		prepare(countSearchRequest, query, searchContext);
+
+		return countSearchRequest;
+	}
+
 	protected SearchSearchRequest createSearchSearchRequest(
 		SearchContext searchContext, Query query, int start, int end) {
 
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
+
+		prepare(searchSearchRequest, query, searchContext);
 
 		QueryConfig queryConfig = searchContext.getQueryConfig();
 
@@ -257,10 +268,6 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 				SearchContextAttributes.ATTRIBUTE_KEY_BASIC_FACET_SELECTION));
 
 		searchSearchRequest.setBasicFacetSelection(basicFacetSelection);
-
-		String[] indexNames = getSelectedIndexNames(queryConfig, searchContext);
-
-		searchSearchRequest.setIndexNames(indexNames);
 
 		searchSearchRequest.putAllFacets(searchContext.getFacets());
 
@@ -283,9 +290,6 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 				SearchContextAttributes.ATTRIBUTE_KEY_LUCENE_SYNTAX));
 
 		searchSearchRequest.setLuceneSyntax(luceneSyntax);
-
-		searchSearchRequest.setQuery(query);
-		searchSearchRequest.setPostFilter(query.getPostFilter());
 
 		String preference = (String)searchContext.getAttribute(
 			ElasticsearchSearchContextAttributes.
@@ -350,6 +354,41 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		return false;
 	}
 
+	protected void populateResponse(
+		BaseSearchResponse baseSearchResponse,
+		SearchResponseBuilder searchResponseBuilder) {
+
+		searchResponseBuilder.requestString(
+			baseSearchResponse.getSearchRequestString()
+		).responseString(
+			baseSearchResponse.getSearchResponseString()
+		);
+	}
+
+	protected void prepare(
+		BaseSearchRequest baseSearchRequest, Query query,
+		SearchContext searchContext) {
+
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		String[] indexNames = getSelectedIndexNames(queryConfig, searchContext);
+
+		baseSearchRequest.setIndexNames(indexNames);
+
+		baseSearchRequest.setPostFilter(query.getPostFilter());
+		baseSearchRequest.setQuery(query);
+
+		SearchRequestBuilder searchRequestBuilder = _getSearchRequestBuilder(
+			searchContext);
+
+		SearchRequest searchRequest = searchRequestBuilder.build();
+
+		baseSearchRequest.setExplain(searchRequest.isExplain());
+		baseSearchRequest.setIncludeResponseString(
+			searchRequest.isIncludeResponseString());
+		baseSearchRequest.setRescoreQuery(searchRequest.getRescoreQuery());
+	}
+
 	@Reference
 	protected IndexNameBuilder indexNameBuilder;
 
@@ -358,6 +397,26 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 	@Reference(target = "(search.engine.impl=Elasticsearch)")
 	protected SearchEngineAdapter searchEngineAdapter;
+
+	@Reference
+	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
+
+	@Reference
+	protected SearchResponseBuilderFactory searchResponseBuilderFactory;
+
+	private SearchRequestBuilder _getSearchRequestBuilder(
+		SearchContext searchContext) {
+
+		return searchRequestBuilderFactory.getSearchRequestBuilder(
+			searchContext);
+	}
+
+	private SearchResponseBuilder _getSearchResponseBuilder(
+		SearchContext searchContext) {
+
+		return searchResponseBuilderFactory.getSearchResponseBuilder(
+			searchContext);
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ElasticsearchIndexSearcher.class);

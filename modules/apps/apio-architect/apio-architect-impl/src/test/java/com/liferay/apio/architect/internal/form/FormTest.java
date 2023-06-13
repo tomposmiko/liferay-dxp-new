@@ -358,10 +358,9 @@ public class FormTest {
 
 	private static String _readBinaryFile(BinaryFile binaryFile) {
 		return Try.fromFallibleWithResources(
-			() -> new BufferedReader(
-				new InputStreamReader(binaryFile.getInputStream())),
-			BufferedReader::readLine
-		).getUnchecked();
+			() -> new BufferedReader(new InputStreamReader(
+				binaryFile.getInputStream())),
+			BufferedReader::readLine).getUnchecked();
 	}
 
 	private static void _testBody(Map<String, Object> map) {

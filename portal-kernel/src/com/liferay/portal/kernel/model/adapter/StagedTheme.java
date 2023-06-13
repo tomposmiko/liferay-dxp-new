@@ -20,5 +20,5 @@ import com.liferay.portal.kernel.model.Theme;
 /**
  * @author Máté Thurzó
  */
-public interface StagedTheme extends StagedModel, Theme {
+public interface StagedTheme extends Theme, StagedModel {
 }

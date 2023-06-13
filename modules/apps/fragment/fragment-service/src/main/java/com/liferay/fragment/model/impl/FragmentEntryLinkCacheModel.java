@@ -17,9 +17,11 @@ package com.liferay.fragment.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.fragment.model.FragmentEntryLink;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing FragmentEntryLink in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see FragmentEntryLink
  * @generated
  */
 @ProviderType
-public class FragmentEntryLinkCacheModel
-	implements CacheModel<FragmentEntryLink>, Externalizable {
-
+public class FragmentEntryLinkCacheModel implements CacheModel<FragmentEntryLink>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,12 +50,9 @@ public class FragmentEntryLinkCacheModel
 			return false;
 		}
 
-		FragmentEntryLinkCacheModel fragmentEntryLinkCacheModel =
-			(FragmentEntryLinkCacheModel)obj;
+		FragmentEntryLinkCacheModel fragmentEntryLinkCacheModel = (FragmentEntryLinkCacheModel)obj;
 
-		if (fragmentEntryLinkId ==
-				fragmentEntryLinkCacheModel.fragmentEntryLinkId) {
-
+		if (fragmentEntryLinkId == fragmentEntryLinkCacheModel.fragmentEntryLinkId) {
 			return true;
 		}
 
@@ -116,8 +115,7 @@ public class FragmentEntryLinkCacheModel
 
 	@Override
 	public FragmentEntryLink toEntityModel() {
-		FragmentEntryLinkImpl fragmentEntryLinkImpl =
-			new FragmentEntryLinkImpl();
+		FragmentEntryLinkImpl fragmentEntryLinkImpl = new FragmentEntryLinkImpl();
 
 		if (uuid == null) {
 			fragmentEntryLinkImpl.setUuid("");
@@ -152,8 +150,7 @@ public class FragmentEntryLinkCacheModel
 			fragmentEntryLinkImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		fragmentEntryLinkImpl.setOriginalFragmentEntryLinkId(
-			originalFragmentEntryLinkId);
+		fragmentEntryLinkImpl.setOriginalFragmentEntryLinkId(originalFragmentEntryLinkId);
 		fragmentEntryLinkImpl.setFragmentEntryId(fragmentEntryId);
 		fragmentEntryLinkImpl.setClassNameId(classNameId);
 		fragmentEntryLinkImpl.setClassPK(classPK);
@@ -192,8 +189,8 @@ public class FragmentEntryLinkCacheModel
 			fragmentEntryLinkImpl.setLastPropagationDate(null);
 		}
 		else {
-			fragmentEntryLinkImpl.setLastPropagationDate(
-				new Date(lastPropagationDate));
+			fragmentEntryLinkImpl.setLastPropagationDate(new Date(
+					lastPropagationDate));
 		}
 
 		if (namespace == null) {
@@ -249,7 +246,8 @@ public class FragmentEntryLinkCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -344,5 +342,4 @@ public class FragmentEntryLinkCacheModel
 	public long lastPropagationDate;
 	public String namespace;
 	public long lastPublishDate;
-
 }

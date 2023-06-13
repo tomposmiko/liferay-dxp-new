@@ -2028,9 +2028,9 @@ definition {
 	@priority = "4"
 	test EditUploadedWorkflowViaViewTabViaAddProcess {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.uploadDefinition(

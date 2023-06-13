@@ -229,11 +229,7 @@ public class ActionSemanticsTest {
 		).returns(
 			Long.class
 		).permissionFunction(
-			params -> Unsafe.unsafeCast(
-				params.get(0)
-			).equals(
-				0L
-			)
+			params -> Unsafe.unsafeCast(params.get(0)).equals(0L)
 		).permissionProvidedClasses(
 			Id.class
 		).executeFunction(

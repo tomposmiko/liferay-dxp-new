@@ -9,18 +9,13 @@
 </thead>
 <tbody>
 <tr>
-	<td>AUTOMATIC_URL</td>
-	<td>//label[contains(.,'Automatic')]/input[@type='radio']</td>
-	<td></td>
-</tr>
-<tr>
 	<td>WORKFLOW_STRUCTURE_RESTRICTIONS_TOGGLE</td>
 	<td>//a[contains(.,'Structure Restrictions and Workflow')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>WORKFLOW_SPECIFIC_RESTRICTIONS_CHOOSE_STRUCTURE_BUTTON</td>
-	<td>//button[contains(@id,'selectStructure')]/span[contains(.,'Choose Structure')]</td>
+	<td>//button[contains(@id,'selectDDMStructure')]/span[contains(.,'Choose Structure')]</td>
 	<td></td>
 </tr>
 <tr>

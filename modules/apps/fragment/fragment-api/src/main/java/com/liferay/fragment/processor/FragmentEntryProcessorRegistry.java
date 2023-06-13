@@ -14,23 +14,62 @@
 
 package com.liferay.fragment.processor;
 
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.util.LocaleUtil;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Lance Ji
  */
 public interface FragmentEntryProcessorRegistry {
 
+	public default JSONArray getAvailableTagsJSONArray() {
+		return null;
+	}
+
 	public JSONObject getDefaultEditableValuesJSONObject(String html);
 
-	public String processFragmentEntryLinkHTML(
+	public default String processFragmentEntryLinkCSS(
+			FragmentEntryLink fragmentEntryLink, String mode, Locale locale)
+		throws PortalException {
+
+		return fragmentEntryLink.getCss();
+	}
+
+	public default String processFragmentEntryLinkHTML(
 			FragmentEntryLink fragmentEntryLink)
-		throws PortalException;
+		throws PortalException {
+
+		return processFragmentEntryLinkHTML(
+			fragmentEntryLink, FragmentEntryLinkConstants.EDIT);
+	}
+
+	public default String processFragmentEntryLinkHTML(
+			FragmentEntryLink fragmentEntryLink, String mode)
+		throws PortalException {
+
+		return processFragmentEntryLinkHTML(
+			fragmentEntryLink, mode, LocaleUtil.getMostRelevantLocale());
+	}
+
+	public default String processFragmentEntryLinkHTML(
+			FragmentEntryLink fragmentEntryLink, String mode, Locale locale)
+		throws PortalException {
+
+		return processFragmentEntryLinkHTML(
+			fragmentEntryLink, mode, locale, Collections.emptyList());
+	}
 
 	public String processFragmentEntryLinkHTML(
-			FragmentEntryLink fragmentEntryLink, String mode)
+			FragmentEntryLink fragmentEntryLink, String mode, Locale locale,
+			List<Long> segmentsIds)
 		throws PortalException;
 
 	public void validateFragmentEntryHTML(String html) throws PortalException;

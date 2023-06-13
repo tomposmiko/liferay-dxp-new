@@ -86,7 +86,7 @@ public class AcceptLanguageProviderTest {
 			false, Constants.TEST, Constants.TEST, true,
 			StringUtil.randomString(20),
 			StringUtil.randomString(10) + "@" + StringUtil.randomString(10), 0,
-			null, LocaleUtil.ITALY, StringUtil.randomString(20), null,
+			null, Locale.ITALY, StringUtil.randomString(20), null,
 			StringUtil.randomString(10), 0, 0, true, 1, 1, 2000, null,
 			new long[] {_group.getGroupId()}, new long[0], new long[0],
 			new long[0], false, new ServiceContext());

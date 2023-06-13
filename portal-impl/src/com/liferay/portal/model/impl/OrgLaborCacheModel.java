@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.OrgLabor;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -31,12 +32,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing OrgLabor in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see OrgLabor
  * @generated
  */
 @ProviderType
-public class OrgLaborCacheModel
-	implements CacheModel<OrgLabor>, Externalizable, MVCCModel {
-
+public class OrgLaborCacheModel implements CacheModel<OrgLabor>, Externalizable,
+	MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -50,8 +51,7 @@ public class OrgLaborCacheModel
 		OrgLaborCacheModel orgLaborCacheModel = (OrgLaborCacheModel)obj;
 
 		if ((orgLaborId == orgLaborCacheModel.orgLaborId) &&
-			(mvccVersion == orgLaborCacheModel.mvccVersion)) {
-
+				(mvccVersion == orgLaborCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -193,7 +193,8 @@ public class OrgLaborCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(orgLaborId);
@@ -252,5 +253,4 @@ public class OrgLaborCacheModel
 	public int friClose;
 	public int satOpen;
 	public int satClose;
-
 }

@@ -528,10 +528,6 @@ public class PortletPermissionImpl implements PortletPermission {
 			Portlet portlet)
 		throws PortalException {
 
-		if (portlet == null) {
-			return false;
-		}
-
 		Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
 
 		ControlPanelEntry controlPanelEntry =

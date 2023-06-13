@@ -16,8 +16,8 @@ package com.liferay.frontend.theme.westeros.bank.site.initializer.internal;
 
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.dynamic.data.mapping.util.DefaultDDMStructureHelper;
+import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
@@ -28,6 +28,7 @@ import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.journal.constants.JournalContentPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
@@ -43,10 +44,12 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
+import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -61,6 +64,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -133,10 +137,8 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 			_updateLogo(serviceContext);
 			_updateLookAndFeel(serviceContext);
 
-			List<FileEntry> fileEntries = _addFileEntries(serviceContext);
-
 			List<FragmentEntry> fragmentEntries = _addFragmentEntries(
-				fileEntries, serviceContext);
+				serviceContext);
 
 			Map<String, FragmentEntry> fragmentEntriesMap =
 				_getFragmentEntriesMap(fragmentEntries);
@@ -167,7 +169,7 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 				"carousel");
 
 			JournalArticle carouselJournalArticle = _addCarouselJournalArticle(
-				fileEntries, serviceContext);
+				serviceContext);
 
 			_configureFragmentEntryLink(
 				serviceContext.getCompanyId(), serviceContext.getScopeGroupId(),
@@ -176,23 +178,23 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 				carouselJournalArticle.getArticleId());
 
 			List<Layout> personalLayoutChildren = _addLayouts(
-				personalLayout, _LAYOUT_CHILDREN_PERSONAL, fragmentEntriesMap,
-				serviceContext);
-
-			_addLayouts(
-				personalLayoutChildren.get(0), _LAYOUT_CHILDREN_CHECKING,
+				personalLayout, _LAYOUT_NAMES_CHILDREN_PERSONAL,
 				fragmentEntriesMap, serviceContext);
 
 			_addLayouts(
-				personalLayoutChildren.get(1), _LAYOUT_CHILDREN_SAVINGS,
+				personalLayoutChildren.get(0), _LAYOUT_NAMES_CHILDREN_CHECKING,
 				fragmentEntriesMap, serviceContext);
 
 			_addLayouts(
-				personalLayoutChildren.get(2), _LAYOUT_CHILDREN_LOANS,
+				personalLayoutChildren.get(1), _LAYOUT_NAMES_CHILDREN_SAVINGS,
 				fragmentEntriesMap, serviceContext);
 
 			_addLayouts(
-				personalLayoutChildren.get(3), _LAYOUT_CHILDREN_ASSURANCE,
+				personalLayoutChildren.get(2), _LAYOUT_NAMES_CHILDREN_LOANS,
+				fragmentEntriesMap, serviceContext);
+
+			_addLayouts(
+				personalLayoutChildren.get(3), _LAYOUT_NAMES_CHILDREN_ASSURANCE,
 				fragmentEntriesMap, serviceContext);
 
 			List<FragmentEntry> businessFragmentEntries = new ArrayList<>();
@@ -212,8 +214,8 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 				serviceContext);
 
 			_addLayouts(
-				businessLayout, _LAYOUT_CHILDREN_BUSINESS, fragmentEntriesMap,
-				serviceContext);
+				businessLayout, _LAYOUT_NAMES_CHILDREN_BUSINESS,
+				fragmentEntriesMap, serviceContext);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -232,43 +234,11 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 		_bundle = bundleContext.getBundle();
 	}
 
-	private JournalArticle _addCarouselJournalArticle(
-			List<FileEntry> fileEntries, ServiceContext serviceContext)
+	private Map<String, String> _addCarouselFileEntriesMap(
+			ServiceContext serviceContext)
 		throws Exception {
-
-		Class<?> clazz = getClass();
-
-		_defaultDDMStructureHelper.addDDMStructures(
-			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
-			_portal.getClassNameId(JournalArticle.class),
-			clazz.getClassLoader(), _PATH + "/ddm/carousel.xml",
-			serviceContext);
-
-		URL carouselContentURL = _bundle.getEntry(
-			_PATH + "/ddm/content/carousel.xml");
 
 		Map<String, String> fileEntriesMap = new HashMap<>();
-
-		for (FileEntry fileEntry : fileEntries) {
-			fileEntriesMap.put(
-				fileEntry.getFileName(),
-				JSONFactoryUtil.looseSerialize(fileEntry));
-		}
-
-		String content = StringUtil.replace(
-			StringUtil.read(carouselContentURL.openStream()), StringPool.DOLLAR,
-			StringPool.DOLLAR, fileEntriesMap);
-
-		return _journalArticleLocalService.addArticle(
-			serviceContext.getUserId(), serviceContext.getScopeGroupId(), 0,
-			Collections.singletonMap(LocaleUtil.US, "Carousel"), null, content,
-			"CAROUSEL", "CAROUSEL", serviceContext);
-	}
-
-	private List<FileEntry> _addFileEntries(ServiceContext serviceContext)
-		throws Exception {
-
-		List<FileEntry> fileEntries = new ArrayList<>();
 
 		Folder folder = _dlAppLocalService.addFolder(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
@@ -276,7 +246,7 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 			StringPool.BLANK, serviceContext);
 
 		Enumeration<URL> urls = _bundle.findEntries(
-			_PATH + "/images", StringPool.STAR, false);
+			_PATH + "/carousel", StringPool.STAR, false);
 
 		while (urls.hasMoreElements()) {
 			URL url = urls.nextElement();
@@ -294,14 +264,71 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 				folder.getFolderId(), fileName, null, fileName,
 				StringPool.BLANK, StringPool.BLANK, bytes, serviceContext);
 
-			fileEntries.add(fileEntry);
+			fileEntriesMap.put(
+				fileEntry.getFileName(),
+				JSONFactoryUtil.looseSerialize(fileEntry));
 		}
 
-		return fileEntries;
+		return fileEntriesMap;
+	}
+
+	private JournalArticle _addCarouselJournalArticle(
+			ServiceContext serviceContext)
+		throws Exception {
+
+		Class<?> clazz = getClass();
+
+		_defaultDDMStructureHelper.addDDMStructures(
+			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
+			_portal.getClassNameId(JournalArticle.class),
+			clazz.getClassLoader(), _PATH + "/ddm/carousel.xml",
+			serviceContext);
+
+		URL carouselContentURL = _bundle.getEntry(
+			_PATH + "/ddm/content/carousel.xml");
+
+		Map<String, String> fileEntriesMap = _addCarouselFileEntriesMap(
+			serviceContext);
+
+		String content = StringUtil.replace(
+			StringUtil.read(carouselContentURL.openStream()), StringPool.DOLLAR,
+			StringPool.DOLLAR, fileEntriesMap);
+
+		return _journalArticleLocalService.addArticle(
+			serviceContext.getUserId(), serviceContext.getScopeGroupId(), 0,
+			Collections.singletonMap(LocaleUtil.US, "Carousel"), null, content,
+			"CAROUSEL", "CAROUSEL", serviceContext);
+	}
+
+	private void _addFileEntries(
+			long fragmentCollectionId, long folderId,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		Enumeration<URL> urls = _bundle.findEntries(
+			_PATH + "/images", StringPool.STAR, false);
+
+		while (urls.hasMoreElements()) {
+			URL url = urls.nextElement();
+
+			byte[] bytes = null;
+
+			try (InputStream is = url.openStream()) {
+				bytes = FileUtil.getBytes(is);
+			}
+
+			String fileName = FileUtil.getShortFileName(url.getPath());
+
+			PortletFileRepositoryUtil.addPortletFileEntry(
+				serviceContext.getScopeGroupId(), serviceContext.getUserId(),
+				FragmentCollection.class.getName(), fragmentCollectionId,
+				FragmentPortletKeys.FRAGMENT, folderId, bytes, fileName,
+				MimeTypesUtil.getContentType(fileName), false);
+		}
 	}
 
 	private List<FragmentEntry> _addFragmentEntries(
-			List<FileEntry> fileEntries, ServiceContext serviceContext)
+			ServiceContext serviceContext)
 		throws Exception {
 
 		List<FragmentEntry> fragmentEntries = new ArrayList<>();
@@ -311,7 +338,9 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 				_THEME_NAME, null, serviceContext);
 
-		Map<String, String> fileEntriesMap = _getFileEntriesMap(fileEntries);
+		_addFileEntries(
+			fragmentCollection.getFragmentCollectionId(),
+			fragmentCollection.getResourcesFolderId(), serviceContext);
 
 		Enumeration<URL> urls = _bundle.findEntries(
 			_PATH + "/fragments", "*.html", false);
@@ -324,10 +353,6 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 
 			url = _bundle.getEntry(filePath + "/" + fileName);
 
-			String html = StringUtil.replace(
-				StringUtil.read(url.openStream()), StringPool.DOLLAR,
-				StringPool.DOLLAR, fileEntriesMap);
-
 			String shortFileName = FileUtil.getShortFileName(url.getPath());
 
 			String fragmentEntryId = FileUtil.stripExtension(shortFileName);
@@ -335,15 +360,32 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 			String fragmentEntryName = StringUtil.upperCaseFirstLetter(
 				fragmentEntryId);
 
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(filePath);
+			sb.append(StringPool.SLASH);
+			sb.append(fragmentEntryId);
+			sb.append(".css");
+
+			URL cssURL = _bundle.getEntry(sb.toString());
+
 			FragmentEntry fragmentEntry =
 				_fragmentEntryLocalService.addFragmentEntry(
 					serviceContext.getUserId(),
 					serviceContext.getScopeGroupId(),
 					fragmentCollection.getFragmentCollectionId(),
-					fragmentEntryName, StringPool.BLANK, html, StringPool.BLANK,
-					_getPreviewFileEntryId(
-						filePath, fragmentEntryId + ".jpg", serviceContext),
+					fragmentEntryName, StringUtil.read(cssURL.openStream()),
+					StringUtil.read(url.openStream()), StringPool.BLANK,
 					WorkflowConstants.STATUS_APPROVED, serviceContext);
+
+			long fragmentEntryPreviewFileEntryId = _getPreviewFileEntryId(
+				FragmentPortletKeys.FRAGMENT, FragmentEntry.class.getName(),
+				fragmentEntry.getFragmentEntryId(), filePath,
+				fragmentEntryId + ".jpg", serviceContext);
+
+			fragmentEntry = _fragmentEntryLocalService.updateFragmentEntry(
+				fragmentEntry.getFragmentEntryId(),
+				fragmentEntryPreviewFileEntryId);
 
 			fragmentEntries.add(fragmentEntry);
 		}
@@ -368,9 +410,6 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		long previewFileEntryId = _getPreviewFileEntryId(
-			thumbnailPath, thumbnailFileName, serviceContext);
-
 		long layoutPageTemplateCollectionId =
 			layoutPageTemplateCollection.getLayoutPageTemplateCollectionId();
 
@@ -379,8 +418,18 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 				layoutPageTemplateCollectionId, name,
 				LayoutPageTemplateEntryTypeConstants.TYPE_BASIC, 0,
-				previewFileEntryId, WorkflowConstants.STATUS_APPROVED,
-				serviceContext);
+				WorkflowConstants.STATUS_APPROVED, serviceContext);
+
+		long previewFileEntryId = _getPreviewFileEntryId(
+			LayoutAdminPortletKeys.GROUP_PAGES,
+			LayoutPageTemplateEntry.class.getName(),
+			layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
+			thumbnailPath, thumbnailFileName, serviceContext);
+
+		layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.updateLayoutPageTemplateEntry(
+				layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
+				previewFileEntryId);
 
 		long[] fragmentEntryIds = ListUtil.toLongArray(
 			fragmentEntries, FragmentEntryModel::getFragmentEntryId);
@@ -412,10 +461,11 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 				new HashMap<>(), new HashMap<>(), new HashMap<>(), "content",
 				StringPool.BLANK, false, new HashMap<>(), serviceContext);
 
-			int fragmentKeyId = random.nextInt(_LAYOUT_FRAGMENT_KEYS.length);
+			int fragmentKeyId = random.nextInt(
+				_LAYOUT_NAMES_FRAGMENT_KEYS.length);
 
 			FragmentEntry fragmentEntry = fragmentEntriesMap.get(
-				_LAYOUT_FRAGMENT_KEYS[fragmentKeyId]);
+				_LAYOUT_NAMES_FRAGMENT_KEYS[fragmentKeyId]);
 
 			_fragmentEntryLinkLocalService.updateFragmentEntryLinks(
 				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
@@ -510,22 +560,6 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 		return serviceContext;
 	}
 
-	private Map<String, String> _getFileEntriesMap(List<FileEntry> fileEntries)
-		throws PortalException {
-
-		Map<String, String> fileEntriesPathMap = new HashMap<>();
-
-		for (FileEntry fileEntry : fileEntries) {
-			String fileEntryURL = DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false);
-
-			fileEntriesPathMap.put(fileEntry.getFileName(), fileEntryURL);
-		}
-
-		return fileEntriesPathMap;
-	}
-
 	private Map<String, FragmentEntry> _getFragmentEntriesMap(
 		List<FragmentEntry> fragmentEntries) {
 
@@ -540,7 +574,8 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 	}
 
 	private long _getPreviewFileEntryId(
-			String path, String fileName, ServiceContext serviceContext)
+			String portletId, String className, long classPK, String path,
+			String fileName, ServiceContext serviceContext)
 		throws Exception {
 
 		StringBundler sb = new StringBundler(3);
@@ -555,9 +590,17 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 			return 0;
 		}
 
-		Folder folder = _dlAppLocalService.getFolder(
-			serviceContext.getScopeGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, _THEME_NAME);
+		Repository repository =
+			PortletFileRepositoryUtil.fetchPortletRepository(
+				serviceContext.getScopeGroupId(), portletId);
+
+		if (repository == null) {
+			repository = PortletFileRepositoryUtil.addPortletRepository(
+				serviceContext.getScopeGroupId(), portletId, serviceContext);
+		}
+
+		String imageFileName =
+			classPK + "_preview." + FileUtil.getExtension(url.getPath());
 
 		byte[] bytes = null;
 
@@ -565,10 +608,10 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 			bytes = FileUtil.getBytes(is);
 		}
 
-		FileEntry fileEntry = _dlAppLocalService.addFileEntry(
-			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
-			folder.getFolderId(), fileName, null, fileName, StringPool.BLANK,
-			StringPool.BLANK, bytes, serviceContext);
+		FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
+			serviceContext.getScopeGroupId(), serviceContext.getUserId(),
+			className, classPK, portletId, repository.getDlFolderId(), bytes,
+			imageFileName, MimeTypesUtil.getContentType(imageFileName), false);
 
 		return fileEntry.getFileEntryId();
 	}
@@ -605,34 +648,34 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 			StringPool.BLANK, StringPool.BLANK);
 	}
 
-	private static final String[] _LAYOUT_CHILDREN_ASSURANCE = {
+	private static final String[] _LAYOUT_NAMES_CHILDREN_ASSURANCE = {
 		"Travel Insurance", "Home insurance", "Life insurance"
 	};
 
-	private static final String[] _LAYOUT_CHILDREN_BUSINESS = {
+	private static final String[] _LAYOUT_NAMES_CHILDREN_BUSINESS = {
 		"Credit Cards for Business", "Assurance for Business"
 	};
 
-	private static final String[] _LAYOUT_CHILDREN_CHECKING = {
+	private static final String[] _LAYOUT_NAMES_CHILDREN_CHECKING = {
 		"All credit cards", "Check your eligibility",
 		"Balance-transfer credit cards", "Purchase credit card"
 	};
 
-	private static final String[] _LAYOUT_CHILDREN_LOANS = {
+	private static final String[] _LAYOUT_NAMES_CHILDREN_LOANS = {
 		"Mortgages", "All mortgage products", "Mortgate rates and charges"
 	};
 
-	private static final String[] _LAYOUT_CHILDREN_PERSONAL = {
+	private static final String[] _LAYOUT_NAMES_CHILDREN_PERSONAL = {
 		"Checking and Credit Cards", "Savings and Investments",
 		"Loans and Mortgages", "Assurance"
 	};
 
-	private static final String[] _LAYOUT_CHILDREN_SAVINGS = {
+	private static final String[] _LAYOUT_NAMES_CHILDREN_SAVINGS = {
 		"Compare Savings accounts", "Everyday Saver",
 		"Children's Instant Saver", "All interest rates"
 	};
 
-	private static final String[] _LAYOUT_FRAGMENT_KEYS = {
+	private static final String[] _LAYOUT_NAMES_FRAGMENT_KEYS = {
 		"features", "links", "news", "offerings", "video"
 	};
 

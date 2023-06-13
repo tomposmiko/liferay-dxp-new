@@ -31,7 +31,6 @@ import com.liferay.adaptive.media.image.url.AMImageURLFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 
@@ -59,17 +58,12 @@ public class AMImageFinderImplTest {
 
 	@Before
 	public void setUp() {
-		ReflectionTestUtil.setFieldValue(
-			_amImageFinderImpl, "_amImageConfigurationHelper",
+		_amImageFinderImpl.setAMImageConfigurationHelper(
 			_amImageConfigurationHelper);
-		ReflectionTestUtil.setFieldValue(
-			_amImageFinderImpl, "_amImageEntryLocalService",
+		_amImageFinderImpl.setAMImageEntryLocalService(
 			_amImageEntryLocalService);
-		ReflectionTestUtil.setFieldValue(
-			_amImageFinderImpl, "_amImageMimeTypeProvider",
-			_amImageMimeTypeProvider);
-		ReflectionTestUtil.setFieldValue(
-			_amImageFinderImpl, "_amImageURLFactory", _amImageURLFactory);
+		_amImageFinderImpl.setAMImageMimeTypeProvider(_amImageMimeTypeProvider);
+		_amImageFinderImpl.setAMImageURLFactory(_amImageURLFactory);
 	}
 
 	@Test(expected = PortalException.class)

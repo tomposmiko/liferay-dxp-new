@@ -17,7 +17,9 @@ package com.liferay.external.reference.service.base;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.kernel.service.persistence.AssetCategoryPersistence;
+
 import com.liferay.external.reference.service.ERAssetCategoryLocalService;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -42,17 +44,17 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.external.reference.service.impl.ERAssetCategoryLocalServiceImpl
+ * @see com.liferay.external.reference.service.ERAssetCategoryLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class ERAssetCategoryLocalServiceBaseImpl
-	extends BaseLocalServiceImpl
-	implements ERAssetCategoryLocalService, IdentifiableOSGiService {
-
+	extends BaseLocalServiceImpl implements ERAssetCategoryLocalService,
+		IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>ERAssetCategoryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.external.reference.service.ERAssetCategoryLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.external.reference.service.ERAssetCategoryLocalServiceUtil} to access the er asset category local service.
 	 */
 
 	/**
@@ -71,7 +73,6 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 	 */
 	public void setERAssetCategoryLocalService(
 		ERAssetCategoryLocalService erAssetCategoryLocalService) {
-
 		this.erAssetCategoryLocalService = erAssetCategoryLocalService;
 	}
 
@@ -80,9 +81,7 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -92,9 +91,7 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -103,9 +100,7 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -116,7 +111,6 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -143,9 +137,7 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 	 *
 	 * @return the asset category local service
 	 */
-	public com.liferay.asset.kernel.service.AssetCategoryLocalService
-		getAssetCategoryLocalService() {
-
+	public com.liferay.asset.kernel.service.AssetCategoryLocalService getAssetCategoryLocalService() {
 		return assetCategoryLocalService;
 	}
 
@@ -155,9 +147,7 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 	 * @param assetCategoryLocalService the asset category local service
 	 */
 	public void setAssetCategoryLocalService(
-		com.liferay.asset.kernel.service.AssetCategoryLocalService
-			assetCategoryLocalService) {
-
+		com.liferay.asset.kernel.service.AssetCategoryLocalService assetCategoryLocalService) {
 		this.assetCategoryLocalService = assetCategoryLocalService;
 	}
 
@@ -177,7 +167,6 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 	 */
 	public void setAssetCategoryPersistence(
 		AssetCategoryPersistence assetCategoryPersistence) {
-
 		this.assetCategoryPersistence = assetCategoryPersistence;
 	}
 
@@ -211,8 +200,8 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -223,29 +212,14 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 
 	@BeanReference(type = ERAssetCategoryLocalService.class)
 	protected ERAssetCategoryLocalService erAssetCategoryLocalService;
-
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
+	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetCategoryLocalService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetCategoryLocalService
-		assetCategoryLocalService;
-
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetCategoryLocalService.class)
+	protected com.liferay.asset.kernel.service.AssetCategoryLocalService assetCategoryLocalService;
 	@ServiceReference(type = AssetCategoryPersistence.class)
 	protected AssetCategoryPersistence assetCategoryPersistence;
-
 }

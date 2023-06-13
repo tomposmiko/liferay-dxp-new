@@ -16,9 +16,11 @@ package com.liferay.tasks.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+
 import com.liferay.tasks.model.TasksEntry;
 
 import java.io.Externalizable;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing TasksEntry in entity cache.
  *
  * @author Ryan Park
+ * @see TasksEntry
  * @generated
  */
 @ProviderType
-public class TasksEntryCacheModel
-	implements CacheModel<TasksEntry>, Externalizable {
-
+public class TasksEntryCacheModel implements CacheModel<TasksEntry>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -187,7 +189,8 @@ public class TasksEntryCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(tasksEntryId);
 
 		objectOutput.writeLong(groupId);
@@ -238,5 +241,4 @@ public class TasksEntryCacheModel
 	public long dueDate;
 	public long finishDate;
 	public int status;
-
 }

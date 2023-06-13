@@ -730,12 +730,6 @@ AUI.add(
 
 						var editingLanguageId = instance._getCurrentEditingLanguageId();
 
-						var hasNewOption = value[editingLanguageId].length !== optionValues.length;
-
-						if (hasNewOption) {
-							instance._updateOtherLanguagesValues(editingLanguageId, optionValues[optionValues.length -1], value);
-						}
-
 						value[editingLanguageId] = optionValues;
 
 						instance.set('value', value);
@@ -790,14 +784,6 @@ AUI.add(
 
 							sortableList.add(container);
 						}
-					},
-
-					_updateOtherLanguagesValues: function(editingLanguageId, option, value) {
-						 AObject.keys(value).forEach(function(languageId) {
-							 if(languageId !== editingLanguageId) {
-								 value[languageId].push(option);
-							 }
-						 });
 					}
 				}
 			}

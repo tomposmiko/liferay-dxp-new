@@ -1227,9 +1227,7 @@ public class GroupServiceTest {
 
 			Assert.assertTrue(group.hasStagingGroup());
 
-			Group stagingGroup = group.getStagingGroup();
-
-			excludedGroupIds.add(stagingGroup.getGroupId());
+			excludedGroupIds.add(group.getStagingGroup().getGroupId());
 		}
 
 		params.put("excludedGroupIds", excludedGroupIds);

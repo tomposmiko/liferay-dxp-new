@@ -16,15 +16,11 @@ package com.liferay.journal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -36,23 +32,11 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class JournalArticleResourceWrapper
+public class JournalArticleResourceWrapper extends BaseModelWrapper<JournalArticleResource>
 	implements JournalArticleResource, ModelWrapper<JournalArticleResource> {
-
 	public JournalArticleResourceWrapper(
 		JournalArticleResource journalArticleResource) {
-
-		_journalArticleResource = journalArticleResource;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return JournalArticleResource.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return JournalArticleResource.class.getName();
+		super(journalArticleResource);
 	}
 
 	@Override
@@ -101,276 +85,139 @@ public class JournalArticleResourceWrapper
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new JournalArticleResourceWrapper(
-			(JournalArticleResource)_journalArticleResource.clone());
-	}
-
-	@Override
-	public int compareTo(JournalArticleResource journalArticleResource) {
-		return _journalArticleResource.compareTo(journalArticleResource);
-	}
-
 	/**
-	 * Returns the article ID of this journal article resource.
-	 *
-	 * @return the article ID of this journal article resource
-	 */
+	* Returns the article ID of this journal article resource.
+	*
+	* @return the article ID of this journal article resource
+	*/
 	@Override
 	public String getArticleId() {
-		return _journalArticleResource.getArticleId();
+		return model.getArticleId();
 	}
 
 	/**
-	 * Returns the company ID of this journal article resource.
-	 *
-	 * @return the company ID of this journal article resource
-	 */
+	* Returns the company ID of this journal article resource.
+	*
+	* @return the company ID of this journal article resource
+	*/
 	@Override
 	public long getCompanyId() {
-		return _journalArticleResource.getCompanyId();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _journalArticleResource.getExpandoBridge();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the group ID of this journal article resource.
-	 *
-	 * @return the group ID of this journal article resource
-	 */
+	* Returns the group ID of this journal article resource.
+	*
+	* @return the group ID of this journal article resource
+	*/
 	@Override
 	public long getGroupId() {
-		return _journalArticleResource.getGroupId();
+		return model.getGroupId();
+	}
+
+	@Override
+	public long getLatestArticlePK() {
+		return model.getLatestArticlePK();
 	}
 
 	/**
-	 * Returns the primary key of this journal article resource.
-	 *
-	 * @return the primary key of this journal article resource
-	 */
+	* Returns the primary key of this journal article resource.
+	*
+	* @return the primary key of this journal article resource
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _journalArticleResource.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _journalArticleResource.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the resource prim key of this journal article resource.
-	 *
-	 * @return the resource prim key of this journal article resource
-	 */
+	* Returns the resource prim key of this journal article resource.
+	*
+	* @return the resource prim key of this journal article resource
+	*/
 	@Override
 	public long getResourcePrimKey() {
-		return _journalArticleResource.getResourcePrimKey();
+		return model.getResourcePrimKey();
 	}
 
 	/**
-	 * Returns the uuid of this journal article resource.
-	 *
-	 * @return the uuid of this journal article resource
-	 */
+	* Returns the uuid of this journal article resource.
+	*
+	* @return the uuid of this journal article resource
+	*/
 	@Override
 	public String getUuid() {
-		return _journalArticleResource.getUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _journalArticleResource.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _journalArticleResource.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _journalArticleResource.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _journalArticleResource.isNew();
+		return model.getUuid();
 	}
 
 	@Override
 	public void persist() {
-		_journalArticleResource.persist();
+		model.persist();
 	}
 
 	/**
-	 * Sets the article ID of this journal article resource.
-	 *
-	 * @param articleId the article ID of this journal article resource
-	 */
+	* Sets the article ID of this journal article resource.
+	*
+	* @param articleId the article ID of this journal article resource
+	*/
 	@Override
 	public void setArticleId(String articleId) {
-		_journalArticleResource.setArticleId(articleId);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_journalArticleResource.setCachedModel(cachedModel);
+		model.setArticleId(articleId);
 	}
 
 	/**
-	 * Sets the company ID of this journal article resource.
-	 *
-	 * @param companyId the company ID of this journal article resource
-	 */
+	* Sets the company ID of this journal article resource.
+	*
+	* @param companyId the company ID of this journal article resource
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_journalArticleResource.setCompanyId(companyId);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_journalArticleResource.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_journalArticleResource.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_journalArticleResource.setExpandoBridgeAttributes(serviceContext);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the group ID of this journal article resource.
-	 *
-	 * @param groupId the group ID of this journal article resource
-	 */
+	* Sets the group ID of this journal article resource.
+	*
+	* @param groupId the group ID of this journal article resource
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_journalArticleResource.setGroupId(groupId);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_journalArticleResource.setNew(n);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the primary key of this journal article resource.
-	 *
-	 * @param primaryKey the primary key of this journal article resource
-	 */
+	* Sets the primary key of this journal article resource.
+	*
+	* @param primaryKey the primary key of this journal article resource
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_journalArticleResource.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_journalArticleResource.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the resource prim key of this journal article resource.
-	 *
-	 * @param resourcePrimKey the resource prim key of this journal article resource
-	 */
+	* Sets the resource prim key of this journal article resource.
+	*
+	* @param resourcePrimKey the resource prim key of this journal article resource
+	*/
 	@Override
 	public void setResourcePrimKey(long resourcePrimKey) {
-		_journalArticleResource.setResourcePrimKey(resourcePrimKey);
+		model.setResourcePrimKey(resourcePrimKey);
 	}
 
 	/**
-	 * Sets the uuid of this journal article resource.
-	 *
-	 * @param uuid the uuid of this journal article resource
-	 */
+	* Sets the uuid of this journal article resource.
+	*
+	* @param uuid the uuid of this journal article resource
+	*/
 	@Override
 	public void setUuid(String uuid) {
-		_journalArticleResource.setUuid(uuid);
+		model.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<JournalArticleResource>
-		toCacheModel() {
-
-		return _journalArticleResource.toCacheModel();
+	protected JournalArticleResourceWrapper wrap(
+		JournalArticleResource journalArticleResource) {
+		return new JournalArticleResourceWrapper(journalArticleResource);
 	}
-
-	@Override
-	public JournalArticleResource toEscapedModel() {
-		return new JournalArticleResourceWrapper(
-			_journalArticleResource.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _journalArticleResource.toString();
-	}
-
-	@Override
-	public JournalArticleResource toUnescapedModel() {
-		return new JournalArticleResourceWrapper(
-			_journalArticleResource.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _journalArticleResource.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof JournalArticleResourceWrapper)) {
-			return false;
-		}
-
-		JournalArticleResourceWrapper journalArticleResourceWrapper =
-			(JournalArticleResourceWrapper)obj;
-
-		if (Objects.equals(
-				_journalArticleResource,
-				journalArticleResourceWrapper._journalArticleResource)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public JournalArticleResource getWrappedModel() {
-		return _journalArticleResource;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _journalArticleResource.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _journalArticleResource.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_journalArticleResource.resetOriginalValues();
-	}
-
-	private final JournalArticleResource _journalArticleResource;
-
 }

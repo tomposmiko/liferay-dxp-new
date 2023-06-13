@@ -164,9 +164,7 @@ public class FormMessageBodyWriter implements MessageBodyWriter<Form<?>> {
 		Form<?> form, AcceptLanguage acceptLanguage,
 		ApplicationURL applicationURL, boolean includeContext) {
 
-		JSONObject jsonObject = new JSONObject();
-
-		return jsonObject.putOpt(
+		return new JSONObject().putOpt(
 			"@context", includeContext ? _contextJSONArray : null
 		).put(
 			"@type", "Class"
@@ -192,9 +190,7 @@ public class FormMessageBodyWriter implements MessageBodyWriter<Form<?>> {
 	protected static JSONObject toJSONObject(
 		FormField formField, JSONObject valueJSONObject) {
 
-		JSONObject jsonObject = new JSONObject();
-
-		return jsonObject.put(
+		return new JSONObject().put(
 			"@type", "SupportedProperty"
 		).put(
 			"property", formField.getName()
@@ -209,12 +205,11 @@ public class FormMessageBodyWriter implements MessageBodyWriter<Form<?>> {
 		);
 	}
 
-	private static final JSONArray _contextJSONArray = new JSONArray() {
-		{
-			put(new JSONObject(singletonMap("@vocab", "http://schema.org")));
-			put("https://www.w3.org/ns/hydra/core#");
-		}
-	};
+	private static final JSONArray _contextJSONArray = new JSONArray().put(
+		new JSONObject(singletonMap("@vocab", "http://schema.org"))
+	).put(
+		"https://www.w3.org/ns/hydra/core#"
+	);
 
 	@Reference
 	private ProviderManager _providerManager;

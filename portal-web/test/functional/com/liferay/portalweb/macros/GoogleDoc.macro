@@ -1,60 +1,33 @@
 definition {
-	macro gotoDrive {
-		AssertElementPresent(locator1 = "Button#SELECT_FILE");
+	macro discardChanges {
+		var key_text = "Discard Changes";
 
-		AssertClick(locator1 = "Button#SELECT_FILE", value1 = "Select File");
+		AssertElementPresent(locator1 = "Button#ANY");
 
-		Pause(locator1 = "3000");
-
-		if (isSet(windowTitle)) {
-			SelectWindow(locator1 = "GoogleLogin#PAGE_TITLE");
-
-			if (IsElementPresent(locator1 = "GoogleLogin#HEADER")) {
-				AssertClick(
-					locator1 = "GoogleLogin#ACCOUNT_MENULIST_USE_ANOTHER_ACCOUNT",
-					value1 = "Use another account"
-				);
-			}
-
-			Type(locator1 = "GoogleLogin#LOGIN_EMAIL_FIELD", value1 = "${userEmailAddress}");
-
-			Click(locator1 = "GoogleLogin#LOGIN_NEXT_BUTTON");
-
-			AssertElementPresent(locator1 = "GoogleLogin#LOGIN_NEXT_BUTTON");
-
-			Type(locator1 = "GoogleLogin#LOGIN_PASSWORD_FIELD", value1 = "${userPassword}");
-
-			Click(locator1 = "GoogleLogin#LOGIN_NEXT_BUTTON");
-
-			SelectWindow.selectWindowNoSPARefresh(locator1 = "title=${windowTitle}");
-
-			Pause(locator1 = "3000");
-		}
-
-		if (IsElementPresent(locator1 = "ProductMenu#PRODUCT_MENU_OPENED")) {
-			Click.clickNoSPARefresh(locator1 = "ProductMenu#TOGGLE");
-		}
-
-		SelectFrame(locator1 = "GoogleDrive#GOOGLE_DRIVE_IFRAME");
+		AssertClick(locator1 = "Button#ANY", value1="Discard Changes");
 	}
 
-	macro selectDocument {
-		var key_googleDocName = "${googleDocName}";
+	macro editTitleInGoogleDoc {
+		Type(locator1 = "GoogleDoc#TITLE", value1 = "${dmDocumentTitle}");
+	}
 
-		Click.clickAt(
-			locator1 = "GoogleDrive#LIST_VIEW_DOCUMENT",
-			value1 = "${googleDocName}"
+	macro gotoEdit {
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
+
+		Click(
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS"
 		);
 
-		Click.clickAt(locator1 = "GoogleDrive#SELECT_BUTTON", value1 = "Select");
+		MenuItem.click(menuItem = "Edit in ${dmGoogleApp}");
+	}
 
-		SelectFrameTop();
+	macro saveAndExit {
+		var key_text = "Save and Return to Liferay";
 
-		var key_dmDocumentTitle = "${googleDocName}";
+		AssertElementPresent(locator1 = "Button#ANY");
 
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaEntry#SELECTED_DOCUMENT_TITLE",
-			value1 = "${googleDocName}"
-		);
+		AssertClick(locator1 = "Button#ANY", value1="Save and Return to Liferay");
+
+		Navigator.openURL();
 	}
 }

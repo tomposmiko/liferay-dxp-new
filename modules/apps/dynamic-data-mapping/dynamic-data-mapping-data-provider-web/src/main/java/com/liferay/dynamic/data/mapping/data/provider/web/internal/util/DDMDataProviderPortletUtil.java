@@ -67,13 +67,15 @@ public class DDMDataProviderPortletUtil {
 
 		Stream<DDMFormField> ddmFormFieldStream = ddmFormFields.stream();
 
-		return ddmFormFieldStream.filter(
+		Set<String> ddmFormFieldNames = ddmFormFieldStream.filter(
 			ddmFormField -> Objects.equals(ddmFormField.getType(), type)
 		).map(
 			DDMFormField::getName
 		).collect(
 			Collectors.toSet()
 		);
+
+		return ddmFormFieldNames;
 	}
 
 }

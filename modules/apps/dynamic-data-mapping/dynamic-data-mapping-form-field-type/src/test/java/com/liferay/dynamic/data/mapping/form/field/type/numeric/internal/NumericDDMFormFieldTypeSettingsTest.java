@@ -52,6 +52,7 @@ public class NumericDDMFormFieldTypeSettingsTest
 	extends BaseDDMFormFieldTypeSettingsTestCase {
 
 	@Before
+	@Override
 	public void setUp() {
 		setUpLanguageUtil();
 		setUpPortalUtil();
@@ -112,7 +113,7 @@ public class NumericDDMFormFieldTypeSettingsTest
 
 		List<String> actions = ddmFormRule0.getActions();
 
-		Assert.assertEquals(actions.toString(), 3, actions.size());
+		Assert.assertEquals(actions.toString(), 4, actions.size());
 
 		Assert.assertTrue(
 			actions.toString(),
@@ -125,8 +126,13 @@ public class NumericDDMFormFieldTypeSettingsTest
 			actions.toString(),
 			actions.contains(
 				"setValidationDataType('validation', getValue('dataType'))"));
+		Assert.assertTrue(
+			actions.toString(),
+			actions.contains(
+				"setValidationFieldName('validation', getValue('name'))"));
 	}
 
+	@Override
 	protected void setUpLanguageUtil() {
 		LanguageUtil languageUtil = new LanguageUtil();
 
@@ -151,6 +157,7 @@ public class NumericDDMFormFieldTypeSettingsTest
 		portalUtil.setPortal(portal);
 	}
 
+	@Override
 	protected void setUpResourceBundleUtil() {
 		PowerMockito.mockStatic(ResourceBundleUtil.class);
 

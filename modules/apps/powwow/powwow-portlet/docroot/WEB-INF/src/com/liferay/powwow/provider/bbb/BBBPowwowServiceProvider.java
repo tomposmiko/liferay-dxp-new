@@ -396,9 +396,11 @@ public class BBBPowwowServiceProvider extends BasePowwowServiceProvider {
 			throw new SystemException("Unable to update BBB meeting");
 		}
 
-		return addPowwowMeeting(
+		Map<String, Serializable> providerTypeMetadataMap = addPowwowMeeting(
 			user, powwowServer, powwowMeeting.getPowwowMeetingId(), name,
 			options);
+
+		return providerTypeMetadataMap;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

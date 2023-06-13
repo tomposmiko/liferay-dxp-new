@@ -9,6 +9,11 @@
 </thead>
 <tbody>
 <tr>
+	<td>ADDRESS</td>
+	<td>//div[label[contains(.,'Address')]]/input</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ALERT</td>
 	<td>//div[contains(@class,'has-error')]</td>
 	<td></td>
@@ -139,6 +144,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EXTENSION</td>
+	<td>//div[label[contains(.,'Extension')]]/input</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FIELD_FILTER_INPUT</td>
 	<td>//div[@data-fieldname='${key_fieldName}']/input</td>
 	<td></td>
@@ -150,7 +160,7 @@
 </tr>
 <tr>
 	<td>FILE</td>
-	<td>//input[contains(@id,'file') and @type='file'] | //input[@type='file']</td>
+	<td>//input[contains(@id,'file') and @type='file']</td>
 	<td></td>
 </tr>
 <tr>
@@ -279,6 +289,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>NUMBER</td>
+	<td>//div[label[contains(.,'Number')]]/input</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PASSWORD</td>
 	<td>//div[label[contains(.,'Password')]]/input | //div[label[contains(.,'Contraseña')]]/input | //div[label[contains(.,'パスワード')]]/input | //div[label[contains(.,'密码')]]/input | //div[contains(.,'Kennwort')]//input[@type='password']</td>
 	<td></td>
@@ -301,11 +316,6 @@
 <tr>
 	<td>PORTAL_NAME</td>
 	<td>//div[label[contains(.,'Portal Name')]]//input[@type='text']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PORTLET_TITLE</td>
-	<td>//div[contains(@class,'portlet-title-editable')]//input</td>
 	<td></td>
 </tr>
 <tr>
@@ -340,7 +350,7 @@
 </tr>
 <tr>
 	<td>REQUIRED_ALERT</td>
-	<td>//div[contains(@class,'has-error')] | //div[contains(@class,'has-error') and contains(.,'key_fieldName')]</td>
+	<td>//div[contains(@class,'has-error')] | //div[contains(@class,'has-error') and contains(.,'key_filedName')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -376,6 +386,11 @@
 <tr>
 	<td>SITE_SEARCH_KEYWORDS</td>
 	<td>//input[contains(@name,'keywords')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SKYPE</td>
+	<td>//div[label[contains(.,'Skype')]]/input</td>
 	<td></td>
 </tr>
 <tr>

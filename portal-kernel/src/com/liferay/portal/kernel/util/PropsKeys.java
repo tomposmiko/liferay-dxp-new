@@ -887,6 +887,12 @@ public interface PropsKeys {
 	public static final String DISCUSSION_MAX_COMMENTS =
 		"discussion.max.comments";
 
+	public static final String DISCUSSION_SUBSCRIBE = "discussion.subscribe";
+
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String DISCUSSION_SUBSCRIBE_BY_DEFAULT =
 		"discussion.subscribe.by.default";
 
@@ -1223,34 +1229,6 @@ public interface PropsKeys {
 	public static final String EHCACHE_REPLICATOR_PROPERTIES_DEFAULT =
 		"ehcache.replicator.properties.default";
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String EHCACHE_RMI_PEER_LISTENER_FACTORY_CLASS =
-		"ehcache.rmi.peer.listener.factory.class";
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String EHCACHE_RMI_PEER_LISTENER_FACTORY_PROPERTIES =
-		"ehcache.rmi.peer.listener.factory.properties";
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String EHCACHE_RMI_PEER_PROVIDER_FACTORY_CLASS =
-		"ehcache.rmi.peer.provider.factory.class";
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String EHCACHE_RMI_PEER_PROVIDER_FACTORY_PROPERTIES =
-		"ehcache.rmi.peer.provider.factory.properties";
-
 	public static final String EHCACHE_SINGLE_VM_CONFIG_LOCATION =
 		"ehcache.single.vm.config.location";
 
@@ -1408,6 +1386,9 @@ public interface PropsKeys {
 
 	public static final String IMAGE_DEFAULT_USER_MALE_PORTRAIT =
 		"image.default.user.male.portrait";
+
+	public static final String IMAGE_DEFAULT_USER_PORTRAIT =
+		"image.default.user.portrait";
 
 	public static final String IMAGE_HOOK_FILE_SYSTEM_ROOT_DIR =
 		"image.hook.file.system.root.dir";
@@ -3026,6 +3007,9 @@ public interface PropsKeys {
 	public static final String SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA =
 		"search.container.show.pagination.top.delta";
 
+	public static final String SEGMENTS_SEGMENTATION_ENABLED =
+		"segments.segmentation.enabled";
+
 	public static final String SERVLET_CONTEXT_CLASS_LOADER_POOL_FALLBACK =
 		"servlet.context.class.loader.pool.fallback";
 
@@ -3312,6 +3296,10 @@ public interface PropsKeys {
 	public static final String SPRING_INFRASTRUCTURE_CONFIGS =
 		"spring.infrastructure.configs";
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String SPRING_PORTLET_CONFIGS =
 		"spring.portlet.configs";
 
@@ -3349,9 +3337,17 @@ public interface PropsKeys {
 	public static final String SQL_DATA_MAX_PARAMETERS =
 		"sql.data.max.parameters";
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String STAGING_DELETE_TEMP_LAR_ON_FAILURE =
 		"staging.delete.temp.lar.on.failure";
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String STAGING_DELETE_TEMP_LAR_ON_SUCCESS =
 		"staging.delete.temp.lar.on.success";
 
@@ -3473,6 +3469,10 @@ public interface PropsKeys {
 	public static final String TRANSACTION_ISOLATION_PORTAL =
 		"transaction.isolation.portal";
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String TRANSACTION_MANAGER_IMPL =
 		"transaction.manager.impl";
 
@@ -3777,9 +3777,6 @@ public interface PropsKeys {
 		"web.server.servlet.version.verbosity";
 
 	public static final String WEBDAV_IGNORE = "webdav.ignore";
-
-	public static final String WEBDAV_NONCE_CLUSTER_TIMEOUT =
-		"webdav.nonce.cluster.timeout";
 
 	public static final String WEBDAV_NONCE_EXPIRATION =
 		"webdav.nonce.expiration";

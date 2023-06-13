@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.site.navigation.service.http.SiteNavigationMenuServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.site.navigation.service.http.SiteNavigationMenuServiceSoap
  * @generated
  */
 @ProviderType
 public class SiteNavigationMenuSoap implements Serializable {
-
 	public static SiteNavigationMenuSoap toSoapModel(SiteNavigationMenu model) {
 		SiteNavigationMenuSoap soapModel = new SiteNavigationMenuSoap();
 
@@ -52,9 +52,7 @@ public class SiteNavigationMenuSoap implements Serializable {
 
 	public static SiteNavigationMenuSoap[] toSoapModels(
 		SiteNavigationMenu[] models) {
-
-		SiteNavigationMenuSoap[] soapModels =
-			new SiteNavigationMenuSoap[models.length];
+		SiteNavigationMenuSoap[] soapModels = new SiteNavigationMenuSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -65,12 +63,10 @@ public class SiteNavigationMenuSoap implements Serializable {
 
 	public static SiteNavigationMenuSoap[][] toSoapModels(
 		SiteNavigationMenu[][] models) {
-
 		SiteNavigationMenuSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels =
-				new SiteNavigationMenuSoap[models.length][models[0].length];
+			soapModels = new SiteNavigationMenuSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new SiteNavigationMenuSoap[0][0];
@@ -85,16 +81,13 @@ public class SiteNavigationMenuSoap implements Serializable {
 
 	public static SiteNavigationMenuSoap[] toSoapModels(
 		List<SiteNavigationMenu> models) {
-
-		List<SiteNavigationMenuSoap> soapModels =
-			new ArrayList<SiteNavigationMenuSoap>(models.size());
+		List<SiteNavigationMenuSoap> soapModels = new ArrayList<SiteNavigationMenuSoap>(models.size());
 
 		for (SiteNavigationMenu model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(
-			new SiteNavigationMenuSoap[soapModels.size()]);
+		return soapModels.toArray(new SiteNavigationMenuSoap[soapModels.size()]);
 	}
 
 	public SiteNavigationMenuSoap() {
@@ -220,5 +213,4 @@ public class SiteNavigationMenuSoap implements Serializable {
 	private int _type;
 	private boolean _auto;
 	private Date _lastPublishDate;
-
 }

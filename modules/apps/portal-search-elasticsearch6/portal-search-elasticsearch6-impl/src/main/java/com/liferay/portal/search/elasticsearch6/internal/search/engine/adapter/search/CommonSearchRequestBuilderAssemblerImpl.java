@@ -26,6 +26,7 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.rescore.QueryRescorerBuilder;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -44,6 +45,7 @@ public class CommonSearchRequestBuilderAssemblerImpl
 		SearchRequestBuilder searchRequestBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
+		searchRequestBuilder.setExplain(baseSearchRequest.isExplain());
 		searchRequestBuilder.setIndices(baseSearchRequest.getIndexNames());
 
 		if (baseSearchRequest.getMinimumScore() > 0) {
@@ -73,6 +75,8 @@ public class CommonSearchRequestBuilderAssemblerImpl
 
 		searchRequestBuilder.setTrackTotalHits(
 			baseSearchRequest.isTrackTotalHits());
+
+		setRescorer(searchRequestBuilder, baseSearchRequest);
 
 		facetTranslator.translate(
 			searchRequestBuilder, baseSearchRequest.getQuery(),
@@ -106,6 +110,20 @@ public class CommonSearchRequestBuilderAssemblerImpl
 		boolQueryBuilder.must(queryBuilder);
 
 		return boolQueryBuilder;
+	}
+
+	protected void setRescorer(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		Query query = baseSearchRequest.getRescoreQuery();
+
+		if (query == null) {
+			return;
+		}
+
+		searchRequestBuilder.setRescorer(
+			new QueryRescorerBuilder(queryTranslator.translate(query, null)));
 	}
 
 	@Reference

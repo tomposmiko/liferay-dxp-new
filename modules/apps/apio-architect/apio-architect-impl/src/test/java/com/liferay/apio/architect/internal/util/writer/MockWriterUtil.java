@@ -113,8 +113,8 @@ public class MockWriterUtil {
 	 *
 	 * @return the model class's {@code Representor}
 	 */
-	public static Optional<Representor<?>> getRepresentorOptional(
-		String resourceName) {
+	public static Optional<Representor<?>>
+		getRepresentorOptional(String resourceName) {
 
 		if ("root".equals(resourceName)) {
 			return Optional.of(createRootModelRepresentor(false));
@@ -209,8 +209,8 @@ public class MockWriterUtil {
 
 		String string = (String)identifier;
 
-		Function<String, Optional<Path>> function = name -> Optional.of(
-			new Path(name, string));
+		Function<String, Optional<Path>> function =
+			name -> Optional.of(new Path(name, string));
 
 		if ("root".equals(resourceName)) {
 			return function.apply("model");

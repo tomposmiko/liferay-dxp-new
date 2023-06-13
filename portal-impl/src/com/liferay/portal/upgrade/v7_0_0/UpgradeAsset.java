@@ -16,8 +16,6 @@ package com.liferay.portal.upgrade.v7_0_0;
 
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
-import com.liferay.portal.kernel.dao.db.DBType;
-import com.liferay.portal.kernel.dao.db.DBTypeToSQLMap;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -55,20 +53,7 @@ public class UpgradeAsset extends UpgradeProcess {
 			sb.append("DLFileVersion) and classPK not in (select fileEntryId ");
 			sb.append("from DLFileEntry)");
 
-			DBTypeToSQLMap dbTypeToSQLMap = new DBTypeToSQLMap(sb.toString());
-
-			sb = new StringBundler(6);
-
-			sb.append("delete from AssetEntry where classNameId = ");
-			sb.append(classNameId);
-			sb.append(" and not exists (select null from DLFileVersion where ");
-			sb.append("fileVersionId = AssetEntry.classPK) and not exists ");
-			sb.append("(select null from DLFileEntry where fileEntryId = ");
-			sb.append("AssetEntry.classPK)");
-
-			dbTypeToSQLMap.add(DBType.POSTGRESQL, sb.toString());
-
-			runSQL(dbTypeToSQLMap);
+			runSQL(sb.toString());
 		}
 	}
 

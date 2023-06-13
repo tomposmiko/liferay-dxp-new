@@ -21,6 +21,9 @@ import com.liferay.mail.reader.model.Message;
 import com.liferay.mail.reader.model.impl.MessageImpl;
 import com.liferay.mail.reader.model.impl.MessageModelImpl;
 import com.liferay.mail.reader.service.persistence.MessagePersistence;
+
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -38,20 +41,15 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,26 +62,23 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see MessagePersistence
+ * @see com.liferay.mail.reader.service.persistence.MessageUtil
  * @generated
  */
 @ProviderType
-public class MessagePersistenceImpl
-	extends BasePersistenceImpl<Message> implements MessagePersistence {
-
+public class MessagePersistenceImpl extends BasePersistenceImpl<Message>
+	implements MessagePersistence {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use <code>MessageUtil</code> to access the message persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use {@link MessageUtil} to access the message persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY =
-		MessageImpl.class.getName();
-
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List1";
-
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List2";
-
+	public static final String FINDER_CLASS_NAME_ENTITY = MessageImpl.class.getName();
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -99,15 +94,15 @@ public class MessagePersistenceImpl
 	 */
 	@Override
 	public List<Message> findByCompanyId(long companyId) {
-		return findByCompanyId(
-			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByCompanyId(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the messages where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -124,7 +119,7 @@ public class MessagePersistenceImpl
 	 * Returns an ordered range of all the messages where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -134,10 +129,8 @@ public class MessagePersistenceImpl
 	 * @return the ordered range of matching messages
 	 */
 	@Override
-	public List<Message> findByCompanyId(
-		long companyId, int start, int end,
+	public List<Message> findByCompanyId(long companyId, int start, int end,
 		OrderByComparator<Message> orderByComparator) {
-
 		return findByCompanyId(companyId, start, end, orderByComparator, true);
 	}
 
@@ -145,7 +138,7 @@ public class MessagePersistenceImpl
 	 * Returns an ordered range of all the messages where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -156,34 +149,28 @@ public class MessagePersistenceImpl
 	 * @return the ordered range of matching messages
 	 */
 	@Override
-	public List<Message> findByCompanyId(
-		long companyId, int start, int end,
-		OrderByComparator<Message> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<Message> findByCompanyId(long companyId, int start, int end,
+		OrderByComparator<Message> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByCompanyId;
-			finderArgs = new Object[] {companyId};
+			finderArgs = new Object[] { companyId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByCompanyId;
-			finderArgs = new Object[] {
-				companyId, start, end, orderByComparator
-			};
+			finderArgs = new Object[] { companyId, start, end, orderByComparator };
 		}
 
 		List<Message> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Message>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Message>)finderCache.getResult(finderPath, finderArgs,
+					this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Message message : list) {
@@ -200,8 +187,8 @@ public class MessagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -212,10 +199,11 @@ public class MessagePersistenceImpl
 			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(MessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -233,16 +221,16 @@ public class MessagePersistenceImpl
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<Message>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<Message>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Message>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<Message>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -271,10 +259,9 @@ public class MessagePersistenceImpl
 	 * @throws NoSuchMessageException if a matching message could not be found
 	 */
 	@Override
-	public Message findByCompanyId_First(
-			long companyId, OrderByComparator<Message> orderByComparator)
+	public Message findByCompanyId_First(long companyId,
+		OrderByComparator<Message> orderByComparator)
 		throws NoSuchMessageException {
-
 		Message message = fetchByCompanyId_First(companyId, orderByComparator);
 
 		if (message != null) {
@@ -301,11 +288,9 @@ public class MessagePersistenceImpl
 	 * @return the first matching message, or <code>null</code> if a matching message could not be found
 	 */
 	@Override
-	public Message fetchByCompanyId_First(
-		long companyId, OrderByComparator<Message> orderByComparator) {
-
-		List<Message> list = findByCompanyId(
-			companyId, 0, 1, orderByComparator);
+	public Message fetchByCompanyId_First(long companyId,
+		OrderByComparator<Message> orderByComparator) {
+		List<Message> list = findByCompanyId(companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -323,10 +308,9 @@ public class MessagePersistenceImpl
 	 * @throws NoSuchMessageException if a matching message could not be found
 	 */
 	@Override
-	public Message findByCompanyId_Last(
-			long companyId, OrderByComparator<Message> orderByComparator)
+	public Message findByCompanyId_Last(long companyId,
+		OrderByComparator<Message> orderByComparator)
 		throws NoSuchMessageException {
-
 		Message message = fetchByCompanyId_Last(companyId, orderByComparator);
 
 		if (message != null) {
@@ -353,17 +337,16 @@ public class MessagePersistenceImpl
 	 * @return the last matching message, or <code>null</code> if a matching message could not be found
 	 */
 	@Override
-	public Message fetchByCompanyId_Last(
-		long companyId, OrderByComparator<Message> orderByComparator) {
-
+	public Message fetchByCompanyId_Last(long companyId,
+		OrderByComparator<Message> orderByComparator) {
 		int count = countByCompanyId(companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Message> list = findByCompanyId(
-			companyId, count - 1, count, orderByComparator);
+		List<Message> list = findByCompanyId(companyId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -382,11 +365,9 @@ public class MessagePersistenceImpl
 	 * @throws NoSuchMessageException if a message with the primary key could not be found
 	 */
 	@Override
-	public Message[] findByCompanyId_PrevAndNext(
-			long messageId, long companyId,
-			OrderByComparator<Message> orderByComparator)
+	public Message[] findByCompanyId_PrevAndNext(long messageId,
+		long companyId, OrderByComparator<Message> orderByComparator)
 		throws NoSuchMessageException {
-
 		Message message = findByPrimaryKey(messageId);
 
 		Session session = null;
@@ -396,13 +377,13 @@ public class MessagePersistenceImpl
 
 			Message[] array = new MessageImpl[3];
 
-			array[0] = getByCompanyId_PrevAndNext(
-				session, message, companyId, orderByComparator, true);
+			array[0] = getByCompanyId_PrevAndNext(session, message, companyId,
+					orderByComparator, true);
 
 			array[1] = message;
 
-			array[2] = getByCompanyId_PrevAndNext(
-				session, message, companyId, orderByComparator, false);
+			array[2] = getByCompanyId_PrevAndNext(session, message, companyId,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -414,15 +395,14 @@ public class MessagePersistenceImpl
 		}
 	}
 
-	protected Message getByCompanyId_PrevAndNext(
-		Session session, Message message, long companyId,
+	protected Message getByCompanyId_PrevAndNext(Session session,
+		Message message, long companyId,
 		OrderByComparator<Message> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -434,8 +414,7 @@ public class MessagePersistenceImpl
 		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -505,9 +484,8 @@ public class MessagePersistenceImpl
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(message)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					message)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -529,10 +507,8 @@ public class MessagePersistenceImpl
 	 */
 	@Override
 	public void removeByCompanyId(long companyId) {
-		for (Message message :
-				findByCompanyId(
-					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (Message message : findByCompanyId(companyId, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(message);
 		}
 	}
@@ -547,7 +523,7 @@ public class MessagePersistenceImpl
 	public int countByCompanyId(long companyId) {
 		FinderPath finderPath = _finderPathCountByCompanyId;
 
-		Object[] finderArgs = new Object[] {companyId};
+		Object[] finderArgs = new Object[] { companyId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -588,9 +564,7 @@ public class MessagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
-		"message.companyId = ?";
-
+	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 = "message.companyId = ?";
 	private FinderPath _finderPathWithPaginationFindByFolderId;
 	private FinderPath _finderPathWithoutPaginationFindByFolderId;
 	private FinderPath _finderPathCountByFolderId;
@@ -603,15 +577,15 @@ public class MessagePersistenceImpl
 	 */
 	@Override
 	public List<Message> findByFolderId(long folderId) {
-		return findByFolderId(
-			folderId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByFolderId(folderId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the messages where folderId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param folderId the folder ID
@@ -628,7 +602,7 @@ public class MessagePersistenceImpl
 	 * Returns an ordered range of all the messages where folderId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param folderId the folder ID
@@ -638,10 +612,8 @@ public class MessagePersistenceImpl
 	 * @return the ordered range of matching messages
 	 */
 	@Override
-	public List<Message> findByFolderId(
-		long folderId, int start, int end,
+	public List<Message> findByFolderId(long folderId, int start, int end,
 		OrderByComparator<Message> orderByComparator) {
-
 		return findByFolderId(folderId, start, end, orderByComparator, true);
 	}
 
@@ -649,7 +621,7 @@ public class MessagePersistenceImpl
 	 * Returns an ordered range of all the messages where folderId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param folderId the folder ID
@@ -660,32 +632,28 @@ public class MessagePersistenceImpl
 	 * @return the ordered range of matching messages
 	 */
 	@Override
-	public List<Message> findByFolderId(
-		long folderId, int start, int end,
-		OrderByComparator<Message> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<Message> findByFolderId(long folderId, int start, int end,
+		OrderByComparator<Message> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByFolderId;
-			finderArgs = new Object[] {folderId};
+			finderArgs = new Object[] { folderId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByFolderId;
-			finderArgs = new Object[] {folderId, start, end, orderByComparator};
+			finderArgs = new Object[] { folderId, start, end, orderByComparator };
 		}
 
 		List<Message> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Message>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Message>)finderCache.getResult(finderPath, finderArgs,
+					this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Message message : list) {
@@ -702,8 +670,8 @@ public class MessagePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -714,10 +682,11 @@ public class MessagePersistenceImpl
 			query.append(_FINDER_COLUMN_FOLDERID_FOLDERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(MessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -735,16 +704,16 @@ public class MessagePersistenceImpl
 				qPos.add(folderId);
 
 				if (!pagination) {
-					list = (List<Message>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<Message>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Message>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<Message>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -773,10 +742,9 @@ public class MessagePersistenceImpl
 	 * @throws NoSuchMessageException if a matching message could not be found
 	 */
 	@Override
-	public Message findByFolderId_First(
-			long folderId, OrderByComparator<Message> orderByComparator)
+	public Message findByFolderId_First(long folderId,
+		OrderByComparator<Message> orderByComparator)
 		throws NoSuchMessageException {
-
 		Message message = fetchByFolderId_First(folderId, orderByComparator);
 
 		if (message != null) {
@@ -803,9 +771,8 @@ public class MessagePersistenceImpl
 	 * @return the first matching message, or <code>null</code> if a matching message could not be found
 	 */
 	@Override
-	public Message fetchByFolderId_First(
-		long folderId, OrderByComparator<Message> orderByComparator) {
-
+	public Message fetchByFolderId_First(long folderId,
+		OrderByComparator<Message> orderByComparator) {
 		List<Message> list = findByFolderId(folderId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -824,10 +791,9 @@ public class MessagePersistenceImpl
 	 * @throws NoSuchMessageException if a matching message could not be found
 	 */
 	@Override
-	public Message findByFolderId_Last(
-			long folderId, OrderByComparator<Message> orderByComparator)
+	public Message findByFolderId_Last(long folderId,
+		OrderByComparator<Message> orderByComparator)
 		throws NoSuchMessageException {
-
 		Message message = fetchByFolderId_Last(folderId, orderByComparator);
 
 		if (message != null) {
@@ -854,17 +820,16 @@ public class MessagePersistenceImpl
 	 * @return the last matching message, or <code>null</code> if a matching message could not be found
 	 */
 	@Override
-	public Message fetchByFolderId_Last(
-		long folderId, OrderByComparator<Message> orderByComparator) {
-
+	public Message fetchByFolderId_Last(long folderId,
+		OrderByComparator<Message> orderByComparator) {
 		int count = countByFolderId(folderId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Message> list = findByFolderId(
-			folderId, count - 1, count, orderByComparator);
+		List<Message> list = findByFolderId(folderId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -883,11 +848,9 @@ public class MessagePersistenceImpl
 	 * @throws NoSuchMessageException if a message with the primary key could not be found
 	 */
 	@Override
-	public Message[] findByFolderId_PrevAndNext(
-			long messageId, long folderId,
-			OrderByComparator<Message> orderByComparator)
+	public Message[] findByFolderId_PrevAndNext(long messageId, long folderId,
+		OrderByComparator<Message> orderByComparator)
 		throws NoSuchMessageException {
-
 		Message message = findByPrimaryKey(messageId);
 
 		Session session = null;
@@ -897,13 +860,13 @@ public class MessagePersistenceImpl
 
 			Message[] array = new MessageImpl[3];
 
-			array[0] = getByFolderId_PrevAndNext(
-				session, message, folderId, orderByComparator, true);
+			array[0] = getByFolderId_PrevAndNext(session, message, folderId,
+					orderByComparator, true);
 
 			array[1] = message;
 
-			array[2] = getByFolderId_PrevAndNext(
-				session, message, folderId, orderByComparator, false);
+			array[2] = getByFolderId_PrevAndNext(session, message, folderId,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -915,15 +878,14 @@ public class MessagePersistenceImpl
 		}
 	}
 
-	protected Message getByFolderId_PrevAndNext(
-		Session session, Message message, long folderId,
+	protected Message getByFolderId_PrevAndNext(Session session,
+		Message message, long folderId,
 		OrderByComparator<Message> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -935,8 +897,7 @@ public class MessagePersistenceImpl
 		query.append(_FINDER_COLUMN_FOLDERID_FOLDERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1006,9 +967,8 @@ public class MessagePersistenceImpl
 		qPos.add(folderId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(message)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					message)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1030,10 +990,8 @@ public class MessagePersistenceImpl
 	 */
 	@Override
 	public void removeByFolderId(long folderId) {
-		for (Message message :
-				findByFolderId(
-					folderId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (Message message : findByFolderId(folderId, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(message);
 		}
 	}
@@ -1048,7 +1006,7 @@ public class MessagePersistenceImpl
 	public int countByFolderId(long folderId) {
 		FinderPath finderPath = _finderPathCountByFolderId;
 
-		Object[] finderArgs = new Object[] {folderId};
+		Object[] finderArgs = new Object[] { folderId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1089,14 +1047,12 @@ public class MessagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_FOLDERID_FOLDERID_2 =
-		"message.folderId = ?";
-
+	private static final String _FINDER_COLUMN_FOLDERID_FOLDERID_2 = "message.folderId = ?";
 	private FinderPath _finderPathFetchByF_R;
 	private FinderPath _finderPathCountByF_R;
 
 	/**
-	 * Returns the message where folderId = &#63; and remoteMessageId = &#63; or throws a <code>NoSuchMessageException</code> if it could not be found.
+	 * Returns the message where folderId = &#63; and remoteMessageId = &#63; or throws a {@link NoSuchMessageException} if it could not be found.
 	 *
 	 * @param folderId the folder ID
 	 * @param remoteMessageId the remote message ID
@@ -1106,7 +1062,6 @@ public class MessagePersistenceImpl
 	@Override
 	public Message findByF_R(long folderId, long remoteMessageId)
 		throws NoSuchMessageException {
-
 		Message message = fetchByF_R(folderId, remoteMessageId);
 
 		if (message == null) {
@@ -1153,24 +1108,22 @@ public class MessagePersistenceImpl
 	 * @return the matching message, or <code>null</code> if a matching message could not be found
 	 */
 	@Override
-	public Message fetchByF_R(
-		long folderId, long remoteMessageId, boolean retrieveFromCache) {
-
-		Object[] finderArgs = new Object[] {folderId, remoteMessageId};
+	public Message fetchByF_R(long folderId, long remoteMessageId,
+		boolean retrieveFromCache) {
+		Object[] finderArgs = new Object[] { folderId, remoteMessageId };
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByF_R, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByF_R, finderArgs,
+					this);
 		}
 
 		if (result instanceof Message) {
 			Message message = (Message)result;
 
 			if ((folderId != message.getFolderId()) ||
-				(remoteMessageId != message.getRemoteMessageId())) {
-
+					(remoteMessageId != message.getRemoteMessageId())) {
 				result = null;
 			}
 		}
@@ -1202,8 +1155,8 @@ public class MessagePersistenceImpl
 				List<Message> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByF_R, finderArgs, list);
+					finderCache.putResult(_finderPathFetchByF_R, finderArgs,
+						list);
 				}
 				else {
 					if (list.size() > 1) {
@@ -1212,8 +1165,8 @@ public class MessagePersistenceImpl
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"MessagePersistenceImpl.fetchByF_R(long, long, boolean) with parameters (" +
-									StringUtil.merge(finderArgs) +
-										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+								StringUtil.merge(finderArgs) +
+								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
 						}
 					}
 
@@ -1252,7 +1205,6 @@ public class MessagePersistenceImpl
 	@Override
 	public Message removeByF_R(long folderId, long remoteMessageId)
 		throws NoSuchMessageException {
-
 		Message message = findByF_R(folderId, remoteMessageId);
 
 		return remove(message);
@@ -1269,7 +1221,7 @@ public class MessagePersistenceImpl
 	public int countByF_R(long folderId, long remoteMessageId) {
 		FinderPath finderPath = _finderPathCountByF_R;
 
-		Object[] finderArgs = new Object[] {folderId, remoteMessageId};
+		Object[] finderArgs = new Object[] { folderId, remoteMessageId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1314,33 +1266,15 @@ public class MessagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_F_R_FOLDERID_2 =
-		"message.folderId = ? AND ";
-
-	private static final String _FINDER_COLUMN_F_R_REMOTEMESSAGEID_2 =
-		"message.remoteMessageId = ?";
+	private static final String _FINDER_COLUMN_F_R_FOLDERID_2 = "message.folderId = ? AND ";
+	private static final String _FINDER_COLUMN_F_R_REMOTEMESSAGEID_2 = "message.remoteMessageId = ?";
 
 	public MessagePersistenceImpl() {
 		setModelClass(Message.class);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("to", "to_");
-		dbColumnNames.put("size", "size_");
-
-		try {
-			Field field = BasePersistenceImpl.class.getDeclaredField(
-				"_dbColumnNames");
-
-			field.setAccessible(true);
-
-			field.set(this, dbColumnNames);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
+		setModelImplClass(MessageImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(MessageModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -1350,13 +1284,11 @@ public class MessagePersistenceImpl
 	 */
 	@Override
 	public void cacheResult(Message message) {
-		entityCache.putResult(
-			MessageModelImpl.ENTITY_CACHE_ENABLED, MessageImpl.class,
-			message.getPrimaryKey(), message);
+		entityCache.putResult(MessageModelImpl.ENTITY_CACHE_ENABLED,
+			MessageImpl.class, message.getPrimaryKey(), message);
 
-		finderCache.putResult(
-			_finderPathFetchByF_R,
-			new Object[] {message.getFolderId(), message.getRemoteMessageId()},
+		finderCache.putResult(_finderPathFetchByF_R,
+			new Object[] { message.getFolderId(), message.getRemoteMessageId() },
 			message);
 
 		message.resetOriginalValues();
@@ -1370,10 +1302,8 @@ public class MessagePersistenceImpl
 	@Override
 	public void cacheResult(List<Message> messages) {
 		for (Message message : messages) {
-			if (entityCache.getResult(
-					MessageModelImpl.ENTITY_CACHE_ENABLED, MessageImpl.class,
-					message.getPrimaryKey()) == null) {
-
+			if (entityCache.getResult(MessageModelImpl.ENTITY_CACHE_ENABLED,
+						MessageImpl.class, message.getPrimaryKey()) == null) {
 				cacheResult(message);
 			}
 			else {
@@ -1386,7 +1316,7 @@ public class MessagePersistenceImpl
 	 * Clears the cache for all messages.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -1402,14 +1332,13 @@ public class MessagePersistenceImpl
 	 * Clears the cache for the message.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(Message message) {
-		entityCache.removeResult(
-			MessageModelImpl.ENTITY_CACHE_ENABLED, MessageImpl.class,
-			message.getPrimaryKey());
+		entityCache.removeResult(MessageModelImpl.ENTITY_CACHE_ENABLED,
+			MessageImpl.class, message.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -1423,9 +1352,8 @@ public class MessagePersistenceImpl
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (Message message : messages) {
-			entityCache.removeResult(
-				MessageModelImpl.ENTITY_CACHE_ENABLED, MessageImpl.class,
-				message.getPrimaryKey());
+			entityCache.removeResult(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageImpl.class, message.getPrimaryKey());
 
 			clearUniqueFindersCache((MessageModelImpl)message, true);
 		}
@@ -1433,36 +1361,34 @@ public class MessagePersistenceImpl
 
 	protected void cacheUniqueFindersCache(MessageModelImpl messageModelImpl) {
 		Object[] args = new Object[] {
-			messageModelImpl.getFolderId(),
-			messageModelImpl.getRemoteMessageId()
-		};
-
-		finderCache.putResult(
-			_finderPathCountByF_R, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByF_R, args, messageModelImpl, false);
-	}
-
-	protected void clearUniqueFindersCache(
-		MessageModelImpl messageModelImpl, boolean clearCurrent) {
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
 				messageModelImpl.getFolderId(),
 				messageModelImpl.getRemoteMessageId()
 			};
+
+		finderCache.putResult(_finderPathCountByF_R, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(_finderPathFetchByF_R, args, messageModelImpl,
+			false);
+	}
+
+	protected void clearUniqueFindersCache(MessageModelImpl messageModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					messageModelImpl.getFolderId(),
+					messageModelImpl.getRemoteMessageId()
+				};
 
 			finderCache.removeResult(_finderPathCountByF_R, args);
 			finderCache.removeResult(_finderPathFetchByF_R, args);
 		}
 
 		if ((messageModelImpl.getColumnBitmask() &
-			 _finderPathFetchByF_R.getColumnBitmask()) != 0) {
-
+				_finderPathFetchByF_R.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
-				messageModelImpl.getOriginalFolderId(),
-				messageModelImpl.getOriginalRemoteMessageId()
-			};
+					messageModelImpl.getOriginalFolderId(),
+					messageModelImpl.getOriginalRemoteMessageId()
+				};
 
 			finderCache.removeResult(_finderPathCountByF_R, args);
 			finderCache.removeResult(_finderPathFetchByF_R, args);
@@ -1509,22 +1435,20 @@ public class MessagePersistenceImpl
 	@Override
 	public Message remove(Serializable primaryKey)
 		throws NoSuchMessageException {
-
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			Message message = (Message)session.get(
-				MessageImpl.class, primaryKey);
+			Message message = (Message)session.get(MessageImpl.class, primaryKey);
 
 			if (message == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchMessageException(
-					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				throw new NoSuchMessageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
 			}
 
 			return remove(message);
@@ -1548,8 +1472,8 @@ public class MessagePersistenceImpl
 			session = openSession();
 
 			if (!session.contains(message)) {
-				message = (Message)session.get(
-					MessageImpl.class, message.getPrimaryKeyObj());
+				message = (Message)session.get(MessageImpl.class,
+						message.getPrimaryKeyObj());
 			}
 
 			if (message != null) {
@@ -1582,18 +1506,17 @@ public class MessagePersistenceImpl
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in message proxy " +
-						invocationHandler.getClass());
+					invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom Message implementation " +
-					message.getClass());
+				message.getClass());
 		}
 
 		MessageModelImpl messageModelImpl = (MessageModelImpl)message;
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -1641,66 +1564,63 @@ public class MessagePersistenceImpl
 		if (!MessageModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else if (isNew) {
-			Object[] args = new Object[] {messageModelImpl.getCompanyId()};
+		else
+		 if (isNew) {
+			Object[] args = new Object[] { messageModelImpl.getCompanyId() };
 
 			finderCache.removeResult(_finderPathCountByCompanyId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByCompanyId, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+				args);
 
-			args = new Object[] {messageModelImpl.getFolderId()};
+			args = new Object[] { messageModelImpl.getFolderId() };
 
 			finderCache.removeResult(_finderPathCountByFolderId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByFolderId, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByFolderId,
+				args);
 
 			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
+				FINDER_ARGS_EMPTY);
 		}
+
 		else {
 			if ((messageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByCompanyId.
-					 getColumnBitmask()) != 0) {
-
+					_finderPathWithoutPaginationFindByCompanyId.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-					messageModelImpl.getOriginalCompanyId()
-				};
+						messageModelImpl.getOriginalCompanyId()
+					};
 
 				finderCache.removeResult(_finderPathCountByCompanyId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByCompanyId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+					args);
 
-				args = new Object[] {messageModelImpl.getCompanyId()};
+				args = new Object[] { messageModelImpl.getCompanyId() };
 
 				finderCache.removeResult(_finderPathCountByCompanyId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByCompanyId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+					args);
 			}
 
 			if ((messageModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByFolderId.
-					 getColumnBitmask()) != 0) {
-
+					_finderPathWithoutPaginationFindByFolderId.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-					messageModelImpl.getOriginalFolderId()
-				};
+						messageModelImpl.getOriginalFolderId()
+					};
 
 				finderCache.removeResult(_finderPathCountByFolderId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByFolderId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByFolderId,
+					args);
 
-				args = new Object[] {messageModelImpl.getFolderId()};
+				args = new Object[] { messageModelImpl.getFolderId() };
 
 				finderCache.removeResult(_finderPathCountByFolderId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByFolderId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByFolderId,
+					args);
 			}
 		}
 
-		entityCache.putResult(
-			MessageModelImpl.ENTITY_CACHE_ENABLED, MessageImpl.class,
-			message.getPrimaryKey(), message, false);
+		entityCache.putResult(MessageModelImpl.ENTITY_CACHE_ENABLED,
+			MessageImpl.class, message.getPrimaryKey(), message, false);
 
 		clearUniqueFindersCache(messageModelImpl, false);
 		cacheUniqueFindersCache(messageModelImpl);
@@ -1711,7 +1631,7 @@ public class MessagePersistenceImpl
 	}
 
 	/**
-	 * Returns the message with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
+	 * Returns the message with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the message
 	 * @return the message
@@ -1720,7 +1640,6 @@ public class MessagePersistenceImpl
 	@Override
 	public Message findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchMessageException {
-
 		Message message = fetchByPrimaryKey(primaryKey);
 
 		if (message == null) {
@@ -1728,15 +1647,15 @@ public class MessagePersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchMessageException(
-				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			throw new NoSuchMessageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
 		}
 
 		return message;
 	}
 
 	/**
-	 * Returns the message with the primary key or throws a <code>NoSuchMessageException</code> if it could not be found.
+	 * Returns the message with the primary key or throws a {@link NoSuchMessageException} if it could not be found.
 	 *
 	 * @param messageId the primary key of the message
 	 * @return the message
@@ -1745,58 +1664,7 @@ public class MessagePersistenceImpl
 	@Override
 	public Message findByPrimaryKey(long messageId)
 		throws NoSuchMessageException {
-
 		return findByPrimaryKey((Serializable)messageId);
-	}
-
-	/**
-	 * Returns the message with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param primaryKey the primary key of the message
-	 * @return the message, or <code>null</code> if a message with the primary key could not be found
-	 */
-	@Override
-	public Message fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(
-			MessageModelImpl.ENTITY_CACHE_ENABLED, MessageImpl.class,
-			primaryKey);
-
-		if (serializable == nullModel) {
-			return null;
-		}
-
-		Message message = (Message)serializable;
-
-		if (message == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				message = (Message)session.get(MessageImpl.class, primaryKey);
-
-				if (message != null) {
-					cacheResult(message);
-				}
-				else {
-					entityCache.putResult(
-						MessageModelImpl.ENTITY_CACHE_ENABLED,
-						MessageImpl.class, primaryKey, nullModel);
-				}
-			}
-			catch (Exception e) {
-				entityCache.removeResult(
-					MessageModelImpl.ENTITY_CACHE_ENABLED, MessageImpl.class,
-					primaryKey);
-
-				throw processException(e);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return message;
 	}
 
 	/**
@@ -1808,103 +1676,6 @@ public class MessagePersistenceImpl
 	@Override
 	public Message fetchByPrimaryKey(long messageId) {
 		return fetchByPrimaryKey((Serializable)messageId);
-	}
-
-	@Override
-	public Map<Serializable, Message> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, Message> map = new HashMap<Serializable, Message>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			Message message = fetchByPrimaryKey(primaryKey);
-
-			if (message != null) {
-				map.put(primaryKey, message);
-			}
-
-			return map;
-		}
-
-		Set<Serializable> uncachedPrimaryKeys = null;
-
-		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(
-				MessageModelImpl.ENTITY_CACHE_ENABLED, MessageImpl.class,
-				primaryKey);
-
-			if (serializable != nullModel) {
-				if (serializable == null) {
-					if (uncachedPrimaryKeys == null) {
-						uncachedPrimaryKeys = new HashSet<Serializable>();
-					}
-
-					uncachedPrimaryKeys.add(primaryKey);
-				}
-				else {
-					map.put(primaryKey, (Message)serializable);
-				}
-			}
-		}
-
-		if (uncachedPrimaryKeys == null) {
-			return map;
-		}
-
-		StringBundler query = new StringBundler(
-			uncachedPrimaryKeys.size() * 2 + 1);
-
-		query.append(_SQL_SELECT_MESSAGE_WHERE_PKS_IN);
-
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
-
-			query.append(",");
-		}
-
-		query.setIndex(query.index() - 1);
-
-		query.append(")");
-
-		String sql = query.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query q = session.createQuery(sql);
-
-			for (Message message : (List<Message>)q.list()) {
-				map.put(message.getPrimaryKeyObj(), message);
-
-				cacheResult(message);
-
-				uncachedPrimaryKeys.remove(message.getPrimaryKeyObj());
-			}
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(
-					MessageModelImpl.ENTITY_CACHE_ENABLED, MessageImpl.class,
-					primaryKey, nullModel);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -1921,7 +1692,7 @@ public class MessagePersistenceImpl
 	 * Returns a range of all the messages.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of messages
@@ -1937,7 +1708,7 @@ public class MessagePersistenceImpl
 	 * Returns an ordered range of all the messages.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of messages
@@ -1946,9 +1717,8 @@ public class MessagePersistenceImpl
 	 * @return the ordered range of messages
 	 */
 	@Override
-	public List<Message> findAll(
-		int start, int end, OrderByComparator<Message> orderByComparator) {
-
+	public List<Message> findAll(int start, int end,
+		OrderByComparator<Message> orderByComparator) {
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -1956,7 +1726,7 @@ public class MessagePersistenceImpl
 	 * Returns an ordered range of all the messages.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of messages
@@ -1966,31 +1736,28 @@ public class MessagePersistenceImpl
 	 * @return the ordered range of messages
 	 */
 	@Override
-	public List<Message> findAll(
-		int start, int end, OrderByComparator<Message> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<Message> findAll(int start, int end,
+		OrderByComparator<Message> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] {start, end, orderByComparator};
+			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
 		List<Message> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Message>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Message>)finderCache.getResult(finderPath, finderArgs,
+					this);
 		}
 
 		if (list == null) {
@@ -1998,13 +1765,13 @@ public class MessagePersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					2 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_MESSAGE);
 
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 
 				sql = query.toString();
 			}
@@ -2024,16 +1791,16 @@ public class MessagePersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<Message>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<Message>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Message>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<Message>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -2071,8 +1838,8 @@ public class MessagePersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(_finderPathCountAll,
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -2084,12 +1851,11 @@ public class MessagePersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
+					count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -2107,6 +1873,21 @@ public class MessagePersistenceImpl
 	}
 
 	@Override
+	protected EntityCache getEntityCache() {
+		return entityCache;
+	}
+
+	@Override
+	protected String getPKDBName() {
+		return "messageId";
+	}
+
+	@Override
+	protected String getSelectSQL() {
+		return _SQL_SELECT_MESSAGE;
+	}
+
+	@Override
 	protected Map<String, Integer> getTableColumnsMap() {
 		return MessageModelImpl.TABLE_COLUMNS_MAP;
 	}
@@ -2115,82 +1896,75 @@ public class MessagePersistenceImpl
 	 * Initializes the message persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(
-			MessageModelImpl.ENTITY_CACHE_ENABLED,
-			MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			MessageModelImpl.ENTITY_CACHE_ENABLED,
-			MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-			new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+				new String[0]);
 
-		_finderPathCountAll = new FinderPath(
-			MessageModelImpl.ENTITY_CACHE_ENABLED,
-			MessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+		_finderPathCountAll = new FinderPath(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+				new String[0]);
 
-		_finderPathWithPaginationFindByCompanyId = new FinderPath(
-			MessageModelImpl.ENTITY_CACHE_ENABLED,
-			MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
+				new String[] {
+					Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
-			MessageModelImpl.ENTITY_CACHE_ENABLED,
-			MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
-			new String[] {Long.class.getName()},
-			MessageModelImpl.COMPANYID_COLUMN_BITMASK |
-			MessageModelImpl.SENTDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+				new String[] { Long.class.getName() },
+				MessageModelImpl.COMPANYID_COLUMN_BITMASK |
+				MessageModelImpl.SENTDATE_COLUMN_BITMASK);
 
-		_finderPathCountByCompanyId = new FinderPath(
-			MessageModelImpl.ENTITY_CACHE_ENABLED,
-			MessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
-			new String[] {Long.class.getName()});
+		_finderPathCountByCompanyId = new FinderPath(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
+				new String[] { Long.class.getName() });
 
-		_finderPathWithPaginationFindByFolderId = new FinderPath(
-			MessageModelImpl.ENTITY_CACHE_ENABLED,
-			MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFolderId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+		_finderPathWithPaginationFindByFolderId = new FinderPath(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFolderId",
+				new String[] {
+					Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByFolderId = new FinderPath(
-			MessageModelImpl.ENTITY_CACHE_ENABLED,
-			MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFolderId",
-			new String[] {Long.class.getName()},
-			MessageModelImpl.FOLDERID_COLUMN_BITMASK |
-			MessageModelImpl.SENTDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByFolderId = new FinderPath(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFolderId",
+				new String[] { Long.class.getName() },
+				MessageModelImpl.FOLDERID_COLUMN_BITMASK |
+				MessageModelImpl.SENTDATE_COLUMN_BITMASK);
 
-		_finderPathCountByFolderId = new FinderPath(
-			MessageModelImpl.ENTITY_CACHE_ENABLED,
-			MessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFolderId",
-			new String[] {Long.class.getName()});
+		_finderPathCountByFolderId = new FinderPath(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFolderId",
+				new String[] { Long.class.getName() });
 
-		_finderPathFetchByF_R = new FinderPath(
-			MessageModelImpl.ENTITY_CACHE_ENABLED,
-			MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByF_R",
-			new String[] {Long.class.getName(), Long.class.getName()},
-			MessageModelImpl.FOLDERID_COLUMN_BITMASK |
-			MessageModelImpl.REMOTEMESSAGEID_COLUMN_BITMASK);
+		_finderPathFetchByF_R = new FinderPath(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageModelImpl.FINDER_CACHE_ENABLED, MessageImpl.class,
+				FINDER_CLASS_NAME_ENTITY, "fetchByF_R",
+				new String[] { Long.class.getName(), Long.class.getName() },
+				MessageModelImpl.FOLDERID_COLUMN_BITMASK |
+				MessageModelImpl.REMOTEMESSAGEID_COLUMN_BITMASK);
 
-		_finderPathCountByF_R = new FinderPath(
-			MessageModelImpl.ENTITY_CACHE_ENABLED,
-			MessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByF_R",
-			new String[] {Long.class.getName(), Long.class.getName()});
+		_finderPathCountByF_R = new FinderPath(MessageModelImpl.ENTITY_CACHE_ENABLED,
+				MessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByF_R",
+				new String[] { Long.class.getName(), Long.class.getName() });
 	}
 
 	public void destroy() {
@@ -2202,40 +1976,19 @@ public class MessagePersistenceImpl
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
-
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-
-	private static final String _SQL_SELECT_MESSAGE =
-		"SELECT message FROM Message message";
-
-	private static final String _SQL_SELECT_MESSAGE_WHERE_PKS_IN =
-		"SELECT message FROM Message message WHERE messageId IN (";
-
-	private static final String _SQL_SELECT_MESSAGE_WHERE =
-		"SELECT message FROM Message message WHERE ";
-
-	private static final String _SQL_COUNT_MESSAGE =
-		"SELECT COUNT(message) FROM Message message";
-
-	private static final String _SQL_COUNT_MESSAGE_WHERE =
-		"SELECT COUNT(message) FROM Message message WHERE ";
-
+	private static final String _SQL_SELECT_MESSAGE = "SELECT message FROM Message message";
+	private static final String _SQL_SELECT_MESSAGE_WHERE = "SELECT message FROM Message message WHERE ";
+	private static final String _SQL_COUNT_MESSAGE = "SELECT COUNT(message) FROM Message message";
+	private static final String _SQL_COUNT_MESSAGE_WHERE = "SELECT COUNT(message) FROM Message message WHERE ";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "message.";
-
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
-		"No Message exists with the primary key ";
-
-	private static final String _NO_SUCH_ENTITY_WITH_KEY =
-		"No Message exists with the key {";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MessagePersistenceImpl.class);
-
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"to", "size"});
-
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Message exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Message exists with the key {";
+	private static final Log _log = LogFactoryUtil.getLog(MessagePersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+				"to", "size"
+			});
 }

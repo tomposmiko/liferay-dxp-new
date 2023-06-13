@@ -1110,9 +1110,13 @@ public class SocialActivityCounterLocalServiceImpl
 				protected SocialActivityCounter performProtectedAction()
 					throws PortalException {
 
-					return socialActivityCounterLocalService.addActivityCounter(
-						groupId, classNameId, classPK, name, ownerType,
-						totalValue, previousActivityCounterId, periodLength);
+					SocialActivityCounter activityCounter =
+						socialActivityCounterLocalService.addActivityCounter(
+							groupId, classNameId, classPK, name, ownerType,
+							totalValue, previousActivityCounterId,
+							periodLength);
+
+					return activityCounter;
 				}
 
 			};

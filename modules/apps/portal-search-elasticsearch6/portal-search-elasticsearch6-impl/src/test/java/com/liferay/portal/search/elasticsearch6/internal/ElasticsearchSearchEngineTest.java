@@ -20,9 +20,8 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnection;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchFixture;
-import com.liferay.portal.search.elasticsearch6.internal.connection.TestElasticsearchConnectionManager;
-import com.liferay.portal.search.elasticsearch6.internal.facet.DefaultFacetProcessor;
-import com.liferay.portal.search.elasticsearch6.internal.facet.FacetProcessor;
+import com.liferay.portal.search.elasticsearch6.internal.connection.EmbeddedElasticsearchConnection;
+import com.liferay.portal.search.elasticsearch6.internal.connection.OperationMode;
 import com.liferay.portal.search.elasticsearch6.internal.index.CompanyIdIndexNameBuilder;
 import com.liferay.portal.search.elasticsearch6.internal.index.CompanyIndexFactory;
 import com.liferay.portal.search.elasticsearch6.internal.index.IndexNameBuilder;
@@ -38,7 +37,6 @@ import org.elasticsearch.action.admin.cluster.snapshots.delete.DeleteSnapshotReq
 import org.elasticsearch.action.admin.cluster.snapshots.get.GetSnapshotsAction;
 import org.elasticsearch.action.admin.cluster.snapshots.get.GetSnapshotsRequestBuilder;
 import org.elasticsearch.action.admin.cluster.snapshots.get.GetSnapshotsResponse;
-import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.snapshots.SnapshotInfo;
 
 import org.junit.After;
@@ -58,12 +56,19 @@ public class ElasticsearchSearchEngineTest {
 
 		_elasticsearchFixture.setUp();
 
-		_elasticsearchConnectionManager =
-			new TestElasticsearchConnectionManager(_elasticsearchFixture);
+		_elasticsearchConnectionManager = createElasticsearchConnectionManager(
+			_elasticsearchFixture.getEmbeddedElasticsearchConnection());
+
+		_elasticsearchConnectionManager.activate(OperationMode.EMBEDDED);
 
 		ElasticsearchEngineAdapterFixture elasticsearchEngineAdapterFixture =
-			new ElasticsearchEngineAdapterFixture(
-				_elasticsearchConnectionManager, _facetProcessor);
+			new ElasticsearchEngineAdapterFixture() {
+				{
+					elasticsearchClientResolver = _elasticsearchFixture;
+				}
+			};
+
+		elasticsearchEngineAdapterFixture.setUp();
 
 		_searchEngineAdapter =
 			elasticsearchEngineAdapterFixture.getSearchEngineAdapter();
@@ -161,7 +166,7 @@ public class ElasticsearchSearchEngineTest {
 		deleteSnapshotRequestBuilder.get();
 	}
 
-	protected CompanyIndexFactory createCompanyIndexFactory() {
+	protected static CompanyIndexFactory createCompanyIndexFactory() {
 		return new CompanyIndexFactory() {
 			{
 				indexNameBuilder = createIndexNameBuilder();
@@ -170,10 +175,25 @@ public class ElasticsearchSearchEngineTest {
 		};
 	}
 
-	protected ElasticsearchConnectionManager
-		createElasticsearchConnectionManager() {
+	protected static IndexNameBuilder createIndexNameBuilder() {
+		return new CompanyIdIndexNameBuilder() {
+			{
+				setIndexNamePrefix(null);
+			}
+		};
+	}
 
-		return new TestElasticsearchConnectionManager(_elasticsearchFixture);
+	protected ElasticsearchConnectionManager
+		createElasticsearchConnectionManager(
+			EmbeddedElasticsearchConnection embeddedElasticsearchConnection) {
+
+		ElasticsearchConnectionManager elasticsearchConnectionManager =
+			new ElasticsearchConnectionManager();
+
+		elasticsearchConnectionManager.setEmbeddedElasticsearchConnection(
+			embeddedElasticsearchConnection);
+
+		return elasticsearchConnectionManager;
 	}
 
 	protected ElasticsearchSearchEngine createElasticsearchSearchEngine(
@@ -191,14 +211,6 @@ public class ElasticsearchSearchEngineTest {
 		};
 	}
 
-	protected IndexNameBuilder createIndexNameBuilder() {
-		return new CompanyIdIndexNameBuilder() {
-			{
-				setIndexNamePrefix(null);
-			}
-		};
-	}
-
 	protected void reconnect(
 		ElasticsearchConnectionManager elasticsearchConnectionManager) {
 
@@ -212,8 +224,6 @@ public class ElasticsearchSearchEngineTest {
 
 	private ElasticsearchConnectionManager _elasticsearchConnectionManager;
 	private ElasticsearchFixture _elasticsearchFixture;
-	private final FacetProcessor<SearchRequestBuilder> _facetProcessor =
-		new DefaultFacetProcessor();
 	private SearchEngineAdapter _searchEngineAdapter;
 
 }

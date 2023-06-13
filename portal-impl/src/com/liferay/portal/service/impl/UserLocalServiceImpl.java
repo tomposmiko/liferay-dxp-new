@@ -105,7 +105,6 @@ import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -2179,7 +2178,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @return the default user for the company
 	 */
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public User getDefaultUser(long companyId) throws PortalException {
 		User userModel = _defaultUsers.get(companyId);
 
@@ -2199,7 +2198,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @return the primary key of the default user for the company
 	 */
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public long getDefaultUserId(long companyId) throws PortalException {
 		User user = getDefaultUser(companyId);
 
@@ -5696,7 +5695,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 					user.getCompanyId(), emailAddress) != null) {
 
 				throw new UserEmailAddressException.MustNotBeDuplicate(
-					user.getCompanyId(), user.getUserId(), emailAddress);
+					user.getUserId(), emailAddress);
 			}
 
 			setEmailAddress(
@@ -6732,18 +6731,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			validGroupIds = ArrayUtil.clone(groupIds);
 		}
 		else {
-			List<Group> userGroups = groupLocalService.getUserGroups(
-				user.getUserId(), true);
-
-			int size = userGroups.size();
-
-			validGroupIds = new long[size];
-
-			for (int i = 0; i < size; i++) {
-				Group userGroup = userGroups.get(i);
-
-				validGroupIds[i] = userGroup.getGroupId();
-			}
+			validGroupIds = user.getGroupIds();
 		}
 
 		if (organizationIds == null) {
@@ -6754,10 +6742,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			Organization organization =
 				organizationPersistence.findByPrimaryKey(organizationId);
 
-			if (!ArrayUtil.contains(validGroupIds, organization.getGroupId())) {
-				validGroupIds = ArrayUtil.append(
-					validGroupIds, organization.getGroupId());
-			}
+			validGroupIds = ArrayUtil.append(
+				validGroupIds, organization.getGroupId());
 		}
 
 		Arrays.sort(validGroupIds);
@@ -6800,7 +6786,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			if ((user != null) && (user.getUserId() != userId)) {
 				throw new UserEmailAddressException.MustNotBeDuplicate(
-					companyId, emailAddress);
+					userId, emailAddress);
 			}
 		}
 
@@ -6846,7 +6832,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 						user.getCompanyId(), emailAddress) != null) {
 
 					throw new UserEmailAddressException.MustNotBeDuplicate(
-						user.getCompanyId(), userId, emailAddress);
+						userId, emailAddress);
 				}
 			}
 
@@ -6934,7 +6920,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 					user.getCompanyId(), emailAddress1) != null) {
 
 				throw new UserEmailAddressException.MustNotBeDuplicate(
-					user.getCompanyId(), user.getUserId(), emailAddress1);
+					user.getUserId(), emailAddress1);
 			}
 		}
 	}
@@ -7127,9 +7113,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			user = doCheckLockout(user, passwordPolicy);
 
-			if (!PasswordModificationThreadLocal.isPasswordModified()) {
-				user = doCheckPasswordExpired(user, passwordPolicy);
-			}
+			user = doCheckPasswordExpired(user, passwordPolicy);
 		}
 
 		return user;

@@ -16,7 +16,10 @@ package com.liferay.headless.apio.demo.internal;
 
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerTracker;
 import com.liferay.dynamic.data.mapping.kernel.DDMTemplate;
 import com.liferay.dynamic.data.mapping.kernel.DDMTemplateManager;
 import com.liferay.dynamic.data.mapping.kernel.DDMTemplateManagerUtil;
@@ -47,6 +50,7 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
@@ -85,7 +89,7 @@ import org.osgi.service.component.annotations.Reference;
 public class HeadlessDemo extends BasePortalInstanceLifecycleListener {
 
 	@Override
-	public void portalInstanceRegistered(Company company) throws Exception {
+	public void portalInstanceRegistered(Company company) {
 		try {
 			Role role = _roleLocalService.getRole(
 				company.getCompanyId(), RoleConstants.ADMINISTRATOR);
@@ -100,7 +104,16 @@ public class HeadlessDemo extends BasePortalInstanceLifecycleListener {
 			List<JournalArticle> journalArticles = _createJournalArticles(
 				company, _group, user);
 
-			_createMainPage(company, _group, user, journalArticles);
+			Folder folder = _createFolder(
+				user, _group, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				"Main Folder");
+
+			_createFolder(user, _group, folder.getFolderId(), "SubFolder");
+
+			FileEntry fileEntry = _createFileEntry(user, _group, folder);
+
+			_createMainPage(
+				company, _group, user, journalArticles, folder, fileEntry);
 		}
 		catch (Exception e) {
 			_log.error("Error initializing data ", e);
@@ -111,15 +124,6 @@ public class HeadlessDemo extends BasePortalInstanceLifecycleListener {
 	protected void deactivate() throws PortalException {
 		if (_group != null) {
 			_groupLocalService.deleteGroup(_group);
-		}
-	}
-
-	protected DDMForm deserialize(String content) {
-		try {
-			return _ddmFormJSONDeserializer.deserialize(content);
-		}
-		catch (PortalException pe) {
-			throw new RuntimeException(pe);
 		}
 	}
 
@@ -144,7 +148,7 @@ public class HeadlessDemo extends BasePortalInstanceLifecycleListener {
 
 	private FileEntry _addPostmanVarFile(
 			Group group, User user, DDMStructure ddmStructure,
-			JournalArticle journalArticle)
+			JournalArticle journalArticle, Folder folder, FileEntry fileEntry)
 		throws Exception {
 
 		ServiceContext serviceContext = new ServiceContext();
@@ -157,6 +161,8 @@ public class HeadlessDemo extends BasePortalInstanceLifecycleListener {
 			"file-entry/demo-variables.json",
 			Arrays.asList(
 				String.valueOf(group.getGroupId()),
+				String.valueOf(fileEntry.getFileEntryId()),
+				String.valueOf(folder.getFolderId()),
 				String.valueOf(ddmStructure.getStructureId()),
 				String.valueOf(journalArticle.getResourcePrimKey()),
 				String.valueOf(user.getUserId())));
@@ -185,6 +191,36 @@ public class HeadlessDemo extends BasePortalInstanceLifecycleListener {
 				_groupLocalService.getGroup(
 					company.getCompanyId(), GroupConstants.GUEST),
 				user));
+	}
+
+	private FileEntry _createFileEntry(User user, Group group, Folder folder)
+		throws Exception {
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setAddGroupPermissions(true);
+		serviceContext.setAddGuestPermissions(true);
+
+		return _dlAppLocalService.addFileEntry(
+			user.getUserId(), group.getGroupId(), folder.getFolderId(), "Logo",
+			ContentTypes.IMAGE_PNG,
+			FileUtil.getBytes(
+				HeadlessDemo.class, _PATH + "layout-set/logo.png"),
+			serviceContext);
+	}
+
+	private Folder _createFolder(
+			User user, Group group, long parentFolderId, String name)
+		throws PortalException {
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setAddGroupPermissions(true);
+		serviceContext.setAddGuestPermissions(true);
+
+		return _dlAppLocalService.addFolder(
+			user.getUserId(), group.getGroupId(), parentFolderId, name, "",
+			serviceContext);
 	}
 
 	private List<JournalArticle> _createJournalArticles(
@@ -260,7 +296,8 @@ public class HeadlessDemo extends BasePortalInstanceLifecycleListener {
 
 	private void _createMainPage(
 			Company company, Group group, User user,
-			List<JournalArticle> journalArticles)
+			List<JournalArticle> journalArticles, Folder folder,
+			FileEntry fileEntry)
 		throws Exception {
 
 		_layoutSetLocalService.updateLogo(
@@ -321,8 +358,8 @@ public class HeadlessDemo extends BasePortalInstanceLifecycleListener {
 
 		DDMStructure ddmStructure = journalArticle.getDDMStructure();
 
-		FileEntry fileEntry = _addPostmanVarFile(
-			group, user, ddmStructure, journalArticle);
+		FileEntry postmanFileEntry = _addPostmanVarFile(
+			group, user, ddmStructure, journalArticle, folder, fileEntry);
 
 		JournalArticle mainPageJournalArticle =
 			_journalArticleLocalService.addArticle(
@@ -333,13 +370,14 @@ public class HeadlessDemo extends BasePortalInstanceLifecycleListener {
 					"journal-article/demo-variables.xml",
 					Arrays.asList(
 						String.valueOf(group.getGroupId()),
-						String.valueOf(group.getGroupId()),
+						String.valueOf(fileEntry.getFileEntryId()),
+						String.valueOf(folder.getFolderId()),
 						String.valueOf(ddmStructure.getStructureId()),
 						String.valueOf(journalArticle.getResourcePrimKey()),
 						String.valueOf(user.getUserId()),
-						String.valueOf(fileEntry.getGroupId()),
-						String.valueOf(fileEntry.getTitle()),
-						String.valueOf(fileEntry.getUuid()))),
+						String.valueOf(postmanFileEntry.getGroupId()),
+						String.valueOf(postmanFileEntry.getTitle()),
+						String.valueOf(postmanFileEntry.getUuid()))),
 				mainPageDDMStructure.getStructureKey(),
 				mainPageDDMTemplate.getTemplateKey(),
 				_getServiceContext(company, group, user));
@@ -354,11 +392,25 @@ public class HeadlessDemo extends BasePortalInstanceLifecycleListener {
 			layout.getTypeSettings());
 	}
 
+	private DDMForm _deserialize(String content) {
+		DDMFormDeserializer ddmFormDeserializer =
+			_ddmFormDeserializerTracker.getDDMFormDeserializer("json");
+
+		DDMFormDeserializerDeserializeRequest.Builder builder =
+			DDMFormDeserializerDeserializeRequest.Builder.newBuilder(content);
+
+		DDMFormDeserializerDeserializeResponse
+			ddmFormDeserializerDeserializeResponse =
+				ddmFormDeserializer.deserialize(builder.build());
+
+		return ddmFormDeserializerDeserializeResponse.getDDMForm();
+	}
+
 	private DDMStructure _getDDMStructure(
 			Company company, Group group, User user, String fileName)
 		throws Exception {
 
-		DDMForm ddmForm = deserialize(_read(fileName));
+		DDMForm ddmForm = _deserialize(_read(fileName));
 
 		DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(ddmForm);
 
@@ -407,7 +459,7 @@ public class HeadlessDemo extends BasePortalInstanceLifecycleListener {
 	private static final Log _log = LogFactoryUtil.getLog(HeadlessDemo.class);
 
 	@Reference
-	private DDMFormJSONDeserializer _ddmFormJSONDeserializer;
+	private DDMFormDeserializerTracker _ddmFormDeserializerTracker;
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;

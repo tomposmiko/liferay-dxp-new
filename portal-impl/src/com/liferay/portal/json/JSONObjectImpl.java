@@ -200,11 +200,6 @@ public class JSONObjectImpl implements JSONObject {
 	}
 
 	@Override
-	public Object opt(String key) {
-		return get(key);
-	}
-
-	@Override
 	public JSONObject put(String key, boolean value) {
 		try {
 			_jsonObject.put(key, value);

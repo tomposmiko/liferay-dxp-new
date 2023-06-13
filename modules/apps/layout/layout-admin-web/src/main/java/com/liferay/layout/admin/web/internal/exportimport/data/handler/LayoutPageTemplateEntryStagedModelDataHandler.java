@@ -27,15 +27,16 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.layout.admin.web.internal.exportimport.data.handler.util.LayoutPageTemplateStructureDataHandlerUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionLocalService;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
-import com.liferay.portal.kernel.model.Group;
+import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutPrototype;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutPrototypeLocalService;
-import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.xml.Element;
@@ -97,19 +98,19 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 		}
 
-		List<FragmentEntryLink> fragmentEntryLinks =
-			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
-				layoutPageTemplateEntry.getGroupId(),
-				_portal.getClassNameId(LayoutPageTemplateEntry.class),
-				layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
+		Layout layout = _layoutLocalService.fetchLayout(
+			layoutPageTemplateEntry.getPlid());
 
-		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
+		if (layout != null) {
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, layoutPageTemplateEntry, fragmentEntryLink,
+				portletDataContext, layoutPageTemplateEntry, layout,
 				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 		}
 
 		_exportAssetDisplayPages(portletDataContext, layoutPageTemplateEntry);
+
+		_exportLayoutPageTemplateStructure(
+			portletDataContext, layoutPageTemplateEntry);
 
 		if (layoutPageTemplateEntry.getLayoutPrototypeId() > 0) {
 			LayoutPrototype layoutPrototype =
@@ -124,66 +125,10 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 		Element entryElement = portletDataContext.getExportDataElement(
 			layoutPageTemplateEntry);
 
-		long defaultUserId = _userLocalService.getDefaultUserId(
-			layoutPageTemplateEntry.getCompanyId());
-
-		if (defaultUserId == layoutPageTemplateEntry.getUserId()) {
-			entryElement.addAttribute("preloaded", "true");
-		}
-
 		portletDataContext.addClassedModel(
 			entryElement,
 			ExportImportPathUtil.getModelPath(layoutPageTemplateEntry),
 			layoutPageTemplateEntry);
-	}
-
-	@Override
-	protected void doImportMissingReference(
-			PortletDataContext portletDataContext, Element referenceElement)
-		throws PortletDataException {
-
-		importMissingGroupReference(portletDataContext, referenceElement);
-
-		String uuid = referenceElement.attributeValue("uuid");
-
-		Map<Long, Long> groupIds =
-			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				Group.class);
-
-		long groupId = GetterUtil.getLong(
-			referenceElement.attributeValue("group-id"));
-
-		groupId = MapUtil.getLong(groupIds, groupId);
-
-		long layoutPageTemplateEntryId = GetterUtil.getLong(
-			referenceElement.attributeValue("class-pk"));
-		String name = GetterUtil.getString(
-			referenceElement.attributeValue("name"));
-		boolean preloaded = GetterUtil.getBoolean(
-			referenceElement.attributeValue("preloaded"));
-
-		LayoutPageTemplateEntry existingLayoutPageTemplateEntry = null;
-
-		if (!preloaded) {
-			existingLayoutPageTemplateEntry = fetchMissingReference(
-				uuid, groupId);
-		}
-		else {
-			existingLayoutPageTemplateEntry = fetchExistingTemplate(
-				uuid, groupId, name, preloaded);
-		}
-
-		if (existingLayoutPageTemplateEntry == null) {
-			return;
-		}
-
-		Map<Long, Long> layoutPageTemplateEntryIds =
-			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				LayoutPageTemplateEntry.class);
-
-		layoutPageTemplateEntryIds.put(
-			layoutPageTemplateEntryId,
-			existingLayoutPageTemplateEntry.getLayoutPageTemplateEntryId());
 	}
 
 	@Override
@@ -243,6 +188,14 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				structureIds, classTypeId, classTypeId);
 		}
 
+		Map<Long, Long> plids =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				Layout.class);
+
+		long plid = MapUtil.getLong(
+			plids, layoutPageTemplateEntry.getPlid(),
+			layoutPageTemplateEntry.getPlid());
+
 		LayoutPageTemplateEntry importedLayoutPageTemplateEntry =
 			(LayoutPageTemplateEntry)layoutPageTemplateEntry.clone();
 
@@ -251,6 +204,12 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 		importedLayoutPageTemplateEntry.setLayoutPageTemplateCollectionId(
 			layoutPageTemplateCollectionId);
 		importedLayoutPageTemplateEntry.setClassTypeId(classTypeId);
+		importedLayoutPageTemplateEntry.setPlid(plid);
+
+		LayoutPageTemplateEntry existingLayoutPageTemplateEntry =
+			_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
+				layoutPageTemplateEntry.getUuid(),
+				portletDataContext.getScopeGroupId());
 
 		Element layoutPrototypeElement =
 			portletDataContext.getReferenceDataElement(
@@ -281,70 +240,32 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				layoutPrototypeId);
 		}
 
-		if (portletDataContext.isDataStrategyMirror()) {
-			Element element =
-				portletDataContext.getImportDataStagedModelElement(
-					layoutPageTemplateEntry);
+		if ((existingLayoutPageTemplateEntry == null) ||
+			!portletDataContext.isDataStrategyMirror()) {
 
-			boolean preloaded = GetterUtil.getBoolean(
-				element.attributeValue("preloaded"));
-
-			LayoutPageTemplateEntry existingLayoutPageTemplateEntry =
-				fetchExistingTemplate(
-					layoutPageTemplateEntry.getUuid(),
-					portletDataContext.getScopeGroupId(),
-					layoutPageTemplateEntry.getName(), preloaded);
-
-			if (existingLayoutPageTemplateEntry == null) {
-				importedLayoutPageTemplateEntry =
-					_stagedModelRepository.addStagedModel(
-						portletDataContext, importedLayoutPageTemplateEntry);
-			}
-			else {
-				importedLayoutPageTemplateEntry.setLayoutPageTemplateEntryId(
-					existingLayoutPageTemplateEntry.
-						getLayoutPageTemplateEntryId());
-
-				importedLayoutPageTemplateEntry =
-					_stagedModelRepository.updateStagedModel(
-						portletDataContext, importedLayoutPageTemplateEntry);
-			}
-		}
-		else {
 			importedLayoutPageTemplateEntry =
 				_stagedModelRepository.addStagedModel(
 					portletDataContext, importedLayoutPageTemplateEntry);
 		}
+		else {
+			importedLayoutPageTemplateEntry.setLayoutPageTemplateEntryId(
+				existingLayoutPageTemplateEntry.getLayoutPageTemplateEntryId());
 
-		importFragmentEntryLinks(
-			portletDataContext, layoutPageTemplateEntry,
-			importedLayoutPageTemplateEntry);
+			importedLayoutPageTemplateEntry =
+				_stagedModelRepository.updateStagedModel(
+					portletDataContext, importedLayoutPageTemplateEntry);
+		}
 
 		_importAssetDisplayPages(
 			portletDataContext, layoutPageTemplateEntry,
 			importedLayoutPageTemplateEntry);
 
+		_importLayoutPageTemplateStructures(
+			portletDataContext, layoutPageTemplateEntry,
+			importedLayoutPageTemplateEntry);
+
 		portletDataContext.importClassedModel(
 			layoutPageTemplateEntry, importedLayoutPageTemplateEntry);
-	}
-
-	protected LayoutPageTemplateEntry fetchExistingTemplate(
-		String uuid, long groupId, String name, boolean preloaded) {
-
-		LayoutPageTemplateEntry existingTemplate = null;
-
-		if (!preloaded) {
-			existingTemplate =
-				_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
-					uuid, groupId);
-		}
-		else {
-			existingTemplate =
-				_layoutPageTemplateEntryLocalService.
-					fetchLayoutPageTemplateEntry(groupId, name);
-		}
-
-		return existingTemplate;
 	}
 
 	@Override
@@ -393,11 +314,6 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 		return true;
 	}
 
-	@Reference(unbind = "-")
-	protected void setUserLocalService(UserLocalService userLocalService) {
-		_userLocalService = userLocalService;
-	}
-
 	private void _exportAssetDisplayPages(
 			PortletDataContext portletDataContext,
 			LayoutPageTemplateEntry layoutPageTemplateEntry)
@@ -418,18 +334,48 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 		}
 	}
 
+	private void _exportLayoutPageTemplateStructure(
+			PortletDataContext portletDataContext,
+			LayoutPageTemplateEntry layoutPageTemplateEntry)
+		throws PortletDataException {
+
+		List<FragmentEntryLink> fragmentEntryLinks =
+			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
+				layoutPageTemplateEntry.getGroupId(),
+				_portal.getClassNameId(LayoutPageTemplateEntry.class),
+				layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
+
+		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, layoutPageTemplateEntry, fragmentEntryLink,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+		}
+
+		LayoutPageTemplateStructure layoutPageTemplateStructure =
+			_layoutPageTemplateStructureLocalService.
+				fetchLayoutPageTemplateStructure(
+					layoutPageTemplateEntry.getGroupId(),
+					_portal.getClassNameId(
+						LayoutPageTemplateEntry.class.getName()),
+					layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
+
+		if (layoutPageTemplateStructure != null) {
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, layoutPageTemplateEntry,
+				layoutPageTemplateStructure,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+		}
+	}
+
 	private void _importAssetDisplayPages(
-		PortletDataContext portletDataContext,
-		LayoutPageTemplateEntry layoutPageTemplateEntry,
-		LayoutPageTemplateEntry importedLayoutPageTemplateEntry) {
+			PortletDataContext portletDataContext,
+			LayoutPageTemplateEntry layoutPageTemplateEntry,
+			LayoutPageTemplateEntry importedLayoutPageTemplateEntry)
+		throws PortletDataException {
 
 		List<Element> assetDisplayPageEntryElements =
 			portletDataContext.getReferenceDataElements(
 				layoutPageTemplateEntry, AssetDisplayPageEntry.class);
-
-		Map<Long, Long> assetDisplayPageEntries =
-			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				AssetDisplayPageEntry.class);
 
 		for (Element assetDisplayPageEntryElement :
 				assetDisplayPageEntryElements) {
@@ -439,6 +385,13 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 			AssetDisplayPageEntry assetDisplayPageEntry =
 				(AssetDisplayPageEntry)portletDataContext.getZipEntryAsObject(
 					path);
+
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, assetDisplayPageEntry);
+
+			Map<Long, Long> assetDisplayPageEntries =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					AssetDisplayPageEntry.class);
 
 			long assetDisplayPageEntryId = MapUtil.getLong(
 				assetDisplayPageEntries,
@@ -453,11 +406,42 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				existingAssetDisplayPageEntry.setLayoutPageTemplateEntryId(
 					importedLayoutPageTemplateEntry.
 						getLayoutPageTemplateEntryId());
+				existingAssetDisplayPageEntry.setPlid(
+					importedLayoutPageTemplateEntry.getPlid());
 
 				_assetDisplayPageEntryLocalService.updateAssetDisplayPageEntry(
 					existingAssetDisplayPageEntry);
 			}
 		}
+	}
+
+	private void _importLayoutPageTemplateStructures(
+			PortletDataContext portletDataContext,
+			LayoutPageTemplateEntry layoutPageTemplateEntry,
+			LayoutPageTemplateEntry importedLayoutPageTemplateEntry)
+		throws Exception {
+
+		importFragmentEntryLinks(
+			portletDataContext, layoutPageTemplateEntry,
+			importedLayoutPageTemplateEntry);
+
+		List<Element> layoutPageTemplateStructureElements =
+			portletDataContext.getReferenceDataElements(
+				layoutPageTemplateEntry, LayoutPageTemplateStructure.class);
+
+		if (layoutPageTemplateStructureElements.size() != 1) {
+			return;
+		}
+
+		Element layoutPageTemplateStructureElement =
+			layoutPageTemplateStructureElements.get(0);
+
+		_layoutPageTemplateStructureDataHandlerUtil.
+			importLayoutPageTemplateStructure(
+				portletDataContext,
+				_portal.getClassNameId(LayoutPageTemplateEntry.class.getName()),
+				importedLayoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
+				layoutPageTemplateStructureElement);
 	}
 
 	@Reference
@@ -471,12 +455,19 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 
 	@Reference
+	private LayoutLocalService _layoutLocalService;
+
+	@Reference
 	private LayoutPageTemplateCollectionLocalService
 		_layoutPageTemplateCollectionLocalService;
 
 	@Reference
-	private LayoutPageTemplateEntryLocalService
-		_layoutPageTemplateEntryLocalService;
+	private LayoutPageTemplateStructureDataHandlerUtil
+		_layoutPageTemplateStructureDataHandlerUtil;
+
+	@Reference
+	private LayoutPageTemplateStructureLocalService
+		_layoutPageTemplateStructureLocalService;
 
 	@Reference
 	private LayoutPrototypeLocalService _layoutPrototypeLocalService;
@@ -490,7 +481,5 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 	)
 	private StagedModelRepository<LayoutPageTemplateEntry>
 		_stagedModelRepository;
-
-	private UserLocalService _userLocalService;
 
 }

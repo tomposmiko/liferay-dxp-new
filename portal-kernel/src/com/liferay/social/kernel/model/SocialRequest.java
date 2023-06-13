@@ -25,22 +25,19 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see SocialRequestModel
+ * @see com.liferay.portlet.social.model.impl.SocialRequestImpl
+ * @see com.liferay.portlet.social.model.impl.SocialRequestModelImpl
  * @generated
  */
-@ImplementationClassName(
-	"com.liferay.portlet.social.model.impl.SocialRequestImpl"
-)
+@ImplementationClassName("com.liferay.portlet.social.model.impl.SocialRequestImpl")
 @ProviderType
-public interface SocialRequest extends PersistedModel, SocialRequestModel {
-
+public interface SocialRequest extends SocialRequestModel, PersistedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.social.model.impl.SocialRequestImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.social.model.impl.SocialRequestImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<SocialRequest, Long> REQUEST_ID_ACCESSOR =
-		new Accessor<SocialRequest, Long>() {
-
+	public static final Accessor<SocialRequest, Long> REQUEST_ID_ACCESSOR = new Accessor<SocialRequest, Long>() {
 			@Override
 			public Long get(SocialRequest socialRequest) {
 				return socialRequest.getRequestId();
@@ -55,7 +52,5 @@ public interface SocialRequest extends PersistedModel, SocialRequestModel {
 			public Class<SocialRequest> getTypeClass() {
 				return SocialRequest.class;
 			}
-
 		};
-
 }

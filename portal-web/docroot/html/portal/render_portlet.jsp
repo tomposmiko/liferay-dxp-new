@@ -278,7 +278,7 @@ if (columnDisabled && customizable) {
 
 // Portlets cannot be moved unless they belong to the layout
 
-if (!layoutTypePortlet.hasPortletId(portletId)) {
+if (!layoutTypePortlet.hasPortletId(portletId, true)) {
 	showCloseIcon = false;
 	showMoveIcon = false;
 }

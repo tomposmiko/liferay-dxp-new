@@ -180,10 +180,6 @@
 			<contains>The addSearchEngineConfigurator method has thrown an exception</contains>
 			<matches></matches>
 		</ignore-error>
-		<ignore-error description="LPS-75111">
-			<contains>Waiting on startup required bundles to activate:</contains>
-			<matches></matches>
-		</ignore-error>
 		<ignore-error description="LPS-81732">
 			<contains>There are no actions associated with the resource com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion</contains>
 			<matches></matches>
@@ -211,14 +207,6 @@
 		<ignore-error description="LPS-88418 - temporarily ignore until fixed">
 			<contains>SQLSTATE=42710</contains>
 			<matches></matches>
-		</ignore-error>
-		<ignore-error description="LPS-88431">
-			<contains></contains>
-			<matches>.*Unable to find class loader for com.liferay.portal.cluster.multiple_.* class loader com.liferay.portal.cluster.multiple_.*</matches>
-		</ignore-error>
-		<ignore-error description="LPS-88431">
-			<contains></contains>
-			<matches>.*Unable to find class loader for com.liferay.portal.scheduler.quartz_.* class loader com.liferay.portal.scheduler.quartz_.*</matches>
 		</ignore-error>
 		<ignore-error description="LPS-88522 - temporarily ignore until fixed">
 			<contains>already has the column lastPublishDate</contains>

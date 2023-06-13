@@ -46,7 +46,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -59,14 +58,8 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class AMImageEntryProcessor implements DLProcessor, ImageProcessor {
 
-	@Activate
-	public void activate() throws Exception {
-		afterPropertiesSet();
-	}
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		_imageProcessor = new ImageProcessorImpl();
 	}
 
 	@Override
@@ -253,6 +246,30 @@ public class AMImageEntryProcessor implements DLProcessor, ImageProcessor {
 		return _isMimeTypeSupported(mimeType);
 	}
 
+	@Reference(unbind = "-")
+	public void setAMAsyncProcessorLocator(
+		AMAsyncProcessorLocator amAsyncProcessorLocator) {
+
+		_amAsyncProcessorLocator = amAsyncProcessorLocator;
+	}
+
+	@Reference(unbind = "-")
+	public void setAMImageFinder(AMImageFinder amImageFinder) {
+		_amImageFinder = amImageFinder;
+	}
+
+	@Reference(unbind = "-")
+	public void setAMImageMimeTypeProvider(
+		AMImageMimeTypeProvider amImageMimeTypeProvider) {
+
+		_amImageMimeTypeProvider = amImageMimeTypeProvider;
+	}
+
+	@Reference(unbind = "-")
+	public void setAMImageValidator(AMImageValidator amImageValidator) {
+		_amImageValidator = amImageValidator;
+	}
+
 	@Override
 	public void storeThumbnail(
 			long companyId, long groupId, long fileEntryId, long fileVersionId,
@@ -329,18 +346,10 @@ public class AMImageEntryProcessor implements DLProcessor, ImageProcessor {
 	private static final Log _log = LogFactoryUtil.getLog(
 		AMImageEntryProcessor.class);
 
-	@Reference
 	private AMAsyncProcessorLocator _amAsyncProcessorLocator;
-
-	@Reference
 	private AMImageFinder _amImageFinder;
-
-	@Reference
 	private AMImageMimeTypeProvider _amImageMimeTypeProvider;
-
-	@Reference
 	private AMImageValidator _amImageValidator;
-
-	private ImageProcessor _imageProcessor;
+	private final ImageProcessor _imageProcessor = new ImageProcessorImpl();
 
 }

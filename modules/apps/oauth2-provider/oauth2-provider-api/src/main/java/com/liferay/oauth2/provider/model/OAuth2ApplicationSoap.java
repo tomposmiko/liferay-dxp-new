@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.oauth2.provider.service.http.OAuth2ApplicationServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.oauth2.provider.service.http.OAuth2ApplicationServiceSoap
  * @generated
  */
 @ProviderType
 public class OAuth2ApplicationSoap implements Serializable {
-
 	public static OAuth2ApplicationSoap toSoapModel(OAuth2Application model) {
 		OAuth2ApplicationSoap soapModel = new OAuth2ApplicationSoap();
 
@@ -40,8 +40,7 @@ public class OAuth2ApplicationSoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
-		soapModel.setOAuth2ApplicationScopeAliasesId(
-			model.getOAuth2ApplicationScopeAliasesId());
+		soapModel.setOAuth2ApplicationScopeAliasesId(model.getOAuth2ApplicationScopeAliasesId());
 		soapModel.setAllowedGrantTypes(model.getAllowedGrantTypes());
 		soapModel.setClientId(model.getClientId());
 		soapModel.setClientProfile(model.getClientProfile());
@@ -59,9 +58,7 @@ public class OAuth2ApplicationSoap implements Serializable {
 
 	public static OAuth2ApplicationSoap[] toSoapModels(
 		OAuth2Application[] models) {
-
-		OAuth2ApplicationSoap[] soapModels =
-			new OAuth2ApplicationSoap[models.length];
+		OAuth2ApplicationSoap[] soapModels = new OAuth2ApplicationSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -72,12 +69,10 @@ public class OAuth2ApplicationSoap implements Serializable {
 
 	public static OAuth2ApplicationSoap[][] toSoapModels(
 		OAuth2Application[][] models) {
-
 		OAuth2ApplicationSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels =
-				new OAuth2ApplicationSoap[models.length][models[0].length];
+			soapModels = new OAuth2ApplicationSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new OAuth2ApplicationSoap[0][0];
@@ -92,9 +87,7 @@ public class OAuth2ApplicationSoap implements Serializable {
 
 	public static OAuth2ApplicationSoap[] toSoapModels(
 		List<OAuth2Application> models) {
-
-		List<OAuth2ApplicationSoap> soapModels =
-			new ArrayList<OAuth2ApplicationSoap>(models.size());
+		List<OAuth2ApplicationSoap> soapModels = new ArrayList<OAuth2ApplicationSoap>(models.size());
 
 		for (OAuth2Application model : models) {
 			soapModels.add(toSoapModel(model));
@@ -168,7 +161,6 @@ public class OAuth2ApplicationSoap implements Serializable {
 
 	public void setOAuth2ApplicationScopeAliasesId(
 		long oAuth2ApplicationScopeAliasesId) {
-
 		_oAuth2ApplicationScopeAliasesId = oAuth2ApplicationScopeAliasesId;
 	}
 
@@ -278,5 +270,4 @@ public class OAuth2ApplicationSoap implements Serializable {
 	private String _name;
 	private String _privacyPolicyURL;
 	private String _redirectURIs;
-
 }

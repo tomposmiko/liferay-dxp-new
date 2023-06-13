@@ -53,14 +53,12 @@ definition {
 
 			Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT_CONFIRM");
 
-			SelectFrame(
+			Click(
 				locator1 = "BlogsEntry#CONTENT_VIDEO",
 				key_service = "${videoService}"
 			);
 
-			SelectFrameTop();
-
-			AssertTextEquals(locator1 = "BlogsEntry#VIDEO_EMBED_HELP_MESSAGE", value1 = "Video playback is disabled during edit mode");
+			AssertTextEquals(locator1 = "BlogsEntry#VIDEO_EMBED_HELP_MESSAGE", value1 = "Video playback is disabled during edit mode.");
 		}
 	}
 
@@ -85,6 +83,19 @@ definition {
 		);
 
 		PortletEntry.publish();
+	}
+
+	macro addEntryExternalURL {
+		SelectFieldText(locator1 = "AlloyEditor#EDITOR", key_editor = "content");
+
+		Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK");
+
+		Type(
+			locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT",
+			value1 = "${entryExternalURL}"
+		);
+
+		Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT_CONFIRM");
 	}
 
 	macro addRelatedAsset {
@@ -348,7 +359,9 @@ definition {
 
 		Select(locator1 = "ReportContent#REASON_SELECT", value1 = "${flagReason}");
 
-		AssertClick(locator1 = "Button#REPORT", value1 = "Report");
+		SelectFrame(locator1 = "ItemSelector#ITEM_SELECTOR_MODAL_FOOTER");
+
+		AssertClick(locator1 = "ReportContent#REPORT_BUTTON", value1 = "Report");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "ReportContent#SUCCESS_MESSAGE",
@@ -573,7 +586,7 @@ definition {
 	macro selectFormattingStyle {
 		SelectFieldText(locator1 = "AlloyEditor#EDITOR", key_editor = "content");
 
-		Click.mouseMoveLeftClick(locator1 = "AlloyEditor#TEXT_FORMATTING_STYLE");
+		Click(locator1 = "AlloyEditor#TEXT_FORMATTING_STYLE");
 
 		Click(
 			locator1 = "AlloyEditor#TEXT_FORMATTING_STYLE_DROPDOWN",
@@ -590,7 +603,7 @@ definition {
 			portlet = "Blogs"
 		);
 
-		if (IsElementPresent(locator1 = "Message#EMPTY_INFO", value1 = "No entries were found.")) {
+		if (IsVisible(locator1 = "Message#EMPTY_INFO", value1 = "No entries were found.")) {
 			Blogs.viewNoEntryCP();
 		}
 		else {
@@ -713,8 +726,8 @@ definition {
 		}
 
 		if (isSet(entryExternalURL)) {
-			AssertClick(
-				locator1 = "BlogsEntry#CONTENT_LINK",
+			AssertClick.assertTextClickAtNoJavaScript(
+				locator1 = "BlogsEntry#CONTENT",
 				value1 = "${entryContent}"
 			);
 
@@ -748,7 +761,7 @@ definition {
 		BlogsNavigator.gotoEditCP(entryTitle = "${entryTitle}");
 
 		DoubleClick(
-			locator1 = "BlogsEntry#CONTENT_LINK_IN_EDIT",
+			locator1 = "BlogsEntry#CONTENT_LINK",
 			key_entryContent = "${entryContent}"
 		);
 
@@ -771,7 +784,7 @@ definition {
 
 		AssertElementPresent(locator1 = "Blogs#ENTRY_TABLE_CREATE_DATE");
 
-		AssertTextEquals(locator1 = "Blogs#ENTRY_TABLE_STATUS", value1 = "Approved");
+		AssertTextEquals(locator1 = "Blogs#ENTRY_TABLE_STATUS", value1 = "APPROVED");
 	}
 
 	macro viewEntryViaAPPG {
@@ -1189,7 +1202,7 @@ definition {
 
 		AssertTextEquals(locator1 = "Blogs#ENTRY_TABLE_TITLE", value1 = "${entryTitle}");
 
-		AssertTextEquals(locator1 = "Blogs#ENTRY_TABLE_STATUS", value1 = "Pending");
+		AssertTextEquals(locator1 = "Blogs#ENTRY_TABLE_STATUS", value1 = "PENDING");
 	}
 
 	macro viewWithWorkflowPGViaAP {

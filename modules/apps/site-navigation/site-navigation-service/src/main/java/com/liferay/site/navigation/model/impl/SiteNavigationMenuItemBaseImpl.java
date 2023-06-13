@@ -34,22 +34,18 @@ import com.liferay.site.navigation.service.SiteNavigationMenuItemLocalServiceUti
 @ProviderType
 public abstract class SiteNavigationMenuItemBaseImpl
 	extends SiteNavigationMenuItemModelImpl implements SiteNavigationMenuItem {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a site navigation menu item model instance should use the <code>SiteNavigationMenuItem</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a site navigation menu item model instance should use the {@link SiteNavigationMenuItem} interface instead.
 	 */
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			SiteNavigationMenuItemLocalServiceUtil.addSiteNavigationMenuItem(
-				this);
+			SiteNavigationMenuItemLocalServiceUtil.addSiteNavigationMenuItem(this);
 		}
 		else {
-			SiteNavigationMenuItemLocalServiceUtil.updateSiteNavigationMenuItem(
-				this);
+			SiteNavigationMenuItemLocalServiceUtil.updateSiteNavigationMenuItem(this);
 		}
 	}
-
 }

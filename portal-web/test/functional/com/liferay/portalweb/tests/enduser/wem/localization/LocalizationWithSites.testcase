@@ -491,7 +491,7 @@ definition {
 		Alert.closePortalLocalizationWarning();
 
 		ProductMenu.gotoPortlet(
-			category = "Compilación",
+			category = "Estructuración",
 			panel = "Site Administration",
 			portlet = "Páginas del sitio web"
 		);
@@ -510,7 +510,7 @@ definition {
 		Alert.closePortalLocalizationWarning();
 
 		ProductMenu.gotoPortlet(
-			category = "Compilación",
+			category = "Estructuración",
 			panel = "Site Administration",
 			portlet = "Páginas del sitio web"
 		);
@@ -546,7 +546,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuración",
 			panel = "Site Administration",
-			portlet = "Configuración del sitio web"
+			portlet = "Ajustes del sitio"
 		);
 
 		Site.configureCurrentLanguagesCP(
@@ -583,7 +583,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuración",
 			panel = "Site Administration",
-			portlet = "Configuración del sitio web"
+			portlet = "Ajustes del sitio"
 		);
 
 		Site.configureCurrentLanguagesCP(
@@ -857,27 +857,17 @@ definition {
 
 		AssertLocation(value1 = "${portalURL}/fr/web/site-name/language-page");
 
-		AssertTextNotPresent(value1 = "The requested resource could not be found.");
-
-		AssertTextEquals(
-			locator1 = "Home#PAGE",
-			value1 = "Language Page",
-			key_pageName = "Language Page"
-		);
+		AssertTextEquals(locator1 = "UserBar#USER_SIGN_IN", value1 = "Sign In");
 
 		Navigator.openSpecificURL(url = "${portalURL}/fr");
 
-		AssertTextNotPresent(value1 = "The requested resource could not be found.");
+		AssertLocation(value1 = "${portalURL}/fr/web/guest/home");
 
-		AssertTextEquals(
-			locator1 = "Home#PAGE",
-			value1 = "Welcome",
-			key_pageName = "Welcome"
-		);
+		AssertTextEquals(locator1 = "UserBar#USER_SIGN_IN", value1 = "Sign In");
 
 		User.loginPG(specificURL = "${portalURL}/fr");
 
-		AssertLocation(value1 = "${portalURL}/web/guest");
+		AssertLocation(value1 = "${portalURL}/web/guest/home");
 
 		ProductMenu.gotoSite(site = "Site Name");
 
@@ -900,13 +890,7 @@ definition {
 			sitePageURL = "http://www.able.com:8080/fr/"
 		);
 
-		AssertTextNotPresent(value1 = "The requested resource could not be found.");
-
-		AssertTextEquals(
-			locator1 = "Home#PAGE",
-			value1 = "Language Page",
-			key_pageName = "Language Page"
-		);
+		AssertTextEquals(locator1 = "UserBar#USER_SIGN_IN", value1 = "Sign In");
 	}
 
 	@priority = "5"
@@ -950,7 +934,7 @@ definition {
 		Navigator.gotoSitePage(pageName = "Site Page Name", siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Compilación",
+			category = "Estructuración",
 			panel = "Site Administration",
 			portlet = "Páginas del sitio web"
 		);

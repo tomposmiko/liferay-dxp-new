@@ -32,13 +32,12 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTaskFormLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class KaleoTaskFormBaseImpl
-	extends KaleoTaskFormModelImpl implements KaleoTaskForm {
-
+public abstract class KaleoTaskFormBaseImpl extends KaleoTaskFormModelImpl
+	implements KaleoTaskForm {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a kaleo task form model instance should use the <code>KaleoTaskForm</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a kaleo task form model instance should use the {@link KaleoTaskForm} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class KaleoTaskFormBaseImpl
 			KaleoTaskFormLocalServiceUtil.updateKaleoTaskForm(this);
 		}
 	}
-
 }

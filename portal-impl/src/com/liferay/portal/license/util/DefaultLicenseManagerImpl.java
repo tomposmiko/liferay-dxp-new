@@ -128,7 +128,9 @@ public class DefaultLicenseManagerImpl implements LicenseManager {
 				"randomUuid");
 
 			if (responseRandomUuid.equals(randomUuid)) {
-				return responseJSONObject.getInt("licenseState");
+				int licenseState = responseJSONObject.getInt("licenseState");
+
+				return licenseState;
 			}
 		}
 		catch (Exception e) {

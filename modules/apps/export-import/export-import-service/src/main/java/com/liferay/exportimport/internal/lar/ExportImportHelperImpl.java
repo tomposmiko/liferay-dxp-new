@@ -17,6 +17,7 @@ package com.liferay.exportimport.internal.lar;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.exportimport.configuration.ExportImportServiceConfiguration;
 import com.liferay.exportimport.constants.ExportImportBackgroundTaskContextMapConstants;
 import com.liferay.exportimport.kernel.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
@@ -37,6 +38,7 @@ import com.liferay.exportimport.kernel.lar.UserIdStrategy;
 import com.liferay.exportimport.portlet.data.handler.provider.PortletDataHandlerProvider;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -93,7 +95,6 @@ import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.model.impl.LayoutImpl;
-import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 import java.io.InputStream;
@@ -114,7 +115,9 @@ import java.util.TreeMap;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 import org.xml.sax.InputSource;
@@ -126,7 +129,10 @@ import org.xml.sax.XMLReader;
  * @author Julio Camarero
  * @author Máté Thurzó
  */
-@Component(immediate = true, service = ExportImportHelper.class)
+@Component(
+	configurationPid = "com.liferay.exportimport.configuration.ExportImportServiceConfiguration",
+	immediate = true, service = ExportImportHelper.class
+)
 @ProviderType
 public class ExportImportHelperImpl implements ExportImportHelper {
 
@@ -556,14 +562,9 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public ZipWriter getLayoutSetZipWriter(long groupId) {
-		StringBundler sb = new StringBundler(4);
+		String fileName = _getZipWriterFileName(String.valueOf(groupId));
 
-		sb.append(groupId);
-		sb.append(StringPool.DASH);
-		sb.append(Time.getTimestamp());
-		sb.append(".lar");
-
-		return getZipWriter(sb.toString());
+		return getZipWriter(fileName);
 	}
 
 	/**
@@ -723,14 +724,9 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public ZipWriter getPortletZipWriter(String portletId) {
-		StringBundler sb = new StringBundler(4);
+		String fileName = _getZipWriterFileName(portletId);
 
-		sb.append(portletId);
-		sb.append(StringPool.DASH);
-		sb.append(Time.getTimestamp());
-		sb.append(".lar");
-
-		return getZipWriter(sb.toString());
+		return getZipWriter(fileName);
 	}
 
 	@Override
@@ -1435,6 +1431,13 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		}
 	}
 
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		_exportImportServiceConfiguration = ConfigurableUtil.createConfigurable(
+			ExportImportServiceConfiguration.class, properties);
+	}
+
 	protected void addCreateDateProperty(
 		PortletDataContext portletDataContext, DynamicQuery dynamicQuery) {
 
@@ -1553,68 +1556,23 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				"Export portlet configuration " + exportPortletConfiguration);
 		}
 
-		boolean exportCurPortletArchivedSetups = exportPortletConfiguration;
-		boolean exportCurPortletConfiguration = exportPortletConfiguration;
-		boolean exportCurPortletSetup = exportPortletConfiguration;
-		boolean exportCurPortletUserPreferences = exportPortletConfiguration;
-
 		String rootPortletId = getExportableRootPortletId(companyId, portletId);
+
+		Map<String, Boolean> exportPortletSetupControlsMap =
+			_createPortletSetupControlsMap(
+				exportPortletConfiguration, exportPortletConfiguration,
+				exportPortletConfiguration, exportPortletConfiguration);
 
 		if (exportPortletConfigurationAll ||
 			(exportPortletConfiguration && type.equals("layout-prototype"))) {
 
-			exportCurPortletConfiguration = true;
-
-			exportCurPortletArchivedSetups = MapUtil.getBoolean(
-				parameterMap,
-				PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL);
-			exportCurPortletSetup = MapUtil.getBoolean(
-				parameterMap, PortletDataHandlerKeys.PORTLET_SETUP_ALL);
-			exportCurPortletUserPreferences = MapUtil.getBoolean(
-				parameterMap,
-				PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL);
+			exportPortletSetupControlsMap = _createAllPortletSetupControlsMap(
+				parameterMap, true);
 		}
 		else if (rootPortletId != null) {
-			exportCurPortletConfiguration =
-				exportPortletConfiguration &&
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_CONFIGURATION +
-						StringPool.UNDERLINE + rootPortletId);
-
-			exportCurPortletArchivedSetups =
-				exportCurPortletConfiguration &&
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS +
-						StringPool.UNDERLINE + rootPortletId);
-			exportCurPortletSetup =
-				exportCurPortletConfiguration &&
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_SETUP +
-						StringPool.UNDERLINE + rootPortletId);
-			exportCurPortletUserPreferences =
-				exportCurPortletConfiguration &&
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_USER_PREFERENCES +
-						StringPool.UNDERLINE + rootPortletId);
+			exportPortletSetupControlsMap = _createRootPortletSetupControlsMap(
+				parameterMap, exportPortletConfiguration, rootPortletId);
 		}
-
-		Map<String, Boolean> exportPortletSetupControlsMap = new HashMap<>();
-
-		exportPortletSetupControlsMap.put(
-			PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS,
-			exportCurPortletArchivedSetups);
-		exportPortletSetupControlsMap.put(
-			PortletDataHandlerKeys.PORTLET_CONFIGURATION,
-			exportCurPortletConfiguration);
-		exportPortletSetupControlsMap.put(
-			PortletDataHandlerKeys.PORTLET_SETUP, exportCurPortletSetup);
-		exportPortletSetupControlsMap.put(
-			PortletDataHandlerKeys.PORTLET_USER_PREFERENCES,
-			exportCurPortletUserPreferences);
 
 		return exportPortletSetupControlsMap;
 	}
@@ -1673,15 +1631,15 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				"Import portlet configuration " + importPortletConfiguration);
 		}
 
-		boolean importCurPortletArchivedSetups = importPortletConfiguration;
-		boolean importCurPortletConfiguration = importPortletConfiguration;
-		boolean importCurPortletSetup = importPortletConfiguration;
-		boolean importCurPortletUserPreferences = importPortletConfiguration;
-
 		String rootPortletId = getExportableRootPortletId(companyId, portletId);
 
+		Map<String, Boolean> importPortletSetupControlsMap =
+			_createPortletSetupControlsMap(
+				importPortletConfiguration, importPortletConfiguration,
+				importPortletConfiguration, importPortletConfiguration);
+
 		if (importPortletConfigurationAll) {
-			importCurPortletConfiguration = true;
+			boolean importCurPortletConfiguration = true;
 
 			if ((manifestSummary != null) &&
 				(manifestSummary.getConfigurationPortletOptions(
@@ -1690,70 +1648,23 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				importCurPortletConfiguration = false;
 			}
 
-			importCurPortletArchivedSetups =
-				importCurPortletConfiguration &&
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL);
-			importCurPortletSetup =
-				importCurPortletConfiguration &&
-				MapUtil.getBoolean(
-					parameterMap, PortletDataHandlerKeys.PORTLET_SETUP_ALL);
-			importCurPortletUserPreferences =
-				importCurPortletConfiguration &&
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL);
+			importPortletSetupControlsMap = _createAllPortletSetupControlsMap(
+				parameterMap, importCurPortletConfiguration);
 		}
 		else if (rootPortletId != null) {
-			importCurPortletConfiguration =
-				importPortletConfiguration &&
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_CONFIGURATION +
-						StringPool.UNDERLINE + rootPortletId);
-
-			importCurPortletArchivedSetups =
-				importCurPortletConfiguration &&
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS +
-						StringPool.UNDERLINE + rootPortletId);
-			importCurPortletSetup =
-				importCurPortletConfiguration &&
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_SETUP +
-						StringPool.UNDERLINE + rootPortletId);
-			importCurPortletUserPreferences =
-				importCurPortletConfiguration &&
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_USER_PREFERENCES +
-						StringPool.UNDERLINE + rootPortletId);
+			importPortletSetupControlsMap = _createRootPortletSetupControlsMap(
+				parameterMap, importPortletConfiguration, rootPortletId);
 		}
 
-		Map<String, Boolean> importPortletSetupMap = new HashMap<>();
-
-		importPortletSetupMap.put(
-			PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS,
-			importCurPortletArchivedSetups);
-		importPortletSetupMap.put(
-			PortletDataHandlerKeys.PORTLET_CONFIGURATION,
-			importCurPortletConfiguration);
-		importPortletSetupMap.put(
-			PortletDataHandlerKeys.PORTLET_SETUP, importCurPortletSetup);
-		importPortletSetupMap.put(
-			PortletDataHandlerKeys.PORTLET_USER_PREFERENCES,
-			importCurPortletUserPreferences);
-
-		return importPortletSetupMap;
+		return importPortletSetupControlsMap;
 	}
 
 	protected ZipWriter getZipWriter(String fileName) {
 		if (!ExportImportThreadLocal.isStagingInProcess() ||
-			(PropsValues.STAGING_DELETE_TEMP_LAR_ON_FAILURE &&
-			 PropsValues.STAGING_DELETE_TEMP_LAR_ON_SUCCESS)) {
+			(_exportImportServiceConfiguration.
+				stagingDeleteTempLarOnFailure() &&
+			 _exportImportServiceConfiguration.
+				 stagingDeleteTempLarOnSuccess())) {
 
 			return ZipWriterFactoryUtil.getZipWriter();
 		}
@@ -1891,10 +1802,107 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		return null;
 	}
 
+	private Map<String, Boolean> _createAllPortletSetupControlsMap(
+		Map<String, String[]> parameterMap, boolean portletConfiguration) {
+
+		return _createPortletConfigurablePortletSetupControlsMap(
+			parameterMap, portletConfiguration,
+			PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL,
+			PortletDataHandlerKeys.PORTLET_SETUP_ALL,
+			PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL);
+	}
+
+	private Map<String, Boolean>
+		_createPortletConfigurablePortletSetupControlsMap(
+			Map<String, String[]> parameterMap, boolean portletConfiguration,
+			String portletArchivedSetupKey, String portletSetupKey,
+			String portletUserPreferencesKey) {
+
+		boolean portletArchivedSetups = false;
+		boolean portletSetup = false;
+		boolean portletUserPreferences = false;
+
+		if (portletConfiguration) {
+			if (MapUtil.getBoolean(parameterMap, portletArchivedSetupKey)) {
+				portletArchivedSetups = true;
+			}
+
+			if (MapUtil.getBoolean(parameterMap, portletSetupKey)) {
+				portletSetup = true;
+			}
+
+			if (MapUtil.getBoolean(parameterMap, portletUserPreferencesKey)) {
+				portletUserPreferences = true;
+			}
+		}
+
+		return _createPortletSetupControlsMap(
+			portletArchivedSetups, portletConfiguration, portletSetup,
+			portletUserPreferences);
+	}
+
+	private Map<String, Boolean> _createPortletSetupControlsMap(
+		boolean portletArchivedSetups, boolean portletConfiguration,
+		boolean portletSetup, boolean portletUserPreferences) {
+
+		Map<String, Boolean> portletSetupControlsMap = new HashMap<>();
+
+		portletSetupControlsMap.put(
+			PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS,
+			portletArchivedSetups);
+		portletSetupControlsMap.put(
+			PortletDataHandlerKeys.PORTLET_CONFIGURATION, portletConfiguration);
+		portletSetupControlsMap.put(
+			PortletDataHandlerKeys.PORTLET_SETUP, portletSetup);
+		portletSetupControlsMap.put(
+			PortletDataHandlerKeys.PORTLET_USER_PREFERENCES,
+			portletUserPreferences);
+
+		return portletSetupControlsMap;
+	}
+
+	private Map<String, Boolean> _createRootPortletSetupControlsMap(
+		Map<String, String[]> parameterMap, boolean portletConfiguration,
+		String rootPortletId) {
+
+		portletConfiguration =
+			portletConfiguration &&
+			MapUtil.getBoolean(
+				parameterMap,
+				PortletDataHandlerKeys.PORTLET_CONFIGURATION +
+					StringPool.UNDERLINE + rootPortletId);
+
+		String portletArchivedSetupKey =
+			PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS +
+				StringPool.UNDERLINE + rootPortletId;
+		String portletSetupKey =
+			PortletDataHandlerKeys.PORTLET_SETUP + StringPool.UNDERLINE +
+				rootPortletId;
+		String portletUserPreferencesKey =
+			PortletDataHandlerKeys.PORTLET_USER_PREFERENCES +
+				StringPool.UNDERLINE + rootPortletId;
+
+		return _createPortletConfigurablePortletSetupControlsMap(
+			parameterMap, portletConfiguration, portletArchivedSetupKey,
+			portletSetupKey, portletUserPreferencesKey);
+	}
+
+	private String _getZipWriterFileName(String id) {
+		StringBundler sb = new StringBundler(4);
+
+		sb.append(id);
+		sb.append(StringPool.DASH);
+		sb.append(Time.getTimestamp());
+		sb.append(".lar");
+
+		return sb.toString();
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ExportImportHelperImpl.class);
 
 	private DLFileEntryLocalService _dlFileEntryLocalService;
+	private ExportImportServiceConfiguration _exportImportServiceConfiguration;
 	private GroupLocalService _groupLocalService;
 	private LayoutLocalService _layoutLocalService;
 	private LayoutService _layoutService;

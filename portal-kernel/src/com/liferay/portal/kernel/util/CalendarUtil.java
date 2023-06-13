@@ -180,9 +180,11 @@ public class CalendarUtil {
 
 		int day = cal.get(Calendar.DATE);
 
-		return (int)
-			(6286 + (year * 365.25) - (year / 100) + (year / 400) +
+		int gregorianDay =
+			(int)(6286 + (year * 365.25) - (year / 100) + (year / 400) +
 				(30.6 * month) + 0.2 + day);
+
+		return gregorianDay;
 	}
 
 	public static Date getGTDate(Calendar cal) {
@@ -457,7 +459,9 @@ public class CalendarUtil {
 
 		cal.set(year, month, day, hour, minute, second);
 
-		return cal.getTimeInMillis() / Time.DAY;
+		long millis = cal.getTimeInMillis() / Time.DAY;
+
+		return millis;
 	}
 
 	private static final Map<String, String[]> _calendarPool =

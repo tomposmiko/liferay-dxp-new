@@ -346,7 +346,10 @@ public class DDMFormBrowserDisplayContext {
 			orderByAsc = true;
 		}
 
-		return new DDMFormInstanceModifiedDateComparator(orderByAsc);
+		OrderByComparator<DDMFormInstance> orderByComparator =
+			new DDMFormInstanceModifiedDateComparator(orderByAsc);
+
+		return orderByComparator;
 	}
 
 	private String _displayStyle;

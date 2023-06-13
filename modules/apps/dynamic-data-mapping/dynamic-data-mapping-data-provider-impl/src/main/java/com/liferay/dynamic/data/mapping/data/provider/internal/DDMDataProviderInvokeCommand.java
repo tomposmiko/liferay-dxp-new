@@ -15,10 +15,11 @@
 package com.liferay.dynamic.data.mapping.data.provider.internal;
 
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProvider;
-import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderContext;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderRequest;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse;
 import com.liferay.dynamic.data.mapping.data.provider.internal.rest.DDMRESTDataProviderSettings;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 
 import com.netflix.hystrix.HystrixCommand;
@@ -33,37 +34,29 @@ public class DDMDataProviderInvokeCommand
 	extends HystrixCommand<DDMDataProviderResponse> {
 
 	public DDMDataProviderInvokeCommand(
-		String ddmDataProviderInstanceName, DDMDataProvider ddmDataProvider,
-		DDMDataProviderRequest ddmDataProviderRequest) {
-
-		// Skip JavaParser
+		String nameCurrentValue, DDMDataProvider ddmDataProvider,
+		DDMDataProviderRequest ddmDataProviderRequest,
+		DDMRESTDataProviderSettings ddmRESTDataProviderSettings) {
 
 		super(
 			Setter.withGroupKey(
 				_hystrixCommandGroupKey
 			).andCommandKey(
 				HystrixCommandKey.Factory.asKey(
-					"DDMDataProviderInvokeCommand#" +
-						ddmDataProviderInstanceName)
+					"DDMDataProviderInvokeCommand#" + nameCurrentValue)
 			).andCommandPropertiesDefaults(
 				HystrixCommandProperties.Setter().
 					withExecutionTimeoutInMilliseconds(
-						getTimeout(ddmDataProviderRequest))
+						getTimeout(ddmRESTDataProviderSettings))
 			));
 
 		_ddmDataProvider = ddmDataProvider;
 		_ddmDataProviderRequest = ddmDataProviderRequest;
+		_permissionChecker = PermissionThreadLocal.getPermissionChecker();
 	}
 
 	protected static int getTimeout(
-		DDMDataProviderRequest ddmDataProviderRequest) {
-
-		DDMDataProviderContext ddmDataProviderContext =
-			ddmDataProviderRequest.getDDMDataProviderContext();
-
-		DDMRESTDataProviderSettings ddmRESTDataProviderSettings =
-			ddmDataProviderContext.getSettingsInstance(
-				DDMRESTDataProviderSettings.class);
+		DDMRESTDataProviderSettings ddmRESTDataProviderSettings) {
 
 		int timeout = GetterUtil.getInteger(
 			ddmRESTDataProviderSettings.timeout());
@@ -77,6 +70,8 @@ public class DDMDataProviderInvokeCommand
 
 	@Override
 	protected DDMDataProviderResponse run() throws Exception {
+		PermissionThreadLocal.setPermissionChecker(_permissionChecker);
+
 		return _ddmDataProvider.getData(_ddmDataProviderRequest);
 	}
 
@@ -90,5 +85,6 @@ public class DDMDataProviderInvokeCommand
 
 	private final DDMDataProvider _ddmDataProvider;
 	private final DDMDataProviderRequest _ddmDataProviderRequest;
+	private final PermissionChecker _permissionChecker;
 
 }

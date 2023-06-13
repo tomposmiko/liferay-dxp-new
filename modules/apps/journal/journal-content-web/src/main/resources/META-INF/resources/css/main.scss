@@ -1,6 +1,6 @@
 .portlet-journal-content {
 	.journal-content-article {
-		img, .cke_widget_image {
+		img {
 			max-width: 100%;
 
 			&[style*="float: left;"], &[style*="float:left;"] {
@@ -27,7 +27,7 @@
 		visibility: hidden;
 
 		.lfr-icon-menu {
-			background-color: #FFF;
+			background-color: #FFFFFF;
 			border: solid 2px;
 			border-radius: 4px;
 			color: #0B5FFF;

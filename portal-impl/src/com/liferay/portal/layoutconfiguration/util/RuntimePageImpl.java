@@ -589,9 +589,11 @@ public class RuntimePageImpl implements RuntimePage {
 			_waitTime = PropsValues.LAYOUT_PARALLEL_RENDER_TIMEOUT;
 		}
 
-		return StringUtil.replaceWithStringBundler(
+		StringBundler sb = StringUtil.replaceWithStringBundler(
 			unsyncStringWriter.toString(), "[$TEMPLATE_PORTLET_", "$]",
 			contentsMap);
+
+		return sb;
 	}
 
 	protected LayoutTemplate getLayoutTemplate(String velocityTemplateId) {

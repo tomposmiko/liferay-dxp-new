@@ -8,17 +8,6 @@
 <tr><td rowspan="1" colspan="3">Staging</td></tr>
 </thead>
 <tbody>
-<!--DELETIONS-->
-<tr>
-	<td>REPLICATE_INDIVIDUAL_DELETIONS</td>
-	<td>//span[contains(.,'Replicate Individual Deletions:')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
 <!--PROCESSES-->
 <tr>
 	<td>PROCESS_SUCCESSFUL</td>
@@ -52,28 +41,18 @@
 </tr>
 <!--STAGING-->
 <tr>
-	<td>COPY_FROM_LIVE</td>
-	<td>//a/span[contains(.,'Copy from Live')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>STAGING_CONTENT_COUNT</td>
 	<td>//span[contains(@class,'badge-info')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>STAGING_CONTENT_CHECKBOX</td>
-	<td>//input[(@type='checkbox') and contains(@id,'${key_contentName}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>STAGING_CONTENT_DELETIONS</td>
-	<td>//span[contains(@class,'badge-warning') and contains(.,'Deletions')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>STAGING_CONTENT_INFO</td>
 	<td>//span[contains(@id,'selectedContent')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>STAGING_STATUS_PORTLET</td>
+	<td>//h5[contains(text(),'Successful')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -87,13 +66,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>STAGING_PUBLISH_TO_REMOTE_LIVE_BUTTON</td>
-	<td>//button[contains(.,'Publish to Remote Live')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>STAGING_STATUS_PORTLET</td>
-	<td>//h5[contains(text(),'Successful')]</td>
+	<td>COPY_FROM_LIVE</td>
+	<td>//a/span[contains(.,'Copy from Live')]</td>
 	<td></td>
 </tr>
 <tr>

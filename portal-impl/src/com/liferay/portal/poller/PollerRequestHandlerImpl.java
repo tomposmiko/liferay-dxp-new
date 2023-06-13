@@ -54,7 +54,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Edward Han
  */
 public class PollerRequestHandlerImpl
-	implements MessageListener, PollerRequestHandler {
+	implements PollerRequestHandler, MessageListener {
 
 	@Override
 	public PollerHeader getPollerHeader(String pollerRequestString) {

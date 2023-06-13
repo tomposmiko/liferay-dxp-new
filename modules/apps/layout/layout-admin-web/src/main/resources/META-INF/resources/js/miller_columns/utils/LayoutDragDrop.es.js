@@ -7,7 +7,7 @@ import State, {Config} from 'metal-state';
  * @review
  */
 
-const DRAG_POSITIONS = {
+const DROP_TARGET_BORDERS = {
 	bottom: 'layout-column-item-drag-bottom',
 	inside: 'layout-column-item-drag-inside',
 	top: 'layout-column-item-drag-top'
@@ -18,7 +18,7 @@ const DRAG_POSITIONS = {
  * @review
  */
 
-const DROP_TARGET_TYPES = {
+const DROP_TARGET_ITEM_TYPES = {
 	column: 'layout-column',
 	item: 'layout-column-item'
 };
@@ -26,14 +26,12 @@ const DROP_TARGET_TYPES = {
 /**
  * LayoutDragDrop
  */
-
 class LayoutDragDrop extends State {
 
 	/**
 	 * @inheritDoc
 	 * @review
 	 */
-
 	constructor(config, ...args) {
 		super(config, ...args);
 
@@ -44,8 +42,7 @@ class LayoutDragDrop extends State {
 	 * @inheritDoc
 	 * @review
 	 */
-
-	dispose() {
+	disposed() {
 		this._dragDrop.dispose();
 	}
 
@@ -54,7 +51,6 @@ class LayoutDragDrop extends State {
 	 * @param {!HTMLElement} target
 	 * @review
 	 */
-
 	addTarget(target) {
 		this._dragDrop.addTarget(target);
 	}
@@ -67,7 +63,6 @@ class LayoutDragDrop extends State {
 	 * @private
 	 * @review
 	 */
-
 	_handleDrag(data) {
 		const targetItem = data.target;
 
@@ -83,22 +78,22 @@ class LayoutDragDrop extends State {
 			if (targetItem.dataset.layoutColumnIndex) {
 				targetId = targetItem.dataset.layoutColumnIndex;
 				targetId = targetId === '0' ? null : targetId;
-				targetType = DROP_TARGET_TYPES.column;
+				targetType = DROP_TARGET_ITEM_TYPES.column;
 			}
 			else if (targetItem.dataset.layoutColumnItemPlid) {
 				targetId = targetItem.dataset.layoutColumnItemPlid;
-				targetType = DROP_TARGET_TYPES.item;
+				targetType = DROP_TARGET_ITEM_TYPES.item;
 
 				if (placeholderItemRegion.top > targetItemRegion.top &&
 					placeholderItemRegion.bottom < targetItemRegion.bottom) {
-					this._draggingItemPosition = DRAG_POSITIONS.inside;
+					this._draggingItemPosition = DROP_TARGET_BORDERS.inside;
 				}
 				else if (Math.abs(mouseY - targetItemRegion.top) <=
 					Math.abs(mouseY - targetItemRegion.bottom)) {
-					this._draggingItemPosition = DRAG_POSITIONS.top;
+					this._draggingItemPosition = DROP_TARGET_BORDERS.top;
 				}
 				else {
-					this._draggingItemPosition = DRAG_POSITIONS.bottom;
+					this._draggingItemPosition = DROP_TARGET_BORDERS.bottom;
 				}
 			}
 
@@ -119,7 +114,6 @@ class LayoutDragDrop extends State {
 	 * @private
 	 * @review
 	 */
-
 	_handleDragEnd() {
 		this.emit('leaveLayoutColumnItem');
 	}
@@ -131,7 +125,6 @@ class LayoutDragDrop extends State {
 	 * @private
 	 * @review
 	 */
-
 	_handleDragStart(data, event) {
 		const sourceItemPlid = event.target.getActiveDrag().dataset.layoutColumnItemPlid;
 
@@ -152,7 +145,6 @@ class LayoutDragDrop extends State {
 	 * @private
 	 * @review
 	 */
-
 	_handleDrop(data, event) {
 		event.preventDefault();
 
@@ -164,11 +156,11 @@ class LayoutDragDrop extends State {
 			if (data.target.dataset.layoutColumnIndex) {
 				targetId = data.target.dataset.layoutColumnIndex;
 				targetId = targetId === '0' ? null : targetId;
-				targetType = DROP_TARGET_TYPES.column;
+				targetType = DROP_TARGET_ITEM_TYPES.column;
 			}
 			else if (data.target.dataset.layoutColumnItemPlid) {
 				targetId = data.target.dataset.layoutColumnItemPlid;
-				targetType = DROP_TARGET_TYPES.item;
+				targetType = DROP_TARGET_ITEM_TYPES.item;
 			}
 		}
 
@@ -186,7 +178,6 @@ class LayoutDragDrop extends State {
 	 * @private
 	 * @review
 	 */
-
 	_initializeDragAndDrop() {
 		if (this._dragDrop) {
 			this._dragDrop.dispose();
@@ -258,8 +249,8 @@ LayoutDragDrop.STATE = {
 };
 
 export {
-	DRAG_POSITIONS,
-	DROP_TARGET_TYPES,
+	DROP_TARGET_BORDERS,
+	DROP_TARGET_ITEM_TYPES,
 	LayoutDragDrop
 };
 export default LayoutDragDrop;

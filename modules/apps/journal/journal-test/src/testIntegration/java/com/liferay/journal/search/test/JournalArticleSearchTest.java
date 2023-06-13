@@ -551,7 +551,7 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 			for (String fieldValue : fieldValues) {
 				Map<Locale, String> map = new HashMap<>();
 
-				map.put(LocaleUtil.US, fieldValue);
+				map.put(Locale.US, fieldValue);
 
 				contents.add(map);
 			}

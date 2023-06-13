@@ -73,6 +73,10 @@ definition {
 		Button.click(button = "Select");
 	}
 
+	macro clickShare {
+		Button.click(button = "Share");
+	}
+
 	macro clickSubmitForPublication {
 		Button.click(button = "Submit for Publication");
 	}

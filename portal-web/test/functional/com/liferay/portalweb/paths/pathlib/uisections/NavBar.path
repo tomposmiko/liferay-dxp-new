@@ -44,11 +44,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>BASIC_SEARCH_FIELD</td>
-	<td>//div[contains(@class,'basic-search')]//input[contains(@id,'keywords')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>CONTAINER</td>
 	<td>//div[@class='navbar ' or contains(@class,'navbar-default')]//div[contains(@class,'container')] | //div[contains(@class,'navbar-collapse')]/div[contains(@class,'container')]</td>
 	<td></td>
@@ -65,7 +60,7 @@
 </tr>
 <tr>
 	<td>HOME</td>
-	<td>//ul[contains(@class,'breadcrumb')]/li//a[contains(.,'Home')]</td>
+	<td>//ol[contains(@class,'breadcrumb')]/li//a[contains(.,'Home')]</td>
 	<td></td>
 </tr>
 <tr>

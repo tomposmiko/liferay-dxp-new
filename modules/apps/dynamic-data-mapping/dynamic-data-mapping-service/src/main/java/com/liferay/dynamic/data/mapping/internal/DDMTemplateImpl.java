@@ -42,9 +42,11 @@ public class DDMTemplateImpl implements DDMTemplate {
 
 	@Override
 	public Object clone() {
-		return new DDMTemplateImpl(
+		DDMTemplateImpl ddmTemplateImpl = new DDMTemplateImpl(
 			(com.liferay.dynamic.data.mapping.model.DDMTemplate)
 				_ddmTemplate.clone());
+
+		return ddmTemplateImpl;
 	}
 
 	@Override

@@ -17,101 +17,96 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String className = (String)request.getAttribute("emailAddresses.className");
-long classPK = (Long)request.getAttribute("emailAddresses.classPK");
+String className = (String)request.getAttribute("contact_information.jsp-className");
+long classPK = (long)request.getAttribute("contact_information.jsp-classPK");
 
-List<EmailAddress> emailAddresses = Collections.emptyList();
+String emptyResultsMessage = ParamUtil.getString(request, "emptyResultsMessage");
 
-int[] emailAddressesIndexes = null;
-
-String emailAddressesIndexesParam = ParamUtil.getString(request, "emailAddressesIndexes");
-
-if (Validator.isNotNull(emailAddressesIndexesParam)) {
-	emailAddresses = new ArrayList<EmailAddress>();
-
-	emailAddressesIndexes = StringUtil.split(emailAddressesIndexesParam, 0);
-
-	for (int emailAddressesIndex : emailAddressesIndexes) {
-		emailAddresses.add(new EmailAddressImpl());
-	}
-}
-else {
-	if (classPK > 0) {
-		emailAddresses = EmailAddressServiceUtil.getEmailAddresses(className, classPK);
-
-		emailAddressesIndexes = new int[emailAddresses.size()];
-
-		for (int i = 0; i < emailAddresses.size(); i++) {
-			emailAddressesIndexes[i] = i;
-		}
-	}
-
-	if (emailAddresses.isEmpty()) {
-		emailAddresses = new ArrayList<EmailAddress>();
-
-		emailAddresses.add(new EmailAddressImpl());
-
-		emailAddressesIndexes = new int[] {0};
-	}
-
-	if (emailAddressesIndexes == null) {
-		emailAddressesIndexes = new int[0];
-	}
-}
+List<EmailAddress> emailAddresses = EmailAddressServiceUtil.getEmailAddresses(className, classPK);
 %>
 
-<liferay-ui:error-marker
-	key="<%= WebKeys.ERROR_SECTION %>"
-	value="additionalEmailAddresses"
-/>
+<h3 class="autofit-row sheet-subtitle">
+	<span class="autofit-col autofit-col-expand">
+		<span class="heading-text"><liferay-ui:message key="additional-email-addresses" /></span>
+	</span>
+	<span class="autofit-col">
+		<span class="heading-end">
 
-<div class="alert alert-info">
-	<liferay-ui:message key="email-address-and-type-are-required-fields" />
-</div>
+			<%
+			PortletURL editURL = liferayPortletResponse.createRenderURL();
 
-<liferay-ui:error exception="<%= EmailAddressException.class %>" message="please-enter-a-valid-email-address" />
-<liferay-ui:error key="<%= NoSuchListTypeException.class.getName() + className + ListTypeConstants.EMAIL_ADDRESS %>" message="please-select-a-type" />
+			editURL.setParameter("mvcPath", "/common/edit_email_address.jsp");
+			editURL.setParameter("redirect", currentURL);
+			editURL.setParameter("className", className);
+			editURL.setParameter("classPK", String.valueOf(classPK));
+			%>
 
-<aui:fieldset id='<%= renderResponse.getNamespace() + "additionalEmailAddresses" %>'>
+			<liferay-ui:icon
+				label="<%= true %>"
+				linkCssClass="add-email-address-link btn btn-secondary btn-sm"
+				message="add"
+				url="<%= editURL.toString() %>"
+			/>
+		</span>
+	</span>
+</h3>
 
-	<%
-	for (int i = 0; i < emailAddressesIndexes.length; i++) {
-		int emailAddressesIndex = emailAddressesIndexes[i];
+<liferay-ui:search-container
+	compactEmptyResultsMessage="<%= true %>"
+	cssClass="lfr-search-container-wrapper"
+	curParam="emailAddressesCur"
+	deltaParam="emailAddressesDelta"
+	emptyResultsMessage="<%= emptyResultsMessage %>"
+	headerNames="email-address,type,"
+	id="emailAddressesSearchContainer"
+	iteratorURL="<%= currentURLObj %>"
+	total="<%= emailAddresses.size() %>"
+>
+	<liferay-ui:search-container-results
+		results="<%= emailAddresses.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
+	/>
 
-		EmailAddress emailAddress = emailAddresses.get(i);
-	%>
+	<liferay-ui:search-container-row
+		className="com.liferay.portal.kernel.model.EmailAddress"
+		escapedModel="<%= true %>"
+		keyProperty="emailAddressId"
+		modelVar="emailAddress"
+	>
+		<liferay-ui:search-container-column-text
+			cssClass="table-cell-expand"
+			name="email-address"
+			property="address"
+		/>
 
-		<aui:model-context bean="<%= emailAddress %>" model="<%= EmailAddress.class %>" />
+		<%
+		ListType emailAddressListType = ListTypeServiceUtil.getListType(emailAddress.getTypeId());
 
-		<div class="form-group-autofit lfr-form-row">
-			<aui:input name='<%= "emailAddressId" + emailAddressesIndex %>' type="hidden" value="<%= emailAddress.getEmailAddressId() %>" />
+		String emailAddressTypeKey = emailAddressListType.getName();
+		%>
 
-			<div class="form-group-item">
-				<aui:input cssClass="email-field" fieldParam='<%= "emailAddressAddress" + emailAddressesIndex %>' id='<%= "emailAddressAddress" + emailAddressesIndex %>' inlineField="<%= true %>" label="email-address" name="address" width="150px" />
-			</div>
+		<liferay-ui:search-container-column-text
+			cssClass="table-cell-expand-small"
+			name="type"
+			value="<%= LanguageUtil.get(request, emailAddressTypeKey) %>"
+		/>
 
-			<div class="form-group-item">
-				<aui:select inlineField="<%= true %>" label="type" listType="<%= className + ListTypeConstants.EMAIL_ADDRESS %>" name='<%= "emailAddressTypeId" + emailAddressesIndex %>' />
-			</div>
+		<liferay-ui:search-container-column-text
+			cssClass="table-cell-expand-smaller"
+		>
+			<c:if test="<%= emailAddress.isPrimary() %>">
+				<span class="label label-primary">
+					<span class="label-item label-item-expand"><%= StringUtil.toUpperCase(LanguageUtil.get(request, "primary"), locale) %></span>
+				</span>
+			</c:if>
+		</liferay-ui:search-container-column-text>
 
-			<div class="form-group-item form-group-item-label-spacer">
-				<aui:input checked="<%= emailAddress.isPrimary() %>" cssClass="primary-ctrl" id='<%= "emailAddressPrimary" + emailAddressesIndex %>' inlineField="<%= true %>" label="primary" name="emailAddressPrimary" type="radio" value="<%= emailAddressesIndex %>" />
-			</div>
-		</div>
+		<liferay-ui:search-container-column-jsp
+			cssClass="entry-action-column"
+			path="/common/email_address_action.jsp"
+		/>
+	</liferay-ui:search-container-row>
 
-	<%
-	}
-	%>
-
-	<aui:input name="emailAddressesIndexes" type="hidden" value="<%= StringUtil.merge(emailAddressesIndexes) %>" />
-</aui:fieldset>
-
-<aui:script use="liferay-auto-fields">
-	new Liferay.AutoFields(
-		{
-			contentBox: '#<portlet:namespace />additionalEmailAddresses',
-			fieldIndexes: '<portlet:namespace />emailAddressesIndexes',
-			namespace: '<portlet:namespace />'
-		}
-	).render();
-</aui:script>
+	<liferay-ui:search-iterator
+		markupView="lexicon"
+	/>
+</liferay-ui:search-container>

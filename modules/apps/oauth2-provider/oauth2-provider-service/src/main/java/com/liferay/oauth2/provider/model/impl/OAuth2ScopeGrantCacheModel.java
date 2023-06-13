@@ -17,9 +17,11 @@ package com.liferay.oauth2.provider.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -30,12 +32,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing OAuth2ScopeGrant in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see OAuth2ScopeGrant
  * @generated
  */
 @ProviderType
-public class OAuth2ScopeGrantCacheModel
-	implements CacheModel<OAuth2ScopeGrant>, Externalizable {
-
+public class OAuth2ScopeGrantCacheModel implements CacheModel<OAuth2ScopeGrant>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -46,12 +48,9 @@ public class OAuth2ScopeGrantCacheModel
 			return false;
 		}
 
-		OAuth2ScopeGrantCacheModel oAuth2ScopeGrantCacheModel =
-			(OAuth2ScopeGrantCacheModel)obj;
+		OAuth2ScopeGrantCacheModel oAuth2ScopeGrantCacheModel = (OAuth2ScopeGrantCacheModel)obj;
 
-		if (oAuth2ScopeGrantId ==
-				oAuth2ScopeGrantCacheModel.oAuth2ScopeGrantId) {
-
+		if (oAuth2ScopeGrantId == oAuth2ScopeGrantCacheModel.oAuth2ScopeGrantId) {
 			return true;
 		}
 
@@ -90,8 +89,7 @@ public class OAuth2ScopeGrantCacheModel
 
 		oAuth2ScopeGrantImpl.setOAuth2ScopeGrantId(oAuth2ScopeGrantId);
 		oAuth2ScopeGrantImpl.setCompanyId(companyId);
-		oAuth2ScopeGrantImpl.setOAuth2ApplicationScopeAliasesId(
-			oAuth2ApplicationScopeAliasesId);
+		oAuth2ScopeGrantImpl.setOAuth2ApplicationScopeAliasesId(oAuth2ApplicationScopeAliasesId);
 
 		if (applicationName == null) {
 			oAuth2ScopeGrantImpl.setApplicationName("");
@@ -132,7 +130,8 @@ public class OAuth2ScopeGrantCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(oAuth2ScopeGrantId);
 
 		objectOutput.writeLong(companyId);
@@ -167,5 +166,4 @@ public class OAuth2ScopeGrantCacheModel
 	public String applicationName;
 	public String bundleSymbolicName;
 	public String scope;
-
 }

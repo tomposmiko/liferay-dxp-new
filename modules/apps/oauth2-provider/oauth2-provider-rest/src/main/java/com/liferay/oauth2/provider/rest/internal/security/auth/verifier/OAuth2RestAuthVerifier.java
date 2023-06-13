@@ -189,13 +189,16 @@ public class OAuth2RestAuthVerifier implements AuthVerifier {
 				oAuth2ApplicationScopeAliases.getScopeAliasesList();
 		}
 
-		return new BearerTokenProvider.AccessToken(
-			oAuth2Application, new ArrayList<>(), StringPool.BLANK, expiresIn,
-			new HashMap<>(), StringPool.BLANK, StringPool.BLANK, issuedAt,
-			StringPool.BLANK, StringPool.BLANK, new HashMap<>(),
-			StringPool.BLANK, StringPool.BLANK, scopeAliasesList,
-			accessTokenContent, _TOKEN_KEY, oAuth2Authorization.getUserId(),
-			oAuth2Authorization.getUserName());
+		BearerTokenProvider.AccessToken accessToken =
+			new BearerTokenProvider.AccessToken(
+				oAuth2Application, new ArrayList<>(), StringPool.BLANK,
+				expiresIn, new HashMap<>(), StringPool.BLANK, StringPool.BLANK,
+				issuedAt, StringPool.BLANK, StringPool.BLANK, new HashMap<>(),
+				StringPool.BLANK, StringPool.BLANK, scopeAliasesList,
+				accessTokenContent, _TOKEN_KEY, oAuth2Authorization.getUserId(),
+				oAuth2Authorization.getUserName());
+
+		return accessToken;
 	}
 
 	private static final String _TOKEN_KEY = "Bearer";

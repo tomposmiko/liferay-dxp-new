@@ -6,8 +6,8 @@ import Soy from 'metal-soy';
 import './LayoutBreadcrumbs.es';
 import './LayoutColumn.es';
 import {
-	DRAG_POSITIONS,
-	DROP_TARGET_TYPES,
+	DROP_TARGET_BORDERS,
+	DROP_TARGET_ITEM_TYPES,
 	LayoutDragDrop
 } from './utils/LayoutDragDrop.es';
 import {
@@ -39,7 +39,6 @@ import templates from './Layout.soy';
  * Metal drag
  * @param {number}
  */
-
 const DRAG_SPEED = 20;
 
 const UPDATE_PATH_TIMEOUT = 500;
@@ -50,13 +49,11 @@ const UPDATE_PATH_TIMEOUT = 500;
  * and N-th + 3 levels of layouts tree.
  * @review
  */
-
 class Layout extends Component {
 
 	/**
 	 * @inheritDoc
 	 */
-
 	attached() {
 		this._handleLayoutColumnsScroll = this._handleLayoutColumnsScroll.bind(this);
 
@@ -95,7 +92,6 @@ class Layout extends Component {
 	 * @inheritDoc
 	 * @review
 	 */
-
 	disposed() {
 		this._layoutDragDrop.dispose();
 		this._removeLayoutColumnsScrollListener();
@@ -104,7 +100,6 @@ class Layout extends Component {
 	/**
 	 * @inheritDoc
 	 */
-
 	rendered(firstRendered) {
 		requestAnimationFrame(
 			() => {
@@ -134,7 +129,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_addLayoutColumnsScrollListener() {
 		const {layoutColumns} = this.refs;
 
@@ -154,7 +148,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_addLayoutDragDropTargets(items) {
 		let element = null;
 		let query = null;
@@ -174,7 +167,6 @@ class Layout extends Component {
 	 * @return {Promise<object>}
 	 * @review
 	 */
-
 	_getItemChildren(plid) {
 		const formData = new FormData();
 
@@ -202,7 +194,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_handleDragLayoutColumnItem(eventData) {
 		clearTimeout(this._updatePathTimeout);
 
@@ -213,10 +204,10 @@ class Layout extends Component {
 			targetType
 		} = eventData;
 
-		if (targetType === DROP_TARGET_TYPES.column) {
+		if (targetType === DROP_TARGET_ITEM_TYPES.column) {
 			this._setColumnHoveredData(sourceItemPlid, targetId);
 		}
-		else if (targetType === DROP_TARGET_TYPES.item) {
+		else if (targetType === DROP_TARGET_ITEM_TYPES.item) {
 			this._setItemHoveredData(
 				position,
 				sourceItemPlid,
@@ -224,7 +215,7 @@ class Layout extends Component {
 			);
 
 			if (
-				this._draggingItemPosition === DRAG_POSITIONS.inside &&
+				this._draggingItemPosition === DROP_TARGET_BORDERS.inside &&
 				this._currentPathItemPlid !== targetId
 			) {
 				this._updatePathTimeout = setTimeout(
@@ -244,7 +235,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_handleDropLayoutColumnItem(eventData) {
 		this._removeLayoutColumnsScrollListener();
 
@@ -264,7 +254,7 @@ class Layout extends Component {
 			let parentPlid = null;
 			let priority = null;
 
-			if (targetType === DROP_TARGET_TYPES.column) {
+			if (targetType === DROP_TARGET_ITEM_TYPES.column) {
 				layoutColumns = clearPath(
 					layoutColumns,
 					this._draggingItem,
@@ -283,7 +273,7 @@ class Layout extends Component {
 				parentPlid = dropData.newParentPlid;
 				priority = dropData.priority;
 			}
-			else if (targetType === DROP_TARGET_TYPES.item) {
+			else if (targetType === DROP_TARGET_ITEM_TYPES.item) {
 				const targetItem = getItem(layoutColumns, targetId);
 
 				layoutColumns = clearPath(
@@ -294,7 +284,7 @@ class Layout extends Component {
 					targetType
 				);
 
-				if (this._draggingItemPosition === DRAG_POSITIONS.inside) {
+				if (this._draggingItemPosition === DROP_TARGET_BORDERS.inside) {
 					const pathUpdated = !!this._currentPathItemPlid;
 
 					const dropData = dropItemInsideItem(
@@ -377,7 +367,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_handleLayoutColumnItemCheck(event) {
 		this._setLayoutColumnItemChecked(
 			event.delegateTarget.value,
@@ -391,7 +380,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_handleLayoutColumnItemCheckboxClick(event) {
 		event.stopPropagation();
 	}
@@ -405,7 +393,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_handleLayoutColumnItemClick(event) {
 		const itemUrl = event.delegateTarget.dataset.layoutColumnItemUrl;
 
@@ -430,7 +417,6 @@ class Layout extends Component {
 	 * @review
 	 * @see DRAG_SPEED
 	 */
-
 	_handleLayoutColumnsScroll() {
 		const {layoutColumns} = this.refs;
 
@@ -449,7 +435,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_handleLeaveLayoutColumnItem() {
 		this._resetHoveredData();
 	}
@@ -460,7 +445,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_handleStartMovingLayoutColumnItem(eventData) {
 		this._addLayoutColumnsScrollListener();
 
@@ -490,7 +474,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_initializeLayoutDragDrop() {
 		if (this._layoutDragDrop) {
 			this._layoutDragDrop.dispose();
@@ -528,7 +511,6 @@ class Layout extends Component {
 	 * @return {Promise<object>}
 	 * @review
 	 */
-
 	_moveLayoutColumnItemOnServer(parentPlid, plid, priority) {
 		const formData = new FormData();
 
@@ -546,7 +528,7 @@ class Layout extends Component {
 				credentials: 'include',
 				method: 'POST'
 			}
-		).catch (
+		).catch(
 			() => {
 				this._resetHoveredData();
 			}
@@ -561,7 +543,6 @@ class Layout extends Component {
 	 * @return {Array}
 	 * @review
 	 */
-
 	_removeHasChildArrow(layoutColumns, itemPlid) {
 		let nextLayoutColumns = layoutColumns;
 
@@ -594,7 +575,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_removeLayoutColumnsScrollListener() {
 		const {layoutColumns} = this.refs;
 
@@ -612,7 +592,6 @@ class Layout extends Component {
 	 * Resets dragging information to null
 	 * @private
 	 */
-
 	_resetHoveredData() {
 		this._draggingItemPosition = null;
 		this._hoveredLayoutColumnItemPlid = null;
@@ -626,7 +605,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_setColumnHoveredData(draggingItemPlid, targetColumnIndex) {
 		const targetColumnIsChild = columnIsItemChild(
 			targetColumnIndex,
@@ -645,7 +623,7 @@ class Layout extends Component {
 			!targetColumnIsChild &&
 			!targetEqualsSource
 		) {
-			this._draggingItemPosition = DRAG_POSITIONS.bottom;
+			this._draggingItemPosition = DROP_TARGET_BORDERS.bottom;
 			this._hoveredLayoutColumnItemPlid = targetColumnLastItem.plid;
 		}
 	}
@@ -657,9 +635,8 @@ class Layout extends Component {
 	 * @param {string} targetItemPlid
 	 * @private
 	 * @review
-	 * @see DRAG_POSITIONS
+	 * @see DROP_TARGET_BORDERS
 	 */
-
 	_setItemHoveredData(position, sourceItemPlid, targetItemPlid) {
 		const targetColumnIndex = getItemColumnIndex(
 			this.layoutColumns,
@@ -675,7 +652,7 @@ class Layout extends Component {
 		const targetEqualsSource = (sourceItemPlid === targetItemPlid);
 
 		const draggingInsideParent = (
-			(position === DRAG_POSITIONS.inside) &&
+			(position === DROP_TARGET_BORDERS.inside) &&
 			itemIsParent(this.layoutColumns, sourceItemPlid, targetItemPlid)
 		);
 
@@ -692,7 +669,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_setLayoutColumnItemChecked(plid, checked) {
 		const column = getItemColumn(this.layoutColumns, plid);
 		const columnIndex = this.layoutColumns.indexOf(column);
@@ -714,7 +690,6 @@ class Layout extends Component {
 	 * @private
 	 * @review
 	 */
-
 	_updatePath(targetItemPlid) {
 		let nextLayoutColumns = this.layoutColumns;
 
@@ -931,7 +906,6 @@ Layout.STATE = {
 	 * @review
 	 * @type {number}
 	 */
-
 	_layoutColumnsScrollLeft: Config.internal().value(null),
 
 	/**

@@ -150,11 +150,6 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 			return new LiteralExpressionImpl(
 				literal.getText(), LiteralExpression.Type.STRING);
 		}
-		else if ((edmType == null) ||
-				 Objects.equals("null", literal.getText())) {
-
-			return new NullLiteralExpression();
-		}
 
 		throw new UnsupportedOperationException(
 			"Literal: " + edmType.getFullQualifiedName());
@@ -177,11 +172,6 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 		if (methodKind == MethodKind.CONTAINS) {
 			return new MethodExpressionImpl(
 				expressions, MethodExpression.Type.CONTAINS);
-		}
-
-		if (methodKind == MethodKind.STARTSWITH) {
-			return new MethodExpressionImpl(
-				expressions, MethodExpression.Type.STARTS_WITH);
 		}
 
 		throw new UnsupportedOperationException("Method call: " + methodKind);
@@ -287,9 +277,6 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 		}
 		else if (binaryOperatorKind == BinaryOperatorKind.LT) {
 			return Optional.of(BinaryExpression.Operation.LT);
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.NE) {
-			return Optional.of(BinaryExpression.Operation.NE);
 		}
 		else if (binaryOperatorKind == BinaryOperatorKind.OR) {
 			return Optional.of(BinaryExpression.Operation.OR);

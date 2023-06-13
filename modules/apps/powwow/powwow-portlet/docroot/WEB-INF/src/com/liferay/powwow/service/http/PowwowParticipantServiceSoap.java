@@ -18,26 +18,26 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+
 import com.liferay.powwow.service.PowwowParticipantServiceUtil;
 
 import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * <code>PowwowParticipantServiceUtil</code> service
- * utility. The static methods of this class call the same methods of the
- * service utility. However, the signatures are different because it is
- * difficult for SOAP to support certain types.
+ * {@link PowwowParticipantServiceUtil} service utility. The
+ * static methods of this class calls the same methods of the service utility.
+ * However, the signatures are different because it is difficult for SOAP to
+ * support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a <code>java.util.List</code>,
- * that is translated to an array of
- * <code>com.liferay.powwow.model.PowwowParticipantSoap</code>. If the method in the
- * service utility returns a
- * <code>com.liferay.powwow.model.PowwowParticipant</code>, that is translated to a
- * <code>com.liferay.powwow.model.PowwowParticipantSoap</code>. Methods that SOAP
- * cannot safely wire are skipped.
+ * if the method in the service utility returns a {@link java.util.List}, that
+ * is translated to an array of {@link com.liferay.powwow.model.PowwowParticipantSoap}.
+ * If the method in the service utility returns a
+ * {@link com.liferay.powwow.model.PowwowParticipant}, that is translated to a
+ * {@link com.liferay.powwow.model.PowwowParticipantSoap}. Methods that SOAP cannot
+ * safely wire are skipped.
  * </p>
  *
  * <p>
@@ -59,25 +59,20 @@ import java.rmi.RemoteException;
  *
  * @author Shinn Lok
  * @see PowwowParticipantServiceHttp
+ * @see com.liferay.powwow.model.PowwowParticipantSoap
+ * @see PowwowParticipantServiceUtil
  * @generated
  */
 @ProviderType
 public class PowwowParticipantServiceSoap {
-
-	public static com.liferay.powwow.model.PowwowParticipantSoap
-			deletePowwowParticipant(
-				com.liferay.powwow.model.PowwowParticipantSoap
-					powwowParticipant)
+	public static com.liferay.powwow.model.PowwowParticipantSoap deletePowwowParticipant(
+		com.liferay.powwow.model.PowwowParticipantSoap powwowParticipant)
 		throws RemoteException {
-
 		try {
-			com.liferay.powwow.model.PowwowParticipant returnValue =
-				PowwowParticipantServiceUtil.deletePowwowParticipant(
-					com.liferay.powwow.model.impl.PowwowParticipantModelImpl.
-						toModel(powwowParticipant));
+			com.liferay.powwow.model.PowwowParticipant returnValue = PowwowParticipantServiceUtil.deletePowwowParticipant(com.liferay.powwow.model.impl.PowwowParticipantModelImpl.toModel(
+						powwowParticipant));
 
-			return com.liferay.powwow.model.PowwowParticipantSoap.toSoapModel(
-				returnValue);
+			return com.liferay.powwow.model.PowwowParticipantSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -86,18 +81,13 @@ public class PowwowParticipantServiceSoap {
 		}
 	}
 
-	public static com.liferay.powwow.model.PowwowParticipantSoap[]
-			getPowwowParticipants(long powwowMeetingId)
-		throws RemoteException {
-
+	public static com.liferay.powwow.model.PowwowParticipantSoap[] getPowwowParticipants(
+		long powwowMeetingId) throws RemoteException {
 		try {
-			java.util.List<com.liferay.powwow.model.PowwowParticipant>
-				returnValue =
-					PowwowParticipantServiceUtil.getPowwowParticipants(
-						powwowMeetingId);
+			java.util.List<com.liferay.powwow.model.PowwowParticipant> returnValue =
+				PowwowParticipantServiceUtil.getPowwowParticipants(powwowMeetingId);
 
-			return com.liferay.powwow.model.PowwowParticipantSoap.toSoapModels(
-				returnValue);
+			return com.liferay.powwow.model.PowwowParticipantSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -108,11 +98,8 @@ public class PowwowParticipantServiceSoap {
 
 	public static int getPowwowParticipantsCount(long powwowMeetingId)
 		throws RemoteException {
-
 		try {
-			int returnValue =
-				PowwowParticipantServiceUtil.getPowwowParticipantsCount(
-					powwowMeetingId);
+			int returnValue = PowwowParticipantServiceUtil.getPowwowParticipantsCount(powwowMeetingId);
 
 			return returnValue;
 		}
@@ -123,23 +110,17 @@ public class PowwowParticipantServiceSoap {
 		}
 	}
 
-	public static com.liferay.powwow.model.PowwowParticipantSoap
-			updatePowwowParticipant(
-				long powwowParticipantId, long powwowMeetingId, String name,
-				long participantUserId, String emailAddress, int type,
-				int status,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.powwow.model.PowwowParticipantSoap updatePowwowParticipant(
+		long powwowParticipantId, long powwowMeetingId, String name,
+		long participantUserId, String emailAddress, int type, int status,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
-
 		try {
-			com.liferay.powwow.model.PowwowParticipant returnValue =
-				PowwowParticipantServiceUtil.updatePowwowParticipant(
-					powwowParticipantId, powwowMeetingId, name,
-					participantUserId, emailAddress, type, status,
-					serviceContext);
+			com.liferay.powwow.model.PowwowParticipant returnValue = PowwowParticipantServiceUtil.updatePowwowParticipant(powwowParticipantId,
+					powwowMeetingId, name, participantUserId, emailAddress,
+					type, status, serviceContext);
 
-			return com.liferay.powwow.model.PowwowParticipantSoap.toSoapModel(
-				returnValue);
+			return com.liferay.powwow.model.PowwowParticipantSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -148,7 +129,5 @@ public class PowwowParticipantServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		PowwowParticipantServiceSoap.class);
-
+	private static Log _log = LogFactoryUtil.getLog(PowwowParticipantServiceSoap.class);
 }

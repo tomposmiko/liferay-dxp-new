@@ -1,0 +1,3 @@
+apiDir: "../headless-web-experience-api/src/main/java"
+apiPackagePath: "com.liferay.headless.web.experience"
+author: "Javier Gamarra"

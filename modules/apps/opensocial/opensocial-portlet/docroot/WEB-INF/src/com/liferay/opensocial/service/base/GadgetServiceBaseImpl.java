@@ -19,6 +19,7 @@ import com.liferay.opensocial.service.GadgetService;
 import com.liferay.opensocial.service.persistence.GadgetPersistence;
 import com.liferay.opensocial.service.persistence.OAuthConsumerPersistence;
 import com.liferay.opensocial.service.persistence.OAuthTokenPersistence;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -43,15 +44,15 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.opensocial.service.impl.GadgetServiceImpl
+ * @see com.liferay.opensocial.service.GadgetServiceUtil
  * @generated
  */
-public abstract class GadgetServiceBaseImpl
-	extends BaseServiceImpl implements GadgetService, IdentifiableOSGiService {
-
+public abstract class GadgetServiceBaseImpl extends BaseServiceImpl
+	implements GadgetService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>GadgetService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.opensocial.service.GadgetServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.opensocial.service.GadgetServiceUtil} to access the gadget remote service.
 	 */
 
 	/**
@@ -59,9 +60,7 @@ public abstract class GadgetServiceBaseImpl
 	 *
 	 * @return the gadget local service
 	 */
-	public com.liferay.opensocial.service.GadgetLocalService
-		getGadgetLocalService() {
-
+	public com.liferay.opensocial.service.GadgetLocalService getGadgetLocalService() {
 		return gadgetLocalService;
 	}
 
@@ -72,7 +71,6 @@ public abstract class GadgetServiceBaseImpl
 	 */
 	public void setGadgetLocalService(
 		com.liferay.opensocial.service.GadgetLocalService gadgetLocalService) {
-
 		this.gadgetLocalService = gadgetLocalService;
 	}
 
@@ -117,9 +115,7 @@ public abstract class GadgetServiceBaseImpl
 	 *
 	 * @return the o auth consumer local service
 	 */
-	public com.liferay.opensocial.service.OAuthConsumerLocalService
-		getOAuthConsumerLocalService() {
-
+	public com.liferay.opensocial.service.OAuthConsumerLocalService getOAuthConsumerLocalService() {
 		return oAuthConsumerLocalService;
 	}
 
@@ -129,9 +125,7 @@ public abstract class GadgetServiceBaseImpl
 	 * @param oAuthConsumerLocalService the o auth consumer local service
 	 */
 	public void setOAuthConsumerLocalService(
-		com.liferay.opensocial.service.OAuthConsumerLocalService
-			oAuthConsumerLocalService) {
-
+		com.liferay.opensocial.service.OAuthConsumerLocalService oAuthConsumerLocalService) {
 		this.oAuthConsumerLocalService = oAuthConsumerLocalService;
 	}
 
@@ -151,7 +145,6 @@ public abstract class GadgetServiceBaseImpl
 	 */
 	public void setOAuthConsumerPersistence(
 		OAuthConsumerPersistence oAuthConsumerPersistence) {
-
 		this.oAuthConsumerPersistence = oAuthConsumerPersistence;
 	}
 
@@ -160,9 +153,7 @@ public abstract class GadgetServiceBaseImpl
 	 *
 	 * @return the o auth token local service
 	 */
-	public com.liferay.opensocial.service.OAuthTokenLocalService
-		getOAuthTokenLocalService() {
-
+	public com.liferay.opensocial.service.OAuthTokenLocalService getOAuthTokenLocalService() {
 		return oAuthTokenLocalService;
 	}
 
@@ -172,9 +163,7 @@ public abstract class GadgetServiceBaseImpl
 	 * @param oAuthTokenLocalService the o auth token local service
 	 */
 	public void setOAuthTokenLocalService(
-		com.liferay.opensocial.service.OAuthTokenLocalService
-			oAuthTokenLocalService) {
-
+		com.liferay.opensocial.service.OAuthTokenLocalService oAuthTokenLocalService) {
 		this.oAuthTokenLocalService = oAuthTokenLocalService;
 	}
 
@@ -194,7 +183,6 @@ public abstract class GadgetServiceBaseImpl
 	 */
 	public void setOAuthTokenPersistence(
 		OAuthTokenPersistence oAuthTokenPersistence) {
-
 		this.oAuthTokenPersistence = oAuthTokenPersistence;
 	}
 
@@ -203,9 +191,7 @@ public abstract class GadgetServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -215,9 +201,7 @@ public abstract class GadgetServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -226,9 +210,7 @@ public abstract class GadgetServiceBaseImpl
 	 *
 	 * @return the class name local service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService
-		getClassNameLocalService() {
-
+	public com.liferay.portal.kernel.service.ClassNameLocalService getClassNameLocalService() {
 		return classNameLocalService;
 	}
 
@@ -238,9 +220,7 @@ public abstract class GadgetServiceBaseImpl
 	 * @param classNameLocalService the class name local service
 	 */
 	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService
-			classNameLocalService) {
-
+		com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService) {
 		this.classNameLocalService = classNameLocalService;
 	}
 
@@ -249,9 +229,7 @@ public abstract class GadgetServiceBaseImpl
 	 *
 	 * @return the class name remote service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameService
-		getClassNameService() {
-
+	public com.liferay.portal.kernel.service.ClassNameService getClassNameService() {
 		return classNameService;
 	}
 
@@ -262,7 +240,6 @@ public abstract class GadgetServiceBaseImpl
 	 */
 	public void setClassNameService(
 		com.liferay.portal.kernel.service.ClassNameService classNameService) {
-
 		this.classNameService = classNameService;
 	}
 
@@ -282,7 +259,6 @@ public abstract class GadgetServiceBaseImpl
 	 */
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
-
 		this.classNamePersistence = classNamePersistence;
 	}
 
@@ -291,9 +267,7 @@ public abstract class GadgetServiceBaseImpl
 	 *
 	 * @return the portlet local service
 	 */
-	public com.liferay.portal.kernel.service.PortletLocalService
-		getPortletLocalService() {
-
+	public com.liferay.portal.kernel.service.PortletLocalService getPortletLocalService() {
 		return portletLocalService;
 	}
 
@@ -303,9 +277,7 @@ public abstract class GadgetServiceBaseImpl
 	 * @param portletLocalService the portlet local service
 	 */
 	public void setPortletLocalService(
-		com.liferay.portal.kernel.service.PortletLocalService
-			portletLocalService) {
-
+		com.liferay.portal.kernel.service.PortletLocalService portletLocalService) {
 		this.portletLocalService = portletLocalService;
 	}
 
@@ -314,9 +286,7 @@ public abstract class GadgetServiceBaseImpl
 	 *
 	 * @return the portlet remote service
 	 */
-	public com.liferay.portal.kernel.service.PortletService
-		getPortletService() {
-
+	public com.liferay.portal.kernel.service.PortletService getPortletService() {
 		return portletService;
 	}
 
@@ -327,7 +297,6 @@ public abstract class GadgetServiceBaseImpl
 	 */
 	public void setPortletService(
 		com.liferay.portal.kernel.service.PortletService portletService) {
-
 		this.portletService = portletService;
 	}
 
@@ -354,9 +323,7 @@ public abstract class GadgetServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService
-		getResourceLocalService() {
-
+	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
 		return resourceLocalService;
 	}
 
@@ -366,9 +333,7 @@ public abstract class GadgetServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService
-			resourceLocalService) {
-
+		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -377,9 +342,7 @@ public abstract class GadgetServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -390,7 +353,6 @@ public abstract class GadgetServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -410,7 +372,6 @@ public abstract class GadgetServiceBaseImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
-
 		this.userService = userService;
 	}
 
@@ -470,8 +431,8 @@ public abstract class GadgetServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -480,87 +441,40 @@ public abstract class GadgetServiceBaseImpl
 		}
 	}
 
-	@BeanReference(
-		type = com.liferay.opensocial.service.GadgetLocalService.class
-	)
-	protected com.liferay.opensocial.service.GadgetLocalService
-		gadgetLocalService;
-
+	@BeanReference(type = com.liferay.opensocial.service.GadgetLocalService.class)
+	protected com.liferay.opensocial.service.GadgetLocalService gadgetLocalService;
 	@BeanReference(type = GadgetService.class)
 	protected GadgetService gadgetService;
-
 	@BeanReference(type = GadgetPersistence.class)
 	protected GadgetPersistence gadgetPersistence;
-
-	@BeanReference(
-		type = com.liferay.opensocial.service.OAuthConsumerLocalService.class
-	)
-	protected com.liferay.opensocial.service.OAuthConsumerLocalService
-		oAuthConsumerLocalService;
-
+	@BeanReference(type = com.liferay.opensocial.service.OAuthConsumerLocalService.class)
+	protected com.liferay.opensocial.service.OAuthConsumerLocalService oAuthConsumerLocalService;
 	@BeanReference(type = OAuthConsumerPersistence.class)
 	protected OAuthConsumerPersistence oAuthConsumerPersistence;
-
-	@BeanReference(
-		type = com.liferay.opensocial.service.OAuthTokenLocalService.class
-	)
-	protected com.liferay.opensocial.service.OAuthTokenLocalService
-		oAuthTokenLocalService;
-
+	@BeanReference(type = com.liferay.opensocial.service.OAuthTokenLocalService.class)
+	protected com.liferay.opensocial.service.OAuthTokenLocalService oAuthTokenLocalService;
 	@BeanReference(type = OAuthTokenPersistence.class)
 	protected OAuthTokenPersistence oAuthTokenPersistence;
-
-	@BeanReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ClassNameLocalService
-		classNameLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ClassNameService.class
-	)
-	protected com.liferay.portal.kernel.service.ClassNameService
-		classNameService;
-
+	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.ClassNameService.class)
+	protected com.liferay.portal.kernel.service.ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.PortletLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.PortletLocalService
-		portletLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.PortletService.class
-	)
+	@BeanReference(type = com.liferay.portal.kernel.service.PortletLocalService.class)
+	protected com.liferay.portal.kernel.service.PortletLocalService portletLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.PortletService.class)
 	protected com.liferay.portal.kernel.service.PortletService portletService;
-
 	@BeanReference(type = PortletPersistence.class)
 	protected PortletPersistence portletPersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ResourceLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
+	@BeanReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
+	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
 	@BeanReference(type = com.liferay.portal.kernel.service.UserService.class)
 	protected com.liferay.portal.kernel.service.UserService userService;
-
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
 }

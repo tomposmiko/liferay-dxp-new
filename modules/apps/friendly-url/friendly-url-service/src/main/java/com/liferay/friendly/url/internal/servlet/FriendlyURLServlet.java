@@ -14,8 +14,6 @@
 
 package com.liferay.friendly.url.internal.servlet;
 
-import com.liferay.petra.encryptor.Encryptor;
-import com.liferay.petra.encryptor.EncryptorException;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
@@ -25,7 +23,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
@@ -72,7 +69,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.osgi.service.component.annotations.Reference;
 
@@ -282,23 +278,6 @@ public class FriendlyURLServlet extends HttpServlet {
 			actualURL = StringUtil.removeSubstring(actualURL, portalURL);
 		}
 
-		long userId = portal.getUserId(request);
-
-		if ((userId > 0) && _isImpersonated(request, userId)) {
-			try {
-				Company company = portal.getCompany(request);
-
-				String encDoAsUserId = Encryptor.encrypt(
-					company.getKeyObj(), String.valueOf(userId));
-
-				actualURL = HttpUtil.setParameter(
-					actualURL, "doAsUserId", encDoAsUserId);
-			}
-			catch (EncryptorException ee) {
-				return new Redirect(actualURL);
-			}
-		}
-
 		return new Redirect(actualURL);
 	}
 
@@ -471,7 +450,7 @@ public class FriendlyURLServlet extends HttpServlet {
 		public boolean isValidForward() {
 			String path = getPath();
 
-			if (!path.startsWith(Portal.PATH_MAIN)) {
+			if (path.charAt(0) != CharPool.SLASH) {
 				return false;
 			}
 
@@ -592,18 +571,6 @@ public class FriendlyURLServlet extends HttpServlet {
 		}
 
 		return false;
-	}
-
-	private boolean _isImpersonated(HttpServletRequest request, long userId) {
-		HttpSession session = request.getSession();
-
-		Long realUserId = (Long)session.getAttribute(WebKeys.USER_ID);
-
-		if (userId == realUserId) {
-			return false;
-		}
-
-		return true;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

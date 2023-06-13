@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateException;
 import com.liferay.portal.kernel.template.TemplateResource;
-import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.template.TemplateContextHelper;
@@ -44,8 +43,6 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import org.apache.xalan.processor.TransformerFactoryImpl;
 
 /**
  * @author Tina Tian
@@ -72,8 +69,10 @@ public class XSLTemplate implements Template {
 		_errorTemplateResource = errorTemplateResource;
 		_templateContextHelper = templateContextHelper;
 
-		_transformerFactory = TransformerFactory.newInstance(
-			_TRANSFORMER_FACTORY_CLASS_NAME, _TRANSFORMER_FACTORY_CLASS_LOADER);
+		_preventLocalConnections =
+			xslEngineConfiguration.preventLocalConnections();
+
+		_transformerFactory = TransformerFactory.newInstance();
 
 		try {
 			_transformerFactory.setFeature(
@@ -82,8 +81,6 @@ public class XSLTemplate implements Template {
 		}
 		catch (TransformerConfigurationException tce) {
 		}
-
-		_context = new HashMap<>();
 	}
 
 	@Override
@@ -117,6 +114,10 @@ public class XSLTemplate implements Template {
 		XSLErrorListener xslErrorListener = new XSLErrorListener(locale);
 
 		_transformerFactory.setErrorListener(xslErrorListener);
+
+		if (_preventLocalConnections) {
+			xslURIResolver = new XSLSecureURIResolver(xslURIResolver);
+		}
 
 		_transformerFactory.setURIResolver(xslURIResolver);
 
@@ -195,14 +196,6 @@ public class XSLTemplate implements Template {
 
 	@Override
 	public void processTemplate(Writer writer) throws TemplateException {
-		Thread currentThread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
-
-		currentThread.setContextClassLoader(
-			AggregateClassLoader.getAggregateClassLoader(
-				contextClassLoader, _TRANSFORMER_FACTORY_CLASS_LOADER));
-
 		try {
 			doProcessTemplate(writer);
 		}
@@ -244,9 +237,6 @@ public class XSLTemplate implements Template {
 						_errorTemplateResource.getTemplateId(),
 					e2);
 			}
-		}
-		finally {
-			currentThread.setContextClassLoader(contextClassLoader);
 		}
 	}
 
@@ -303,21 +293,9 @@ public class XSLTemplate implements Template {
 		}
 	}
 
-	private static final ClassLoader _TRANSFORMER_FACTORY_CLASS_LOADER;
-
-	private static final String _TRANSFORMER_FACTORY_CLASS_NAME;
-
-	static {
-		Class<?> transformerFactoryClass = TransformerFactoryImpl.class;
-
-		_TRANSFORMER_FACTORY_CLASS_NAME = transformerFactoryClass.getName();
-
-		_TRANSFORMER_FACTORY_CLASS_LOADER =
-			transformerFactoryClass.getClassLoader();
-	}
-
-	private final Map<String, Object> _context;
+	private final Map<String, Object> _context = new HashMap<>();
 	private TemplateResource _errorTemplateResource;
+	private final boolean _preventLocalConnections;
 	private final TemplateContextHelper _templateContextHelper;
 	private final TransformerFactory _transformerFactory;
 	private StreamSource _xmlStreamSource;

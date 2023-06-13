@@ -167,8 +167,8 @@ public class NestedResource {
 		 * @review
 		 */
 		public static ResponseFunctionStep params(List<String> params) {
-			return responseFunction ->
-				allowedMethodsFunction -> () -> new NestedResource(
+			return responseFunction -> allowedMethodsFunction -> () ->
+				new NestedResource(
 					responseFunction, allowedMethodsFunction, params);
 		}
 

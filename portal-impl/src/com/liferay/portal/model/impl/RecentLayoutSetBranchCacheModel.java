@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.RecentLayoutSetBranch;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -31,12 +32,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing RecentLayoutSetBranch in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see RecentLayoutSetBranch
  * @generated
  */
 @ProviderType
-public class RecentLayoutSetBranchCacheModel
-	implements CacheModel<RecentLayoutSetBranch>, Externalizable, MVCCModel {
-
+public class RecentLayoutSetBranchCacheModel implements CacheModel<RecentLayoutSetBranch>,
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -47,13 +48,10 @@ public class RecentLayoutSetBranchCacheModel
 			return false;
 		}
 
-		RecentLayoutSetBranchCacheModel recentLayoutSetBranchCacheModel =
-			(RecentLayoutSetBranchCacheModel)obj;
+		RecentLayoutSetBranchCacheModel recentLayoutSetBranchCacheModel = (RecentLayoutSetBranchCacheModel)obj;
 
-		if ((recentLayoutSetBranchId ==
-				recentLayoutSetBranchCacheModel.recentLayoutSetBranchId) &&
-			(mvccVersion == recentLayoutSetBranchCacheModel.mvccVersion)) {
-
+		if ((recentLayoutSetBranchId == recentLayoutSetBranchCacheModel.recentLayoutSetBranchId) &&
+				(mvccVersion == recentLayoutSetBranchCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -102,12 +100,10 @@ public class RecentLayoutSetBranchCacheModel
 
 	@Override
 	public RecentLayoutSetBranch toEntityModel() {
-		RecentLayoutSetBranchImpl recentLayoutSetBranchImpl =
-			new RecentLayoutSetBranchImpl();
+		RecentLayoutSetBranchImpl recentLayoutSetBranchImpl = new RecentLayoutSetBranchImpl();
 
 		recentLayoutSetBranchImpl.setMvccVersion(mvccVersion);
-		recentLayoutSetBranchImpl.setRecentLayoutSetBranchId(
-			recentLayoutSetBranchId);
+		recentLayoutSetBranchImpl.setRecentLayoutSetBranchId(recentLayoutSetBranchId);
 		recentLayoutSetBranchImpl.setGroupId(groupId);
 		recentLayoutSetBranchImpl.setCompanyId(companyId);
 		recentLayoutSetBranchImpl.setUserId(userId);
@@ -137,7 +133,8 @@ public class RecentLayoutSetBranchCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(recentLayoutSetBranchId);
@@ -160,5 +157,4 @@ public class RecentLayoutSetBranchCacheModel
 	public long userId;
 	public long layoutSetBranchId;
 	public long layoutSetId;
-
 }

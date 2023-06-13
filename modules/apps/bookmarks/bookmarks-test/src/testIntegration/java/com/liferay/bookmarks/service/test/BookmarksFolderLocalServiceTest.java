@@ -20,7 +20,7 @@ import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.bookmarks.service.BookmarksFolderLocalServiceUtil;
-import com.liferay.bookmarks.test.util.BookmarksTestUtil;
+import com.liferay.bookmarks.util.test.BookmarksTestUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
@@ -48,7 +48,6 @@ import com.liferay.subscription.model.Subscription;
 import com.liferay.subscription.service.SubscriptionLocalServiceUtil;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -196,8 +195,7 @@ public class BookmarksFolderLocalServiceTest {
 				TestPropsValues.getUserId(), BookmarksFolder.class.getName());
 
 		for (Subscription subscription : subscriptions) {
-			if (Objects.equals(
-					subscription.getClassName(),
+			if (subscription.getClassName().equals(
 					BookmarksFolder.class.getName()) &&
 				(subscription.getClassPK() == expectedSubscriptionClassPK)) {
 
@@ -236,8 +234,7 @@ public class BookmarksFolderLocalServiceTest {
 		for (Subscription subscription : subscriptions) {
 			Assert.assertFalse(
 				"Subscription exists",
-				Objects.equals(
-					subscription.getClassName(),
+				subscription.getClassName().equals(
 					BookmarksFolder.class.getName()) &&
 				(subscription.getClassPK() == expectedSubscriptionClassPK));
 		}

@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @author Alexander Chow
  */
-public interface RepositoryModel<T> extends Serializable, StagedGroupedModel {
+public interface RepositoryModel<T> extends StagedGroupedModel, Serializable {
 
 	public void execute(RepositoryModelOperation repositoryModelOperation)
 		throws PortalException;

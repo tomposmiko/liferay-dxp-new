@@ -55,9 +55,7 @@ public class FIFOWelderTest {
 		File[] files = tempFolder.listFiles();
 
 		for (File file : files) {
-			String fileName = file.getName();
-
-			if (file.isFile() && fileName.startsWith("FIFO-")) {
+			if (file.isFile() && file.getName().startsWith("FIFO-")) {
 				file.delete();
 			}
 		}

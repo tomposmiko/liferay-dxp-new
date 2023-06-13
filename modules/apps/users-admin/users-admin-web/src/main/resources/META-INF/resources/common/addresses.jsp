@@ -17,152 +17,109 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String className = (String)request.getAttribute("addresses.className");
-long classPK = (Long)request.getAttribute("addresses.classPK");
+String className = (String)request.getAttribute("contact_information.jsp-className");
+long classPK = (long)request.getAttribute("contact_information.jsp-classPK");
 
-List<Address> addresses = Collections.emptyList();
+String emptyResultsMessage = ParamUtil.getString(request, "emptyResultsMessage");
 
-int[] addressesIndexes = null;
-
-String addressesIndexesParam = ParamUtil.getString(request, "addressesIndexes");
-
-if (Validator.isNotNull(addressesIndexesParam)) {
-	addresses = new ArrayList<Address>();
-
-	addressesIndexes = StringUtil.split(addressesIndexesParam, 0);
-
-	for (int addressesIndex : addressesIndexes) {
-		addresses.add(new AddressImpl());
-	}
-}
-else {
-	if (classPK > 0) {
-		addresses = AddressServiceUtil.getAddresses(className, classPK);
-
-		addressesIndexes = new int[addresses.size()];
-
-		for (int i = 0; i < addresses.size(); i++) {
-			addressesIndexes[i] = i;
-		}
-	}
-
-	if (addresses.isEmpty()) {
-		addresses = new ArrayList<Address>();
-
-		addresses.add(new AddressImpl());
-
-		addressesIndexes = new int[] {0};
-	}
-
-	if (addressesIndexes == null) {
-		addressesIndexes = new int[0];
-	}
-}
+List<Address> addresses = AddressServiceUtil.getAddresses(className, classPK);
 %>
 
-<liferay-ui:error-marker
-	key="<%= WebKeys.ERROR_SECTION %>"
-	value="addresses"
-/>
+<div class="sheet-header">
+	<h2 class="autofit-row sheet-title">
+		<span class="autofit-col autofit-col-expand">
+			<span class="heading-text"><liferay-ui:message key="addresses" /></span>
+		</span>
+		<span class="autofit-col">
+			<span class="heading-end">
 
-<div class="alert alert-info">
-	<liferay-ui:message key="street-1-and-city-are-required-fields.-postal-code-could-be-required-in-some-countries" />
+				<%
+				PortletURL editURL = liferayPortletResponse.createRenderURL();
+
+				editURL.setParameter("mvcPath", "/common/edit_address.jsp");
+				editURL.setParameter("redirect", currentURL);
+				editURL.setParameter("className", className);
+				editURL.setParameter("classPK", String.valueOf(classPK));
+				%>
+
+				<liferay-ui:icon
+					label="<%= true %>"
+					linkCssClass="add-address-link btn btn-secondary btn-sm"
+					message="add"
+					url="<%= editURL.toString() %>"
+				/>
+			</span>
+		</span>
+	</h2>
 </div>
 
-<liferay-ui:error exception="<%= AddressCityException.class %>" message="please-enter-a-valid-city" />
-<liferay-ui:error exception="<%= AddressStreetException.class %>" message="please-enter-a-valid-street" />
-<liferay-ui:error exception="<%= AddressZipException.class %>" message="please-enter-a-valid-postal-code" />
-<liferay-ui:error exception="<%= NoSuchCountryException.class %>" message="please-select-a-country" />
-<liferay-ui:error key="<%= NoSuchListTypeException.class.getName() + className + ListTypeConstants.ADDRESS %>" message="please-select-a-type" />
-<liferay-ui:error exception="<%= NoSuchRegionException.class %>" message="please-select-a-region" />
+<c:if test="<%= addresses.isEmpty() %>">
+	<div class="contact-information-empty-results-message-wrapper">
+		<liferay-ui:empty-result-message
+			message="<%= emptyResultsMessage %>"
+		/>
+	</div>
+</c:if>
 
-<aui:fieldset cssClass="addresses" id='<%= renderResponse.getNamespace() + "addresses" %>'>
+<div
+	class="<%=
+		CSSClassNames.builder(
+			"addresses-table-wrapper", "table-responsive"
+		).add(
+			"hide", addresses.isEmpty()
+		).build()
+	%>"
+>
+	<table class="table table-autofit">
+		<tbody>
 
-	<%
-	for (int i = 0; i < addressesIndexes.length; i++) {
-		int addressesIndex = addressesIndexes[i];
+			<%
+			for (Address address : addresses) {
+			%>
 
-		Address address = addresses.get(i);
+				<tr>
+					<td>
+						<div class="sticker sticker-secondary sticker-static">
+							<aui:icon image="picture" markupView="lexicon" />
+						</div>
+					</td>
+					<td class="table-cell-expand">
+						<h4>
 
-		long countryId = ParamUtil.getLong(request, "addressCountryId" + addressesIndex, address.getCountryId());
-		long regionId = ParamUtil.getLong(request, "addressRegionId" + addressesIndex, address.getRegionId());
-	%>
+							<%
+							ListType listType = address.getType();
+							%>
 
-		<aui:model-context bean="<%= address %>" model="<%= Address.class %>" />
+							<liferay-ui:message key="<%= listType.getName() %>" />
+						</h4>
 
-		<div class="lfr-form-row">
-			<div class="row-fields">
-				<%@ include file="/common/addresses_address.jspf" %>
-			</div>
-		</div>
+						<div class="address-display-wrapper">
+							<liferay-text-localizer:address-display
+								address="<%= address %>"
+							/>
+						</div>
 
-		<aui:script use="liferay-address,liferay-dynamic-select">
-			new Liferay.DynamicSelect(
-				[
-					{
-						select: '<portlet:namespace />addressCountryId<%= addressesIndex %>',
-						selectData: Liferay.Address.getCountries,
-						selectDesc: 'nameCurrentValue',
-						selectId: 'countryId',
-						selectSort: '<%= true %>',
-						selectVal: '<%= countryId %>'
-					},
-					{
-						select: '<portlet:namespace />addressRegionId<%= addressesIndex %>',
-						selectData: Liferay.Address.getRegions,
-						selectDesc: 'name',
-						selectId: 'regionId',
-						selectVal: '<%= regionId %>'
-					}
-				]
-			);
-		</aui:script>
+						<c:if test="<%= address.isPrimary() %>">
+							<div>
+								<span class="label label-primary">
+									<span class="label-item label-item-expand"><%= StringUtil.toUpperCase(LanguageUtil.get(request, "primary"), locale) %></span>
+								</span>
+							</div>
+						</c:if>
+					</td>
+					<td>
+						<span class="autofit-col lfr-search-container-wrapper">
+							<liferay-util:include page="/common/address_action.jsp" servletContext="<%= application %>">
+								<liferay-util:param name="addressId" value="<%= String.valueOf(address.getAddressId()) %>" />
+							</liferay-util:include>
+						</span>
+					</td>
+				</tr>
 
-	<%
-	}
-	%>
-
-	<aui:input name="addressesIndexes" type="hidden" value="<%= StringUtil.merge(addressesIndexes) %>" />
-</aui:fieldset>
-
-<aui:script use="liferay-address,liferay-auto-fields,liferay-dynamic-select">
-	new Liferay.AutoFields(
-		{
-			contentBox: '#<portlet:namespace />addresses',
-			fieldIndexes: '<portlet:namespace />addressesIndexes',
-			namespace: '<portlet:namespace />',
-			on: {
-				'clone': function(event) {
-					var guid = event.guid - 1;
-					var row = event.row;
-
-					var dynamicSelects = row.one('select[data-componentType=dynamic_select]');
-
-					if (dynamicSelects) {
-						dynamicSelects.detach('change');
-					}
-
-					new Liferay.DynamicSelect(
-						[
-							{
-								select: '<portlet:namespace />addressCountryId' + guid,
-								selectData: Liferay.Address.getCountries,
-								selectDesc: 'nameCurrentValue',
-								selectId: 'countryId',
-								selectSort: '<%= true %>',
-								selectVal: '0'
-							},
-							{
-								select: '<portlet:namespace />addressRegionId' + guid,
-								selectData: Liferay.Address.getRegions,
-								selectDesc: 'name',
-								selectId: 'regionId',
-								selectVal: '0'
-							}
-						]
-					);
-				}
+			<%
 			}
-		}
-	).render();
-</aui:script>
+			%>
+
+		</tbody>
+	</table>
+</div>

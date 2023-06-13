@@ -138,12 +138,7 @@ name = HtmlUtil.escapeJS(name);
 		getText: function() {
 			var value;
 
-			var textArea = document.getElementById('<%= name %>');
-
-			if (textArea.nodeName.toLowerCase() === 'textarea' && textArea.value) {
-				value = textArea.value;
-			}
-			else if (window['<%= name %>'].instanceReady) {
+			if (window['<%= name %>'].instanceReady) {
 				value = document.getElementById('<%= name %>').value;
 			}
 			else {
@@ -155,12 +150,7 @@ name = HtmlUtil.escapeJS(name);
 
 		initEditor: function() {
 			<c:if test="<%= (contents == null) && Validator.isNotNull(initMethod) %>">
-
-				var initEditorFunction = window['<%= HtmlUtil.escapeJS(namespace + initMethod) %>'];
-
-				if (typeof initEditorFunction === 'function') {
-					<%= name %>.setHTML(initEditorFunction());
-				}
+				<%= name %>.setHTML(<%= HtmlUtil.escapeJS(namespace + initMethod) %>());
 			</c:if>
 
 			<c:if test="<%= Validator.isNotNull(onChangeMethod) %>">

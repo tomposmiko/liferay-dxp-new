@@ -26,6 +26,7 @@ taglib uri="http://liferay.com/tld/expando" prefix="liferay-expando" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
+taglib uri="http://liferay.com/tld/site-navigation" prefix="liferay-site-navigation" %><%@
 taglib uri="http://liferay.com/tld/soy" prefix="soy" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
@@ -45,11 +46,13 @@ page import="com.liferay.layout.admin.web.internal.display.context.LayoutPageTem
 page import="com.liferay.layout.admin.web.internal.display.context.LayoutPageTemplateDisplayContext" %><%@
 page import="com.liferay.layout.admin.web.internal.display.context.LayoutPrototypeDisplayContext" %><%@
 page import="com.liferay.layout.admin.web.internal.display.context.LayoutsAdminDisplayContext" %><%@
+page import="com.liferay.layout.admin.web.internal.display.context.LayoutsAdminManagementToolbarDisplayContext" %><%@
 page import="com.liferay.layout.admin.web.internal.display.context.OrphanPortletsDisplayContext" %><%@
 page import="com.liferay.layout.admin.web.internal.display.context.SelectLayoutPageTemplateEntryDisplayContext" %><%@
 page import="com.liferay.layout.admin.web.internal.display.context.SelectThemeDisplayContext" %><%@
 page import="com.liferay.layout.admin.web.internal.security.permission.resource.LayoutPageTemplateCollectionPermission" %><%@
 page import="com.liferay.layout.admin.web.internal.security.permission.resource.LayoutPageTemplateEntryPermission" %><%@
+page import="com.liferay.layout.constants.LayoutConstants" %><%@
 page import="com.liferay.layout.page.template.constants.LayoutPageTemplateActionKeys" %><%@
 page import="com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants" %><%@
 page import="com.liferay.layout.page.template.exception.DuplicateLayoutPageTemplateCollectionException" %><%@
@@ -61,6 +64,7 @@ page import="com.liferay.layout.page.template.service.LayoutPageTemplateCollecti
 page import="com.liferay.layout.page.template.service.LayoutPageTemplateCollectionServiceUtil" %><%@
 page import="com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil" %><%@
 page import="com.liferay.layouts.admin.kernel.model.LayoutTypePortletConstants" %><%@
+page import="com.liferay.petra.string.StringBundler" %><%@
 page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker" %><%@
@@ -80,6 +84,8 @@ page import="com.liferay.portal.kernel.exception.RequiredLayoutPrototypeExceptio
 page import="com.liferay.portal.kernel.exception.SitemapChangeFrequencyException" %><%@
 page import="com.liferay.portal.kernel.exception.SitemapIncludeException" %><%@
 page import="com.liferay.portal.kernel.exception.SitemapPagePriorityException" %><%@
+page import="com.liferay.portal.kernel.json.JSONFactoryUtil" %><%@
+page import="com.liferay.portal.kernel.json.JSONSerializer" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
 page import="com.liferay.portal.kernel.layoutconfiguration.util.RuntimePageUtil" %><%@
@@ -89,7 +95,6 @@ page import="com.liferay.portal.kernel.model.GroupConstants" %><%@
 page import="com.liferay.portal.kernel.model.Layout" %><%@
 page import="com.liferay.portal.kernel.model.LayoutBranch" %><%@
 page import="com.liferay.portal.kernel.model.LayoutBranchConstants" %><%@
-page import="com.liferay.portal.kernel.model.LayoutConstants" %><%@
 page import="com.liferay.portal.kernel.model.LayoutPrototype" %><%@
 page import="com.liferay.portal.kernel.model.LayoutRevision" %><%@
 page import="com.liferay.portal.kernel.model.LayoutSet" %><%@
@@ -154,13 +159,11 @@ page import="com.liferay.sites.kernel.util.SitesUtil" %>
 
 <%@ page import="java.util.Date" %><%@
 page import="java.util.HashMap" %><%@
-page import="java.util.HashSet" %><%@
 page import="java.util.List" %><%@
 page import="java.util.Locale" %><%@
 page import="java.util.Map" %><%@
 page import="java.util.Objects" %><%@
-page import="java.util.ResourceBundle" %><%@
-page import="java.util.Set" %>
+page import="java.util.ResourceBundle" %>
 
 <%@ page import="javax.portlet.PortletRequest" %><%@
 page import="javax.portlet.PortletURL" %><%@

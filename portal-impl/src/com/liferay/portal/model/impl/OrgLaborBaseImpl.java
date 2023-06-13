@@ -32,13 +32,12 @@ import com.liferay.portal.kernel.service.OrgLaborLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class OrgLaborBaseImpl
-	extends OrgLaborModelImpl implements OrgLabor {
-
+public abstract class OrgLaborBaseImpl extends OrgLaborModelImpl
+	implements OrgLabor {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a org labor model instance should use the <code>OrgLabor</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a org labor model instance should use the {@link OrgLabor} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class OrgLaborBaseImpl
 			OrgLaborLocalServiceUtil.updateOrgLabor(this);
 		}
 	}
-
 }

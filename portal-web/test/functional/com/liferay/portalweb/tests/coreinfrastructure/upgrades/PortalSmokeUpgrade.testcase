@@ -14,18 +14,6 @@ definition {
 	}
 
 	@priority = "5"
-	test ViewPortalSmokeArchive6130 {
-		property data.archive.type = "data-archive-portal";
-		property portal.upgrades = "true";
-		property portal.version = "6.1.30";
-		property test.assert.warning.exceptions = "true";
-
-		Upgrade.viewUpgrade();
-
-		Upgrade.searchForAssetsAfterUpgrade();
-	}
-
-	@priority = "5"
 	test ViewPortalSmokeArchive621015 {
 		property data.archive.type = "data-archive-portal";
 		property portal.upgrades = "true";
@@ -81,19 +69,6 @@ definition {
 		property portal.upgrades = "true";
 		property portal.version = "7.0.4";
 		property test.assert.warning.exceptions = "true";
-
-		Upgrade.viewUpgrade();
-
-		Upgrade.searchForAssetsAfterUpgrade();
-	}
-
-	@priority = "5"
-	test ViewPortalSmokeArchive7110 {
-		property data.archive.type = "data-archive-portal";
-		property portal.upgrades = "true";
-		property portal.version = "7.1.10";
-		property test.assert.warning.exceptions = "true";
-		property test.run.environment = "EE";
 
 		Upgrade.viewUpgrade();
 

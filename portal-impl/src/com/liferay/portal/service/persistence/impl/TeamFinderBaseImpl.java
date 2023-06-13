@@ -21,10 +21,6 @@ import com.liferay.portal.kernel.model.Team;
 import com.liferay.portal.kernel.service.persistence.TeamPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 
-import java.lang.reflect.Field;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,27 +28,8 @@ import java.util.Set;
  * @generated
  */
 public class TeamFinderBaseImpl extends BasePersistenceImpl<Team> {
-
 	public TeamFinderBaseImpl() {
 		setModelClass(Team.class);
-
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("uuid", "uuid_");
-
-		try {
-			Field field = BasePersistenceImpl.class.getDeclaredField(
-				"_dbColumnNames");
-
-			field.setAccessible(true);
-
-			field.set(this, dbColumnNames);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
 	}
 
 	@Override
@@ -80,8 +57,5 @@ public class TeamFinderBaseImpl extends BasePersistenceImpl<Team> {
 
 	@BeanReference(type = TeamPersistence.class)
 	protected TeamPersistence teamPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		TeamFinderBaseImpl.class);
-
+	private static final Log _log = LogFactoryUtil.getLog(TeamFinderBaseImpl.class);
 }

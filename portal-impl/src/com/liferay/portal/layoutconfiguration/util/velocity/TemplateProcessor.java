@@ -15,15 +15,12 @@
 package com.liferay.portal.layoutconfiguration.util.velocity;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.petra.xml.XMLUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletContainerUtil;
 import com.liferay.portal.kernel.portlet.PortletJSONUtil;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
@@ -35,14 +32,12 @@ import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.layoutconfiguration.util.PortletRenderer;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -191,128 +186,16 @@ public class TemplateProcessor implements ColumnProcessor {
 
 	@Override
 	public String processPortlet(String portletId) throws Exception {
-		return processPortlet(portletId, (Map<String, ?>)null);
-	}
-
-	@Override
-	public String processPortlet(
-			String portletId, Map<String, ?> defaultSettingsMap)
-		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		Layout layout = themeDisplay.getLayout();
-
-		Portlet portlet = PortletLocalServiceUtil.getPortletById(
-			themeDisplay.getCompanyId(), portletId);
-
-		if (layout.isTypePortlet()) {
-			LayoutTypePortlet layoutTypePortlet =
-				(LayoutTypePortlet)layout.getLayoutType();
-
-			if (!layoutTypePortlet.hasPortletId(portletId, true) &&
-				!layout.isPortletEmbedded(portletId, layout.getGroupId())) {
-
-				String defaultPreferences = portlet.getDefaultPreferences();
-
-				Settings currentSettings = SettingsFactoryUtil.getSettings(
-					new PortletInstanceSettingsLocator(layout, portletId));
-
-				ModifiableSettings currentModifiableSettings =
-					currentSettings.getModifiableSettings();
-
-				Collection<String> currentModifiableSettingsKeys =
-					currentModifiableSettings.getModifiedKeys();
-
-				if (!currentModifiableSettingsKeys.isEmpty()) {
-					StringBundler sb = new StringBundler();
-
-					sb.append("<portlet-preferences>");
-
-					for (String key : currentModifiableSettingsKeys) {
-						String[] values = currentModifiableSettings.getValues(
-							key, null);
-
-						if (values == null) {
-							continue;
-						}
-
-						sb.append("<preference><name>");
-						sb.append(key);
-						sb.append("</name>");
-
-						for (String value : values) {
-							sb.append("<value>");
-							sb.append(XMLUtil.toCompactSafe(value));
-							sb.append("</value>");
-						}
-
-						sb.append("</preference>");
-					}
-
-					sb.append("</portlet-preferences>");
-
-					defaultPreferences = sb.toString();
-				}
-
-				PortletPreferencesFactoryUtil.getLayoutPortletSetup(
-					layout.getCompanyId(), layout.getGroupId(),
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-					PortletKeys.PREFS_PLID_SHARED, portletId,
-					defaultPreferences);
-			}
-		}
-
-		if (defaultSettingsMap != null) {
-			Settings settings = SettingsFactoryUtil.getSettings(
-				new PortletInstanceSettingsLocator(layout, portletId));
-
-			ModifiableSettings modifiableSettings =
-				settings.getModifiableSettings();
-
-			boolean modified = false;
-
-			for (Map.Entry<String, ?> entry : defaultSettingsMap.entrySet()) {
-				String key = entry.getKey();
-				Object value = entry.getValue();
-
-				if (value instanceof String) {
-					Object storedValue = modifiableSettings.getValue(key, null);
-
-					if (storedValue == null) {
-						modifiableSettings.setValue(key, (String)value);
-
-						modified = true;
-					}
-				}
-				else if (value instanceof String[]) {
-					Object[] storedValues = modifiableSettings.getValues(
-						key, null);
-
-					if (storedValues == null) {
-						modifiableSettings.setValues(key, (String[])value);
-
-						modified = true;
-					}
-				}
-				else {
-					throw new IllegalArgumentException(
-						StringBundler.concat(
-							"Key ", key, " has unsupported value of type ",
-							ClassUtil.getClassName(value.getClass())));
-				}
-			}
-
-			if (modified) {
-				modifiableSettings.store();
-			}
-		}
-
 		_request.setAttribute(WebKeys.RENDER_PORTLET_RESOURCE, Boolean.TRUE);
 
 		BufferCacheServletResponse bufferCacheServletResponse =
 			new BufferCacheServletResponse(_response);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Portlet portlet = PortletLocalServiceUtil.getPortletById(
+			themeDisplay.getCompanyId(), portletId);
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -336,6 +219,60 @@ public class TemplateProcessor implements ColumnProcessor {
 		finally {
 			_request.removeAttribute(WebKeys.RENDER_PORTLET_RESOURCE);
 		}
+	}
+
+	@Override
+	public String processPortlet(
+			String portletId, Map<String, ?> defaultSettingsMap)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Settings settings = SettingsFactoryUtil.getSettings(
+			new PortletInstanceSettingsLocator(
+				themeDisplay.getLayout(), portletId));
+
+		ModifiableSettings modifiableSettings =
+			settings.getModifiableSettings();
+
+		boolean modified = false;
+
+		for (Map.Entry<String, ?> entry : defaultSettingsMap.entrySet()) {
+			String key = entry.getKey();
+			Object value = entry.getValue();
+
+			if (value instanceof String) {
+				Object storedValue = modifiableSettings.getValue(key, null);
+
+				if (storedValue == null) {
+					modifiableSettings.setValue(key, (String)value);
+
+					modified = true;
+				}
+			}
+			else if (value instanceof String[]) {
+				Object[] storedValues = modifiableSettings.getValues(key, null);
+
+				if (storedValues == null) {
+					modifiableSettings.setValues(key, (String[])value);
+
+					modified = true;
+				}
+			}
+			else {
+				throw new IllegalArgumentException(
+					StringBundler.concat(
+						"Key ", key, " has unsupported value of type ",
+						ClassUtil.getClassName(value.getClass())));
+			}
+		}
+
+		if (modified) {
+			modifiableSettings.store();
+		}
+
+		return processPortlet(portletId);
 	}
 
 	@Override

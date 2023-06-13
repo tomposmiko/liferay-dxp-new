@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.LocaleUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,11 +44,11 @@ public class JournalArticleFixture {
 
 		Map<Locale, String> titleMap = new HashMap<>();
 
-		titleMap.put(LocaleUtil.US, RandomTestUtil.randomString());
+		titleMap.put(Locale.US, RandomTestUtil.randomString());
 
 		Map<Locale, String> descriptionMap = new HashMap<>();
 
-		descriptionMap.put(LocaleUtil.US, RandomTestUtil.randomString());
+		descriptionMap.put(Locale.US, RandomTestUtil.randomString());
 
 		String ddmStructureKey = "BASIC-WEB-CONTENT";
 		String ddmTemplateKey = "BASIC-WEB-CONTENT";

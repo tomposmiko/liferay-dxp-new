@@ -55,7 +55,10 @@ public class ElasticsearchConfigurationTest {
 
 		properties.load(clazz.getResourceAsStream(fileName));
 
-		return PropertiesUtil.toMap(properties);
+		Map<String, Object> elasticsearchConfigurationProperties =
+			PropertiesUtil.toMap(properties);
+
+		return elasticsearchConfigurationProperties;
 	}
 
 }

@@ -134,7 +134,7 @@ public class SoyTemplateResourcesCollector {
 		}
 
 		Enumeration<URL> urls = bundle.findEntries(
-			templatePath, _SOY_FILE_EXTENSION, true);
+			"META-INF/resources" + templatePath, _SOY_FILE_EXTENSION, true);
 
 		if (urls == null) {
 			return Collections.emptyList();

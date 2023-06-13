@@ -445,7 +445,10 @@ public class CentralizedThreadLocalTest {
 		CentralizedThreadLocal<String> centralizedThreadLocal =
 			new CentralizedThreadLocal<>(false);
 
-		FutureTask<?> poisonFutureTask = new FutureTask<>(() -> null);
+		FutureTask<?> poisonFutureTask = new FutureTask<>(
+			() -> {
+				return null;
+			});
 
 		BlockingQueue<FutureTask<?>> blockingQueue = new SynchronousQueue<>();
 

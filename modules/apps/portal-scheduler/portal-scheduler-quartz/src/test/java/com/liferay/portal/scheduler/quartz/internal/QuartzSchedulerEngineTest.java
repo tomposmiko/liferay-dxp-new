@@ -52,7 +52,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -842,7 +841,7 @@ public class QuartzSchedulerEngineTest {
 			Set<JobKey> jobKeys = new HashSet<>();
 
 			for (JobKey jobKey : _jobs.keySet()) {
-				if (Objects.equals(jobKey.getGroup(), groupName)) {
+				if (jobKey.getGroup().equals(groupName)) {
 					jobKeys.add(jobKey);
 				}
 			}
@@ -966,7 +965,7 @@ public class QuartzSchedulerEngineTest {
 			String groupName = groupMatcher.getCompareToValue();
 
 			for (JobKey jobKey : _jobs.keySet()) {
-				if (Objects.equals(jobKey.getGroup(), groupName)) {
+				if (jobKey.getGroup().equals(groupName)) {
 					pauseJob(jobKey);
 				}
 			}
@@ -1024,7 +1023,7 @@ public class QuartzSchedulerEngineTest {
 			String groupName = groupMatcher.getCompareToValue();
 
 			for (JobKey jobKey : _jobs.keySet()) {
-				if (Objects.equals(jobKey.getGroup(), groupName)) {
+				if (jobKey.getGroup().equals(groupName)) {
 					resumeJob(jobKey);
 				}
 			}

@@ -16,9 +16,10 @@ package com.liferay.portal.workflow.kaleo.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.workflow.kaleo.model.KaleoTransition;
 
 import java.io.Externalizable;
@@ -32,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing KaleoTransition in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see KaleoTransition
  * @generated
  */
 @ProviderType
-public class KaleoTransitionCacheModel
-	implements CacheModel<KaleoTransition>, Externalizable {
-
+public class KaleoTransitionCacheModel implements CacheModel<KaleoTransition>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,8 +49,7 @@ public class KaleoTransitionCacheModel
 			return false;
 		}
 
-		KaleoTransitionCacheModel kaleoTransitionCacheModel =
-			(KaleoTransitionCacheModel)obj;
+		KaleoTransitionCacheModel kaleoTransitionCacheModel = (KaleoTransitionCacheModel)obj;
 
 		if (kaleoTransitionId == kaleoTransitionCacheModel.kaleoTransitionId) {
 			return true;
@@ -134,8 +134,7 @@ public class KaleoTransitionCacheModel
 			kaleoTransitionImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		kaleoTransitionImpl.setKaleoDefinitionVersionId(
-			kaleoDefinitionVersionId);
+		kaleoTransitionImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		kaleoTransitionImpl.setKaleoNodeId(kaleoNodeId);
 
 		if (name == null) {
@@ -206,7 +205,8 @@ public class KaleoTransitionCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(kaleoTransitionId);
 
 		objectOutput.writeLong(groupId);
@@ -280,5 +280,4 @@ public class KaleoTransitionCacheModel
 	public long targetKaleoNodeId;
 	public String targetKaleoNodeName;
 	public boolean defaultTransition;
-
 }

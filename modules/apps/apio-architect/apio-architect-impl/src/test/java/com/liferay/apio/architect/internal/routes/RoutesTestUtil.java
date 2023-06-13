@@ -94,9 +94,8 @@ public class RoutesTestUtil {
 	 *
 	 * @review
 	 */
-	public static final Supplier<Form.Builder> FORM_BUILDER_SUPPLIER =
-		() -> new FormImpl.BuilderImpl<>(
-			__ -> null, __ -> Optional.of("custom"));
+	public static final Supplier<Form.Builder> FORM_BUILDER_SUPPLIER = () ->
+		new FormImpl.BuilderImpl<>(__ -> null, __ -> Optional.of("custom"));
 
 	/**
 	 * A mock {@link CustomRoute} with name {@code read} and method {@code GET}.

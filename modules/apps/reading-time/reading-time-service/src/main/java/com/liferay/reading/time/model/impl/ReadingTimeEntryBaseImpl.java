@@ -32,13 +32,12 @@ import com.liferay.reading.time.service.ReadingTimeEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class ReadingTimeEntryBaseImpl
-	extends ReadingTimeEntryModelImpl implements ReadingTimeEntry {
-
+public abstract class ReadingTimeEntryBaseImpl extends ReadingTimeEntryModelImpl
+	implements ReadingTimeEntry {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a reading time entry model instance should use the <code>ReadingTimeEntry</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a reading time entry model instance should use the {@link ReadingTimeEntry} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class ReadingTimeEntryBaseImpl
 			ReadingTimeEntryLocalServiceUtil.updateReadingTimeEntry(this);
 		}
 	}
-
 }

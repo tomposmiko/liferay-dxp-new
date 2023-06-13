@@ -272,7 +272,10 @@ public class ComboServletTest extends PowerMockito {
 	}
 
 	protected ServletConfig getServletConfig() {
-		return new MockServletConfig(_portalServletContext);
+		ServletConfig servletConfig = new MockServletConfig(
+			_portalServletContext);
+
+		return servletConfig;
 	}
 
 	protected void setUpComboServlet() throws ServletException {

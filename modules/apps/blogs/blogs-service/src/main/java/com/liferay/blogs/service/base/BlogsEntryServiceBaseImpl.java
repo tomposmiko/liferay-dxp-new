@@ -16,13 +16,16 @@ package com.liferay.blogs.service.base;
 
 import com.liferay.asset.kernel.service.persistence.AssetEntryPersistence;
 import com.liferay.asset.kernel.service.persistence.AssetLinkPersistence;
+
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryService;
 import com.liferay.blogs.service.persistence.BlogsEntryFinder;
 import com.liferay.blogs.service.persistence.BlogsEntryPersistence;
 import com.liferay.blogs.service.persistence.BlogsStatsUserFinder;
 import com.liferay.blogs.service.persistence.BlogsStatsUserPersistence;
+
 import com.liferay.expando.kernel.service.persistence.ExpandoRowPersistence;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -39,6 +42,7 @@ import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.service.persistence.WorkflowInstanceLinkPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+
 import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
 
 import javax.sql.DataSource;
@@ -52,16 +56,15 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.blogs.service.impl.BlogsEntryServiceImpl
+ * @see com.liferay.blogs.service.BlogsEntryServiceUtil
  * @generated
  */
-public abstract class BlogsEntryServiceBaseImpl
-	extends BaseServiceImpl
+public abstract class BlogsEntryServiceBaseImpl extends BaseServiceImpl
 	implements BlogsEntryService, IdentifiableOSGiService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>BlogsEntryService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.blogs.service.BlogsEntryServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.blogs.service.BlogsEntryServiceUtil} to access the blogs entry remote service.
 	 */
 
 	/**
@@ -69,9 +72,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the blogs entry local service
 	 */
-	public com.liferay.blogs.service.BlogsEntryLocalService
-		getBlogsEntryLocalService() {
-
+	public com.liferay.blogs.service.BlogsEntryLocalService getBlogsEntryLocalService() {
 		return blogsEntryLocalService;
 	}
 
@@ -81,9 +82,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param blogsEntryLocalService the blogs entry local service
 	 */
 	public void setBlogsEntryLocalService(
-		com.liferay.blogs.service.BlogsEntryLocalService
-			blogsEntryLocalService) {
-
+		com.liferay.blogs.service.BlogsEntryLocalService blogsEntryLocalService) {
 		this.blogsEntryLocalService = blogsEntryLocalService;
 	}
 
@@ -121,7 +120,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setBlogsEntryPersistence(
 		BlogsEntryPersistence blogsEntryPersistence) {
-
 		this.blogsEntryPersistence = blogsEntryPersistence;
 	}
 
@@ -148,9 +146,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -160,9 +156,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -171,9 +165,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the company local service
 	 */
-	public com.liferay.portal.kernel.service.CompanyLocalService
-		getCompanyLocalService() {
-
+	public com.liferay.portal.kernel.service.CompanyLocalService getCompanyLocalService() {
 		return companyLocalService;
 	}
 
@@ -183,9 +175,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param companyLocalService the company local service
 	 */
 	public void setCompanyLocalService(
-		com.liferay.portal.kernel.service.CompanyLocalService
-			companyLocalService) {
-
+		com.liferay.portal.kernel.service.CompanyLocalService companyLocalService) {
 		this.companyLocalService = companyLocalService;
 	}
 
@@ -194,9 +184,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the company remote service
 	 */
-	public com.liferay.portal.kernel.service.CompanyService
-		getCompanyService() {
-
+	public com.liferay.portal.kernel.service.CompanyService getCompanyService() {
 		return companyService;
 	}
 
@@ -207,7 +195,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setCompanyService(
 		com.liferay.portal.kernel.service.CompanyService companyService) {
-
 		this.companyService = companyService;
 	}
 
@@ -234,9 +221,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the group local service
 	 */
-	public com.liferay.portal.kernel.service.GroupLocalService
-		getGroupLocalService() {
-
+	public com.liferay.portal.kernel.service.GroupLocalService getGroupLocalService() {
 		return groupLocalService;
 	}
 
@@ -247,7 +232,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setGroupLocalService(
 		com.liferay.portal.kernel.service.GroupLocalService groupLocalService) {
-
 		this.groupLocalService = groupLocalService;
 	}
 
@@ -267,7 +251,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setGroupService(
 		com.liferay.portal.kernel.service.GroupService groupService) {
-
 		this.groupService = groupService;
 	}
 
@@ -294,9 +277,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the image local service
 	 */
-	public com.liferay.portal.kernel.service.ImageLocalService
-		getImageLocalService() {
-
+	public com.liferay.portal.kernel.service.ImageLocalService getImageLocalService() {
 		return imageLocalService;
 	}
 
@@ -307,7 +288,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setImageLocalService(
 		com.liferay.portal.kernel.service.ImageLocalService imageLocalService) {
-
 		this.imageLocalService = imageLocalService;
 	}
 
@@ -327,7 +307,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setImageService(
 		com.liferay.portal.kernel.service.ImageService imageService) {
-
 		this.imageService = imageService;
 	}
 
@@ -354,9 +333,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the organization local service
 	 */
-	public com.liferay.portal.kernel.service.OrganizationLocalService
-		getOrganizationLocalService() {
-
+	public com.liferay.portal.kernel.service.OrganizationLocalService getOrganizationLocalService() {
 		return organizationLocalService;
 	}
 
@@ -366,9 +343,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param organizationLocalService the organization local service
 	 */
 	public void setOrganizationLocalService(
-		com.liferay.portal.kernel.service.OrganizationLocalService
-			organizationLocalService) {
-
+		com.liferay.portal.kernel.service.OrganizationLocalService organizationLocalService) {
 		this.organizationLocalService = organizationLocalService;
 	}
 
@@ -377,9 +352,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the organization remote service
 	 */
-	public com.liferay.portal.kernel.service.OrganizationService
-		getOrganizationService() {
-
+	public com.liferay.portal.kernel.service.OrganizationService getOrganizationService() {
 		return organizationService;
 	}
 
@@ -389,9 +362,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param organizationService the organization remote service
 	 */
 	public void setOrganizationService(
-		com.liferay.portal.kernel.service.OrganizationService
-			organizationService) {
-
+		com.liferay.portal.kernel.service.OrganizationService organizationService) {
 		this.organizationService = organizationService;
 	}
 
@@ -411,7 +382,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setOrganizationPersistence(
 		OrganizationPersistence organizationPersistence) {
-
 		this.organizationPersistence = organizationPersistence;
 	}
 
@@ -420,9 +390,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService
-		getResourceLocalService() {
-
+	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
 		return resourceLocalService;
 	}
 
@@ -432,9 +400,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService
-			resourceLocalService) {
-
+		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -443,9 +409,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -456,7 +420,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -476,7 +439,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
-
 		this.userService = userService;
 	}
 
@@ -503,9 +465,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the workflow instance link local service
 	 */
-	public com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-		getWorkflowInstanceLinkLocalService() {
-
+	public com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService getWorkflowInstanceLinkLocalService() {
 		return workflowInstanceLinkLocalService;
 	}
 
@@ -515,11 +475,8 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param workflowInstanceLinkLocalService the workflow instance link local service
 	 */
 	public void setWorkflowInstanceLinkLocalService(
-		com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-			workflowInstanceLinkLocalService) {
-
-		this.workflowInstanceLinkLocalService =
-			workflowInstanceLinkLocalService;
+		com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService) {
+		this.workflowInstanceLinkLocalService = workflowInstanceLinkLocalService;
 	}
 
 	/**
@@ -527,9 +484,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the workflow instance link persistence
 	 */
-	public WorkflowInstanceLinkPersistence
-		getWorkflowInstanceLinkPersistence() {
-
+	public WorkflowInstanceLinkPersistence getWorkflowInstanceLinkPersistence() {
 		return workflowInstanceLinkPersistence;
 	}
 
@@ -540,7 +495,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setWorkflowInstanceLinkPersistence(
 		WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence) {
-
 		this.workflowInstanceLinkPersistence = workflowInstanceLinkPersistence;
 	}
 
@@ -549,9 +503,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the asset entry local service
 	 */
-	public com.liferay.asset.kernel.service.AssetEntryLocalService
-		getAssetEntryLocalService() {
-
+	public com.liferay.asset.kernel.service.AssetEntryLocalService getAssetEntryLocalService() {
 		return assetEntryLocalService;
 	}
 
@@ -561,9 +513,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param assetEntryLocalService the asset entry local service
 	 */
 	public void setAssetEntryLocalService(
-		com.liferay.asset.kernel.service.AssetEntryLocalService
-			assetEntryLocalService) {
-
+		com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService) {
 		this.assetEntryLocalService = assetEntryLocalService;
 	}
 
@@ -572,9 +522,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the asset entry remote service
 	 */
-	public com.liferay.asset.kernel.service.AssetEntryService
-		getAssetEntryService() {
-
+	public com.liferay.asset.kernel.service.AssetEntryService getAssetEntryService() {
 		return assetEntryService;
 	}
 
@@ -585,7 +533,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setAssetEntryService(
 		com.liferay.asset.kernel.service.AssetEntryService assetEntryService) {
-
 		this.assetEntryService = assetEntryService;
 	}
 
@@ -605,7 +552,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setAssetEntryPersistence(
 		AssetEntryPersistence assetEntryPersistence) {
-
 		this.assetEntryPersistence = assetEntryPersistence;
 	}
 
@@ -614,9 +560,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the asset link local service
 	 */
-	public com.liferay.asset.kernel.service.AssetLinkLocalService
-		getAssetLinkLocalService() {
-
+	public com.liferay.asset.kernel.service.AssetLinkLocalService getAssetLinkLocalService() {
 		return assetLinkLocalService;
 	}
 
@@ -626,9 +570,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param assetLinkLocalService the asset link local service
 	 */
 	public void setAssetLinkLocalService(
-		com.liferay.asset.kernel.service.AssetLinkLocalService
-			assetLinkLocalService) {
-
+		com.liferay.asset.kernel.service.AssetLinkLocalService assetLinkLocalService) {
 		this.assetLinkLocalService = assetLinkLocalService;
 	}
 
@@ -648,7 +590,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setAssetLinkPersistence(
 		AssetLinkPersistence assetLinkPersistence) {
-
 		this.assetLinkPersistence = assetLinkPersistence;
 	}
 
@@ -657,9 +598,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the expando row local service
 	 */
-	public com.liferay.expando.kernel.service.ExpandoRowLocalService
-		getExpandoRowLocalService() {
-
+	public com.liferay.expando.kernel.service.ExpandoRowLocalService getExpandoRowLocalService() {
 		return expandoRowLocalService;
 	}
 
@@ -669,9 +608,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param expandoRowLocalService the expando row local service
 	 */
 	public void setExpandoRowLocalService(
-		com.liferay.expando.kernel.service.ExpandoRowLocalService
-			expandoRowLocalService) {
-
+		com.liferay.expando.kernel.service.ExpandoRowLocalService expandoRowLocalService) {
 		this.expandoRowLocalService = expandoRowLocalService;
 	}
 
@@ -691,7 +628,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setExpandoRowPersistence(
 		ExpandoRowPersistence expandoRowPersistence) {
-
 		this.expandoRowPersistence = expandoRowPersistence;
 	}
 
@@ -700,9 +636,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the ratings stats local service
 	 */
-	public com.liferay.ratings.kernel.service.RatingsStatsLocalService
-		getRatingsStatsLocalService() {
-
+	public com.liferay.ratings.kernel.service.RatingsStatsLocalService getRatingsStatsLocalService() {
 		return ratingsStatsLocalService;
 	}
 
@@ -712,9 +646,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param ratingsStatsLocalService the ratings stats local service
 	 */
 	public void setRatingsStatsLocalService(
-		com.liferay.ratings.kernel.service.RatingsStatsLocalService
-			ratingsStatsLocalService) {
-
+		com.liferay.ratings.kernel.service.RatingsStatsLocalService ratingsStatsLocalService) {
 		this.ratingsStatsLocalService = ratingsStatsLocalService;
 	}
 
@@ -734,7 +666,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setRatingsStatsPersistence(
 		RatingsStatsPersistence ratingsStatsPersistence) {
-
 		this.ratingsStatsPersistence = ratingsStatsPersistence;
 	}
 
@@ -743,9 +674,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 *
 	 * @return the blogs stats user local service
 	 */
-	public com.liferay.blogs.service.BlogsStatsUserLocalService
-		getBlogsStatsUserLocalService() {
-
+	public com.liferay.blogs.service.BlogsStatsUserLocalService getBlogsStatsUserLocalService() {
 		return blogsStatsUserLocalService;
 	}
 
@@ -755,9 +684,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	 * @param blogsStatsUserLocalService the blogs stats user local service
 	 */
 	public void setBlogsStatsUserLocalService(
-		com.liferay.blogs.service.BlogsStatsUserLocalService
-			blogsStatsUserLocalService) {
-
+		com.liferay.blogs.service.BlogsStatsUserLocalService blogsStatsUserLocalService) {
 		this.blogsStatsUserLocalService = blogsStatsUserLocalService;
 	}
 
@@ -777,7 +704,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setBlogsStatsUserPersistence(
 		BlogsStatsUserPersistence blogsStatsUserPersistence) {
-
 		this.blogsStatsUserPersistence = blogsStatsUserPersistence;
 	}
 
@@ -797,7 +723,6 @@ public abstract class BlogsEntryServiceBaseImpl
 	 */
 	public void setBlogsStatsUserFinder(
 		BlogsStatsUserFinder blogsStatsUserFinder) {
-
 		this.blogsStatsUserFinder = blogsStatsUserFinder;
 	}
 
@@ -839,8 +764,8 @@ public abstract class BlogsEntryServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -849,165 +774,74 @@ public abstract class BlogsEntryServiceBaseImpl
 		}
 	}
 
-	@BeanReference(
-		type = com.liferay.blogs.service.BlogsEntryLocalService.class
-	)
-	protected com.liferay.blogs.service.BlogsEntryLocalService
-		blogsEntryLocalService;
-
+	@BeanReference(type = com.liferay.blogs.service.BlogsEntryLocalService.class)
+	protected com.liferay.blogs.service.BlogsEntryLocalService blogsEntryLocalService;
 	@BeanReference(type = BlogsEntryService.class)
 	protected BlogsEntryService blogsEntryService;
-
 	@BeanReference(type = BlogsEntryPersistence.class)
 	protected BlogsEntryPersistence blogsEntryPersistence;
-
 	@BeanReference(type = BlogsEntryFinder.class)
 	protected BlogsEntryFinder blogsEntryFinder;
-
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.CompanyLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.CompanyLocalService
-		companyLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.CompanyService.class
-	)
+	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.CompanyLocalService.class)
+	protected com.liferay.portal.kernel.service.CompanyLocalService companyLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.CompanyService.class)
 	protected com.liferay.portal.kernel.service.CompanyService companyService;
-
 	@ServiceReference(type = CompanyPersistence.class)
 	protected CompanyPersistence companyPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.GroupLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.GroupLocalService
-		groupLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.GroupService.class
-	)
+	@ServiceReference(type = com.liferay.portal.kernel.service.GroupLocalService.class)
+	protected com.liferay.portal.kernel.service.GroupLocalService groupLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.GroupService.class)
 	protected com.liferay.portal.kernel.service.GroupService groupService;
-
 	@ServiceReference(type = GroupPersistence.class)
 	protected GroupPersistence groupPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ImageLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ImageLocalService
-		imageLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ImageService.class
-	)
+	@ServiceReference(type = com.liferay.portal.kernel.service.ImageLocalService.class)
+	protected com.liferay.portal.kernel.service.ImageLocalService imageLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.ImageService.class)
 	protected com.liferay.portal.kernel.service.ImageService imageService;
-
 	@ServiceReference(type = ImagePersistence.class)
 	protected ImagePersistence imagePersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.OrganizationLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.OrganizationLocalService
-		organizationLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.OrganizationService.class
-	)
-	protected com.liferay.portal.kernel.service.OrganizationService
-		organizationService;
-
+	@ServiceReference(type = com.liferay.portal.kernel.service.OrganizationLocalService.class)
+	protected com.liferay.portal.kernel.service.OrganizationLocalService organizationLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.OrganizationService.class)
+	protected com.liferay.portal.kernel.service.OrganizationService organizationService;
 	@ServiceReference(type = OrganizationPersistence.class)
 	protected OrganizationPersistence organizationPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ResourceLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserService.class
-	)
+	@ServiceReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
+	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserService.class)
 	protected com.liferay.portal.kernel.service.UserService userService;
-
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-		workflowInstanceLinkLocalService;
-
+	@ServiceReference(type = com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService.class)
+	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService;
 	@ServiceReference(type = WorkflowInstanceLinkPersistence.class)
 	protected WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetEntryLocalService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetEntryLocalService
-		assetEntryLocalService;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetEntryService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetEntryService
-		assetEntryService;
-
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetEntryLocalService.class)
+	protected com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService;
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetEntryService.class)
+	protected com.liferay.asset.kernel.service.AssetEntryService assetEntryService;
 	@ServiceReference(type = AssetEntryPersistence.class)
 	protected AssetEntryPersistence assetEntryPersistence;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetLinkLocalService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetLinkLocalService
-		assetLinkLocalService;
-
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetLinkLocalService.class)
+	protected com.liferay.asset.kernel.service.AssetLinkLocalService assetLinkLocalService;
 	@ServiceReference(type = AssetLinkPersistence.class)
 	protected AssetLinkPersistence assetLinkPersistence;
-
-	@ServiceReference(
-		type = com.liferay.expando.kernel.service.ExpandoRowLocalService.class
-	)
-	protected com.liferay.expando.kernel.service.ExpandoRowLocalService
-		expandoRowLocalService;
-
+	@ServiceReference(type = com.liferay.expando.kernel.service.ExpandoRowLocalService.class)
+	protected com.liferay.expando.kernel.service.ExpandoRowLocalService expandoRowLocalService;
 	@ServiceReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-
-	@ServiceReference(
-		type = com.liferay.ratings.kernel.service.RatingsStatsLocalService.class
-	)
-	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService
-		ratingsStatsLocalService;
-
+	@ServiceReference(type = com.liferay.ratings.kernel.service.RatingsStatsLocalService.class)
+	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService ratingsStatsLocalService;
 	@ServiceReference(type = RatingsStatsPersistence.class)
 	protected RatingsStatsPersistence ratingsStatsPersistence;
-
-	@BeanReference(
-		type = com.liferay.blogs.service.BlogsStatsUserLocalService.class
-	)
-	protected com.liferay.blogs.service.BlogsStatsUserLocalService
-		blogsStatsUserLocalService;
-
+	@BeanReference(type = com.liferay.blogs.service.BlogsStatsUserLocalService.class)
+	protected com.liferay.blogs.service.BlogsStatsUserLocalService blogsStatsUserLocalService;
 	@BeanReference(type = BlogsStatsUserPersistence.class)
 	protected BlogsStatsUserPersistence blogsStatsUserPersistence;
-
 	@BeanReference(type = BlogsStatsUserFinder.class)
 	protected BlogsStatsUserFinder blogsStatsUserFinder;
-
 }

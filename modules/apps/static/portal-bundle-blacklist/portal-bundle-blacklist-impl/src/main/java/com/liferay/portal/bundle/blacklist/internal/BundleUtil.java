@@ -23,8 +23,6 @@ import com.liferay.portal.lpkg.deployer.LPKGDeployer;
 
 import java.io.File;
 
-import java.net.URI;
-
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
@@ -87,12 +85,8 @@ public class BundleUtil {
 		String[] webContextPath = parameters.get("Web-ContextPath");
 
 		if (parameters.isEmpty() && location.endsWith(".lpkg")) {
-			URI uri = new URI(location);
-
-			uri = uri.normalize();
-
 			bundle = bundleContext.installBundle(
-				location, lpkgDeployer.toBundle(new File(uri.getPath())));
+				location, lpkgDeployer.toBundle(new File(location)));
 		}
 		else if (ArrayUtil.isNotEmpty(lpkgPath)) {
 			bundle = bundleContext.getBundle(lpkgPath[0]);

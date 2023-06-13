@@ -236,6 +236,433 @@ definition {
 	}
 
 	@priority = "4"
+	test EditUserAdditionalEmailAddresses {
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		UserNavigator.gotoUser(userScreenName = "usersn");
+
+		UserNavigator.gotoContact();
+
+		Navigator.gotoNavNested(navNested = "Contact Information");
+
+		User.addContactInformation(
+			address = "additional1@liferay.com",
+			contactType = "add-email-address-link"
+		);
+
+		User.viewContactInformation(
+			address = "additional1@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "additional1@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		User.addContactInformation(
+			address = "additional2@liferay.com",
+			contactType = "add-email-address-link",
+			makePrimary = "true"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "additional2@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		User.addContactInformation(
+			address = "additional3@liferay.com",
+			contactType = "add-email-address-link"
+		);
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "additional1@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "additional2@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "additional3@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		UserNavigator.gotoEdit(rowEntry = "additional2@liferay.com");
+
+		User.editPrimary(makePrimary = "false");
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "additional2@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "additional3@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		User.makePrimary(rowEntry = "additional2@liferay.com");
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "additional1@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "additional2@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "additional3@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		User.removeContactInformation(rowEntry = "additional3@liferay.com");
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "additional2@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+
+		User.removeContactInformation(rowEntry = "additional2@liferay.com");
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "additional1@liferay.com",
+			searchContainerType = "emailAddressesSearchContainer"
+		);
+	}
+
+	@priority = "4"
+	test EditUserAddresses {
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		UserNavigator.gotoUser(userScreenName = "usersn");
+
+		UserNavigator.gotoContact();
+
+		User.addContactInformation(
+			city = "Diamond Bar",
+			contactType = "add-address-link",
+			country = "United States",
+			postalCode = "91765",
+			region = "California",
+			street1 = "1400 Montefino Ave"
+		);
+
+		User.viewAddress(
+			city = "Diamond Bar",
+			country = "United States",
+			postalCode = "91765",
+			region = "California",
+			street1 = "1400 Montefino Ave"
+		);
+
+		User.viewIsPrimary(primaryValue = "1400 Montefino Ave");
+
+		User.addContactInformation(
+			city = "Chicago",
+			contactType = "add-address-link",
+			makePrimary = "true",
+			postalCode = "60606",
+			street1 = "205 West Wacker Dr"
+		);
+
+		User.viewIsPrimary(primaryValue = "205 West Wacker Dr");
+
+		User.addContactInformation(
+			city = "Raleigh",
+			contactType = "add-address-link",
+			postalCode = "27607",
+			street1 = "4000 Westchase Blvd"
+		);
+
+		User.viewNotPrimary(primaryValue = "1400 Montefino Ave");
+
+		User.viewIsPrimary(primaryValue = "205 West Wacker Dr");
+
+		User.viewNotPrimary(primaryValue = "4000 Westchase Blvd");
+
+		UserNavigator.gotoEdit(rowEntry = "205 West Wacker Dr");
+
+		User.editPrimary(makePrimary = "false");
+
+		User.viewNotPrimary(primaryValue = "205 West Wacker Dr");
+
+		User.viewIsPrimary(primaryValue = "4000 Westchase Blvd");
+
+		User.makePrimary(rowEntry = "205 West Wacker Dr");
+
+		User.viewNotPrimary(primaryValue = "1400 Montefino Ave");
+
+		User.viewIsPrimary(primaryValue = "205 West Wacker Dr");
+
+		User.viewNotPrimary(primaryValue = "4000 Westchase Blvd");
+
+		User.removeContactInformation(rowEntry = "4000 Westchase Blvd");
+
+		User.viewIsPrimary(primaryValue = "205 West Wacker Dr");
+
+		User.removeContactInformation(rowEntry = "205 West Wacker Dr");
+
+		User.viewIsPrimary(primaryValue = "1400 Montefino Ave");
+	}
+
+	@priority = "4"
+	test EditUserPhoneNumbers {
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		UserNavigator.gotoUser(userScreenName = "usersn");
+
+		UserNavigator.gotoContact();
+
+		Navigator.gotoNavNested(navNested = "Contact Information");
+
+		User.addContactInformation(
+			contactType = "add-phone-number-link",
+			extension = "111",
+			number = "1111111111"
+		);
+
+		User.viewContactInformation(
+			extension = "111",
+			number = "1111111111",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "1111111111",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.addContactInformation(
+			contactType = "add-phone-number-link",
+			makePrimary = "true",
+			number = "2222222222"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "2222222222",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.addContactInformation(
+			contactType = "add-phone-number-link",
+			number = "3333333333"
+		);
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "1111111111",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "2222222222",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "3333333333",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		UserNavigator.gotoEdit(rowEntry = "2222222222");
+
+		User.editPrimary(makePrimary = "false");
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "2222222222",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "3333333333",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.makePrimary(rowEntry = "2222222222");
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "1111111111",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "2222222222",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "3333333333",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.removeContactInformation(rowEntry = "3333333333");
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "2222222222",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.removeContactInformation(rowEntry = "2222222222");
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "1111111111",
+			searchContainerType = "phonesSearchContainer"
+		);
+	}
+
+	@priority = "4"
+	test EditUserWebsites {
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		UserNavigator.gotoUser(userScreenName = "usersn");
+
+		UserNavigator.gotoContact();
+
+		Navigator.gotoNavNested(navNested = "Contact Information");
+
+		User.addContactInformation(
+			contactType = "add-website-link",
+			url = "http://www.liferay1.com"
+		);
+
+		User.viewContactInformation(
+			searchContainerType = "websitesSearchContainer",
+			url = "http://www.liferay1.com"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "http://www.liferay1.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+
+		User.addContactInformation(
+			contactType = "add-website-link",
+			makePrimary = "true",
+			url = "http://www.liferay2.com"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "http://www.liferay2.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+
+		User.addContactInformation(
+			contactType = "add-website-link",
+			url = "http://www.liferay3.com"
+		);
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "http://www.liferay1.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "http://www.liferay2.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "http://www.liferay3.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+
+		UserNavigator.gotoEdit(rowEntry = "http://www.liferay2.com");
+
+		User.editPrimary(makePrimary = "false");
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "http://www.liferay2.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "http://www.liferay3.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+
+		User.makePrimary(rowEntry = "http://www.liferay2.com");
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "http://www.liferay1.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "http://www.liferay2.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+
+		User.viewNotPrimary(
+			contactInfoPrimaryValue = "http://www.liferay3.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+
+		User.removeContactInformation(rowEntry = "http://www.liferay3.com");
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "http://www.liferay2.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+
+		User.removeContactInformation(rowEntry = "http://www.liferay2.com");
+
+		User.viewIsPrimary(
+			contactInfoPrimaryValue = "http://www.liferay1.com",
+			searchContainerType = "websitesSearchContainer"
+		);
+	}
+
+	@priority = "4"
 	test ImpersonatingAdministratorandOwner {
 		property test.name.skip.portal.instance = "UsersandorganizationsUsecase#ImpersonatingAdministratorandOwner";
 
@@ -492,6 +919,8 @@ definition {
 			portlet = "Users and Organizations"
 		);
 
+		Organization.editOrganizationCP(orgName = "${orgName}");
+
 		Organization.addCategorizationCP(
 			orgName = "Organization Name 1",
 			tagName = "alpha"
@@ -523,6 +952,8 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations"
 		);
+
+		Organization.editOrganizationCP(orgName = "${orgName}");
 
 		Organization.addCategorizationCP(
 			orgName = "Organization Name 2",
@@ -751,7 +1182,7 @@ definition {
 
 		Page.viewSpecificPG(pageNameList = "Home,Wiki");
 
-		AssertTextEquals(
+		AssertTextEquals.assertTextCaseInsensitive(
 			locator1 = "Portlet#SPECIFIC_TITLE",
 			value1 = "Message Boards",
 			key_portletTitleName = "Message Boards"
@@ -1386,11 +1817,7 @@ definition {
 			configurationScope = "System Scope"
 		);
 
-		AssertClick(
-			locator1 = "Button#ANY",
-			value1 = "Add",
-			key_text = "Add"
-		);
+		AssertClick(locator1 = "Button#ADD", value1 = "Add");
 
 		for (var settingName : list "Name,Children Types") {
 			SystemSettings.editTextAreaSetting(
@@ -1570,5 +1997,46 @@ definition {
 		MessageboardsThread.viewDoNotHaveRequiredPermissionsPG(
 			threadSubject = "Canada Message Subject"
 		);
+	}
+
+	@priority = "4"
+	test ViewUserFormPersistence {
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		UserNavigator.gotoUser(userScreenName = "usersn");
+
+		UserNavigator.gotoContact();
+
+		Navigator.gotoNavNested(navNested = "Contact Information");
+
+		User.addContactInformation(
+			contactType = "add-phone-number-link",
+			extension = "111",
+			number = "1111111111"
+		);
+
+		User.addContactInformation(skype = "skype12345");
+
+		User.viewContactInformation(
+			number = "1111111111",
+			searchContainerType = "phonesSearchContainer"
+		);
+
+		User.viewContactInformation(skype = "skype12345");
+
+		User.removeContactInformation(rowEntry = "1111111111");
+
+		User.viewContactInformation(skype = "skype12345");
 	}
 }

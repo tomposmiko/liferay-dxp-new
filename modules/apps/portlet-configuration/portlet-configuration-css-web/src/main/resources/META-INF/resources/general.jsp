@@ -28,7 +28,8 @@ contextUseForAllTitle.put("inputSelector", ".custom-title input");
 
 <soy:component-renderer
 	context="<%= contextUseForAllTitle %>"
-	module="portlet-configuration-css-web/js/ToggleDisableInputs.es"
+	module="js/ToggleDisableInputs.es"
+	servletContext="<%= application %>"
 	templateNamespace="com.liferay.portlet.configuration.css.web.ToggleDisableInputs.render"
 />
 
@@ -40,24 +41,6 @@ contextUseForAllTitle.put("inputSelector", ".custom-title input");
 		xml="<%= portletConfigurationCSSPortletDisplayContext.getCustomTitleXML() %>"
 	/>
 </aui:field-wrapper>
-
-<c:if test="<%= portletConfigurationCSSPortletDisplayContext.isShowLinkToPage() %>">
-	<aui:select label="link-portlet-urls-to-page" name="linkToLayoutUuid">
-		<aui:option label="current-page" selected="<%= Objects.equals(StringPool.BLANK, portletConfigurationCSSPortletDisplayContext.getLinkToLayoutUuid()) %>" value="" />
-
-		<%
-		for (LayoutDescription layoutDescription : portletConfigurationCSSPortletDisplayContext.getLayoutDescriptions()) {
-			Layout layoutDescriptionLayout = LayoutLocalServiceUtil.fetchLayout(layoutDescription.getPlid());
-		%>
-
-			<aui:option label="<%= layoutDescription.getDisplayName() %>" selected="<%= Objects.equals(layoutDescriptionLayout.getUuid(), portletConfigurationCSSPortletDisplayContext.getLinkToLayoutUuid()) %>" value="<%= layoutDescriptionLayout.getUuid() %>" />
-
-		<%
-		}
-		%>
-
-	</aui:select>
-</c:if>
 
 <aui:select label="portlet-decorators" name="portletDecoratorId">
 

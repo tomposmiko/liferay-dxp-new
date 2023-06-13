@@ -21,6 +21,9 @@ import com.liferay.marketplace.model.App;
 import com.liferay.marketplace.model.impl.AppImpl;
 import com.liferay.marketplace.model.impl.AppModelImpl;
 import com.liferay.marketplace.service.persistence.AppPersistence;
+
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -38,7 +41,6 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
@@ -46,14 +48,10 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,26 +65,23 @@ import java.util.Set;
  * </p>
  *
  * @author Ryan Park
+ * @see AppPersistence
+ * @see com.liferay.marketplace.service.persistence.AppUtil
  * @generated
  */
 @ProviderType
-public class AppPersistenceImpl
-	extends BasePersistenceImpl<App> implements AppPersistence {
-
+public class AppPersistenceImpl extends BasePersistenceImpl<App>
+	implements AppPersistence {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use <code>AppUtil</code> to access the app persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use {@link AppUtil} to access the app persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY =
-		AppImpl.class.getName();
-
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List1";
-
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List2";
-
+	public static final String FINDER_CLASS_NAME_ENTITY = AppImpl.class.getName();
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -109,7 +104,7 @@ public class AppPersistenceImpl
 	 * Returns a range of all the apps where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -126,7 +121,7 @@ public class AppPersistenceImpl
 	 * Returns an ordered range of all the apps where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -136,10 +131,8 @@ public class AppPersistenceImpl
 	 * @return the ordered range of matching apps
 	 */
 	@Override
-	public List<App> findByUuid(
-		String uuid, int start, int end,
+	public List<App> findByUuid(String uuid, int start, int end,
 		OrderByComparator<App> orderByComparator) {
-
 		return findByUuid(uuid, start, end, orderByComparator, true);
 	}
 
@@ -147,7 +140,7 @@ public class AppPersistenceImpl
 	 * Returns an ordered range of all the apps where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -158,10 +151,8 @@ public class AppPersistenceImpl
 	 * @return the ordered range of matching apps
 	 */
 	@Override
-	public List<App> findByUuid(
-		String uuid, int start, int end,
+	public List<App> findByUuid(String uuid, int start, int end,
 		OrderByComparator<App> orderByComparator, boolean retrieveFromCache) {
-
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -169,22 +160,20 @@ public class AppPersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid;
-			finderArgs = new Object[] {uuid};
+			finderArgs = new Object[] { uuid };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid;
-			finderArgs = new Object[] {uuid, start, end, orderByComparator};
+			finderArgs = new Object[] { uuid, start, end, orderByComparator };
 		}
 
 		List<App> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<App>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<App>)finderCache.getResult(finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (App app : list) {
@@ -201,8 +190,8 @@ public class AppPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -222,10 +211,11 @@ public class AppPersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AppModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -245,16 +235,15 @@ public class AppPersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<App>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<App>)QueryUtil.list(q, getDialect(), start,
+							end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<App>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<App>)QueryUtil.list(q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -283,10 +272,8 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
-	public App findByUuid_First(
-			String uuid, OrderByComparator<App> orderByComparator)
-		throws NoSuchAppException {
-
+	public App findByUuid_First(String uuid,
+		OrderByComparator<App> orderByComparator) throws NoSuchAppException {
 		App app = fetchByUuid_First(uuid, orderByComparator);
 
 		if (app != null) {
@@ -313,9 +300,8 @@ public class AppPersistenceImpl
 	 * @return the first matching app, or <code>null</code> if a matching app could not be found
 	 */
 	@Override
-	public App fetchByUuid_First(
-		String uuid, OrderByComparator<App> orderByComparator) {
-
+	public App fetchByUuid_First(String uuid,
+		OrderByComparator<App> orderByComparator) {
 		List<App> list = findByUuid(uuid, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -334,10 +320,8 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
-	public App findByUuid_Last(
-			String uuid, OrderByComparator<App> orderByComparator)
-		throws NoSuchAppException {
-
+	public App findByUuid_Last(String uuid,
+		OrderByComparator<App> orderByComparator) throws NoSuchAppException {
 		App app = fetchByUuid_Last(uuid, orderByComparator);
 
 		if (app != null) {
@@ -364,9 +348,8 @@ public class AppPersistenceImpl
 	 * @return the last matching app, or <code>null</code> if a matching app could not be found
 	 */
 	@Override
-	public App fetchByUuid_Last(
-		String uuid, OrderByComparator<App> orderByComparator) {
-
+	public App fetchByUuid_Last(String uuid,
+		OrderByComparator<App> orderByComparator) {
 		int count = countByUuid(uuid);
 
 		if (count == 0) {
@@ -392,10 +375,8 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
-	public App[] findByUuid_PrevAndNext(
-			long appId, String uuid, OrderByComparator<App> orderByComparator)
-		throws NoSuchAppException {
-
+	public App[] findByUuid_PrevAndNext(long appId, String uuid,
+		OrderByComparator<App> orderByComparator) throws NoSuchAppException {
 		uuid = Objects.toString(uuid, "");
 
 		App app = findByPrimaryKey(appId);
@@ -407,13 +388,13 @@ public class AppPersistenceImpl
 
 			App[] array = new AppImpl[3];
 
-			array[0] = getByUuid_PrevAndNext(
-				session, app, uuid, orderByComparator, true);
+			array[0] = getByUuid_PrevAndNext(session, app, uuid,
+					orderByComparator, true);
 
 			array[1] = app;
 
-			array[2] = getByUuid_PrevAndNext(
-				session, app, uuid, orderByComparator, false);
+			array[2] = getByUuid_PrevAndNext(session, app, uuid,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -425,15 +406,13 @@ public class AppPersistenceImpl
 		}
 	}
 
-	protected App getByUuid_PrevAndNext(
-		Session session, App app, String uuid,
+	protected App getByUuid_PrevAndNext(Session session, App app, String uuid,
 		OrderByComparator<App> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -454,8 +433,7 @@ public class AppPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -527,9 +505,8 @@ public class AppPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(app)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					app)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -551,9 +528,8 @@ public class AppPersistenceImpl
 	 */
 	@Override
 	public void removeByUuid(String uuid) {
-		for (App app :
-				findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (App app : findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				null)) {
 			remove(app);
 		}
 	}
@@ -570,7 +546,7 @@ public class AppPersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByUuid;
 
-		Object[] finderArgs = new Object[] {uuid};
+		Object[] finderArgs = new Object[] { uuid };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -623,10 +599,7 @@ public class AppPersistenceImpl
 	}
 
 	private static final String _FINDER_COLUMN_UUID_UUID_2 = "app.uuid = ?";
-
-	private static final String _FINDER_COLUMN_UUID_UUID_3 =
-		"(app.uuid IS NULL OR app.uuid = '')";
-
+	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(app.uuid IS NULL OR app.uuid = '')";
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
 	private FinderPath _finderPathCountByUuid_C;
@@ -640,15 +613,15 @@ public class AppPersistenceImpl
 	 */
 	@Override
 	public List<App> findByUuid_C(String uuid, long companyId) {
-		return findByUuid_C(
-			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the apps where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -658,9 +631,8 @@ public class AppPersistenceImpl
 	 * @return the range of matching apps
 	 */
 	@Override
-	public List<App> findByUuid_C(
-		String uuid, long companyId, int start, int end) {
-
+	public List<App> findByUuid_C(String uuid, long companyId, int start,
+		int end) {
 		return findByUuid_C(uuid, companyId, start, end, null);
 	}
 
@@ -668,7 +640,7 @@ public class AppPersistenceImpl
 	 * Returns an ordered range of all the apps where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -679,19 +651,16 @@ public class AppPersistenceImpl
 	 * @return the ordered range of matching apps
 	 */
 	@Override
-	public List<App> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<App> orderByComparator) {
-
-		return findByUuid_C(
-			uuid, companyId, start, end, orderByComparator, true);
+	public List<App> findByUuid_C(String uuid, long companyId, int start,
+		int end, OrderByComparator<App> orderByComparator) {
+		return findByUuid_C(uuid, companyId, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the apps where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -703,10 +672,9 @@ public class AppPersistenceImpl
 	 * @return the ordered range of matching apps
 	 */
 	@Override
-	public List<App> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<App> orderByComparator, boolean retrieveFromCache) {
-
+	public List<App> findByUuid_C(String uuid, long companyId, int start,
+		int end, OrderByComparator<App> orderByComparator,
+		boolean retrieveFromCache) {
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -714,30 +682,29 @@ public class AppPersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid_C;
-			finderArgs = new Object[] {uuid, companyId};
+			finderArgs = new Object[] { uuid, companyId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
-				uuid, companyId, start, end, orderByComparator
-			};
+					uuid, companyId,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<App> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<App>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<App>)finderCache.getResult(finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (App app : list) {
 					if (!uuid.equals(app.getUuid()) ||
-						(companyId != app.getCompanyId())) {
-
+							(companyId != app.getCompanyId())) {
 						list = null;
 
 						break;
@@ -750,8 +717,8 @@ public class AppPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -773,10 +740,11 @@ public class AppPersistenceImpl
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AppModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -798,16 +766,15 @@ public class AppPersistenceImpl
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<App>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<App>)QueryUtil.list(q, getDialect(), start,
+							end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<App>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<App>)QueryUtil.list(q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -837,11 +804,8 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
-	public App findByUuid_C_First(
-			String uuid, long companyId,
-			OrderByComparator<App> orderByComparator)
-		throws NoSuchAppException {
-
+	public App findByUuid_C_First(String uuid, long companyId,
+		OrderByComparator<App> orderByComparator) throws NoSuchAppException {
 		App app = fetchByUuid_C_First(uuid, companyId, orderByComparator);
 
 		if (app != null) {
@@ -872,9 +836,8 @@ public class AppPersistenceImpl
 	 * @return the first matching app, or <code>null</code> if a matching app could not be found
 	 */
 	@Override
-	public App fetchByUuid_C_First(
-		String uuid, long companyId, OrderByComparator<App> orderByComparator) {
-
+	public App fetchByUuid_C_First(String uuid, long companyId,
+		OrderByComparator<App> orderByComparator) {
 		List<App> list = findByUuid_C(uuid, companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -894,11 +857,8 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
-	public App findByUuid_C_Last(
-			String uuid, long companyId,
-			OrderByComparator<App> orderByComparator)
-		throws NoSuchAppException {
-
+	public App findByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator<App> orderByComparator) throws NoSuchAppException {
 		App app = fetchByUuid_C_Last(uuid, companyId, orderByComparator);
 
 		if (app != null) {
@@ -929,17 +889,16 @@ public class AppPersistenceImpl
 	 * @return the last matching app, or <code>null</code> if a matching app could not be found
 	 */
 	@Override
-	public App fetchByUuid_C_Last(
-		String uuid, long companyId, OrderByComparator<App> orderByComparator) {
-
+	public App fetchByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator<App> orderByComparator) {
 		int count = countByUuid_C(uuid, companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<App> list = findByUuid_C(
-			uuid, companyId, count - 1, count, orderByComparator);
+		List<App> list = findByUuid_C(uuid, companyId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -959,11 +918,9 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
-	public App[] findByUuid_C_PrevAndNext(
-			long appId, String uuid, long companyId,
-			OrderByComparator<App> orderByComparator)
+	public App[] findByUuid_C_PrevAndNext(long appId, String uuid,
+		long companyId, OrderByComparator<App> orderByComparator)
 		throws NoSuchAppException {
-
 		uuid = Objects.toString(uuid, "");
 
 		App app = findByPrimaryKey(appId);
@@ -975,13 +932,13 @@ public class AppPersistenceImpl
 
 			App[] array = new AppImpl[3];
 
-			array[0] = getByUuid_C_PrevAndNext(
-				session, app, uuid, companyId, orderByComparator, true);
+			array[0] = getByUuid_C_PrevAndNext(session, app, uuid, companyId,
+					orderByComparator, true);
 
 			array[1] = app;
 
-			array[2] = getByUuid_C_PrevAndNext(
-				session, app, uuid, companyId, orderByComparator, false);
+			array[2] = getByUuid_C_PrevAndNext(session, app, uuid, companyId,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -993,15 +950,14 @@ public class AppPersistenceImpl
 		}
 	}
 
-	protected App getByUuid_C_PrevAndNext(
-		Session session, App app, String uuid, long companyId,
-		OrderByComparator<App> orderByComparator, boolean previous) {
-
+	protected App getByUuid_C_PrevAndNext(Session session, App app,
+		String uuid, long companyId, OrderByComparator<App> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1024,8 +980,7 @@ public class AppPersistenceImpl
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1099,9 +1054,8 @@ public class AppPersistenceImpl
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(app)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					app)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1124,11 +1078,8 @@ public class AppPersistenceImpl
 	 */
 	@Override
 	public void removeByUuid_C(String uuid, long companyId) {
-		for (App app :
-				findByUuid_C(
-					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (App app : findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(app);
 		}
 	}
@@ -1146,7 +1097,7 @@ public class AppPersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByUuid_C;
 
-		Object[] finderArgs = new Object[] {uuid, companyId};
+		Object[] finderArgs = new Object[] { uuid, companyId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1202,15 +1153,9 @@ public class AppPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
-		"app.uuid = ? AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
-		"(app.uuid IS NULL OR app.uuid = '') AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
-		"app.companyId = ?";
-
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "app.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(app.uuid IS NULL OR app.uuid = '') AND ";
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "app.companyId = ?";
 	private FinderPath _finderPathWithPaginationFindByCompanyId;
 	private FinderPath _finderPathWithoutPaginationFindByCompanyId;
 	private FinderPath _finderPathCountByCompanyId;
@@ -1223,15 +1168,15 @@ public class AppPersistenceImpl
 	 */
 	@Override
 	public List<App> findByCompanyId(long companyId) {
-		return findByCompanyId(
-			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByCompanyId(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the apps where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -1248,7 +1193,7 @@ public class AppPersistenceImpl
 	 * Returns an ordered range of all the apps where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -1258,10 +1203,8 @@ public class AppPersistenceImpl
 	 * @return the ordered range of matching apps
 	 */
 	@Override
-	public List<App> findByCompanyId(
-		long companyId, int start, int end,
+	public List<App> findByCompanyId(long companyId, int start, int end,
 		OrderByComparator<App> orderByComparator) {
-
 		return findByCompanyId(companyId, start, end, orderByComparator, true);
 	}
 
@@ -1269,7 +1212,7 @@ public class AppPersistenceImpl
 	 * Returns an ordered range of all the apps where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -1280,33 +1223,27 @@ public class AppPersistenceImpl
 	 * @return the ordered range of matching apps
 	 */
 	@Override
-	public List<App> findByCompanyId(
-		long companyId, int start, int end,
+	public List<App> findByCompanyId(long companyId, int start, int end,
 		OrderByComparator<App> orderByComparator, boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByCompanyId;
-			finderArgs = new Object[] {companyId};
+			finderArgs = new Object[] { companyId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByCompanyId;
-			finderArgs = new Object[] {
-				companyId, start, end, orderByComparator
-			};
+			finderArgs = new Object[] { companyId, start, end, orderByComparator };
 		}
 
 		List<App> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<App>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<App>)finderCache.getResult(finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (App app : list) {
@@ -1323,8 +1260,8 @@ public class AppPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1335,10 +1272,11 @@ public class AppPersistenceImpl
 			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AppModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1356,16 +1294,15 @@ public class AppPersistenceImpl
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<App>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<App>)QueryUtil.list(q, getDialect(), start,
+							end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<App>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<App>)QueryUtil.list(q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1394,10 +1331,8 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
-	public App findByCompanyId_First(
-			long companyId, OrderByComparator<App> orderByComparator)
-		throws NoSuchAppException {
-
+	public App findByCompanyId_First(long companyId,
+		OrderByComparator<App> orderByComparator) throws NoSuchAppException {
 		App app = fetchByCompanyId_First(companyId, orderByComparator);
 
 		if (app != null) {
@@ -1424,9 +1359,8 @@ public class AppPersistenceImpl
 	 * @return the first matching app, or <code>null</code> if a matching app could not be found
 	 */
 	@Override
-	public App fetchByCompanyId_First(
-		long companyId, OrderByComparator<App> orderByComparator) {
-
+	public App fetchByCompanyId_First(long companyId,
+		OrderByComparator<App> orderByComparator) {
 		List<App> list = findByCompanyId(companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -1445,10 +1379,8 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
-	public App findByCompanyId_Last(
-			long companyId, OrderByComparator<App> orderByComparator)
-		throws NoSuchAppException {
-
+	public App findByCompanyId_Last(long companyId,
+		OrderByComparator<App> orderByComparator) throws NoSuchAppException {
 		App app = fetchByCompanyId_Last(companyId, orderByComparator);
 
 		if (app != null) {
@@ -1475,17 +1407,16 @@ public class AppPersistenceImpl
 	 * @return the last matching app, or <code>null</code> if a matching app could not be found
 	 */
 	@Override
-	public App fetchByCompanyId_Last(
-		long companyId, OrderByComparator<App> orderByComparator) {
-
+	public App fetchByCompanyId_Last(long companyId,
+		OrderByComparator<App> orderByComparator) {
 		int count = countByCompanyId(companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<App> list = findByCompanyId(
-			companyId, count - 1, count, orderByComparator);
+		List<App> list = findByCompanyId(companyId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1504,11 +1435,8 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
-	public App[] findByCompanyId_PrevAndNext(
-			long appId, long companyId,
-			OrderByComparator<App> orderByComparator)
-		throws NoSuchAppException {
-
+	public App[] findByCompanyId_PrevAndNext(long appId, long companyId,
+		OrderByComparator<App> orderByComparator) throws NoSuchAppException {
 		App app = findByPrimaryKey(appId);
 
 		Session session = null;
@@ -1518,13 +1446,13 @@ public class AppPersistenceImpl
 
 			App[] array = new AppImpl[3];
 
-			array[0] = getByCompanyId_PrevAndNext(
-				session, app, companyId, orderByComparator, true);
+			array[0] = getByCompanyId_PrevAndNext(session, app, companyId,
+					orderByComparator, true);
 
 			array[1] = app;
 
-			array[2] = getByCompanyId_PrevAndNext(
-				session, app, companyId, orderByComparator, false);
+			array[2] = getByCompanyId_PrevAndNext(session, app, companyId,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -1536,15 +1464,14 @@ public class AppPersistenceImpl
 		}
 	}
 
-	protected App getByCompanyId_PrevAndNext(
-		Session session, App app, long companyId,
-		OrderByComparator<App> orderByComparator, boolean previous) {
-
+	protected App getByCompanyId_PrevAndNext(Session session, App app,
+		long companyId, OrderByComparator<App> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1556,8 +1483,7 @@ public class AppPersistenceImpl
 		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1627,9 +1553,8 @@ public class AppPersistenceImpl
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(app)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					app)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1651,10 +1576,8 @@ public class AppPersistenceImpl
 	 */
 	@Override
 	public void removeByCompanyId(long companyId) {
-		for (App app :
-				findByCompanyId(
-					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (App app : findByCompanyId(companyId, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(app);
 		}
 	}
@@ -1669,7 +1592,7 @@ public class AppPersistenceImpl
 	public int countByCompanyId(long companyId) {
 		FinderPath finderPath = _finderPathCountByCompanyId;
 
-		Object[] finderArgs = new Object[] {companyId};
+		Object[] finderArgs = new Object[] { companyId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1710,14 +1633,12 @@ public class AppPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
-		"app.companyId = ?";
-
+	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 = "app.companyId = ?";
 	private FinderPath _finderPathFetchByRemoteAppId;
 	private FinderPath _finderPathCountByRemoteAppId;
 
 	/**
-	 * Returns the app where remoteAppId = &#63; or throws a <code>NoSuchAppException</code> if it could not be found.
+	 * Returns the app where remoteAppId = &#63; or throws a {@link NoSuchAppException} if it could not be found.
 	 *
 	 * @param remoteAppId the remote app ID
 	 * @return the matching app
@@ -1767,13 +1688,13 @@ public class AppPersistenceImpl
 	 */
 	@Override
 	public App fetchByRemoteAppId(long remoteAppId, boolean retrieveFromCache) {
-		Object[] finderArgs = new Object[] {remoteAppId};
+		Object[] finderArgs = new Object[] { remoteAppId };
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByRemoteAppId, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByRemoteAppId,
+					finderArgs, this);
 		}
 
 		if (result instanceof App) {
@@ -1807,8 +1728,8 @@ public class AppPersistenceImpl
 				List<App> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByRemoteAppId, finderArgs, list);
+					finderCache.putResult(_finderPathFetchByRemoteAppId,
+						finderArgs, list);
 				}
 				else {
 					if (list.size() > 1) {
@@ -1817,8 +1738,8 @@ public class AppPersistenceImpl
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"AppPersistenceImpl.fetchByRemoteAppId(long, boolean) with parameters (" +
-									StringUtil.merge(finderArgs) +
-										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+								StringUtil.merge(finderArgs) +
+								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
 						}
 					}
 
@@ -1830,8 +1751,8 @@ public class AppPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathFetchByRemoteAppId, finderArgs);
+				finderCache.removeResult(_finderPathFetchByRemoteAppId,
+					finderArgs);
 
 				throw processException(e);
 			}
@@ -1871,7 +1792,7 @@ public class AppPersistenceImpl
 	public int countByRemoteAppId(long remoteAppId) {
 		FinderPath finderPath = _finderPathCountByRemoteAppId;
 
-		Object[] finderArgs = new Object[] {remoteAppId};
+		Object[] finderArgs = new Object[] { remoteAppId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1912,9 +1833,7 @@ public class AppPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_REMOTEAPPID_REMOTEAPPID_2 =
-		"app.remoteAppId = ?";
-
+	private static final String _FINDER_COLUMN_REMOTEAPPID_REMOTEAPPID_2 = "app.remoteAppId = ?";
 	private FinderPath _finderPathWithPaginationFindByCategory;
 	private FinderPath _finderPathWithoutPaginationFindByCategory;
 	private FinderPath _finderPathCountByCategory;
@@ -1927,15 +1846,15 @@ public class AppPersistenceImpl
 	 */
 	@Override
 	public List<App> findByCategory(String category) {
-		return findByCategory(
-			category, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByCategory(category, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the apps where category = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param category the category
@@ -1952,7 +1871,7 @@ public class AppPersistenceImpl
 	 * Returns an ordered range of all the apps where category = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param category the category
@@ -1962,10 +1881,8 @@ public class AppPersistenceImpl
 	 * @return the ordered range of matching apps
 	 */
 	@Override
-	public List<App> findByCategory(
-		String category, int start, int end,
+	public List<App> findByCategory(String category, int start, int end,
 		OrderByComparator<App> orderByComparator) {
-
 		return findByCategory(category, start, end, orderByComparator, true);
 	}
 
@@ -1973,7 +1890,7 @@ public class AppPersistenceImpl
 	 * Returns an ordered range of all the apps where category = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param category the category
@@ -1984,10 +1901,8 @@ public class AppPersistenceImpl
 	 * @return the ordered range of matching apps
 	 */
 	@Override
-	public List<App> findByCategory(
-		String category, int start, int end,
+	public List<App> findByCategory(String category, int start, int end,
 		OrderByComparator<App> orderByComparator, boolean retrieveFromCache) {
-
 		category = Objects.toString(category, "");
 
 		boolean pagination = true;
@@ -1995,22 +1910,20 @@ public class AppPersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByCategory;
-			finderArgs = new Object[] {category};
+			finderArgs = new Object[] { category };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByCategory;
-			finderArgs = new Object[] {category, start, end, orderByComparator};
+			finderArgs = new Object[] { category, start, end, orderByComparator };
 		}
 
 		List<App> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<App>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<App>)finderCache.getResult(finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (App app : list) {
@@ -2027,8 +1940,8 @@ public class AppPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -2048,10 +1961,11 @@ public class AppPersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AppModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2071,16 +1985,15 @@ public class AppPersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<App>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<App>)QueryUtil.list(q, getDialect(), start,
+							end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<App>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<App>)QueryUtil.list(q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2109,10 +2022,8 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
-	public App findByCategory_First(
-			String category, OrderByComparator<App> orderByComparator)
-		throws NoSuchAppException {
-
+	public App findByCategory_First(String category,
+		OrderByComparator<App> orderByComparator) throws NoSuchAppException {
 		App app = fetchByCategory_First(category, orderByComparator);
 
 		if (app != null) {
@@ -2139,9 +2050,8 @@ public class AppPersistenceImpl
 	 * @return the first matching app, or <code>null</code> if a matching app could not be found
 	 */
 	@Override
-	public App fetchByCategory_First(
-		String category, OrderByComparator<App> orderByComparator) {
-
+	public App fetchByCategory_First(String category,
+		OrderByComparator<App> orderByComparator) {
 		List<App> list = findByCategory(category, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -2160,10 +2070,8 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
-	public App findByCategory_Last(
-			String category, OrderByComparator<App> orderByComparator)
-		throws NoSuchAppException {
-
+	public App findByCategory_Last(String category,
+		OrderByComparator<App> orderByComparator) throws NoSuchAppException {
 		App app = fetchByCategory_Last(category, orderByComparator);
 
 		if (app != null) {
@@ -2190,17 +2098,16 @@ public class AppPersistenceImpl
 	 * @return the last matching app, or <code>null</code> if a matching app could not be found
 	 */
 	@Override
-	public App fetchByCategory_Last(
-		String category, OrderByComparator<App> orderByComparator) {
-
+	public App fetchByCategory_Last(String category,
+		OrderByComparator<App> orderByComparator) {
 		int count = countByCategory(category);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<App> list = findByCategory(
-			category, count - 1, count, orderByComparator);
+		List<App> list = findByCategory(category, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2219,11 +2126,8 @@ public class AppPersistenceImpl
 	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
-	public App[] findByCategory_PrevAndNext(
-			long appId, String category,
-			OrderByComparator<App> orderByComparator)
-		throws NoSuchAppException {
-
+	public App[] findByCategory_PrevAndNext(long appId, String category,
+		OrderByComparator<App> orderByComparator) throws NoSuchAppException {
 		category = Objects.toString(category, "");
 
 		App app = findByPrimaryKey(appId);
@@ -2235,13 +2139,13 @@ public class AppPersistenceImpl
 
 			App[] array = new AppImpl[3];
 
-			array[0] = getByCategory_PrevAndNext(
-				session, app, category, orderByComparator, true);
+			array[0] = getByCategory_PrevAndNext(session, app, category,
+					orderByComparator, true);
 
 			array[1] = app;
 
-			array[2] = getByCategory_PrevAndNext(
-				session, app, category, orderByComparator, false);
+			array[2] = getByCategory_PrevAndNext(session, app, category,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -2253,15 +2157,14 @@ public class AppPersistenceImpl
 		}
 	}
 
-	protected App getByCategory_PrevAndNext(
-		Session session, App app, String category,
-		OrderByComparator<App> orderByComparator, boolean previous) {
-
+	protected App getByCategory_PrevAndNext(Session session, App app,
+		String category, OrderByComparator<App> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2282,8 +2185,7 @@ public class AppPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2355,9 +2257,8 @@ public class AppPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(app)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					app)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2379,10 +2280,8 @@ public class AppPersistenceImpl
 	 */
 	@Override
 	public void removeByCategory(String category) {
-		for (App app :
-				findByCategory(
-					category, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (App app : findByCategory(category, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(app);
 		}
 	}
@@ -2399,7 +2298,7 @@ public class AppPersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByCategory;
 
-		Object[] finderArgs = new Object[] {category};
+		Object[] finderArgs = new Object[] { category };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2451,32 +2350,15 @@ public class AppPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_CATEGORY_CATEGORY_2 =
-		"app.category = ?";
-
-	private static final String _FINDER_COLUMN_CATEGORY_CATEGORY_3 =
-		"(app.category IS NULL OR app.category = '')";
+	private static final String _FINDER_COLUMN_CATEGORY_CATEGORY_2 = "app.category = ?";
+	private static final String _FINDER_COLUMN_CATEGORY_CATEGORY_3 = "(app.category IS NULL OR app.category = '')";
 
 	public AppPersistenceImpl() {
 		setModelClass(App.class);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("uuid", "uuid_");
-
-		try {
-			Field field = BasePersistenceImpl.class.getDeclaredField(
-				"_dbColumnNames");
-
-			field.setAccessible(true);
-
-			field.set(this, dbColumnNames);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
+		setModelImplClass(AppImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(AppModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -2486,13 +2368,11 @@ public class AppPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(App app) {
-		entityCache.putResult(
-			AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class,
+		entityCache.putResult(AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class,
 			app.getPrimaryKey(), app);
 
-		finderCache.putResult(
-			_finderPathFetchByRemoteAppId, new Object[] {app.getRemoteAppId()},
-			app);
+		finderCache.putResult(_finderPathFetchByRemoteAppId,
+			new Object[] { app.getRemoteAppId() }, app);
 
 		app.resetOriginalValues();
 	}
@@ -2505,10 +2385,8 @@ public class AppPersistenceImpl
 	@Override
 	public void cacheResult(List<App> apps) {
 		for (App app : apps) {
-			if (entityCache.getResult(
-					AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class,
-					app.getPrimaryKey()) == null) {
-
+			if (entityCache.getResult(AppModelImpl.ENTITY_CACHE_ENABLED,
+						AppImpl.class, app.getPrimaryKey()) == null) {
 				cacheResult(app);
 			}
 			else {
@@ -2521,7 +2399,7 @@ public class AppPersistenceImpl
 	 * Clears the cache for all apps.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -2537,14 +2415,13 @@ public class AppPersistenceImpl
 	 * Clears the cache for the app.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(App app) {
-		entityCache.removeResult(
-			AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class,
-			app.getPrimaryKey());
+		entityCache.removeResult(AppModelImpl.ENTITY_CACHE_ENABLED,
+			AppImpl.class, app.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -2558,39 +2435,34 @@ public class AppPersistenceImpl
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (App app : apps) {
-			entityCache.removeResult(
-				AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class,
-				app.getPrimaryKey());
+			entityCache.removeResult(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppImpl.class, app.getPrimaryKey());
 
 			clearUniqueFindersCache((AppModelImpl)app, true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(AppModelImpl appModelImpl) {
-		Object[] args = new Object[] {appModelImpl.getRemoteAppId()};
+		Object[] args = new Object[] { appModelImpl.getRemoteAppId() };
 
-		finderCache.putResult(
-			_finderPathCountByRemoteAppId, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByRemoteAppId, args, appModelImpl, false);
+		finderCache.putResult(_finderPathCountByRemoteAppId, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(_finderPathFetchByRemoteAppId, args,
+			appModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(
-		AppModelImpl appModelImpl, boolean clearCurrent) {
-
+	protected void clearUniqueFindersCache(AppModelImpl appModelImpl,
+		boolean clearCurrent) {
 		if (clearCurrent) {
-			Object[] args = new Object[] {appModelImpl.getRemoteAppId()};
+			Object[] args = new Object[] { appModelImpl.getRemoteAppId() };
 
 			finderCache.removeResult(_finderPathCountByRemoteAppId, args);
 			finderCache.removeResult(_finderPathFetchByRemoteAppId, args);
 		}
 
 		if ((appModelImpl.getColumnBitmask() &
-			 _finderPathFetchByRemoteAppId.getColumnBitmask()) != 0) {
-
-			Object[] args = new Object[] {
-				appModelImpl.getOriginalRemoteAppId()
-			};
+				_finderPathFetchByRemoteAppId.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] { appModelImpl.getOriginalRemoteAppId() };
 
 			finderCache.removeResult(_finderPathCountByRemoteAppId, args);
 			finderCache.removeResult(_finderPathFetchByRemoteAppId, args);
@@ -2652,8 +2524,8 @@ public class AppPersistenceImpl
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchAppException(
-					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				throw new NoSuchAppException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
 			}
 
 			return remove(app);
@@ -2710,12 +2582,12 @@ public class AppPersistenceImpl
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in app proxy " +
-						invocationHandler.getClass());
+					invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom App implementation " +
-					app.getClass());
+				app.getClass());
 		}
 
 		AppModelImpl appModelImpl = (AppModelImpl)app;
@@ -2726,8 +2598,7 @@ public class AppPersistenceImpl
 			app.setUuid(uuid);
 		}
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -2775,118 +2646,107 @@ public class AppPersistenceImpl
 		if (!AppModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else if (isNew) {
-			Object[] args = new Object[] {appModelImpl.getUuid()};
+		else
+		 if (isNew) {
+			Object[] args = new Object[] { appModelImpl.getUuid() };
 
 			finderCache.removeResult(_finderPathCountByUuid, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByUuid, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
+				args);
 
 			args = new Object[] {
-				appModelImpl.getUuid(), appModelImpl.getCompanyId()
-			};
-
-			finderCache.removeResult(_finderPathCountByUuid_C, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByUuid_C, args);
-
-			args = new Object[] {appModelImpl.getCompanyId()};
-
-			finderCache.removeResult(_finderPathCountByCompanyId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByCompanyId, args);
-
-			args = new Object[] {appModelImpl.getCategory()};
-
-			finderCache.removeResult(_finderPathCountByCategory, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByCategory, args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
-		}
-		else {
-			if ((appModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUuid.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {appModelImpl.getOriginalUuid()};
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid, args);
-
-				args = new Object[] {appModelImpl.getUuid()};
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid, args);
-			}
-
-			if ((appModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					appModelImpl.getOriginalUuid(),
-					appModelImpl.getOriginalCompanyId()
-				};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid_C, args);
-
-				args = new Object[] {
 					appModelImpl.getUuid(), appModelImpl.getCompanyId()
 				};
 
+			finderCache.removeResult(_finderPathCountByUuid_C, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+				args);
+
+			args = new Object[] { appModelImpl.getCompanyId() };
+
+			finderCache.removeResult(_finderPathCountByCompanyId, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+				args);
+
+			args = new Object[] { appModelImpl.getCategory() };
+
+			finderCache.removeResult(_finderPathCountByCategory, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByCategory,
+				args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
+				FINDER_ARGS_EMPTY);
+		}
+
+		else {
+			if ((appModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByUuid.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] { appModelImpl.getOriginalUuid() };
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
+					args);
+
+				args = new Object[] { appModelImpl.getUuid() };
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
+					args);
+			}
+
+			if ((appModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						appModelImpl.getOriginalUuid(),
+						appModelImpl.getOriginalCompanyId()
+					};
+
 				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid_C, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+					args);
+
+				args = new Object[] {
+						appModelImpl.getUuid(), appModelImpl.getCompanyId()
+					};
+
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+					args);
 			}
 
 			if ((appModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByCompanyId.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					appModelImpl.getOriginalCompanyId()
-				};
+					_finderPathWithoutPaginationFindByCompanyId.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] { appModelImpl.getOriginalCompanyId() };
 
 				finderCache.removeResult(_finderPathCountByCompanyId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByCompanyId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+					args);
 
-				args = new Object[] {appModelImpl.getCompanyId()};
+				args = new Object[] { appModelImpl.getCompanyId() };
 
 				finderCache.removeResult(_finderPathCountByCompanyId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByCompanyId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+					args);
 			}
 
 			if ((appModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByCategory.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					appModelImpl.getOriginalCategory()
-				};
+					_finderPathWithoutPaginationFindByCategory.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] { appModelImpl.getOriginalCategory() };
 
 				finderCache.removeResult(_finderPathCountByCategory, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByCategory, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByCategory,
+					args);
 
-				args = new Object[] {appModelImpl.getCategory()};
+				args = new Object[] { appModelImpl.getCategory() };
 
 				finderCache.removeResult(_finderPathCountByCategory, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByCategory, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByCategory,
+					args);
 			}
 		}
 
-		entityCache.putResult(
-			AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class,
+		entityCache.putResult(AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class,
 			app.getPrimaryKey(), app, false);
 
 		clearUniqueFindersCache(appModelImpl, false);
@@ -2898,7 +2758,7 @@ public class AppPersistenceImpl
 	}
 
 	/**
-	 * Returns the app with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
+	 * Returns the app with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the app
 	 * @return the app
@@ -2907,7 +2767,6 @@ public class AppPersistenceImpl
 	@Override
 	public App findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchAppException {
-
 		App app = fetchByPrimaryKey(primaryKey);
 
 		if (app == null) {
@@ -2915,15 +2774,15 @@ public class AppPersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchAppException(
-				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			throw new NoSuchAppException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
 		}
 
 		return app;
 	}
 
 	/**
-	 * Returns the app with the primary key or throws a <code>NoSuchAppException</code> if it could not be found.
+	 * Returns the app with the primary key or throws a {@link NoSuchAppException} if it could not be found.
 	 *
 	 * @param appId the primary key of the app
 	 * @return the app
@@ -2937,157 +2796,12 @@ public class AppPersistenceImpl
 	/**
 	 * Returns the app with the primary key or returns <code>null</code> if it could not be found.
 	 *
-	 * @param primaryKey the primary key of the app
-	 * @return the app, or <code>null</code> if a app with the primary key could not be found
-	 */
-	@Override
-	public App fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(
-			AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class, primaryKey);
-
-		if (serializable == nullModel) {
-			return null;
-		}
-
-		App app = (App)serializable;
-
-		if (app == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				app = (App)session.get(AppImpl.class, primaryKey);
-
-				if (app != null) {
-					cacheResult(app);
-				}
-				else {
-					entityCache.putResult(
-						AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class,
-						primaryKey, nullModel);
-				}
-			}
-			catch (Exception e) {
-				entityCache.removeResult(
-					AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class,
-					primaryKey);
-
-				throw processException(e);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return app;
-	}
-
-	/**
-	 * Returns the app with the primary key or returns <code>null</code> if it could not be found.
-	 *
 	 * @param appId the primary key of the app
 	 * @return the app, or <code>null</code> if a app with the primary key could not be found
 	 */
 	@Override
 	public App fetchByPrimaryKey(long appId) {
 		return fetchByPrimaryKey((Serializable)appId);
-	}
-
-	@Override
-	public Map<Serializable, App> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, App> map = new HashMap<Serializable, App>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			App app = fetchByPrimaryKey(primaryKey);
-
-			if (app != null) {
-				map.put(primaryKey, app);
-			}
-
-			return map;
-		}
-
-		Set<Serializable> uncachedPrimaryKeys = null;
-
-		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(
-				AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class, primaryKey);
-
-			if (serializable != nullModel) {
-				if (serializable == null) {
-					if (uncachedPrimaryKeys == null) {
-						uncachedPrimaryKeys = new HashSet<Serializable>();
-					}
-
-					uncachedPrimaryKeys.add(primaryKey);
-				}
-				else {
-					map.put(primaryKey, (App)serializable);
-				}
-			}
-		}
-
-		if (uncachedPrimaryKeys == null) {
-			return map;
-		}
-
-		StringBundler query = new StringBundler(
-			uncachedPrimaryKeys.size() * 2 + 1);
-
-		query.append(_SQL_SELECT_APP_WHERE_PKS_IN);
-
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
-
-			query.append(",");
-		}
-
-		query.setIndex(query.index() - 1);
-
-		query.append(")");
-
-		String sql = query.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query q = session.createQuery(sql);
-
-			for (App app : (List<App>)q.list()) {
-				map.put(app.getPrimaryKeyObj(), app);
-
-				cacheResult(app);
-
-				uncachedPrimaryKeys.remove(app.getPrimaryKeyObj());
-			}
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(
-					AppModelImpl.ENTITY_CACHE_ENABLED, AppImpl.class,
-					primaryKey, nullModel);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -3104,7 +2818,7 @@ public class AppPersistenceImpl
 	 * Returns a range of all the apps.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of apps
@@ -3120,7 +2834,7 @@ public class AppPersistenceImpl
 	 * Returns an ordered range of all the apps.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of apps
@@ -3129,9 +2843,8 @@ public class AppPersistenceImpl
 	 * @return the ordered range of apps
 	 */
 	@Override
-	public List<App> findAll(
-		int start, int end, OrderByComparator<App> orderByComparator) {
-
+	public List<App> findAll(int start, int end,
+		OrderByComparator<App> orderByComparator) {
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -3139,7 +2852,7 @@ public class AppPersistenceImpl
 	 * Returns an ordered range of all the apps.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of apps
@@ -3149,31 +2862,27 @@ public class AppPersistenceImpl
 	 * @return the ordered range of apps
 	 */
 	@Override
-	public List<App> findAll(
-		int start, int end, OrderByComparator<App> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<App> findAll(int start, int end,
+		OrderByComparator<App> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] {start, end, orderByComparator};
+			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
 		List<App> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<App>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<App>)finderCache.getResult(finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -3181,13 +2890,13 @@ public class AppPersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					2 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_APP);
 
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 
 				sql = query.toString();
 			}
@@ -3207,16 +2916,15 @@ public class AppPersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<App>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<App>)QueryUtil.list(q, getDialect(), start,
+							end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<App>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<App>)QueryUtil.list(q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3254,8 +2962,8 @@ public class AppPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(_finderPathCountAll,
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -3267,12 +2975,11 @@ public class AppPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
+					count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -3290,6 +2997,21 @@ public class AppPersistenceImpl
 	}
 
 	@Override
+	protected EntityCache getEntityCache() {
+		return entityCache;
+	}
+
+	@Override
+	protected String getPKDBName() {
+		return "appId";
+	}
+
+	@Override
+	protected String getSelectSQL() {
+		return _SQL_SELECT_APP;
+	}
+
+	@Override
 	protected Map<String, Integer> getTableColumnsMap() {
 		return AppModelImpl.TABLE_COLUMNS_MAP;
 	}
@@ -3298,125 +3020,115 @@ public class AppPersistenceImpl
 	 * Initializes the app persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-			new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+				new String[0]);
 
-		_finderPathCountAll = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+		_finderPathCountAll = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+				new String[0]);
 
-		_finderPathWithPaginationFindByUuid = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
-			new String[] {
-				String.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByUuid = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-			new String[] {String.class.getName()},
-			AppModelImpl.UUID_COLUMN_BITMASK);
-
-		_finderPathCountByUuid = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
-			new String[] {String.class.getName()});
-
-		_finderPathWithPaginationFindByUuid_C = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
-			new String[] {
-				String.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByUuid = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
+				new String[] {
+					String.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			AppModelImpl.UUID_COLUMN_BITMASK |
-			AppModelImpl.COMPANYID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+				new String[] { String.class.getName() },
+				AppModelImpl.UUID_COLUMN_BITMASK);
 
-		_finderPathCountByUuid_C = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
-			new String[] {String.class.getName(), Long.class.getName()});
+		_finderPathCountByUuid = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
+				new String[] { String.class.getName() });
 
-		_finderPathWithPaginationFindByCompanyId = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+				new String[] {
+					String.class.getName(), Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
-			new String[] {Long.class.getName()},
-			AppModelImpl.COMPANYID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+				new String[] { String.class.getName(), Long.class.getName() },
+				AppModelImpl.UUID_COLUMN_BITMASK |
+				AppModelImpl.COMPANYID_COLUMN_BITMASK);
 
-		_finderPathCountByCompanyId = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
-			new String[] {Long.class.getName()});
+		_finderPathCountByUuid_C = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+				new String[] { String.class.getName(), Long.class.getName() });
 
-		_finderPathFetchByRemoteAppId = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByRemoteAppId",
-			new String[] {Long.class.getName()},
-			AppModelImpl.REMOTEAPPID_COLUMN_BITMASK);
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
+				new String[] {
+					Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathCountByRemoteAppId = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByRemoteAppId",
-			new String[] {Long.class.getName()});
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+				new String[] { Long.class.getName() },
+				AppModelImpl.COMPANYID_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByCategory = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCategory",
-			new String[] {
-				String.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+		_finderPathCountByCompanyId = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
+				new String[] { Long.class.getName() });
 
-		_finderPathWithoutPaginationFindByCategory = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCategory",
-			new String[] {String.class.getName()},
-			AppModelImpl.CATEGORY_COLUMN_BITMASK);
+		_finderPathFetchByRemoteAppId = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
+				FINDER_CLASS_NAME_ENTITY, "fetchByRemoteAppId",
+				new String[] { Long.class.getName() },
+				AppModelImpl.REMOTEAPPID_COLUMN_BITMASK);
 
-		_finderPathCountByCategory = new FinderPath(
-			AppModelImpl.ENTITY_CACHE_ENABLED,
-			AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCategory",
-			new String[] {String.class.getName()});
+		_finderPathCountByRemoteAppId = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+				"countByRemoteAppId", new String[] { Long.class.getName() });
+
+		_finderPathWithPaginationFindByCategory = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCategory",
+				new String[] {
+					String.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByCategory = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, AppImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCategory",
+				new String[] { String.class.getName() },
+				AppModelImpl.CATEGORY_COLUMN_BITMASK);
+
+		_finderPathCountByCategory = new FinderPath(AppModelImpl.ENTITY_CACHE_ENABLED,
+				AppModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCategory",
+				new String[] { String.class.getName() });
 	}
 
 	public void destroy() {
@@ -3428,39 +3140,19 @@ public class AppPersistenceImpl
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
-
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-
 	private static final String _SQL_SELECT_APP = "SELECT app FROM App app";
-
-	private static final String _SQL_SELECT_APP_WHERE_PKS_IN =
-		"SELECT app FROM App app WHERE appId IN (";
-
-	private static final String _SQL_SELECT_APP_WHERE =
-		"SELECT app FROM App app WHERE ";
-
-	private static final String _SQL_COUNT_APP =
-		"SELECT COUNT(app) FROM App app";
-
-	private static final String _SQL_COUNT_APP_WHERE =
-		"SELECT COUNT(app) FROM App app WHERE ";
-
+	private static final String _SQL_SELECT_APP_WHERE = "SELECT app FROM App app WHERE ";
+	private static final String _SQL_COUNT_APP = "SELECT COUNT(app) FROM App app";
+	private static final String _SQL_COUNT_APP_WHERE = "SELECT COUNT(app) FROM App app WHERE ";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "app.";
-
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
-		"No App exists with the primary key ";
-
-	private static final String _NO_SUCH_ENTITY_WITH_KEY =
-		"No App exists with the key {";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AppPersistenceImpl.class);
-
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"uuid"});
-
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No App exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No App exists with the key {";
+	private static final Log _log = LogFactoryUtil.getLog(AppPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+				"uuid"
+			});
 }

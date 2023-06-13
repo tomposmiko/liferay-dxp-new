@@ -7,39 +7,43 @@
 	{@param multiSelection: bool}
 	{@param nodes: list<?>}
 	{@param pathThemeImages: string}
+	{@param? _handleSearchFormKeyDown: any}
+	{@param? _selectedNodeChange: any}
 	{@param? namespace: string}
-	{@param? selectedNodeChange_: any}
 	{@param? viewType: string}
 
 	<div class="select-category">
-		<nav class="management-bar navbar navbar-light">
-			<div class="navbar-form navbar-form-autofit">
-				<div class="container-fluid">
-					<form role="search">
-						<div class="input-group input-group-inset">
-							<div class="input-group-input">
-								<input class="form-control" data-oninput="searchNodes_" name="{$namespace}filterKeywords" placeholder="{msg desc=""}search{/msg}" type="text">
-							</div>
+		<form class="select-category-filter" role="search">
+			<div class="container-fluid-1280">
+				<div class="input-group">
+					<div class="input-group-item">
+						<input
+							class="form-control input-group-inset input-group-inset-after"
+							data-oninput="_searchNodes"
+							data-onkeydown="{$_handleSearchFormKeyDown}"
+							name="{$namespace}filterKeywords"
+							placeholder="{msg desc=""}search{/msg}"
+							type="text"
+						/>
 
-							<span class="input-group-inset-item">
-								<button class="btn btn-unstyled" type="button">
-									<svg class="lexicon-icon">
-										<use xlink:href="{$pathThemeImages}/lexicon/icons.svg#search"></use>
-									</svg>
-								</button>
-							</span>
-						</div>
-					</form>
+						<span class="input-group-inset-item input-group-inset-item-after">
+							<button class="btn btn-unstyled" type="submit">
+								<svg class="lexicon-icon lexicon-icon-search" focusable="false" role="presentation">
+									<use xlink:href="{$pathThemeImages}/lexicon/icons.svg#search"></use>
+								</svg>
+							</button>
+						</span>
+					</div>
 				</div>
 			</div>
-		</nav>
+		</form>
 
-		<form class="container-fluid-1280" name="{$namespace}selectCategoryFm">
-			<fieldset class="panel-body">
+		<form name="{$namespace}selectCategoryFm">
+			<fieldset class="container-fluid-1280">
 				<div class="category-tree" id="{$namespace}categoryContainer">
 					{call liferay.frontend.CardsTreeview.render}
 						{param events: [
-							'selectedNodesChanged': $selectedNodeChange_
+							'selectedNodesChanged': $_selectedNodeChange
 						]/}
 						{param multiSelection: $multiSelection /}
 						{param nodes: $nodes /}

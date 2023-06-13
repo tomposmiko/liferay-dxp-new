@@ -17,9 +17,11 @@ package com.liferay.portlet.asset.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.kernel.model.AssetEntry;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing AssetEntry in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see AssetEntry
  * @generated
  */
 @ProviderType
-public class AssetEntryCacheModel
-	implements CacheModel<AssetEntry>, Externalizable {
-
+public class AssetEntryCacheModel implements CacheModel<AssetEntry>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -293,7 +295,8 @@ public class AssetEntryCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(entryId);
 
 		objectOutput.writeLong(groupId);
@@ -411,5 +414,4 @@ public class AssetEntryCacheModel
 	public int width;
 	public double priority;
 	public int viewCount;
-
 }

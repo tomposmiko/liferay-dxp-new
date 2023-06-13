@@ -355,8 +355,8 @@ public class FieldsWriterTest {
 
 		_fieldsWriter.writeRelatedModels(
 			pathFunction,
-			(singleModel, embeddedPathElements) -> Assert.fail(
-				"Should not be embedded"),
+			(singleModel, embeddedPathElements) ->
+				Assert.fail("Should not be embedded"),
 			(url, embeddedPathElements) -> {
 				linkedRelatedModelURLs.add(url);
 				linkedPathElementsList.add(embeddedPathElements);
@@ -393,8 +393,8 @@ public class FieldsWriterTest {
 
 		_fieldsWriter.writeRelatedModels(
 			pathFunction,
-			(singleModel, embeddedPathElements) -> Assert.fail(
-				"Should not be embedded"),
+			(singleModel, embeddedPathElements) ->
+				Assert.fail("Should not be embedded"),
 			(url, embeddedPathElements) -> {
 				linkedRelatedModelURLs.add(url);
 				embeddedPathElementsList.add(embeddedPathElements);

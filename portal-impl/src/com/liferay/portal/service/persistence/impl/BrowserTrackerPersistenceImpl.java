@@ -16,7 +16,10 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -34,7 +37,6 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.impl.BrowserTrackerImpl;
 import com.liferay.portal.model.impl.BrowserTrackerModelImpl;
 
@@ -43,12 +45,8 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * The persistence implementation for the browser tracker service.
@@ -58,27 +56,23 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see BrowserTrackerPersistence
+ * @see com.liferay.portal.kernel.service.persistence.BrowserTrackerUtil
  * @generated
  */
 @ProviderType
-public class BrowserTrackerPersistenceImpl
-	extends BasePersistenceImpl<BrowserTracker>
+public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTracker>
 	implements BrowserTrackerPersistence {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use <code>BrowserTrackerUtil</code> to access the browser tracker persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use {@link BrowserTrackerUtil} to access the browser tracker persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY =
-		BrowserTrackerImpl.class.getName();
-
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List1";
-
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List2";
-
+	public static final String FINDER_CLASS_NAME_ENTITY = BrowserTrackerImpl.class.getName();
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -86,7 +80,7 @@ public class BrowserTrackerPersistenceImpl
 	private FinderPath _finderPathCountByUserId;
 
 	/**
-	 * Returns the browser tracker where userId = &#63; or throws a <code>NoSuchBrowserTrackerException</code> if it could not be found.
+	 * Returns the browser tracker where userId = &#63; or throws a {@link NoSuchBrowserTrackerException} if it could not be found.
 	 *
 	 * @param userId the user ID
 	 * @return the matching browser tracker
@@ -95,7 +89,6 @@ public class BrowserTrackerPersistenceImpl
 	@Override
 	public BrowserTracker findByUserId(long userId)
 		throws NoSuchBrowserTrackerException {
-
 		BrowserTracker browserTracker = fetchByUserId(userId);
 
 		if (browserTracker == null) {
@@ -137,16 +130,14 @@ public class BrowserTrackerPersistenceImpl
 	 * @return the matching browser tracker, or <code>null</code> if a matching browser tracker could not be found
 	 */
 	@Override
-	public BrowserTracker fetchByUserId(
-		long userId, boolean retrieveFromCache) {
-
-		Object[] finderArgs = new Object[] {userId};
+	public BrowserTracker fetchByUserId(long userId, boolean retrieveFromCache) {
+		Object[] finderArgs = new Object[] { userId };
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = FinderCacheUtil.getResult(
-				_finderPathFetchByUserId, finderArgs, this);
+			result = FinderCacheUtil.getResult(_finderPathFetchByUserId,
+					finderArgs, this);
 		}
 
 		if (result instanceof BrowserTracker) {
@@ -180,8 +171,8 @@ public class BrowserTrackerPersistenceImpl
 				List<BrowserTracker> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByUserId, finderArgs, list);
+					FinderCacheUtil.putResult(_finderPathFetchByUserId,
+						finderArgs, list);
 				}
 				else {
 					BrowserTracker browserTracker = list.get(0);
@@ -192,8 +183,8 @@ public class BrowserTrackerPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByUserId, finderArgs);
+				FinderCacheUtil.removeResult(_finderPathFetchByUserId,
+					finderArgs);
 
 				throw processException(e);
 			}
@@ -219,7 +210,6 @@ public class BrowserTrackerPersistenceImpl
 	@Override
 	public BrowserTracker removeByUserId(long userId)
 		throws NoSuchBrowserTrackerException {
-
 		BrowserTracker browserTracker = findByUserId(userId);
 
 		return remove(browserTracker);
@@ -235,10 +225,10 @@ public class BrowserTrackerPersistenceImpl
 	public int countByUserId(long userId) {
 		FinderPath finderPath = _finderPathCountByUserId;
 
-		Object[] finderArgs = new Object[] {userId};
+		Object[] finderArgs = new Object[] { userId };
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -277,11 +267,14 @@ public class BrowserTrackerPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_USERID_USERID_2 =
-		"browserTracker.userId = ?";
+	private static final String _FINDER_COLUMN_USERID_USERID_2 = "browserTracker.userId = ?";
 
 	public BrowserTrackerPersistenceImpl() {
 		setModelClass(BrowserTracker.class);
+
+		setModelImplClass(BrowserTrackerImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -291,14 +284,12 @@ public class BrowserTrackerPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(BrowserTracker browserTracker) {
-		EntityCacheUtil.putResult(
-			BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.putResult(BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
 			BrowserTrackerImpl.class, browserTracker.getPrimaryKey(),
 			browserTracker);
 
-		FinderCacheUtil.putResult(
-			_finderPathFetchByUserId, new Object[] {browserTracker.getUserId()},
-			browserTracker);
+		FinderCacheUtil.putResult(_finderPathFetchByUserId,
+			new Object[] { browserTracker.getUserId() }, browserTracker);
 
 		browserTracker.resetOriginalValues();
 	}
@@ -312,10 +303,8 @@ public class BrowserTrackerPersistenceImpl
 	public void cacheResult(List<BrowserTracker> browserTrackers) {
 		for (BrowserTracker browserTracker : browserTrackers) {
 			if (EntityCacheUtil.getResult(
-					BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-					BrowserTrackerImpl.class, browserTracker.getPrimaryKey()) ==
-						null) {
-
+						BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+						BrowserTrackerImpl.class, browserTracker.getPrimaryKey()) == null) {
 				cacheResult(browserTracker);
 			}
 			else {
@@ -328,7 +317,7 @@ public class BrowserTrackerPersistenceImpl
 	 * Clears the cache for all browser trackers.
 	 *
 	 * <p>
-	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -344,13 +333,12 @@ public class BrowserTrackerPersistenceImpl
 	 * Clears the cache for the browser tracker.
 	 *
 	 * <p>
-	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(BrowserTracker browserTracker) {
-		EntityCacheUtil.removeResult(
-			BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.removeResult(BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
 			BrowserTrackerImpl.class, browserTracker.getPrimaryKey());
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -365,42 +353,38 @@ public class BrowserTrackerPersistenceImpl
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (BrowserTracker browserTracker : browserTrackers) {
-			EntityCacheUtil.removeResult(
-				BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			EntityCacheUtil.removeResult(BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
 				BrowserTrackerImpl.class, browserTracker.getPrimaryKey());
 
-			clearUniqueFindersCache(
-				(BrowserTrackerModelImpl)browserTracker, true);
+			clearUniqueFindersCache((BrowserTrackerModelImpl)browserTracker,
+				true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
 		BrowserTrackerModelImpl browserTrackerModelImpl) {
+		Object[] args = new Object[] { browserTrackerModelImpl.getUserId() };
 
-		Object[] args = new Object[] {browserTrackerModelImpl.getUserId()};
-
-		FinderCacheUtil.putResult(
-			_finderPathCountByUserId, args, Long.valueOf(1), false);
-		FinderCacheUtil.putResult(
-			_finderPathFetchByUserId, args, browserTrackerModelImpl, false);
+		FinderCacheUtil.putResult(_finderPathCountByUserId, args,
+			Long.valueOf(1), false);
+		FinderCacheUtil.putResult(_finderPathFetchByUserId, args,
+			browserTrackerModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		BrowserTrackerModelImpl browserTrackerModelImpl, boolean clearCurrent) {
-
 		if (clearCurrent) {
-			Object[] args = new Object[] {browserTrackerModelImpl.getUserId()};
+			Object[] args = new Object[] { browserTrackerModelImpl.getUserId() };
 
 			FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
 			FinderCacheUtil.removeResult(_finderPathFetchByUserId, args);
 		}
 
 		if ((browserTrackerModelImpl.getColumnBitmask() &
-			 _finderPathFetchByUserId.getColumnBitmask()) != 0) {
-
+				_finderPathFetchByUserId.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
-				browserTrackerModelImpl.getOriginalUserId()
-			};
+					browserTrackerModelImpl.getOriginalUserId()
+				};
 
 			FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
 			FinderCacheUtil.removeResult(_finderPathFetchByUserId, args);
@@ -435,7 +419,6 @@ public class BrowserTrackerPersistenceImpl
 	@Override
 	public BrowserTracker remove(long browserTrackerId)
 		throws NoSuchBrowserTrackerException {
-
 		return remove((Serializable)browserTrackerId);
 	}
 
@@ -449,22 +432,21 @@ public class BrowserTrackerPersistenceImpl
 	@Override
 	public BrowserTracker remove(Serializable primaryKey)
 		throws NoSuchBrowserTrackerException {
-
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			BrowserTracker browserTracker = (BrowserTracker)session.get(
-				BrowserTrackerImpl.class, primaryKey);
+			BrowserTracker browserTracker = (BrowserTracker)session.get(BrowserTrackerImpl.class,
+					primaryKey);
 
 			if (browserTracker == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchBrowserTrackerException(
-					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				throw new NoSuchBrowserTrackerException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
 			}
 
 			return remove(browserTracker);
@@ -488,9 +470,8 @@ public class BrowserTrackerPersistenceImpl
 			session = openSession();
 
 			if (!session.contains(browserTracker)) {
-				browserTracker = (BrowserTracker)session.get(
-					BrowserTrackerImpl.class,
-					browserTracker.getPrimaryKeyObj());
+				browserTracker = (BrowserTracker)session.get(BrowserTrackerImpl.class,
+						browserTracker.getPrimaryKeyObj());
 			}
 
 			if (browserTracker != null) {
@@ -519,21 +500,19 @@ public class BrowserTrackerPersistenceImpl
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(browserTracker.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(
-					browserTracker);
+				invocationHandler = ProxyUtil.getInvocationHandler(browserTracker);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in browserTracker proxy " +
-						invocationHandler.getClass());
+					invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom BrowserTracker implementation " +
-					browserTracker.getClass());
+				browserTracker.getClass());
 		}
 
-		BrowserTrackerModelImpl browserTrackerModelImpl =
-			(BrowserTrackerModelImpl)browserTracker;
+		BrowserTrackerModelImpl browserTrackerModelImpl = (BrowserTrackerModelImpl)browserTracker;
 
 		Session session = null;
 
@@ -559,18 +538,16 @@ public class BrowserTrackerPersistenceImpl
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
 		if (!BrowserTrackerModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else if (isNew) {
-			FinderCacheUtil.removeResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		else
+		 if (isNew) {
+			FinderCacheUtil.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindAll,
+				FINDER_ARGS_EMPTY);
 		}
 
-		EntityCacheUtil.putResult(
-			BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.putResult(BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
 			BrowserTrackerImpl.class, browserTracker.getPrimaryKey(),
 			browserTracker, false);
 
@@ -583,7 +560,7 @@ public class BrowserTrackerPersistenceImpl
 	}
 
 	/**
-	 * Returns the browser tracker with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
+	 * Returns the browser tracker with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the browser tracker
 	 * @return the browser tracker
@@ -592,7 +569,6 @@ public class BrowserTrackerPersistenceImpl
 	@Override
 	public BrowserTracker findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchBrowserTrackerException {
-
 		BrowserTracker browserTracker = fetchByPrimaryKey(primaryKey);
 
 		if (browserTracker == null) {
@@ -600,15 +576,15 @@ public class BrowserTrackerPersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchBrowserTrackerException(
-				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			throw new NoSuchBrowserTrackerException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
 		}
 
 		return browserTracker;
 	}
 
 	/**
-	 * Returns the browser tracker with the primary key or throws a <code>NoSuchBrowserTrackerException</code> if it could not be found.
+	 * Returns the browser tracker with the primary key or throws a {@link NoSuchBrowserTrackerException} if it could not be found.
 	 *
 	 * @param browserTrackerId the primary key of the browser tracker
 	 * @return the browser tracker
@@ -617,59 +593,7 @@ public class BrowserTrackerPersistenceImpl
 	@Override
 	public BrowserTracker findByPrimaryKey(long browserTrackerId)
 		throws NoSuchBrowserTrackerException {
-
 		return findByPrimaryKey((Serializable)browserTrackerId);
-	}
-
-	/**
-	 * Returns the browser tracker with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param primaryKey the primary key of the browser tracker
-	 * @return the browser tracker, or <code>null</code> if a browser tracker with the primary key could not be found
-	 */
-	@Override
-	public BrowserTracker fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = EntityCacheUtil.getResult(
-			BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			BrowserTrackerImpl.class, primaryKey);
-
-		if (serializable == nullModel) {
-			return null;
-		}
-
-		BrowserTracker browserTracker = (BrowserTracker)serializable;
-
-		if (browserTracker == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				browserTracker = (BrowserTracker)session.get(
-					BrowserTrackerImpl.class, primaryKey);
-
-				if (browserTracker != null) {
-					cacheResult(browserTracker);
-				}
-				else {
-					EntityCacheUtil.putResult(
-						BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-						BrowserTrackerImpl.class, primaryKey, nullModel);
-				}
-			}
-			catch (Exception e) {
-				EntityCacheUtil.removeResult(
-					BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-					BrowserTrackerImpl.class, primaryKey);
-
-				throw processException(e);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return browserTracker;
 	}
 
 	/**
@@ -681,106 +605,6 @@ public class BrowserTrackerPersistenceImpl
 	@Override
 	public BrowserTracker fetchByPrimaryKey(long browserTrackerId) {
 		return fetchByPrimaryKey((Serializable)browserTrackerId);
-	}
-
-	@Override
-	public Map<Serializable, BrowserTracker> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, BrowserTracker> map =
-			new HashMap<Serializable, BrowserTracker>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			BrowserTracker browserTracker = fetchByPrimaryKey(primaryKey);
-
-			if (browserTracker != null) {
-				map.put(primaryKey, browserTracker);
-			}
-
-			return map;
-		}
-
-		Set<Serializable> uncachedPrimaryKeys = null;
-
-		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = EntityCacheUtil.getResult(
-				BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-				BrowserTrackerImpl.class, primaryKey);
-
-			if (serializable != nullModel) {
-				if (serializable == null) {
-					if (uncachedPrimaryKeys == null) {
-						uncachedPrimaryKeys = new HashSet<Serializable>();
-					}
-
-					uncachedPrimaryKeys.add(primaryKey);
-				}
-				else {
-					map.put(primaryKey, (BrowserTracker)serializable);
-				}
-			}
-		}
-
-		if (uncachedPrimaryKeys == null) {
-			return map;
-		}
-
-		StringBundler query = new StringBundler(
-			uncachedPrimaryKeys.size() * 2 + 1);
-
-		query.append(_SQL_SELECT_BROWSERTRACKER_WHERE_PKS_IN);
-
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
-
-			query.append(",");
-		}
-
-		query.setIndex(query.index() - 1);
-
-		query.append(")");
-
-		String sql = query.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query q = session.createQuery(sql);
-
-			for (BrowserTracker browserTracker :
-					(List<BrowserTracker>)q.list()) {
-
-				map.put(browserTracker.getPrimaryKeyObj(), browserTracker);
-
-				cacheResult(browserTracker);
-
-				uncachedPrimaryKeys.remove(browserTracker.getPrimaryKeyObj());
-			}
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				EntityCacheUtil.putResult(
-					BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-					BrowserTrackerImpl.class, primaryKey, nullModel);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -797,7 +621,7 @@ public class BrowserTrackerPersistenceImpl
 	 * Returns a range of all the browser trackers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BrowserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BrowserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of browser trackers
@@ -813,7 +637,7 @@ public class BrowserTrackerPersistenceImpl
 	 * Returns an ordered range of all the browser trackers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BrowserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BrowserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of browser trackers
@@ -822,10 +646,8 @@ public class BrowserTrackerPersistenceImpl
 	 * @return the ordered range of browser trackers
 	 */
 	@Override
-	public List<BrowserTracker> findAll(
-		int start, int end,
+	public List<BrowserTracker> findAll(int start, int end,
 		OrderByComparator<BrowserTracker> orderByComparator) {
-
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -833,7 +655,7 @@ public class BrowserTrackerPersistenceImpl
 	 * Returns an ordered range of all the browser trackers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BrowserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BrowserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of browser trackers
@@ -843,31 +665,29 @@ public class BrowserTrackerPersistenceImpl
 	 * @return the ordered range of browser trackers
 	 */
 	@Override
-	public List<BrowserTracker> findAll(
-		int start, int end, OrderByComparator<BrowserTracker> orderByComparator,
+	public List<BrowserTracker> findAll(int start, int end,
+		OrderByComparator<BrowserTracker> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] {start, end, orderByComparator};
+			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
 		List<BrowserTracker> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BrowserTracker>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BrowserTracker>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 		}
 
 		if (list == null) {
@@ -875,13 +695,13 @@ public class BrowserTrackerPersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					2 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_BROWSERTRACKER);
 
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 
 				sql = query.toString();
 			}
@@ -901,16 +721,16 @@ public class BrowserTrackerPersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<BrowserTracker>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BrowserTracker>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BrowserTracker>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BrowserTracker>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -948,8 +768,8 @@ public class BrowserTrackerPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		Long count = (Long)FinderCacheUtil.getResult(_finderPathCountAll,
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -961,12 +781,12 @@ public class BrowserTrackerPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				FinderCacheUtil.putResult(_finderPathCountAll,
+					FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+				FinderCacheUtil.removeResult(_finderPathCountAll,
+					FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -979,6 +799,21 @@ public class BrowserTrackerPersistenceImpl
 	}
 
 	@Override
+	protected EntityCache getEntityCache() {
+		return EntityCacheUtil.getEntityCache();
+	}
+
+	@Override
+	protected String getPKDBName() {
+		return "browserTrackerId";
+	}
+
+	@Override
+	protected String getSelectSQL() {
+		return _SQL_SELECT_BROWSERTRACKER;
+	}
+
+	@Override
 	protected Map<String, Integer> getTableColumnsMap() {
 		return BrowserTrackerModelImpl.TABLE_COLUMNS_MAP;
 	}
@@ -987,36 +822,32 @@ public class BrowserTrackerPersistenceImpl
 	 * Initializes the browser tracker persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(
-			BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			BrowserTrackerModelImpl.FINDER_CACHE_ENABLED,
-			BrowserTrackerImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+				BrowserTrackerModelImpl.FINDER_CACHE_ENABLED,
+				BrowserTrackerImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			BrowserTrackerModelImpl.FINDER_CACHE_ENABLED,
-			BrowserTrackerImpl.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-			"findAll", new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+				BrowserTrackerModelImpl.FINDER_CACHE_ENABLED,
+				BrowserTrackerImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+				new String[0]);
 
-		_finderPathCountAll = new FinderPath(
-			BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			BrowserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+		_finderPathCountAll = new FinderPath(BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+				BrowserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+				new String[0]);
 
-		_finderPathFetchByUserId = new FinderPath(
-			BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			BrowserTrackerModelImpl.FINDER_CACHE_ENABLED,
-			BrowserTrackerImpl.class, FINDER_CLASS_NAME_ENTITY, "fetchByUserId",
-			new String[] {Long.class.getName()},
-			BrowserTrackerModelImpl.USERID_COLUMN_BITMASK);
+		_finderPathFetchByUserId = new FinderPath(BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+				BrowserTrackerModelImpl.FINDER_CACHE_ENABLED,
+				BrowserTrackerImpl.class, FINDER_CLASS_NAME_ENTITY,
+				"fetchByUserId", new String[] { Long.class.getName() },
+				BrowserTrackerModelImpl.USERID_COLUMN_BITMASK);
 
-		_finderPathCountByUserId = new FinderPath(
-			BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			BrowserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
-			new String[] {Long.class.getName()});
+		_finderPathCountByUserId = new FinderPath(BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+				BrowserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
+				new String[] { Long.class.getName() });
 	}
 
 	public void destroy() {
@@ -1028,31 +859,12 @@ public class BrowserTrackerPersistenceImpl
 
 	@BeanReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-
-	private static final String _SQL_SELECT_BROWSERTRACKER =
-		"SELECT browserTracker FROM BrowserTracker browserTracker";
-
-	private static final String _SQL_SELECT_BROWSERTRACKER_WHERE_PKS_IN =
-		"SELECT browserTracker FROM BrowserTracker browserTracker WHERE browserTrackerId IN (";
-
-	private static final String _SQL_SELECT_BROWSERTRACKER_WHERE =
-		"SELECT browserTracker FROM BrowserTracker browserTracker WHERE ";
-
-	private static final String _SQL_COUNT_BROWSERTRACKER =
-		"SELECT COUNT(browserTracker) FROM BrowserTracker browserTracker";
-
-	private static final String _SQL_COUNT_BROWSERTRACKER_WHERE =
-		"SELECT COUNT(browserTracker) FROM BrowserTracker browserTracker WHERE ";
-
+	private static final String _SQL_SELECT_BROWSERTRACKER = "SELECT browserTracker FROM BrowserTracker browserTracker";
+	private static final String _SQL_SELECT_BROWSERTRACKER_WHERE = "SELECT browserTracker FROM BrowserTracker browserTracker WHERE ";
+	private static final String _SQL_COUNT_BROWSERTRACKER = "SELECT COUNT(browserTracker) FROM BrowserTracker browserTracker";
+	private static final String _SQL_COUNT_BROWSERTRACKER_WHERE = "SELECT COUNT(browserTracker) FROM BrowserTracker browserTracker WHERE ";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "browserTracker.";
-
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
-		"No BrowserTracker exists with the primary key ";
-
-	private static final String _NO_SUCH_ENTITY_WITH_KEY =
-		"No BrowserTracker exists with the key {";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		BrowserTrackerPersistenceImpl.class);
-
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No BrowserTracker exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No BrowserTracker exists with the key {";
+	private static final Log _log = LogFactoryUtil.getLog(BrowserTrackerPersistenceImpl.class);
 }

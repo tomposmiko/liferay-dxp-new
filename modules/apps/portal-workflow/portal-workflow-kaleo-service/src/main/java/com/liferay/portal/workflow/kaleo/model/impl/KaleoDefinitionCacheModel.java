@@ -16,9 +16,10 @@ package com.liferay.portal.workflow.kaleo.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 
 import java.io.Externalizable;
@@ -32,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing KaleoDefinition in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see KaleoDefinition
  * @generated
  */
 @ProviderType
-public class KaleoDefinitionCacheModel
-	implements CacheModel<KaleoDefinition>, Externalizable {
-
+public class KaleoDefinitionCacheModel implements CacheModel<KaleoDefinition>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,8 +49,7 @@ public class KaleoDefinitionCacheModel
 			return false;
 		}
 
-		KaleoDefinitionCacheModel kaleoDefinitionCacheModel =
-			(KaleoDefinitionCacheModel)obj;
+		KaleoDefinitionCacheModel kaleoDefinitionCacheModel = (KaleoDefinitionCacheModel)obj;
 
 		if (kaleoDefinitionId == kaleoDefinitionCacheModel.kaleoDefinitionId) {
 			return true;
@@ -187,7 +187,8 @@ public class KaleoDefinitionCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(kaleoDefinitionId);
 
 		objectOutput.writeLong(groupId);
@@ -252,5 +253,4 @@ public class KaleoDefinitionCacheModel
 	public String content;
 	public int version;
 	public boolean active;
-
 }

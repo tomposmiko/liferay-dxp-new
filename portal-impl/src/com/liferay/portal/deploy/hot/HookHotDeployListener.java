@@ -86,9 +86,7 @@ import com.liferay.portal.kernel.servlet.WrapHttpServletRequestFilter;
 import com.liferay.portal.kernel.servlet.WrapHttpServletResponseFilter;
 import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorConstants;
 import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorEntry;
-import com.liferay.portal.kernel.spring.aop.AdvisedSupport;
 import com.liferay.portal.kernel.struts.StrutsAction;
-import com.liferay.portal.kernel.struts.StrutsPortletAction;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
 import com.liferay.portal.kernel.url.ServletContextURLContainer;
@@ -118,7 +116,7 @@ import com.liferay.portal.repository.util.ExternalRepositoryFactoryImpl;
 import com.liferay.portal.security.auth.AuthVerifierPipeline;
 import com.liferay.portal.servlet.filters.cache.CacheUtil;
 import com.liferay.portal.servlet.taglib.ui.DeprecatedFormNavigatorEntry;
-import com.liferay.portal.spring.aop.ServiceBeanAopProxy;
+import com.liferay.portal.spring.aop.AopInvocationHandler;
 import com.liferay.portal.spring.context.PortalContextLoaderListener;
 import com.liferay.portal.util.JavaScriptBundleUtil;
 import com.liferay.portal.util.PortalInstances;
@@ -1772,12 +1770,13 @@ public class HookHotDeployListener
 			String servletContextName, ClassLoader portletClassLoader,
 			String serviceType, Class<?> serviceTypeClass,
 			Constructor<?> serviceImplConstructor, Object serviceProxy)
-		throws Exception {
+		throws ReflectiveOperationException {
 
-		AdvisedSupport advisedSupport = ServiceBeanAopProxy.getAdvisedSupport(
-			serviceProxy);
+		AopInvocationHandler aopInvocationHandler =
+			ProxyUtil.fetchInvocationHandler(
+				serviceProxy, AopInvocationHandler.class);
 
-		Object previousService = advisedSupport.getTarget();
+		Object previousService = aopInvocationHandler.getTarget();
 
 		ServiceWrapper<?> serviceWrapper =
 			(ServiceWrapper<?>)serviceImplConstructor.newInstance(
@@ -1937,19 +1936,6 @@ public class HookHotDeployListener
 			registerService(
 				servletContextName, strutsActionClassName, StrutsAction.class,
 				strutsAction, "path", strutsActionPath);
-		}
-		else {
-			StrutsPortletAction strutsPortletAction =
-				(StrutsPortletAction)ProxyUtil.newProxyInstance(
-					portletClassLoader,
-					new Class<?>[] {StrutsPortletAction.class},
-					new ClassLoaderBeanHandler(
-						strutsActionObject, portletClassLoader));
-
-			registerService(
-				servletContextName, strutsActionClassName,
-				StrutsPortletAction.class, strutsPortletAction, "path",
-				strutsActionPath);
 		}
 	}
 
@@ -2227,15 +2213,16 @@ public class HookHotDeployListener
 	private void _initServices(
 			String servletContextName, Constructor<?> serviceImplConstructor,
 			Object serviceProxy)
-		throws Exception {
+		throws ReflectiveOperationException {
 
 		Class<?> proxyClass = serviceProxy.getClass();
 
 		if (ProxyUtil.isProxyClass(proxyClass)) {
-			AdvisedSupport advisedSupport =
-				ServiceBeanAopProxy.getAdvisedSupport(serviceProxy);
+			AopInvocationHandler aopInvocationHandler =
+				ProxyUtil.fetchInvocationHandler(
+					serviceProxy, AopInvocationHandler.class);
 
-			Object previousService = advisedSupport.getTarget();
+			Object previousService = aopInvocationHandler.getTarget();
 
 			ServiceWrapper<?> serviceWrapper =
 				(ServiceWrapper<?>)serviceImplConstructor.newInstance(

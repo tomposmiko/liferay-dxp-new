@@ -132,8 +132,6 @@ public class XmlRpcParserTest {
 		}
 	}
 
-	// Skip JavaParser
-
 	private static final String[] _FAULT_RESPONSES = {
 		StringBundler.concat(
 			"<?xml version=\"1.0\"?>",
@@ -173,8 +171,6 @@ public class XmlRpcParserTest {
 			"</methodResponse>")
 	};
 
-	// Skip JavaParser
-
 	private static final String[] _NON_PARAMETERIZED_METHODS = {
 		StringBundler.concat(
 			"<?xml version=\"1.0\"?>",
@@ -190,8 +186,6 @@ public class XmlRpcParserTest {
 			"</methodCall>")
 	};
 
-	// Skip JavaParser
-
 	private static final String _PARAMETERIZED_METHOD =
 		StringBundler.concat(
 			"<?xml version=\"1.0\"?>",
@@ -203,8 +197,6 @@ public class XmlRpcParserTest {
 			"<param><value><string>world</string></value></param>",
 			"</params>",
 			"</methodCall>");
-
-	// Skip JavaParser
 
 	private static final String[] _SUCCESS_RESPONSES = {
 		StringBundler.concat(

@@ -99,9 +99,11 @@ public class RequestParameterAutoLoginSupport extends BaseAutoLogin {
 			}
 		}
 
-		return new String[] {
+		String[] credentials = {
 			String.valueOf(userId), password, Boolean.FALSE.toString()
 		};
+
+		return credentials;
 	}
 
 	protected String getLoginParam() {

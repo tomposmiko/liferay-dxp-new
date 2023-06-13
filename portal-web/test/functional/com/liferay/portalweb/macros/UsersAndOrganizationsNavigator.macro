@@ -1,4 +1,12 @@
 definition {
+	macro gotoMenuBarInformation {
+		MenuBar.gotoInformation();
+	}
+
+	macro gotoMenuBarOrganizationSite {
+		MenuBar.gotoOrganizationSite();
+	}
+
 	macro gotoOrganizations {
 		Pause(locator1 = "1000");
 

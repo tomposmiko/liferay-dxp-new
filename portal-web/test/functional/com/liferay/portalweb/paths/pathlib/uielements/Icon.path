@@ -65,7 +65,7 @@
 </tr>
 <tr>
 	<td>DELETE</td>
-	<td>//*[*[name()='svg'][contains(@class,'icon-trash')]] | //button[@data-title='Delete' or @title='Delete']</td>
+	<td>//*[*[name()='svg'][contains(@class,'icon-trash')]] | //button[@data-title='Delete' or @title='Delete'] | //*[*[name()='svg'][contains(@class,'times-circle')]] | //a[@data-title='Deactivate' or @title='Deactivate']</td>
 	<td></td>
 </tr>
 <tr>
@@ -95,12 +95,12 @@
 </tr>
 <tr>
 	<td>EXPIRE</td>
-	<td>//button[*[name()='svg'][contains(@class,'icon-time')]]</td>
+	<td>//a[@data-title='Expire'] | //a[@title='Expire']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FLAG</td>
-	<td>//div[@title='Flag']//span[//*[name()='svg'][contains(@class,'lexicon-icon')]]</td>
+	<td>//div[contains(@class,'taglib-flags')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -140,12 +140,7 @@
 </tr>
 <tr>
 	<td>MOVE_TO_RECYCLE_BIN</td>
-	<td>//a[contains(@data-qa-id,'recycle-binButton')]/span[contains(@class,'icon-monospaced')] | //*[*[name()='svg'][contains(@class,'icon-trash')]]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>OK</td>
-	<td>//span[contains(@class,'icon-ok')]</td>
+	<td>//a[contains(@data-qa-id,'recycle-binButton')]/span[contains(@class,'icon-monospaced')] | //*[*[name()='svg'][contains(@class,'icon-trash')] | //a[@data-title='Deactivate']]</td>
 	<td></td>
 </tr>
 <tr>
@@ -190,6 +185,11 @@
 </tr>
 <!--ELLIPSIS-->
 <tr>
+	<td>VERTICAL_ELLIPSIS_BUTTON</td>
+	<td>//div[contains(@class,'dropdown-action')]//button[contains(@class,'dropdown-toggle')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>BODY_VERTICAL_ELLIPSIS</td>
 	<td>//div[contains(@class,'portlet') and contains(@class,'container')]//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
 	<td></td>
@@ -212,6 +212,11 @@
 <tr>
 	<td>PAGE_CUSTOMIZATION_ELLIPSIS</td>
 	<td>//*[@data-qa-id='controlMenu']//div[contains(@class,'icon-menu')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REMOVE_TAG</td>
+	<td>//span[contains(.,'${key_removeTag}')]//..//i[contains(@class,'icon-remove')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -242,6 +247,11 @@
 <tr>
 	<td>STAGING_BAR_VERTICAL_ELLIPSIS</td>
 	<td>//li[contains(@class,'control-menu-nav-item')]//a[span/*[contains(@class,'lexicon-icon-ellipsis-v')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TABLE_VERTICAL_ELLIPSIS</td>
+	<td>//tr[contains(.,'${key_rowEntry}')]//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
 	<td></td>
 </tr>
 <tr>

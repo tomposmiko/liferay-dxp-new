@@ -183,8 +183,11 @@ public class AddMenuTag extends IncludeTag {
 	}
 
 	protected List<AddMenuItem> getAddMenuItems() {
-		return (List<AddMenuItem>)request.getAttribute(
-			"liferay-frontend:add-menu:addMenuItems");
+		List<AddMenuItem> addMenuItems =
+			(List<AddMenuItem>)request.getAttribute(
+				"liferay-frontend:add-menu:addMenuItems");
+
+		return addMenuItems;
 	}
 
 	@Override

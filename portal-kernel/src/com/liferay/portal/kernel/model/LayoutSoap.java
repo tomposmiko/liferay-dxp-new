@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.LayoutServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.portal.service.http.LayoutServiceSoap
  * @generated
  */
 @ProviderType
 public class LayoutSoap implements Serializable {
-
 	public static LayoutSoap toSoapModel(Layout model) {
 		LayoutSoap soapModel = new LayoutSoap();
 
@@ -43,6 +43,9 @@ public class LayoutSoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
+		soapModel.setParentPlid(model.getParentPlid());
+		soapModel.setLeftPlid(model.getLeftPlid());
+		soapModel.setRightPlid(model.getRightPlid());
 		soapModel.setPrivateLayout(model.isPrivateLayout());
 		soapModel.setLayoutId(model.getLayoutId());
 		soapModel.setParentLayoutId(model.getParentLayoutId());
@@ -54,6 +57,7 @@ public class LayoutSoap implements Serializable {
 		soapModel.setType(model.getType());
 		soapModel.setTypeSettings(model.getTypeSettings());
 		soapModel.setHidden(model.isHidden());
+		soapModel.setSystem(model.isSystem());
 		soapModel.setFriendlyURL(model.getFriendlyURL());
 		soapModel.setIconImageId(model.getIconImageId());
 		soapModel.setThemeId(model.getThemeId());
@@ -61,10 +65,8 @@ public class LayoutSoap implements Serializable {
 		soapModel.setCss(model.getCss());
 		soapModel.setPriority(model.getPriority());
 		soapModel.setLayoutPrototypeUuid(model.getLayoutPrototypeUuid());
-		soapModel.setLayoutPrototypeLinkEnabled(
-			model.isLayoutPrototypeLinkEnabled());
-		soapModel.setSourcePrototypeLayoutUuid(
-			model.getSourcePrototypeLayoutUuid());
+		soapModel.setLayoutPrototypeLinkEnabled(model.isLayoutPrototypeLinkEnabled());
+		soapModel.setSourcePrototypeLayoutUuid(model.getSourcePrototypeLayoutUuid());
 		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
@@ -190,6 +192,30 @@ public class LayoutSoap implements Serializable {
 		_modifiedDate = modifiedDate;
 	}
 
+	public long getParentPlid() {
+		return _parentPlid;
+	}
+
+	public void setParentPlid(long parentPlid) {
+		_parentPlid = parentPlid;
+	}
+
+	public long getLeftPlid() {
+		return _leftPlid;
+	}
+
+	public void setLeftPlid(long leftPlid) {
+		_leftPlid = leftPlid;
+	}
+
+	public long getRightPlid() {
+		return _rightPlid;
+	}
+
+	public void setRightPlid(long rightPlid) {
+		_rightPlid = rightPlid;
+	}
+
 	public boolean getPrivateLayout() {
 		return _privateLayout;
 	}
@@ -286,6 +312,18 @@ public class LayoutSoap implements Serializable {
 		_hidden = hidden;
 	}
 
+	public boolean getSystem() {
+		return _system;
+	}
+
+	public boolean isSystem() {
+		return _system;
+	}
+
+	public void setSystem(boolean system) {
+		_system = system;
+	}
+
 	public String getFriendlyURL() {
 		return _friendlyURL;
 	}
@@ -352,7 +390,6 @@ public class LayoutSoap implements Serializable {
 
 	public void setLayoutPrototypeLinkEnabled(
 		boolean layoutPrototypeLinkEnabled) {
-
 		_layoutPrototypeLinkEnabled = layoutPrototypeLinkEnabled;
 	}
 
@@ -381,6 +418,9 @@ public class LayoutSoap implements Serializable {
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
+	private long _parentPlid;
+	private long _leftPlid;
+	private long _rightPlid;
 	private boolean _privateLayout;
 	private long _layoutId;
 	private long _parentLayoutId;
@@ -392,6 +432,7 @@ public class LayoutSoap implements Serializable {
 	private String _type;
 	private String _typeSettings;
 	private boolean _hidden;
+	private boolean _system;
 	private String _friendlyURL;
 	private long _iconImageId;
 	private String _themeId;
@@ -402,5 +443,4 @@ public class LayoutSoap implements Serializable {
 	private boolean _layoutPrototypeLinkEnabled;
 	private String _sourcePrototypeLayoutUuid;
 	private Date _lastPublishDate;
-
 }

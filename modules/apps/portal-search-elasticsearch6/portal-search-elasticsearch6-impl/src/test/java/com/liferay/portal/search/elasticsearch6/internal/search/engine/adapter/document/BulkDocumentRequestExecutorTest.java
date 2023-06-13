@@ -17,10 +17,11 @@ package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchFixture;
-import com.liferay.portal.search.elasticsearch6.internal.connection.TestElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch6.internal.document.DefaultElasticsearchDocumentFactory;
+import com.liferay.portal.search.elasticsearch6.internal.document.ElasticsearchDocumentFactory;
 import com.liferay.portal.search.engine.adapter.document.BulkDocumentRequest;
+import com.liferay.portal.search.engine.adapter.document.BulkableDocumentRequestTranslator;
 import com.liferay.portal.search.engine.adapter.document.DeleteDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentRequest;
@@ -40,34 +41,33 @@ public class BulkDocumentRequestExecutorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_elasticsearchFixture = new ElasticsearchFixture(
-			DeleteByQueryDocumentRequestExecutorTest.class.getSimpleName());
+		ElasticsearchFixture elasticsearchFixture = new ElasticsearchFixture(
+			getClass());
 
-		_elasticsearchFixture.setUp();
+		ElasticsearchDocumentFactory elasticsearchDocumentFactory1 =
+			new DefaultElasticsearchDocumentFactory();
 
-		_elasticsearchConnectionManager =
-			new TestElasticsearchConnectionManager(_elasticsearchFixture);
-
-		_documentFixture.setUp();
-
-		final ElasticsearchBulkableDocumentRequestTranslator
-			elasticsearchBulkableDocumentRequestTranslator =
-				new ElasticsearchBulkableDocumentRequestTranslator() {
-					{
-						elasticsearchConnectionManager =
-							_elasticsearchConnectionManager;
-					}
-				};
+		BulkableDocumentRequestTranslator bulkableDocumentRequestTranslator1 =
+			new ElasticsearchBulkableDocumentRequestTranslator() {
+				{
+					elasticsearchClientResolver = elasticsearchFixture;
+					elasticsearchDocumentFactory =
+						elasticsearchDocumentFactory1;
+				}
+			};
 
 		_bulkDocumentRequestExecutor = new BulkDocumentRequestExecutorImpl() {
 			{
 				bulkableDocumentRequestTranslator =
-					elasticsearchBulkableDocumentRequestTranslator;
-
-				elasticsearchConnectionManager =
-					_elasticsearchConnectionManager;
+					bulkableDocumentRequestTranslator1;
+				elasticsearchClientResolver = elasticsearchFixture;
 			}
 		};
+
+		_elasticsearchFixture = elasticsearchFixture;
+
+		_documentFixture.setUp();
+		_elasticsearchFixture.setUp();
 	}
 
 	@After
@@ -95,7 +95,7 @@ public class BulkDocumentRequestExecutorTest {
 		bulkDocumentRequest.addBulkableDocumentRequest(indexDocumentRequest);
 
 		DeleteDocumentRequest deleteDocumentRequest = new DeleteDocumentRequest(
-			_INDEX_NAME, _MAPPING_NAME, uid);
+			_INDEX_NAME, uid);
 
 		bulkDocumentRequest.addBulkableDocumentRequest(deleteDocumentRequest);
 
@@ -122,7 +122,6 @@ public class BulkDocumentRequestExecutorTest {
 
 	private BulkDocumentRequestExecutorImpl _bulkDocumentRequestExecutor;
 	private final DocumentFixture _documentFixture = new DocumentFixture();
-	private ElasticsearchConnectionManager _elasticsearchConnectionManager;
 	private ElasticsearchFixture _elasticsearchFixture;
 
 }

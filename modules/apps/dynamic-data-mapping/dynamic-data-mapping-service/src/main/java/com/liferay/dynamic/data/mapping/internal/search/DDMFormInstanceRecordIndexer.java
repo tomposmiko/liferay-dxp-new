@@ -22,7 +22,6 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
-import com.liferay.dynamic.data.mapping.storage.StorageEngine;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -41,7 +40,6 @@ import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
-import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchPermissionChecker;
 import com.liferay.portal.kernel.search.Summary;
@@ -50,7 +48,7 @@ import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -63,13 +61,9 @@ import java.util.Set;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Leonardo Barros
  */
-@Component(immediate = true, service = Indexer.class)
 public class DDMFormInstanceRecordIndexer
 	extends BaseIndexer<DDMFormInstanceRecord> {
 
@@ -237,8 +231,8 @@ public class DDMFormInstanceRecordIndexer
 
 		DDMStructure ddmStructure = ddmFormInstance.getStructure();
 
-		DDMFormValues ddmFormValues = storageEngine.getDDMFormValues(
-			ddmFormInstanceRecordVersion.getStorageId());
+		DDMFormValues ddmFormValues =
+			ddmFormInstanceRecordVersion.getDDMFormValues();
 
 		addContent(ddmFormInstanceRecordVersion, ddmFormValues, document);
 
@@ -297,8 +291,8 @@ public class DDMFormInstanceRecordIndexer
 			Locale locale)
 		throws Exception {
 
-		DDMFormValues ddmFormValues = storageEngine.getDDMFormValues(
-			ddmFormInstanceRecordVersion.getStorageId());
+		DDMFormValues ddmFormValues =
+			ddmFormInstanceRecordVersion.getDDMFormValues();
 
 		if (ddmFormValues == null) {
 			return StringPool.BLANK;
@@ -312,7 +306,7 @@ public class DDMFormInstanceRecordIndexer
 	}
 
 	protected ResourceBundle getResourceBundle(Locale defaultLocale) {
-		return portal.getResourceBundle(defaultLocale);
+		return PortalUtil.getResourceBundle(defaultLocale);
 	}
 
 	protected String getTitle(long ddmFormInstanceId, Locale locale) {
@@ -389,34 +383,15 @@ public class DDMFormInstanceRecordIndexer
 		indexableActionableDynamicQuery.performActions();
 	}
 
-	@Reference
 	protected ClassNameLocalService classNameLocalService;
-
-	@Reference
 	protected DDMFormInstanceLocalService ddmFormInstanceLocalService;
-
-	@Reference
 	protected DDMFormInstanceRecordLocalService
 		ddmFormInstanceRecordLocalService;
-
-	@Reference
 	protected DDMFormInstanceRecordVersionLocalService
 		ddmFormInstanceRecordVersionLocalService;
-
-	@Reference
 	protected DDMIndexer ddmIndexer;
-
-	@Reference
 	protected IndexWriterHelper indexWriterHelper;
-
-	@Reference
-	protected Portal portal;
-
-	@Reference
 	protected SearchPermissionChecker searchPermissionChecker;
-
-	@Reference
-	protected StorageEngine storageEngine;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMFormInstanceRecordIndexer.class);

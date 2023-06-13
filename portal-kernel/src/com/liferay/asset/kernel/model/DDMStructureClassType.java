@@ -56,7 +56,10 @@ public class DDMStructureClassType implements ClassType {
 
 	@Override
 	public List<ClassTypeField> getClassTypeFields() throws PortalException {
-		return getClassTypeFields(getClassTypeId());
+		List<ClassTypeField> classTypeFields = getClassTypeFields(
+			getClassTypeId());
+
+		return classTypeFields;
 	}
 
 	@Override

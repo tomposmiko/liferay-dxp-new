@@ -17,22 +17,42 @@ package com.liferay.dynamic.data.mapping.form.renderer.internal.servlet.taglib.h
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.internal.servlet.taglib.DDMFormFieldTypesDynamicInclude;
-import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesJSONSerializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesSerializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesSerializerSerializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesSerializerSerializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesSerializerTracker;
+import com.liferay.frontend.js.loader.modules.extender.npm.JSModule;
+import com.liferay.frontend.js.loader.modules.extender.npm.JSPackage;
+import com.liferay.frontend.js.loader.modules.extender.npm.NPMRegistry;
+import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.servlet.taglib.BaseDynamicInclude;
 import com.liferay.portal.kernel.servlet.taglib.aui.ScriptData;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
 
-import java.util.Collections;
+import java.net.URL;
+
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -41,37 +61,160 @@ import org.osgi.service.component.annotations.Reference;
 public abstract class BaseDDMFormFieldTypesDynamicInclude
 	extends BaseDynamicInclude {
 
+	public String getFormRendererModuleName() {
+		return npmResolver.resolveModuleName(
+			"dynamic-data-mapping-form-renderer");
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_bundleContext = bundleContext;
+	}
+
+	protected Set<String> getFieldTypesModules(
+		List<DDMFormFieldType> ddmFormFieldTypes) {
+
+		Stream<DDMFormFieldType> ddmFormFieldTypeStream =
+			ddmFormFieldTypes.stream();
+
+		Set<String> javaScriptPackageNames = ddmFormFieldTypeStream.map(
+			this::getJavaScriptPackageName
+		).filter(
+			this::isValidPackageName
+		).collect(
+			Collectors.toSet()
+		);
+
+		Collection<JSPackage> resolvedJSPackages =
+			npmRegistry.getResolvedJSPackages();
+
+		Stream<JSPackage> jsPackagesStream =
+			resolvedJSPackages.parallelStream();
+
+		return jsPackagesStream.filter(
+			jsPackage -> javaScriptPackageNames.contains(jsPackage.getName())
+		).flatMap(
+			this::getModulesIdStream
+		).collect(
+			Collectors.toSet()
+		);
+	}
+
+	protected String getJavaScriptPackageName(Bundle bundle) throws Exception {
+		JSONObject jsonObject = getPackageJSONObject(bundle);
+
+		if (jsonObject == null) {
+			return null;
+		}
+
+		return jsonObject.getString("name");
+	}
+
+	protected String getJavaScriptPackageName(
+		DDMFormFieldType ddmFormFieldType) {
+
+		Map<String, Object> ddmFormFieldTypeProperties =
+			ddmFormFieldTypeServicesTracker.getDDMFormFieldTypeProperties(
+				ddmFormFieldType.getName());
+
+		long bundleId = GetterUtil.getLong(
+			ddmFormFieldTypeProperties.get("service.bundleid"), -1L);
+
+		Bundle bundle = _bundleContext.getBundle(bundleId);
+
+		try {
+			return getJavaScriptPackageName(bundle);
+		}
+		catch (Exception e) {
+			return StringPool.BLANK;
+		}
+	}
+
+	protected String getModuleId(JSModule jsModule) {
+		return jsModule.getResolvedId();
+	}
+
+	protected Stream<String> getModulesIdStream(JSPackage jsPackage) {
+		Collection<JSModule> jsModules = jsPackage.getJSModules();
+
+		Stream<JSModule> stream = jsModules.stream();
+
+		return stream.map(this::getModuleId);
+	}
+
+	protected JSONObject getPackageJSONObject(Bundle bundle) throws Exception {
+		URL url = bundle.getEntry("package.json");
+
+		if (url == null) {
+			return null;
+		}
+
+		String json = StringUtil.read(url.openStream());
+
+		return JSONFactoryUtil.createJSONObject(json);
+	}
+
 	protected void include(HttpServletResponse response) throws IOException {
 		ScriptData scriptData = new ScriptData();
+
+		DDMFormFieldTypesSerializer ddmFormFieldTypesSerializer =
+			ddmFormFieldTypesSerializerTracker.getDDMFormFieldTypesSerializer(
+				"json");
 
 		List<DDMFormFieldType> ddmFormFieldTypes =
 			ddmFormFieldTypeServicesTracker.getDDMFormFieldTypes();
 
-		try {
-			scriptData.append(
-				null,
-				StringUtil.replaceToStringBundler(
-					_TMPL_CONTENT, StringPool.POUND, StringPool.POUND,
-					Collections.singletonMap(
-						"fieldTypes",
-						ddmFormFieldTypesJSONSerializer.serialize(
-							ddmFormFieldTypes))),
-				_MODULES, ScriptData.ModulesType.AUI);
-		}
-		catch (PortalException pe) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
-			}
-		}
+		DDMFormFieldTypesSerializerSerializeRequest.Builder builder =
+			DDMFormFieldTypesSerializerSerializeRequest.Builder.newBuilder(
+				ddmFormFieldTypes);
+
+		DDMFormFieldTypesSerializerSerializeResponse
+			ddmFormFieldTypesSerializerSerializeResponse =
+				ddmFormFieldTypesSerializer.serialize(builder.build());
+
+		Map<String, String> values = new HashMap<>();
+
+		values.put(
+			"fieldTypes",
+			ddmFormFieldTypesSerializerSerializeResponse.getContent());
+
+		values.put("formRendererModuleName", getFormRendererModuleName());
+
+		Set<String> fieldTypesModules = getFieldTypesModules(ddmFormFieldTypes);
+
+		values.put(
+			"javaScriptTemplateDependencies",
+			jsonFactory.looseSerialize(
+				ListUtil.fromCollection(fieldTypesModules)));
+
+		scriptData.append(
+			null,
+			StringUtil.replaceToStringBundler(
+				_TMPL_CONTENT, StringPool.POUND, StringPool.POUND, values),
+			_MODULES, ScriptData.ModulesType.AUI);
 
 		scriptData.writeTo(response.getWriter());
+	}
+
+	protected boolean isValidPackageName(String packageName) {
+		return Validator.isNotNull(packageName);
 	}
 
 	@Reference
 	protected DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker;
 
 	@Reference
-	protected DDMFormFieldTypesJSONSerializer ddmFormFieldTypesJSONSerializer;
+	protected DDMFormFieldTypesSerializerTracker
+		ddmFormFieldTypesSerializerTracker;
+
+	@Reference
+	protected JSONFactory jsonFactory;
+
+	@Reference
+	protected NPMRegistry npmRegistry;
+
+	@Reference
+	protected NPMResolver npmResolver;
 
 	private static final String _MODULES =
 		"liferay-ddm-form-renderer-types,liferay-ddm-soy-template-util";
@@ -80,7 +223,6 @@ public abstract class BaseDDMFormFieldTypesDynamicInclude
 		DDMFormFieldTypesDynamicInclude.class,
 		"/META-INF/resources/dynamic_include/field_types.tmpl");
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseDDMFormFieldTypesDynamicInclude.class);
+	private BundleContext _bundleContext;
 
 }

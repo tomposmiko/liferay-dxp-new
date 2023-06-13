@@ -70,9 +70,7 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 				CharPool.COMMA));
 
 		for (long siteNavigationMenuId : siteNavigationMenuIds) {
-			if (siteNavigationMenuId > 0) {
-				_addSiteNavigationMenuItem(siteNavigationMenuId, layout);
-			}
+			_addSiteNavigationMenuItem(siteNavigationMenuId, layout);
 		}
 	}
 
@@ -82,13 +80,8 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 			_siteNavigationMenuLocalService.getSiteNavigationMenus(
 				layout.getGroupId());
 
-		try {
-			for (SiteNavigationMenu siteNavigationMenu : siteNavigationMenus) {
-				_deleteSiteNavigationMenuItem(siteNavigationMenu, layout);
-			}
-		}
-		catch (PortalException pe) {
-			throw new ModelListenerException(pe);
+		for (SiteNavigationMenu siteNavigationMenu : siteNavigationMenus) {
+			_deleteSiteNavigationMenuItem(siteNavigationMenu, layout);
 		}
 	}
 
@@ -127,8 +120,7 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 	}
 
 	private void _deleteSiteNavigationMenuItem(
-			SiteNavigationMenu siteNavigationMenu, Layout layout)
-		throws PortalException {
+		SiteNavigationMenu siteNavigationMenu, Layout layout) {
 
 		List<SiteNavigationMenuItem> siteNavigationMenuItems =
 			_siteNavigationMenuItemLocalService.getSiteNavigationMenuItems(
@@ -146,8 +138,7 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 			if (Objects.equals(layout.getUuid(), layoutUuid)) {
 				_siteNavigationMenuItemLocalService.
-					deleteSiteNavigationMenuItem(
-						siteNavigationMenuItem.getSiteNavigationMenuItemId());
+					deleteSiteNavigationMenuItem(siteNavigationMenuItem);
 			}
 		}
 	}

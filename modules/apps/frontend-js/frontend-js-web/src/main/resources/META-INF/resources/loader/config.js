@@ -22,8 +22,6 @@
 
 	__CONFIG__.paths = Liferay.PATHS;
 
-	__CONFIG__.resolvePath = Liferay.RESOLVE_PATH;
-
 	__CONFIG__.namespace = 'Liferay';
 
 	__CONFIG__.explainResolutions = Liferay.EXPLAIN_RESOLUTIONS;

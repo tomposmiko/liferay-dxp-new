@@ -138,9 +138,9 @@ public class SQLQueryImpl implements SQLQuery {
 	@SuppressWarnings("rawtypes")
 	public Iterator iterate(boolean unmodifiable) throws ORMException {
 		try {
-			List<?> list = list(unmodifiable);
-
-			return list.iterator();
+			return list(
+				unmodifiable
+			).iterator();
 		}
 		catch (Exception e) {
 			throw ExceptionTranslator.translate(e);

@@ -22,12 +22,10 @@ import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.test.util.CompanyTestUtil;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
@@ -35,9 +33,7 @@ import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
-import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
-import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalServiceUtil;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalServiceUtil;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
@@ -71,8 +67,7 @@ public class UpgradeKaleoDefinitionVersionTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_company1 = CompanyTestUtil.addCompany();
-		_company2 = CompanyTestUtil.addCompany();
+		_group = GroupTestUtil.addGroup();
 		_name = StringUtil.randomString();
 		_timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -90,20 +85,11 @@ public class UpgradeKaleoDefinitionVersionTest {
 
 	@Test
 	public void testCreateKaleoDefinitionVersion() throws Exception {
-		addKaleoDefinition(
-			_company1.getCompanyId(), _company1.getGroupId(), _name, 1);
-		addKaleoDefinition(
-			_company1.getCompanyId(), _company1.getGroupId(), _name, 2);
-		addKaleoDefinition(
-			_company2.getCompanyId(), _company2.getGroupId(), _name, 3);
+		addKaleoDefinition(_name, 1);
 
 		_upgradeKaleoDefinitionVersion.upgrade();
 
-		getKaleoDefinition(_company1.getCompanyId(), _name);
-		getKaleoDefinitionVersion(_company1.getCompanyId(), _name, 1);
-		getKaleoDefinitionVersion(_company1.getCompanyId(), _name, 2);
-		getKaleoDefinition(_company2.getCompanyId(), _name);
-		getKaleoDefinitionVersion(_company2.getCompanyId(), _name, 3);
+		getKaleoDefinitionVersion(_name, 1);
 	}
 
 	protected void addColumn(String table, String column) throws Exception {
@@ -144,8 +130,7 @@ public class UpgradeKaleoDefinitionVersionTest {
 		}
 	}
 
-	protected void addKaleoDefinition(
-			long companyId, long groupId, String name, int version)
+	protected void addKaleoDefinition(String name, int version)
 		throws Exception {
 
 		StringBundler sb = new StringBundler(5);
@@ -162,14 +147,10 @@ public class UpgradeKaleoDefinitionVersionTest {
 			PreparedStatement ps = con.prepareStatement(sql)) {
 
 			ps.setLong(1, RandomTestUtil.randomLong());
-			ps.setLong(2, groupId);
-			ps.setLong(3, companyId);
+			ps.setLong(2, _group.getGroupId());
+			ps.setLong(3, _group.getCompanyId());
 			ps.setLong(4, TestPropsValues.getUserId());
-
-			User user = TestPropsValues.getUser();
-
-			ps.setString(5, user.getFullName());
-
+			ps.setString(5, TestPropsValues.getUser().getFullName());
 			ps.setTimestamp(6, _timestamp);
 			ps.setTimestamp(7, _timestamp);
 			ps.setString(8, name);
@@ -191,23 +172,12 @@ public class UpgradeKaleoDefinitionVersionTest {
 		_db.runSQL("delete from KaleoDefinition where name = '" + name + "'");
 	}
 
-	protected KaleoDefinition getKaleoDefinition(long companyId, String name)
-		throws PortalException {
-
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setCompanyId(companyId);
-
-		return KaleoDefinitionLocalServiceUtil.getKaleoDefinition(
-			name, serviceContext);
-	}
-
 	protected KaleoDefinitionVersion getKaleoDefinitionVersion(
-			long companyId, String name, int version)
+			String name, int version)
 		throws PortalException {
 
 		return KaleoDefinitionVersionLocalServiceUtil.getKaleoDefinitionVersion(
-			companyId, name, getVersion(version));
+			_group.getCompanyId(), name, getVersion(version));
 	}
 
 	protected String getVersion(int version) {
@@ -306,14 +276,12 @@ public class UpgradeKaleoDefinitionVersionTest {
 			});
 	}
 
-	@DeleteAfterTestRun
-	private Company _company1;
-
-	@DeleteAfterTestRun
-	private Company _company2;
-
 	private DB _db;
 	private DBInspector _dbInspector;
+
+	@DeleteAfterTestRun
+	private Group _group;
+
 	private String _name;
 	private Timestamp _timestamp;
 	private UpgradeProcess _upgradeKaleoDefinitionVersion;

@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.RepositoryServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.portal.service.http.RepositoryServiceSoap
  * @generated
  */
 @ProviderType
 public class RepositorySoap implements Serializable {
-
 	public static RepositorySoap toSoapModel(Repository model) {
 		RepositorySoap soapModel = new RepositorySoap();
 
@@ -82,8 +82,7 @@ public class RepositorySoap implements Serializable {
 	}
 
 	public static RepositorySoap[] toSoapModels(List<Repository> models) {
-		List<RepositorySoap> soapModels = new ArrayList<RepositorySoap>(
-			models.size());
+		List<RepositorySoap> soapModels = new ArrayList<RepositorySoap>(models.size());
 
 		for (Repository model : models) {
 			soapModels.add(toSoapModel(model));
@@ -247,5 +246,4 @@ public class RepositorySoap implements Serializable {
 	private String _typeSettings;
 	private long _dlFolderId;
 	private Date _lastPublishDate;
-
 }

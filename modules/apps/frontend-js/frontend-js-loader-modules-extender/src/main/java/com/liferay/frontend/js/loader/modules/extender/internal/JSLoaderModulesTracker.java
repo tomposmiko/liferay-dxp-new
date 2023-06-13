@@ -126,10 +126,6 @@ public class JSLoaderModulesTracker
 		_lastModified = System.currentTimeMillis();
 	}
 
-	public void updateLastModified() {
-		_lastModified = System.currentTimeMillis();
-	}
-
 	@Deactivate
 	protected void deactivate() {
 		_serviceTracker.close();

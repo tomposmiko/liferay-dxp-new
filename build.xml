@@ -590,7 +590,7 @@ message.
 				>
 					<fileset
 						dir="lib/portal"
-						includes="aopalliance.jar,asm-analysis.jar,asm-commons.jar,asm-tree.jar,asm-util.jar,asm.jar,aspectj-rt.jar,aspectj-weaver.jar,c3p0.jar,cglib-nodep.jar,com.liferay.portal.slim.runtime.jar,commons-beanutils.jar,commons-chain.jar,commons-codec.jar,commons-collections.jar,commons-compress.jar,commons-configuration.jar,commons-dbcp.jar,commons-digester.jar,commons-discovery.jar,commons-fileupload.jar,commons-httpclient.jar,commons-io.jar,commons-lang.jar,commons-logging.jar,commons-math.jar,commons-pool.jar,commons-validator.jar,concurrent.jar,dom4j.jar,easyconf.jar,hibernate-commons-annotations.jar,hibernate-core.jar,hikaricp.jar,httpclient.jar,httpcore.jar,httpmime.jar,jabsorb.jar,jakarta-regexp.jar,javassist.jar,jaxb-impl.jar,jaxen.jar,jcl-over-slf4j.jar,jdom.jar,jna.jar,jodconverter.jar,jodd-bean.jar,jodd-core.jar,json-java.jar,jsr107cache.jar,kxml2.jar,liferay-icu4j.jar,log4j.jar,log4j-extras.jar,mchange-commons-java.jar,netty-all.jar,portal-impl.jar,rome.jar,saaj-api.jar,saaj-impl.jar,serializer.jar,slf4j-api.jar,spring-aop.jar,spring-aspects.jar,spring-beans.jar,spring-context.jar,spring-context-support.jar,spring-core.jar,spring-expression.jar,spring-jdbc.jar,spring-jms.jar,spring-orm.jar,spring-oxm.jar,spring-tx.jar,spring-web.jar,spring-webmvc.jar,stax.jar,stax-ex.jar,streambuffer.jar,stringtemplate.jar,tika-core.jar,tika-parsers.jar,tomcat-jdbc.jar,tomcat-juli.jar,util-java.jar,util-slf4j.jar,util-taglib.jar,wstx.jar,xalan.jar,xbean.jar,xbean-spring.jar,xercesImpl.jar,xml-apis.jar,xmlsec.jar,xmpcore.jar,xpp3.jar,xstream.jar,xz.jar"
+						includes="asm-analysis.jar,asm-commons.jar,asm-tree.jar,asm-util.jar,asm.jar,aspectj-rt.jar,aspectj-weaver.jar,bnd.jar,c3p0.jar,cglib-nodep.jar,com.liferay.portal.slim.runtime.jar,commons-beanutils.jar,commons-chain.jar,commons-codec.jar,commons-collections.jar,commons-compress.jar,commons-configuration.jar,commons-dbcp.jar,commons-digester.jar,commons-discovery.jar,commons-fileupload.jar,commons-httpclient.jar,commons-io.jar,commons-lang.jar,commons-logging.jar,commons-math.jar,commons-pool.jar,commons-validator.jar,concurrent.jar,dom4j.jar,easyconf.jar,hibernate-commons-annotations.jar,hibernate-core.jar,hikaricp.jar,httpclient.jar,httpcore.jar,httpmime.jar,jabsorb.jar,jakarta-regexp.jar,javassist.jar,jaxb-impl.jar,jaxen.jar,jcl-over-slf4j.jar,jdom.jar,jna.jar,jodconverter.jar,jodd-bean.jar,jodd-core.jar,json-java.jar,jsr107cache.jar,kxml2.jar,liferay-icu4j.jar,log4j.jar,log4j-extras.jar,mchange-commons-java.jar,netty-all.jar,portal-impl.jar,rome.jar,saaj-api.jar,saaj-impl.jar,serializer.jar,slf4j-api.jar,spring-aop.jar,spring-aspects.jar,spring-beans.jar,spring-context.jar,spring-context-support.jar,spring-core.jar,spring-expression.jar,spring-jdbc.jar,spring-jms.jar,spring-orm.jar,spring-oxm.jar,spring-tx.jar,spring-web.jar,spring-webmvc.jar,stax.jar,stax-ex.jar,streambuffer.jar,stringtemplate.jar,tika-core.jar,tika-parsers.jar,tomcat-jdbc.jar,tomcat-juli.jar,util-java.jar,util-slf4j.jar,util-taglib.jar,wstx.jar,xalan.jar,xbean.jar,xbean-spring.jar,xercesImpl.jar,xml-apis.jar,xmlsec.jar,xmpcore.jar,xpp3.jar,xstream.jar,xz.jar"
 					/>
 				</copy>
 			</then>
@@ -956,6 +956,13 @@ This target has been renamed to "snapshot-bundle". Please call "snapshot-bundle"
 			<param name="properties.dest.dir" value="${properties.dest.dir}" />
 			<param name="properties.file" value="definitions/liferay-plugin-package_7_1_0.properties" />
 			<param name="properties.title" value="Liferay Plugin Package 7.1 Properties" />
+			<param name="properties.toc" value="true" />
+		</antcall>
+
+		<antcall target="propertiesdoc-cmd">
+			<param name="properties.dest.dir" value="${properties.dest.dir}" />
+			<param name="properties.file" value="definitions/liferay-plugin-package_7_2_0.properties" />
+			<param name="properties.title" value="Liferay Plugin Package 7.2 Properties" />
 			<param name="properties.toc" value="true" />
 		</antcall>
 
@@ -1384,6 +1391,11 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 			<arg value="testIntegrationClasses" />
 		</gradle-execute>
 
+		<gradle-execute dir="modules/sdk/gradle-util" failonerror="false" forcedcacheenabled="false" setupbinariescache="false" task="findbugsMain">
+			<arg value="--continue" />
+			<arg value="--parallel" />
+		</gradle-execute>
+
 		<ant dir="portal-web" inheritAll="false" target="update-gradle-cache" />
 
 		<echo append="true" file="${basedir}/.gitignore">
@@ -1422,11 +1434,13 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 				<dtd location="${definitions.dir}/liferay-display_6_2_0.dtd" publicId="-//Liferay//DTD Display 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-display_7_0_0.dtd" publicId="-//Liferay//DTD Display 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-display_7_1_0.dtd" publicId="-//Liferay//DTD Display 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-display_7_2_0.dtd" publicId="-//Liferay//DTD Display 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-friendly-url-routes_6_0_0.dtd" publicId="-//Liferay//DTD Friendly URL Routes 6.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-friendly-url-routes_6_1_0.dtd" publicId="-//Liferay//DTD Friendly URL Routes 6.1.0//EN" />
 				<dtd location="${definitions.dir}/liferay-friendly-url-routes_6_2_0.dtd" publicId="-//Liferay//DTD Friendly URL Routes 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-friendly-url-routes_7_0_0.dtd" publicId="-//Liferay//DTD Friendly URL Routes 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-friendly-url-routes_7_1_0.dtd" publicId="-//Liferay//DTD Friendly URL Routes 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-friendly-url-routes_7_2_0.dtd" publicId="-//Liferay//DTD Friendly URL Routes 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-hook_5_1_0.dtd" publicId="-//Liferay//DTD Hook 5.1.0//EN" />
 				<dtd location="${definitions.dir}/liferay-hook_5_2_0.dtd" publicId="-//Liferay//DTD Hook 5.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-hook_6_0_0.dtd" publicId="-//Liferay//DTD Hook 6.0.0//EN" />
@@ -1434,6 +1448,7 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 				<dtd location="${definitions.dir}/liferay-hook_6_2_0.dtd" publicId="-//Liferay//DTD Hook 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-hook_7_0_0.dtd" publicId="-//Liferay//DTD Hook 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-hook_7_1_0.dtd" publicId="-//Liferay//DTD Hook 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-hook_7_2_0.dtd" publicId="-//Liferay//DTD Hook 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-layout-templates_3_6_0.dtd" publicId="-//Liferay//DTD Layout Templates 3.6.0//EN" />
 				<dtd location="${definitions.dir}/liferay-layout-templates_4_0_0.dtd" publicId="-//Liferay//DTD Layout Templates 4.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-layout-templates_4_3_0.dtd" publicId="-//Liferay//DTD Layout Templates 4.3.0//EN" />
@@ -1445,6 +1460,7 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 				<dtd location="${definitions.dir}/liferay-layout-templates_6_2_0.dtd" publicId="-//Liferay//DTD Layout Templates 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-layout-templates_7_0_0.dtd" publicId="-//Liferay//DTD Layout Templates 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-layout-templates_7_1_0.dtd" publicId="-//Liferay//DTD Layout Templates 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-layout-templates_7_2_0.dtd" publicId="-//Liferay//DTD Layout Templates 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-look-and-feel_3_5_0.dtd" publicId="-//Liferay//DTD Look and Feel 3.5.0//EN" />
 				<dtd location="${definitions.dir}/liferay-look-and-feel_4_0_0.dtd" publicId="-//Liferay//DTD Look and Feel 4.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-look-and-feel_4_3_0.dtd" publicId="-//Liferay//DTD Look and Feel 4.3.0//EN" />
@@ -1456,6 +1472,7 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 				<dtd location="${definitions.dir}/liferay-look-and-feel_6_2_0.dtd" publicId="-//Liferay//DTD Look and Feel 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-look-and-feel_7_0_0.dtd" publicId="-//Liferay//DTD Look and Feel 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-look-and-feel_7_1_0.dtd" publicId="-//Liferay//DTD Look and Feel 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-look-and-feel_7_2_0.dtd" publicId="-//Liferay//DTD Look and Feel 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-plugin-package_4_3_0.dtd" publicId="-//Liferay//DTD Plugin Package 4.3.0//EN" />
 				<dtd location="${definitions.dir}/liferay-plugin-package_5_0_0.dtd" publicId="-//Liferay//DTD Plugin Package 5.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-plugin-package_5_1_0.dtd" publicId="-//Liferay//DTD Plugin Package 5.1.0//EN" />
@@ -1465,6 +1482,7 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 				<dtd location="${definitions.dir}/liferay-plugin-package_6_2_0.dtd" publicId="-//Liferay//DTD Plugin Package 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-plugin-package_7_0_0.dtd" publicId="-//Liferay//DTD Plugin Package 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-plugin-package_7_1_0.dtd" publicId="-//Liferay//DTD Plugin Package 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-plugin-package_7_2_0.dtd" publicId="-//Liferay//DTD Plugin Package 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-plugin-repository_4_3_0.dtd" publicId="-//Liferay//DTD Plugin Repository 4.3.0//EN" />
 				<dtd location="${definitions.dir}/liferay-plugin-repository_5_0_0.dtd" publicId="-//Liferay//DTD Plugin Repository 5.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-plugin-repository_5_1_0.dtd" publicId="-//Liferay//DTD Plugin Repository 5.1.0//EN" />
@@ -1474,6 +1492,7 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 				<dtd location="${definitions.dir}/liferay-plugin-repository_6_2_0.dtd" publicId="-//Liferay//DTD Plugin Repository 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-plugin-repository_7_0_0.dtd" publicId="-//Liferay//DTD Plugin Repository 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-plugin-repository_7_1_0.dtd" publicId="-//Liferay//DTD Plugin Repository 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-plugin-repository_7_2_0.dtd" publicId="-//Liferay//DTD Plugin Repository 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-portlet_2_0_0.dtd" publicId="-//Liferay//DTD PORTLET 2.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-portlet_2_2_0.dtd" publicId="-//Liferay//DTD PORTLET 2.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-portlet-app_3_5_0.dtd" publicId="-//Liferay//DTD Portlet Application 3.5.0//EN" />
@@ -1493,11 +1512,13 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 				<dtd location="${definitions.dir}/liferay-portlet-app_6_2_0.dtd" publicId="-//Liferay//DTD Portlet Application 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-portlet-app_7_0_0.dtd" publicId="-//Liferay//DTD Portlet Application 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-portlet-app_7_1_0.dtd" publicId="-//Liferay//DTD Portlet Application 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-portlet-app_7_2_0.dtd" publicId="-//Liferay//DTD Portlet Application 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-resource-action-mapping_6_0_0.dtd" publicId="-//Liferay//DTD Resource Action Mapping 6.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-resource-action-mapping_6_1_0.dtd" publicId="-//Liferay//DTD Resource Action Mapping 6.1.0//EN" />
 				<dtd location="${definitions.dir}/liferay-resource-action-mapping_6_2_0.dtd" publicId="-//Liferay//DTD Resource Action Mapping 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-resource-action-mapping_7_0_0.dtd" publicId="-//Liferay//DTD Resource Action Mapping 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-resource-action-mapping_7_1_0.dtd" publicId="-//Liferay//DTD Resource Action Mapping 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-resource-action-mapping_7_2_0.dtd" publicId="-//Liferay//DTD Resource Action Mapping 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-service-builder_3_5_0.dtd" publicId="-//Liferay//DTD Service Builder 3.5.0//EN" />
 				<dtd location="${definitions.dir}/liferay-service-builder_3_6_1.dtd" publicId="-//Liferay//DTD Service Builder 3.6.1//EN" />
 				<dtd location="${definitions.dir}/liferay-service-builder_4_0_0.dtd" publicId="-//Liferay//DTD Service Builder 4.0.0//EN" />
@@ -1513,11 +1534,13 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 				<dtd location="${definitions.dir}/liferay-service-builder_6_2_0.dtd" publicId="-//Liferay//DTD Service Builder 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-service-builder_7_0_0.dtd" publicId="-//Liferay//DTD Service Builder 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-service-builder_7_1_0.dtd" publicId="-//Liferay//DTD Service Builder 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-service-builder_7_2_0.dtd" publicId="-//Liferay//DTD Service Builder 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-skin_2_0_0.dtd" publicId="-//Liferay//DTD SKIN 2.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-social_6_1_0.dtd" publicId="-//Liferay//DTD Social 6.1.0//EN" />
 				<dtd location="${definitions.dir}/liferay-social_6_2_0.dtd" publicId="-//Liferay//DTD Social 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-social_7_0_0.dtd" publicId="-//Liferay//DTD Social 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-social_7_1_0.dtd" publicId="-//Liferay//DTD Social 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-social_7_2_0.dtd" publicId="-//Liferay//DTD Social 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-theme-loader_4_3_0.dtd" publicId="-//Liferay//DTD Theme Loader 4.3.0//EN" />
 				<dtd location="${definitions.dir}/liferay-theme-loader_5_0_0.dtd" publicId="-//Liferay//DTD Theme Loader 5.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-theme-loader_5_1_0.dtd" publicId="-//Liferay//DTD Theme Loader 5.1.0//EN" />
@@ -1527,13 +1550,13 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 				<dtd location="${definitions.dir}/liferay-theme-loader_6_2_0.dtd" publicId="-//Liferay//DTD Theme Loader 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-theme-loader_7_0_0.dtd" publicId="-//Liferay//DTD Theme Loader 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-theme-loader_7_1_0.dtd" publicId="-//Liferay//DTD Theme Loader 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-theme-loader_7_2_0.dtd" publicId="-//Liferay//DTD Theme Loader 7.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-user-notification-definitions_6_2_0.dtd" publicId="-//Liferay//DTD User Notification Definition 6.2.0//EN" />
 				<dtd location="${definitions.dir}/liferay-user-notification-definitions_7_0_0.dtd" publicId="-//Liferay//DTD User Notification Definition 7.0.0//EN" />
 				<dtd location="${definitions.dir}/liferay-user-notification-definitions_7_1_0.dtd" publicId="-//Liferay//DTD User Notification Definition 7.1.0//EN" />
+				<dtd location="${definitions.dir}/liferay-user-notification-definitions_7_2_0.dtd" publicId="-//Liferay//DTD User Notification Definition 7.2.0//EN" />
 				<dtd location="${definitions.dir}/mule-configuration.dtd" publicId="-//MuleSource //DTD mule-configuration XML V1.0//EN" />
 				<dtd location="${definitions.dir}/spring-beans.dtd" publicId="-//SPRING//DTD BEAN//EN" />
-				<dtd location="${definitions.dir}/struts-config_1_2.dtd" publicId="-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" />
-				<dtd location="${definitions.dir}/tiles-config_1_1.dtd" publicId="-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN" />
 				<dtd location="${definitions.dir}/web-app_2_3.dtd" publicId="-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" />
 				<dtd location="${definitions.dir}/web-facesconfig_1_0.dtd" publicId="-//Sun Microsystems, Inc.//DTD JavaServer Faces Config 1.0//EN" />
 				<dtd location="${definitions.dir}/web-facesconfig_1_1.dtd" publicId="-//Sun Microsystems, Inc.//DTD JavaServer Faces Config 1.1//EN" />

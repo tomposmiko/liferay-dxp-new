@@ -463,7 +463,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Sites",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -1137,7 +1137,6 @@ definition {
 			structureName = "WC Structure Name",
 			templateDescription = "WC Template Description",
 			templateFieldNames = "Image",
-			templateLanguage = "ftl",
 			templateName = "WC Template Name"
 		);
 
@@ -1218,113 +1217,6 @@ definition {
 		AssertHTMLSourceTextPresent(value1 = "Web Content Image Description");
 
 		AssertConsoleTextNotPresent(value1 = "DuplicateFileEntryException");
-	}
-
-	@description = "This is a use case for LPS-91017, LPS-89646."
-	@priority = "4"
-	test StagingPublishWCWithWebContentFieldViaAP {
-		Navigator.gotoStagedSitePage(
-			pageName = "Staging Test Page",
-			siteName = "Site Name"
-		);
-
-		Portlet.addPG(portletName = "Asset Publisher");
-
-		Navigator.gotoStagedSitePage(
-			pageName = "Staging Test Page",
-			siteName = "Site Name"
-		);
-
-		ProductMenu.gotoPortlet(
-			category = "Content",
-			panel = "Site Administration",
-			portlet = "Web Content"
-		);
-
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "WC WebContent Title"
-		);
-
-		PortletEntry.publish();
-
-		WebContent.viewTitle(webContentTitle = "WC WebContent Title");
-
-		NavItem.gotoStructures();
-
-		WebContentStructures.addCP(
-			structureDescription = "Structure Description",
-			structureName = "Structure Name"
-		);
-
-		DynamicDataMapping.addField(
-			field = "Web Content",
-			fieldFieldLabel = "Web Content",
-			fieldName = "WebContent"
-		);
-
-		WebContentStructures.saveCP(structureName = "Structure Name");
-
-		NavItem.gotoTemplates();
-
-		WebContentTemplates.addCP(
-			structureName = "Structure Name",
-			templateDescription = "Template Description",
-			templateFieldNames = "Web Content",
-			templateName = "Template Name"
-		);
-
-		ProductMenu.gotoPortlet(
-			category = "Content",
-			panel = "Site Administration",
-			portlet = "Web Content"
-		);
-
-		WebContentNavigator.gotoAddWithStructureCP(structureName = "Structure Name");
-
-		WebContent.addWithStructureCP(
-			fieldName = "WebContent",
-			webContentSelectWCFile = "WC WebContent Title",
-			description = "WC WebContent 1 Description",
-			webContentTitle = "WC WebContent 1 Title"
-		);
-
-		PortletEntry.publish();
-
-		WebContent.viewTitle(webContentTitle = "WC WebContent 1 Title");
-
-		Navigator.gotoStagedSitePage(
-			pageName = "Staging Test Page",
-			siteName = "Site Name"
-		);
-
-		AssetPublisherPortlet.viewAssetPG(
-			assetContent = "WC WebContent 1 Description",
-			assetTitle = "WC WebContent 1 Title"
-		);
-
-		Staging.gotoPublishToLive();
-
-		Staging.publishToLive();
-
-		ProductMenu.gotoLiveSite();
-
-		AssetPublisherPortlet.viewAssetPG(
-			assetContent = "WC WebContent 1 Description",
-			assetTitle = "WC WebContent 1 Title"
-		);
-
-		ProductMenu.gotoPortlet(
-			category = "Content",
-			panel = "Site Administration",
-			portlet = "Web Content"
-		);
-
-		WebContent.viewTitle(onLive = "true", webContentTitle = "WC WebContent Title");
-
-		WebContent.viewTitle(onLive = "true", webContentTitle = "WC WebContent 1 Title");
 	}
 
 	@priority = "4"

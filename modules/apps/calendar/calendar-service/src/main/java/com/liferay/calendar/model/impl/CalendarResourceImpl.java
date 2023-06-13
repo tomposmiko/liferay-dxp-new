@@ -36,8 +36,11 @@ public class CalendarResourceImpl extends CalendarResourceBaseImpl {
 
 	@Override
 	public List<Calendar> getCalendars() {
-		return CalendarLocalServiceUtil.getCalendarResourceCalendars(
-			getGroupId(), getCalendarResourceId());
+		List<Calendar> calendars =
+			CalendarLocalServiceUtil.getCalendarResourceCalendars(
+				getGroupId(), getCalendarResourceId());
+
+		return calendars;
 	}
 
 	@Override

@@ -148,23 +148,15 @@ public class RecentGroupManager {
 				continue;
 			}
 
-			if (!group.isCompany()) {
-				Layout layout = _layoutLocalService.fetchFirstLayout(
-					group.getGroupId(), false,
-					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+			Layout layout = _layoutLocalService.fetchFirstLayout(
+				group.getGroupId(), false,
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
-				if (layout == null) {
-					layout = _layoutLocalService.fetchFirstLayout(
-						group.getGroupId(), true,
-						LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+			if ((layout == null) ||
+				!LayoutPermissionUtil.contains(
+					permissionChecker, layout, true, ActionKeys.VIEW)) {
 
-					if ((layout == null) ||
-						!LayoutPermissionUtil.contains(
-							permissionChecker, layout, true, ActionKeys.VIEW)) {
-
-						continue;
-					}
-				}
+				continue;
 			}
 
 			String groupURL = _groupURLProvider.getGroupURL(

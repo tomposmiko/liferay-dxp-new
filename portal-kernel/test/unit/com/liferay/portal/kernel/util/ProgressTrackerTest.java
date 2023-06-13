@@ -112,8 +112,11 @@ public class ProgressTrackerTest {
 	}
 
 	protected ProgressTracker getAttribute(String status) {
-		return (ProgressTracker)_mockHttpSession.getAttribute(
-			status + ProgressTrackerTest.class.getName());
+		ProgressTracker progressTracker =
+			(ProgressTracker)_mockHttpSession.getAttribute(
+				status + ProgressTrackerTest.class.getName());
+
+		return progressTracker;
 	}
 
 	private MockHttpSession _mockHttpSession;

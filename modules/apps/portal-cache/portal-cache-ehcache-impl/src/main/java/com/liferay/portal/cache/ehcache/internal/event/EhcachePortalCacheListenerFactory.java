@@ -67,17 +67,25 @@ public class EhcachePortalCacheListenerFactory
 						portalCacheListener);
 		}
 
-		String className = properties.getProperty(
+		String className = (String)properties.remove(
 			EhcacheConstants.CACHE_LISTENER_PROPERTIES_KEY_FACTORY_CLASS_NAME);
 
 		if (Validator.isNull(className)) {
 			return null;
 		}
 
+		ClassLoader classLoader = (ClassLoader)properties.remove(
+			EhcacheConstants.
+				CACHE_LISTENER_PROPERTIES_KEY_FACTORY_CLASS_LOADER);
+
+		if (classLoader == null) {
+			return null;
+		}
+
 		try {
 			CacheEventListenerFactory cacheEventListenerFactory =
 				(CacheEventListenerFactory)InstanceFactory.newInstance(
-					getClassLoader(), className);
+					classLoader, className);
 
 			CacheEventListener cacheEventListener =
 				cacheEventListenerFactory.createCacheEventListener(properties);
@@ -90,12 +98,6 @@ public class EhcachePortalCacheListenerFactory
 					className,
 				e);
 		}
-	}
-
-	protected ClassLoader getClassLoader() {
-		Class<?> clazz = getClass();
-
-		return clazz.getClassLoader();
 	}
 
 	@Reference(unbind = "-")

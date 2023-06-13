@@ -335,9 +335,7 @@ public class SitesImpl implements Sites {
 		typeSettingsProperties.setProperty(
 			LAST_MERGE_TIME, String.valueOf(modifiedDate.getTime()));
 
-		LayoutLocalServiceUtil.updateLayout(
-			targetLayout.getGroupId(), targetLayout.isPrivateLayout(),
-			targetLayout.getLayoutId(), targetLayout.getTypeSettings());
+		LayoutLocalServiceUtil.updateLayout(targetLayout);
 
 		UnicodeProperties prototypeTypeSettingsProperties =
 			layoutPrototypeLayout.getTypeSettingsProperties();
@@ -1629,23 +1627,6 @@ public class SitesImpl implements Sites {
 
 		long lastMergeTime = GetterUtil.getLong(
 			layout.getTypeSettingsProperty(LAST_MERGE_TIME));
-
-		if (lastMergeTime == 0) {
-			try {
-				MergeLayoutPrototypesThreadLocal.setInProgress(true);
-
-				Layout targetLayout = LayoutLocalServiceUtil.getLayout(
-					layout.getPlid());
-
-				if (targetLayout != null) {
-					lastMergeTime = GetterUtil.getLong(
-						targetLayout.getTypeSettingsProperty(LAST_MERGE_TIME));
-				}
-			}
-			finally {
-				MergeLayoutPrototypesThreadLocal.setInProgress(false);
-			}
-		}
 
 		LayoutPrototype layoutPrototype =
 			LayoutPrototypeLocalServiceUtil.

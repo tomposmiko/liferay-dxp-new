@@ -16,17 +16,14 @@ package com.liferay.message.boards.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
 
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -38,20 +35,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class MBMessageWrapper implements MBMessage, ModelWrapper<MBMessage> {
-
+public class MBMessageWrapper extends BaseModelWrapper<MBMessage>
+	implements MBMessage, ModelWrapper<MBMessage> {
 	public MBMessageWrapper(MBMessage mbMessage) {
-		_mbMessage = mbMessage;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return MBMessage.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return MBMessage.class.getName();
+		super(mbMessage);
 	}
 
 	@Override
@@ -248,1044 +235,893 @@ public class MBMessageWrapper implements MBMessage, ModelWrapper<MBMessage> {
 	}
 
 	@Override
-	public com.liferay.portal.kernel.repository.model.Folder
-			addAttachmentsFolder()
+	public com.liferay.portal.kernel.repository.model.Folder addAttachmentsFolder()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.addAttachmentsFolder();
-	}
-
-	@Override
-	public Object clone() {
-		return new MBMessageWrapper((MBMessage)_mbMessage.clone());
-	}
-
-	@Override
-	public int compareTo(MBMessage mbMessage) {
-		return _mbMessage.compareTo(mbMessage);
+		return model.addAttachmentsFolder();
 	}
 
 	/**
-	 * Returns the allow pingbacks of this message-boards message.
-	 *
-	 * @return the allow pingbacks of this message-boards message
-	 */
+	* Returns the allow pingbacks of this message-boards message.
+	*
+	* @return the allow pingbacks of this message-boards message
+	*/
 	@Override
 	public boolean getAllowPingbacks() {
-		return _mbMessage.getAllowPingbacks();
+		return model.getAllowPingbacks();
 	}
 
 	/**
-	 * Returns the anonymous of this message-boards message.
-	 *
-	 * @return the anonymous of this message-boards message
-	 */
+	* Returns the anonymous of this message-boards message.
+	*
+	* @return the anonymous of this message-boards message
+	*/
 	@Override
 	public boolean getAnonymous() {
-		return _mbMessage.getAnonymous();
+		return model.getAnonymous();
 	}
 
 	/**
-	 * Returns the answer of this message-boards message.
-	 *
-	 * @return the answer of this message-boards message
-	 */
+	* Returns the answer of this message-boards message.
+	*
+	* @return the answer of this message-boards message
+	*/
 	@Override
 	public boolean getAnswer() {
-		return _mbMessage.getAnswer();
+		return model.getAnswer();
 	}
 
 	@Override
 	public String[] getAssetTagNames() {
-		return _mbMessage.getAssetTagNames();
+		return model.getAssetTagNames();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
-			getAttachmentsFileEntries()
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getAttachmentsFileEntries()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.getAttachmentsFileEntries();
+		return model.getAttachmentsFileEntries();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
-			getAttachmentsFileEntries(int start, int end)
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getAttachmentsFileEntries(
+		int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.getAttachmentsFileEntries(start, end);
+		return model.getAttachmentsFileEntries(start, end);
 	}
 
 	@Override
 	public int getAttachmentsFileEntriesCount()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.getAttachmentsFileEntriesCount();
+		return model.getAttachmentsFileEntriesCount();
 	}
 
 	@Override
 	public long getAttachmentsFolderId()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.getAttachmentsFolderId();
+		return model.getAttachmentsFolderId();
 	}
 
 	/**
-	 * Returns the body of this message-boards message.
-	 *
-	 * @return the body of this message-boards message
-	 */
+	* Returns the body of this message-boards message.
+	*
+	* @return the body of this message-boards message
+	*/
 	@Override
 	public String getBody() {
-		return _mbMessage.getBody();
+		return model.getBody();
 	}
 
 	@Override
 	public String getBody(boolean translate) {
-		return _mbMessage.getBody(translate);
+		return model.getBody(translate);
 	}
 
 	@Override
 	public MBCategory getCategory()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.getCategory();
+		return model.getCategory();
 	}
 
 	/**
-	 * Returns the category ID of this message-boards message.
-	 *
-	 * @return the category ID of this message-boards message
-	 */
+	* Returns the category ID of this message-boards message.
+	*
+	* @return the category ID of this message-boards message
+	*/
 	@Override
 	public long getCategoryId() {
-		return _mbMessage.getCategoryId();
+		return model.getCategoryId();
 	}
 
 	/**
-	 * Returns the fully qualified class name of this message-boards message.
-	 *
-	 * @return the fully qualified class name of this message-boards message
-	 */
+	* Returns the fully qualified class name of this message-boards message.
+	*
+	* @return the fully qualified class name of this message-boards message
+	*/
 	@Override
 	public String getClassName() {
-		return _mbMessage.getClassName();
+		return model.getClassName();
 	}
 
 	/**
-	 * Returns the class name ID of this message-boards message.
-	 *
-	 * @return the class name ID of this message-boards message
-	 */
+	* Returns the class name ID of this message-boards message.
+	*
+	* @return the class name ID of this message-boards message
+	*/
 	@Override
 	public long getClassNameId() {
-		return _mbMessage.getClassNameId();
+		return model.getClassNameId();
 	}
 
 	/**
-	 * Returns the class pk of this message-boards message.
-	 *
-	 * @return the class pk of this message-boards message
-	 */
+	* Returns the class pk of this message-boards message.
+	*
+	* @return the class pk of this message-boards message
+	*/
 	@Override
 	public long getClassPK() {
-		return _mbMessage.getClassPK();
+		return model.getClassPK();
 	}
 
 	/**
-	 * Returns the company ID of this message-boards message.
-	 *
-	 * @return the company ID of this message-boards message
-	 */
+	* Returns the company ID of this message-boards message.
+	*
+	* @return the company ID of this message-boards message
+	*/
 	@Override
 	public long getCompanyId() {
-		return _mbMessage.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the create date of this message-boards message.
-	 *
-	 * @return the create date of this message-boards message
-	 */
+	* Returns the create date of this message-boards message.
+	*
+	* @return the create date of this message-boards message
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _mbMessage.getCreateDate();
+		return model.getCreateDate();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
-			getDeletedAttachmentsFileEntries()
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getDeletedAttachmentsFileEntries()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.getDeletedAttachmentsFileEntries();
+		return model.getDeletedAttachmentsFileEntries();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
-			getDeletedAttachmentsFileEntries(int start, int end)
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getDeletedAttachmentsFileEntries(
+		int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.getDeletedAttachmentsFileEntries(start, end);
+		return model.getDeletedAttachmentsFileEntries(start, end);
 	}
 
 	@Override
 	public int getDeletedAttachmentsFileEntriesCount()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.getDeletedAttachmentsFileEntriesCount();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _mbMessage.getExpandoBridge();
+		return model.getDeletedAttachmentsFileEntriesCount();
 	}
 
 	/**
-	 * Returns the format of this message-boards message.
-	 *
-	 * @return the format of this message-boards message
-	 */
+	* Returns the format of this message-boards message.
+	*
+	* @return the format of this message-boards message
+	*/
 	@Override
 	public String getFormat() {
-		return _mbMessage.getFormat();
+		return model.getFormat();
 	}
 
 	/**
-	 * Returns the group ID of this message-boards message.
-	 *
-	 * @return the group ID of this message-boards message
-	 */
+	* Returns the group ID of this message-boards message.
+	*
+	* @return the group ID of this message-boards message
+	*/
 	@Override
 	public long getGroupId() {
-		return _mbMessage.getGroupId();
+		return model.getGroupId();
 	}
 
 	/**
-	 * Returns the last publish date of this message-boards message.
-	 *
-	 * @return the last publish date of this message-boards message
-	 */
+	* Returns the last publish date of this message-boards message.
+	*
+	* @return the last publish date of this message-boards message
+	*/
 	@Override
 	public Date getLastPublishDate() {
-		return _mbMessage.getLastPublishDate();
+		return model.getLastPublishDate();
 	}
 
 	/**
-	 * Returns the message ID of this message-boards message.
-	 *
-	 * @return the message ID of this message-boards message
-	 */
+	* Returns the message ID of this message-boards message.
+	*
+	* @return the message ID of this message-boards message
+	*/
 	@Override
 	public long getMessageId() {
-		return _mbMessage.getMessageId();
+		return model.getMessageId();
 	}
 
 	/**
-	 * Returns the modified date of this message-boards message.
-	 *
-	 * @return the modified date of this message-boards message
-	 */
+	* Returns the modified date of this message-boards message.
+	*
+	* @return the modified date of this message-boards message
+	*/
 	@Override
 	public Date getModifiedDate() {
-		return _mbMessage.getModifiedDate();
+		return model.getModifiedDate();
 	}
 
 	/**
-	 * Returns the parent message ID of this message-boards message.
-	 *
-	 * @return the parent message ID of this message-boards message
-	 */
+	* Returns the parent message ID of this message-boards message.
+	*
+	* @return the parent message ID of this message-boards message
+	*/
 	@Override
 	public long getParentMessageId() {
-		return _mbMessage.getParentMessageId();
+		return model.getParentMessageId();
 	}
 
 	/**
-	 * Returns the primary key of this message-boards message.
-	 *
-	 * @return the primary key of this message-boards message
-	 */
+	* Returns the primary key of this message-boards message.
+	*
+	* @return the primary key of this message-boards message
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _mbMessage.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _mbMessage.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the priority of this message-boards message.
-	 *
-	 * @return the priority of this message-boards message
-	 */
+	* Returns the priority of this message-boards message.
+	*
+	* @return the priority of this message-boards message
+	*/
 	@Override
 	public double getPriority() {
-		return _mbMessage.getPriority();
+		return model.getPriority();
 	}
 
 	/**
-	 * Returns the root message ID of this message-boards message.
-	 *
-	 * @return the root message ID of this message-boards message
-	 */
+	* Returns the root message ID of this message-boards message.
+	*
+	* @return the root message ID of this message-boards message
+	*/
 	@Override
 	public long getRootMessageId() {
-		return _mbMessage.getRootMessageId();
+		return model.getRootMessageId();
 	}
 
 	/**
-	 * Returns the status of this message-boards message.
-	 *
-	 * @return the status of this message-boards message
-	 */
+	* Returns the status of this message-boards message.
+	*
+	* @return the status of this message-boards message
+	*/
 	@Override
 	public int getStatus() {
-		return _mbMessage.getStatus();
+		return model.getStatus();
 	}
 
 	/**
-	 * Returns the status by user ID of this message-boards message.
-	 *
-	 * @return the status by user ID of this message-boards message
-	 */
+	* Returns the status by user ID of this message-boards message.
+	*
+	* @return the status by user ID of this message-boards message
+	*/
 	@Override
 	public long getStatusByUserId() {
-		return _mbMessage.getStatusByUserId();
+		return model.getStatusByUserId();
 	}
 
 	/**
-	 * Returns the status by user name of this message-boards message.
-	 *
-	 * @return the status by user name of this message-boards message
-	 */
+	* Returns the status by user name of this message-boards message.
+	*
+	* @return the status by user name of this message-boards message
+	*/
 	@Override
 	public String getStatusByUserName() {
-		return _mbMessage.getStatusByUserName();
+		return model.getStatusByUserName();
 	}
 
 	/**
-	 * Returns the status by user uuid of this message-boards message.
-	 *
-	 * @return the status by user uuid of this message-boards message
-	 */
+	* Returns the status by user uuid of this message-boards message.
+	*
+	* @return the status by user uuid of this message-boards message
+	*/
 	@Override
 	public String getStatusByUserUuid() {
-		return _mbMessage.getStatusByUserUuid();
+		return model.getStatusByUserUuid();
 	}
 
 	/**
-	 * Returns the status date of this message-boards message.
-	 *
-	 * @return the status date of this message-boards message
-	 */
+	* Returns the status date of this message-boards message.
+	*
+	* @return the status date of this message-boards message
+	*/
 	@Override
 	public Date getStatusDate() {
-		return _mbMessage.getStatusDate();
+		return model.getStatusDate();
 	}
 
 	/**
-	 * Returns the subject of this message-boards message.
-	 *
-	 * @return the subject of this message-boards message
-	 */
+	* Returns the subject of this message-boards message.
+	*
+	* @return the subject of this message-boards message
+	*/
 	@Override
 	public String getSubject() {
-		return _mbMessage.getSubject();
+		return model.getSubject();
 	}
 
 	@Override
 	public MBThread getThread()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.getThread();
+		return model.getThread();
 	}
 
 	@Override
 	public long getThreadAttachmentsFolderId()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.getThreadAttachmentsFolderId();
+		return model.getThreadAttachmentsFolderId();
 	}
 
 	/**
-	 * Returns the thread ID of this message-boards message.
-	 *
-	 * @return the thread ID of this message-boards message
-	 */
+	* Returns the thread ID of this message-boards message.
+	*
+	* @return the thread ID of this message-boards message
+	*/
 	@Override
 	public long getThreadId() {
-		return _mbMessage.getThreadId();
+		return model.getThreadId();
 	}
 
 	/**
-	 * Returns the trash entry created when this message-boards message was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this message-boards message.
-	 *
-	 * @return the trash entry created when this message-boards message was moved to the Recycle Bin
-	 */
+	* Returns the trash entry created when this message-boards message was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this message-boards message.
+	*
+	* @return the trash entry created when this message-boards message was moved to the Recycle Bin
+	*/
 	@Override
 	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessage.getTrashEntry();
+		return model.getTrashEntry();
 	}
 
 	/**
-	 * Returns the class primary key of the trash entry for this message-boards message.
-	 *
-	 * @return the class primary key of the trash entry for this message-boards message
-	 */
+	* Returns the class primary key of the trash entry for this message-boards message.
+	*
+	* @return the class primary key of the trash entry for this message-boards message
+	*/
 	@Override
 	public long getTrashEntryClassPK() {
-		return _mbMessage.getTrashEntryClassPK();
+		return model.getTrashEntryClassPK();
 	}
 
 	/**
-	 * Returns the trash handler for this message-boards message.
-	 *
-	 * @return the trash handler for this message-boards message
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
+	* Returns the trash handler for this message-boards message.
+	*
+	* @return the trash handler for this message-boards message
+	* @deprecated As of Judson (7.1.x), with no direct replacement
+	*/
 	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
-		return _mbMessage.getTrashHandler();
+		return model.getTrashHandler();
 	}
 
 	/**
-	 * Returns the user ID of this message-boards message.
-	 *
-	 * @return the user ID of this message-boards message
-	 */
+	* Returns the user ID of this message-boards message.
+	*
+	* @return the user ID of this message-boards message
+	*/
 	@Override
 	public long getUserId() {
-		return _mbMessage.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this message-boards message.
-	 *
-	 * @return the user name of this message-boards message
-	 */
+	* Returns the user name of this message-boards message.
+	*
+	* @return the user name of this message-boards message
+	*/
 	@Override
 	public String getUserName() {
-		return _mbMessage.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this message-boards message.
-	 *
-	 * @return the user uuid of this message-boards message
-	 */
+	* Returns the user uuid of this message-boards message.
+	*
+	* @return the user uuid of this message-boards message
+	*/
 	@Override
 	public String getUserUuid() {
-		return _mbMessage.getUserUuid();
+		return model.getUserUuid();
 	}
 
 	/**
-	 * Returns the uuid of this message-boards message.
-	 *
-	 * @return the uuid of this message-boards message
-	 */
+	* Returns the uuid of this message-boards message.
+	*
+	* @return the uuid of this message-boards message
+	*/
 	@Override
 	public String getUuid() {
-		return _mbMessage.getUuid();
+		return model.getUuid();
 	}
 
 	@Override
 	public String getWorkflowClassName() {
-		return _mbMessage.getWorkflowClassName();
-	}
-
-	@Override
-	public int hashCode() {
-		return _mbMessage.hashCode();
+		return model.getWorkflowClassName();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is allow pingbacks.
-	 *
-	 * @return <code>true</code> if this message-boards message is allow pingbacks; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is allow pingbacks.
+	*
+	* @return <code>true</code> if this message-boards message is allow pingbacks; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isAllowPingbacks() {
-		return _mbMessage.isAllowPingbacks();
+		return model.isAllowPingbacks();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is anonymous.
-	 *
-	 * @return <code>true</code> if this message-boards message is anonymous; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is anonymous.
+	*
+	* @return <code>true</code> if this message-boards message is anonymous; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isAnonymous() {
-		return _mbMessage.isAnonymous();
+		return model.isAnonymous();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is answer.
-	 *
-	 * @return <code>true</code> if this message-boards message is answer; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is answer.
+	*
+	* @return <code>true</code> if this message-boards message is answer; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isAnswer() {
-		return _mbMessage.isAnswer();
+		return model.isAnswer();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is approved.
-	 *
-	 * @return <code>true</code> if this message-boards message is approved; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is approved.
+	*
+	* @return <code>true</code> if this message-boards message is approved; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isApproved() {
-		return _mbMessage.isApproved();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _mbMessage.isCachedModel();
+		return model.isApproved();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is denied.
-	 *
-	 * @return <code>true</code> if this message-boards message is denied; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is denied.
+	*
+	* @return <code>true</code> if this message-boards message is denied; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isDenied() {
-		return _mbMessage.isDenied();
+		return model.isDenied();
 	}
 
 	@Override
 	public boolean isDiscussion() {
-		return _mbMessage.isDiscussion();
+		return model.isDiscussion();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is a draft.
-	 *
-	 * @return <code>true</code> if this message-boards message is a draft; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is a draft.
+	*
+	* @return <code>true</code> if this message-boards message is a draft; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isDraft() {
-		return _mbMessage.isDraft();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _mbMessage.isEscapedModel();
+		return model.isDraft();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is expired.
-	 *
-	 * @return <code>true</code> if this message-boards message is expired; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is expired.
+	*
+	* @return <code>true</code> if this message-boards message is expired; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isExpired() {
-		return _mbMessage.isExpired();
+		return model.isExpired();
 	}
 
 	@Override
 	public boolean isFormatBBCode() {
-		return _mbMessage.isFormatBBCode();
+		return model.isFormatBBCode();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is inactive.
-	 *
-	 * @return <code>true</code> if this message-boards message is inactive; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is inactive.
+	*
+	* @return <code>true</code> if this message-boards message is inactive; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isInactive() {
-		return _mbMessage.isInactive();
+		return model.isInactive();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is incomplete.
-	 *
-	 * @return <code>true</code> if this message-boards message is incomplete; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is incomplete.
+	*
+	* @return <code>true</code> if this message-boards message is incomplete; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isIncomplete() {
-		return _mbMessage.isIncomplete();
+		return model.isIncomplete();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is in the Recycle Bin.
-	 *
-	 * @return <code>true</code> if this message-boards message is in the Recycle Bin; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is in the Recycle Bin.
+	*
+	* @return <code>true</code> if this message-boards message is in the Recycle Bin; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isInTrash() {
-		return _mbMessage.isInTrash();
+		return model.isInTrash();
 	}
 
 	/**
-	 * Returns <code>true</code> if the parent of this message-boards message is in the Recycle Bin.
-	 *
-	 * @return <code>true</code> if the parent of this message-boards message is in the Recycle Bin; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if the parent of this message-boards message is in the Recycle Bin.
+	*
+	* @return <code>true</code> if the parent of this message-boards message is in the Recycle Bin; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isInTrashContainer() {
-		return _mbMessage.isInTrashContainer();
+		return model.isInTrashContainer();
 	}
 
 	@Override
 	public boolean isInTrashExplicitly() {
-		return _mbMessage.isInTrashExplicitly();
+		return model.isInTrashExplicitly();
 	}
 
 	@Override
 	public boolean isInTrashImplicitly() {
-		return _mbMessage.isInTrashImplicitly();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _mbMessage.isNew();
+		return model.isInTrashImplicitly();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is pending.
-	 *
-	 * @return <code>true</code> if this message-boards message is pending; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is pending.
+	*
+	* @return <code>true</code> if this message-boards message is pending; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isPending() {
-		return _mbMessage.isPending();
+		return model.isPending();
 	}
 
 	@Override
 	public boolean isReply() {
-		return _mbMessage.isReply();
+		return model.isReply();
 	}
 
 	@Override
 	public boolean isRoot() {
-		return _mbMessage.isRoot();
+		return model.isRoot();
 	}
 
 	/**
-	 * Returns <code>true</code> if this message-boards message is scheduled.
-	 *
-	 * @return <code>true</code> if this message-boards message is scheduled; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this message-boards message is scheduled.
+	*
+	* @return <code>true</code> if this message-boards message is scheduled; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isScheduled() {
-		return _mbMessage.isScheduled();
+		return model.isScheduled();
 	}
 
 	@Override
 	public void persist() {
-		_mbMessage.persist();
+		model.persist();
 	}
 
 	/**
-	 * Sets whether this message-boards message is allow pingbacks.
-	 *
-	 * @param allowPingbacks the allow pingbacks of this message-boards message
-	 */
+	* Sets whether this message-boards message is allow pingbacks.
+	*
+	* @param allowPingbacks the allow pingbacks of this message-boards message
+	*/
 	@Override
 	public void setAllowPingbacks(boolean allowPingbacks) {
-		_mbMessage.setAllowPingbacks(allowPingbacks);
+		model.setAllowPingbacks(allowPingbacks);
 	}
 
 	/**
-	 * Sets whether this message-boards message is anonymous.
-	 *
-	 * @param anonymous the anonymous of this message-boards message
-	 */
+	* Sets whether this message-boards message is anonymous.
+	*
+	* @param anonymous the anonymous of this message-boards message
+	*/
 	@Override
 	public void setAnonymous(boolean anonymous) {
-		_mbMessage.setAnonymous(anonymous);
+		model.setAnonymous(anonymous);
 	}
 
 	/**
-	 * Sets whether this message-boards message is answer.
-	 *
-	 * @param answer the answer of this message-boards message
-	 */
+	* Sets whether this message-boards message is answer.
+	*
+	* @param answer the answer of this message-boards message
+	*/
 	@Override
 	public void setAnswer(boolean answer) {
-		_mbMessage.setAnswer(answer);
+		model.setAnswer(answer);
 	}
 
 	@Override
 	public void setAttachmentsFolderId(long attachmentsFolderId) {
-		_mbMessage.setAttachmentsFolderId(attachmentsFolderId);
+		model.setAttachmentsFolderId(attachmentsFolderId);
 	}
 
 	/**
-	 * Sets the body of this message-boards message.
-	 *
-	 * @param body the body of this message-boards message
-	 */
+	* Sets the body of this message-boards message.
+	*
+	* @param body the body of this message-boards message
+	*/
 	@Override
 	public void setBody(String body) {
-		_mbMessage.setBody(body);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_mbMessage.setCachedModel(cachedModel);
+		model.setBody(body);
 	}
 
 	/**
-	 * Sets the category ID of this message-boards message.
-	 *
-	 * @param categoryId the category ID of this message-boards message
-	 */
+	* Sets the category ID of this message-boards message.
+	*
+	* @param categoryId the category ID of this message-boards message
+	*/
 	@Override
 	public void setCategoryId(long categoryId) {
-		_mbMessage.setCategoryId(categoryId);
+		model.setCategoryId(categoryId);
 	}
 
 	@Override
 	public void setClassName(String className) {
-		_mbMessage.setClassName(className);
+		model.setClassName(className);
 	}
 
 	/**
-	 * Sets the class name ID of this message-boards message.
-	 *
-	 * @param classNameId the class name ID of this message-boards message
-	 */
+	* Sets the class name ID of this message-boards message.
+	*
+	* @param classNameId the class name ID of this message-boards message
+	*/
 	@Override
 	public void setClassNameId(long classNameId) {
-		_mbMessage.setClassNameId(classNameId);
+		model.setClassNameId(classNameId);
 	}
 
 	/**
-	 * Sets the class pk of this message-boards message.
-	 *
-	 * @param classPK the class pk of this message-boards message
-	 */
+	* Sets the class pk of this message-boards message.
+	*
+	* @param classPK the class pk of this message-boards message
+	*/
 	@Override
 	public void setClassPK(long classPK) {
-		_mbMessage.setClassPK(classPK);
+		model.setClassPK(classPK);
 	}
 
 	/**
-	 * Sets the company ID of this message-boards message.
-	 *
-	 * @param companyId the company ID of this message-boards message
-	 */
+	* Sets the company ID of this message-boards message.
+	*
+	* @param companyId the company ID of this message-boards message
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_mbMessage.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this message-boards message.
-	 *
-	 * @param createDate the create date of this message-boards message
-	 */
+	* Sets the create date of this message-boards message.
+	*
+	* @param createDate the create date of this message-boards message
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_mbMessage.setCreateDate(createDate);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_mbMessage.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_mbMessage.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_mbMessage.setExpandoBridgeAttributes(serviceContext);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the format of this message-boards message.
-	 *
-	 * @param format the format of this message-boards message
-	 */
+	* Sets the format of this message-boards message.
+	*
+	* @param format the format of this message-boards message
+	*/
 	@Override
 	public void setFormat(String format) {
-		_mbMessage.setFormat(format);
+		model.setFormat(format);
 	}
 
 	/**
-	 * Sets the group ID of this message-boards message.
-	 *
-	 * @param groupId the group ID of this message-boards message
-	 */
+	* Sets the group ID of this message-boards message.
+	*
+	* @param groupId the group ID of this message-boards message
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_mbMessage.setGroupId(groupId);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the last publish date of this message-boards message.
-	 *
-	 * @param lastPublishDate the last publish date of this message-boards message
-	 */
+	* Sets the last publish date of this message-boards message.
+	*
+	* @param lastPublishDate the last publish date of this message-boards message
+	*/
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
-		_mbMessage.setLastPublishDate(lastPublishDate);
+		model.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	 * Sets the message ID of this message-boards message.
-	 *
-	 * @param messageId the message ID of this message-boards message
-	 */
+	* Sets the message ID of this message-boards message.
+	*
+	* @param messageId the message ID of this message-boards message
+	*/
 	@Override
 	public void setMessageId(long messageId) {
-		_mbMessage.setMessageId(messageId);
+		model.setMessageId(messageId);
 	}
 
 	/**
-	 * Sets the modified date of this message-boards message.
-	 *
-	 * @param modifiedDate the modified date of this message-boards message
-	 */
+	* Sets the modified date of this message-boards message.
+	*
+	* @param modifiedDate the modified date of this message-boards message
+	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
-		_mbMessage.setModifiedDate(modifiedDate);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_mbMessage.setNew(n);
+		model.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	 * Sets the parent message ID of this message-boards message.
-	 *
-	 * @param parentMessageId the parent message ID of this message-boards message
-	 */
+	* Sets the parent message ID of this message-boards message.
+	*
+	* @param parentMessageId the parent message ID of this message-boards message
+	*/
 	@Override
 	public void setParentMessageId(long parentMessageId) {
-		_mbMessage.setParentMessageId(parentMessageId);
+		model.setParentMessageId(parentMessageId);
 	}
 
 	/**
-	 * Sets the primary key of this message-boards message.
-	 *
-	 * @param primaryKey the primary key of this message-boards message
-	 */
+	* Sets the primary key of this message-boards message.
+	*
+	* @param primaryKey the primary key of this message-boards message
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_mbMessage.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_mbMessage.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the priority of this message-boards message.
-	 *
-	 * @param priority the priority of this message-boards message
-	 */
+	* Sets the priority of this message-boards message.
+	*
+	* @param priority the priority of this message-boards message
+	*/
 	@Override
 	public void setPriority(double priority) {
-		_mbMessage.setPriority(priority);
+		model.setPriority(priority);
 	}
 
 	/**
-	 * Sets the root message ID of this message-boards message.
-	 *
-	 * @param rootMessageId the root message ID of this message-boards message
-	 */
+	* Sets the root message ID of this message-boards message.
+	*
+	* @param rootMessageId the root message ID of this message-boards message
+	*/
 	@Override
 	public void setRootMessageId(long rootMessageId) {
-		_mbMessage.setRootMessageId(rootMessageId);
+		model.setRootMessageId(rootMessageId);
 	}
 
 	/**
-	 * Sets the status of this message-boards message.
-	 *
-	 * @param status the status of this message-boards message
-	 */
+	* Sets the status of this message-boards message.
+	*
+	* @param status the status of this message-boards message
+	*/
 	@Override
 	public void setStatus(int status) {
-		_mbMessage.setStatus(status);
+		model.setStatus(status);
 	}
 
 	/**
-	 * Sets the status by user ID of this message-boards message.
-	 *
-	 * @param statusByUserId the status by user ID of this message-boards message
-	 */
+	* Sets the status by user ID of this message-boards message.
+	*
+	* @param statusByUserId the status by user ID of this message-boards message
+	*/
 	@Override
 	public void setStatusByUserId(long statusByUserId) {
-		_mbMessage.setStatusByUserId(statusByUserId);
+		model.setStatusByUserId(statusByUserId);
 	}
 
 	/**
-	 * Sets the status by user name of this message-boards message.
-	 *
-	 * @param statusByUserName the status by user name of this message-boards message
-	 */
+	* Sets the status by user name of this message-boards message.
+	*
+	* @param statusByUserName the status by user name of this message-boards message
+	*/
 	@Override
 	public void setStatusByUserName(String statusByUserName) {
-		_mbMessage.setStatusByUserName(statusByUserName);
+		model.setStatusByUserName(statusByUserName);
 	}
 
 	/**
-	 * Sets the status by user uuid of this message-boards message.
-	 *
-	 * @param statusByUserUuid the status by user uuid of this message-boards message
-	 */
+	* Sets the status by user uuid of this message-boards message.
+	*
+	* @param statusByUserUuid the status by user uuid of this message-boards message
+	*/
 	@Override
 	public void setStatusByUserUuid(String statusByUserUuid) {
-		_mbMessage.setStatusByUserUuid(statusByUserUuid);
+		model.setStatusByUserUuid(statusByUserUuid);
 	}
 
 	/**
-	 * Sets the status date of this message-boards message.
-	 *
-	 * @param statusDate the status date of this message-boards message
-	 */
+	* Sets the status date of this message-boards message.
+	*
+	* @param statusDate the status date of this message-boards message
+	*/
 	@Override
 	public void setStatusDate(Date statusDate) {
-		_mbMessage.setStatusDate(statusDate);
+		model.setStatusDate(statusDate);
 	}
 
 	/**
-	 * Sets the subject of this message-boards message.
-	 *
-	 * @param subject the subject of this message-boards message
-	 */
+	* Sets the subject of this message-boards message.
+	*
+	* @param subject the subject of this message-boards message
+	*/
 	@Override
 	public void setSubject(String subject) {
-		_mbMessage.setSubject(subject);
+		model.setSubject(subject);
 	}
 
 	/**
-	 * Sets the thread ID of this message-boards message.
-	 *
-	 * @param threadId the thread ID of this message-boards message
-	 */
+	* Sets the thread ID of this message-boards message.
+	*
+	* @param threadId the thread ID of this message-boards message
+	*/
 	@Override
 	public void setThreadId(long threadId) {
-		_mbMessage.setThreadId(threadId);
+		model.setThreadId(threadId);
 	}
 
 	/**
-	 * Sets the user ID of this message-boards message.
-	 *
-	 * @param userId the user ID of this message-boards message
-	 */
+	* Sets the user ID of this message-boards message.
+	*
+	* @param userId the user ID of this message-boards message
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_mbMessage.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this message-boards message.
-	 *
-	 * @param userName the user name of this message-boards message
-	 */
+	* Sets the user name of this message-boards message.
+	*
+	* @param userName the user name of this message-boards message
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_mbMessage.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this message-boards message.
-	 *
-	 * @param userUuid the user uuid of this message-boards message
-	 */
+	* Sets the user uuid of this message-boards message.
+	*
+	* @param userUuid the user uuid of this message-boards message
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_mbMessage.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	/**
-	 * Sets the uuid of this message-boards message.
-	 *
-	 * @param uuid the uuid of this message-boards message
-	 */
+	* Sets the uuid of this message-boards message.
+	*
+	* @param uuid the uuid of this message-boards message
+	*/
 	@Override
 	public void setUuid(String uuid) {
-		_mbMessage.setUuid(uuid);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.CacheModel<MBMessage>
-		toCacheModel() {
-
-		return _mbMessage.toCacheModel();
-	}
-
-	@Override
-	public MBMessage toEscapedModel() {
-		return new MBMessageWrapper(_mbMessage.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _mbMessage.toString();
-	}
-
-	@Override
-	public MBMessage toUnescapedModel() {
-		return new MBMessageWrapper(_mbMessage.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _mbMessage.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof MBMessageWrapper)) {
-			return false;
-		}
-
-		MBMessageWrapper mbMessageWrapper = (MBMessageWrapper)obj;
-
-		if (Objects.equals(_mbMessage, mbMessageWrapper._mbMessage)) {
-			return true;
-		}
-
-		return false;
+		model.setUuid(uuid);
 	}
 
 	@Override
 	public StagedModelType getStagedModelType() {
-		return _mbMessage.getStagedModelType();
+		return model.getStagedModelType();
 	}
 
 	@Override
-	public MBMessage getWrappedModel() {
-		return _mbMessage;
+	protected MBMessageWrapper wrap(MBMessage mbMessage) {
+		return new MBMessageWrapper(mbMessage);
 	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _mbMessage.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _mbMessage.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_mbMessage.resetOriginalValues();
-	}
-
-	private final MBMessage _mbMessage;
-
 }

@@ -104,6 +104,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ENABLE_AUTO_TAGGING</td>
+	<td>//label[contains(.,'Enable Auto Tagging')]/input[@type='checkbox']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ENABLE_COMMENTS</td>
 	<td>//label[contains(.,'Enable Comments')]/input[@type='checkbox']</td>
 	<td></td>
@@ -371,6 +376,11 @@
 <tr>
 	<td>SHOW_HEADER_TEXT</td>
 	<td>//label[contains(.,'Show Header Text')]/input[@type='checkbox']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SHOW_NAVIGATION_LINKS_CHECKBOX</td>
+	<td>//label[contains(@for,'showTabs')]//input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>

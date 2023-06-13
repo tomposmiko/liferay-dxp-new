@@ -17,9 +17,11 @@ package com.liferay.journal.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.journal.model.JournalFolder;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing JournalFolder in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see JournalFolder
  * @generated
  */
 @ProviderType
-public class JournalFolderCacheModel
-	implements CacheModel<JournalFolder>, Externalizable {
-
+public class JournalFolderCacheModel implements CacheModel<JournalFolder>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,8 +50,7 @@ public class JournalFolderCacheModel
 			return false;
 		}
 
-		JournalFolderCacheModel journalFolderCacheModel =
-			(JournalFolderCacheModel)obj;
+		JournalFolderCacheModel journalFolderCacheModel = (JournalFolderCacheModel)obj;
 
 		if (folderId == journalFolderCacheModel.folderId) {
 			return true;
@@ -230,7 +231,8 @@ public class JournalFolderCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -314,5 +316,4 @@ public class JournalFolderCacheModel
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
-
 }

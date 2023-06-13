@@ -254,9 +254,12 @@ public class LiferayAppDataService implements AppDataService {
 		long companyId, String appId) {
 
 		try {
-			return ExpandoColumnLocalServiceUtil.getColumns(
-				companyId, User.class.getName(),
-				ShindigUtil.getTableOpenSocial());
+			List<ExpandoColumn> expandoColumns =
+				ExpandoColumnLocalServiceUtil.getColumns(
+					companyId, User.class.getName(),
+					ShindigUtil.getTableOpenSocial());
+
+			return expandoColumns;
 		}
 		catch (Exception e) {
 			return null;

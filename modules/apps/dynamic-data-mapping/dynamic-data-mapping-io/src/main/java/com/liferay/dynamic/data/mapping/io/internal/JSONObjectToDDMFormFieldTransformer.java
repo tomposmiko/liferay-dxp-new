@@ -52,7 +52,9 @@ public class JSONObjectToDDMFormFieldTransformer {
 	public DDMFormField transform(JSONObject jsonObject)
 		throws PortalException {
 
-		return getDDMFormField(jsonObject);
+		DDMFormField ddmFormField = getDDMFormField(jsonObject);
+
+		return ddmFormField;
 	}
 
 	protected void addOptionValueLabels(

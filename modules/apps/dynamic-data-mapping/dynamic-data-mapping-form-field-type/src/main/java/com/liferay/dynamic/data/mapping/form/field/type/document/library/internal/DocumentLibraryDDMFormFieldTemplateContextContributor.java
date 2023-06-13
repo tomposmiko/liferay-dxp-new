@@ -111,10 +111,14 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		stringsMap.put("select", LanguageUtil.get(resourceBundle, "select"));
 
 		parameters.put("strings", stringsMap);
-		parameters.put(
-			"value",
-			jsonFactory.looseDeserialize(
-				ddmFormFieldRenderingContext.getValue()));
+
+		String value = ddmFormFieldRenderingContext.getValue();
+
+		if (Validator.isNull(value)) {
+			value = "{}";
+		}
+
+		parameters.put("value", jsonFactory.looseDeserialize(value));
 
 		return parameters;
 	}
@@ -184,10 +188,12 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		}
 
 		try {
-			return AuthTokenUtil.getToken(
+			String itemSelectorAuthToken = AuthTokenUtil.getToken(
 				request,
 				portal.getControlPanelPlid(themeDisplay.getCompanyId()),
 				PortletKeys.ITEM_SELECTOR);
+
+			return itemSelectorAuthToken;
 		}
 		catch (PortalException pe) {
 			_log.error("Unable to generate item selector auth token ", pe);

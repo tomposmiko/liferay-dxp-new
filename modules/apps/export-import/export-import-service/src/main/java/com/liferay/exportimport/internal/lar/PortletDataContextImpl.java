@@ -24,6 +24,7 @@ import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.model.ExpandoColumn;
+import com.liferay.expando.kernel.model.adapter.StagedExpandoColumn;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalServiceUtil;
 import com.liferay.exportimport.internal.util.ExportImportPermissionUtil;
 import com.liferay.exportimport.internal.xstream.ConverterAdapter;
@@ -45,7 +46,6 @@ import com.liferay.exportimport.kernel.lar.UserIdStrategy;
 import com.liferay.exportimport.kernel.xstream.XStreamAlias;
 import com.liferay.exportimport.kernel.xstream.XStreamConverter;
 import com.liferay.exportimport.kernel.xstream.XStreamType;
-import com.liferay.message.boards.kernel.model.MBMessage;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
@@ -287,17 +287,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Deprecated
 	@Override
 	public void addComments(Class<?> clazz, long classPK) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#exportComments(
-	 *             PortletDataContext, StagedModel)}
-	 */
-	@Deprecated
-	@Override
-	public void addComments(
-		String className, long classPK, List<MBMessage> messages) {
 	}
 
 	/**
@@ -839,15 +828,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public ClassLoader getClassLoader() {
 		return _xStream.getClassLoader();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public Map<String, List<MBMessage>> getComments() {
-		return Collections.emptyMap();
 	}
 
 	@Override
@@ -1580,8 +1560,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 		newPrimaryKeysMap.put(primaryKeyObj, newPrimaryKeyObj);
 
-		if ((classedModel instanceof StagedGroupedModel) &&
-			(newClassedModel instanceof StagedGroupedModel)) {
+		if (classedModel instanceof StagedGroupedModel &&
+			newClassedModel instanceof StagedGroupedModel) {
 
 			Map<Long, Long> groupIds = (Map<Long, Long>)getNewPrimaryKeysMap(
 				Group.class);
@@ -2219,6 +2199,17 @@ public class PortletDataContextImpl implements PortletDataContext {
 			}
 
 			_expandoColumnsMap.put(className, expandoColumns);
+
+			for (ExpandoColumn expandoColumn : expandoColumns) {
+				StagedExpandoColumn stagedExpandoColumn =
+					ModelAdapterUtil.adapt(
+						expandoColumn, ExpandoColumn.class,
+						StagedExpandoColumn.class);
+
+				addReferenceElement(
+					classedModel, element, stagedExpandoColumn,
+					REFERENCE_TYPE_DEPENDENCY, true);
+			}
 		}
 
 		ExpandoBridge expandoBridge = classedModel.getExpandoBridge();
@@ -3081,10 +3072,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 			}
 
 			if ((workflowDefinition != null) &&
-				!WorkflowDefinitionLinkLocalServiceUtil.
+				(!WorkflowDefinitionLinkLocalServiceUtil.
 					hasWorkflowDefinitionLink(
 						getCompanyId(), getScopeGroupId(), className,
-						newPrimaryKey)) {
+						newPrimaryKey))) {
 
 				try {
 					long importedClassPK = GetterUtil.getLong(

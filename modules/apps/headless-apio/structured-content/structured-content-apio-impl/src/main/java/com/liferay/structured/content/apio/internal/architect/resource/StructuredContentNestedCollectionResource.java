@@ -35,6 +35,8 @@ import com.liferay.category.apio.architect.identifier.CategoryIdentifier;
 import com.liferay.comment.apio.architect.identifier.CommentIdentifier;
 import com.liferay.content.space.apio.architect.model.ContentSpace;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.dynamic.data.mapping.exception.StorageFieldNameException;
+import com.liferay.dynamic.data.mapping.exception.StorageFieldRequiredException;
 import com.liferay.dynamic.data.mapping.kernel.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.kernel.DDMFormValues;
 import com.liferay.dynamic.data.mapping.kernel.Value;
@@ -42,6 +44,8 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureService;
+import com.liferay.journal.exception.ArticleContentException;
+import com.liferay.journal.exception.ArticleTitleException;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalArticleDisplay;
@@ -105,7 +109,6 @@ import com.liferay.structured.content.apio.internal.model.JournalArticleWrapper;
 import com.liferay.structured.content.apio.internal.model.RenderedJournalArticle;
 import com.liferay.structured.content.apio.internal.util.JournalArticleContentHelper;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -118,6 +121,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.ws.rs.BadRequestException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -327,21 +332,28 @@ public class StructuredContentNestedCollectionResource
 	}
 
 	private JournalArticleWrapper _addJournalArticle(
-			long contentSpaceId, StructuredContent structuredContent,
-			AcceptLanguage acceptLanguage, ThemeDisplay themeDisplay)
-		throws PortalException {
+		long contentSpaceId, StructuredContent structuredContent,
+		AcceptLanguage acceptLanguage, ThemeDisplay themeDisplay) {
 
-		DDMStructure ddmStructure = _ddmStructureService.getStructure(
-			structuredContent.getContentStructureId());
+		DDMStructure ddmStructure;
+
+		try {
+			ddmStructure = _ddmStructureService.getStructure(
+				structuredContent.getContentStructureId());
+		}
+		catch (PortalException pe) {
+			throw new BadRequestException(
+				"Unable to add Structured Content with invalid Structure" +
+					pe.getMessage());
+		}
 
 		Locale locale = acceptLanguage.getPreferredLocale();
 
 		String content =
 			_journalArticleContentHelper.createJournalArticleContent(
-				structuredContent.getStructuredContentValues(), ddmStructure,
-				LocaleUtil.toLanguageId(locale),
-				Collections.singletonList(LocaleUtil.toLanguageId(locale)),
-				LocaleUtil.toLanguageId(locale));
+				ddmStructure,
+				Collections.singletonMap(
+					locale, structuredContent.getStructuredContentValues()));
 
 		String ddmStructureKey = ddmStructure.getStructureKey();
 		String ddmTemplateKey = _getDDMTemplateKey(ddmStructure);
@@ -350,32 +362,38 @@ public class StructuredContentNestedCollectionResource
 		ServiceContext serviceContext = getServiceContext(
 			contentSpaceId, structuredContent);
 
-		JournalArticle journalArticle = _journalArticleService.addArticle(
-			contentSpaceId, 0, 0, 0, null, true,
-			structuredContent.getTitleMap(locale),
-			_getDefaultValue(
-				structuredContent.getDescriptionMapOptional(locale),
-				Collections.emptyMap()),
-			content, ddmStructureKey, ddmTemplateKey, null,
-			_getDefaultValue(
-				structuredContent.getPublishedDateMonthOptional(),
-				calendar.get(Calendar.MONTH)),
-			_getDefaultValue(
-				structuredContent.getPublishedDateDayOptional(),
-				calendar.get(Calendar.DATE)),
-			_getDefaultValue(
-				structuredContent.getPublishedDateYearOptional(),
-				calendar.get(Calendar.YEAR)),
-			_getDefaultValue(
-				structuredContent.getPublishedDateHourOptional(),
-				calendar.get(Calendar.HOUR)),
-			_getDefaultValue(
-				structuredContent.getPublishedDateMinuteOptional(),
-				calendar.get(Calendar.MINUTE)),
-			0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0, true, true, null,
-			serviceContext);
+		try {
+			JournalArticle journalArticle = _journalArticleService.addArticle(
+				contentSpaceId, 0, 0, 0, null, true,
+				structuredContent.getTitleMap(locale),
+				_getDefaultValue(
+					structuredContent.getDescriptionMapOptional(locale),
+					Collections.emptyMap()),
+				content, ddmStructureKey, ddmTemplateKey, null,
+				_getDefaultValue(
+					structuredContent.getPublishedDateMonthOptional(),
+					calendar.get(Calendar.MONTH)),
+				_getDefaultValue(
+					structuredContent.getPublishedDateDayOptional(),
+					calendar.get(Calendar.DATE)),
+				_getDefaultValue(
+					structuredContent.getPublishedDateYearOptional(),
+					calendar.get(Calendar.YEAR)),
+				_getDefaultValue(
+					structuredContent.getPublishedDateHourOptional(),
+					calendar.get(Calendar.HOUR)),
+				_getDefaultValue(
+					structuredContent.getPublishedDateMinuteOptional(),
+					calendar.get(Calendar.MINUTE)),
+				0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0, true, true, null,
+				serviceContext);
 
-		return new JournalArticleWrapper(journalArticle, locale, themeDisplay);
+			return new JournalArticleWrapper(
+				journalArticle, locale, themeDisplay);
+		}
+		catch (PortalException pe) {
+			throw _getBadRequestException(pe);
+		}
 	}
 
 	private ClassNameClassPK _createClassNameClassPK(
@@ -430,6 +448,34 @@ public class StructuredContentNestedCollectionResource
 		_journalArticleService.deleteArticle(
 			journalArticle.getGroupId(), journalArticle.getArticleId(),
 			journalArticle.getArticleResourceUuid(), new ServiceContext());
+	}
+
+	private BadRequestException _getBadRequestException(PortalException pe) {
+		if (pe instanceof ArticleTitleException.MustNotExceedMaximumLength) {
+			return new BadRequestException(
+				"Unable to add Structured Content: the title exceeds the " +
+					"maximum length",
+				pe);
+		}
+		else if (pe instanceof ArticleTitleException) {
+			return new BadRequestException(
+				"Unable to add Structured Content without title in default " +
+					"language",
+				pe);
+		}
+		else if (pe instanceof ArticleContentException ||
+				 pe instanceof StorageFieldNameException ||
+				 pe instanceof StorageFieldRequiredException) {
+
+			throw new BadRequestException(
+				"Unable to add Structured Content with invalid Structured " +
+					"Content Values",
+				pe);
+		}
+		else {
+			throw new BadRequestException(
+				"Unable to add Structured Content ", pe);
+		}
 	}
 
 	private String _getDDMTemplateKey(DDMStructure ddmStructure) {
@@ -518,22 +564,6 @@ public class StructuredContentNestedCollectionResource
 
 		return new JournalArticleWrapper(
 			journalArticle, acceptLanguage.getPreferredLocale(), themeDisplay);
-	}
-
-	private List<String> _getLanguagesIds(
-		List<String> languagesIds, Locale locale) {
-
-		String languageId = LocaleUtil.toLanguageId(locale);
-
-		if (!languagesIds.contains(languageId)) {
-			return Stream.concat(
-				languagesIds.stream(), Stream.of(languageId)
-			).collect(
-				Collectors.toList()
-			);
-		}
-
-		return new ArrayList(languagesIds);
 	}
 
 	private String _getLayoutLink(JSONObject jsonObject)
@@ -785,12 +815,9 @@ public class StructuredContentNestedCollectionResource
 
 		String content =
 			_journalArticleContentHelper.createJournalArticleContent(
-				structuredContent.getStructuredContentValues(), ddmStructure,
-				journalArticle.getDefaultLanguageId(),
-				_getLanguagesIds(
-					Arrays.asList(journalArticle.getAvailableLanguageIds()),
-					locale),
-				LocaleUtil.toLanguageId(locale));
+				ddmStructure,
+				Collections.singletonMap(
+					locale, structuredContent.getStructuredContentValues()));
 
 		String ddmTemplateKey = _getDDMTemplateKey(ddmStructure);
 

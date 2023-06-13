@@ -16,16 +16,14 @@ package com.liferay.portal.background.task.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -37,21 +35,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class BackgroundTaskWrapper
+public class BackgroundTaskWrapper extends BaseModelWrapper<BackgroundTask>
 	implements BackgroundTask, ModelWrapper<BackgroundTask> {
-
 	public BackgroundTaskWrapper(BackgroundTask backgroundTask) {
-		_backgroundTask = backgroundTask;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return BackgroundTask.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return BackgroundTask.class.getName();
+		super(backgroundTask);
 	}
 
 	@Override
@@ -135,21 +122,21 @@ public class BackgroundTaskWrapper
 		}
 
 		String servletContextNames = (String)attributes.get(
-			"servletContextNames");
+				"servletContextNames");
 
 		if (servletContextNames != null) {
 			setServletContextNames(servletContextNames);
 		}
 
 		String taskExecutorClassName = (String)attributes.get(
-			"taskExecutorClassName");
+				"taskExecutorClassName");
 
 		if (taskExecutorClassName != null) {
 			setTaskExecutorClassName(taskExecutorClassName);
 		}
 
-		Map<String, Serializable> taskContextMap =
-			(Map<String, Serializable>)attributes.get("taskContextMap");
+		Map<String, Serializable> taskContextMap = (Map<String, Serializable>)attributes.get(
+				"taskContextMap");
 
 		if (taskContextMap != null) {
 			setTaskContextMap(taskContextMap);
@@ -183,581 +170,433 @@ public class BackgroundTaskWrapper
 	@Override
 	public void addAttachment(long userId, String fileName, java.io.File file)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_backgroundTask.addAttachment(userId, fileName, file);
+		model.addAttachment(userId, fileName, file);
 	}
 
 	@Override
-	public void addAttachment(
-			long userId, String fileName, java.io.InputStream inputStream)
+	public void addAttachment(long userId, String fileName,
+		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_backgroundTask.addAttachment(userId, fileName, inputStream);
+		model.addAttachment(userId, fileName, inputStream);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.repository.model.Folder
-			addAttachmentsFolder()
+	public com.liferay.portal.kernel.repository.model.Folder addAttachmentsFolder()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _backgroundTask.addAttachmentsFolder();
+		return model.addAttachmentsFolder();
 	}
 
 	@Override
-	public Object clone() {
-		return new BackgroundTaskWrapper(
-			(BackgroundTask)_backgroundTask.clone());
-	}
-
-	@Override
-	public int compareTo(BackgroundTask backgroundTask) {
-		return _backgroundTask.compareTo(backgroundTask);
-	}
-
-	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
-			getAttachmentsFileEntries()
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getAttachmentsFileEntries()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _backgroundTask.getAttachmentsFileEntries();
+		return model.getAttachmentsFileEntries();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
-			getAttachmentsFileEntries(int start, int end)
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getAttachmentsFileEntries(
+		int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _backgroundTask.getAttachmentsFileEntries(start, end);
+		return model.getAttachmentsFileEntries(start, end);
 	}
 
 	@Override
 	public int getAttachmentsFileEntriesCount()
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _backgroundTask.getAttachmentsFileEntriesCount();
+		return model.getAttachmentsFileEntriesCount();
 	}
 
 	@Override
 	public long getAttachmentsFolderId() {
-		return _backgroundTask.getAttachmentsFolderId();
+		return model.getAttachmentsFolderId();
 	}
 
 	/**
-	 * Returns the background task ID of this background task.
-	 *
-	 * @return the background task ID of this background task
-	 */
+	* Returns the background task ID of this background task.
+	*
+	* @return the background task ID of this background task
+	*/
 	@Override
 	public long getBackgroundTaskId() {
-		return _backgroundTask.getBackgroundTaskId();
+		return model.getBackgroundTaskId();
 	}
 
 	/**
-	 * Returns the company ID of this background task.
-	 *
-	 * @return the company ID of this background task
-	 */
+	* Returns the company ID of this background task.
+	*
+	* @return the company ID of this background task
+	*/
 	@Override
 	public long getCompanyId() {
-		return _backgroundTask.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the completed of this background task.
-	 *
-	 * @return the completed of this background task
-	 */
+	* Returns the completed of this background task.
+	*
+	* @return the completed of this background task
+	*/
 	@Override
 	public boolean getCompleted() {
-		return _backgroundTask.getCompleted();
+		return model.getCompleted();
 	}
 
 	/**
-	 * Returns the completion date of this background task.
-	 *
-	 * @return the completion date of this background task
-	 */
+	* Returns the completion date of this background task.
+	*
+	* @return the completion date of this background task
+	*/
 	@Override
 	public Date getCompletionDate() {
-		return _backgroundTask.getCompletionDate();
+		return model.getCompletionDate();
 	}
 
 	/**
-	 * Returns the create date of this background task.
-	 *
-	 * @return the create date of this background task
-	 */
+	* Returns the create date of this background task.
+	*
+	* @return the create date of this background task
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _backgroundTask.getCreateDate();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _backgroundTask.getExpandoBridge();
+		return model.getCreateDate();
 	}
 
 	/**
-	 * Returns the group ID of this background task.
-	 *
-	 * @return the group ID of this background task
-	 */
+	* Returns the group ID of this background task.
+	*
+	* @return the group ID of this background task
+	*/
 	@Override
 	public long getGroupId() {
-		return _backgroundTask.getGroupId();
+		return model.getGroupId();
 	}
 
 	/**
-	 * Returns the modified date of this background task.
-	 *
-	 * @return the modified date of this background task
-	 */
+	* Returns the modified date of this background task.
+	*
+	* @return the modified date of this background task
+	*/
 	@Override
 	public Date getModifiedDate() {
-		return _backgroundTask.getModifiedDate();
+		return model.getModifiedDate();
 	}
 
 	/**
-	 * Returns the mvcc version of this background task.
-	 *
-	 * @return the mvcc version of this background task
-	 */
+	* Returns the mvcc version of this background task.
+	*
+	* @return the mvcc version of this background task
+	*/
 	@Override
 	public long getMvccVersion() {
-		return _backgroundTask.getMvccVersion();
+		return model.getMvccVersion();
 	}
 
 	/**
-	 * Returns the name of this background task.
-	 *
-	 * @return the name of this background task
-	 */
+	* Returns the name of this background task.
+	*
+	* @return the name of this background task
+	*/
 	@Override
 	public String getName() {
-		return _backgroundTask.getName();
+		return model.getName();
 	}
 
 	/**
-	 * Returns the primary key of this background task.
-	 *
-	 * @return the primary key of this background task
-	 */
+	* Returns the primary key of this background task.
+	*
+	* @return the primary key of this background task
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _backgroundTask.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _backgroundTask.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the servlet context names of this background task.
-	 *
-	 * @return the servlet context names of this background task
-	 */
+	* Returns the servlet context names of this background task.
+	*
+	* @return the servlet context names of this background task
+	*/
 	@Override
 	public String getServletContextNames() {
-		return _backgroundTask.getServletContextNames();
+		return model.getServletContextNames();
 	}
 
 	/**
-	 * Returns the status of this background task.
-	 *
-	 * @return the status of this background task
-	 */
+	* Returns the status of this background task.
+	*
+	* @return the status of this background task
+	*/
 	@Override
 	public int getStatus() {
-		return _backgroundTask.getStatus();
+		return model.getStatus();
 	}
 
 	@Override
 	public String getStatusLabel() {
-		return _backgroundTask.getStatusLabel();
+		return model.getStatusLabel();
 	}
 
 	/**
-	 * Returns the status message of this background task.
-	 *
-	 * @return the status message of this background task
-	 */
+	* Returns the status message of this background task.
+	*
+	* @return the status message of this background task
+	*/
 	@Override
 	public String getStatusMessage() {
-		return _backgroundTask.getStatusMessage();
+		return model.getStatusMessage();
 	}
 
 	/**
-	 * Returns the task context map of this background task.
-	 *
-	 * @return the task context map of this background task
-	 */
+	* Returns the task context map of this background task.
+	*
+	* @return the task context map of this background task
+	*/
 	@Override
 	public Map<String, Serializable> getTaskContextMap() {
-		return _backgroundTask.getTaskContextMap();
+		return model.getTaskContextMap();
 	}
 
 	/**
-	 * Returns the task executor class name of this background task.
-	 *
-	 * @return the task executor class name of this background task
-	 */
+	* Returns the task executor class name of this background task.
+	*
+	* @return the task executor class name of this background task
+	*/
 	@Override
 	public String getTaskExecutorClassName() {
-		return _backgroundTask.getTaskExecutorClassName();
+		return model.getTaskExecutorClassName();
 	}
 
 	/**
-	 * Returns the user ID of this background task.
-	 *
-	 * @return the user ID of this background task
-	 */
+	* Returns the user ID of this background task.
+	*
+	* @return the user ID of this background task
+	*/
 	@Override
 	public long getUserId() {
-		return _backgroundTask.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this background task.
-	 *
-	 * @return the user name of this background task
-	 */
+	* Returns the user name of this background task.
+	*
+	* @return the user name of this background task
+	*/
 	@Override
 	public String getUserName() {
-		return _backgroundTask.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this background task.
-	 *
-	 * @return the user uuid of this background task
-	 */
+	* Returns the user uuid of this background task.
+	*
+	* @return the user uuid of this background task
+	*/
 	@Override
 	public String getUserUuid() {
-		return _backgroundTask.getUserUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _backgroundTask.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _backgroundTask.isCachedModel();
+		return model.getUserUuid();
 	}
 
 	/**
-	 * Returns <code>true</code> if this background task is completed.
-	 *
-	 * @return <code>true</code> if this background task is completed; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this background task is completed.
+	*
+	* @return <code>true</code> if this background task is completed; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isCompleted() {
-		return _backgroundTask.isCompleted();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _backgroundTask.isEscapedModel();
+		return model.isCompleted();
 	}
 
 	@Override
 	public boolean isInProgress() {
-		return _backgroundTask.isInProgress();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _backgroundTask.isNew();
+		return model.isInProgress();
 	}
 
 	@Override
 	public void persist() {
-		_backgroundTask.persist();
+		model.persist();
 	}
 
 	/**
-	 * Sets the background task ID of this background task.
-	 *
-	 * @param backgroundTaskId the background task ID of this background task
-	 */
+	* Sets the background task ID of this background task.
+	*
+	* @param backgroundTaskId the background task ID of this background task
+	*/
 	@Override
 	public void setBackgroundTaskId(long backgroundTaskId) {
-		_backgroundTask.setBackgroundTaskId(backgroundTaskId);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_backgroundTask.setCachedModel(cachedModel);
+		model.setBackgroundTaskId(backgroundTaskId);
 	}
 
 	/**
-	 * Sets the company ID of this background task.
-	 *
-	 * @param companyId the company ID of this background task
-	 */
+	* Sets the company ID of this background task.
+	*
+	* @param companyId the company ID of this background task
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_backgroundTask.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets whether this background task is completed.
-	 *
-	 * @param completed the completed of this background task
-	 */
+	* Sets whether this background task is completed.
+	*
+	* @param completed the completed of this background task
+	*/
 	@Override
 	public void setCompleted(boolean completed) {
-		_backgroundTask.setCompleted(completed);
+		model.setCompleted(completed);
 	}
 
 	/**
-	 * Sets the completion date of this background task.
-	 *
-	 * @param completionDate the completion date of this background task
-	 */
+	* Sets the completion date of this background task.
+	*
+	* @param completionDate the completion date of this background task
+	*/
 	@Override
 	public void setCompletionDate(Date completionDate) {
-		_backgroundTask.setCompletionDate(completionDate);
+		model.setCompletionDate(completionDate);
 	}
 
 	/**
-	 * Sets the create date of this background task.
-	 *
-	 * @param createDate the create date of this background task
-	 */
+	* Sets the create date of this background task.
+	*
+	* @param createDate the create date of this background task
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_backgroundTask.setCreateDate(createDate);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_backgroundTask.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_backgroundTask.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_backgroundTask.setExpandoBridgeAttributes(serviceContext);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the group ID of this background task.
-	 *
-	 * @param groupId the group ID of this background task
-	 */
+	* Sets the group ID of this background task.
+	*
+	* @param groupId the group ID of this background task
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_backgroundTask.setGroupId(groupId);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the modified date of this background task.
-	 *
-	 * @param modifiedDate the modified date of this background task
-	 */
+	* Sets the modified date of this background task.
+	*
+	* @param modifiedDate the modified date of this background task
+	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
-		_backgroundTask.setModifiedDate(modifiedDate);
+		model.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	 * Sets the mvcc version of this background task.
-	 *
-	 * @param mvccVersion the mvcc version of this background task
-	 */
+	* Sets the mvcc version of this background task.
+	*
+	* @param mvccVersion the mvcc version of this background task
+	*/
 	@Override
 	public void setMvccVersion(long mvccVersion) {
-		_backgroundTask.setMvccVersion(mvccVersion);
+		model.setMvccVersion(mvccVersion);
 	}
 
 	/**
-	 * Sets the name of this background task.
-	 *
-	 * @param name the name of this background task
-	 */
+	* Sets the name of this background task.
+	*
+	* @param name the name of this background task
+	*/
 	@Override
 	public void setName(String name) {
-		_backgroundTask.setName(name);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_backgroundTask.setNew(n);
+		model.setName(name);
 	}
 
 	/**
-	 * Sets the primary key of this background task.
-	 *
-	 * @param primaryKey the primary key of this background task
-	 */
+	* Sets the primary key of this background task.
+	*
+	* @param primaryKey the primary key of this background task
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_backgroundTask.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_backgroundTask.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the servlet context names of this background task.
-	 *
-	 * @param servletContextNames the servlet context names of this background task
-	 */
+	* Sets the servlet context names of this background task.
+	*
+	* @param servletContextNames the servlet context names of this background task
+	*/
 	@Override
 	public void setServletContextNames(String servletContextNames) {
-		_backgroundTask.setServletContextNames(servletContextNames);
+		model.setServletContextNames(servletContextNames);
 	}
 
 	/**
-	 * Sets the status of this background task.
-	 *
-	 * @param status the status of this background task
-	 */
+	* Sets the status of this background task.
+	*
+	* @param status the status of this background task
+	*/
 	@Override
 	public void setStatus(int status) {
-		_backgroundTask.setStatus(status);
+		model.setStatus(status);
 	}
 
 	/**
-	 * Sets the status message of this background task.
-	 *
-	 * @param statusMessage the status message of this background task
-	 */
+	* Sets the status message of this background task.
+	*
+	* @param statusMessage the status message of this background task
+	*/
 	@Override
 	public void setStatusMessage(String statusMessage) {
-		_backgroundTask.setStatusMessage(statusMessage);
+		model.setStatusMessage(statusMessage);
 	}
 
 	/**
-	 * Sets the task context map of this background task.
-	 *
-	 * @param taskContextMap the task context map of this background task
-	 */
+	* Sets the task context map of this background task.
+	*
+	* @param taskContextMap the task context map of this background task
+	*/
 	@Override
 	public void setTaskContextMap(Map<String, Serializable> taskContextMap) {
-		_backgroundTask.setTaskContextMap(taskContextMap);
+		model.setTaskContextMap(taskContextMap);
 	}
 
 	/**
-	 * Sets the task executor class name of this background task.
-	 *
-	 * @param taskExecutorClassName the task executor class name of this background task
-	 */
+	* Sets the task executor class name of this background task.
+	*
+	* @param taskExecutorClassName the task executor class name of this background task
+	*/
 	@Override
 	public void setTaskExecutorClassName(String taskExecutorClassName) {
-		_backgroundTask.setTaskExecutorClassName(taskExecutorClassName);
+		model.setTaskExecutorClassName(taskExecutorClassName);
 	}
 
 	/**
-	 * Sets the user ID of this background task.
-	 *
-	 * @param userId the user ID of this background task
-	 */
+	* Sets the user ID of this background task.
+	*
+	* @param userId the user ID of this background task
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_backgroundTask.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this background task.
-	 *
-	 * @param userName the user name of this background task
-	 */
+	* Sets the user name of this background task.
+	*
+	* @param userName the user name of this background task
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_backgroundTask.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this background task.
-	 *
-	 * @param userUuid the user uuid of this background task
-	 */
+	* Sets the user uuid of this background task.
+	*
+	* @param userUuid the user uuid of this background task
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_backgroundTask.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<BackgroundTask>
-		toCacheModel() {
-
-		return _backgroundTask.toCacheModel();
+	protected BackgroundTaskWrapper wrap(BackgroundTask backgroundTask) {
+		return new BackgroundTaskWrapper(backgroundTask);
 	}
-
-	@Override
-	public BackgroundTask toEscapedModel() {
-		return new BackgroundTaskWrapper(_backgroundTask.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _backgroundTask.toString();
-	}
-
-	@Override
-	public BackgroundTask toUnescapedModel() {
-		return new BackgroundTaskWrapper(_backgroundTask.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _backgroundTask.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof BackgroundTaskWrapper)) {
-			return false;
-		}
-
-		BackgroundTaskWrapper backgroundTaskWrapper =
-			(BackgroundTaskWrapper)obj;
-
-		if (Objects.equals(
-				_backgroundTask, backgroundTaskWrapper._backgroundTask)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public BackgroundTask getWrappedModel() {
-		return _backgroundTask;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _backgroundTask.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _backgroundTask.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_backgroundTask.resetOriginalValues();
-	}
-
-	private final BackgroundTask _backgroundTask;
-
 }

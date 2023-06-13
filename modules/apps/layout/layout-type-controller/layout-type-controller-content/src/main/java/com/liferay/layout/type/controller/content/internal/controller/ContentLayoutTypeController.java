@@ -14,25 +14,22 @@
 
 package com.liferay.layout.type.controller.content.internal.controller;
 
-import com.liferay.fragment.model.FragmentEntryLink;
-import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.item.selector.ItemSelector;
-import com.liferay.layout.type.controller.content.internal.constants.ContentLayoutTypeControllerConstants;
+import com.liferay.layout.constants.LayoutConstants;
 import com.liferay.layout.type.controller.content.internal.constants.ContentLayoutTypeControllerWebKeys;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.model.impl.BaseLayoutTypeControllerImpl;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.servlet.TransferHeadersHelperUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.servlet.PipingServletResponse;
-
-import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -48,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	property = "layout.type=" + ContentLayoutTypeControllerConstants.LAYOUT_TYPE_CONTENT,
+	property = "layout.type=" + LayoutConstants.LAYOUT_TYPE_CONTENT,
 	service = LayoutTypeController.class
 )
 public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
@@ -77,21 +74,21 @@ public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
 			Layout layout)
 		throws Exception {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		String layoutMode = ParamUtil.getString(
 			request, "p_l_mode", Constants.VIEW);
 
-		if (layoutMode.equals(Constants.VIEW)) {
-			List<FragmentEntryLink> fragmentEntryLinks =
-				_fragmentEntryLinkLocalService.getFragmentEntryLinks(
-					layout.getGroupId(),
-					_portal.getClassNameId(Layout.class.getName()),
-					layout.getPlid());
+		if (layoutMode.equals(Constants.EDIT) &&
+			!LayoutPermissionUtil.contains(
+				themeDisplay.getPermissionChecker(), themeDisplay.getLayout(),
+				ActionKeys.UPDATE)) {
 
-			request.setAttribute(
-				ContentLayoutTypeControllerWebKeys.LAYOUT_FRAGMENTS,
-				fragmentEntryLinks);
+			layoutMode = Constants.VIEW;
 		}
-		else {
+
+		if (layoutMode.equals(Constants.EDIT)) {
 			request.setAttribute(
 				ContentLayoutTypeControllerWebKeys.ITEM_SELECTOR,
 				_itemSelector);
@@ -209,12 +206,6 @@ public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
 	private static final String _VIEW_PAGE = "/layout/view/content.jsp";
 
 	@Reference
-	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
-
-	@Reference
 	private ItemSelector _itemSelector;
-
-	@Reference
-	private Portal _portal;
 
 }

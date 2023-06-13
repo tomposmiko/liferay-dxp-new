@@ -25,11 +25,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portlet.expando.service.http.ExpandoColumnServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.portlet.expando.service.http.ExpandoColumnServiceSoap
  * @generated
  */
 @ProviderType
 public class ExpandoColumnSoap implements Serializable {
-
 	public static ExpandoColumnSoap toSoapModel(ExpandoColumn model) {
 		ExpandoColumnSoap soapModel = new ExpandoColumnSoap();
 
@@ -72,8 +72,7 @@ public class ExpandoColumnSoap implements Serializable {
 	}
 
 	public static ExpandoColumnSoap[] toSoapModels(List<ExpandoColumn> models) {
-		List<ExpandoColumnSoap> soapModels = new ArrayList<ExpandoColumnSoap>(
-			models.size());
+		List<ExpandoColumnSoap> soapModels = new ArrayList<ExpandoColumnSoap>(models.size());
 
 		for (ExpandoColumn model : models) {
 			soapModels.add(toSoapModel(model));
@@ -156,5 +155,4 @@ public class ExpandoColumnSoap implements Serializable {
 	private int _type;
 	private String _defaultData;
 	private String _typeSettings;
-
 }

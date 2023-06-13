@@ -134,6 +134,7 @@ AUI.add(
 						var eventHandles = [
 							inputPlaceholder.get('form').on('submit', A.rbind(STR_SUBMIT, instance, inputPlaceholder)),
 							instance.after('select', instance._onSelectFlag, instance),
+							Liferay.on('inputLocalized:defaultLocaleChanged', A.bind('_onDefaultLocaleChanged', instance)),
 							Liferay.on('inputLocalized:localeChanged', A.bind('_onLocaleChanged', instance)),
 							Liferay.on('submitForm', A.rbind(STR_SUBMIT, instance, inputPlaceholder))
 						];
@@ -368,6 +369,33 @@ AUI.add(
 						var namespace = instance.get('namespace');
 
 						return '#' + namespace + id + '_' + languageId;
+					},
+
+					_onDefaultLocaleChanged: function(event) {
+						var instance = this;
+
+						var prevDefaultLanguageId = instance.get('defaultLanguageId');
+						var prevDefaultValue = instance.getValue(prevDefaultLanguageId);
+
+						if (!prevDefaultValue) {
+							instance.removeInputLanguage(prevDefaultLanguageId);
+							instance.updateInputLanguage(prevDefaultValue, prevDefaultLanguageId);
+						}
+
+						var defaultLanguageId = event.item.getAttribute('data-value');
+
+						instance.set('defaultLanguageId', defaultLanguageId);
+
+						instance._updateTranslationStatus(defaultLanguageId);
+						instance._updateTranslationStatus(prevDefaultLanguageId);
+
+						Liferay.fire(
+							'inputLocalized:localeChanged',
+							{
+								item: event.item,
+								source: instance
+							}
+						);
 					},
 
 					_onInputValueChange: function(event, input) {

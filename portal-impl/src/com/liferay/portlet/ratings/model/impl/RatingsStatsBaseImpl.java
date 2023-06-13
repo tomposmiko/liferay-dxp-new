@@ -32,13 +32,12 @@ import com.liferay.ratings.kernel.service.RatingsStatsLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class RatingsStatsBaseImpl
-	extends RatingsStatsModelImpl implements RatingsStats {
-
+public abstract class RatingsStatsBaseImpl extends RatingsStatsModelImpl
+	implements RatingsStats {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a ratings stats model instance should use the <code>RatingsStats</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a ratings stats model instance should use the {@link RatingsStats} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class RatingsStatsBaseImpl
 			RatingsStatsLocalServiceUtil.updateRatingsStats(this);
 		}
 	}
-
 }

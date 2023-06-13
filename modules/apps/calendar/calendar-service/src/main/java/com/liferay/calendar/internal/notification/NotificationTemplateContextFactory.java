@@ -258,8 +258,10 @@ public class NotificationTemplateContextFactory {
 	private static String _getUserTimezoneDisplayName(User user) {
 		TimeZone userTimezone = user.getTimeZone();
 
-		return userTimezone.getDisplayName(
+		String userTimezoneDisplayName = userTimezone.getDisplayName(
 			false, TimeZone.SHORT, user.getLocale());
+
+		return userTimezoneDisplayName;
 	}
 
 	private static CompanyLocalService _companyLocalService;

@@ -509,10 +509,7 @@ definition {
 		if (isSet(defaultSiteLanguage)) {
 			var defaultSiteLanguage = "${defaultSiteLanguage}";
 
-			Select(
-				locator1 = "Select#DEFAULT_LANGUAGE_2",
-				value1 = "${defaultSiteLanguage}"
-			);
+			Select(locator1 = "Select#DEFAULT_LANGUAGE", value1 = "${defaultSiteLanguage}");
 		}
 
 		if (isSet(localizedSaveButton)) {
@@ -698,8 +695,8 @@ definition {
 
 		var siteLARFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "Public_Pages-*.lar");
 
-		UploadTempFile.uploadTempFileHiddenNoMouseOver(
-			locator1 = "TextInput#FILE",
+		SikuliUploadTempFile(
+			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
 			value1 = "${siteLARFileName}"
 		);
 
@@ -1089,6 +1086,10 @@ definition {
 
 		Search.searchCP(searchTerm = "Name");
 
+		AssertVisible(
+			locator1 = "Link#CLEAR"
+		);
+
 		if (IsElementNotPresent(locator1 = "Message#EMPTY_INFO")) {
 			PortletEntry.selectAll();
 
@@ -1195,10 +1196,7 @@ definition {
 		if (isSet(defaultSiteLanguage)) {
 			var defaultSiteLanguage = "${defaultSiteLanguage}";
 
-			Select(
-				locator1 = "Select#DEFAULT_LANGUAGE_2",
-				value1 = "${defaultSiteLanguage}"
-			);
+			Select(locator1 = "Select#DEFAULT_LANGUAGE", value1 = "${defaultSiteLanguage}");
 		}
 	}
 

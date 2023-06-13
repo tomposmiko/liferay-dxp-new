@@ -32,13 +32,12 @@ import com.liferay.portal.kernel.service.EmailAddressLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class EmailAddressBaseImpl
-	extends EmailAddressModelImpl implements EmailAddress {
-
+public abstract class EmailAddressBaseImpl extends EmailAddressModelImpl
+	implements EmailAddress {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a email address model instance should use the <code>EmailAddress</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a email address model instance should use the {@link EmailAddress} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class EmailAddressBaseImpl
 			EmailAddressLocalServiceUtil.updateEmailAddress(this);
 		}
 	}
-
 }

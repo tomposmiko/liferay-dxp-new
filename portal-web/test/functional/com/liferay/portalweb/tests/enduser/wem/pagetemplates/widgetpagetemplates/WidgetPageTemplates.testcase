@@ -381,7 +381,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Compilación",
+			category = "Estructuración",
 			panel = "Site Administration",
 			portlet = "Páginas del sitio web"
 		);

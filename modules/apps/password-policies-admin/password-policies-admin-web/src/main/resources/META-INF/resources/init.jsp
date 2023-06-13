@@ -27,7 +27,6 @@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.password.policies.admin.constants.PasswordPoliciesAdminPortletKeys" %><%@
-page import="com.liferay.password.policies.admin.web.internal.configuration.PasswordPoliciesConfiguration" %><%@
 page import="com.liferay.password.policies.admin.web.internal.display.context.EditPasswordPolicyAssignmentsManagementToolbarDisplayContext" %><%@
 page import="com.liferay.password.policies.admin.web.internal.display.context.PasswordPolicyDisplayContext" %><%@
 page import="com.liferay.password.policies.admin.web.internal.display.context.ViewPasswordPoliciesManagementToolbarDisplayContext" %><%@
@@ -58,8 +57,6 @@ page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.model.impl.PasswordPolicyImpl" %><%@
 page import="com.liferay.taglib.search.ResultRow" %><%@
 page import="com.liferay.users.admin.kernel.util.UsersAdmin" %>
-
-<%@ page import="java.util.Arrays" %>
 
 <%@ page import="javax.portlet.PortletURL" %><%@
 page import="javax.portlet.WindowState" %>

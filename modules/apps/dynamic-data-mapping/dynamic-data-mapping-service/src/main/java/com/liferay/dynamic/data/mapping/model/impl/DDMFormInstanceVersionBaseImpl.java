@@ -34,22 +34,18 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalServi
 @ProviderType
 public abstract class DDMFormInstanceVersionBaseImpl
 	extends DDMFormInstanceVersionModelImpl implements DDMFormInstanceVersion {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a ddm form instance version model instance should use the <code>DDMFormInstanceVersion</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a ddm form instance version model instance should use the {@link DDMFormInstanceVersion} interface instead.
 	 */
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			DDMFormInstanceVersionLocalServiceUtil.addDDMFormInstanceVersion(
-				this);
+			DDMFormInstanceVersionLocalServiceUtil.addDDMFormInstanceVersion(this);
 		}
 		else {
-			DDMFormInstanceVersionLocalServiceUtil.updateDDMFormInstanceVersion(
-				this);
+			DDMFormInstanceVersionLocalServiceUtil.updateDDMFormInstanceVersion(this);
 		}
 	}
-
 }

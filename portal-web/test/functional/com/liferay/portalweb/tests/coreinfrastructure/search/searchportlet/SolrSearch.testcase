@@ -2,7 +2,7 @@
 definition {
 	property osgi.app.includes = "portal-search-solr7";
 	property osgi.module.configuration.file.names = "com.liferay.portal.bundle.blacklist.internal.BundleBlacklistConfiguration.config";
-	property osgi.module.configurations = "blacklistBundleSymbolicNames=&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees.api,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise.test.data,com.liferay.portal.mobile.device.detection.fiftyonedegrees,com.liferay.portal.search.elasticsearch6.api,com.liferay.portal.search.elasticsearch6.impl,com.liferay.portal.search.elasticsearch6.xpack.security.impl,com.liferay.portal.search.elasticsearch6.xpack.monitoring.web,com.liferay.commerce.elasticsearch6&quot;";
+	property osgi.module.configurations = "blacklistBundleSymbolicNames=&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees.api,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise.test.data,com.liferay.portal.mobile.device.detection.fiftyonedegrees,com.liferay.portal.search.elasticsearch6.api,com.liferay.portal.search.elasticsearch6.impl,com.liferay.portal.search.elasticsearch6.xpack.security.impl,com.liferay.portal.search.elasticsearch6.xpack.monitoring.web&quot;";
 	property portal.release = "true";
 	property portal.suite.search.engine = "solr";
 	property portal.upstream = "true";
@@ -269,8 +269,11 @@ definition {
 		SearchResultPortlet.viewNoSearchResults(searchTerm = "Name1");
 	}
 
+	@ignore = "true"
 	@priority = "4"
 	test SearchBlogsEntryCategoryQuotes {
+		// Ignoring test until LPS-73326 is resolved
+
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
@@ -958,106 +961,6 @@ definition {
 	}
 
 	@priority = "4"
-	test SearchMessageBoardsThread {
-		ProductMenu.gotoPortlet(
-			category = "Build",
-			panel = "Site Administration",
-			portlet = "Pages"
-		);
-
-		SitePages.addPublicPage(pageName = "Message Boards Page");
-
-		Navigator.gotoPage(pageName = "Message Boards Page");
-
-		Portlet.addPG(portletName = "Message Boards");
-
-		Navigator.gotoPage(pageName = "Message Boards Page");
-
-		MessageboardsThread.addPG(
-			threadBody = "MB Thread Message Body",
-			threadSubject = "MB Thread Message Subject"
-		);
-
-		Navigator.openURL();
-
-		SearchPortlets.searchEmbedded(searchTerm = "MB Thread Message Subject");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "MB Thread Message Body");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "MB");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "Thread");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "Message");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "Subject");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "Body");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetSummary = "MB Thread Message Body",
-			searchAssetTitle = "MB Thread Message Subject",
-			searchAssetType = "Message Boards Message"
-		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "MB1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "MB1");
-
-		SearchPortlets.searchEmbedded(searchTerm = "Thread1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Thread1");
-
-		SearchPortlets.searchEmbedded(searchTerm = "Message1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Message1");
-
-		SearchPortlets.searchEmbedded(searchTerm = "Subject1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Subject1");
-
-		SearchPortlets.searchEmbedded(searchTerm = "Body1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Body1");
-	}
-
-	@priority = "4"
 	test SearchUser {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
@@ -1482,6 +1385,20 @@ definition {
 	@description = "This is a use case for LPS-74299."
 	@priority = "3"
 	test ViewFacetPersistence {
+		// Workaround for LPS-89026
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search"
+		);
+
+		SearchAdministration.executeSearchActions(
+			actionsDescription = "Reindex all search indexes."
+		);
+
+		Navigator.openURL();
+
 		ProductMenu.gotoPortlet(
 			category = "Build",
 			panel = "Site Administration",
@@ -1524,12 +1441,9 @@ definition {
 		property osgi.app.includes = "bookmarks,portal-search-solr7";
 		var searchPage = "Search Page";
 
-		JSONCategory.addVocabularyByGroupName(
-			groupName = "Guest",
-			title = "Fruit Vocabulary"
-		);
+		JSONCategory.addVocabulary(groupName = "Guest", title = "Fruit Vocabulary");
 
-		JSONCategory.addCategoryByGroupName(
+		JSONCategory.addCategory(
 			groupName = "Guest",
 			title = "organic",
 			vocabularyName = "Fruit Vocabulary"
@@ -1993,6 +1907,18 @@ definition {
 	test ViewSearchResultDetails {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SearchUsecase#ViewSearchResultDetails";
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search"
+		);
+
+		SearchAdministration.executeSearchActions(
+			actionsDescription = "Reindex all search indexes."
+		);
+
+		Navigator.openURL();
 
 		SearchPortlets.searchEmbedded(searchTerm = "Test Test");
 

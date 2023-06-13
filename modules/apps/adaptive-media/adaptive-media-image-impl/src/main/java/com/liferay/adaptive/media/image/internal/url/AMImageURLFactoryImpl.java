@@ -66,6 +66,11 @@ public class AMImageURLFactoryImpl implements AMImageURLFactory {
 		return _amURIResolver.resolveURI(URI.create(relativeURI));
 	}
 
+	@Reference(unbind = "-")
+	protected void setAMURIResolver(AMURIResolver amURIResolver) {
+		_amURIResolver = amURIResolver;
+	}
+
 	private String _encode(String s) {
 		try {
 			return URLEncoder.encode(s, StandardCharsets.UTF_8.name());
@@ -75,7 +80,6 @@ public class AMImageURLFactoryImpl implements AMImageURLFactory {
 		}
 	}
 
-	@Reference
 	private AMURIResolver _amURIResolver;
 
 }

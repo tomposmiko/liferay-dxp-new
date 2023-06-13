@@ -2,7 +2,6 @@
 definition {
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property test.assert.warning.exceptions = "true";
 	property testray.main.component.name = "Documents Management";
 
 	setUp {
@@ -123,6 +122,58 @@ definition {
 		DMDocument.viewCP(dmDocumentSize = "259B", dmDocumentTitle = "DM Document Title");
 	}
 
+	@description = "This test ensures that a user can check in a document without changing versions."
+	@priority = "5"
+	test CheckInDocumentAsCurrentVersion {
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media"
+		);
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		DMDocument.addCP(
+			dmDocumentFile = "Document_1.doc",
+			dmDocumentTitle = "Check in as current version"
+		);
+
+		DMDocument.checkoutCP(dmDocumentTitle = "Check in as current version");
+
+		Refresh();
+
+		DMDocument.checkinCP(
+			dmDocumentTitle = "Check in as current version",
+			revision = "Current"
+		);
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media"
+		);
+
+		AssertElementNotPresent(
+			locator1 = "DocumentsAndMedia#ICON_DOCUMENT_ICON_LOCKED",
+			key_dmDocumentTitle = "Check in as current version"
+		);
+
+		DMDocument.checkDocumentCheckboxCP(
+			dmDocumentTitle = "Check in as current version"
+		);
+
+		Click(locator1 = "Icon#INFO");
+
+		DMDocument.selectVersion();
+
+		AssertTextEquals(
+			locator1 = "DocumentsAndMedia#SIDEBAR_LATEST_VERSION",
+			value1 = "Version 1.0"
+		);
+	}
+
 	@description = "This test ensures that a user can check in a document as a major version."
 	@priority = "5"
 	test CheckInDocumentAsMajorVersion {
@@ -227,6 +278,89 @@ definition {
 		);
 	}
 
+	@description = "This test asserts that major version increment will occur even if only metadata was changed if version increment was selected manually."
+	@priority = "4"
+	test CustomizeVersionNumberMajor{
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media"
+		);
+
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.txt",
+			dmDocumentTitle = "DM Document Title"
+		);
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
+
+		DMDocument.viewCP(dmDocumentSize = "259B", dmDocumentTitle = "DM Document Title");
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media"
+		);
+
+		DMDocument.editCP(
+			dmDocumentDescription = "DM Document Description1",
+			dmDocumentDescriptionEdit = "DM Document Description Edit",
+			dmDocumentTitle = "DM Document Title",
+			dmDocumentTitleEdit = "DM Document Title Edit",
+			revision = "Major",
+			versioning = "true"
+		);
+
+		DMDocument.viewEditCP(
+			dmDocumentTitleEdit = "DM Document Title Edit",
+			dmDocumentVersionNumber = "2.0"
+		);
+	}
+
+	@description = "This test asserts that minor version increment will occur even if the actual file was changed if version increment was selected manually."
+	@priority = "4"
+	test CustomizeVersionNumberMinor{
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media"
+		);
+
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.txt",
+			dmDocumentTitle = "DM Document Title"
+		);
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
+
+		DMDocument.viewCP(dmDocumentSize = "259B", dmDocumentTitle = "DM Document Title");
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media"
+		);
+
+		DMDocument.editCP(
+			dmDocumentFileEdit = "Document_2.doc",
+			dmDocumentTitle = "DM Document Title",
+			revision = "Minor",
+			versioning = "true"
+		);
+
+		DMDocument.viewEditCP(
+			dmDocumentTitleEdit = "DM Document Title",
+			dmDocumentVersionNumber = "1.1"
+		);
+	}
+
+	@description = "This test edits the title and description of a document. It asserts minor version increment because only its metadata was updated."
 	@priority = "5"
 	test EditDocument {
 		property app.server.types = "jboss,resin,tcserver,tomcat,weblogic,websphere,wildfly";
@@ -250,15 +384,7 @@ definition {
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
 
-		var browserType = PropsUtil.get("browser.type");
-
-		if (("${browserType}" == "edge") || ("${browserType}" == "internetexplorer")) {
-			DMDocument.viewCP(dmDocumentSize = "268B", dmDocumentTitle = "DM Document Title");
-		}
-
-		else {
-			DMDocument.viewCP(dmDocumentSize = "259B", dmDocumentTitle = "DM Document Title");
-		}
+		DMDocument.viewCP(dmDocumentSize = "259B", dmDocumentTitle = "DM Document Title");
 
 		Navigator.openURL();
 
@@ -275,7 +401,10 @@ definition {
 			dmDocumentTitleEdit = "DM Document Title Edit"
 		);
 
-		DMDocument.viewEditCP(dmDocumentTitleEdit = "DM Document Title Edit");
+		DMDocument.viewEditCP(
+			dmDocumentTitleEdit = "DM Document Title Edit",
+			dmDocumentVersionNumber = "1.1"
+		);
 	}
 
 	@priority = "5"
@@ -316,6 +445,88 @@ definition {
 		DMFolder.viewCP(
 			dmFolderName = "DM Folder Name Name",
 			specificNameFolder = "true"
+		);
+	}
+
+	@description = "This test ensures that only the last two versions of a file are kept when the max version limit is set."
+	@priority = "5"
+	test LimitMaxFileVersion {
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "System Settings"
+		);
+
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Documents and Media",
+			configurationName = "Service",
+			configurationScope = "System Scope"
+		);
+
+		Type(
+			locator1 = "TextInput#GENERIC_TEXT_INPUT",
+			value1 = "2",
+			key_fieldLabel = "Maximum Number Of Versions"
+		);
+
+		ScrollWebElementIntoView(locator1 = "Button#SAVE");
+
+		AssertClick(locator1 = "Button#SAVE", value1 = "Save");
+
+		AssertElementPresent(locator1 = "Message#SUCCESS");
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media"
+		);
+
+		DMDocument.addCP(
+			dmDocumentFile = "Document_1.doc",
+			dmDocumentTitle = "Edit this document two times"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media"
+		);
+
+		DMDocument.editCP(
+			dmDocumentTitle = "Edit this document two times",
+			dmDocumentTitleEdit = "First edit"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media"
+		);
+
+		DMDocument.editCP(
+			dmDocumentTitle = "First edit",
+			dmDocumentTitleEdit = "Second edit"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media"
+		);
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Second edit");
+
+		for (var versionNumber : list "1.2,1.1") {
+			AssertElementPresent(
+				locator1 = "DocumentsAndMedia#DOCUMENT_VERSION_ANY",
+				key_dmDocumentVersionNumber = "${versionNumber}"
+			);
+		}
+
+		AssertElementNotPresent(
+			locator1 = "DocumentsAndMedia#DOCUMENT_VERSION_ANY",
+			key_dmDocumentVersionNumber = "1.0"
 		);
 	}
 
@@ -429,6 +640,7 @@ definition {
 		);
 
 		DMFolder.moveToFolderCP(
+			dmFolderName = "DM Folder1 Name",
 			dmFolderName = "DM Folder2 Name",
 			dmFolderName1 = "DM Folder1 Name",
 			dmFolderName2 = "DM Folder2 Name"

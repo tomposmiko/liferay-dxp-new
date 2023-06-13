@@ -21,11 +21,7 @@
 <%
 FileEntry fileEntry = (FileEntry)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY);
 
-FileVersion fileVersion = (FileVersion)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_VERSION);
-
-if (fileVersion == null) {
-	fileVersion = fileEntry.getFileVersion();
-}
+FileVersion fileVersion = fileEntry.getFileVersion();
 
 DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext = dlDisplayContextProvider.getDLViewFileVersionDisplayContext(request, response, fileVersion);
 %>

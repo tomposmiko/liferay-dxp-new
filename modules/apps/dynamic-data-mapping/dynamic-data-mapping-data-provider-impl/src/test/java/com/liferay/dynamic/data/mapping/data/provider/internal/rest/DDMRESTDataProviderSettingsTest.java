@@ -49,7 +49,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class DDMRESTDataProviderSettingsTest {
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		setUpLanguageUtil();
 		setUpPortalUtil();
 		setUpResourceBundleUtil();

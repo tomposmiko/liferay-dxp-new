@@ -373,12 +373,10 @@ definition {
 		User.deleteCP();
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Submissions"
 		);
-
-		Navigator.gotoNavItem(navItem = "Monitoring");
 
 		Workflow.withdrawTaskByActions(
 			workflowAssetTitle = "Site Page Name",

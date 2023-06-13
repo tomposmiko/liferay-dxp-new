@@ -34,22 +34,18 @@ import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalServiceU
 @ProviderType
 public abstract class AssetDisplayPageEntryBaseImpl
 	extends AssetDisplayPageEntryModelImpl implements AssetDisplayPageEntry {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a asset display page entry model instance should use the <code>AssetDisplayPageEntry</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a asset display page entry model instance should use the {@link AssetDisplayPageEntry} interface instead.
 	 */
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			AssetDisplayPageEntryLocalServiceUtil.addAssetDisplayPageEntry(
-				this);
+			AssetDisplayPageEntryLocalServiceUtil.addAssetDisplayPageEntry(this);
 		}
 		else {
-			AssetDisplayPageEntryLocalServiceUtil.updateAssetDisplayPageEntry(
-				this);
+			AssetDisplayPageEntryLocalServiceUtil.updateAssetDisplayPageEntry(this);
 		}
 	}
-
 }

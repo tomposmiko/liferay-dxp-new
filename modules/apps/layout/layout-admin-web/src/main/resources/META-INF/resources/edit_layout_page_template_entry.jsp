@@ -34,7 +34,27 @@ renderResponse.setTitle(layoutPageTemplateDisplayContext.getLayoutPageTemplateEn
 />
 
 <soy:component-renderer
+	componentId='<%= renderResponse.getNamespace() + "fragmentsEditor" %>'
 	context="<%= fragmentsEditorDisplayContext.getEditorContext() %>"
-	module="layout-admin-web/js/fragments_editor/FragmentsEditor.es"
+	module="js/fragments_editor/FragmentsEditor.es"
 	templateNamespace="com.liferay.layout.admin.web.FragmentsEditor.render"
 />
+
+<%
+JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
+
+StringBundler sb = new StringBundler(16);
+
+sb.append(npmResolvedPackageName);
+sb.append("/js/fragments_editor/reducers/reducers.es as ReducersModule, ");
+sb.append(npmResolvedPackageName);
+sb.append("/js/fragments_editor/store/store.es as StoreModule");
+%>
+
+<aui:script require="<%= sb.toString() %>">
+	StoreModule.createStore(
+		<%= jsonSerializer.serializeDeep(fragmentsEditorDisplayContext.getEditorContext()) %>,
+		ReducersModule.reducers,
+		['<portlet:namespace />fragmentsEditor']
+	);
+</aui:script>

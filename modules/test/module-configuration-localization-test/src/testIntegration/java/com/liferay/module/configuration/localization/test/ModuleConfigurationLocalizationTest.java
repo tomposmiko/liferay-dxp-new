@@ -73,8 +73,7 @@ public class ModuleConfigurationLocalizationTest {
 				continue;
 			}
 
-			sb.append(StringPool.NEW_LINE);
-			sb.append("Bundle {id: ");
+			sb.append("\nBundle {id: ");
 			sb.append(bundle.getBundleId());
 			sb.append(", name: ");
 			sb.append(bundle.getSymbolicName());
@@ -82,12 +81,10 @@ public class ModuleConfigurationLocalizationTest {
 			sb.append(bundle.getVersion());
 			sb.append(StringPool.CLOSE_CURLY_BRACE);
 			sb.append(bundleError);
-			sb.append(StringPool.NEW_LINE);
 		}
 
-		String message = sb.toString();
-
-		Assert.assertTrue("Test failed due to: " + message, message.isEmpty());
+		Assert.assertEquals(
+			"Test failed due to: " + sb.toString(), 0, sb.index());
 	}
 
 	private String _collectBundleError(Bundle bundle) {

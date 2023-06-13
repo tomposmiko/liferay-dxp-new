@@ -32,13 +32,12 @@ import com.liferay.portal.kernel.service.SystemEventLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class SystemEventBaseImpl
-	extends SystemEventModelImpl implements SystemEvent {
-
+public abstract class SystemEventBaseImpl extends SystemEventModelImpl
+	implements SystemEvent {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a system event model instance should use the <code>SystemEvent</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a system event model instance should use the {@link SystemEvent} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class SystemEventBaseImpl
 			SystemEventLocalServiceUtil.updateSystemEvent(this);
 		}
 	}
-
 }

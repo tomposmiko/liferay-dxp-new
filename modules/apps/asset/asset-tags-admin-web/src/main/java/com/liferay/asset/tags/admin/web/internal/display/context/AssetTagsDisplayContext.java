@@ -48,6 +48,8 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portlet.asset.service.permission.AssetTagsPermission;
 import com.liferay.portlet.asset.util.comparator.AssetTagAssetCountComparator;
 import com.liferay.portlet.asset.util.comparator.AssetTagNameComparator;
+import com.liferay.staging.StagingGroupHelper;
+import com.liferay.staging.StagingGroupHelperUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,14 +79,16 @@ public class AssetTagsDisplayContext {
 	public List<DropdownItem> getActionDropdownItems() {
 		return new DropdownItemList() {
 			{
-				add(
-					dropdownItem -> {
-						dropdownItem.putData("action", "mergeTags");
-						dropdownItem.setIcon("merge");
-						dropdownItem.setLabel(
-							LanguageUtil.get(_request, "merge"));
-						dropdownItem.setQuickAction(true);
-					});
+				if (isShowTagsActions()) {
+					add(
+						dropdownItem -> {
+							dropdownItem.putData("action", "mergeTags");
+							dropdownItem.setIcon("merge");
+							dropdownItem.setLabel(
+								LanguageUtil.get(_request, "merge"));
+							dropdownItem.setQuickAction(true);
+						});
+				}
 
 				add(
 					dropdownItem -> {
@@ -409,7 +413,7 @@ public class AssetTagsDisplayContext {
 				AssetTagsAdminPortletKeys.ASSET_TAGS_ADMIN,
 				themeDisplay.getSiteGroupId(), ActionKeys.MANAGE_TAG)) {
 
-			return isShowTagsActionMenu();
+			return isShowTagsActions();
 		}
 
 		return false;
@@ -429,27 +433,30 @@ public class AssetTagsDisplayContext {
 		return false;
 	}
 
-	public boolean isShowTagsActionMenu() {
-		if (_showTagsActionMenu != null) {
-			return _showTagsActionMenu;
+	public boolean isShowTagsActions() {
+		if (_showTagsActions != null) {
+			return _showTagsActions;
 		}
 
-		boolean showTagsActionMenu = true;
+		boolean showTagsActions = true;
+
+		StagingGroupHelper stagingGroupHelper =
+			StagingGroupHelperUtil.getStagingGroupHelper();
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		Group group = themeDisplay.getScopeGroup();
 
-		if (group.isStaged() && !group.isStagingGroup() &&
-			!group.isStagedRemotely()) {
+		if (stagingGroupHelper.isLocalLiveGroup(group) ||
+			stagingGroupHelper.isRemoteLiveGroup(group)) {
 
-			showTagsActionMenu = false;
+			showTagsActions = false;
 		}
 
-		_showTagsActionMenu = showTagsActionMenu;
+		_showTagsActions = showTagsActions;
 
-		return _showTagsActionMenu;
+		return _showTagsActions;
 	}
 
 	private List<DropdownItem> _getFilterNavigationDropdownItems() {
@@ -499,7 +506,7 @@ public class AssetTagsDisplayContext {
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private final HttpServletRequest _request;
-	private Boolean _showTagsActionMenu;
+	private Boolean _showTagsActions;
 	private AssetTag _tag;
 	private Long _tagId;
 	private SearchContainer _tagsSearchContainer;

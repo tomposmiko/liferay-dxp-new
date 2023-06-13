@@ -96,7 +96,7 @@ definition {
 			userEmailAddress = "test@liferay.com"
 		);
 
-		Clustering.shutdownSpecificServer(nodePort = "8");
+		Portlet.shutdownSpecificServer(nodePort = "8");
 
 		SearchPortlets.searchEmbedded(searchTerm = "Apple");
 

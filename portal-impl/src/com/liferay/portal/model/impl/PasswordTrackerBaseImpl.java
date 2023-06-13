@@ -32,13 +32,12 @@ import com.liferay.portal.kernel.service.PasswordTrackerLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class PasswordTrackerBaseImpl
-	extends PasswordTrackerModelImpl implements PasswordTracker {
-
+public abstract class PasswordTrackerBaseImpl extends PasswordTrackerModelImpl
+	implements PasswordTracker {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a password tracker model instance should use the <code>PasswordTracker</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a password tracker model instance should use the {@link PasswordTracker} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class PasswordTrackerBaseImpl
 			PasswordTrackerLocalServiceUtil.updatePasswordTracker(this);
 		}
 	}
-
 }

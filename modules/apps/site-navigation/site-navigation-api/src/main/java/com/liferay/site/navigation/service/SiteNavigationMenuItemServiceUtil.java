@@ -18,115 +18,98 @@ import aQute.bnd.annotation.ProviderType;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
+
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * Provides the remote service utility for SiteNavigationMenuItem. This utility wraps
- * <code>com.liferay.site.navigation.service.impl.SiteNavigationMenuItemServiceImpl</code> and is an
- * access point for service operations in application layer code running on a
- * remote server. Methods of this service are expected to have security checks
- * based on the propagated JAAS credentials because this service can be
+ * {@link com.liferay.site.navigation.service.impl.SiteNavigationMenuItemServiceImpl} and is the
+ * primary access point for service operations in application layer code running
+ * on a remote server. Methods of this service are expected to have security
+ * checks based on the propagated JAAS credentials because this service can be
  * accessed remotely.
  *
  * @author Brian Wing Shun Chan
  * @see SiteNavigationMenuItemService
+ * @see com.liferay.site.navigation.service.base.SiteNavigationMenuItemServiceBaseImpl
+ * @see com.liferay.site.navigation.service.impl.SiteNavigationMenuItemServiceImpl
  * @generated
  */
 @ProviderType
 public class SiteNavigationMenuItemServiceUtil {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this class directly. Add custom service methods to <code>com.liferay.site.navigation.service.impl.SiteNavigationMenuItemServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify this class directly. Add custom service methods to {@link com.liferay.site.navigation.service.impl.SiteNavigationMenuItemServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static com.liferay.site.navigation.model.SiteNavigationMenuItem
-			addSiteNavigationMenuItem(
-				long groupId, long siteNavigationMenuId,
-				long parentSiteNavigationMenuItemId, String type,
-				String typeSettings,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.site.navigation.model.SiteNavigationMenuItem addSiteNavigationMenuItem(
+		long groupId, long siteNavigationMenuId,
+		long parentSiteNavigationMenuItemId, String type, String typeSettings,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().addSiteNavigationMenuItem(
-			groupId, siteNavigationMenuId, parentSiteNavigationMenuItemId, type,
-			typeSettings, serviceContext);
+		return getService()
+				   .addSiteNavigationMenuItem(groupId, siteNavigationMenuId,
+			parentSiteNavigationMenuItemId, type, typeSettings, serviceContext);
 	}
 
-	public static com.liferay.site.navigation.model.SiteNavigationMenuItem
-			deleteSiteNavigationMenuItem(long siteNavigationMenuItemId)
+	public static com.liferay.site.navigation.model.SiteNavigationMenuItem deleteSiteNavigationMenuItem(
+		long siteNavigationMenuItemId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().deleteSiteNavigationMenuItem(
-			siteNavigationMenuItemId);
+		return getService()
+				   .deleteSiteNavigationMenuItem(siteNavigationMenuItemId);
 	}
 
 	public static void deleteSiteNavigationMenuItems(long siteNavigationMenuId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		getService().deleteSiteNavigationMenuItems(siteNavigationMenuId);
 	}
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static java.util.List
-		<com.liferay.site.navigation.model.SiteNavigationMenuItem>
-			getSiteNavigationMenuItems(long siteNavigationMenuId) {
-
+	public static java.util.List<com.liferay.site.navigation.model.SiteNavigationMenuItem> getSiteNavigationMenuItems(
+		long siteNavigationMenuId) {
 		return getService().getSiteNavigationMenuItems(siteNavigationMenuId);
 	}
 
-	public static com.liferay.site.navigation.model.SiteNavigationMenuItem
-			updateSiteNavigationMenuItem(
-				long siteNavigationMenuId, long parentSiteNavigationMenuItemId,
-				int order)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateSiteNavigationMenuItem(
-			siteNavigationMenuId, parentSiteNavigationMenuItemId, order);
+	public static com.liferay.site.navigation.model.SiteNavigationMenuItem updateSiteNavigationMenuItem(
+		long siteNavigationMenuId, long parentSiteNavigationMenuItemId,
+		int order) throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateSiteNavigationMenuItem(siteNavigationMenuId,
+			parentSiteNavigationMenuItemId, order);
 	}
 
-	public static com.liferay.site.navigation.model.SiteNavigationMenuItem
-			updateSiteNavigationMenuItem(
-				long siteNavigationMenuId, String typeSettings,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.site.navigation.model.SiteNavigationMenuItem updateSiteNavigationMenuItem(
+		long siteNavigationMenuId, String typeSettings,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateSiteNavigationMenuItem(
-			siteNavigationMenuId, typeSettings, serviceContext);
+		return getService()
+				   .updateSiteNavigationMenuItem(siteNavigationMenuId,
+			typeSettings, serviceContext);
 	}
 
 	public static SiteNavigationMenuItemService getService() {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker
-		<SiteNavigationMenuItemService, SiteNavigationMenuItemService>
-			_serviceTracker;
+	private static ServiceTracker<SiteNavigationMenuItemService, SiteNavigationMenuItemService> _serviceTracker;
 
 	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			SiteNavigationMenuItemService.class);
+		Bundle bundle = FrameworkUtil.getBundle(SiteNavigationMenuItemService.class);
 
-		ServiceTracker
-			<SiteNavigationMenuItemService, SiteNavigationMenuItemService>
-				serviceTracker =
-					new ServiceTracker
-						<SiteNavigationMenuItemService,
-						 SiteNavigationMenuItemService>(
-							 bundle.getBundleContext(),
-							 SiteNavigationMenuItemService.class, null);
+		ServiceTracker<SiteNavigationMenuItemService, SiteNavigationMenuItemService> serviceTracker =
+			new ServiceTracker<SiteNavigationMenuItemService, SiteNavigationMenuItemService>(bundle.getBundleContext(),
+				SiteNavigationMenuItemService.class, null);
 
 		serviceTracker.open();
 
 		_serviceTracker = serviceTracker;
 	}
-
 }

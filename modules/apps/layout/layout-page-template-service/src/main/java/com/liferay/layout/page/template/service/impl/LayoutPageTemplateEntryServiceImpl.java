@@ -139,24 +139,6 @@ public class LayoutPageTemplateEntryServiceImpl
 	}
 
 	@Override
-	public LayoutPageTemplateEntry fetchLayoutPageTemplateEntry(
-			long groupId, String name)
-		throws PortalException {
-
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				groupId, name);
-
-		if (layoutPageTemplateEntry != null) {
-			_layoutPageTemplateEntryModelResourcePermission.check(
-				getPermissionChecker(), layoutPageTemplateEntry,
-				ActionKeys.VIEW);
-		}
-
-		return layoutPageTemplateEntry;
-	}
-
-	@Override
 	public LayoutPageTemplateEntry fetchLayoutPageTemplateEntryByUuidAndGroupId(
 		String uuid, long groupId) {
 
@@ -247,6 +229,14 @@ public class LayoutPageTemplateEntryServiceImpl
 		return getLayoutPageTemplateEntries(
 			groupId, type, WorkflowConstants.STATUS_ANY, start, end,
 			orderByComparator);
+	}
+
+	@Override
+	public List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
+		long groupId, long classNameId, int type, boolean defaultTemplate) {
+
+		return layoutPageTemplateEntryPersistence.filterFindByG_C_T_D(
+			groupId, classNameId, type, defaultTemplate);
 	}
 
 	@Override

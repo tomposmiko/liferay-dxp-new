@@ -34,11 +34,10 @@ import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalServiceUtil;
 @ProviderType
 public abstract class OAuth2ApplicationBaseImpl
 	extends OAuth2ApplicationModelImpl implements OAuth2Application {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a o auth2 application model instance should use the <code>OAuth2Application</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a o auth2 application model instance should use the {@link OAuth2Application} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class OAuth2ApplicationBaseImpl
 			OAuth2ApplicationLocalServiceUtil.updateOAuth2Application(this);
 		}
 	}
-
 }

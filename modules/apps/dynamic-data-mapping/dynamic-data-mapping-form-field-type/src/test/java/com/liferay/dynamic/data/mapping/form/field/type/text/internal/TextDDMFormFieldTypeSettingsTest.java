@@ -54,6 +54,7 @@ public class TextDDMFormFieldTypeSettingsTest
 	extends BaseDDMFormFieldTypeSettingsTestCase {
 
 	@Before
+	@Override
 	public void setUp() {
 		setUpLanguageUtil();
 		setUpPortalUtil();
@@ -159,12 +160,11 @@ public class TextDDMFormFieldTypeSettingsTest
 
 		Assert.assertEquals(actions.toString(), 1, actions.size());
 
-		StringBundler sb = new StringBundler(4);
+		StringBundler sb = new StringBundler(3);
 
-		sb.append("call('getDataProviderInstanceOutputParameters', concat('");
-		sb.append("dataProviderInstanceId=', getValue('ddmDataProvider");
-		sb.append("InstanceId')), 'ddmDataProviderInstanceOutput=output");
-		sb.append("ParameterNames')");
+		sb.append("call('getDataProviderInstanceOutputParameters', '");
+		sb.append("dataProviderInstanceId=ddmDataProviderInstanceId', '");
+		sb.append("ddmDataProviderInstanceOutput=outputParameterNames')");
 
 		Assert.assertEquals(sb.toString(), actions.get(0));
 
@@ -174,7 +174,7 @@ public class TextDDMFormFieldTypeSettingsTest
 
 		actions = ddmFormRule1.getActions();
 
-		Assert.assertEquals(actions.toString(), 6, actions.size());
+		Assert.assertEquals(actions.toString(), 8, actions.size());
 		Assert.assertTrue(
 			actions.toString(),
 			actions.contains(
@@ -185,6 +185,14 @@ public class TextDDMFormFieldTypeSettingsTest
 			actions.contains(
 				"setRequired('ddmDataProviderInstanceOutput', equals(" +
 					"getValue('dataSourceType'), \"data-provider\"))"));
+		Assert.assertTrue(
+			actions.toString(),
+			actions.contains(
+				"setValidationDataType('validation', getValue('dataType'))"));
+		Assert.assertTrue(
+			actions.toString(),
+			actions.contains(
+				"setValidationFieldName('validation', getValue('name'))"));
 		Assert.assertTrue(
 			actions.toString(),
 			actions.contains(
@@ -208,6 +216,7 @@ public class TextDDMFormFieldTypeSettingsTest
 					"\"manual\") and getValue('autocomplete'))"));
 	}
 
+	@Override
 	protected void setUpLanguageUtil() {
 		LanguageUtil languageUtil = new LanguageUtil();
 
@@ -232,6 +241,7 @@ public class TextDDMFormFieldTypeSettingsTest
 		portalUtil.setPortal(portal);
 	}
 
+	@Override
 	protected void setUpResourceBundleUtil() {
 		PowerMockito.mockStatic(ResourceBundleUtil.class);
 

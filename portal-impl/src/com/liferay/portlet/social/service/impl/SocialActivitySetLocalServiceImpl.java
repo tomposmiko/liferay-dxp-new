@@ -72,11 +72,7 @@ public class SocialActivitySetLocalServiceImpl
 		}
 
 		SocialActivitySet activitySet =
-			socialActivitySetPersistence.fetchByPrimaryKey(activitySetId);
-
-		if (activitySet == null) {
-			return;
-		}
+			socialActivitySetPersistence.findByPrimaryKey(activitySetId);
 
 		if (activitySet.getActivityCount() == 1) {
 			socialActivitySetPersistence.remove(activitySetId);

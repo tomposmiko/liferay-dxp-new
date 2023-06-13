@@ -191,6 +191,7 @@ public class SearchResultsPortletTest {
 		throws Exception {
 
 		SearchResultsPortlet searchResultsPortlet = new SearchResultsPortlet() {
+
 			{
 				assetEntryLocalService = Mockito.mock(
 					AssetEntryLocalService.class);

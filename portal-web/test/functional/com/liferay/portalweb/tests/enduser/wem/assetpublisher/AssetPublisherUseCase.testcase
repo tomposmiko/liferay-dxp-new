@@ -24,6 +24,10 @@ definition {
 
 		Portlet.addPG(portletName = "Asset Publisher");
 
+		AssetPublisherPortlet.configureAssetLinkBehaviorPG(
+			assetLinkBehavior = "Show Full Content"
+		);
+
 		Navigator.gotoPage(pageName = "Asset Publisher Page");
 	}
 
@@ -807,11 +811,7 @@ definition {
 
 		WebContent.addCP(webContentTitle = "Netz Inhalt1 Titel");
 
-		Type(
-			locator1 = "TextInput#DDM",
-			value1 = "3",
-			key_fieldName = "Integer"
-		);
+		Type(locator1 = "TextInput#DDM", value1 = "3", key_fieldName = "Integer");
 
 		PortletEntry.publish();
 
@@ -851,11 +851,7 @@ definition {
 
 		WebContent.addCP(webContentTitle = "Netz Inhalt2 Titel");
 
-		Type(
-			locator1 = "TextInput#DDM",
-			value1 = "8",
-			key_fieldName = "Integer"
-		);
+		Type(locator1 = "TextInput#DDM", value1 = "8", key_fieldName = "Integer");
 
 		PortletEntry.publish();
 
@@ -895,11 +891,7 @@ definition {
 
 		WebContent.addCP(webContentTitle = "Netz Inhalt3 Titel");
 
-		Type(
-			locator1 = "TextInput#DDM",
-			value1 = "5",
-			key_fieldName = "Integer"
-		);
+		Type(locator1 = "TextInput#DDM", value1 = "5", key_fieldName = "Integer");
 
 		PortletEntry.publish();
 
@@ -1802,9 +1794,7 @@ definition {
 			entryTitle = "Blogs Entry2 Title"
 		);
 
-		Panel.expandPanel(panel = "Related Assets");
-
-		BlogsEntry.addRelatedAsset(
+		RelatedAssets.selectAsset(
 			assetTitle = "Blogs Entry1 Title",
 			assetType = "Blogs Entry"
 		);
@@ -1977,7 +1967,7 @@ definition {
 
 		Panel.expandPanel(panel = "Related Assets");
 
-		BlogsEntry.addRelatedAsset(
+		RelatedAssets.selectAsset(
 			assetTitle = "WC WebContent Title",
 			assetType = "Basic Web Content"
 		);
@@ -2092,7 +2082,7 @@ definition {
 			dmDocumentSize = "12KB",
 			dmDocumentTitle = "DM Document Title Edit",
 			dmDocumentUploader = "Test Test",
-			dmDocumentVersionNumber = "1.1",
+			dmDocumentVersionNumber = "2.0",
 			portletName = "Documents and Media",
 			searchTerm = "DM Document Title",
 			workflow = "APPROVED"
@@ -2131,14 +2121,6 @@ definition {
 		Navigator.gotoPage(pageName = "Asset Publisher Page 2");
 
 		Portlet.addPG(portletName = "Asset Publisher");
-
-		Navigator.gotoPage(pageName = "Asset Publisher Page");
-
-		AssetPublisherPortlet.configureAssetLinkBehaviorPG(
-			assetLinkBehavior = "View in Context"
-		);
-
-		Navigator.gotoPage(pageName = "Asset Publisher Page 2");
 
 		AssetPublisherPortlet.configureDisplaySettings(
 			displaySettings = "Set as the Default Asset Publisher for This Page"

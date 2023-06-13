@@ -17,9 +17,9 @@ package com.liferay.frontend.js.loader.modules.extender.internal.npm;
 import com.github.yuchi.semver.Range;
 import com.github.yuchi.semver.Version;
 
-import com.liferay.frontend.js.loader.modules.extender.internal.JSLoaderModulesTracker;
 import com.liferay.frontend.js.loader.modules.extender.npm.JSBundle;
 import com.liferay.frontend.js.loader.modules.extender.npm.JSBundleProcessor;
+import com.liferay.frontend.js.loader.modules.extender.npm.JSBundleTracker;
 import com.liferay.frontend.js.loader.modules.extender.npm.JSModule;
 import com.liferay.frontend.js.loader.modules.extender.npm.JSPackage;
 import com.liferay.frontend.js.loader.modules.extender.npm.JSPackageDependency;
@@ -28,6 +28,8 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -82,7 +84,7 @@ public class NPMRegistryImpl implements NPMRegistry {
 	 * @return the OSGi bundles
 	 */
 	public Collection<JSBundle> getJSBundles() {
-		return _jsBundles;
+		return _jsBundles.keySet();
 	}
 
 	/**
@@ -224,6 +226,24 @@ public class NPMRegistryImpl implements NPMRegistry {
 		_reopenBundleTracker();
 	}
 
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	protected void bindJSBundleTracker(JSBundleTracker jsBundleTracker) {
+		_jsBundleTrackers.add(jsBundleTracker);
+
+		for (Map.Entry<JSBundle, Bundle> entry : _jsBundles.entrySet()) {
+			try {
+				jsBundleTracker.addedJSBundle(
+					entry.getKey(), entry.getValue(), this);
+			}
+			catch (Exception e) {
+				_log.error("Unable to add JS bundle", e);
+			}
+		}
+	}
+
 	@Deactivate
 	protected synchronized void deactivate() {
 		_bundleTracker.close();
@@ -237,6 +257,10 @@ public class NPMRegistryImpl implements NPMRegistry {
 		_jsBundleProcessors.remove(jsBundleProcessor);
 
 		_reopenBundleTracker();
+	}
+
+	protected void unbindJSBundleTracker(JSBundleTracker jsBundleTracker) {
+		_jsBundleTrackers.remove(jsBundleTracker);
 	}
 
 	private JSONObject _getPackageJSONObject(Bundle bundle) {
@@ -271,15 +295,29 @@ public class NPMRegistryImpl implements NPMRegistry {
 		for (JSBundleProcessor jsBundleProcessor : _jsBundleProcessors) {
 			JSBundle jsBundle = jsBundleProcessor.process(bundle);
 
-			if (jsBundle != null) {
-				_jsBundles.add(jsBundle);
-
-				_processLegacyBridges(bundle);
-
-				_refreshJSModuleCaches();
-
-				return jsBundle;
+			if (jsBundle == null) {
+				continue;
 			}
+
+			_jsBundles.put(jsBundle, bundle);
+
+			_processLegacyBridges(bundle);
+
+			_refreshJSModuleCaches();
+
+			if (jsBundle != null) {
+				for (JSBundleTracker jsBundleTracker : _jsBundleTrackers) {
+					try {
+						jsBundleTracker.addedJSBundle(
+							jsBundle, bundle, NPMRegistryImpl.this);
+					}
+					catch (Exception e) {
+						_log.error("Unable to add JS bundle", e);
+					}
+				}
+			}
+
+			return jsBundle;
 		}
 
 		return null;
@@ -322,7 +360,7 @@ public class NPMRegistryImpl implements NPMRegistry {
 		Map<String, JSModule> resolvedJSModules = new HashMap<>();
 		Map<String, JSPackage> resolvedJSPackages = new HashMap<>();
 
-		for (JSBundle jsBundle : _jsBundles) {
+		for (JSBundle jsBundle : _jsBundles.keySet()) {
 			for (JSPackage jsPackage : jsBundle.getJSPackages()) {
 				jsPackages.put(jsPackage.getId(), jsPackage);
 				jsPackageVersions.add(new JSPackageVersion(jsPackage));
@@ -345,18 +383,30 @@ public class NPMRegistryImpl implements NPMRegistry {
 		_jsPackageVersions = jsPackageVersions;
 		_resolvedJSModules = resolvedJSModules;
 		_resolvedJSPackages = resolvedJSPackages;
-
-		_jsLoaderModulesTracker.updateLastModified();
 	}
 
 	private synchronized boolean _removeBundle(JSBundle jsBundle) {
-		boolean removed = _jsBundles.remove(jsBundle);
+		Bundle bundle = _jsBundles.get(jsBundle);
 
-		if (removed) {
-			_refreshJSModuleCaches();
+		if (bundle == null) {
+			return false;
 		}
 
-		return removed;
+		_jsBundles.remove(jsBundle);
+
+		_refreshJSModuleCaches();
+
+		for (JSBundleTracker jsBundleTracker : _jsBundleTrackers) {
+			try {
+				jsBundleTracker.removedJSBundle(
+					jsBundle, bundle, NPMRegistryImpl.this);
+			}
+			catch (Exception e) {
+				_log.error("Unable to remove JS bundle", e);
+			}
+		}
+
+		return true;
 	}
 
 	private synchronized void _reopenBundleTracker() {
@@ -369,6 +419,9 @@ public class NPMRegistryImpl implements NPMRegistry {
 	private static final JSPackage _NULL_JS_PACKAGE =
 		ProxyFactory.newDummyInstance(JSPackage.class);
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		NPMRegistryImpl.class);
+
 	private BundleContext _bundleContext;
 	private BundleTracker<JSBundle> _bundleTracker;
 	private final Map<String, JSPackage> _dependencyJSPackages =
@@ -376,23 +429,9 @@ public class NPMRegistryImpl implements NPMRegistry {
 	private final Map<String, String> _globalAliases = new HashMap<>();
 	private final List<JSBundleProcessor> _jsBundleProcessors =
 		new ArrayList<>();
-
-	private final Set<JSBundle> _jsBundles = new ConcurrentSkipListSet<>(
-		new Comparator<JSBundle>() {
-
-			@Override
-			public int compare(JSBundle jsBundle1, JSBundle jsBundle2) {
-				String id1 = jsBundle1.getId();
-				String id2 = jsBundle2.getId();
-
-				return id1.compareTo(id2);
-			}
-
-		});
-
-	@Reference
-	private JSLoaderModulesTracker _jsLoaderModulesTracker;
-
+	private final Map<JSBundle, Bundle> _jsBundles = new ConcurrentHashMap<>();
+	private final Set<JSBundleTracker> _jsBundleTrackers =
+		new ConcurrentSkipListSet<>(Comparator.comparingInt(Object::hashCode));
 	private Map<String, JSModule> _jsModules = new HashMap<>();
 
 	@Reference

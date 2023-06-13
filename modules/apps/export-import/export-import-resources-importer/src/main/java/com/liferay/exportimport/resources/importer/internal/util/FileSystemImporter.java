@@ -20,13 +20,15 @@ import com.liferay.document.library.kernel.exception.DuplicateFileEntryException
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
-import com.liferay.dynamic.data.mapping.io.DDMFormXSDDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeResponse;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -130,8 +132,8 @@ public class FileSystemImporter extends BaseImporter {
 
 	public FileSystemImporter(
 		AssetTagLocalService assetTagLocalService,
-		DDMFormJSONDeserializer ddmFormJSONDeserializer,
-		DDMFormXSDDeserializer ddmFormXSDDeserializer,
+		DDMFormDeserializer ddmFormJSONDeserializer,
+		DDMFormDeserializer ddmFormXSDDeserializer,
 		DDMStructureLocalService ddmStructureLocalService,
 		DDMTemplateLocalService ddmTemplateLocalService, DDMXML ddmxml,
 		DLAppLocalService dlAppLocalService,
@@ -402,7 +404,7 @@ public class FileSystemImporter extends BaseImporter {
 
 			ddmxml.validateXML(definition);
 
-			DDMForm ddmForm = ddmFormXSDDeserializer.deserialize(definition);
+			DDMForm ddmForm = deserializeXSD(definition);
 
 			DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(
 				ddmForm);
@@ -513,10 +515,10 @@ public class FileSystemImporter extends BaseImporter {
 
 			ddmxml.validateXML(content);
 
-			ddmForm = ddmFormXSDDeserializer.deserialize(content);
+			ddmForm = deserializeXSD(content);
 		}
 		else {
-			ddmForm = ddmFormJSONDeserializer.deserialize(content);
+			ddmForm = deserializeJSONDDMForm(content);
 		}
 
 		DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(ddmForm);
@@ -812,8 +814,9 @@ public class FileSystemImporter extends BaseImporter {
 				fileEntry = dlAppLocalService.updateFileEntry(
 					userId, fileEntry.getFileEntryId(), fileName,
 					mimeTypes.getContentType(fileName), fileName,
-					StringPool.BLANK, StringPool.BLANK, true, inputStream,
-					length, serviceContext);
+					StringPool.BLANK, StringPool.BLANK,
+					DLVersionNumberIncrease.MAJOR, inputStream, length,
+					serviceContext);
 
 				dlFileEntryLocalService.deleteFileVersion(
 					fileEntry.getUserId(), fileEntry.getFileEntryId(),
@@ -1291,7 +1294,7 @@ public class FileSystemImporter extends BaseImporter {
 		Map<Locale, String> nameMap = getMap(
 			layoutTemplateJSONObject.getString("name"));
 
-		String name = nameMap.get(LocaleUtil.getDefault());
+		String name = nameMap.get(Locale.getDefault());
 
 		LayoutPrototype layoutPrototype = getLayoutPrototype(companyId, name);
 
@@ -1405,6 +1408,28 @@ public class FileSystemImporter extends BaseImporter {
 		}
 
 		primaryKeys.add(primaryKey);
+	}
+
+	protected DDMForm deserializeJSONDDMForm(String content) {
+		DDMFormDeserializerDeserializeRequest.Builder builder =
+			DDMFormDeserializerDeserializeRequest.Builder.newBuilder(content);
+
+		DDMFormDeserializerDeserializeResponse
+			ddmFormDeserializerDeserializeResponse =
+				ddmFormJSONDeserializer.deserialize(builder.build());
+
+		return ddmFormDeserializerDeserializeResponse.getDDMForm();
+	}
+
+	protected DDMForm deserializeXSD(String content) {
+		DDMFormDeserializerDeserializeRequest.Builder builder =
+			DDMFormDeserializerDeserializeRequest.Builder.newBuilder(content);
+
+		DDMFormDeserializerDeserializeResponse
+			ddmFormDeserializerDeserializeResponse =
+				ddmFormXSDDeserializer.deserialize(builder.build());
+
+		return ddmFormDeserializerDeserializeResponse.getDDMForm();
 	}
 
 	protected void doImportResources() throws Exception {
@@ -1970,8 +1995,8 @@ public class FileSystemImporter extends BaseImporter {
 	}
 
 	protected final AssetTagLocalService assetTagLocalService;
-	protected final DDMFormJSONDeserializer ddmFormJSONDeserializer;
-	protected final DDMFormXSDDeserializer ddmFormXSDDeserializer;
+	protected final DDMFormDeserializer ddmFormJSONDeserializer;
+	protected final DDMFormDeserializer ddmFormXSDDeserializer;
 	protected final DDMStructureLocalService ddmStructureLocalService;
 	protected final DDMTemplateLocalService ddmTemplateLocalService;
 	protected final DDMXML ddmxml;

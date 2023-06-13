@@ -38,6 +38,7 @@ import com.liferay.site.navigation.taglib.internal.util.SiteNavigationMenuNavIte
 import com.liferay.taglib.util.IncludeTag;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +80,7 @@ public class NavigationMenuTag extends IncludeTag {
 			if (_siteNavigationMenuId > 0) {
 				branchNavItems = _getBranchNavItems();
 
-				navItems = _getMenuNavItems(request, branchNavItems);
+				navItems = _getMenuNavItems(branchNavItems);
 			}
 			else {
 				branchNavItems = getBranchNavItems(request);
@@ -177,7 +178,28 @@ public class NavigationMenuTag extends IncludeTag {
 	protected List<NavItem> getBranchNavItems(HttpServletRequest request)
 		throws PortalException {
 
-		return NavItemUtil.getBranchNavItems(request);
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Layout layout = themeDisplay.getLayout();
+
+		if (layout.isRootLayout()) {
+			return Collections.singletonList(
+				new NavItem(request, themeDisplay, layout, null));
+		}
+
+		List<Layout> ancestorLayouts = layout.getAncestors();
+
+		List<NavItem> navItems = new ArrayList<>(ancestorLayouts.size());
+
+		for (int i = ancestorLayouts.size() - 1; i >= 0; i--) {
+			Layout ancestorLayout = ancestorLayouts.get(i);
+
+			navItems.add(
+				new NavItem(request, themeDisplay, ancestorLayout, null));
+		}
+
+		return navItems;
 	}
 
 	protected String getDisplayStyle() {
@@ -206,7 +228,7 @@ public class NavigationMenuTag extends IncludeTag {
 	@Deprecated
 	protected List<NavItem> getMenuItems() {
 		try {
-			return _getMenuNavItems(request, new ArrayList<NavItem>());
+			return _getMenuNavItems(new ArrayList<NavItem>());
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -253,9 +275,6 @@ public class NavigationMenuTag extends IncludeTag {
 			return new ArrayList<>();
 		}
 
-		SiteNavigationMenuItem originalSiteNavigationMenuItem =
-			siteNavigationMenuItem;
-
 		List<SiteNavigationMenuItem> ancestorSiteNavigationMenuItems =
 			new ArrayList<>();
 
@@ -285,39 +304,28 @@ public class NavigationMenuTag extends IncludeTag {
 
 		navItems.add(
 			new SiteNavigationMenuNavItem(
-				request, themeDisplay, originalSiteNavigationMenuItem));
+				request, themeDisplay, siteNavigationMenuItem));
 
 		return navItems;
 	}
 
-	private List<NavItem> _getMenuNavItems(
-			HttpServletRequest request, List<NavItem> branchNavItems)
+	private List<NavItem> _getMenuNavItems(List<NavItem> branchNavItems)
 		throws Exception {
 
-		if (_rootItemType.equals("absolute")) {
+		if (_rootItemType.equals("relative") && (_rootItemLevel >= 0) &&
+			(_rootItemLevel < branchNavItems.size())) {
+
+			NavItem rootNavItem = branchNavItems.get(_rootItemLevel);
+
+			return rootNavItem.getChildren();
+		}
+		else if (_rootItemType.equals("absolute")) {
 			if (_rootItemLevel == 0) {
 				return NavItemUtil.getChildNavItems(
 					request, _siteNavigationMenuId, 0);
 			}
 			else if (branchNavItems.size() >= _rootItemLevel) {
 				NavItem rootNavItem = branchNavItems.get(_rootItemLevel - 1);
-
-				return rootNavItem.getChildren();
-			}
-		}
-		else if (_rootItemType.equals("relative") && (_rootItemLevel >= 0) &&
-				 (_rootItemLevel < (branchNavItems.size() + 1))) {
-
-			int absoluteLevel = branchNavItems.size() - 1 - _rootItemLevel;
-
-			if (absoluteLevel == -1) {
-				return NavItemUtil.getChildNavItems(
-					request, _siteNavigationMenuId, 0);
-			}
-			else if ((absoluteLevel >= 0) &&
-					 (absoluteLevel < branchNavItems.size())) {
-
-				NavItem rootNavItem = branchNavItems.get(absoluteLevel);
 
 				return rootNavItem.getChildren();
 			}

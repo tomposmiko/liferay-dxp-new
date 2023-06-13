@@ -115,7 +115,10 @@ public class ServletAdapter extends HttpServlet {
 
 				@Override
 				public String getInitParameter(String name) {
-					return GetterUtil.getString(properties.get(name), null);
+					String value = GetterUtil.getString(
+						properties.get(name), null);
+
+					return value;
 				}
 
 				@Override

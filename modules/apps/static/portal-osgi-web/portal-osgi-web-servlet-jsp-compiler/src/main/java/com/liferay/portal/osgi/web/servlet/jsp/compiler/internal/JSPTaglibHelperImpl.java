@@ -14,10 +14,6 @@
 
 package com.liferay.portal.osgi.web.servlet.jsp.compiler.internal;
 
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.osgi.web.servlet.JSPTaglibHelper;
 
 import java.io.InputStream;
@@ -25,9 +21,13 @@ import java.io.InputStream;
 import java.net.URL;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletContext;
+
+import org.apache.jasper.xmlparser.ParserUtils;
+import org.apache.jasper.xmlparser.TreeNode;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.wiring.BundleWiring;
@@ -70,17 +70,26 @@ public class JSPTaglibHelperImpl implements JSPTaglibHelper {
 			}
 
 			try (InputStream inputStream = url.openStream()) {
-				Document document = SAXReaderUtil.read(inputStream);
+				ParserUtils parserUtils = new ParserUtils(true);
 
-				Element rootElement = document.getRootElement();
+				TreeNode treeNode = parserUtils.parseXMLDocument(
+					url.getPath(), inputStream, false);
 
-				for (Element listenerElement :
-						rootElement.elements("listener")) {
+				Iterator<TreeNode> iterator = treeNode.findChildren("listener");
 
-					String listenerClassName = listenerElement.elementText(
+				while (iterator.hasNext()) {
+					TreeNode listenerTreeNode = iterator.next();
+
+					TreeNode listenerClassTreeNode = listenerTreeNode.findChild(
 						"listener-class");
 
-					if (Validator.isNull(listenerClassName)) {
+					if (listenerClassTreeNode == null) {
+						continue;
+					}
+
+					String listenerClassName = listenerClassTreeNode.getBody();
+
+					if (listenerClassName == null) {
 						continue;
 					}
 
@@ -94,6 +103,6 @@ public class JSPTaglibHelperImpl implements JSPTaglibHelper {
 	}
 
 	private static final String _ANALYZED_TLDS =
-		JSPTaglibHelperImpl.class.getName() + "#ANALYZED_TLDS";
+		JSPTaglibHelperImpl.class.getName().concat("#ANALYZED_TLDS");
 
 }

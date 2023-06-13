@@ -16,15 +16,11 @@ package com.liferay.trash.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -36,21 +32,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class TrashVersionWrapper
+public class TrashVersionWrapper extends BaseModelWrapper<TrashVersion>
 	implements TrashVersion, ModelWrapper<TrashVersion> {
-
 	public TrashVersionWrapper(TrashVersion trashVersion) {
-		_trashVersion = trashVersion;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return TrashVersion.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return TrashVersion.class.getName();
+		super(trashVersion);
 	}
 
 	@Override
@@ -113,349 +98,209 @@ public class TrashVersionWrapper
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new TrashVersionWrapper((TrashVersion)_trashVersion.clone());
-	}
-
-	@Override
-	public int compareTo(TrashVersion trashVersion) {
-		return _trashVersion.compareTo(trashVersion);
-	}
-
 	/**
-	 * Returns the fully qualified class name of this trash version.
-	 *
-	 * @return the fully qualified class name of this trash version
-	 */
+	* Returns the fully qualified class name of this trash version.
+	*
+	* @return the fully qualified class name of this trash version
+	*/
 	@Override
 	public String getClassName() {
-		return _trashVersion.getClassName();
+		return model.getClassName();
 	}
 
 	/**
-	 * Returns the class name ID of this trash version.
-	 *
-	 * @return the class name ID of this trash version
-	 */
+	* Returns the class name ID of this trash version.
+	*
+	* @return the class name ID of this trash version
+	*/
 	@Override
 	public long getClassNameId() {
-		return _trashVersion.getClassNameId();
+		return model.getClassNameId();
 	}
 
 	/**
-	 * Returns the class pk of this trash version.
-	 *
-	 * @return the class pk of this trash version
-	 */
+	* Returns the class pk of this trash version.
+	*
+	* @return the class pk of this trash version
+	*/
 	@Override
 	public long getClassPK() {
-		return _trashVersion.getClassPK();
+		return model.getClassPK();
 	}
 
 	/**
-	 * Returns the company ID of this trash version.
-	 *
-	 * @return the company ID of this trash version
-	 */
+	* Returns the company ID of this trash version.
+	*
+	* @return the company ID of this trash version
+	*/
 	@Override
 	public long getCompanyId() {
-		return _trashVersion.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the entry ID of this trash version.
-	 *
-	 * @return the entry ID of this trash version
-	 */
+	* Returns the entry ID of this trash version.
+	*
+	* @return the entry ID of this trash version
+	*/
 	@Override
 	public long getEntryId() {
-		return _trashVersion.getEntryId();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _trashVersion.getExpandoBridge();
+		return model.getEntryId();
 	}
 
 	/**
-	 * Returns the primary key of this trash version.
-	 *
-	 * @return the primary key of this trash version
-	 */
+	* Returns the primary key of this trash version.
+	*
+	* @return the primary key of this trash version
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _trashVersion.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _trashVersion.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the status of this trash version.
-	 *
-	 * @return the status of this trash version
-	 */
+	* Returns the status of this trash version.
+	*
+	* @return the status of this trash version
+	*/
 	@Override
 	public int getStatus() {
-		return _trashVersion.getStatus();
+		return model.getStatus();
 	}
 
 	/**
-	 * Returns the type settings of this trash version.
-	 *
-	 * @return the type settings of this trash version
-	 */
+	* Returns the type settings of this trash version.
+	*
+	* @return the type settings of this trash version
+	*/
 	@Override
 	public String getTypeSettings() {
-		return _trashVersion.getTypeSettings();
+		return model.getTypeSettings();
 	}
 
 	@Override
-	public com.liferay.portal.kernel.util.UnicodeProperties
-		getTypeSettingsProperties() {
-
-		return _trashVersion.getTypeSettingsProperties();
+	public com.liferay.portal.kernel.util.UnicodeProperties getTypeSettingsProperties() {
+		return model.getTypeSettingsProperties();
 	}
 
 	@Override
 	public String getTypeSettingsProperty(String key) {
-		return _trashVersion.getTypeSettingsProperty(key);
+		return model.getTypeSettingsProperty(key);
 	}
 
 	@Override
 	public String getTypeSettingsProperty(String key, String defaultValue) {
-		return _trashVersion.getTypeSettingsProperty(key, defaultValue);
+		return model.getTypeSettingsProperty(key, defaultValue);
 	}
 
 	/**
-	 * Returns the version ID of this trash version.
-	 *
-	 * @return the version ID of this trash version
-	 */
+	* Returns the version ID of this trash version.
+	*
+	* @return the version ID of this trash version
+	*/
 	@Override
 	public long getVersionId() {
-		return _trashVersion.getVersionId();
-	}
-
-	@Override
-	public int hashCode() {
-		return _trashVersion.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _trashVersion.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _trashVersion.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _trashVersion.isNew();
+		return model.getVersionId();
 	}
 
 	@Override
 	public void persist() {
-		_trashVersion.persist();
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_trashVersion.setCachedModel(cachedModel);
+		model.persist();
 	}
 
 	@Override
 	public void setClassName(String className) {
-		_trashVersion.setClassName(className);
+		model.setClassName(className);
 	}
 
 	/**
-	 * Sets the class name ID of this trash version.
-	 *
-	 * @param classNameId the class name ID of this trash version
-	 */
+	* Sets the class name ID of this trash version.
+	*
+	* @param classNameId the class name ID of this trash version
+	*/
 	@Override
 	public void setClassNameId(long classNameId) {
-		_trashVersion.setClassNameId(classNameId);
+		model.setClassNameId(classNameId);
 	}
 
 	/**
-	 * Sets the class pk of this trash version.
-	 *
-	 * @param classPK the class pk of this trash version
-	 */
+	* Sets the class pk of this trash version.
+	*
+	* @param classPK the class pk of this trash version
+	*/
 	@Override
 	public void setClassPK(long classPK) {
-		_trashVersion.setClassPK(classPK);
+		model.setClassPK(classPK);
 	}
 
 	/**
-	 * Sets the company ID of this trash version.
-	 *
-	 * @param companyId the company ID of this trash version
-	 */
+	* Sets the company ID of this trash version.
+	*
+	* @param companyId the company ID of this trash version
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_trashVersion.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the entry ID of this trash version.
-	 *
-	 * @param entryId the entry ID of this trash version
-	 */
+	* Sets the entry ID of this trash version.
+	*
+	* @param entryId the entry ID of this trash version
+	*/
 	@Override
 	public void setEntryId(long entryId) {
-		_trashVersion.setEntryId(entryId);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_trashVersion.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_trashVersion.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_trashVersion.setExpandoBridgeAttributes(serviceContext);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_trashVersion.setNew(n);
+		model.setEntryId(entryId);
 	}
 
 	/**
-	 * Sets the primary key of this trash version.
-	 *
-	 * @param primaryKey the primary key of this trash version
-	 */
+	* Sets the primary key of this trash version.
+	*
+	* @param primaryKey the primary key of this trash version
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_trashVersion.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_trashVersion.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the status of this trash version.
-	 *
-	 * @param status the status of this trash version
-	 */
+	* Sets the status of this trash version.
+	*
+	* @param status the status of this trash version
+	*/
 	@Override
 	public void setStatus(int status) {
-		_trashVersion.setStatus(status);
+		model.setStatus(status);
 	}
 
 	/**
-	 * Sets the type settings of this trash version.
-	 *
-	 * @param typeSettings the type settings of this trash version
-	 */
+	* Sets the type settings of this trash version.
+	*
+	* @param typeSettings the type settings of this trash version
+	*/
 	@Override
 	public void setTypeSettings(String typeSettings) {
-		_trashVersion.setTypeSettings(typeSettings);
+		model.setTypeSettings(typeSettings);
 	}
 
 	@Override
 	public void setTypeSettingsProperties(
-		com.liferay.portal.kernel.util.UnicodeProperties
-			typeSettingsProperties) {
-
-		_trashVersion.setTypeSettingsProperties(typeSettingsProperties);
+		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties) {
+		model.setTypeSettingsProperties(typeSettingsProperties);
 	}
 
 	/**
-	 * Sets the version ID of this trash version.
-	 *
-	 * @param versionId the version ID of this trash version
-	 */
+	* Sets the version ID of this trash version.
+	*
+	* @param versionId the version ID of this trash version
+	*/
 	@Override
 	public void setVersionId(long versionId) {
-		_trashVersion.setVersionId(versionId);
+		model.setVersionId(versionId);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<TrashVersion>
-		toCacheModel() {
-
-		return _trashVersion.toCacheModel();
+	protected TrashVersionWrapper wrap(TrashVersion trashVersion) {
+		return new TrashVersionWrapper(trashVersion);
 	}
-
-	@Override
-	public TrashVersion toEscapedModel() {
-		return new TrashVersionWrapper(_trashVersion.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _trashVersion.toString();
-	}
-
-	@Override
-	public TrashVersion toUnescapedModel() {
-		return new TrashVersionWrapper(_trashVersion.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _trashVersion.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof TrashVersionWrapper)) {
-			return false;
-		}
-
-		TrashVersionWrapper trashVersionWrapper = (TrashVersionWrapper)obj;
-
-		if (Objects.equals(_trashVersion, trashVersionWrapper._trashVersion)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public TrashVersion getWrappedModel() {
-		return _trashVersion;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _trashVersion.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _trashVersion.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_trashVersion.resetOriginalValues();
-	}
-
-	private final TrashVersion _trashVersion;
-
 }

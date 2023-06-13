@@ -27,9 +27,9 @@ definition {
 
 		selenium.waitForVisible();
 
-		selenium.waitForTextCaseInsensitive();
+		selenium.waitForText();
 
-		selenium.assertTextCaseInsensitive();
+		selenium.assertText();
 
 		selenium.mouseOver();
 

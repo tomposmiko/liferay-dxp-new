@@ -169,10 +169,6 @@ AUI.add(
 
 							instance._open = false;
 
-							if (instance._isErrorRequired()) {
-								instance.showErrorMessage();
-							}
-
 							instance.fire('closeList');
 						}
 					},
@@ -289,10 +285,6 @@ AUI.add(
 						instance.set('value', value);
 
 						instance.render();
-
-						if (instance._isErrorRequired()) {
-							instance.showErrorMessage();
-						}
 					},
 
 					showErrorMessage: function() {
@@ -310,10 +302,6 @@ AUI.add(
 					toggleList: function(event) {
 						var instance = this;
 
-						if (event) {
-							event.stopPropagation();
-						}
-
 						var container = instance.get('container');
 
 						var selectTrigger = container.one('.select-field-trigger');
@@ -326,7 +314,7 @@ AUI.add(
 
 							var userView = container.ancestor('.ddm-user-view-content');
 
-							if (event && userView) {
+							if (userView) {
 								var selectInputNode = event.currentTarget.one('.input-select-wrapper')._node;
 
 								var dropdownMenu = event.currentTarget.one('.dropdown-menu');
@@ -519,22 +507,6 @@ AUI.add(
 						}
 
 						return !container.contains(event.target);
-					},
-
-					_isErrorRequired: function() {
-						var instance = this;
-
-						var required = instance.get('required');
-
-						var valid = instance.get('valid');
-
-						var value = instance.getValue();
-
-						if (required && !valid && (value.length < 1)) {
-							return true;
-						}
-
-						return false;
 					},
 
 					_isListOpen: function() {

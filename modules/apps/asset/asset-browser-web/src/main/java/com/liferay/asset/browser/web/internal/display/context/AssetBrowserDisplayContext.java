@@ -16,6 +16,7 @@ package com.liferay.asset.browser.web.internal.display.context;
 
 import com.liferay.asset.browser.web.internal.configuration.AssetBrowserWebConfigurationValues;
 import com.liferay.asset.browser.web.internal.constants.AssetBrowserPortletKeys;
+import com.liferay.asset.browser.web.internal.search.AddAssetEntryChecker;
 import com.liferay.asset.browser.web.internal.search.AssetBrowserSearch;
 import com.liferay.asset.constants.AssetWebKeys;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
@@ -26,8 +27,6 @@ import com.liferay.asset.util.AssetHelper;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
@@ -135,6 +134,12 @@ public class AssetBrowserDisplayContext {
 		AssetBrowserSearch assetBrowserSearch = new AssetBrowserSearch(
 			_renderRequest, getPortletURL());
 
+		if (isMultipleSelection()) {
+			assetBrowserSearch.setRowChecker(
+				new AddAssetEntryChecker(
+					_renderResponse, getRefererAssetEntryId()));
+		}
+
 		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
 
 		int total = getTotalItems();
@@ -142,21 +147,15 @@ public class AssetBrowserDisplayContext {
 		assetBrowserSearch.setTotal(total);
 
 		if (AssetBrowserWebConfigurationValues.SEARCH_WITH_DATABASE) {
-			long[] subtypeSelectionIds = null;
-
-			if (getSubtypeSelectionId() > 0) {
-				subtypeSelectionIds = new long[] {getSubtypeSelectionId()};
-			}
-
 			List<AssetEntry> assetEntries =
 				AssetEntryLocalServiceUtil.getEntries(
 					_getFilterGroupIds(),
 					new long[] {assetRendererFactory.getClassNameId()},
-					subtypeSelectionIds, _getKeywords(), _getKeywords(),
-					_getKeywords(), _getKeywords(), _getListable(), false,
-					false, assetBrowserSearch.getStart(),
-					assetBrowserSearch.getEnd(), "modifiedDate",
-					StringPool.BLANK, getOrderByType(), StringPool.BLANK);
+					_getKeywords(), _getKeywords(), _getKeywords(),
+					_getKeywords(), _getListable(), false, false,
+					assetBrowserSearch.getStart(), assetBrowserSearch.getEnd(),
+					"modifiedDate", StringPool.BLANK, getOrderByType(),
+					StringPool.BLANK);
 
 			assetBrowserSearch.setResults(assetEntries);
 		}
@@ -282,20 +281,6 @@ public class AssetBrowserDisplayContext {
 		};
 	}
 
-	public List<NavigationItem> getNavigationItems() {
-		return new NavigationItemList() {
-			{
-				add(
-					navigationItem -> {
-						navigationItem.setActive(true);
-						navigationItem.setHref(getPortletURL());
-						navigationItem.setLabel(
-							LanguageUtil.get(_request, "entries"));
-					});
-			}
-		};
-	}
-
 	public String getOrderByType() {
 		if (Validator.isNotNull(_orderByType)) {
 			return _orderByType;
@@ -383,6 +368,17 @@ public class AssetBrowserDisplayContext {
 		}
 
 		return true;
+	}
+
+	public boolean isMultipleSelection() {
+		if (_multipleSelection != null) {
+			return _multipleSelection;
+		}
+
+		_multipleSelection = ParamUtil.getBoolean(
+			_request, "multipleSelection");
+
+		return _multipleSelection;
 	}
 
 	private String _getAddButtonLabel() {
@@ -495,6 +491,7 @@ public class AssetBrowserDisplayContext {
 	private List<DropdownItem> _getOrderByDropdownItems() {
 		return new DropdownItemList() {
 			{
+
 				if (!AssetBrowserWebConfigurationValues.SEARCH_WITH_DATABASE) {
 					add(
 						dropdownItem -> {
@@ -535,13 +532,17 @@ public class AssetBrowserDisplayContext {
 			portletURL.setParameter(
 				"selectedGroupId", String.valueOf(selectedGroupId));
 		}
-		else {
-			long[] selectedGroupIds = _getSelectedGroupIds();
 
-			if (selectedGroupIds.length > 0) {
-				portletURL.setParameter(
-					"selectedGroupIds", StringUtil.merge(selectedGroupIds));
-			}
+		if (isMultipleSelection()) {
+			portletURL.setParameter(
+				"multipleSelection", Boolean.TRUE.toString());
+		}
+
+		long[] selectedGroupIds = _getSelectedGroupIds();
+
+		if (selectedGroupIds.length > 0) {
+			portletURL.setParameter(
+				"selectedGroupIds", StringUtil.merge(selectedGroupIds));
 		}
 
 		portletURL.setParameter(
@@ -607,16 +608,10 @@ public class AssetBrowserDisplayContext {
 		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
 
 		if (AssetBrowserWebConfigurationValues.SEARCH_WITH_DATABASE) {
-			long[] subtypeSelectionIds = null;
-
-			if (getSubtypeSelectionId() > 0) {
-				subtypeSelectionIds = new long[] {getSubtypeSelectionId()};
-			}
-
 			return AssetEntryLocalServiceUtil.getEntriesCount(
 				groupIds, new long[] {assetRendererFactory.getClassNameId()},
-				subtypeSelectionIds, _getKeywords(), _getKeywords(),
-				_getKeywords(), _getKeywords(), _getListable(), false, false);
+				_getKeywords(), _getKeywords(), _getKeywords(), _getKeywords(),
+				_getListable(), false, false);
 		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
@@ -657,6 +652,7 @@ public class AssetBrowserDisplayContext {
 	private String _eventName;
 	private Long _groupId;
 	private String _keywords;
+	private Boolean _multipleSelection;
 	private String _orderByCol;
 	private String _orderByType;
 	private Long _refererAssetEntryId;

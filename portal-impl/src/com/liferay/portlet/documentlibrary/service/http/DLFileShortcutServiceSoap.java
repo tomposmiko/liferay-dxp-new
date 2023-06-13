@@ -17,6 +17,7 @@ package com.liferay.portlet.documentlibrary.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.document.library.kernel.service.DLFileShortcutServiceUtil;
+
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -24,20 +25,19 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * <code>DLFileShortcutServiceUtil</code> service
- * utility. The static methods of this class call the same methods of the
- * service utility. However, the signatures are different because it is
- * difficult for SOAP to support certain types.
+ * {@link DLFileShortcutServiceUtil} service utility. The
+ * static methods of this class calls the same methods of the service utility.
+ * However, the signatures are different because it is difficult for SOAP to
+ * support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a <code>java.util.List</code>,
- * that is translated to an array of
- * <code>com.liferay.document.library.kernel.model.DLFileShortcutSoap</code>. If the method in the
- * service utility returns a
- * <code>com.liferay.document.library.kernel.model.DLFileShortcut</code>, that is translated to a
- * <code>com.liferay.document.library.kernel.model.DLFileShortcutSoap</code>. Methods that SOAP
- * cannot safely wire are skipped.
+ * if the method in the service utility returns a {@link java.util.List}, that
+ * is translated to an array of {@link com.liferay.document.library.kernel.model.DLFileShortcutSoap}.
+ * If the method in the service utility returns a
+ * {@link com.liferay.document.library.kernel.model.DLFileShortcut}, that is translated to a
+ * {@link com.liferay.document.library.kernel.model.DLFileShortcutSoap}. Methods that SOAP cannot
+ * safely wire are skipped.
  * </p>
  *
  * <p>
@@ -59,26 +59,22 @@ import java.rmi.RemoteException;
  *
  * @author Brian Wing Shun Chan
  * @see DLFileShortcutServiceHttp
+ * @see com.liferay.document.library.kernel.model.DLFileShortcutSoap
+ * @see DLFileShortcutServiceUtil
  * @generated
  */
 @ProviderType
 public class DLFileShortcutServiceSoap {
-
-	public static com.liferay.document.library.kernel.model.DLFileShortcutSoap
-			addFileShortcut(
-				long groupId, long repositoryId, long folderId,
-				long toFileEntryId,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.document.library.kernel.model.DLFileShortcutSoap addFileShortcut(
+		long groupId, long repositoryId, long folderId, long toFileEntryId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
-
 		try {
-			com.liferay.document.library.kernel.model.DLFileShortcut
-				returnValue = DLFileShortcutServiceUtil.addFileShortcut(
-					groupId, repositoryId, folderId, toFileEntryId,
-					serviceContext);
+			com.liferay.document.library.kernel.model.DLFileShortcut returnValue =
+				DLFileShortcutServiceUtil.addFileShortcut(groupId,
+					repositoryId, folderId, toFileEntryId, serviceContext);
 
-			return com.liferay.document.library.kernel.model.DLFileShortcutSoap.
-				toSoapModel(returnValue);
+			return com.liferay.document.library.kernel.model.DLFileShortcutSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -89,7 +85,6 @@ public class DLFileShortcutServiceSoap {
 
 	public static void deleteFileShortcut(long fileShortcutId)
 		throws RemoteException {
-
 		try {
 			DLFileShortcutServiceUtil.deleteFileShortcut(fileShortcutId);
 		}
@@ -100,17 +95,13 @@ public class DLFileShortcutServiceSoap {
 		}
 	}
 
-	public static com.liferay.document.library.kernel.model.DLFileShortcutSoap
-			getFileShortcut(long fileShortcutId)
-		throws RemoteException {
-
+	public static com.liferay.document.library.kernel.model.DLFileShortcutSoap getFileShortcut(
+		long fileShortcutId) throws RemoteException {
 		try {
-			com.liferay.document.library.kernel.model.DLFileShortcut
-				returnValue = DLFileShortcutServiceUtil.getFileShortcut(
-					fileShortcutId);
+			com.liferay.document.library.kernel.model.DLFileShortcut returnValue =
+				DLFileShortcutServiceUtil.getFileShortcut(fileShortcutId);
 
-			return com.liferay.document.library.kernel.model.DLFileShortcutSoap.
-				toSoapModel(returnValue);
+			return com.liferay.document.library.kernel.model.DLFileShortcutSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -119,21 +110,17 @@ public class DLFileShortcutServiceSoap {
 		}
 	}
 
-	public static com.liferay.document.library.kernel.model.DLFileShortcutSoap
-			updateFileShortcut(
-				long fileShortcutId, long repositoryId, long folderId,
-				long toFileEntryId,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.document.library.kernel.model.DLFileShortcutSoap updateFileShortcut(
+		long fileShortcutId, long repositoryId, long folderId,
+		long toFileEntryId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
-
 		try {
-			com.liferay.document.library.kernel.model.DLFileShortcut
-				returnValue = DLFileShortcutServiceUtil.updateFileShortcut(
-					fileShortcutId, repositoryId, folderId, toFileEntryId,
-					serviceContext);
+			com.liferay.document.library.kernel.model.DLFileShortcut returnValue =
+				DLFileShortcutServiceUtil.updateFileShortcut(fileShortcutId,
+					repositoryId, folderId, toFileEntryId, serviceContext);
 
-			return com.liferay.document.library.kernel.model.DLFileShortcutSoap.
-				toSoapModel(returnValue);
+			return com.liferay.document.library.kernel.model.DLFileShortcutSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -142,13 +129,11 @@ public class DLFileShortcutServiceSoap {
 		}
 	}
 
-	public static void updateFileShortcuts(
-			long oldToFileEntryId, long newToFileEntryId)
-		throws RemoteException {
-
+	public static void updateFileShortcuts(long oldToFileEntryId,
+		long newToFileEntryId) throws RemoteException {
 		try {
-			DLFileShortcutServiceUtil.updateFileShortcuts(
-				oldToFileEntryId, newToFileEntryId);
+			DLFileShortcutServiceUtil.updateFileShortcuts(oldToFileEntryId,
+				newToFileEntryId);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -157,7 +142,5 @@ public class DLFileShortcutServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		DLFileShortcutServiceSoap.class);
-
+	private static Log _log = LogFactoryUtil.getLog(DLFileShortcutServiceSoap.class);
 }

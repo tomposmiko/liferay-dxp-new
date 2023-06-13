@@ -81,7 +81,7 @@ definition {
 	macro viewWithWorkflowPG {
 		var key_commentBody = "${commentBody}";
 
-		AssertTextEquals(
+		AssertTextEquals.assertTextCaseInsensitive(
 			locator1 = "Comments#WORKFLOW_STATUS",
 			value1 = "${commentStatus}"
 		);

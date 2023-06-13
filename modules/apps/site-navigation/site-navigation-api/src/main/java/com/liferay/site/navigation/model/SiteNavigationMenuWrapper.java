@@ -16,17 +16,14 @@ package com.liferay.site.navigation.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
 
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -38,21 +35,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class SiteNavigationMenuWrapper
+public class SiteNavigationMenuWrapper extends BaseModelWrapper<SiteNavigationMenu>
 	implements SiteNavigationMenu, ModelWrapper<SiteNavigationMenu> {
-
 	public SiteNavigationMenuWrapper(SiteNavigationMenu siteNavigationMenu) {
-		_siteNavigationMenu = siteNavigationMenu;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return SiteNavigationMenu.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return SiteNavigationMenu.class.getName();
+		super(siteNavigationMenu);
 	}
 
 	@Override
@@ -83,8 +69,7 @@ public class SiteNavigationMenuWrapper
 			setUuid(uuid);
 		}
 
-		Long siteNavigationMenuId = (Long)attributes.get(
-			"siteNavigationMenuId");
+		Long siteNavigationMenuId = (Long)attributes.get("siteNavigationMenuId");
 
 		if (siteNavigationMenuId != null) {
 			setSiteNavigationMenuId(siteNavigationMenuId);
@@ -151,461 +136,319 @@ public class SiteNavigationMenuWrapper
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new SiteNavigationMenuWrapper(
-			(SiteNavigationMenu)_siteNavigationMenu.clone());
-	}
-
-	@Override
-	public int compareTo(SiteNavigationMenu siteNavigationMenu) {
-		return _siteNavigationMenu.compareTo(siteNavigationMenu);
-	}
-
 	/**
-	 * Returns the auto of this site navigation menu.
-	 *
-	 * @return the auto of this site navigation menu
-	 */
+	* Returns the auto of this site navigation menu.
+	*
+	* @return the auto of this site navigation menu
+	*/
 	@Override
 	public boolean getAuto() {
-		return _siteNavigationMenu.getAuto();
+		return model.getAuto();
 	}
 
 	/**
-	 * Returns the company ID of this site navigation menu.
-	 *
-	 * @return the company ID of this site navigation menu
-	 */
+	* Returns the company ID of this site navigation menu.
+	*
+	* @return the company ID of this site navigation menu
+	*/
 	@Override
 	public long getCompanyId() {
-		return _siteNavigationMenu.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the create date of this site navigation menu.
-	 *
-	 * @return the create date of this site navigation menu
-	 */
+	* Returns the create date of this site navigation menu.
+	*
+	* @return the create date of this site navigation menu
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _siteNavigationMenu.getCreateDate();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _siteNavigationMenu.getExpandoBridge();
+		return model.getCreateDate();
 	}
 
 	/**
-	 * Returns the group ID of this site navigation menu.
-	 *
-	 * @return the group ID of this site navigation menu
-	 */
+	* Returns the group ID of this site navigation menu.
+	*
+	* @return the group ID of this site navigation menu
+	*/
 	@Override
 	public long getGroupId() {
-		return _siteNavigationMenu.getGroupId();
+		return model.getGroupId();
 	}
 
 	/**
-	 * Returns the last publish date of this site navigation menu.
-	 *
-	 * @return the last publish date of this site navigation menu
-	 */
+	* Returns the last publish date of this site navigation menu.
+	*
+	* @return the last publish date of this site navigation menu
+	*/
 	@Override
 	public Date getLastPublishDate() {
-		return _siteNavigationMenu.getLastPublishDate();
+		return model.getLastPublishDate();
 	}
 
 	/**
-	 * Returns the modified date of this site navigation menu.
-	 *
-	 * @return the modified date of this site navigation menu
-	 */
+	* Returns the modified date of this site navigation menu.
+	*
+	* @return the modified date of this site navigation menu
+	*/
 	@Override
 	public Date getModifiedDate() {
-		return _siteNavigationMenu.getModifiedDate();
+		return model.getModifiedDate();
 	}
 
 	/**
-	 * Returns the name of this site navigation menu.
-	 *
-	 * @return the name of this site navigation menu
-	 */
+	* Returns the name of this site navigation menu.
+	*
+	* @return the name of this site navigation menu
+	*/
 	@Override
 	public String getName() {
-		return _siteNavigationMenu.getName();
+		return model.getName();
 	}
 
 	/**
-	 * Returns the primary key of this site navigation menu.
-	 *
-	 * @return the primary key of this site navigation menu
-	 */
+	* Returns the primary key of this site navigation menu.
+	*
+	* @return the primary key of this site navigation menu
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _siteNavigationMenu.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _siteNavigationMenu.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the site navigation menu ID of this site navigation menu.
-	 *
-	 * @return the site navigation menu ID of this site navigation menu
-	 */
+	* Returns the site navigation menu ID of this site navigation menu.
+	*
+	* @return the site navigation menu ID of this site navigation menu
+	*/
 	@Override
 	public long getSiteNavigationMenuId() {
-		return _siteNavigationMenu.getSiteNavigationMenuId();
+		return model.getSiteNavigationMenuId();
 	}
 
 	/**
-	 * Returns the type of this site navigation menu.
-	 *
-	 * @return the type of this site navigation menu
-	 */
+	* Returns the type of this site navigation menu.
+	*
+	* @return the type of this site navigation menu
+	*/
 	@Override
 	public int getType() {
-		return _siteNavigationMenu.getType();
+		return model.getType();
 	}
 
 	@Override
 	public String getTypeKey() {
-		return _siteNavigationMenu.getTypeKey();
+		return model.getTypeKey();
 	}
 
 	/**
-	 * Returns the user ID of this site navigation menu.
-	 *
-	 * @return the user ID of this site navigation menu
-	 */
+	* Returns the user ID of this site navigation menu.
+	*
+	* @return the user ID of this site navigation menu
+	*/
 	@Override
 	public long getUserId() {
-		return _siteNavigationMenu.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this site navigation menu.
-	 *
-	 * @return the user name of this site navigation menu
-	 */
+	* Returns the user name of this site navigation menu.
+	*
+	* @return the user name of this site navigation menu
+	*/
 	@Override
 	public String getUserName() {
-		return _siteNavigationMenu.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this site navigation menu.
-	 *
-	 * @return the user uuid of this site navigation menu
-	 */
+	* Returns the user uuid of this site navigation menu.
+	*
+	* @return the user uuid of this site navigation menu
+	*/
 	@Override
 	public String getUserUuid() {
-		return _siteNavigationMenu.getUserUuid();
+		return model.getUserUuid();
 	}
 
 	/**
-	 * Returns the uuid of this site navigation menu.
-	 *
-	 * @return the uuid of this site navigation menu
-	 */
+	* Returns the uuid of this site navigation menu.
+	*
+	* @return the uuid of this site navigation menu
+	*/
 	@Override
 	public String getUuid() {
-		return _siteNavigationMenu.getUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _siteNavigationMenu.hashCode();
+		return model.getUuid();
 	}
 
 	/**
-	 * Returns <code>true</code> if this site navigation menu is auto.
-	 *
-	 * @return <code>true</code> if this site navigation menu is auto; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this site navigation menu is auto.
+	*
+	* @return <code>true</code> if this site navigation menu is auto; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isAuto() {
-		return _siteNavigationMenu.isAuto();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _siteNavigationMenu.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _siteNavigationMenu.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _siteNavigationMenu.isNew();
+		return model.isAuto();
 	}
 
 	@Override
 	public boolean isPrimary() {
-		return _siteNavigationMenu.isPrimary();
+		return model.isPrimary();
 	}
 
 	@Override
 	public void persist() {
-		_siteNavigationMenu.persist();
+		model.persist();
 	}
 
 	/**
-	 * Sets whether this site navigation menu is auto.
-	 *
-	 * @param auto the auto of this site navigation menu
-	 */
+	* Sets whether this site navigation menu is auto.
+	*
+	* @param auto the auto of this site navigation menu
+	*/
 	@Override
 	public void setAuto(boolean auto) {
-		_siteNavigationMenu.setAuto(auto);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_siteNavigationMenu.setCachedModel(cachedModel);
+		model.setAuto(auto);
 	}
 
 	/**
-	 * Sets the company ID of this site navigation menu.
-	 *
-	 * @param companyId the company ID of this site navigation menu
-	 */
+	* Sets the company ID of this site navigation menu.
+	*
+	* @param companyId the company ID of this site navigation menu
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_siteNavigationMenu.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this site navigation menu.
-	 *
-	 * @param createDate the create date of this site navigation menu
-	 */
+	* Sets the create date of this site navigation menu.
+	*
+	* @param createDate the create date of this site navigation menu
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_siteNavigationMenu.setCreateDate(createDate);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_siteNavigationMenu.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_siteNavigationMenu.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_siteNavigationMenu.setExpandoBridgeAttributes(serviceContext);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets the group ID of this site navigation menu.
-	 *
-	 * @param groupId the group ID of this site navigation menu
-	 */
+	* Sets the group ID of this site navigation menu.
+	*
+	* @param groupId the group ID of this site navigation menu
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_siteNavigationMenu.setGroupId(groupId);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the last publish date of this site navigation menu.
-	 *
-	 * @param lastPublishDate the last publish date of this site navigation menu
-	 */
+	* Sets the last publish date of this site navigation menu.
+	*
+	* @param lastPublishDate the last publish date of this site navigation menu
+	*/
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
-		_siteNavigationMenu.setLastPublishDate(lastPublishDate);
+		model.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	 * Sets the modified date of this site navigation menu.
-	 *
-	 * @param modifiedDate the modified date of this site navigation menu
-	 */
+	* Sets the modified date of this site navigation menu.
+	*
+	* @param modifiedDate the modified date of this site navigation menu
+	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
-		_siteNavigationMenu.setModifiedDate(modifiedDate);
+		model.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	 * Sets the name of this site navigation menu.
-	 *
-	 * @param name the name of this site navigation menu
-	 */
+	* Sets the name of this site navigation menu.
+	*
+	* @param name the name of this site navigation menu
+	*/
 	@Override
 	public void setName(String name) {
-		_siteNavigationMenu.setName(name);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_siteNavigationMenu.setNew(n);
+		model.setName(name);
 	}
 
 	/**
-	 * Sets the primary key of this site navigation menu.
-	 *
-	 * @param primaryKey the primary key of this site navigation menu
-	 */
+	* Sets the primary key of this site navigation menu.
+	*
+	* @param primaryKey the primary key of this site navigation menu
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_siteNavigationMenu.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_siteNavigationMenu.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the site navigation menu ID of this site navigation menu.
-	 *
-	 * @param siteNavigationMenuId the site navigation menu ID of this site navigation menu
-	 */
+	* Sets the site navigation menu ID of this site navigation menu.
+	*
+	* @param siteNavigationMenuId the site navigation menu ID of this site navigation menu
+	*/
 	@Override
 	public void setSiteNavigationMenuId(long siteNavigationMenuId) {
-		_siteNavigationMenu.setSiteNavigationMenuId(siteNavigationMenuId);
+		model.setSiteNavigationMenuId(siteNavigationMenuId);
 	}
 
 	/**
-	 * Sets the type of this site navigation menu.
-	 *
-	 * @param type the type of this site navigation menu
-	 */
+	* Sets the type of this site navigation menu.
+	*
+	* @param type the type of this site navigation menu
+	*/
 	@Override
 	public void setType(int type) {
-		_siteNavigationMenu.setType(type);
+		model.setType(type);
 	}
 
 	/**
-	 * Sets the user ID of this site navigation menu.
-	 *
-	 * @param userId the user ID of this site navigation menu
-	 */
+	* Sets the user ID of this site navigation menu.
+	*
+	* @param userId the user ID of this site navigation menu
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_siteNavigationMenu.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this site navigation menu.
-	 *
-	 * @param userName the user name of this site navigation menu
-	 */
+	* Sets the user name of this site navigation menu.
+	*
+	* @param userName the user name of this site navigation menu
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_siteNavigationMenu.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this site navigation menu.
-	 *
-	 * @param userUuid the user uuid of this site navigation menu
-	 */
+	* Sets the user uuid of this site navigation menu.
+	*
+	* @param userUuid the user uuid of this site navigation menu
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_siteNavigationMenu.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	/**
-	 * Sets the uuid of this site navigation menu.
-	 *
-	 * @param uuid the uuid of this site navigation menu
-	 */
+	* Sets the uuid of this site navigation menu.
+	*
+	* @param uuid the uuid of this site navigation menu
+	*/
 	@Override
 	public void setUuid(String uuid) {
-		_siteNavigationMenu.setUuid(uuid);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.CacheModel<SiteNavigationMenu>
-		toCacheModel() {
-
-		return _siteNavigationMenu.toCacheModel();
-	}
-
-	@Override
-	public SiteNavigationMenu toEscapedModel() {
-		return new SiteNavigationMenuWrapper(
-			_siteNavigationMenu.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _siteNavigationMenu.toString();
-	}
-
-	@Override
-	public SiteNavigationMenu toUnescapedModel() {
-		return new SiteNavigationMenuWrapper(
-			_siteNavigationMenu.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _siteNavigationMenu.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof SiteNavigationMenuWrapper)) {
-			return false;
-		}
-
-		SiteNavigationMenuWrapper siteNavigationMenuWrapper =
-			(SiteNavigationMenuWrapper)obj;
-
-		if (Objects.equals(
-				_siteNavigationMenu,
-				siteNavigationMenuWrapper._siteNavigationMenu)) {
-
-			return true;
-		}
-
-		return false;
+		model.setUuid(uuid);
 	}
 
 	@Override
 	public StagedModelType getStagedModelType() {
-		return _siteNavigationMenu.getStagedModelType();
+		return model.getStagedModelType();
 	}
 
 	@Override
-	public SiteNavigationMenu getWrappedModel() {
-		return _siteNavigationMenu;
+	protected SiteNavigationMenuWrapper wrap(
+		SiteNavigationMenu siteNavigationMenu) {
+		return new SiteNavigationMenuWrapper(siteNavigationMenu);
 	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _siteNavigationMenu.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _siteNavigationMenu.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_siteNavigationMenu.resetOriginalValues();
-	}
-
-	private final SiteNavigationMenu _siteNavigationMenu;
-
 }

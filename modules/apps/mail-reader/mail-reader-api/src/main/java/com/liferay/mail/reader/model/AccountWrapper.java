@@ -16,16 +16,12 @@ package com.liferay.mail.reader.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -37,20 +33,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class AccountWrapper implements Account, ModelWrapper<Account> {
-
+public class AccountWrapper extends BaseModelWrapper<Account> implements Account,
+	ModelWrapper<Account> {
 	public AccountWrapper(Account account) {
-		_account = account;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return Account.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return Account.class.getName();
+		super(account);
 	}
 
 	@Override
@@ -246,767 +232,633 @@ public class AccountWrapper implements Account, ModelWrapper<Account> {
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new AccountWrapper((Account)_account.clone());
-	}
-
-	@Override
-	public int compareTo(Account account) {
-		return _account.compareTo(account);
-	}
-
 	/**
-	 * Returns the account ID of this account.
-	 *
-	 * @return the account ID of this account
-	 */
+	* Returns the account ID of this account.
+	*
+	* @return the account ID of this account
+	*/
 	@Override
 	public long getAccountId() {
-		return _account.getAccountId();
+		return model.getAccountId();
 	}
 
 	/**
-	 * Returns the address of this account.
-	 *
-	 * @return the address of this account
-	 */
+	* Returns the address of this account.
+	*
+	* @return the address of this account
+	*/
 	@Override
 	public String getAddress() {
-		return _account.getAddress();
+		return model.getAddress();
 	}
 
 	/**
-	 * Returns the company ID of this account.
-	 *
-	 * @return the company ID of this account
-	 */
+	* Returns the company ID of this account.
+	*
+	* @return the company ID of this account
+	*/
 	@Override
 	public long getCompanyId() {
-		return _account.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the create date of this account.
-	 *
-	 * @return the create date of this account
-	 */
+	* Returns the create date of this account.
+	*
+	* @return the create date of this account
+	*/
 	@Override
 	public Date getCreateDate() {
-		return _account.getCreateDate();
+		return model.getCreateDate();
 	}
 
 	/**
-	 * Returns the default sender of this account.
-	 *
-	 * @return the default sender of this account
-	 */
+	* Returns the default sender of this account.
+	*
+	* @return the default sender of this account
+	*/
 	@Override
 	public boolean getDefaultSender() {
-		return _account.getDefaultSender();
+		return model.getDefaultSender();
 	}
 
 	/**
-	 * Returns the draft folder ID of this account.
-	 *
-	 * @return the draft folder ID of this account
-	 */
+	* Returns the draft folder ID of this account.
+	*
+	* @return the draft folder ID of this account
+	*/
 	@Override
 	public long getDraftFolderId() {
-		return _account.getDraftFolderId();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _account.getExpandoBridge();
+		return model.getDraftFolderId();
 	}
 
 	/**
-	 * Returns the folder prefix of this account.
-	 *
-	 * @return the folder prefix of this account
-	 */
+	* Returns the folder prefix of this account.
+	*
+	* @return the folder prefix of this account
+	*/
 	@Override
 	public String getFolderPrefix() {
-		return _account.getFolderPrefix();
+		return model.getFolderPrefix();
 	}
 
 	/**
-	 * Returns the inbox folder ID of this account.
-	 *
-	 * @return the inbox folder ID of this account
-	 */
+	* Returns the inbox folder ID of this account.
+	*
+	* @return the inbox folder ID of this account
+	*/
 	@Override
 	public long getInboxFolderId() {
-		return _account.getInboxFolderId();
+		return model.getInboxFolderId();
 	}
 
 	/**
-	 * Returns the incoming host name of this account.
-	 *
-	 * @return the incoming host name of this account
-	 */
+	* Returns the incoming host name of this account.
+	*
+	* @return the incoming host name of this account
+	*/
 	@Override
 	public String getIncomingHostName() {
-		return _account.getIncomingHostName();
+		return model.getIncomingHostName();
 	}
 
 	/**
-	 * Returns the incoming port of this account.
-	 *
-	 * @return the incoming port of this account
-	 */
+	* Returns the incoming port of this account.
+	*
+	* @return the incoming port of this account
+	*/
 	@Override
 	public int getIncomingPort() {
-		return _account.getIncomingPort();
+		return model.getIncomingPort();
 	}
 
 	/**
-	 * Returns the incoming secure of this account.
-	 *
-	 * @return the incoming secure of this account
-	 */
+	* Returns the incoming secure of this account.
+	*
+	* @return the incoming secure of this account
+	*/
 	@Override
 	public boolean getIncomingSecure() {
-		return _account.getIncomingSecure();
+		return model.getIncomingSecure();
 	}
 
 	/**
-	 * Returns the login of this account.
-	 *
-	 * @return the login of this account
-	 */
+	* Returns the login of this account.
+	*
+	* @return the login of this account
+	*/
 	@Override
 	public String getLogin() {
-		return _account.getLogin();
+		return model.getLogin();
 	}
 
 	/**
-	 * Returns the modified date of this account.
-	 *
-	 * @return the modified date of this account
-	 */
+	* Returns the modified date of this account.
+	*
+	* @return the modified date of this account
+	*/
 	@Override
 	public Date getModifiedDate() {
-		return _account.getModifiedDate();
+		return model.getModifiedDate();
 	}
 
 	/**
-	 * Returns the outgoing host name of this account.
-	 *
-	 * @return the outgoing host name of this account
-	 */
+	* Returns the outgoing host name of this account.
+	*
+	* @return the outgoing host name of this account
+	*/
 	@Override
 	public String getOutgoingHostName() {
-		return _account.getOutgoingHostName();
+		return model.getOutgoingHostName();
 	}
 
 	/**
-	 * Returns the outgoing port of this account.
-	 *
-	 * @return the outgoing port of this account
-	 */
+	* Returns the outgoing port of this account.
+	*
+	* @return the outgoing port of this account
+	*/
 	@Override
 	public int getOutgoingPort() {
-		return _account.getOutgoingPort();
+		return model.getOutgoingPort();
 	}
 
 	/**
-	 * Returns the outgoing secure of this account.
-	 *
-	 * @return the outgoing secure of this account
-	 */
+	* Returns the outgoing secure of this account.
+	*
+	* @return the outgoing secure of this account
+	*/
 	@Override
 	public boolean getOutgoingSecure() {
-		return _account.getOutgoingSecure();
+		return model.getOutgoingSecure();
 	}
 
 	/**
-	 * Returns the password of this account.
-	 *
-	 * @return the password of this account
-	 */
+	* Returns the password of this account.
+	*
+	* @return the password of this account
+	*/
 	@Override
 	public String getPassword() {
-		return _account.getPassword();
+		return model.getPassword();
 	}
 
 	@Override
 	public String getPasswordDecrypted() {
-		return _account.getPasswordDecrypted();
+		return model.getPasswordDecrypted();
 	}
 
 	/**
-	 * Returns the personal name of this account.
-	 *
-	 * @return the personal name of this account
-	 */
+	* Returns the personal name of this account.
+	*
+	* @return the personal name of this account
+	*/
 	@Override
 	public String getPersonalName() {
-		return _account.getPersonalName();
+		return model.getPersonalName();
 	}
 
 	/**
-	 * Returns the primary key of this account.
-	 *
-	 * @return the primary key of this account
-	 */
+	* Returns the primary key of this account.
+	*
+	* @return the primary key of this account
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _account.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _account.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the protocol of this account.
-	 *
-	 * @return the protocol of this account
-	 */
+	* Returns the protocol of this account.
+	*
+	* @return the protocol of this account
+	*/
 	@Override
 	public String getProtocol() {
-		return _account.getProtocol();
+		return model.getProtocol();
 	}
 
 	/**
-	 * Returns the save password of this account.
-	 *
-	 * @return the save password of this account
-	 */
+	* Returns the save password of this account.
+	*
+	* @return the save password of this account
+	*/
 	@Override
 	public boolean getSavePassword() {
-		return _account.getSavePassword();
+		return model.getSavePassword();
 	}
 
 	/**
-	 * Returns the sent folder ID of this account.
-	 *
-	 * @return the sent folder ID of this account
-	 */
+	* Returns the sent folder ID of this account.
+	*
+	* @return the sent folder ID of this account
+	*/
 	@Override
 	public long getSentFolderId() {
-		return _account.getSentFolderId();
+		return model.getSentFolderId();
 	}
 
 	/**
-	 * Returns the signature of this account.
-	 *
-	 * @return the signature of this account
-	 */
+	* Returns the signature of this account.
+	*
+	* @return the signature of this account
+	*/
 	@Override
 	public String getSignature() {
-		return _account.getSignature();
+		return model.getSignature();
 	}
 
 	/**
-	 * Returns the trash folder ID of this account.
-	 *
-	 * @return the trash folder ID of this account
-	 */
+	* Returns the trash folder ID of this account.
+	*
+	* @return the trash folder ID of this account
+	*/
 	@Override
 	public long getTrashFolderId() {
-		return _account.getTrashFolderId();
+		return model.getTrashFolderId();
 	}
 
 	/**
-	 * Returns the user ID of this account.
-	 *
-	 * @return the user ID of this account
-	 */
+	* Returns the user ID of this account.
+	*
+	* @return the user ID of this account
+	*/
 	@Override
 	public long getUserId() {
-		return _account.getUserId();
+		return model.getUserId();
 	}
 
 	/**
-	 * Returns the user name of this account.
-	 *
-	 * @return the user name of this account
-	 */
+	* Returns the user name of this account.
+	*
+	* @return the user name of this account
+	*/
 	@Override
 	public String getUserName() {
-		return _account.getUserName();
+		return model.getUserName();
 	}
 
 	/**
-	 * Returns the user uuid of this account.
-	 *
-	 * @return the user uuid of this account
-	 */
+	* Returns the user uuid of this account.
+	*
+	* @return the user uuid of this account
+	*/
 	@Override
 	public String getUserUuid() {
-		return _account.getUserUuid();
+		return model.getUserUuid();
 	}
 
 	/**
-	 * Returns the use signature of this account.
-	 *
-	 * @return the use signature of this account
-	 */
+	* Returns the use signature of this account.
+	*
+	* @return the use signature of this account
+	*/
 	@Override
 	public boolean getUseSignature() {
-		return _account.getUseSignature();
-	}
-
-	@Override
-	public int hashCode() {
-		return _account.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _account.isCachedModel();
+		return model.getUseSignature();
 	}
 
 	/**
-	 * Returns <code>true</code> if this account is default sender.
-	 *
-	 * @return <code>true</code> if this account is default sender; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this account is default sender.
+	*
+	* @return <code>true</code> if this account is default sender; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isDefaultSender() {
-		return _account.isDefaultSender();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _account.isEscapedModel();
+		return model.isDefaultSender();
 	}
 
 	/**
-	 * Returns <code>true</code> if this account is incoming secure.
-	 *
-	 * @return <code>true</code> if this account is incoming secure; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this account is incoming secure.
+	*
+	* @return <code>true</code> if this account is incoming secure; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isIncomingSecure() {
-		return _account.isIncomingSecure();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _account.isNew();
+		return model.isIncomingSecure();
 	}
 
 	/**
-	 * Returns <code>true</code> if this account is outgoing secure.
-	 *
-	 * @return <code>true</code> if this account is outgoing secure; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this account is outgoing secure.
+	*
+	* @return <code>true</code> if this account is outgoing secure; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isOutgoingSecure() {
-		return _account.isOutgoingSecure();
+		return model.isOutgoingSecure();
 	}
 
 	/**
-	 * Returns <code>true</code> if this account is save password.
-	 *
-	 * @return <code>true</code> if this account is save password; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this account is save password.
+	*
+	* @return <code>true</code> if this account is save password; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isSavePassword() {
-		return _account.isSavePassword();
+		return model.isSavePassword();
 	}
 
 	/**
-	 * Returns <code>true</code> if this account is use signature.
-	 *
-	 * @return <code>true</code> if this account is use signature; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this account is use signature.
+	*
+	* @return <code>true</code> if this account is use signature; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isUseSignature() {
-		return _account.isUseSignature();
+		return model.isUseSignature();
 	}
 
 	@Override
 	public void persist() {
-		_account.persist();
+		model.persist();
 	}
 
 	/**
-	 * Sets the account ID of this account.
-	 *
-	 * @param accountId the account ID of this account
-	 */
+	* Sets the account ID of this account.
+	*
+	* @param accountId the account ID of this account
+	*/
 	@Override
 	public void setAccountId(long accountId) {
-		_account.setAccountId(accountId);
+		model.setAccountId(accountId);
 	}
 
 	/**
-	 * Sets the address of this account.
-	 *
-	 * @param address the address of this account
-	 */
+	* Sets the address of this account.
+	*
+	* @param address the address of this account
+	*/
 	@Override
 	public void setAddress(String address) {
-		_account.setAddress(address);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_account.setCachedModel(cachedModel);
+		model.setAddress(address);
 	}
 
 	/**
-	 * Sets the company ID of this account.
-	 *
-	 * @param companyId the company ID of this account
-	 */
+	* Sets the company ID of this account.
+	*
+	* @param companyId the company ID of this account
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_account.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the create date of this account.
-	 *
-	 * @param createDate the create date of this account
-	 */
+	* Sets the create date of this account.
+	*
+	* @param createDate the create date of this account
+	*/
 	@Override
 	public void setCreateDate(Date createDate) {
-		_account.setCreateDate(createDate);
+		model.setCreateDate(createDate);
 	}
 
 	/**
-	 * Sets whether this account is default sender.
-	 *
-	 * @param defaultSender the default sender of this account
-	 */
+	* Sets whether this account is default sender.
+	*
+	* @param defaultSender the default sender of this account
+	*/
 	@Override
 	public void setDefaultSender(boolean defaultSender) {
-		_account.setDefaultSender(defaultSender);
+		model.setDefaultSender(defaultSender);
 	}
 
 	/**
-	 * Sets the draft folder ID of this account.
-	 *
-	 * @param draftFolderId the draft folder ID of this account
-	 */
+	* Sets the draft folder ID of this account.
+	*
+	* @param draftFolderId the draft folder ID of this account
+	*/
 	@Override
 	public void setDraftFolderId(long draftFolderId) {
-		_account.setDraftFolderId(draftFolderId);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_account.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_account.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_account.setExpandoBridgeAttributes(serviceContext);
+		model.setDraftFolderId(draftFolderId);
 	}
 
 	/**
-	 * Sets the folder prefix of this account.
-	 *
-	 * @param folderPrefix the folder prefix of this account
-	 */
+	* Sets the folder prefix of this account.
+	*
+	* @param folderPrefix the folder prefix of this account
+	*/
 	@Override
 	public void setFolderPrefix(String folderPrefix) {
-		_account.setFolderPrefix(folderPrefix);
+		model.setFolderPrefix(folderPrefix);
 	}
 
 	/**
-	 * Sets the inbox folder ID of this account.
-	 *
-	 * @param inboxFolderId the inbox folder ID of this account
-	 */
+	* Sets the inbox folder ID of this account.
+	*
+	* @param inboxFolderId the inbox folder ID of this account
+	*/
 	@Override
 	public void setInboxFolderId(long inboxFolderId) {
-		_account.setInboxFolderId(inboxFolderId);
+		model.setInboxFolderId(inboxFolderId);
 	}
 
 	/**
-	 * Sets the incoming host name of this account.
-	 *
-	 * @param incomingHostName the incoming host name of this account
-	 */
+	* Sets the incoming host name of this account.
+	*
+	* @param incomingHostName the incoming host name of this account
+	*/
 	@Override
 	public void setIncomingHostName(String incomingHostName) {
-		_account.setIncomingHostName(incomingHostName);
+		model.setIncomingHostName(incomingHostName);
 	}
 
 	/**
-	 * Sets the incoming port of this account.
-	 *
-	 * @param incomingPort the incoming port of this account
-	 */
+	* Sets the incoming port of this account.
+	*
+	* @param incomingPort the incoming port of this account
+	*/
 	@Override
 	public void setIncomingPort(int incomingPort) {
-		_account.setIncomingPort(incomingPort);
+		model.setIncomingPort(incomingPort);
 	}
 
 	/**
-	 * Sets whether this account is incoming secure.
-	 *
-	 * @param incomingSecure the incoming secure of this account
-	 */
+	* Sets whether this account is incoming secure.
+	*
+	* @param incomingSecure the incoming secure of this account
+	*/
 	@Override
 	public void setIncomingSecure(boolean incomingSecure) {
-		_account.setIncomingSecure(incomingSecure);
+		model.setIncomingSecure(incomingSecure);
 	}
 
 	/**
-	 * Sets the login of this account.
-	 *
-	 * @param login the login of this account
-	 */
+	* Sets the login of this account.
+	*
+	* @param login the login of this account
+	*/
 	@Override
 	public void setLogin(String login) {
-		_account.setLogin(login);
+		model.setLogin(login);
 	}
 
 	/**
-	 * Sets the modified date of this account.
-	 *
-	 * @param modifiedDate the modified date of this account
-	 */
+	* Sets the modified date of this account.
+	*
+	* @param modifiedDate the modified date of this account
+	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
-		_account.setModifiedDate(modifiedDate);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_account.setNew(n);
+		model.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	 * Sets the outgoing host name of this account.
-	 *
-	 * @param outgoingHostName the outgoing host name of this account
-	 */
+	* Sets the outgoing host name of this account.
+	*
+	* @param outgoingHostName the outgoing host name of this account
+	*/
 	@Override
 	public void setOutgoingHostName(String outgoingHostName) {
-		_account.setOutgoingHostName(outgoingHostName);
+		model.setOutgoingHostName(outgoingHostName);
 	}
 
 	/**
-	 * Sets the outgoing port of this account.
-	 *
-	 * @param outgoingPort the outgoing port of this account
-	 */
+	* Sets the outgoing port of this account.
+	*
+	* @param outgoingPort the outgoing port of this account
+	*/
 	@Override
 	public void setOutgoingPort(int outgoingPort) {
-		_account.setOutgoingPort(outgoingPort);
+		model.setOutgoingPort(outgoingPort);
 	}
 
 	/**
-	 * Sets whether this account is outgoing secure.
-	 *
-	 * @param outgoingSecure the outgoing secure of this account
-	 */
+	* Sets whether this account is outgoing secure.
+	*
+	* @param outgoingSecure the outgoing secure of this account
+	*/
 	@Override
 	public void setOutgoingSecure(boolean outgoingSecure) {
-		_account.setOutgoingSecure(outgoingSecure);
+		model.setOutgoingSecure(outgoingSecure);
 	}
 
 	/**
-	 * Sets the password of this account.
-	 *
-	 * @param password the password of this account
-	 */
+	* Sets the password of this account.
+	*
+	* @param password the password of this account
+	*/
 	@Override
 	public void setPassword(String password) {
-		_account.setPassword(password);
+		model.setPassword(password);
 	}
 
 	@Override
 	public void setPasswordDecrypted(String unencryptedPassword) {
-		_account.setPasswordDecrypted(unencryptedPassword);
+		model.setPasswordDecrypted(unencryptedPassword);
 	}
 
 	/**
-	 * Sets the personal name of this account.
-	 *
-	 * @param personalName the personal name of this account
-	 */
+	* Sets the personal name of this account.
+	*
+	* @param personalName the personal name of this account
+	*/
 	@Override
 	public void setPersonalName(String personalName) {
-		_account.setPersonalName(personalName);
+		model.setPersonalName(personalName);
 	}
 
 	/**
-	 * Sets the primary key of this account.
-	 *
-	 * @param primaryKey the primary key of this account
-	 */
+	* Sets the primary key of this account.
+	*
+	* @param primaryKey the primary key of this account
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_account.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_account.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the protocol of this account.
-	 *
-	 * @param protocol the protocol of this account
-	 */
+	* Sets the protocol of this account.
+	*
+	* @param protocol the protocol of this account
+	*/
 	@Override
 	public void setProtocol(String protocol) {
-		_account.setProtocol(protocol);
+		model.setProtocol(protocol);
 	}
 
 	/**
-	 * Sets whether this account is save password.
-	 *
-	 * @param savePassword the save password of this account
-	 */
+	* Sets whether this account is save password.
+	*
+	* @param savePassword the save password of this account
+	*/
 	@Override
 	public void setSavePassword(boolean savePassword) {
-		_account.setSavePassword(savePassword);
+		model.setSavePassword(savePassword);
 	}
 
 	/**
-	 * Sets the sent folder ID of this account.
-	 *
-	 * @param sentFolderId the sent folder ID of this account
-	 */
+	* Sets the sent folder ID of this account.
+	*
+	* @param sentFolderId the sent folder ID of this account
+	*/
 	@Override
 	public void setSentFolderId(long sentFolderId) {
-		_account.setSentFolderId(sentFolderId);
+		model.setSentFolderId(sentFolderId);
 	}
 
 	/**
-	 * Sets the signature of this account.
-	 *
-	 * @param signature the signature of this account
-	 */
+	* Sets the signature of this account.
+	*
+	* @param signature the signature of this account
+	*/
 	@Override
 	public void setSignature(String signature) {
-		_account.setSignature(signature);
+		model.setSignature(signature);
 	}
 
 	/**
-	 * Sets the trash folder ID of this account.
-	 *
-	 * @param trashFolderId the trash folder ID of this account
-	 */
+	* Sets the trash folder ID of this account.
+	*
+	* @param trashFolderId the trash folder ID of this account
+	*/
 	@Override
 	public void setTrashFolderId(long trashFolderId) {
-		_account.setTrashFolderId(trashFolderId);
+		model.setTrashFolderId(trashFolderId);
 	}
 
 	/**
-	 * Sets the user ID of this account.
-	 *
-	 * @param userId the user ID of this account
-	 */
+	* Sets the user ID of this account.
+	*
+	* @param userId the user ID of this account
+	*/
 	@Override
 	public void setUserId(long userId) {
-		_account.setUserId(userId);
+		model.setUserId(userId);
 	}
 
 	/**
-	 * Sets the user name of this account.
-	 *
-	 * @param userName the user name of this account
-	 */
+	* Sets the user name of this account.
+	*
+	* @param userName the user name of this account
+	*/
 	@Override
 	public void setUserName(String userName) {
-		_account.setUserName(userName);
+		model.setUserName(userName);
 	}
 
 	/**
-	 * Sets the user uuid of this account.
-	 *
-	 * @param userUuid the user uuid of this account
-	 */
+	* Sets the user uuid of this account.
+	*
+	* @param userUuid the user uuid of this account
+	*/
 	@Override
 	public void setUserUuid(String userUuid) {
-		_account.setUserUuid(userUuid);
+		model.setUserUuid(userUuid);
 	}
 
 	/**
-	 * Sets whether this account is use signature.
-	 *
-	 * @param useSignature the use signature of this account
-	 */
+	* Sets whether this account is use signature.
+	*
+	* @param useSignature the use signature of this account
+	*/
 	@Override
 	public void setUseSignature(boolean useSignature) {
-		_account.setUseSignature(useSignature);
+		model.setUseSignature(useSignature);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<Account> toCacheModel() {
-		return _account.toCacheModel();
+	protected AccountWrapper wrap(Account account) {
+		return new AccountWrapper(account);
 	}
-
-	@Override
-	public Account toEscapedModel() {
-		return new AccountWrapper(_account.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _account.toString();
-	}
-
-	@Override
-	public Account toUnescapedModel() {
-		return new AccountWrapper(_account.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _account.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof AccountWrapper)) {
-			return false;
-		}
-
-		AccountWrapper accountWrapper = (AccountWrapper)obj;
-
-		if (Objects.equals(_account, accountWrapper._account)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public Account getWrappedModel() {
-		return _account;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _account.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _account.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_account.resetOriginalValues();
-	}
-
-	private final Account _account;
-
 }

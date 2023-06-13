@@ -50,6 +50,8 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.model.MembershipRequest;
 import com.liferay.portal.kernel.model.MembershipRequestConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.Team;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
@@ -57,6 +59,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.RemoteAuthException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
@@ -72,6 +75,7 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.TeamLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -377,6 +381,22 @@ public class SiteAdminPortlet extends MVCPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
+		long groupId = ParamUtil.getLong(renderRequest, "groupId");
+
+		if (groupId > 0) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			try {
+				GroupPermissionUtil.check(
+					themeDisplay.getPermissionChecker(), groupId,
+					ActionKeys.VIEW);
+			}
+			catch (PortalException pe) {
+				SessionErrors.add(renderRequest, pe.getClass());
+			}
+		}
+
 		renderRequest.setAttribute(
 			SiteWebKeys.GROUP_SEARCH_PROVIDER, groupSearchProvider);
 
@@ -464,10 +484,10 @@ public class SiteAdminPortlet extends MVCPortlet {
 		return refererGroupId;
 	}
 
-	protected List<Long> getRoleIds(PortletRequest portletRequest)
+	protected List<Role> getRoles(PortletRequest portletRequest)
 		throws Exception {
 
-		List<Long> roleIds = new ArrayList<>();
+		List<Role> roles = new ArrayList<>();
 
 		long[] siteRolesRoleIds = ArrayUtil.unique(
 			ParamUtil.getLongValues(
@@ -478,10 +498,12 @@ public class SiteAdminPortlet extends MVCPortlet {
 				continue;
 			}
 
-			roleIds.add(siteRolesRoleId);
+			Role role = roleLocalService.getRole(siteRolesRoleId);
+
+			roles.add(role);
 		}
 
-		return roleIds;
+		return roles;
 	}
 
 	protected PortletURL getSiteAdministrationURL(
@@ -499,10 +521,10 @@ public class SiteAdminPortlet extends MVCPortlet {
 			actionRequest, group, portletId, 0, 0, PortletRequest.RENDER_PHASE);
 	}
 
-	protected List<Long> getTeamIds(PortletRequest portletRequest)
+	protected List<Team> getTeams(PortletRequest portletRequest)
 		throws Exception {
 
-		List<Long> teamIds = new ArrayList<>();
+		List<Team> teams = new ArrayList<>();
 
 		long[] teamsTeamIds = ArrayUtil.unique(
 			ParamUtil.getLongValues(
@@ -513,10 +535,12 @@ public class SiteAdminPortlet extends MVCPortlet {
 				continue;
 			}
 
-			teamIds.add(teamsTeamId);
+			Team team = teamLocalService.getTeam(teamsTeamId);
+
+			teams.add(team);
 		}
 
-		return teamIds;
+		return teams;
 	}
 
 	@Override
@@ -790,10 +814,14 @@ public class SiteAdminPortlet extends MVCPortlet {
 
 		typeSettingsProperties.setProperty(
 			"defaultSiteRoleIds",
-			ListUtil.toString(getRoleIds(actionRequest), StringPool.BLANK));
+			ListUtil.toString(
+				getRoles(actionRequest), Role.ROLE_ID_ACCESSOR,
+				StringPool.COMMA));
 		typeSettingsProperties.setProperty(
 			"defaultTeamIds",
-			ListUtil.toString(getTeamIds(actionRequest), StringPool.BLANK));
+			ListUtil.toString(
+				getTeams(actionRequest), Team.TEAM_ID_ACCESSOR,
+				StringPool.COMMA));
 
 		String[] analyticsTypes = PrefsPropsUtil.getStringArray(
 			themeDisplay.getCompanyId(), PropsKeys.ADMIN_ANALYTICS_TYPES,
@@ -862,29 +890,14 @@ public class SiteAdminPortlet extends MVCPortlet {
 			PropertiesParamUtil.getProperties(
 				actionRequest, "TypeSettingsProperties--");
 
-		boolean inheritLocales = GetterUtil.getBoolean(
-			typeSettingsProperties.getProperty("inheritLocales"));
+		if (GetterUtil.getBoolean(
+				formTypeSettingsProperties.getProperty("inheritLocales"))) {
 
-		if (formTypeSettingsProperties.containsKey("inheritLocales")) {
-			inheritLocales = GetterUtil.getBoolean(
-				formTypeSettingsProperties.getProperty("inheritLocales"));
-		}
-
-		if (inheritLocales) {
 			formTypeSettingsProperties.setProperty(
 				PropsKeys.LOCALES,
 				StringUtil.merge(
 					LocaleUtil.toLanguageIds(
 						LanguageUtil.getAvailableLocales())));
-		}
-
-		if (formTypeSettingsProperties.containsKey(PropsKeys.LOCALES) &&
-			Validator.isNull(
-				formTypeSettingsProperties.getProperty(PropsKeys.LOCALES))) {
-
-			throw new LocaleException(
-				LocaleException.TYPE_DEFAULT,
-				"Must have at least one valid locale for site " + liveGroupId);
 		}
 
 		typeSettingsProperties.putAll(formTypeSettingsProperties);

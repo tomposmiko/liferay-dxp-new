@@ -17,14 +17,15 @@ package com.liferay.portal.template.freemarker.internal;
 import com.liferay.petra.concurrent.ConcurrentReferenceKeyHashMap;
 import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.petra.reflect.ReflectionUtil;
-import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.templateparser.TemplateNode;
+import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PortalImpl;
 
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.EnumerationModel;
@@ -47,12 +48,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.w3c.dom.Node;
@@ -63,8 +62,7 @@ import org.w3c.dom.Node;
 public class LiferayObjectWrapper extends DefaultObjectWrapper {
 
 	public LiferayObjectWrapper(
-		String[] allowedClassNames, String[] restrictedClassNames,
-		String[] restrictedMethodNames) {
+		String[] allowedClassNames, String[] restrictedClassNames) {
 
 		super(Configuration.getVersion());
 
@@ -115,39 +113,6 @@ public class LiferayObjectWrapper extends DefaultObjectWrapper {
 			}
 		}
 
-		if (restrictedMethodNames == null) {
-			_restrictedMethodNames = Collections.emptyMap();
-		}
-		else {
-			_restrictedMethodNames = new HashMap<>(
-				restrictedMethodNames.length);
-
-			for (String restrictedMethodName : restrictedMethodNames) {
-				int index = restrictedMethodName.indexOf(CharPool.POUND);
-
-				if (index < 0) {
-					_log.error(
-						StringBundler.concat(
-							"\"", restrictedMethodName,
-							"\" does not match format ",
-							"\"className#methodName\""));
-
-					continue;
-				}
-
-				String className = StringUtil.trim(
-					restrictedMethodName.substring(0, index));
-				String methodName = StringUtil.trim(
-					restrictedMethodName.substring(index + 1));
-
-				Set<String> methodNames =
-					_restrictedMethodNames.computeIfAbsent(
-						className, key -> new HashSet<>());
-
-				methodNames.add(StringUtil.toLowerCase(methodName));
-			}
-		}
-
 		_allowAllClasses = _allowedClassNames.contains(StringPool.STAR);
 
 		if (restrictedClassNames == null) {
@@ -158,6 +123,20 @@ public class LiferayObjectWrapper extends DefaultObjectWrapper {
 			_restrictedClasses = new ArrayList<>(restrictedClassNames.length);
 			_restrictedPackageNames = new ArrayList<>();
 
+			AggregateClassLoader aggregateClassLoader =
+				new AggregateClassLoader(
+					LiferayObjectWrapper.class.getClassLoader());
+
+			aggregateClassLoader.addClassLoader(
+				PortalImpl.class.getClassLoader());
+
+			Thread thread = Thread.currentThread();
+
+			if (thread.getContextClassLoader() != null) {
+				aggregateClassLoader.addClassLoader(
+					thread.getContextClassLoader());
+			}
+
 			for (String restrictedClassName : restrictedClassNames) {
 				restrictedClassName = StringUtil.trim(restrictedClassName);
 
@@ -166,7 +145,8 @@ public class LiferayObjectWrapper extends DefaultObjectWrapper {
 				}
 
 				try {
-					_restrictedClasses.add(Class.forName(restrictedClassName));
+					_restrictedClasses.add(
+						aggregateClassLoader.loadClass(restrictedClassName));
 				}
 				catch (ClassNotFoundException cnfe) {
 					if (_log.isInfoEnabled()) {
@@ -200,17 +180,6 @@ public class LiferayObjectWrapper extends DefaultObjectWrapper {
 
 		if (!_allowAllClasses) {
 			_checkClassIsRestricted(clazz);
-		}
-
-		if (_restrictedMethodNames.containsKey(className)) {
-			LiferayFreeMarkerBeanModel liferayFreeMarkerBeanModel =
-				(LiferayFreeMarkerBeanModel)
-					_LIFERAY_FREEMARKER_BEAN_MODEL_FACTORY.create(object, this);
-
-			liferayFreeMarkerBeanModel.setRestrictedMethodNames(
-				_restrictedMethodNames.get(className));
-
-			return liferayFreeMarkerBeanModel;
 		}
 
 		if (className.startsWith("com.liferay.")) {
@@ -327,19 +296,6 @@ public class LiferayObjectWrapper extends DefaultObjectWrapper {
 
 		};
 
-	private static final ModelFactory _LIFERAY_FREEMARKER_BEAN_MODEL_FACTORY =
-		new ModelFactory() {
-
-			@Override
-			public TemplateModel create(
-				Object object, ObjectWrapper objectWrapper) {
-
-				return new LiferayFreeMarkerBeanModel(
-					object, (BeansWrapper)objectWrapper);
-			}
-
-		};
-
 	private static final ModelFactory _NODE_MODEL_FACTORY = new ModelFactory() {
 
 		@Override
@@ -409,7 +365,6 @@ public class LiferayObjectWrapper extends DefaultObjectWrapper {
 	private final Map<String, ClassRestrictionInformation>
 		_classRestrictionInformations = new ConcurrentHashMap<>();
 	private final List<Class<?>> _restrictedClasses;
-	private final Map<String, Set<String>> _restrictedMethodNames;
 	private final List<String> _restrictedPackageNames;
 
 	private static class ClassRestrictionInformation {

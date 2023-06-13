@@ -1,6 +1,19 @@
 definition {
 	macro addPage {
-		LexiconEntry.gotoAddMenuItem(menuItem = "Public Page");
+		var key_breadcrumbName="Pages";
+
+		if (IsElementPresent(locator1 = "Message#EMPTY_INFO_TAGLIB")) {
+			SitePages.gotoAddFirstPage(
+				pageType = "Public Page"
+			);
+		} else {
+			AssertClick(
+				locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
+				value1="Pages"
+			);
+
+			LexiconEntry.gotoAddMenuItem(menuItem = "Public Page");
+		}
 
 		if (!(isSet(collectionName))) {
 			var collectionName = "Basic Pages";
@@ -15,9 +28,7 @@ definition {
 			Card.clickSitePagesCardLink(cardName = "Content Page");
 		}
 
-		if (IsElementPresent(locator1 = "IFrame#DIALOG")) {
-			SelectFrame(locator1 = "IFrame#DIALOG");
-		}
+		SelectFrame(locator1 = "IFrame#DIALOG");
 
 		PortletEntry.inputName(name = "${pageName}");
 
@@ -26,7 +37,15 @@ definition {
 		SelectFrame.selectFrameTop();
 	}
 
-	macro gotoEdit {
-		Click(locator1 = "Icon#EDIT_PENCIL");
+	macro gotoEditMode {
+		Click(locator1 = "ToggleSwitch#EDIT_MODE");
+
+		AssertLocation.assertPartialLocation(value1 = "mode=edit");
+	}
+
+	macro gotoViewMode {
+		Click(locator1 = "ToggleSwitch#EDIT_MODE");
+
+		AssertLocation.assertPartialLocation(value1 = "mode=view");
 	}
 }

@@ -205,10 +205,7 @@ public class WebDAVOSXTest extends BaseWebDAVTestCase {
 				tuple = serviceGet(_TEST_META_NAME);
 
 				assertCode(HttpServletResponse.SC_OK, tuple);
-
-				byte[] responseBody = getResponseBody(tuple);
-
-				Assert.assertTrue(responseBody.length == 0);
+				Assert.assertTrue(getResponseBody(tuple).length == 0);
 			}
 
 			unlock(_TEST_META_NAME);
@@ -383,10 +380,7 @@ public class WebDAVOSXTest extends BaseWebDAVTestCase {
 		tuple = serviceGet(_TEST_META_NAME);
 
 		assertCode(HttpServletResponse.SC_OK, tuple);
-
-		byte[] responseBody = getResponseBody(tuple);
-
-		Assert.assertTrue(responseBody.length == 0);
+		Assert.assertTrue(getResponseBody(tuple).length == 0);
 
 		assertCode(
 			HttpServletResponse.SC_CREATED,
@@ -574,11 +568,11 @@ public class WebDAVOSXTest extends BaseWebDAVTestCase {
 
 		Set<Locale> availableLocales = new LinkedHashSet<>();
 
-		availableLocales.add(LocaleUtil.US);
+		availableLocales.add(Locale.US);
 
 		ddmForm.setAvailableLocales(availableLocales);
 
-		ddmForm.setDefaultLocale(LocaleUtil.US);
+		ddmForm.setDefaultLocale(Locale.US);
 
 		return ddmForm;
 	}

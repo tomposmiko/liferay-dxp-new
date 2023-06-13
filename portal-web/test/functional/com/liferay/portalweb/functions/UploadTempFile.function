@@ -13,14 +13,4 @@ definition {
 
 		selenium.assertLiferayErrors();
 	}
-
-	function uploadTempFileHiddenNoMouseOver {
-		WaitForSPARefresh();
-
-		selenium.uploadTempFile();
-
-		selenium.assertJavaScriptErrors();
-
-		selenium.assertLiferayErrors();
-	}
 }

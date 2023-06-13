@@ -129,12 +129,12 @@ definition {
 			portlet = "Audit"
 		);
 
-		var key_resourceAction = "LOGIN_FAILURE";
+		var key_resourceAction = "Login Failure";
 		var key_resourceName = "User";
 
 		AssertTextEquals(
 			locator1 = "AuditReports#REPORTS_TABLE_RESOURCE_ACTION",
-			value1 = "LOGIN_FAILURE"
+			value1 = "Login Failure"
 		);
 
 		ProductMenu.gotoPortlet(
@@ -181,12 +181,12 @@ definition {
 			portlet = "Audit"
 		);
 
-		var key_resourceAction = "IMPERSONATE";
+		var key_resourceAction = "Impersonate";
 		var key_resourceName = "User";
 
 		AssertTextEquals(
 			locator1 = "AuditReports#REPORTS_TABLE_RESOURCE_ACTION",
-			value1 = "IMPERSONATE"
+			value1 = "Impersonate"
 		);
 
 		ProductMenu.gotoPortlet(
@@ -224,62 +224,62 @@ definition {
 			portlet = "Audit"
 		);
 
-		var key_resourceAction = "ADD";
+		var key_resourceAction = "Add";
 		var key_resourceName = "Role";
 
 		AssertTextEquals(
 			locator1 = "AuditReports#REPORTS_TABLE_RESOURCE_NAME",
-			value1 = "com.liferay.portal.kernel.model.Role"
+			value1 = "Role"
 		);
 
-		var key_resourceAction = "ADD";
+		var key_resourceAction = "Add";
 		var key_resourceName = "Role";
 
 		AssertTextEquals(
 			locator1 = "AuditReports#REPORTS_TABLE_RESOURCE_ACTION",
-			value1 = "ADD"
+			value1 = "Add"
 		);
 
-		var key_resourceAction = "ASSIGN";
+		var key_resourceAction = "Assign";
 		var key_resourceName = "User";
 
 		AssertTextEquals(
 			locator1 = "AuditReports#REPORTS_TABLE_RESOURCE_NAME",
-			value1 = "com.liferay.portal.kernel.model.User"
+			value1 = "User"
 		);
 
-		var key_resourceAction = "ASSIGN";
+		var key_resourceAction = "Assign";
 		var key_resourceName = "User";
 
 		AssertTextEquals(
 			locator1 = "AuditReports#REPORTS_TABLE_RESOURCE_ACTION",
-			value1 = "ASSIGN"
+			value1 = "Assign"
 		);
 
-		var key_resourceAction = "ADD";
-		var key_resourceName = "UserGroup";
+		var key_resourceAction = "Add";
+		var key_resourceName = "User Group";
 
 		AssertTextEquals(
 			locator1 = "AuditReports#REPORTS_TABLE_RESOURCE_NAME",
-			value1 = "com.liferay.portal.kernel.model.UserGroup"
+			value1 = "User Group"
 		);
 
-		var key_resourceAction = "ADD";
-		var key_resourceName = "UserGroup";
+		var key_resourceAction = "Add";
+		var key_resourceName = "User Group";
 
 		AssertTextEquals(
 			locator1 = "AuditReports#REPORTS_TABLE_RESOURCE_ACTION",
-			value1 = "ADD"
+			value1 = "Add"
 		);
 
 		AssertTextEquals(
-			locator1 = "xpath=(//tr[contains(.,'ASSIGN') and contains(.,'User')]/td[4])[2]",
-			value1 = "com.liferay.portal.kernel.model.User"
+			locator1 = "xpath=(//tr[contains(.,'Assign') and contains(.,'User')]/td[4])[2]",
+			value1 = "User"
 		);
 
 		AssertTextEquals(
-			locator1 = "xpath=(//tr[contains(.,'ASSIGN') and contains(.,'User')]/td[5])[2]",
-			value1 = "ASSIGN"
+			locator1 = "xpath=(//tr[contains(.,'Assign') and contains(.,'User')]/td[5])[2]",
+			value1 = "Assign"
 		);
 	}
 }

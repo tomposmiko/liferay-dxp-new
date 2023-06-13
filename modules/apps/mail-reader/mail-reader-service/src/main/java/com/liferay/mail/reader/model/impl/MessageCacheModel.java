@@ -17,9 +17,11 @@ package com.liferay.mail.reader.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.mail.reader.model.Message;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,11 +34,11 @@ import java.util.Date;
  * The cache model class for representing Message in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see Message
  * @generated
  */
 @ProviderType
 public class MessageCacheModel implements CacheModel<Message>, Externalizable {
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -251,7 +253,8 @@ public class MessageCacheModel implements CacheModel<Message>, Externalizable {
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(messageId);
 
 		objectOutput.writeLong(companyId);
@@ -362,5 +365,4 @@ public class MessageCacheModel implements CacheModel<Message>, Externalizable {
 	public long size;
 	public long remoteMessageId;
 	public String contentType;
-
 }

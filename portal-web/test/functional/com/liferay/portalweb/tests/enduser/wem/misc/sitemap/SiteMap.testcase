@@ -9,13 +9,7 @@ definition {
 
 		User.firstLoginPG();
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Sites"
-		);
-
-		Site.addBlankCP(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Test Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Build",
@@ -23,11 +17,15 @@ definition {
 			portlet = "Pages"
 		);
 
-		SitePages.addPrivatePage(pageName = "Site Page Name");
+		JSONLayout.addPrivateLayout(
+			groupName = "Test Site Name",
+			layoutName = "Site Page Name"
+		);
 
-		SitePages.addPrivateChildPage(
-			childPageName = "Child Page Name",
-			parentPageName = "Site Page Name"
+		JSONLayout.addPrivateLayout(
+			groupName = "Test Site Name",
+			layoutName = "Child Page Name",
+			parentLayoutName = "Site Page Name"
 		);
 	}
 
@@ -38,7 +36,7 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			Site.tearDownCP(siteName = "Site Name");
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
 		}
 	}
 
@@ -46,7 +44,7 @@ definition {
 	test DisplayPrivatePageWithChildPage {
 		Navigator.gotoPrivateSitePage(
 			pageName = "Child Page Name",
-			siteName = "Site Name"
+			siteName = "Test Site Name"
 		);
 
 		Portlet.addPG(portletName = "Site Map");

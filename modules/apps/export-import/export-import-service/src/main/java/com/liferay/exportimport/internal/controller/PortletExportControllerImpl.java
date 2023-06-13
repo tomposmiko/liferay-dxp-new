@@ -100,12 +100,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -202,25 +200,11 @@ public class PortletExportControllerImpl implements PortletExportController {
 		try {
 			portletDataContext.setExportDataRootElement(rootElement);
 
-			List<AssetLink> assetLinks = new ArrayList<>();
-
-			assetLinks.addAll(
-				_assetLinkLocalService.getLinks(
-					portletDataContext.getGroupId(),
-					portletDataContext.getStartDate(),
-					portletDataContext.getEndDate(), QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS));
-
-			Set<Long> assetLinkIds = portletDataContext.getAssetLinkIds();
-
-			for (Long assetLinkId : assetLinkIds) {
-				AssetLink assetLink = _assetLinkLocalService.fetchAssetLink(
-					assetLinkId);
-
-				if ((assetLink != null) && !assetLinks.contains(assetLink)) {
-					assetLinks.add(assetLink);
-				}
-			}
+			List<AssetLink> assetLinks = _assetLinkLocalService.getLinks(
+				portletDataContext.getGroupId(),
+				portletDataContext.getStartDate(),
+				portletDataContext.getEndDate(), QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
 
 			for (AssetLink assetLink : assetLinks) {
 				StagedAssetLink stagedAssetLink = ModelAdapterUtil.adapt(
@@ -241,6 +225,10 @@ public class PortletExportControllerImpl implements PortletExportController {
 			document.formattedString());
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
 	@Override
 	public void exportExpandoTables(PortletDataContext portletDataContext)
 		throws Exception {
@@ -958,7 +946,6 @@ public class PortletExportControllerImpl implements PortletExportController {
 			exportPortletControlsMap.get(PortletDataHandlerKeys.PORTLET_SETUP));
 
 		exportAssetLinks(portletDataContext);
-		exportExpandoTables(portletDataContext);
 		exportLocks(portletDataContext);
 
 		portletDataContext.addDeletionSystemEventStagedModelTypes(

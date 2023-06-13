@@ -32,13 +32,16 @@ import com.google.template.soy.data.restricted.StringData;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.template.soy.utils.SoyRawData;
+import com.liferay.portal.template.soy.util.SoyRawData;
 
 import java.io.IOException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -55,11 +58,24 @@ import org.apache.commons.lang3.ClassUtils;
  * sub-elements to Soy types as late as possible.
  *
  * @author Raymond Augé
+ * @see SoyContextImpl
  */
 public class SoyTemplateRecord extends SoyAbstractValue implements SoyRecord {
 
-	public Object add(String key, Object value) {
-		return _map.put(key, value);
+	/**
+	 * Create a record with initial values.
+	 *
+	 * @param map initial values
+	 * @review
+	 */
+	public SoyTemplateRecord(Map<String, Object> map) {
+		_map = new ConcurrentHashMap<>();
+
+		for (Map.Entry<String, Object> entry : map.entrySet()) {
+			if (entry.getValue() != null) {
+				_map.put(entry.getKey(), entry.getValue());
+			}
+		}
 	}
 
 	@Override
@@ -195,6 +211,12 @@ public class SoyTemplateRecord extends SoyAbstractValue implements SoyRecord {
 		if (object == null) {
 			return NullData.INSTANCE;
 		}
+		else if (object instanceof BigDecimal) {
+			return StringData.forValue(object.toString());
+		}
+		else if (object instanceof BigInteger) {
+			return StringData.forValue(object.toString());
+		}
 		else if (object instanceof Boolean) {
 			return BooleanData.forValue((Boolean)object);
 		}
@@ -329,6 +351,6 @@ public class SoyTemplateRecord extends SoyAbstractValue implements SoyRecord {
 
 	private final Map<String, SoyValueProvider> _computedValues =
 		new ConcurrentHashMap<>();
-	private final Map<String, Object> _map = new ConcurrentHashMap<>();
+	private final Map<String, Object> _map;
 
 }

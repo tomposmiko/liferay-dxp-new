@@ -30,11 +30,13 @@ public class DateRangeTermFilterTranslatorImpl
 
 	@Override
 	public Query translate(DateRangeTermFilter dateRangeTermFilter) {
-		return TermRangeQuery.newStringRange(
+		TermRangeQuery termRangeQuery = TermRangeQuery.newStringRange(
 			dateRangeTermFilter.getField(), dateRangeTermFilter.getLowerBound(),
 			dateRangeTermFilter.getUpperBound(),
 			dateRangeTermFilter.isIncludesLower(),
 			dateRangeTermFilter.isIncludesUpper());
+
+		return termRangeQuery;
 	}
 
 }

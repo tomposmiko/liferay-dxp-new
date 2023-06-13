@@ -14,7 +14,10 @@
 
 package com.liferay.structured.content.apio.client.test.internal.activator;
 
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerTracker;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureConstants;
@@ -24,7 +27,6 @@ import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.apio.test.util.AuthConfigurationTestUtil;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -63,11 +65,11 @@ public class StructuredContentApioTestBundleActivator
 
 	@Override
 	public void start(BundleContext bundleContext) {
-		_ddmFormJSONDeserializerServiceReference =
-			bundleContext.getServiceReference(DDMFormJSONDeserializer.class);
+		_ddmFormDeserializerTrackerServiceReference =
+			bundleContext.getServiceReference(DDMFormDeserializerTracker.class);
 
-		_ddmFormJSONDeserializer = bundleContext.getService(
-			_ddmFormJSONDeserializerServiceReference);
+		_ddmFormDeserializerTracker = bundleContext.getService(
+			_ddmFormDeserializerTrackerServiceReference);
 
 		_groupLocalServiceServiceReference = bundleContext.getServiceReference(
 			GroupLocalService.class);
@@ -91,17 +93,22 @@ public class StructuredContentApioTestBundleActivator
 	public void stop(BundleContext bundleContext) {
 		_cleanUp();
 
-		bundleContext.ungetService(_ddmFormJSONDeserializerServiceReference);
+		bundleContext.ungetService(_ddmFormDeserializerTrackerServiceReference);
 		bundleContext.ungetService(_groupLocalServiceServiceReference);
 	}
 
 	protected DDMForm deserialize(String content) {
-		try {
-			return _ddmFormJSONDeserializer.deserialize(content);
-		}
-		catch (PortalException pe) {
-			throw new RuntimeException(pe);
-		}
+		DDMFormDeserializer ddmFormDeserializer =
+			_ddmFormDeserializerTracker.getDDMFormDeserializer("json");
+
+		DDMFormDeserializerDeserializeRequest.Builder builder =
+			DDMFormDeserializerDeserializeRequest.Builder.newBuilder(content);
+
+		DDMFormDeserializerDeserializeResponse
+			ddmFormDeserializerDeserializeResponse =
+				ddmFormDeserializer.deserialize(builder.build());
+
+		return ddmFormDeserializerDeserializeResponse.getDDMForm();
 	}
 
 	private void _cleanUp() {
@@ -169,9 +176,9 @@ public class StructuredContentApioTestBundleActivator
 	private static final Log _log = LogFactoryUtil.getLog(
 		StructuredContentApioTestBundleActivator.class);
 
-	private DDMFormJSONDeserializer _ddmFormJSONDeserializer;
-	private ServiceReference<DDMFormJSONDeserializer>
-		_ddmFormJSONDeserializerServiceReference;
+	private DDMFormDeserializerTracker _ddmFormDeserializerTracker;
+	private ServiceReference<DDMFormDeserializerTracker>
+		_ddmFormDeserializerTrackerServiceReference;
 	private Group _group;
 	private GroupLocalService _groupLocalService;
 	private ServiceReference<GroupLocalService>

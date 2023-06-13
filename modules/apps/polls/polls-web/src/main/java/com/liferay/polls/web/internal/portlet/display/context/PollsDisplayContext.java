@@ -330,7 +330,10 @@ public class PollsDisplayContext {
 	}
 
 	protected ThemeDisplay getThemeDisplay() {
-		return (ThemeDisplay)_renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return themeDisplay;
 	}
 
 	protected boolean hasResults() {

@@ -99,11 +99,6 @@
 </tr>
 <!--RESULTS_PORTLET-->
 <tr>
-	<td>RESULTS_PORTLET_PAGINATION_CONFIG</td>
-	<td>//input[contains(@name,'paginationDelta')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>RESULTS_PORTLET_SEARCH_QUERY</td>
 	<td>//p[contains(@class,'search-total-label')]</td>
 	<td></td>
@@ -137,6 +132,22 @@
 <tr>
 	<td>FACET_PORTLET_CLEAR_SPECIFIC</td>
 	<td>//div[contains(@class,'search-facet') and contains(@id,'${key_facetClass}')]//a[contains(@onclick,'clearSelections(event);')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SEARCH_INSIGHTS_PORTLET-->
+<tr>
+	<td>SEARCH_INSIGHTS_PORTLET_STRING_QUERY</td>
+	<td>//div[@class='full-query']/code[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY</td>
+	<td>//div[@class='full-query')]/code[2]</td>
 	<td></td>
 </tr>
 <tr>

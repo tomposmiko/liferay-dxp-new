@@ -25,22 +25,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see DDMFormInstanceModel
+ * @see com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceImpl
+ * @see com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceModelImpl
  * @generated
  */
-@ImplementationClassName(
-	"com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceImpl"
-)
+@ImplementationClassName("com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceImpl")
 @ProviderType
 public interface DDMFormInstance extends DDMFormInstanceModel, PersistedModel {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to <code>com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<DDMFormInstance, Long>
-		FORM_INSTANCE_ID_ACCESSOR = new Accessor<DDMFormInstance, Long>() {
-
+	public static final Accessor<DDMFormInstance, Long> FORM_INSTANCE_ID_ACCESSOR =
+		new Accessor<DDMFormInstance, Long>() {
 			@Override
 			public Long get(DDMFormInstance ddmFormInstance) {
 				return ddmFormInstance.getFormInstanceId();
@@ -55,16 +53,17 @@ public interface DDMFormInstance extends DDMFormInstanceModel, PersistedModel {
 			public Class<DDMFormInstance> getTypeClass() {
 				return DDMFormInstance.class;
 			}
-
 		};
+
+	public DDMForm getDDMForm()
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public java.util.List<DDMFormInstanceRecord> getFormInstanceRecords();
 
 	public DDMFormInstanceVersion getFormInstanceVersion(String version)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public com.liferay.dynamic.data.mapping.storage.DDMFormValues
-			getSettingsDDMFormValues()
+	public com.liferay.dynamic.data.mapping.storage.DDMFormValues getSettingsDDMFormValues()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public DDMFormInstanceSettings getSettingsModel()
@@ -72,5 +71,4 @@ public interface DDMFormInstance extends DDMFormInstanceModel, PersistedModel {
 
 	public DDMStructure getStructure()
 		throws com.liferay.portal.kernel.exception.PortalException;
-
 }

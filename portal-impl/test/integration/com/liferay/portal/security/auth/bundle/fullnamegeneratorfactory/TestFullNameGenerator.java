@@ -15,7 +15,6 @@
 package com.liferay.portal.security.auth.bundle.fullnamegeneratorfactory;
 
 import com.liferay.portal.kernel.security.auth.FullNameGenerator;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.Locale;
@@ -44,7 +43,7 @@ public class TestFullNameGenerator implements FullNameGenerator {
 		long prefixId, long suffixId) {
 
 		if (firstName.equals("James")) {
-			if (locale.equals(LocaleUtil.FRENCH)) {
+			if (locale.equals(Locale.FRENCH)) {
 				return "Jacques";
 			}
 		}

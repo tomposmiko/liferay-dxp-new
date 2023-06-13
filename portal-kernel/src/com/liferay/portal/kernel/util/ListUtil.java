@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.ToLongFunction;
 
 /**
@@ -67,7 +69,7 @@ public class ListUtil {
 	}
 
 	public static <E> int count(
-		List<? extends E> list, PredicateFilter<E> predicateFilter) {
+		List<? extends E> list, Predicate<E> predicate) {
 
 		if (isEmpty(list)) {
 			return 0;
@@ -76,7 +78,7 @@ public class ListUtil {
 		int count = 0;
 
 		for (E element : list) {
-			if (predicateFilter.filter(element)) {
+			if (predicate.test(element)) {
 				count++;
 			}
 		}
@@ -113,14 +115,14 @@ public class ListUtil {
 	}
 
 	public static <E> boolean exists(
-		List<? extends E> list, PredicateFilter<E> predicateFilter) {
+		List<? extends E> list, Predicate<E> predicate) {
 
 		if (isEmpty(list)) {
 			return false;
 		}
 
 		for (E element : list) {
-			if (predicateFilter.filter(element)) {
+			if (predicate.test(element)) {
 				return true;
 			}
 		}
@@ -130,10 +132,10 @@ public class ListUtil {
 
 	public static <T> List<T> filter(
 		List<? extends T> inputList, List<T> outputList,
-		PredicateFilter<T> predicateFilter) {
+		Predicate<T> predicate) {
 
 		for (T item : inputList) {
-			if (predicateFilter.filter(item)) {
+			if (predicate.test(item)) {
 				outputList.add(item);
 			}
 		}
@@ -142,10 +144,9 @@ public class ListUtil {
 	}
 
 	public static <T> List<T> filter(
-		List<? extends T> inputList, PredicateFilter<T> predicateFilter) {
+		List<? extends T> inputList, Predicate<T> predicate) {
 
-		return filter(
-			inputList, new ArrayList<T>(inputList.size()), predicateFilter);
+		return filter(inputList, new ArrayList<T>(inputList.size()), predicate);
 	}
 
 	public static <E> List<E> fromArray(E[] array) {

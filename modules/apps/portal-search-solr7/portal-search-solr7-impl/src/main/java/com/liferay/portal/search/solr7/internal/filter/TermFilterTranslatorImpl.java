@@ -35,7 +35,9 @@ public class TermFilterTranslatorImpl implements TermFilterTranslator {
 			termFilter.getField(),
 			ClientUtils.escapeQueryChars(termFilter.getValue()));
 
-		return new TermQuery(term);
+		TermQuery termQuery = new TermQuery(term);
+
+		return termQuery;
 	}
 
 }

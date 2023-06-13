@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.json;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -38,11 +37,7 @@ public interface JSONFactory {
 
 	public JSONArray createJSONArray();
 
-	public JSONArray createJSONArray(Collection<?> collection);
-
 	public JSONArray createJSONArray(String json) throws JSONException;
-
-	public <T> JSONArray createJSONArray(T[] array);
 
 	public <T> JSONDeserializer<T> createJSONDeserializer();
 

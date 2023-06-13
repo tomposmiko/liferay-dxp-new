@@ -151,7 +151,9 @@ public class MailingListMessageListener extends BaseMessageListener {
 		URLName urlName = new URLName(
 			protocol, host, port, StringPool.BLANK, user, password);
 
-		return session.getStore(urlName);
+		Store store = session.getStore(urlName);
+
+		return store;
 	}
 
 	protected void processMessage(

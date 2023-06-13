@@ -15,9 +15,11 @@
 package com.liferay.journal.internal.upgrade.v1_1_5;
 
 import com.liferay.journal.internal.upgrade.util.JournalArticleImageUpgradeUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
@@ -25,7 +27,6 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
@@ -51,8 +52,7 @@ public class UpgradeContentImages extends UpgradeProcess {
 	}
 
 	protected String convertTypeImageElements(
-			long userId, long groupId, long companyId, String content,
-			long resourcePrimKey)
+			long userId, long groupId, String content, long resourcePrimKey)
 		throws Exception {
 
 		Document contentDocument = SAXReaderUtil.read(content);
@@ -65,29 +65,28 @@ public class UpgradeContentImages extends UpgradeProcess {
 		List<Node> imageNodes = xPath.selectNodes(contentDocument);
 
 		for (Node imageNode : imageNodes) {
-			Element imageElement = (Element)imageNode;
+			Element imageEl = (Element)imageNode;
 
-			List<Element> dynamicContentElements = imageElement.elements(
+			List<Element> dynamicContentEls = imageEl.elements(
 				"dynamic-content");
 
-			for (Element dynamicContentElement : dynamicContentElements) {
+			for (Element dynamicContentEl : dynamicContentEls) {
 				long fileEntryId = GetterUtil.getLong(
-					dynamicContentElement.attributeValue("fileEntryId"));
+					dynamicContentEl.attributeValue("fileEntryId"));
 
-				String id = dynamicContentElement.attributeValue("id");
+				String id = dynamicContentEl.attributeValue("id");
 
 				FileEntry fileEntry = null;
 
 				if (Validator.isNotNull(id)) {
 					fileEntry = _getFileEntryById(
-						userId, groupId, companyId, resourcePrimKey, id);
+						userId, groupId, resourcePrimKey, id);
 				}
 				else if (fileEntryId > 0) {
 					fileEntry = _getFileEntryByFileEntryId(fileEntryId);
 				}
 				else {
-					String data = String.valueOf(
-						dynamicContentElement.getData());
+					String data = String.valueOf(dynamicContentEl.getData());
 
 					fileEntry =
 						_journalArticleImageUpgradeUtil.getFileEntryFromURL(
@@ -98,29 +97,22 @@ public class UpgradeContentImages extends UpgradeProcess {
 					continue;
 				}
 
-				dynamicContentElement.clearContent();
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-				dynamicContentElement.addCDATA(
-					JSONUtil.put(
-						"alt",
-						GetterUtil.getString(
-							dynamicContentElement.attributeValue("alt"))
-					).put(
-						"groupId", fileEntry.getGroupId()
-					).put(
-						"name", fileEntry.getFileName()
-					).put(
-						"resourcePrimKey", resourcePrimKey
-					).put(
-						"title", fileEntry.getTitle()
-					).put(
-						"type", "journal"
-					).put(
-						"uuid", fileEntry.getUuid()
-					).toString());
+				jsonObject.put("alt", StringPool.BLANK);
+				jsonObject.put("groupId", fileEntry.getGroupId());
+				jsonObject.put("name", fileEntry.getFileName());
+				jsonObject.put("resourcePrimKey", resourcePrimKey);
+				jsonObject.put("title", fileEntry.getTitle());
+				jsonObject.put("type", "journal");
+				jsonObject.put("uuid", fileEntry.getUuid());
+
+				dynamicContentEl.clearContent();
+
+				dynamicContentEl.addCDATA(jsonObject.toString());
 
 				if (fileEntryId <= 0) {
-					dynamicContentElement.addAttribute(
+					dynamicContentEl.addAttribute(
 						"fileEntryId",
 						String.valueOf(fileEntry.getFileEntryId()));
 				}
@@ -138,24 +130,22 @@ public class UpgradeContentImages extends UpgradeProcess {
 	protected void updateContentImages() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement ps1 = connection.prepareStatement(
-				"select id_, resourcePrimKey, groupId, companyId, userId, " +
-					"content from JournalArticle where content like ?")) {
+				"select content, groupId, id_, resourcePrimKey, userId from " +
+					"JournalArticle where content like ?")) {
 
 			ps1.setString(1, "%type=\"image\"%");
 
 			ResultSet rs1 = ps1.executeQuery();
 
 			while (rs1.next()) {
-				long id = rs1.getLong(1);
-
-				long resourcePrimKey = rs1.getLong(2);
-				long groupId = rs1.getLong(3);
-				long companyId = rs1.getLong(4);
+				String content = rs1.getString(1);
+				long groupId = rs1.getLong(2);
+				long id = rs1.getLong(3);
+				long resourcePrimKey = rs1.getLong(4);
 				long userId = rs1.getLong(5);
-				String content = rs1.getString(6);
 
 				String newContent = convertTypeImageElements(
-					userId, groupId, companyId, content, resourcePrimKey);
+					userId, groupId, content, resourcePrimKey);
 
 				try (PreparedStatement ps2 =
 						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
@@ -180,25 +170,15 @@ public class UpgradeContentImages extends UpgradeProcess {
 				fileEntryId);
 		}
 		catch (PortalException pe) {
-			String message = "Unable to get file entry " + fileEntryId;
-
-			if (_log.isDebugEnabled()) {
-				_log.debug(message, pe);
-			}
-			else if (_log.isWarnEnabled()) {
-				_log.warn(message);
-			}
+			_log.error("Unable to get file entry " + fileEntryId, pe);
 		}
 
 		return fileEntry;
 	}
 
 	private FileEntry _getFileEntryById(
-			long userId, long groupId, long companyId, long resourcePrimKey,
-			String id)
+			long userId, long groupId, long resourcePrimKey, String id)
 		throws PortalException {
-
-		userId = PortalUtil.getValidUserId(companyId, userId);
 
 		long folderId = _journalArticleImageUpgradeUtil.getFolderId(
 			userId, groupId, resourcePrimKey);
@@ -210,18 +190,12 @@ public class UpgradeContentImages extends UpgradeProcess {
 				groupId, folderId, id);
 		}
 		catch (PortalException pe) {
-			String message = StringBundler.concat(
-				"Unable to get file entry with group ID ",
-				String.valueOf(groupId), ", folder ID ",
-				String.valueOf(folderId), ", and file name ", id,
-				" for resourcePrimKey ", String.valueOf(resourcePrimKey));
-
-			if (_log.isDebugEnabled()) {
-				_log.debug(message, pe);
-			}
-			else if (_log.isWarnEnabled()) {
-				_log.warn(message);
-			}
+			_log.error(
+				StringBundler.concat(
+					"Unable to get file entry with group ID ",
+					String.valueOf(groupId), ", folder ID ",
+					String.valueOf(folderId), ", and file name ", id),
+				pe);
 		}
 
 		return fileEntry;

@@ -143,7 +143,7 @@ definition {
 			var defaultPortalLanguage = "${defaultPortalLanguage}";
 
 			Select(
-				locator1 = "Select#DEFAULT_LANGUAGE_2",
+				locator1 = "Select#DEFAULT_LANGUAGE",
 				value1 = "${defaultPortalLanguage}"
 			);
 		}
@@ -1206,7 +1206,7 @@ definition {
 		Navigator.gotoNavTab(navTab = "${navTab}");
 
 		AssertSelectedLabel(
-			locator1 = "Select#DEFAULT_LANGUAGE_2",
+			locator1 = "Select#DEFAULT_LANGUAGE",
 			value1 = "${defaultPortalLanguage}"
 		);
 	}
@@ -1215,7 +1215,7 @@ definition {
 		Navigator.gotoNavTab(navTab = "Miscellaneous");
 
 		AssertSelectedLabel(
-			locator1 = "Select#DEFAULT_LANGUAGE_2",
+			locator1 = "Select#DEFAULT_LANGUAGE",
 			value1 = "${defaultPortalLanguage}"
 		);
 	}

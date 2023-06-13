@@ -294,12 +294,13 @@ public class AMJournalArticleStagedModelDataHandlerTest
 	private void _assertXMLEquals(String expectedXML, String actualXML)
 		throws Exception {
 
-		Document actualDocument = SAXReaderUtil.read(actualXML);
-		Document expectedDocument = SAXReaderUtil.read(expectedXML);
-
 		AssertUtils.assertEqualsIgnoreCase(
-			expectedDocument.formattedString(),
-			actualDocument.formattedString());
+			SAXReaderUtil.read(
+				expectedXML
+			).formattedString(),
+			SAXReaderUtil.read(
+				actualXML
+			).formattedString());
 	}
 
 	private String _getContent(String html) throws Exception {

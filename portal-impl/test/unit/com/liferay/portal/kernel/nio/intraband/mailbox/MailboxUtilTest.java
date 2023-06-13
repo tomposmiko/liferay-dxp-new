@@ -37,7 +37,6 @@ import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -126,7 +125,7 @@ public class MailboxUtilTest {
 
 		for (Thread thread : ThreadUtil.getThreads()) {
 			if ((thread != null) &&
-				Objects.equals(thread.getName(), MailboxUtil.class.getName())) {
+				thread.getName().equals(MailboxUtil.class.getName())) {
 
 				reaperThread = thread;
 

@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
-import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.security.permission.PermissionCacheUtil;
@@ -266,8 +265,7 @@ public class ResourceActionLocalServiceImpl
 						actionIds &= ~bitwiseValue;
 
 						resourcePermission.setActionIds(actionIds);
-						resourcePermission.setViewActionId(
-							(actionIds % 2) == 1);
+						resourcePermission.setViewActionId(actionIds % 2 == 1);
 
 						resourcePermissionPersistence.update(
 							resourcePermission);
@@ -293,7 +291,7 @@ public class ResourceActionLocalServiceImpl
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public ResourceAction fetchResourceAction(String name, String actionId) {
 		String key = encodeKey(name, actionId);
 
@@ -301,7 +299,7 @@ public class ResourceActionLocalServiceImpl
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public ResourceAction getResourceAction(String name, String actionId)
 		throws PortalException {
 

@@ -603,7 +603,7 @@ definition {
 
 	@priority = "5"
 	test DeleteBlogsEntryOrgRoleDefaultPermission {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		Permissions.setUpOrgRoleLoginUserPG(
 			orgName = "Organization Name",
@@ -645,7 +645,7 @@ definition {
 
 	@priority = "5"
 	test DeleteBlogsEntryOrgRoleDefinePermission {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		Permissions.setUpOrgRoleLoginUserPG(
 			orgName = "Organization Name",

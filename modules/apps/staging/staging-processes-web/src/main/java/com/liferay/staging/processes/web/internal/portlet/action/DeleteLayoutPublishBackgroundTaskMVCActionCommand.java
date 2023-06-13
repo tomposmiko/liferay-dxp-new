@@ -14,7 +14,6 @@
 
 package com.liferay.staging.processes.web.internal.portlet.action;
 
-import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.exception.NoSuchBackgroundTaskException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -52,12 +51,7 @@ public class DeleteLayoutPublishBackgroundTaskMVCActionCommand
 			actionRequest, "deleteBackgroundTaskIds");
 
 		for (long backgroundTaskId : backgroundTaskIds) {
-			BackgroundTask backgroundTask =
-				_backgroundTaskManager.getBackgroundTask(backgroundTaskId);
-
-			if (!backgroundTask.isInProgress()) {
-				_backgroundTaskManager.deleteBackgroundTask(backgroundTaskId);
-			}
+			_backgroundTaskManager.deleteBackgroundTask(backgroundTaskId);
 		}
 	}
 

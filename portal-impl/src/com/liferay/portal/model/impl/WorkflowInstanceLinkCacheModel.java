@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.WorkflowInstanceLink;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -33,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing WorkflowInstanceLink in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see WorkflowInstanceLink
  * @generated
  */
 @ProviderType
-public class WorkflowInstanceLinkCacheModel
-	implements CacheModel<WorkflowInstanceLink>, Externalizable, MVCCModel {
-
+public class WorkflowInstanceLinkCacheModel implements CacheModel<WorkflowInstanceLink>,
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,13 +50,10 @@ public class WorkflowInstanceLinkCacheModel
 			return false;
 		}
 
-		WorkflowInstanceLinkCacheModel workflowInstanceLinkCacheModel =
-			(WorkflowInstanceLinkCacheModel)obj;
+		WorkflowInstanceLinkCacheModel workflowInstanceLinkCacheModel = (WorkflowInstanceLinkCacheModel)obj;
 
-		if ((workflowInstanceLinkId ==
-				workflowInstanceLinkCacheModel.workflowInstanceLinkId) &&
-			(mvccVersion == workflowInstanceLinkCacheModel.mvccVersion)) {
-
+		if ((workflowInstanceLinkId == workflowInstanceLinkCacheModel.workflowInstanceLinkId) &&
+				(mvccVersion == workflowInstanceLinkCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -112,12 +110,10 @@ public class WorkflowInstanceLinkCacheModel
 
 	@Override
 	public WorkflowInstanceLink toEntityModel() {
-		WorkflowInstanceLinkImpl workflowInstanceLinkImpl =
-			new WorkflowInstanceLinkImpl();
+		WorkflowInstanceLinkImpl workflowInstanceLinkImpl = new WorkflowInstanceLinkImpl();
 
 		workflowInstanceLinkImpl.setMvccVersion(mvccVersion);
-		workflowInstanceLinkImpl.setWorkflowInstanceLinkId(
-			workflowInstanceLinkId);
+		workflowInstanceLinkImpl.setWorkflowInstanceLinkId(workflowInstanceLinkId);
 		workflowInstanceLinkImpl.setGroupId(groupId);
 		workflowInstanceLinkImpl.setCompanyId(companyId);
 		workflowInstanceLinkImpl.setUserId(userId);
@@ -175,7 +171,8 @@ public class WorkflowInstanceLinkCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(workflowInstanceLinkId);
@@ -214,5 +211,4 @@ public class WorkflowInstanceLinkCacheModel
 	public long classNameId;
 	public long classPK;
 	public long workflowInstanceId;
-
 }

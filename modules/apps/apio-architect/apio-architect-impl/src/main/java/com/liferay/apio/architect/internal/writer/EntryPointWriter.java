@@ -83,8 +83,8 @@ public class EntryPointWriter {
 		public static EntryPointMessageMapperStep entryPoint(
 			EntryPoint entryPoint) {
 
-			return entryPointMessageMapper ->
-				requestInfo -> typeFunction -> () -> new EntryPointWriter(
+			return entryPointMessageMapper -> requestInfo -> typeFunction -> ()
+				-> new EntryPointWriter(
 					entryPoint, entryPointMessageMapper, requestInfo,
 					typeFunction);
 		}

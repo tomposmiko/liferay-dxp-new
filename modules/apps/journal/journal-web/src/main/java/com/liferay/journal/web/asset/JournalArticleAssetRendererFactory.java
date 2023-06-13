@@ -17,6 +17,7 @@ package com.liferay.journal.web.asset;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.BaseAssetRendererFactory;
+import com.liferay.asset.kernel.model.BaseDDMStructureClassTypeReader;
 import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
@@ -147,7 +148,7 @@ public class JournalArticleAssetRendererFactory
 
 	@Override
 	public ClassTypeReader getClassTypeReader() {
-		return new JournalArticleClassTypeReader(getClassName());
+		return new BaseDDMStructureClassTypeReader(getClassName());
 	}
 
 	@Override

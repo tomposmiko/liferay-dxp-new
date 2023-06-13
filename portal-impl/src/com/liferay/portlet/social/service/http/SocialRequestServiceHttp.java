@@ -22,15 +22,15 @@ import com.liferay.portal.kernel.security.auth.HttpPrincipal;
 import com.liferay.portal.kernel.service.http.TunnelUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
+
 import com.liferay.social.kernel.service.SocialRequestServiceUtil;
 
 /**
  * Provides the HTTP utility for the
- * <code>SocialRequestServiceUtil</code> service
- * utility. The
+ * {@link SocialRequestServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it requires an additional
- * <code>HttpPrincipal</code> parameter.
+ * {@link HttpPrincipal} parameter.
  *
  * <p>
  * The benefits of using the HTTP utility is that it is fast and allows for
@@ -49,23 +49,22 @@ import com.liferay.social.kernel.service.SocialRequestServiceUtil;
  *
  * @author Brian Wing Shun Chan
  * @see SocialRequestServiceSoap
+ * @see HttpPrincipal
+ * @see SocialRequestServiceUtil
  * @generated
  */
 @ProviderType
 public class SocialRequestServiceHttp {
-
 	public static com.liferay.social.kernel.model.SocialRequest updateRequest(
-			HttpPrincipal httpPrincipal, long requestId, int status,
-			com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay)
+		HttpPrincipal httpPrincipal, long requestId, int status,
+		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				SocialRequestServiceUtil.class, "updateRequest",
-				_updateRequestParameterTypes0);
+			MethodKey methodKey = new MethodKey(SocialRequestServiceUtil.class,
+					"updateRequest", _updateRequestParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, requestId, status, themeDisplay);
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					requestId, status, themeDisplay);
 
 			Object returnObj = null;
 
@@ -73,15 +72,11 @@ public class SocialRequestServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
 			return (com.liferay.social.kernel.model.SocialRequest)returnObj;
@@ -93,13 +88,9 @@ public class SocialRequestServiceHttp {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		SocialRequestServiceHttp.class);
-
-	private static final Class<?>[] _updateRequestParameterTypes0 =
-		new Class[] {
+	private static Log _log = LogFactoryUtil.getLog(SocialRequestServiceHttp.class);
+	private static final Class<?>[] _updateRequestParameterTypes0 = new Class[] {
 			long.class, int.class,
 			com.liferay.portal.kernel.theme.ThemeDisplay.class
 		};
-
 }

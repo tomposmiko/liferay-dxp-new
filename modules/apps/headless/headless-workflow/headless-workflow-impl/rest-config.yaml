@@ -1,0 +1,3 @@
+apiDir: "../headless-workflow-api/src/main/java"
+apiPackagePath: "com.liferay.headless.workflow"
+author: "Javier Gamarra"

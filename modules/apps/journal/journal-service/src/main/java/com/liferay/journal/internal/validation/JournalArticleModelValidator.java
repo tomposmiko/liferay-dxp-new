@@ -49,11 +49,13 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.exception.NoSuchImageException;
+import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Image;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ImageLocalService;
@@ -177,9 +179,6 @@ public class JournalArticleModelValidator
 				throw new NoSuchTemplateException(
 					"{templateKey=" + ddmTemplateKey + "}");
 			}
-		}
-		else if (classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT) {
-			throw new NoSuchTemplateException("DDM template key is null");
 		}
 
 		if (!smallImage || Validator.isNotNull(smallImageURL) ||
@@ -466,6 +465,16 @@ public class JournalArticleModelValidator
 
 			if (ddmTemplate == null) {
 				throw new NoSuchTemplateException();
+			}
+		}
+
+		if (Validator.isNotNull(layoutUuid)) {
+			Layout layout = _journalHelper.getArticleLayout(
+				layoutUuid, groupId);
+
+			if (layout == null) {
+				throw new NoSuchLayoutException(
+					JournalArticleConstants.DISPLAY_PAGE);
 			}
 		}
 

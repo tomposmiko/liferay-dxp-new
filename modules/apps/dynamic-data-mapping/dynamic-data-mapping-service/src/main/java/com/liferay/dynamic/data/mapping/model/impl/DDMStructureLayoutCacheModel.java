@@ -17,9 +17,11 @@ package com.liferay.dynamic.data.mapping.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructureLayout;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing DDMStructureLayout in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see DDMStructureLayout
  * @generated
  */
 @ProviderType
-public class DDMStructureLayoutCacheModel
-	implements CacheModel<DDMStructureLayout>, Externalizable {
-
+public class DDMStructureLayoutCacheModel implements CacheModel<DDMStructureLayout>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,12 +50,9 @@ public class DDMStructureLayoutCacheModel
 			return false;
 		}
 
-		DDMStructureLayoutCacheModel ddmStructureLayoutCacheModel =
-			(DDMStructureLayoutCacheModel)obj;
+		DDMStructureLayoutCacheModel ddmStructureLayoutCacheModel = (DDMStructureLayoutCacheModel)obj;
 
-		if (structureLayoutId ==
-				ddmStructureLayoutCacheModel.structureLayoutId) {
-
+		if (structureLayoutId == ddmStructureLayoutCacheModel.structureLayoutId) {
 			return true;
 		}
 
@@ -96,8 +95,7 @@ public class DDMStructureLayoutCacheModel
 
 	@Override
 	public DDMStructureLayout toEntityModel() {
-		DDMStructureLayoutImpl ddmStructureLayoutImpl =
-			new DDMStructureLayoutImpl();
+		DDMStructureLayoutImpl ddmStructureLayoutImpl = new DDMStructureLayoutImpl();
 
 		if (uuid == null) {
 			ddmStructureLayoutImpl.setUuid("");
@@ -151,7 +149,6 @@ public class DDMStructureLayoutCacheModel
 	@Override
 	public void readExternal(ObjectInput objectInput)
 		throws ClassNotFoundException, IOException {
-
 		uuid = objectInput.readUTF();
 
 		structureLayoutId = objectInput.readLong();
@@ -168,13 +165,12 @@ public class DDMStructureLayoutCacheModel
 		structureVersionId = objectInput.readLong();
 		definition = objectInput.readUTF();
 
-		_ddmFormLayout =
-			(com.liferay.dynamic.data.mapping.model.DDMFormLayout)
-				objectInput.readObject();
+		_ddmFormLayout = (com.liferay.dynamic.data.mapping.model.DDMFormLayout)objectInput.readObject();
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -223,5 +219,4 @@ public class DDMStructureLayoutCacheModel
 	public long structureVersionId;
 	public String definition;
 	public com.liferay.dynamic.data.mapping.model.DDMFormLayout _ddmFormLayout;
-
 }

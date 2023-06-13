@@ -472,15 +472,15 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 		String userIdField, String groupIdField, long[] groupIds,
 		String permissionSQL) {
 
-		String permissionSQLContributorsSQL = null;
-
 		List<PermissionSQLContributor> permissionSQLContributors =
 			_permissionSQLContributors.getService(className);
+
+		StringBundler permissionSQLContributorsSQLSB = null;
 
 		if ((permissionSQLContributors != null) &&
 			!permissionSQLContributors.isEmpty()) {
 
-			StringBundler permissionSQLContributorsSQLSB = new StringBundler(
+			permissionSQLContributorsSQLSB = new StringBundler(
 				permissionSQLContributors.size() * 3);
 
 			for (PermissionSQLContributor permissionSQLContributor :
@@ -499,12 +499,27 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 				permissionSQLContributorsSQLSB.append(contributorPermissionSQL);
 				permissionSQLContributorsSQLSB.append(") ");
 			}
-
-			permissionSQLContributorsSQL =
-				permissionSQLContributorsSQLSB.toString();
 		}
 
-		if (Validator.isNotNull(permissionSQLContributorsSQL)) {
+		StringBundler groupAdminResourcePermissionSB = null;
+
+		for (long groupId : groupIds) {
+			if (!isEnabled(groupId)) {
+				if (groupAdminResourcePermissionSB == null) {
+					groupAdminResourcePermissionSB = new StringBundler(
+						groupIds.length * 2 - 1);
+				}
+				else {
+					groupAdminResourcePermissionSB.append(", ");
+				}
+
+				groupAdminResourcePermissionSB.append(groupId);
+			}
+		}
+
+		if ((permissionSQLContributorsSQLSB != null) ||
+			(groupAdminResourcePermissionSB != null)) {
+
 			sb.append("(");
 		}
 
@@ -514,8 +529,21 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 		sb.append(permissionSQL);
 		sb.append(")) ");
 
-		if (Validator.isNotNull(permissionSQLContributorsSQL)) {
-			sb.append(permissionSQLContributorsSQL);
+		if (permissionSQLContributorsSQLSB != null) {
+			sb.append(permissionSQLContributorsSQLSB);
+		}
+
+		if (groupAdminResourcePermissionSB != null) {
+			sb.append(" OR (");
+			sb.append(groupIdField);
+			sb.append(" IN (");
+			sb.append(groupAdminResourcePermissionSB);
+			sb.append(")) ");
+		}
+
+		if ((permissionSQLContributorsSQLSB != null) ||
+			(groupAdminResourcePermissionSB != null)) {
+
 			sb.append(") ");
 		}
 	}
@@ -537,49 +565,17 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 		String roleIdsOrOwnerIdSQL = getRoleIdsOrOwnerIdSQL(
 			permissionChecker, groupIds, userIdField);
 
-		StringBundler groupAdminResourcePermissionSB = null;
-
-		for (long groupId : groupIds) {
-			if (!isEnabled(groupId)) {
-				groupAdminResourcePermissionSB = new StringBundler(5);
-
-				if (!roleIdsOrOwnerIdSQL.isEmpty()) {
-					groupAdminResourcePermissionSB.append(" OR ");
-				}
-
-				groupAdminResourcePermissionSB.append(
-					"((ResourcePermission.primKeyId = 0) AND ");
-
-				groupAdminResourcePermissionSB.append(
-					"(ResourcePermission.roleId = ");
-
-				groupAdminResourcePermissionSB.append(
-					permissionChecker.getOwnerRoleId());
-
-				groupAdminResourcePermissionSB.append("))");
-
-				break;
-			}
-		}
-
 		int scope = ResourceConstants.SCOPE_INDIVIDUAL;
-
-		String groupAdminSQL = StringPool.BLANK;
-
-		if (groupAdminResourcePermissionSB != null) {
-			groupAdminSQL = groupAdminResourcePermissionSB.toString();
-		}
 
 		resourcePermissionSQL = StringUtil.replace(
 			resourcePermissionSQL,
 			new String[] {
 				"[$CLASS_NAME$]", "[$COMPANY_ID$]",
-				"[$GROUP_ADMIN_RESOURCE_PERMISSION$]",
 				"[$RESOURCE_SCOPE_INDIVIDUAL$]", "[$ROLE_IDS_OR_OWNER_ID$]"
 			},
 			new String[] {
-				className, String.valueOf(companyId), groupAdminSQL,
-				String.valueOf(scope), roleIdsOrOwnerIdSQL
+				className, String.valueOf(companyId), String.valueOf(scope),
+				roleIdsOrOwnerIdSQL
 			});
 
 		return resourcePermissionSQL;

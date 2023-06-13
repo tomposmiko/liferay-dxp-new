@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.AddressServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.portal.service.http.AddressServiceSoap
  * @generated
  */
 @ProviderType
 public class AddressSoap implements Serializable {
-
 	public static AddressSoap toSoapModel(Address model) {
 		AddressSoap soapModel = new AddressSoap();
 
@@ -86,8 +86,7 @@ public class AddressSoap implements Serializable {
 	}
 
 	public static AddressSoap[] toSoapModels(List<Address> models) {
-		List<AddressSoap> soapModels = new ArrayList<AddressSoap>(
-			models.size());
+		List<AddressSoap> soapModels = new ArrayList<AddressSoap>(models.size());
 
 		for (Address model : models) {
 			soapModels.add(toSoapModel(model));
@@ -295,5 +294,4 @@ public class AddressSoap implements Serializable {
 	private long _typeId;
 	private boolean _mailing;
 	private boolean _primary;
-
 }

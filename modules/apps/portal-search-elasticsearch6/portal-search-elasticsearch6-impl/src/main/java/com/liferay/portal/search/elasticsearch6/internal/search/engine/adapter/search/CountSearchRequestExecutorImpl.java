@@ -17,7 +17,7 @@ package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.engine.adapter.search.CountSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.CountSearchResponse;
 
@@ -39,7 +39,7 @@ public class CountSearchRequestExecutorImpl
 
 	@Override
 	public CountSearchResponse execute(CountSearchRequest countSearchRequest) {
-		Client client = elasticsearchConnectionManager.getClient();
+		Client client = elasticsearchClientResolver.getClient();
 
 		SearchRequestBuilder searchRequestBuilder =
 			SearchAction.INSTANCE.newRequestBuilder(client);
@@ -58,10 +58,9 @@ public class CountSearchRequestExecutorImpl
 
 		countSearchResponse.setCount(searchHits.totalHits);
 
-		String searchRequestBuilderString = searchRequestBuilder.toString();
-
 		commonSearchResponseAssembler.assemble(
-			searchResponse, countSearchResponse, searchRequestBuilderString);
+			searchRequestBuilder, searchResponse, countSearchRequest,
+			countSearchResponse);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -82,7 +81,7 @@ public class CountSearchRequestExecutorImpl
 	protected CommonSearchResponseAssembler commonSearchResponseAssembler;
 
 	@Reference
-	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
+	protected ElasticsearchClientResolver elasticsearchClientResolver;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CountSearchRequestExecutorImpl.class);

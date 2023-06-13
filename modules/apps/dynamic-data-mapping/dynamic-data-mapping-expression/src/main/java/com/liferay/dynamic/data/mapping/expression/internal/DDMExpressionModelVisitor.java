@@ -18,6 +18,7 @@ import com.liferay.dynamic.data.mapping.expression.internal.parser.DDMExpression
 import com.liferay.dynamic.data.mapping.expression.internal.parser.DDMExpressionParser;
 import com.liferay.dynamic.data.mapping.expression.model.AndExpression;
 import com.liferay.dynamic.data.mapping.expression.model.ArithmeticExpression;
+import com.liferay.dynamic.data.mapping.expression.model.ArrayExpression;
 import com.liferay.dynamic.data.mapping.expression.model.ComparisonExpression;
 import com.liferay.dynamic.data.mapping.expression.model.Expression;
 import com.liferay.dynamic.data.mapping.expression.model.FloatingPointLiteral;
@@ -64,6 +65,13 @@ public class DDMExpressionModelVisitor
 		Expression r = visitChild(context, 2);
 
 		return new AndExpression(l, r);
+	}
+
+	@Override
+	public Expression visitArray(
+		@NotNull DDMExpressionParser.ArrayContext context) {
+
+		return new ArrayExpression(context.getText());
 	}
 
 	@Override
@@ -134,8 +142,8 @@ public class DDMExpressionModelVisitor
 
 	@Override
 	public Expression visitGreaterThanOrEqualsExpression(
-		@NotNull
-			DDMExpressionParser.GreaterThanOrEqualsExpressionContext context) {
+		@NotNull DDMExpressionParser.GreaterThanOrEqualsExpressionContext
+			context) {
 
 		Expression l = visitChild(context, 0);
 		Expression r = visitChild(context, 2);
@@ -162,8 +170,8 @@ public class DDMExpressionModelVisitor
 
 	@Override
 	public Expression visitLessThanOrEqualsExpression(
-		@NotNull
-			DDMExpressionParser.LessThanOrEqualsExpressionContext context) {
+		@NotNull DDMExpressionParser.LessThanOrEqualsExpressionContext
+			context) {
 
 		Expression l = visitChild(context, 0);
 		Expression r = visitChild(context, 2);

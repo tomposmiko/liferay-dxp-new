@@ -44,9 +44,11 @@ public class DLFileEntryExpandoBridgeRetriever
 
 			DLFileVersion dlFileVersion = dlFileEntry.getFileVersion();
 
-			return expandoBridgeFactory.getExpandoBridge(
+			ExpandoBridge expandoBridge = expandoBridgeFactory.getExpandoBridge(
 				dlFileEntry.getCompanyId(), DLFileEntry.class.getName(),
 				dlFileVersion.getFileVersionId());
+
+			return expandoBridge;
 		}
 		catch (PortalException pe) {
 			throw new SystemException(pe);

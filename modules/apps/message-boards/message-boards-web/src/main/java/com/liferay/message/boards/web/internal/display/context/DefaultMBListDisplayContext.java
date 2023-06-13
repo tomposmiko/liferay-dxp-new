@@ -166,7 +166,7 @@ public class DefaultMBListDisplayContext implements MBListDisplayContext {
 
 		QueryDefinition<MBCategory> queryDefinition = new QueryDefinition<>(
 			status, themeDisplay.getUserId(), true, searchContainer.getStart(),
-			searchContainer.getEnd(), searchContainer.getOrderByComparator());
+			searchContainer.getEnd(), null);
 
 		searchContainer.setTotal(
 			MBCategoryServiceUtil.getCategoriesCount(

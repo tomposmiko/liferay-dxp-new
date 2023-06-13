@@ -20,9 +20,7 @@
 String redirect = ParamUtil.getString(request, "redirect");
 
 AssetEntry assetEntry = workflowTaskDisplayContext.getAssetEntry();
-
-AssetRenderer assetRenderer = workflowTaskDisplayContext.getAssetRenderer(workflowTaskDisplayContext.getWorkflowTask());
-
+AssetRenderer assetRenderer = workflowTaskDisplayContext.getAssetRenderer();
 AssetRendererFactory assetRendererFactory = workflowTaskDisplayContext.getAssetRendererFactory();
 
 String languageId = LanguageUtil.getLanguageId(request);

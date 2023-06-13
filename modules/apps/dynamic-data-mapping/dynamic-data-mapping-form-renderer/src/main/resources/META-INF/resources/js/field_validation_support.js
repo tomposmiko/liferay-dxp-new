@@ -22,6 +22,7 @@ AUI.add(
 				var instance = this;
 
 				instance._eventHandlers.push(
+					instance.after('focus', instance._afterFocus),
 					instance.after('blur', instance._afterBlur),
 					instance.after('validChange', instance._afterValidChange)
 				);
@@ -74,17 +75,15 @@ AUI.add(
 						}
 					);
 				}
-				else if (['checkbox_multiple', 'radio'].indexOf(instance.get('type')) !== -1) {
-					setTimeout(
-						function() {
-							instance.showPendingErrorMessage();
-						},
-						100
-					);
-				}
 				else {
 					instance.showErrorMessage();
 				}
+			},
+
+			_afterFocus: function() {
+				var instance = this;
+
+				instance.hideErrorMessage();
 			},
 
 			_afterValidChange: function(event) {

@@ -930,27 +930,6 @@ public class LocalizationImpl implements Localization {
 	}
 
 	@Override
-	public Map<Locale, String> populateLocalizationMap(
-		Map<Locale, String> localizationMap, String defaultLanguageId,
-		long groupId) {
-
-		String defaultValue = localizationMap.get(
-			LocaleUtil.fromLanguageId(defaultLanguageId));
-
-		for (Locale availableLocale :
-				LanguageUtil.getAvailableLocales(groupId)) {
-
-			if (!localizationMap.containsKey(availableLocale) ||
-				Validator.isNull(localizationMap.get(availableLocale))) {
-
-				localizationMap.put(availableLocale, defaultValue);
-			}
-		}
-
-		return localizationMap;
-	}
-
-	@Override
 	public String removeLocalization(
 		String xml, String key, String requestedLanguageId) {
 

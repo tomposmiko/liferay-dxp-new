@@ -23,6 +23,7 @@ import com.liferay.portal.workflow.portlet.tab.WorkflowPortletTab;
 import com.liferay.portal.workflow.web.internal.constants.WorkflowPortletKeys;
 import com.liferay.portal.workflow.web.internal.display.context.util.WorkflowNavigationRequestHelper;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -49,6 +50,10 @@ public class WorkflowNavigationDisplayContext {
 		WorkflowPortletTab selectedWorkflowPortletTab,
 		List<WorkflowPortletTab> workflowPortletTabs) {
 
+		if (workflowPortletTabs.size() == 1) {
+			return Collections.emptyList();
+		}
+
 		ResourceBundle resourceBundle =
 			_resourceBundleLoader.loadResourceBundle(
 				_workflowNavigationRequestHelper.getLocale());
@@ -61,6 +66,7 @@ public class WorkflowNavigationDisplayContext {
 
 		return new NavigationItemList() {
 			{
+
 				for (WorkflowPortletTab workflowPortletTab :
 						workflowPortletTabs) {
 

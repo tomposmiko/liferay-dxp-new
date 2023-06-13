@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutTemplate;
 import com.liferay.portal.kernel.model.LayoutTemplateConstants;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
+import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
@@ -146,13 +147,12 @@ public class NestedPortletsPortlet extends MVCPortlet {
 
 			templateId = sb.toString();
 
-			content = processColumnMatcher.replaceAll(
-				"$1" + renderResponse.getNamespace() + "_$2$3");
+			content = processColumnMatcher.replaceAll("$1\\${$2}$3");
 
 			Matcher columnIdMatcher = _columnIdPattern.matcher(content);
 
 			templateContent = columnIdMatcher.replaceAll(
-				"$1" + renderResponse.getNamespace() + "_$2$3");
+				"$1" + renderResponse.getNamespace() + "$2$3");
 		}
 
 		checkLayout(themeDisplay.getLayout(), columnIds.values());
@@ -168,13 +168,14 @@ public class NestedPortletsPortlet extends MVCPortlet {
 
 		Map<String, Object> vmVariables =
 			(Map<String, Object>)renderRequest.getAttribute(
-				WebKeys.FTL_VARIABLES);
+				WebKeys.VM_VARIABLES + portletDisplay.getId());
 
 		if (vmVariables != null) {
 			vmVariables.putAll(columnIds);
 		}
 		else {
-			renderRequest.setAttribute(WebKeys.FTL_VARIABLES, columnIds);
+			renderRequest.setAttribute(
+				WebKeys.VM_VARIABLES + portletDisplay.getId(), columnIds);
 		}
 
 		super.include(viewTemplate, renderRequest, renderResponse);
@@ -234,6 +235,13 @@ public class NestedPortletsPortlet extends MVCPortlet {
 		LayoutTemplateLocalService layoutTemplateLocalService) {
 
 		_layoutTemplateLocalService = layoutTemplateLocalService;
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.nested.portlets.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=1.1.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

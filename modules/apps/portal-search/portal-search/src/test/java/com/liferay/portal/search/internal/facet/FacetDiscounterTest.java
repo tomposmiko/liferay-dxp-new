@@ -21,10 +21,17 @@ import com.liferay.portal.kernel.search.facet.MultiValueFacet;
 import com.liferay.portal.kernel.search.facet.RangeFacet;
 import com.liferay.portal.kernel.search.facet.SimpleFacet;
 import com.liferay.portal.kernel.search.facet.collector.DefaultTermCollector;
+import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.search.internal.test.util.AssertUtils;
+import com.liferay.portal.search.internal.test.util.SearchMapUtil;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,20 +54,9 @@ public class FacetDiscounterTest {
 
 		_discount(facetDiscounter, _createDocument(new String[] {"a", "c"}));
 
-		_assertFrequencies(facet, "[a=9, b=5, c=1]");
-	}
-
-	@Test
-	public void testOrderStillDescendingAfterSkewedDecrements() {
-		Facet facet = new SimpleFacet(null);
-
-		_populate(facet, _toTerm("a", 9), _toTerm("b", 8), _toTerm("c", 6));
-
-		FacetDiscounter facetDiscounter = new FacetDiscounter(facet);
-
-		_discount(facetDiscounter, "a", "a", "b", "b", "b");
-
-		_assertFrequencies(facet, "[a=7, c=6, b=5]");
+		_assertTermCollectors(
+			facet,
+			SearchMapUtil.join(_toMap("a", 9), _toMap("b", 5), _toMap("c", 1)));
 	}
 
 	@Test
@@ -73,7 +69,9 @@ public class FacetDiscounterTest {
 
 		_discount(facetDiscounter, "2", "7");
 
-		_assertFrequencies(facet, "[[0 TO 5]=2, [0 TO 9]=1]");
+		_assertTermCollectors(
+			facet,
+			SearchMapUtil.join(_toMap("[0 TO 5]", 2), _toMap("[0 TO 9]", 1)));
 	}
 
 	@Test
@@ -86,7 +84,9 @@ public class FacetDiscounterTest {
 
 		_discount(facetDiscounter, "a", "b", "c");
 
-		_assertFrequencies(facet, "[a=9, b=4, c=1]");
+		_assertTermCollectors(
+			facet,
+			SearchMapUtil.join(_toMap("a", 9), _toMap("b", 4), _toMap("c", 1)));
 	}
 
 	@Test
@@ -99,15 +99,37 @@ public class FacetDiscounterTest {
 
 		_discount(facetDiscounter, "secret");
 
-		_assertFrequencies(facet, "[public=1000]");
+		_assertTermCollectors(facet, _toMap("public", 1000));
 	}
 
-	private static void _assertFrequencies(Facet facet, String expected) {
-		FacetsAssert.assertFrequencies(_FIELD_NAME, facet, expected);
+	private static Map<String, Integer> _toMap(
+		List<TermCollector> termCollectors) {
+
+		Map<String, Integer> map = new HashMap<>();
+
+		for (TermCollector termCollector : termCollectors) {
+			map.put(termCollector.getTerm(), termCollector.getFrequency());
+		}
+
+		return map;
+	}
+
+	private static Map<String, Integer> _toMap(String key, int value) {
+		return Collections.singletonMap(key, value);
 	}
 
 	private static TermCollector _toTerm(String term, int frequency) {
 		return new DefaultTermCollector(term, frequency);
+	}
+
+	private void _assertTermCollectors(
+		Facet facet, Map<String, Integer> frequencies) {
+
+		FacetCollector facetCollector = facet.getFacetCollector();
+
+		AssertUtils.assertEquals(
+			_FIELD_NAME, frequencies,
+			_toMap(facetCollector.getTermCollectors()));
 	}
 
 	private Document _createDocument(String term) {

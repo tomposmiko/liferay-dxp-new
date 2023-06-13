@@ -29,7 +29,6 @@ import java.net.ConnectException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -124,11 +123,9 @@ public class SecureXMLFactoryProviderImplTest {
 
 			@Override
 			public void run(String xml) throws Exception {
-				XMLInputFactory xmlInputFactory =
-					_secureXMLFactoryProvider.newXMLInputFactory();
-
 				XMLEventReader xmlEventReader =
-					xmlInputFactory.createXMLEventReader(new StringReader(xml));
+					_secureXMLFactoryProvider.newXMLInputFactory().
+						createXMLEventReader(new StringReader(xml));
 
 				while (xmlEventReader.hasNext()) {
 					xmlEventReader.next();

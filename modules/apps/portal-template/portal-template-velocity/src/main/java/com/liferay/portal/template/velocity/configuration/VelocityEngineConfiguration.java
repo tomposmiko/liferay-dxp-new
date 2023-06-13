@@ -42,16 +42,10 @@ public interface VelocityEngineConfiguration {
 	public int resourceModificationCheckInterval();
 
 	@Meta.AD(
-		deflt = "java.lang.Class|java.lang.ClassLoader|java.lang.Compiler|java.lang.Package|java.lang.Process|java.lang.Runtime|java.lang.RuntimePermission|java.lang.SecurityManager|java.lang.System|java.lang.Thread|java.lang.ThreadGroup|java.lang.ThreadLocal",
+		deflt = "com.liferay.portal.json.jabsorb.serializer.LiferayJSONDeserializationWhitelist|java.lang.Class|java.lang.ClassLoader|java.lang.Compiler|java.lang.Package|java.lang.Process|java.lang.Runtime|java.lang.RuntimePermission|java.lang.SecurityManager|java.lang.System|java.lang.Thread|java.lang.ThreadGroup|java.lang.ThreadLocal",
 		name = "restricted-classes", required = false
 	)
 	public String[] restrictedClasses();
-
-	@Meta.AD(
-		deflt = "com.liferay.portal.model.impl.CompanyImpl#getKey",
-		name = "restricted-methods", required = false
-	)
-	public String[] restrictedMethods();
 
 	@Meta.AD(
 		deflt = "java.lang.reflect", name = "restricted-packages",

@@ -94,6 +94,14 @@ class ManagementToolbar extends ClayComponent {
 		}
 	}
 
+	_handleFilterLabelCloseClicked(event) {
+		let removeLabelURL = event.data.label.data && event.data.label.data.removeLabelURL;
+
+		if (removeLabelURL) {
+			Liferay.Util.navigate(removeLabelURL);
+		}
+	}
+
 	/**
 	 * Toggles the info panel
 	 * @param {!Event} event
@@ -152,12 +160,6 @@ class ManagementToolbar extends ClayComponent {
 		var elements = event.elements;
 
 		this.selectedItems = elements.allSelectedElements.filter(':enabled').size();
-
-		this.checkboxStatus = 'unchecked';
-
-		if (this.selectedItems !== 0) {
-			this.checkboxStatus = this.selectedItems < this.totalItems ? 'indeterminate' : 'checked';
-		}
 
 		if (this.actionItems) {
 			this.actionItems = this.actionItems.map(
@@ -461,15 +463,6 @@ ManagementToolbar.STATE = {
 	 */
 
 	showInfoButton: Config.bool().value(false),
-
-	/**
-	 * Flag to indicate if the results bar should be shown or not.
-	 * @default false
-	 * @instance
-	 * @memberof ManagementToolbar
-	 * @type {?bool}
-	 */
-	showResultsBar: Config.bool().value(false),
 
 	/**
 	 * Flag to indicate if search should be shown or not.

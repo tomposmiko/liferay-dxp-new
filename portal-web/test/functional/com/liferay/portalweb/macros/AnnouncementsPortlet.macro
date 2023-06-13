@@ -2,6 +2,7 @@ definition {
 	macro configureDisplayCountPG {
 		Portlet.gotoPortletOptions(
 			portletName = "Announcements",
+			portletName = "${portletName}",
 			portletOption = "Configuration"
 		);
 

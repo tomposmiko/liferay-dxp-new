@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portlet.announcements.service.http.AnnouncementsFlagServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @see com.liferay.portlet.announcements.service.http.AnnouncementsFlagServiceSoap
  * @generated
  */
 @ProviderType
 public class AnnouncementsFlagSoap implements Serializable {
-
 	public static AnnouncementsFlagSoap toSoapModel(AnnouncementsFlag model) {
 		AnnouncementsFlagSoap soapModel = new AnnouncementsFlagSoap();
 
@@ -46,9 +46,7 @@ public class AnnouncementsFlagSoap implements Serializable {
 
 	public static AnnouncementsFlagSoap[] toSoapModels(
 		AnnouncementsFlag[] models) {
-
-		AnnouncementsFlagSoap[] soapModels =
-			new AnnouncementsFlagSoap[models.length];
+		AnnouncementsFlagSoap[] soapModels = new AnnouncementsFlagSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -59,12 +57,10 @@ public class AnnouncementsFlagSoap implements Serializable {
 
 	public static AnnouncementsFlagSoap[][] toSoapModels(
 		AnnouncementsFlag[][] models) {
-
 		AnnouncementsFlagSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels =
-				new AnnouncementsFlagSoap[models.length][models[0].length];
+			soapModels = new AnnouncementsFlagSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new AnnouncementsFlagSoap[0][0];
@@ -79,9 +75,7 @@ public class AnnouncementsFlagSoap implements Serializable {
 
 	public static AnnouncementsFlagSoap[] toSoapModels(
 		List<AnnouncementsFlag> models) {
-
-		List<AnnouncementsFlagSoap> soapModels =
-			new ArrayList<AnnouncementsFlagSoap>(models.size());
+		List<AnnouncementsFlagSoap> soapModels = new ArrayList<AnnouncementsFlagSoap>(models.size());
 
 		for (AnnouncementsFlag model : models) {
 			soapModels.add(toSoapModel(model));
@@ -155,5 +149,4 @@ public class AnnouncementsFlagSoap implements Serializable {
 	private Date _createDate;
 	private long _entryId;
 	private int _value;
-
 }

@@ -23,10 +23,16 @@ import com.liferay.dynamic.data.mapping.exception.StructureDefinitionException;
 import com.liferay.dynamic.data.mapping.exception.StructureDuplicateElementException;
 import com.liferay.dynamic.data.mapping.exception.StructureDuplicateStructureKeyException;
 import com.liferay.dynamic.data.mapping.exception.StructureNameException;
+import com.liferay.dynamic.data.mapping.internal.search.util.DDMSearchHelper;
 import com.liferay.dynamic.data.mapping.internal.util.DDMFormTemplateSynchonizer;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONSerializer;
-import com.liferay.dynamic.data.mapping.io.DDMFormXSDDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerTracker;
+import com.liferay.dynamic.data.mapping.io.DDMFormSerializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormSerializerTracker;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstanceLink;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
@@ -45,7 +51,6 @@ import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.dynamic.data.mapping.util.DDMXML;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValidationException;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValidator;
-import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
@@ -59,14 +64,17 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.DDMStructureIndexer;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
-import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
@@ -83,6 +91,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -121,6 +130,7 @@ import java.util.regex.Pattern;
 public class DDMStructureLocalServiceImpl
 	extends DDMStructureLocalServiceBaseImpl {
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DDMStructure addStructure(
 			long userId, long groupId, long parentStructureId, long classNameId,
@@ -162,7 +172,7 @@ public class DDMStructureLocalServiceImpl
 		structure.setVersion(DDMStructureConstants.VERSION_DEFAULT);
 		structure.setDescriptionMap(descriptionMap, ddmForm.getDefaultLocale());
 		structure.setNameMap(nameMap, ddmForm.getDefaultLocale());
-		structure.setDefinition(ddmFormJSONSerializer.serialize(ddmForm));
+		structure.setDefinition(serializeJSONDDMForm(ddmForm));
 		structure.setStorageType(storageType);
 		structure.setType(type);
 
@@ -240,7 +250,7 @@ public class DDMStructureLocalServiceImpl
 
 		ddmXML.validateXML(definition);
 
-		DDMForm ddmForm = ddmFormXSDDeserializer.deserialize(definition);
+		DDMForm ddmForm = deserializeXSDDDMForm(definition);
 
 		DDMFormLayout ddmFormLayout = ddm.getDefaultDDMFormLayout(ddmForm);
 
@@ -248,6 +258,56 @@ public class DDMStructureLocalServiceImpl
 			userId, groupId, parentStructureId, classNameId, structureKey,
 			nameMap, descriptionMap, ddmForm, ddmFormLayout, storageType, type,
 			serviceContext);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public DDMStructure addStructure(
+			long userId, long groupId, long parentStructureId, long classNameId,
+			String structureKey, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, String definition,
+			String storageType, ServiceContext serviceContext)
+		throws PortalException {
+
+		User user = userLocalService.getUser(userId);
+
+		if (Validator.isNull(structureKey)) {
+			structureKey = String.valueOf(counterLocalService.increment());
+		}
+		else {
+			structureKey = StringUtil.toUpperCase(structureKey.trim());
+		}
+
+		long structureId = counterLocalService.increment();
+
+		DDMStructure structure = ddmStructurePersistence.create(structureId);
+
+		structure.setUuid(serviceContext.getUuid());
+		structure.setGroupId(groupId);
+		structure.setCompanyId(user.getCompanyId());
+		structure.setUserId(user.getUserId());
+		structure.setUserName(user.getFullName());
+		structure.setVersionUserId(user.getUserId());
+		structure.setVersionUserName(user.getFullName());
+		structure.setCreateDate(new Date());
+		structure.setModifiedDate(new Date());
+		structure.setParentStructureId(parentStructureId);
+		structure.setClassNameId(classNameId);
+		structure.setStructureKey(structureKey);
+		structure.setVersion(DDMStructureConstants.VERSION_DEFAULT);
+		structure.setNameMap(nameMap);
+		structure.setDescriptionMap(descriptionMap);
+		structure.setDefinition(definition);
+		structure.setStorageType(storageType);
+		structure.setType(DDMStructureConstants.TYPE_DEFAULT);
+
+		ddmStructurePersistence.update(structure);
+
+		addStructureVersion(
+			user, structure, DDMStructureConstants.VERSION_DEFAULT,
+			serviceContext);
+
+		return structure;
 	}
 
 	@Override
@@ -364,7 +424,7 @@ public class DDMStructureLocalServiceImpl
 
 		ddmXML.validateXML(definition);
 
-		DDMForm ddmForm = ddmFormXSDDeserializer.deserialize(definition);
+		DDMForm ddmForm = deserializeXSDDDMForm(definition);
 
 		DDMFormLayout ddmFormLayout = ddm.getDefaultDDMFormLayout(ddmForm);
 
@@ -475,9 +535,12 @@ public class DDMStructureLocalServiceImpl
 	 *
 	 * @param structure the structure to be deleted
 	 */
+	@Indexable(type = IndexableType.DELETE)
 	@Override
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
-	public void deleteStructure(DDMStructure structure) throws PortalException {
+	public DDMStructure deleteStructure(DDMStructure structure)
+		throws PortalException {
+
 		if (!GroupThreadLocal.isDeleteInProcess()) {
 			if (ddmStructureLinkPersistence.countByStructureId(
 					structure.getStructureId()) > 0) {
@@ -550,6 +613,8 @@ public class DDMStructureLocalServiceImpl
 		backgroundTaskmanager.deleteGroupBackgroundTasks(
 			structure.getGroupId(), backgroundTaskName,
 			DDMStructureIndexerBackgroundTaskExecutor.class.getName());
+
+		return structure;
 	}
 
 	/**
@@ -915,11 +980,11 @@ public class DDMStructureLocalServiceImpl
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public DDMForm getStructureDDMForm(DDMStructure structure)
 		throws PortalException {
 
-		return ddmFormJSONDeserializer.deserialize(structure.getDefinition());
+		return deserializeJSONDDMForm(structure.getDefinition());
 	}
 
 	/**
@@ -1181,7 +1246,7 @@ public class DDMStructureLocalServiceImpl
 		DDMForm ddmForm = ddm.updateDDMFormDefaultLocale(
 			structure.getDDMForm(), defaultImportLocale);
 
-		return ddmFormJSONSerializer.serialize(ddmForm);
+		return serializeJSONDDMForm(ddmForm);
 	}
 
 	@Override
@@ -1221,9 +1286,15 @@ public class DDMStructureLocalServiceImpl
 			OrderByComparator<DDMStructure> orderByComparator)
 		throws PortalException {
 
-		return ddmStructureFinder.findByKeywords(
-			companyId, groupIds, classNameId, classPK, keywords, start, end,
-			orderByComparator);
+		SearchContext searchContext =
+			ddmSearchHelper.buildStructureSearchContext(
+				companyId, groupIds, classNameId, classPK, keywords, keywords,
+				StringPool.BLANK, null, WorkflowConstants.STATUS_ANY, start,
+				end, orderByComparator);
+
+		return ddmSearchHelper.doSearch(
+			searchContext, DDMStructure.class,
+			ddmStructurePersistence::findByPrimaryKey);
 	}
 
 	/**
@@ -1259,9 +1330,14 @@ public class DDMStructureLocalServiceImpl
 		int status, int start, int end,
 		OrderByComparator<DDMStructure> orderByComparator) {
 
-		return ddmStructureFinder.findByKeywords(
-			companyId, groupIds, classNameId, keywords, status, start, end,
-			orderByComparator);
+		SearchContext searchContext =
+			ddmSearchHelper.buildStructureSearchContext(
+				companyId, groupIds, classNameId, null, keywords, keywords,
+				StringPool.BLANK, null, status, start, end, orderByComparator);
+
+		return ddmSearchHelper.doSearch(
+			searchContext, DDMStructure.class,
+			ddmStructurePersistence::findByPrimaryKey);
 	}
 
 	/**
@@ -1303,9 +1379,14 @@ public class DDMStructureLocalServiceImpl
 		boolean andOperator, int start, int end,
 		OrderByComparator<DDMStructure> orderByComparator) {
 
-		return ddmStructureFinder.findByC_G_C_N_D_S_T_S(
-			companyId, groupIds, classNameId, name, description, storageType,
-			type, status, andOperator, start, end, orderByComparator);
+		SearchContext searchContext =
+			ddmSearchHelper.buildStructureSearchContext(
+				companyId, groupIds, classNameId, null, name, description,
+				storageType, type, status, start, end, orderByComparator);
+
+		return ddmSearchHelper.doSearch(
+			searchContext, DDMStructure.class,
+			ddmStructurePersistence::findByPrimaryKey);
 	}
 
 	@Override
@@ -1314,8 +1395,13 @@ public class DDMStructureLocalServiceImpl
 			String keywords)
 		throws PortalException {
 
-		return ddmStructureFinder.countByKeywords(
-			companyId, groupIds, classNameId, classPK, keywords);
+		SearchContext searchContext =
+			ddmSearchHelper.buildStructureSearchContext(
+				companyId, groupIds, classNameId, classPK, keywords, keywords,
+				StringPool.BLANK, null, WorkflowConstants.STATUS_ANY,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		return ddmSearchHelper.doSearchCount(searchContext, DDMStructure.class);
 	}
 
 	/**
@@ -1335,8 +1421,13 @@ public class DDMStructureLocalServiceImpl
 		long companyId, long[] groupIds, long classNameId, String keywords,
 		int status) {
 
-		return ddmStructureFinder.countByKeywords(
-			companyId, groupIds, classNameId, keywords, status);
+		SearchContext searchContext =
+			ddmSearchHelper.buildStructureSearchContext(
+				companyId, groupIds, classNameId, null, keywords, keywords,
+				StringPool.BLANK, null, status, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
+
+		return ddmSearchHelper.doSearchCount(searchContext, DDMStructure.class);
 	}
 
 	/**
@@ -1362,11 +1453,16 @@ public class DDMStructureLocalServiceImpl
 		String description, String storageType, int type, int status,
 		boolean andOperator) {
 
-		return ddmStructureFinder.countByC_G_C_N_D_S_T_S(
-			companyId, groupIds, classNameId, name, description, storageType,
-			type, status, andOperator);
+		SearchContext searchContext =
+			ddmSearchHelper.buildStructureSearchContext(
+				companyId, groupIds, classNameId, null, name, description,
+				storageType, type, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				null);
+
+		return ddmSearchHelper.doSearchCount(searchContext, DDMStructure.class);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DDMStructure updateStructure(
 			long userId, long structureId, DDMForm ddmForm,
@@ -1382,6 +1478,7 @@ public class DDMStructureLocalServiceImpl
 			serviceContext, structure);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DDMStructure updateStructure(
 			long userId, long groupId, long parentStructureId, long classNameId,
@@ -1400,6 +1497,7 @@ public class DDMStructureLocalServiceImpl
 			ddmFormLayout, serviceContext, structure);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DDMStructure updateStructure(
 			long userId, long structureId, long parentStructureId,
@@ -1414,6 +1512,58 @@ public class DDMStructureLocalServiceImpl
 		return doUpdateStructure(
 			userId, parentStructureId, nameMap, descriptionMap, ddmForm,
 			ddmFormLayout, serviceContext, structure);
+	}
+
+	@Override
+	public DDMStructure updateStructure(
+			long userId, long structureId, long parentStructureId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			String definition, ServiceContext serviceContext)
+		throws PortalException {
+
+		DDMStructure structure = ddmStructurePersistence.findByPrimaryKey(
+			structureId);
+
+		User user = userLocalService.getUser(userId);
+
+		structure.setUserId(userId);
+		structure.setParentStructureId(parentStructureId);
+
+		DDMStructureVersion latestStructureVersion =
+			ddmStructureVersionLocalService.getLatestStructureVersion(
+				structure.getStructureId());
+
+		boolean majorVersion = GetterUtil.getBoolean(
+			serviceContext.getAttribute("majorVersion"));
+
+		String version = getNextVersion(
+			latestStructureVersion.getVersion(), majorVersion);
+
+		structure.setVersion(version);
+
+		structure.setNameMap(nameMap);
+		structure.setVersionUserId(user.getUserId());
+		structure.setVersionUserName(user.getFullName());
+		structure.setModifiedDate(new Date());
+		structure.setDescriptionMap(descriptionMap);
+		structure.setDefinition(definition);
+
+		// Structure version
+
+		DDMStructureVersion structureVersion = addStructureVersion(
+			user, structure, version, serviceContext);
+
+		if (!structureVersion.isApproved()) {
+			return structure;
+		}
+
+		ddmStructurePersistence.update(structure);
+
+		// Indexer
+
+		reindexStructure(structure, serviceContext);
+
+		return structure;
 	}
 
 	/**
@@ -1454,7 +1604,7 @@ public class DDMStructureLocalServiceImpl
 
 		ddmXML.validateXML(definition);
 
-		DDMForm ddmForm = ddmFormXSDDeserializer.deserialize(definition);
+		DDMForm ddmForm = deserializeXSDDDMForm(definition);
 
 		DDMFormLayout ddmFormLayout = ddm.getDefaultDDMFormLayout(ddmForm);
 
@@ -1498,7 +1648,7 @@ public class DDMStructureLocalServiceImpl
 
 		ddmXML.validateXML(definition);
 
-		DDMForm ddmForm = ddmFormXSDDeserializer.deserialize(definition);
+		DDMForm ddmForm = deserializeXSDDDMForm(definition);
 
 		DDMFormLayout ddmFormLayout = ddm.getDefaultDDMFormLayout(ddmForm);
 
@@ -1534,7 +1684,7 @@ public class DDMStructureLocalServiceImpl
 
 		ddmXML.validateXML(definition);
 
-		DDMForm ddmForm = ddmFormXSDDeserializer.deserialize(definition);
+		DDMForm ddmForm = deserializeXSDDDMForm(definition);
 
 		DDMFormLayout ddmFormLayout = ddm.getDefaultDDMFormLayout(ddmForm);
 
@@ -1625,6 +1775,33 @@ public class DDMStructureLocalServiceImpl
 		return deletedStructureIds;
 	}
 
+	protected DDMForm deserializeDDMForm(
+		String content, DDMFormDeserializer ddmFormDeserializer) {
+
+		DDMFormDeserializerDeserializeRequest.Builder builder =
+			DDMFormDeserializerDeserializeRequest.Builder.newBuilder(content);
+
+		DDMFormDeserializerDeserializeResponse
+			ddmFormDeserializerDeserializeResponse =
+				ddmFormDeserializer.deserialize(builder.build());
+
+		return ddmFormDeserializerDeserializeResponse.getDDMForm();
+	}
+
+	protected DDMForm deserializeJSONDDMForm(String content) {
+		DDMFormDeserializer ddmFormDeserializer =
+			ddmFormDeserializerTracker.getDDMFormDeserializer("json");
+
+		return deserializeDDMForm(content, ddmFormDeserializer);
+	}
+
+	protected DDMForm deserializeXSDDDMForm(String content) {
+		DDMFormDeserializer ddmFormDeserializer =
+			ddmFormDeserializerTracker.getDDMFormDeserializer("xsd");
+
+		return deserializeDDMForm(content, ddmFormDeserializer);
+	}
+
 	protected DDMStructure doUpdateStructure(
 			long userId, long parentStructureId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, DDMForm ddmForm,
@@ -1660,7 +1837,7 @@ public class DDMStructureLocalServiceImpl
 		structure.setVersionUserId(user.getUserId());
 		structure.setVersionUserName(user.getFullName());
 		structure.setDescriptionMap(descriptionMap, ddmForm.getDefaultLocale());
-		structure.setDefinition(ddmFormJSONSerializer.serialize(ddmForm));
+		structure.setDefinition(serializeJSONDDMForm(ddmForm));
 
 		// Structure version
 
@@ -1893,16 +2070,36 @@ public class DDMStructureLocalServiceImpl
 			taskContextMap, serviceContext);
 	}
 
+	protected String serializeJSONDDMForm(DDMForm ddmForm) {
+		DDMFormSerializer ddmFormSerializer =
+			ddmFormSerializerTracker.getDDMFormSerializer("json");
+
+		DDMFormSerializerSerializeRequest.Builder builder =
+			DDMFormSerializerSerializeRequest.Builder.newBuilder(ddmForm);
+
+		DDMFormSerializerSerializeResponse ddmFormSerializerSerializeResponse =
+			ddmFormSerializer.serialize(builder.build());
+
+		return ddmFormSerializerSerializeResponse.getContent();
+	}
+
 	protected void syncStructureTemplatesFields(final DDMStructure structure) {
 		TransactionCommitCallbackUtil.registerCallback(
 			new Callable<Void>() {
 
 				@Override
 				public Void call() throws Exception {
+					DDMFormSerializer ddmFormSerializer =
+						ddmFormSerializerTracker.getDDMFormSerializer("json");
+
+					DDMFormDeserializer ddmFormDeserializer =
+						ddmFormDeserializerTracker.getDDMFormDeserializer(
+							"json");
+
 					DDMFormTemplateSynchonizer ddmFormTemplateSynchonizer =
 						new DDMFormTemplateSynchonizer(
-							structure.getDDMForm(), ddmFormJSONDeserializer,
-							ddmFormJSONSerializer, ddmTemplateLocalService);
+							structure.getDDMForm(), ddmFormDeserializer,
+							ddmFormSerializer, ddmTemplateLocalService);
 
 					List<DDMTemplate> templates = getStructureTemplates(
 						structure, DDMTemplateConstants.TEMPLATE_TYPE_FORM);
@@ -1994,9 +2191,7 @@ public class DDMStructureLocalServiceImpl
 		throws PortalException {
 
 		try {
-			if (!ExportImportThreadLocal.isImportInProcess()) {
-				validate(nameMap, ddmForm.getDefaultLocale());
-			}
+			validate(nameMap, ddmForm.getDefaultLocale());
 
 			validate(ddmForm);
 
@@ -2075,20 +2270,20 @@ public class DDMStructureLocalServiceImpl
 	@ServiceReference(type = DDM.class)
 	protected DDM ddm;
 
-	@ServiceReference(type = DDMFormJSONDeserializer.class)
-	protected DDMFormJSONDeserializer ddmFormJSONDeserializer;
+	@ServiceReference(type = DDMFormDeserializerTracker.class)
+	protected DDMFormDeserializerTracker ddmFormDeserializerTracker;
 
-	@ServiceReference(type = DDMFormJSONSerializer.class)
-	protected DDMFormJSONSerializer ddmFormJSONSerializer;
+	@ServiceReference(type = DDMFormSerializerTracker.class)
+	protected DDMFormSerializerTracker ddmFormSerializerTracker;
 
 	@ServiceReference(type = DDMFormValidator.class)
 	protected DDMFormValidator ddmFormValidator;
 
-	@ServiceReference(type = DDMFormXSDDeserializer.class)
-	protected DDMFormXSDDeserializer ddmFormXSDDeserializer;
-
 	@ServiceReference(type = DDMPermissionSupport.class)
 	protected DDMPermissionSupport ddmPermissionSupport;
+
+	@ServiceReference(type = DDMSearchHelper.class)
+	protected DDMSearchHelper ddmSearchHelper;
 
 	@ServiceReference(type = DDMXML.class)
 	protected DDMXML ddmXML;

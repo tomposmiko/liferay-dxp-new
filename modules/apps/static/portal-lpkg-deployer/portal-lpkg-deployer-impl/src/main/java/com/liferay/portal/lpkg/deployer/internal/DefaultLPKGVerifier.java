@@ -14,7 +14,9 @@
 
 package com.liferay.portal.lpkg.deployer.internal;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.lpkg.deployer.LPKGVerifier;
 import com.liferay.portal.lpkg.deployer.LPKGVerifyException;
@@ -23,7 +25,6 @@ import java.io.File;
 import java.io.InputStream;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
@@ -34,7 +35,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Shuyang Zhou
@@ -87,11 +87,6 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 					iae);
 			}
 
-			if (LPKGIndexValidatorThreadLocal.isEnabled()) {
-				_lpkgIndexValidator.validate(
-					Collections.singletonList(lpkgFile));
-			}
-
 			List<Bundle> oldBundles = new ArrayList<>();
 
 			for (Bundle bundle : _bundleContext.getBundles()) {
@@ -105,10 +100,12 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 					oldBundles.add(bundle);
 				}
 				else {
-					String location = LPKGLocationUtil.getLPKGLocation(
-						lpkgFile);
+					String path = lpkgFile.getCanonicalPath();
 
-					if (location.equals(bundle.getLocation())) {
+					path = StringUtil.replace(
+						path, CharPool.BACK_SLASH, CharPool.FORWARD_SLASH);
+
+					if (path.equals(bundle.getLocation())) {
 						continue;
 					}
 
@@ -116,7 +113,7 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 						StringBundler.concat(
 							"Existing LPKG bundle ", String.valueOf(bundle),
 							" has the same symbolic name and version as LPKG ",
-							"file ", location));
+							"file ", path));
 				}
 			}
 
@@ -128,8 +125,5 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 	}
 
 	private BundleContext _bundleContext;
-
-	@Reference
-	private LPKGIndexValidator _lpkgIndexValidator;
 
 }

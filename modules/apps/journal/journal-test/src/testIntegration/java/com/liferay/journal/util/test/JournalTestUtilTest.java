@@ -44,6 +44,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerTestRule;
 
 import java.lang.reflect.Method;
 
@@ -69,7 +70,9 @@ public class JournalTestUtilTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -290,7 +293,7 @@ public class JournalTestUtilTest {
 
 		Map<Locale, String> contents = new HashMap<>();
 
-		contents.put(LocaleUtil.US, "This is an updated test article.");
+		contents.put(Locale.US, "This is an updated test article.");
 
 		String defaultLanguageId = LanguageUtil.getLanguageId(
 			LocaleUtil.getSiteDefault());

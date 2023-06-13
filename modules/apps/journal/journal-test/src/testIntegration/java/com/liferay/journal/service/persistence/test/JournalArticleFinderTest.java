@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
 
 import java.util.ArrayList;
@@ -83,6 +84,7 @@ public class JournalArticleFinderTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
+			PermissionCheckerTestRule.INSTANCE,
 			new TransactionalTestRule(
 				Propagation.SUPPORTS, "com.liferay.journal.service"));
 
@@ -303,13 +305,13 @@ public class JournalArticleFinderTest {
 
 		Map<Locale, String> titleMap = new HashMap<>();
 
-		titleMap.put(LocaleUtil.US, "Localized Article");
-		titleMap.put(LocaleUtil.FRANCE, "Localized Article");
+		titleMap.put(Locale.US, "Localized Article");
+		titleMap.put(Locale.FRANCE, "Localized Article");
 
 		JournalTestUtil.addArticle(
 			_group.getGroupId(), _folder.getFolderId(),
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, titleMap, titleMap,
-			titleMap, LocaleUtil.US, true, true, serviceContext);
+			titleMap, Locale.US, true, true, serviceContext);
 
 		QueryDefinition<JournalArticle> queryDefinition =
 			new QueryDefinition<>();

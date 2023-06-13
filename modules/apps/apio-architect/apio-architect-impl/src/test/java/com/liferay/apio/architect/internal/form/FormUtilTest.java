@@ -789,10 +789,9 @@ public class FormUtilTest {
 
 	private String _readBinaryFile(BinaryFile binaryFile) {
 		return Try.fromFallibleWithResources(
-			() -> new BufferedReader(
-				new InputStreamReader(binaryFile.getInputStream())),
-			BufferedReader::readLine
-		).getUnchecked();
+			() -> new BufferedReader(new InputStreamReader(
+				binaryFile.getInputStream())),
+			BufferedReader::readLine).getUnchecked();
 	}
 
 	private void _validateBooleanList(List<Boolean> list) {
@@ -838,8 +837,8 @@ public class FormUtilTest {
 	}
 
 	private <T> void _validateOptionalListMethod(
-		BiFunction<Body, List<T>, FieldFormBiConsumer<List<T>, List<T>>>
-			biFunction) {
+		BiFunction
+			<Body, List<T>, FieldFormBiConsumer<List<T>, List<T>>> biFunction) {
 
 		List<T> list = new ArrayList<>();
 

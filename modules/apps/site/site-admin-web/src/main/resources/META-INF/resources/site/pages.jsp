@@ -63,7 +63,7 @@ if (publicLayoutSet != null) {
 <%
 boolean disableLayoutSetPrototypeInput = false;
 
-if (!LanguageUtil.isInheritLocales(group.getGroupId()) && !siteAdminConfiguration.enableCustomLanguagesWithTemplatePropagation()) {
+if (!LanguageUtil.isInheritLocales(group.getGroupId())) {
 	disableLayoutSetPrototypeInput = true;
 }
 

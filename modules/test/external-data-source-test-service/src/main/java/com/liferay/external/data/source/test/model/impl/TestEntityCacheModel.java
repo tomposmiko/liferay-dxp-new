@@ -17,6 +17,7 @@ package com.liferay.external.data.source.test.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.external.data.source.test.model.TestEntity;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -30,12 +31,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing TestEntity in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see TestEntity
  * @generated
  */
 @ProviderType
-public class TestEntityCacheModel
-	implements CacheModel<TestEntity>, Externalizable {
-
+public class TestEntityCacheModel implements CacheModel<TestEntity>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -98,7 +99,8 @@ public class TestEntityCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(id);
 
 		if (data == null) {
@@ -111,5 +113,4 @@ public class TestEntityCacheModel
 
 	public long id;
 	public String data;
-
 }

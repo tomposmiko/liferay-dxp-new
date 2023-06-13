@@ -34,11 +34,10 @@ import com.liferay.document.library.kernel.service.DLFileEntryMetadataLocalServi
 @ProviderType
 public abstract class DLFileEntryMetadataBaseImpl
 	extends DLFileEntryMetadataModelImpl implements DLFileEntryMetadata {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a document library file entry metadata model instance should use the <code>DLFileEntryMetadata</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a document library file entry metadata model instance should use the {@link DLFileEntryMetadata} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class DLFileEntryMetadataBaseImpl
 			DLFileEntryMetadataLocalServiceUtil.updateDLFileEntryMetadata(this);
 		}
 	}
-
 }

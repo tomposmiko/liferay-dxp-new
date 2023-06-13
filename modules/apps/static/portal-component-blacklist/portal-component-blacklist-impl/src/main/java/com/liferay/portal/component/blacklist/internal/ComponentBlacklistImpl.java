@@ -101,6 +101,7 @@ public class ComponentBlacklistImpl implements ComponentBlacklist {
 					componentDescriptionDTO);
 
 				_disabledComponentNames.add(componentDescriptionDTO.name);
+
 			});
 	}
 

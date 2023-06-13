@@ -18,34 +18,36 @@ import aQute.bnd.annotation.ProviderType;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
+
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * Provides the remote service utility for ReadingTimeEntry. This utility wraps
- * <code>com.liferay.reading.time.service.impl.ReadingTimeEntryServiceImpl</code> and is an
- * access point for service operations in application layer code running on a
- * remote server. Methods of this service are expected to have security checks
- * based on the propagated JAAS credentials because this service can be
+ * {@link com.liferay.reading.time.service.impl.ReadingTimeEntryServiceImpl} and is the
+ * primary access point for service operations in application layer code running
+ * on a remote server. Methods of this service are expected to have security
+ * checks based on the propagated JAAS credentials because this service can be
  * accessed remotely.
  *
  * @author Brian Wing Shun Chan
  * @see ReadingTimeEntryService
+ * @see com.liferay.reading.time.service.base.ReadingTimeEntryServiceBaseImpl
+ * @see com.liferay.reading.time.service.impl.ReadingTimeEntryServiceImpl
  * @generated
  */
 @ProviderType
 public class ReadingTimeEntryServiceUtil {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this class directly. Add custom service methods to <code>com.liferay.reading.time.service.impl.ReadingTimeEntryServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify this class directly. Add custom service methods to {@link com.liferay.reading.time.service.impl.ReadingTimeEntryServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
@@ -54,22 +56,17 @@ public class ReadingTimeEntryServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker
-		<ReadingTimeEntryService, ReadingTimeEntryService> _serviceTracker;
+	private static ServiceTracker<ReadingTimeEntryService, ReadingTimeEntryService> _serviceTracker;
 
 	static {
 		Bundle bundle = FrameworkUtil.getBundle(ReadingTimeEntryService.class);
 
-		ServiceTracker<ReadingTimeEntryService, ReadingTimeEntryService>
-			serviceTracker =
-				new ServiceTracker
-					<ReadingTimeEntryService, ReadingTimeEntryService>(
-						bundle.getBundleContext(),
-						ReadingTimeEntryService.class, null);
+		ServiceTracker<ReadingTimeEntryService, ReadingTimeEntryService> serviceTracker =
+			new ServiceTracker<ReadingTimeEntryService, ReadingTimeEntryService>(bundle.getBundleContext(),
+				ReadingTimeEntryService.class, null);
 
 		serviceTracker.open();
 
 		_serviceTracker = serviceTracker;
 	}
-
 }

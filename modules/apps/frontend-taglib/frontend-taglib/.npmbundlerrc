@@ -1,0 +1,8 @@
+{
+    "ignore": [
+      "**/config.js",
+      "**/management_bar.js",
+      "**/sidebar_panel.js"
+    ],
+    "preset": "liferay-npm-bundler-preset-liferay-dev"
+}

@@ -184,14 +184,17 @@ create index IX_3B69160F on Groups_UserGroups (userGroupId);
 create index IX_6A925A4D on Image (size_);
 
 create index IX_881EABCB on Layout (companyId, layoutPrototypeUuid[$COLUMN_LENGTH:75$]);
+create index IX_D4B8A526 on Layout (groupId, leftPlid, rightPlid, privateLayout);
 create unique index IX_BC2C4231 on Layout (groupId, privateLayout, friendlyURL[$COLUMN_LENGTH:255$]);
 create unique index IX_7162C27C on Layout (groupId, privateLayout, layoutId);
+create index IX_2C89110E on Layout (groupId, privateLayout, leftPlid, rightPlid);
 create index IX_7399B71E on Layout (groupId, privateLayout, parentLayoutId, priority);
 create index IX_8CE8C0D9 on Layout (groupId, privateLayout, sourcePrototypeLayoutUuid[$COLUMN_LENGTH:75$]);
 create index IX_1A1B61D2 on Layout (groupId, privateLayout, type_[$COLUMN_LENGTH:75$]);
 create index IX_6EDC627B on Layout (groupId, type_[$COLUMN_LENGTH:75$]);
 create index IX_23922F7D on Layout (iconImageId);
 create index IX_B529BFD3 on Layout (layoutPrototypeUuid[$COLUMN_LENGTH:75$]);
+create index IX_1D4DCAA5 on Layout (parentPlid);
 create index IX_3BC009C0 on Layout (privateLayout, iconImageId);
 create index IX_39A18ECC on Layout (sourcePrototypeLayoutUuid[$COLUMN_LENGTH:75$]);
 create index IX_2CE4BE84 on Layout (uuid_[$COLUMN_LENGTH:75$], companyId);
@@ -401,7 +404,7 @@ create index IX_8BACD0AA on Ticket (companyId, classNameId, classPK, type_);
 create index IX_B2468446 on Ticket (key_[$COLUMN_LENGTH:75$]);
 
 create index IX_CB9015AF on UserGroup (companyId, externalReferenceCode[$COLUMN_LENGTH:75$]);
-create unique index IX_23EAD0D on UserGroup (companyId, name[$COLUMN_LENGTH:255$]);
+create unique index IX_23EAD0D on UserGroup (companyId, name[$COLUMN_LENGTH:75$]);
 create index IX_69771487 on UserGroup (companyId, parentUserGroupId);
 create index IX_72394F8E on UserGroup (uuid_[$COLUMN_LENGTH:75$], companyId);
 

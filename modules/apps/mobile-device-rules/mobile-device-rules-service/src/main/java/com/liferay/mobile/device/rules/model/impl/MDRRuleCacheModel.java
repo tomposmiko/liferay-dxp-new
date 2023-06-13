@@ -17,9 +17,11 @@ package com.liferay.mobile.device.rules.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.mobile.device.rules.model.MDRRule;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,11 +34,11 @@ import java.util.Date;
  * The cache model class for representing MDRRule in entity cache.
  *
  * @author Edward C. Han
+ * @see MDRRule
  * @generated
  */
 @ProviderType
 public class MDRRuleCacheModel implements CacheModel<MDRRule>, Externalizable {
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -201,7 +203,8 @@ public class MDRRuleCacheModel implements CacheModel<MDRRule>, Externalizable {
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -274,5 +277,4 @@ public class MDRRuleCacheModel implements CacheModel<MDRRule>, Externalizable {
 	public String type;
 	public String typeSettings;
 	public long lastPublishDate;
-
 }

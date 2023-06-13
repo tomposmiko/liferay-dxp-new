@@ -15,7 +15,7 @@
 package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.cluster;
 
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterRequest;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterResponse;
 
@@ -63,9 +63,13 @@ public class StatsClusterRequestExecutorImpl
 			ClusterHealthStatus clusterHealthStatus =
 				clusterStatsResponse.getStatus();
 
-			return new StatsClusterResponse(
-				clusterHealthStatusTranslator.translate(clusterHealthStatus),
-				Strings.toString(xContentBuilder));
+			StatsClusterResponse statsClusterResponse =
+				new StatsClusterResponse(
+					clusterHealthStatusTranslator.translate(
+						clusterHealthStatus),
+					Strings.toString(xContentBuilder));
+
+			return statsClusterResponse;
 		}
 		catch (IOException ioe) {
 			throw new SystemException(ioe);
@@ -75,14 +79,17 @@ public class StatsClusterRequestExecutorImpl
 	protected ClusterStatsRequestBuilder createClusterStatsRequestBuilder(
 		StatsClusterRequest statsClusterRequest) {
 
-		return ClusterStatsAction.INSTANCE.newRequestBuilder(
-			elasticsearchConnectionManager.getClient());
+		ClusterStatsRequestBuilder clusterStatsRequestBuilder =
+			ClusterStatsAction.INSTANCE.newRequestBuilder(
+				elasticsearchClientResolver.getClient());
+
+		return clusterStatsRequestBuilder;
 	}
 
 	@Reference
 	protected ClusterHealthStatusTranslator clusterHealthStatusTranslator;
 
 	@Reference
-	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
+	protected ElasticsearchClientResolver elasticsearchClientResolver;
 
 }

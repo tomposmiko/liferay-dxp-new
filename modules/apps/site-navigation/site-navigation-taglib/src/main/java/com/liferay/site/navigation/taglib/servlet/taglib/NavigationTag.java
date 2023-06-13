@@ -19,6 +19,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateManagerUtil;
 import com.liferay.portal.kernel.theme.NavItem;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -31,6 +32,8 @@ import com.liferay.site.navigation.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.site.navigation.taglib.internal.util.NavItemUtil;
 import com.liferay.taglib.util.IncludeTag;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,7 +162,30 @@ public class NavigationTag extends IncludeTag {
 	protected List<NavItem> getBranchNavItems(HttpServletRequest request)
 		throws PortalException {
 
-		return NavItemUtil.getBranchNavItems(request);
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Layout layout = themeDisplay.getLayout();
+
+		if (layout.isRootLayout()) {
+			return Collections.singletonList(
+				new NavItem(request, themeDisplay, layout, null));
+		}
+
+		List<Layout> ancestorLayouts = layout.getAncestors();
+
+		List<NavItem> navItems = new ArrayList<>(ancestorLayouts.size() + 1);
+
+		for (int i = ancestorLayouts.size() - 1; i >= 0; i--) {
+			Layout ancestorLayout = ancestorLayouts.get(i);
+
+			navItems.add(
+				new NavItem(request, themeDisplay, ancestorLayout, null));
+		}
+
+		navItems.add(new NavItem(request, themeDisplay, layout, null));
+
+		return navItems;
 	}
 
 	protected String getDisplayStyle() {

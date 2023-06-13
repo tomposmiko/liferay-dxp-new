@@ -19,10 +19,12 @@ import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeSettings;
 import com.liferay.dynamic.data.mapping.internal.util.DDMImpl;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONSerializer;
-import com.liferay.dynamic.data.mapping.io.internal.DDMFormJSONDeserializerImpl;
-import com.liferay.dynamic.data.mapping.io.internal.DDMFormJSONSerializerImpl;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeResponse;
+import com.liferay.dynamic.data.mapping.io.internal.DDMFormJSONDeserializer;
+import com.liferay.dynamic.data.mapping.io.internal.DDMFormJSONSerializer;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayoutColumn;
@@ -227,7 +229,10 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 	protected DDMFormLayoutColumn createDDMFormLayoutColumn(
 		int size, String... fieldNames) {
 
-		return new DDMFormLayoutColumn(size, fieldNames);
+		DDMFormLayoutColumn ddmFormLayoutColumn = new DDMFormLayoutColumn(
+			size, fieldNames);
+
+		return ddmFormLayoutColumn;
 	}
 
 	protected List<DDMFormLayoutColumn> createDDMFormLayoutColumns(
@@ -380,7 +385,14 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 	}
 
 	protected DDMStructure createStructure(String name, DDMForm ddmForm) {
-		return createStructure(name, ddmFormJSONSerializer.serialize(ddmForm));
+		DDMFormSerializerSerializeRequest.Builder builder =
+			DDMFormSerializerSerializeRequest.Builder.newBuilder(ddmForm);
+
+		DDMFormSerializerSerializeResponse ddmFormSerializerSerializeResponse =
+			ddmFormJSONSerializer.serialize(builder.build());
+
+		return createStructure(
+			name, ddmFormSerializerSerializeResponse.getContent());
 	}
 
 	protected DDMStructure createStructure(String name, String definition) {
@@ -560,8 +572,7 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 		// DDM form field type services tracker
 
 		java.lang.reflect.Field field = ReflectionUtil.getDeclaredField(
-			DDMFormJSONDeserializerImpl.class,
-			"_ddmFormFieldTypeServicesTracker");
+			DDMFormJSONDeserializer.class, "_ddmFormFieldTypeServicesTracker");
 
 		field.set(
 			ddmFormJSONDeserializer,
@@ -570,7 +581,7 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 		// JSON factory
 
 		field = ReflectionUtil.getDeclaredField(
-			DDMFormJSONDeserializerImpl.class, "_jsonFactory");
+			DDMFormJSONDeserializer.class, "_jsonFactory");
 
 		field.set(ddmFormJSONDeserializer, new JSONFactoryImpl());
 	}
@@ -580,8 +591,7 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 		// DDM form field type services tracker
 
 		java.lang.reflect.Field field = ReflectionUtil.getDeclaredField(
-			DDMFormJSONSerializerImpl.class,
-			"_ddmFormFieldTypeServicesTracker");
+			DDMFormJSONSerializer.class, "_ddmFormFieldTypeServicesTracker");
 
 		field.set(
 			ddmFormJSONSerializer, getMockedDDMFormFieldTypeServicesTracker());
@@ -589,7 +599,7 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 		// JSON factory
 
 		field = ReflectionUtil.getDeclaredField(
-			DDMFormJSONSerializerImpl.class, "_jsonFactory");
+			DDMFormJSONSerializer.class, "_jsonFactory");
 
 		field.set(ddmFormJSONSerializer, new JSONFactoryImpl());
 	}
@@ -629,8 +639,16 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 
 					DDMStructure structure = (DDMStructure)args[0];
 
-					return ddmFormJSONDeserializer.deserialize(
-						structure.getDefinition());
+					DDMFormDeserializerDeserializeRequest.Builder builder =
+						DDMFormDeserializerDeserializeRequest.Builder.
+							newBuilder(structure.getDefinition());
+
+					DDMFormDeserializerDeserializeResponse
+						ddmFormDeserializerDeserializeResponse =
+							ddmFormJSONDeserializer.deserialize(
+								builder.build());
+
+					return ddmFormDeserializerDeserializeResponse.getDDMForm();
 				}
 
 			}
@@ -885,9 +903,9 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 	}
 
 	protected final DDMFormJSONDeserializer ddmFormJSONDeserializer =
-		new DDMFormJSONDeserializerImpl();
+		new DDMFormJSONDeserializer();
 	protected final DDMFormJSONSerializer ddmFormJSONSerializer =
-		new DDMFormJSONSerializerImpl();
+		new DDMFormJSONSerializer();
 
 	@Mock
 	protected Language language;

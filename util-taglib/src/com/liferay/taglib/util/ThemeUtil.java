@@ -14,7 +14,6 @@
 
 package com.liferay.taglib.util;
 
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -76,58 +75,13 @@ public class ThemeUtil {
 			HttpServletResponse response, String path, Theme theme)
 		throws Exception {
 
-		String extension = theme.getTemplateExtension();
-
-		if (extension.equals(ThemeHelper.TEMPLATE_EXTENSION_FTL)) {
-			includeFTL(servletContext, request, response, path, theme, true);
-		}
-		else {
-			path = theme.getTemplatesPath() + StringPool.SLASH + path;
-
-			includeJSP(servletContext, request, response, path, theme);
-		}
+		include(servletContext, request, response, path, theme, true);
 	}
 
-	public static String includeFTL(
+	public static String include(
 			ServletContext servletContext, HttpServletRequest request,
 			HttpServletResponse response, String path, Theme theme,
 			boolean write)
-		throws Exception {
-
-		return doDispatch(
-			servletContext, request, response, path, theme, write,
-			ThemeHelper.TEMPLATE_EXTENSION_FTL);
-	}
-
-	public static void includeJSP(
-			ServletContext servletContext, HttpServletRequest request,
-			HttpServletResponse response, String path, Theme theme)
-		throws Exception {
-
-		doDispatch(
-			servletContext, request, response, path, theme, true,
-			ThemeHelper.TEMPLATE_EXTENSION_JSP);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static String includeVM(
-			ServletContext servletContext, HttpServletRequest request,
-			HttpServletResponse response, String path, Theme theme,
-			boolean write)
-		throws Exception {
-
-		return doDispatch(
-			servletContext, request, response, path, theme, write,
-			ThemeHelper.TEMPLATE_EXTENSION_VM);
-	}
-
-	protected static String doDispatch(
-			ServletContext servletContext, HttpServletRequest request,
-			HttpServletResponse response, String path, Theme theme,
-			boolean write, String extension)
 		throws Exception {
 
 		String pluginServletContextName = GetterUtil.getString(
@@ -154,16 +108,8 @@ public class ThemeUtil {
 		}
 
 		try {
-			if (extension.equals(ThemeHelper.TEMPLATE_EXTENSION_FTL)) {
-				return doIncludeFTL(
-					servletContext, request, response, path, theme, false,
-					write);
-			}
-			else if (extension.equals(ThemeHelper.TEMPLATE_EXTENSION_JSP)) {
-				doIncludeJSP(servletContext, request, response, path, theme);
-			}
-
-			return null;
+			return doIncludeFTL(
+				servletContext, request, response, path, theme, false, write);
 		}
 		finally {
 			if ((pluginClassLoader != null) &&
@@ -172,6 +118,63 @@ public class ThemeUtil {
 				currentThread.setContextClassLoader(contextClassLoader);
 			}
 		}
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	public static String includeFTL(
+			ServletContext servletContext, HttpServletRequest request,
+			HttpServletResponse response, String path, Theme theme,
+			boolean write)
+		throws Exception {
+
+		return include(servletContext, request, response, path, theme, write);
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	public static void includeJSP(
+			ServletContext servletContext, HttpServletRequest request,
+			HttpServletResponse response, String path, Theme theme)
+		throws Exception {
+
+		doDispatch(
+			servletContext, request, response, path, theme, true,
+			ThemeHelper.TEMPLATE_EXTENSION_JSP);
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	public static String includeVM(
+			ServletContext servletContext, HttpServletRequest request,
+			HttpServletResponse response, String path, Theme theme,
+			boolean write)
+		throws Exception {
+
+		return doDispatch(
+			servletContext, request, response, path, theme, write,
+			ThemeHelper.TEMPLATE_EXTENSION_VM);
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 *             #include(ServletContext, HttpServletRequest,
+	 * 					HttpServletResponse, String, Theme, boolean)}
+	 */
+	@Deprecated
+	protected static String doDispatch(
+			ServletContext servletContext, HttpServletRequest request,
+			HttpServletResponse response, String path, Theme theme,
+			boolean write, String extension)
+		throws Exception {
+
+		return include(servletContext, request, response, path, theme, write);
 	}
 
 	protected static String doIncludeFTL(
@@ -286,6 +289,10 @@ public class ThemeUtil {
 		return writer.toString();
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	protected static void doIncludeJSP(
 			ServletContext servletContext, HttpServletRequest request,
 			HttpServletResponse response, String path, Theme theme)

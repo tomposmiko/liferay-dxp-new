@@ -16,13 +16,20 @@
 
 <%@ include file="/init.jsp" %>
 
-<%@ page import="com.liferay.document.library.configuration.DLConfiguration" %><%@
+<%@ page import="com.liferay.bulk.selection.BulkSelection" %><%@
+page import="com.liferay.bulk.selection.BulkSelectionRunner" %><%@
+page import="com.liferay.document.library.configuration.DLConfiguration" %><%@
+page import="com.liferay.document.library.kernel.model.DLVersionNumberIncrease" %><%@
+page import="com.liferay.document.library.web.internal.bulk.selection.BulkSelectionRunnerUtil" %><%@
 page import="com.liferay.document.library.web.internal.util.RepositoryClassDefinitionUtil" %><%@
 page import="com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil" %><%@
+page import="com.liferay.portal.kernel.repository.capabilities.TrashCapability" %><%@
 page import="com.liferay.portal.kernel.util.LocaleUtil" %><%@
 page import="com.liferay.portal.util.RepositoryUtil" %><%@
 page import="com.liferay.staging.StagingGroupHelper" %><%@
 page import="com.liferay.staging.StagingGroupHelperUtil" %>
+
+<%@ taglib uri="http://liferay.com/tld/soy" prefix="soy" %>
 
 <%
 DLRequestHelper dlRequestHelper = new DLRequestHelper(request);
@@ -33,13 +40,9 @@ portletName = dlRequestHelper.getResourcePortletName();
 
 String portletResource = dlRequestHelper.getPortletResource();
 
-DLAdminDisplayContext dlAdminDisplayContext = (DLAdminDisplayContext)request.getAttribute(DLWebKeys.DOCUMENT_LIBRARY_ADMIN_DISPLAY_CONTEXT);
+DLAdminDisplayContext dlAdminDisplayContext = dlAdminDisplayContextProvider.getDLAdminDisplayContext(request, response);
 
-if (dlAdminDisplayContext == null) {
-	dlAdminDisplayContext = new DLAdminDisplayContext(liferayPortletRequest, liferayPortletResponse);
-
-	request.setAttribute(DLWebKeys.DOCUMENT_LIBRARY_ADMIN_DISPLAY_CONTEXT, dlAdminDisplayContext);
-}
+DLAdminManagementToolbarDisplayContext dlAdminManagementToolbarDisplayContext = dlAdminDisplayContextProvider.getDLAdminManagementToolbarDisplayContext(request, response);
 
 DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
 DLGroupServiceSettings dlGroupServiceSettings = dlRequestHelper.getDLGroupServiceSettings();

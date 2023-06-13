@@ -188,11 +188,7 @@ public class Predicates {
 	public static Predicate<ActionSemantics> isAction(
 		String name, String method) {
 
-		return isActionNamed(
-			name
-		).and(
-			isActionBy(method)
-		);
+		return isActionNamed(name).and(isActionBy(method));
 	}
 
 	/**

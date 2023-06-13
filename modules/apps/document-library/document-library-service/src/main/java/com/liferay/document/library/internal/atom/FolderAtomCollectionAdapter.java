@@ -177,8 +177,10 @@ public class FolderAtomCollectionAdapter
 
 		ServiceContext serviceContext = new ServiceContext();
 
-		return _dlAppService.addFolder(
+		Folder folder = _dlAppService.addFolder(
 			repositoryId, parentFolderId, title, summary, serviceContext);
+
+		return folder;
 	}
 
 	@Override

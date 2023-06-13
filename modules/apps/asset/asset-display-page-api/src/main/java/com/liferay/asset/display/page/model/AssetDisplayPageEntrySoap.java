@@ -30,15 +30,12 @@ import java.util.List;
  */
 @ProviderType
 public class AssetDisplayPageEntrySoap implements Serializable {
-
 	public static AssetDisplayPageEntrySoap toSoapModel(
 		AssetDisplayPageEntry model) {
-
 		AssetDisplayPageEntrySoap soapModel = new AssetDisplayPageEntrySoap();
 
 		soapModel.setUuid(model.getUuid());
-		soapModel.setAssetDisplayPageEntryId(
-			model.getAssetDisplayPageEntryId());
+		soapModel.setAssetDisplayPageEntryId(model.getAssetDisplayPageEntryId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
@@ -47,18 +44,16 @@ public class AssetDisplayPageEntrySoap implements Serializable {
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setClassNameId(model.getClassNameId());
 		soapModel.setClassPK(model.getClassPK());
-		soapModel.setLayoutPageTemplateEntryId(
-			model.getLayoutPageTemplateEntryId());
+		soapModel.setLayoutPageTemplateEntryId(model.getLayoutPageTemplateEntryId());
 		soapModel.setType(model.getType());
+		soapModel.setPlid(model.getPlid());
 
 		return soapModel;
 	}
 
 	public static AssetDisplayPageEntrySoap[] toSoapModels(
 		AssetDisplayPageEntry[] models) {
-
-		AssetDisplayPageEntrySoap[] soapModels =
-			new AssetDisplayPageEntrySoap[models.length];
+		AssetDisplayPageEntrySoap[] soapModels = new AssetDisplayPageEntrySoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -69,12 +64,10 @@ public class AssetDisplayPageEntrySoap implements Serializable {
 
 	public static AssetDisplayPageEntrySoap[][] toSoapModels(
 		AssetDisplayPageEntry[][] models) {
-
 		AssetDisplayPageEntrySoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels =
-				new AssetDisplayPageEntrySoap[models.length][models[0].length];
+			soapModels = new AssetDisplayPageEntrySoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new AssetDisplayPageEntrySoap[0][0];
@@ -89,16 +82,13 @@ public class AssetDisplayPageEntrySoap implements Serializable {
 
 	public static AssetDisplayPageEntrySoap[] toSoapModels(
 		List<AssetDisplayPageEntry> models) {
-
-		List<AssetDisplayPageEntrySoap> soapModels =
-			new ArrayList<AssetDisplayPageEntrySoap>(models.size());
+		List<AssetDisplayPageEntrySoap> soapModels = new ArrayList<AssetDisplayPageEntrySoap>(models.size());
 
 		for (AssetDisplayPageEntry model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(
-			new AssetDisplayPageEntrySoap[soapModels.size()]);
+		return soapModels.toArray(new AssetDisplayPageEntrySoap[soapModels.size()]);
 	}
 
 	public AssetDisplayPageEntrySoap() {
@@ -208,6 +198,14 @@ public class AssetDisplayPageEntrySoap implements Serializable {
 		_type = type;
 	}
 
+	public long getPlid() {
+		return _plid;
+	}
+
+	public void setPlid(long plid) {
+		_plid = plid;
+	}
+
 	private String _uuid;
 	private long _assetDisplayPageEntryId;
 	private long _groupId;
@@ -220,5 +218,5 @@ public class AssetDisplayPageEntrySoap implements Serializable {
 	private long _classPK;
 	private long _layoutPageTemplateEntryId;
 	private int _type;
-
+	private long _plid;
 }

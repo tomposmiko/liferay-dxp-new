@@ -30,7 +30,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 <div class="task-action">
 	<aui:form action="<%= assignURL %>" method="post" name="assignFm">
-		<div class="modal-body task-action-content">
+		<div class="task-action-content">
 			<aui:input name="workflowTaskId" type="hidden" value="<%= String.valueOf(workflowTask.getWorkflowTaskId()) %>" />
 
 			<c:choose>
@@ -57,41 +57,30 @@ String redirect = ParamUtil.getString(request, "redirect");
 			<aui:input cols="55" cssClass="task-action-comment" disabled="<%= !hasOtherAssignees && (assigneeUserId <= 0) %>" name="comment" placeholder="comment" rows="1" type="textarea" />
 		</div>
 
-		<div class="modal-footer">
-			<div class="btn-group">
-				<div class="btn-group-item">
-					<aui:button name="close" type="cancel" />
-				</div>
+		<aui:button-row cssClass="modal-footer task-action-button">
+			<aui:button disabled="<%= !hasOtherAssignees && (assigneeUserId <= 0) %>" name="done" primary="<%= true %>" value="done" />
 
-				<div class="btn-group-item">
-					<aui:button disabled="<%= !hasOtherAssignees && (assigneeUserId <= 0) %>" name="done" primary="<%= true %>" value="done" />
-				</div>
-			</div>
-		</div>
+			<aui:button name="close" type="cancel" />
+		</aui:button-row>
 	</aui:form>
 </div>
 
 <aui:script use="aui-base,aui-io-request">
-	var done = A.one('#<portlet:namespace />done');
-
-	if (done) {
-		done.on(
-			'click',
-			function(event) {
-				A.io.request(
-					'<%= assignURL.toString() %>',
-					{
-						form: {id: '<portlet:namespace />assignFm'},
-						method: 'POST',
-						on: {
-							success: function() {
-								Liferay.Util.getOpener().<portlet:namespace />refreshPortlet('<%= redirect.toString() %>');
-								Liferay.Util.getWindow('<portlet:namespace />assignToDialog').destroy();
-							}
+	A.one('#<portlet:namespace />done').on(
+		'click',
+		function(event) {
+			A.io.request(
+				'<%= assignURL.toString() %>',
+				{
+					form: {id: '<portlet:namespace />assignFm'},
+					method: 'POST',
+					on: {
+						success: function() {
+							Liferay.Util.getOpener().<portlet:namespace />refreshPortlet('<%= redirect.toString() %>');
+							Liferay.Util.getWindow('<portlet:namespace />assignToDialog').destroy();
 						}
 					}
-				);
-			}
-		);
-	}
+				}
+			);
+		});
 </aui:script>

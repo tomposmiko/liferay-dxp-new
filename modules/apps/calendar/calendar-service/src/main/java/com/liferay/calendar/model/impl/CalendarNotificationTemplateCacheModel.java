@@ -17,9 +17,11 @@ package com.liferay.calendar.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.calendar.model.CalendarNotificationTemplate;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing CalendarNotificationTemplate in entity cache.
  *
  * @author Eduardo Lundgren
+ * @see CalendarNotificationTemplate
  * @generated
  */
 @ProviderType
-public class CalendarNotificationTemplateCacheModel
-	implements CacheModel<CalendarNotificationTemplate>, Externalizable {
-
+public class CalendarNotificationTemplateCacheModel implements CacheModel<CalendarNotificationTemplate>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,14 +50,10 @@ public class CalendarNotificationTemplateCacheModel
 			return false;
 		}
 
-		CalendarNotificationTemplateCacheModel
-			calendarNotificationTemplateCacheModel =
-				(CalendarNotificationTemplateCacheModel)obj;
+		CalendarNotificationTemplateCacheModel calendarNotificationTemplateCacheModel =
+			(CalendarNotificationTemplateCacheModel)obj;
 
-		if (calendarNotificationTemplateId ==
-				calendarNotificationTemplateCacheModel.
-					calendarNotificationTemplateId) {
-
+		if (calendarNotificationTemplateId == calendarNotificationTemplateCacheModel.calendarNotificationTemplateId) {
 			return true;
 		}
 
@@ -108,8 +106,7 @@ public class CalendarNotificationTemplateCacheModel
 
 	@Override
 	public CalendarNotificationTemplate toEntityModel() {
-		CalendarNotificationTemplateImpl calendarNotificationTemplateImpl =
-			new CalendarNotificationTemplateImpl();
+		CalendarNotificationTemplateImpl calendarNotificationTemplateImpl = new CalendarNotificationTemplateImpl();
 
 		if (uuid == null) {
 			calendarNotificationTemplateImpl.setUuid("");
@@ -118,8 +115,7 @@ public class CalendarNotificationTemplateCacheModel
 			calendarNotificationTemplateImpl.setUuid(uuid);
 		}
 
-		calendarNotificationTemplateImpl.setCalendarNotificationTemplateId(
-			calendarNotificationTemplateId);
+		calendarNotificationTemplateImpl.setCalendarNotificationTemplateId(calendarNotificationTemplateId);
 		calendarNotificationTemplateImpl.setGroupId(groupId);
 		calendarNotificationTemplateImpl.setCompanyId(companyId);
 		calendarNotificationTemplateImpl.setUserId(userId);
@@ -135,16 +131,15 @@ public class CalendarNotificationTemplateCacheModel
 			calendarNotificationTemplateImpl.setCreateDate(null);
 		}
 		else {
-			calendarNotificationTemplateImpl.setCreateDate(
-				new Date(createDate));
+			calendarNotificationTemplateImpl.setCreateDate(new Date(createDate));
 		}
 
 		if (modifiedDate == Long.MIN_VALUE) {
 			calendarNotificationTemplateImpl.setModifiedDate(null);
 		}
 		else {
-			calendarNotificationTemplateImpl.setModifiedDate(
-				new Date(modifiedDate));
+			calendarNotificationTemplateImpl.setModifiedDate(new Date(
+					modifiedDate));
 		}
 
 		calendarNotificationTemplateImpl.setCalendarId(calendarId);
@@ -153,24 +148,21 @@ public class CalendarNotificationTemplateCacheModel
 			calendarNotificationTemplateImpl.setNotificationType("");
 		}
 		else {
-			calendarNotificationTemplateImpl.setNotificationType(
-				notificationType);
+			calendarNotificationTemplateImpl.setNotificationType(notificationType);
 		}
 
 		if (notificationTypeSettings == null) {
 			calendarNotificationTemplateImpl.setNotificationTypeSettings("");
 		}
 		else {
-			calendarNotificationTemplateImpl.setNotificationTypeSettings(
-				notificationTypeSettings);
+			calendarNotificationTemplateImpl.setNotificationTypeSettings(notificationTypeSettings);
 		}
 
 		if (notificationTemplateType == null) {
 			calendarNotificationTemplateImpl.setNotificationTemplateType("");
 		}
 		else {
-			calendarNotificationTemplateImpl.setNotificationTemplateType(
-				notificationTemplateType);
+			calendarNotificationTemplateImpl.setNotificationTemplateType(notificationTemplateType);
 		}
 
 		if (subject == null) {
@@ -191,8 +183,8 @@ public class CalendarNotificationTemplateCacheModel
 			calendarNotificationTemplateImpl.setLastPublishDate(null);
 		}
 		else {
-			calendarNotificationTemplateImpl.setLastPublishDate(
-				new Date(lastPublishDate));
+			calendarNotificationTemplateImpl.setLastPublishDate(new Date(
+					lastPublishDate));
 		}
 
 		calendarNotificationTemplateImpl.resetOriginalValues();
@@ -225,7 +217,8 @@ public class CalendarNotificationTemplateCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -306,5 +299,4 @@ public class CalendarNotificationTemplateCacheModel
 	public String subject;
 	public String body;
 	public long lastPublishDate;
-
 }

@@ -5,17 +5,23 @@
 	color: #FFF;
 	height: $managementBarHeight;
 	left: 0;
+	max-height: $managementBarHeight;
+	min-height: $managementBarHeight;
 	position: fixed;
 	top: $controlMenuHeight;
-	transition: ease $productMenuTransitionDuration;
-	transition-property: left, width;
+	transition: left ease $productMenuTransitionDuration, width ease $productMenuTransitionDuration;
 	width: 100%;
 	will-change: left, width;
 	z-index: $managementBarZIndex;
 
 	body.open & {
-		left: $productMenuWidth;
-		width: calc(100% - #{$productMenuWidth});
+		left: $sidebarWidth;
+		width: calc(100% - #{$sidebarWidth});
+	}
+
+	& > .container-fluid {
+		padding: 6px 1rem 7px;
+		padding-right: $sidebarButtonsWidth;
 	}
 
 	&__add-fragment-button {
@@ -71,7 +77,12 @@
 	}
 
 	@media (min-width: 768px) {
-		height: $managementBarHeight;
+		height: $desktopManagementBarHeight;
 		top: $desktopControlMenuHeight;
+
+		& > .container-fluid {
+			padding: 10px 1.25rem;
+			padding-right: $sidebarButtonsWidth;
+		}
 	}
 }

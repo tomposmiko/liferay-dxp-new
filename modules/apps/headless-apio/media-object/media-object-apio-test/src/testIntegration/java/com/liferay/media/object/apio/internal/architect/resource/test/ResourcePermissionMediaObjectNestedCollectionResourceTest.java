@@ -41,8 +41,6 @@ import com.liferay.portal.test.rule.PermissionCheckerTestRule;
 
 import java.io.ByteArrayInputStream;
 
-import java.nio.charset.StandardCharsets;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -549,9 +547,8 @@ public class ResourcePermissionMediaObjectNestedCollectionResourceTest
 		return DLAppServiceUtil.addFileEntry(
 			groupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, null, null,
 			RandomTestUtil.randomString(10), RandomTestUtil.randomString(10),
-			StringPool.BLANK,
-			new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)),
-			0L, serviceContext);
+			StringPool.BLANK, new ByteArrayInputStream(content.getBytes()), 0L,
+			serviceContext);
 	}
 
 	@DeleteAfterTestRun

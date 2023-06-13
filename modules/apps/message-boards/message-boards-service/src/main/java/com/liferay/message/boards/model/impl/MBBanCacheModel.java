@@ -17,9 +17,11 @@ package com.liferay.message.boards.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.message.boards.model.MBBan;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -32,11 +34,11 @@ import java.util.Date;
  * The cache model class for representing MBBan in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see MBBan
  * @generated
  */
 @ProviderType
 public class MBBanCacheModel implements CacheModel<MBBan>, Externalizable {
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -161,7 +163,8 @@ public class MBBanCacheModel implements CacheModel<MBBan>, Externalizable {
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -201,5 +204,4 @@ public class MBBanCacheModel implements CacheModel<MBBan>, Externalizable {
 	public long modifiedDate;
 	public long banUserId;
 	public long lastPublishDate;
-
 }

@@ -2718,9 +2718,9 @@ definition {
 		property testray.component.names = "Training";
 
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.uploadDefinition(
@@ -3930,9 +3930,9 @@ definition {
 	@priority = "4"
 	test EditProcessWorkflowAfterFormSubmission {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.uploadDefinition(
@@ -4124,9 +4124,9 @@ definition {
 	@priority = "4"
 	test EditProcessWorkflowBeforeFormSubmission {
 		ProductMenu.gotoPortlet(
-			category = "Configuration",
+			category = "Workflow",
 			panel = "Control Panel",
-			portlet = "Workflow"
+			portlet = "Process Builder"
 		);
 
 		Workflow.uploadDefinition(

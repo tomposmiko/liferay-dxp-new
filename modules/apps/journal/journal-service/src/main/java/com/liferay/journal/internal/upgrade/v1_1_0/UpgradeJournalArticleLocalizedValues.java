@@ -26,13 +26,11 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -85,17 +83,44 @@ public class UpgradeJournalArticleLocalizedValues extends UpgradeProcess {
 	}
 
 	protected void updateJournalArticleDefaultLanguageId() throws Exception {
+		String whereClause = StringPool.BLANK;
+
 		if (!hasColumn("JournalArticle", "defaultLanguageId")) {
 			runSQL(
 				"alter table JournalArticle add defaultLanguageId " +
 					"VARCHAR(75) null");
 		}
+		else {
+			whereClause =
+				" where defaultLanguageId is null or defaultLanguageId = ''";
+		}
 
-		String whereClause =
-			" where defaultLanguageId is null or defaultLanguageId = ''";
+		try (LoggingTimer loggingTimer = new LoggingTimer();
+			PreparedStatement ps1 = connection.prepareStatement(
+				"select id_, title from JournalArticle" + whereClause);
+			PreparedStatement ps2 =
+				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+					connection,
+					"update JournalArticle set defaultLanguageId = ? where " +
+						"id_ = ?");
+			ResultSet rs = ps1.executeQuery()) {
 
-		_updateDefaultLanguage("title", whereClause, false);
-		_updateDefaultLanguage("content", whereClause, true);
+			Locale defaultLocale = LocaleUtil.getSiteDefault();
+
+			while (rs.next()) {
+				String defaultLanguageId =
+					LocalizationUtil.getDefaultLanguageId(
+						rs.getString(2), defaultLocale);
+
+				ps2.setString(1, defaultLanguageId);
+
+				ps2.setLong(2, rs.getLong(1));
+
+				ps2.addBatch();
+			}
+
+			ps2.executeBatch();
+		}
 	}
 
 	protected void updateJournalArticleLocalizedFields() throws Exception {
@@ -107,8 +132,8 @@ public class UpgradeJournalArticleLocalizedValues extends UpgradeProcess {
 
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement ps1 = connection.prepareStatement(
-				"select id_, companyId, title, description, " +
-					"defaultLanguageId from JournalArticle");
+				"select id_, companyId, title, description from " +
+					"JournalArticle");
 			PreparedStatement ps2 =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					connection, sb.toString());
@@ -117,20 +142,21 @@ public class UpgradeJournalArticleLocalizedValues extends UpgradeProcess {
 			while (rs.next()) {
 				long articleId = rs.getLong(1);
 				long companyId = rs.getLong(2);
+				String title = rs.getString(3);
+				String description = rs.getString(4);
 
-				String defaultLanguageId = rs.getString(5);
+				Map<Locale, String> titleMap =
+					LocalizationUtil.getLocalizationMap(title);
 
-				Map<Locale, String> titleMap = _getLocalizationMap(
-					rs.getString(3), defaultLanguageId);
-				Map<Locale, String> descriptionMap = _getLocalizationMap(
-					rs.getString(4), defaultLanguageId);
+				Map<Locale, String> descriptionMap =
+					LocalizationUtil.getLocalizationMap(description);
 
-				Set<Locale> locales = new HashSet<>();
+				Set<Locale> localeSet = new HashSet<>();
 
-				locales.addAll(titleMap.keySet());
-				locales.addAll(descriptionMap.keySet());
+				localeSet.addAll(titleMap.keySet());
+				localeSet.addAll(descriptionMap.keySet());
 
-				for (Locale locale : locales) {
+				for (Locale locale : localeSet) {
 					String localizedTitle = titleMap.get(locale);
 					String localizedDescription = descriptionMap.get(locale);
 
@@ -150,8 +176,6 @@ public class UpgradeJournalArticleLocalizedValues extends UpgradeProcess {
 						if (localizedDescription != safeLocalizedDescription) {
 							_log(articleId, "description");
 						}
-
-						localizedDescription = safeLocalizedDescription;
 					}
 
 					ps2.setLong(1, _increment());
@@ -181,21 +205,6 @@ public class UpgradeJournalArticleLocalizedValues extends UpgradeProcess {
 		runSQLTemplateString(template, false, false);
 	}
 
-	private static Map<Locale, String> _getLocalizationMap(
-		String value, String defaultLanguageId) {
-
-		if (Validator.isXml(value)) {
-			return LocalizationUtil.getLocalizationMap(value);
-		}
-
-		Map<Locale, String> localizationMap = new HashMap<>();
-
-		localizationMap.put(
-			LocaleUtil.fromLanguageId(defaultLanguageId), value);
-
-		return localizationMap;
-	}
-
 	private static long _increment() {
 		DB db = DBManagerUtil.getDB();
 
@@ -213,54 +222,20 @@ public class UpgradeJournalArticleLocalizedValues extends UpgradeProcess {
 				" because it is too long"));
 	}
 
-	private String _truncate(String value, int maxLength) throws Exception {
-		byte[] valueBytes = value.getBytes(StringPool.UTF8);
+	private String _truncate(String text, int maxBytes) throws Exception {
+		byte[] valueBytes = text.getBytes(StringPool.UTF8);
 
-		if (valueBytes.length <= maxLength) {
-			return value;
+		if (valueBytes.length <= maxBytes) {
+			return text;
 		}
 
-		byte[] convertedValue = new byte[maxLength];
+		byte[] convertedValue = new byte[maxBytes];
 
-		System.arraycopy(valueBytes, 0, convertedValue, 0, maxLength);
+		System.arraycopy(valueBytes, 0, convertedValue, 0, maxBytes);
 
 		String returnValue = new String(convertedValue, StringPool.UTF8);
 
 		return StringUtil.shorten(returnValue, returnValue.length() - 1);
-	}
-
-	private void _updateDefaultLanguage(
-			String sourceField, String whereClause, boolean strictUpdate)
-		throws Exception {
-
-		try (LoggingTimer loggingTimer = new LoggingTimer();
-			PreparedStatement ps1 = connection.prepareStatement(
-				StringBundler.concat(
-					"select id_, ", sourceField, " from JournalArticle",
-					whereClause));
-			PreparedStatement ps2 =
-				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-					connection,
-					"update JournalArticle set defaultLanguageId = ? where " +
-						"id_ = ?");
-			ResultSet rs = ps1.executeQuery()) {
-
-			while (rs.next()) {
-				String sourceFieldValue = rs.getString(2);
-
-				if (Validator.isXml(sourceFieldValue) || strictUpdate) {
-					ps2.setString(
-						1,
-						LocalizationUtil.getDefaultLanguageId(
-							sourceFieldValue, LocaleUtil.getSiteDefault()));
-					ps2.setLong(2, rs.getLong(1));
-
-					ps2.addBatch();
-				}
-			}
-
-			ps2.executeBatch();
-		}
 	}
 
 	private static final int _MAX_LENGTH_DESCRIPTION = 4000;

@@ -16,15 +16,12 @@ package com.liferay.chat.service.persistence.impl;
 
 import com.liferay.chat.model.Status;
 import com.liferay.chat.service.persistence.StatusPersistence;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 
-import java.lang.reflect.Field;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,27 +29,8 @@ import java.util.Set;
  * @generated
  */
 public class StatusFinderBaseImpl extends BasePersistenceImpl<Status> {
-
 	public StatusFinderBaseImpl() {
 		setModelClass(Status.class);
-
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("online", "online_");
-
-		try {
-			Field field = BasePersistenceImpl.class.getDeclaredField(
-				"_dbColumnNames");
-
-			field.setAccessible(true);
-
-			field.set(this, dbColumnNames);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
 	}
 
 	@Override
@@ -80,8 +58,5 @@ public class StatusFinderBaseImpl extends BasePersistenceImpl<Status> {
 
 	@BeanReference(type = StatusPersistence.class)
 	protected StatusPersistence statusPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		StatusFinderBaseImpl.class);
-
+	private static final Log _log = LogFactoryUtil.getLog(StatusFinderBaseImpl.class);
 }

@@ -144,17 +144,9 @@ public class RepresentorTransformerTest {
 				(relatedCollection.getIdentifierClass() ==
 					StringIdentifier.class)
 		).filter(
-			relatedCollection -> {
-				String key = relatedCollection.getKey();
-
-				if (key.equals("linkToChildCollection1") ||
-					key.equals("linkToChildCollection2")) {
-
-					return true;
-				}
-
-				return false;
-			}
+			relatedCollection ->
+				relatedCollection.getKey().equals("linkToChildCollection1") ||
+				relatedCollection.getKey().equals("linkToChildCollection2")
 		).collect(
 			Collectors.toList()
 		);

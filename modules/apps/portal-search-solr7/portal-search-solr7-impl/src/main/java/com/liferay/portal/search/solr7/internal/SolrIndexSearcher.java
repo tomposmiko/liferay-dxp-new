@@ -58,6 +58,11 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.constants.SearchContextAttributes;
+import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.search.legacy.searcher.SearchResponseBuilderFactory;
+import com.liferay.portal.search.searcher.SearchRequest;
+import com.liferay.portal.search.searcher.SearchRequestBuilder;
+import com.liferay.portal.search.searcher.SearchResponseBuilder;
 import com.liferay.portal.search.solr7.configuration.SolrConfiguration;
 import com.liferay.portal.search.solr7.internal.connection.SolrClientManager;
 import com.liferay.portal.search.solr7.internal.facet.CompositeFacetProcessor;
@@ -235,7 +240,6 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		_solrConfiguration = ConfigurableUtil.createConfigurable(
 			SolrConfiguration.class, properties);
 
-		_defaultCollection = _solrConfiguration.defaultCollection();
 		_logExceptionsOnly = _solrConfiguration.logExceptionsOnly();
 	}
 
@@ -476,6 +480,15 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 
 		SolrQuery solrQuery = new SolrQuery();
 
+		SearchRequestBuilder searchRequestBuilder = _getSearchRequestBuilder(
+			searchContext);
+
+		SearchRequest searchRequest = searchRequestBuilder.build();
+
+		if (searchRequest.isExplain()) {
+			solrQuery.setShowDebugInfo(true);
+		}
+
 		addStats(solrQuery, searchContext);
 
 		if (!count) {
@@ -513,12 +526,10 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 			}
 		}
 
-		String solrQueryString = solrQuery.toString();
-
-		searchContext.setAttribute("queryString", solrQueryString);
+		String requestString = solrQuery.toString();
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Search query " + solrQueryString);
+			_log.debug("Search query " + requestString);
 		}
 
 		QueryResponse queryResponse = executeSearchRequest(solrQuery);
@@ -526,9 +537,13 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		if (_log.isInfoEnabled()) {
 			_log.info(
 				StringBundler.concat(
-					"The search engine processed ", solrQueryString, " in ",
+					"The search engine processed ", requestString, " in ",
 					queryResponse.getElapsedTime(), " ms"));
 		}
+
+		String responseString = getResponseString(queryResponse, searchContext);
+
+		populateResponse(requestString, responseString, searchContext);
 
 		return queryResponse;
 	}
@@ -552,7 +567,9 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		QueryResponse queryResponse = doSearch(
 			searchContext, query, start, end, false);
 
-		return processResponse(queryResponse, searchContext, query);
+		Hits hits = processResponse(queryResponse, searchContext, query);
+
+		return hits;
 	}
 
 	protected void excludeTags(
@@ -568,8 +585,7 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 
 		SolrClient solrClient = _solrClientManager.getSolrClient();
 
-		return solrClient.query(
-			_defaultCollection, solrQuery, SolrRequest.METHOD.POST);
+		return solrClient.query(solrQuery, SolrRequest.METHOD.POST);
 	}
 
 	protected String getExcludeTagsString(
@@ -611,7 +627,7 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 
 		Stream<Map.Entry<String, JSONObject>> stream = entrySet.stream();
 
-		return stream.map(
+		String jsonString = stream.map(
 			entry -> StringBundler.concat(
 				StringPool.QUOTE, entry.getKey(), StringPool.QUOTE,
 				StringPool.COLON, entry.getValue())
@@ -620,6 +636,23 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 				StringPool.COMMA, StringPool.OPEN_CURLY_BRACE,
 				StringPool.CLOSE_CURLY_BRACE)
 		);
+
+		return jsonString;
+	}
+
+	protected String getResponseString(
+		QueryResponse queryResponse, SearchContext searchContext) {
+
+		SearchRequestBuilder searchRequestBuilder = _getSearchRequestBuilder(
+			searchContext);
+
+		SearchRequest searchRequest = searchRequestBuilder.build();
+
+		if (searchRequest.isIncludeResponseString()) {
+			return queryResponse.toString();
+		}
+
+		return null;
 	}
 
 	protected String getSortFieldName(Sort sort, String scoreFieldName) {
@@ -630,6 +663,20 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		}
 
 		return Field.getSortFieldName(sort, scoreFieldName);
+	}
+
+	protected void populateResponse(
+		String requestString, String responseString,
+		SearchContext searchContext) {
+
+		SearchResponseBuilder searchResponseBuilder = _getSearchResponseBuilder(
+			searchContext);
+
+		searchResponseBuilder.requestString(
+			requestString
+		).responseString(
+			responseString
+		);
 	}
 
 	protected Hits processResponse(
@@ -855,6 +902,12 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 	@Reference
 	protected Props props;
 
+	@Reference
+	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
+
+	@Reference
+	protected SearchResponseBuilderFactory searchResponseBuilderFactory;
+
 	private void _add(
 		Collection<String> filterQueries, Filter filter,
 		SearchContext searchContext) {
@@ -873,12 +926,25 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		}
 	}
 
+	private SearchRequestBuilder _getSearchRequestBuilder(
+		SearchContext searchContext) {
+
+		return searchRequestBuilderFactory.getSearchRequestBuilder(
+			searchContext);
+	}
+
+	private SearchResponseBuilder _getSearchResponseBuilder(
+		SearchContext searchContext) {
+
+		return searchResponseBuilderFactory.getSearchResponseBuilder(
+			searchContext);
+	}
+
 	private static final String _VERSION_FIELD = "_version_";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SolrIndexSearcher.class);
 
-	private String _defaultCollection;
 	private FacetProcessor<SolrQuery> _facetProcessor;
 	private FilterTranslator<String> _filterTranslator;
 	private GroupByTranslator _groupByTranslator;

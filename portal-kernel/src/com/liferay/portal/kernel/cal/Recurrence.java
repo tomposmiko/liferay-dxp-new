@@ -210,10 +210,7 @@ public class Recurrence implements Serializable {
 	 * @return Calendar
 	 */
 	public Calendar getCandidateStartTime(Calendar current) {
-		Date dtStartDate = dtStart.getTime();
-		Date currentDate = current.getTime();
-
-		if (dtStartDate.getTime() > currentDate.getTime()) {
+		if (dtStart.getTime().getTime() > current.getTime().getTime()) {
 			throw new IllegalArgumentException("Current time before DtStart");
 		}
 
@@ -269,10 +266,8 @@ public class Recurrence implements Serializable {
 		 */
 		Calendar tempEnd = (Calendar)dtStart.clone();
 
-		Date dtStartDate = dtStart.getTime();
-
 		tempEnd.setTime(
-			new Date(dtStartDate.getTime() + duration.getInterval()));
+			new Date(dtStart.getTime().getTime() + duration.getInterval()));
 
 		return tempEnd;
 	}
@@ -374,11 +369,7 @@ public class Recurrence implements Serializable {
 		myCurrent.set(Calendar.SECOND, 0);
 		myCurrent.set(Calendar.MILLISECOND, 0);
 
-		Date myCurrentDate = myCurrent.getTime();
-
-		Date dtStartDate = dtStart.getTime();
-
-		if (myCurrentDate.getTime() < dtStartDate.getTime()) {
+		if (myCurrent.getTime().getTime() < dtStart.getTime().getTime()) {
 
 			// The current time is earlier than the start time.
 
@@ -393,15 +384,8 @@ public class Recurrence implements Serializable {
 
 		// Loop over ranges for the duration.
 
-		while (true) {
-			Date candidateDate = candidate.getTime();
-			myCurrentDate = myCurrent.getTime();
-
-			if ((candidateDate.getTime() + duration.getInterval()) <=
-					myCurrentDate.getTime()) {
-
-				break;
-			}
+		while ((candidate.getTime().getTime() + duration.getInterval()) >
+					myCurrent.getTime().getTime()) {
 
 			if (candidateIsInRecurrence(candidate, debug)) {
 				return true;
@@ -413,10 +397,7 @@ public class Recurrence implements Serializable {
 
 			// Make sure we haven't rolled back to before dtStart.
 
-			candidateDate = candidate.getTime();
-			dtStartDate = dtStart.getTime();
-
-			if (candidateDate.getTime() < dtStartDate.getTime()) {
+			if (candidate.getTime().getTime() < dtStart.getTime().getTime()) {
 				if (debug) {
 					System.err.println("No candidates after dtStart");
 				}
@@ -525,11 +506,8 @@ public class Recurrence implements Serializable {
 		tempEnd.clear(Calendar.DST_OFFSET);
 		tempEnd.setTimeZone(TimeZoneUtil.getTimeZone(StringPool.UTC));
 
-		Date tempEndDate = tempEnd.getTime();
-
-		Date dtStartDate = dtStart.getTime();
-
-		duration.setInterval(tempEndDate.getTime() - dtStartDate.getTime());
+		duration.setInterval(
+			tempEnd.getTime().getTime() - dtStart.getTime().getTime());
 	}
 
 	/**
@@ -699,9 +677,7 @@ public class Recurrence implements Serializable {
 		tempCal.set(Calendar.MINUTE, 0);
 		tempCal.set(Calendar.HOUR_OF_DAY, 0);
 
-		Date tempCalDate = tempCal.getTime();
-
-		return tempCalDate.getTime() / (24 * 60 * 60 * 1000);
+		return tempCal.getTime().getTime() / (24 * 60 * 60 * 1000);
 	}
 
 	/**
@@ -747,9 +723,8 @@ public class Recurrence implements Serializable {
 			(tempCal.getFirstDayOfWeek() - Calendar.THURSDAY) * 24L * 60 * 60 *
 				1000;
 
-		Date tempCalDate = tempCal.getTime();
-
-		return (tempCalDate.getTime() - weekEpoch) / (7 * 24 * 60 * 60 * 1000);
+		return (tempCal.getTime().getTime() - weekEpoch) /
+			(7 * 24 * 60 * 60 * 1000);
 	}
 
 	/**
@@ -837,20 +812,16 @@ public class Recurrence implements Serializable {
 	protected boolean candidateIsInRecurrence(
 		Calendar candidate, boolean debug) {
 
-		if (until != null) {
-			Date candidateDate = candidate.getTime();
-			Date untilDate = until.getTime();
+		if ((until != null) &&
+			(candidate.getTime().getTime() > until.getTime().getTime())) {
 
-			if (candidateDate.getTime() > untilDate.getTime()) {
+			// After "until"
 
-				// After "until"
-
-				if (debug) {
-					System.err.println("after until");
-				}
-
-				return false;
+			if (debug) {
+				System.err.println("after until");
 			}
+
+			return false;
 		}
 
 		if ((getRecurrenceCount(candidate) % interval) != 0) {

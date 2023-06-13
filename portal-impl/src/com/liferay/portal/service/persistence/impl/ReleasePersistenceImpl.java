@@ -16,6 +16,9 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
+import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -34,21 +37,16 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.ReleaseImpl;
 import com.liferay.portal.model.impl.ReleaseModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -62,26 +60,23 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see ReleasePersistence
+ * @see com.liferay.portal.kernel.service.persistence.ReleaseUtil
  * @generated
  */
 @ProviderType
-public class ReleasePersistenceImpl
-	extends BasePersistenceImpl<Release> implements ReleasePersistence {
-
+public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
+	implements ReleasePersistence {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use <code>ReleaseUtil</code> to access the release persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use {@link ReleaseUtil} to access the release persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY =
-		ReleaseImpl.class.getName();
-
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List1";
-
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List2";
-
+	public static final String FINDER_CLASS_NAME_ENTITY = ReleaseImpl.class.getName();
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -89,7 +84,7 @@ public class ReleasePersistenceImpl
 	private FinderPath _finderPathCountByServletContextName;
 
 	/**
-	 * Returns the release where servletContextName = &#63; or throws a <code>NoSuchReleaseException</code> if it could not be found.
+	 * Returns the release where servletContextName = &#63; or throws a {@link NoSuchReleaseException} if it could not be found.
 	 *
 	 * @param servletContextName the servlet context name
 	 * @return the matching release
@@ -98,7 +93,6 @@ public class ReleasePersistenceImpl
 	@Override
 	public Release findByServletContextName(String servletContextName)
 		throws NoSuchReleaseException {
-
 		Release release = fetchByServletContextName(servletContextName);
 
 		if (release == null) {
@@ -140,26 +134,24 @@ public class ReleasePersistenceImpl
 	 * @return the matching release, or <code>null</code> if a matching release could not be found
 	 */
 	@Override
-	public Release fetchByServletContextName(
-		String servletContextName, boolean retrieveFromCache) {
-
+	public Release fetchByServletContextName(String servletContextName,
+		boolean retrieveFromCache) {
 		servletContextName = Objects.toString(servletContextName, "");
 
-		Object[] finderArgs = new Object[] {servletContextName};
+		Object[] finderArgs = new Object[] { servletContextName };
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = FinderCacheUtil.getResult(
-				_finderPathFetchByServletContextName, finderArgs, this);
+			result = FinderCacheUtil.getResult(_finderPathFetchByServletContextName,
+					finderArgs, this);
 		}
 
 		if (result instanceof Release) {
 			Release release = (Release)result;
 
-			if (!Objects.equals(
-					servletContextName, release.getServletContextName())) {
-
+			if (!Objects.equals(servletContextName,
+						release.getServletContextName())) {
 				result = null;
 			}
 		}
@@ -172,14 +164,12 @@ public class ReleasePersistenceImpl
 			boolean bindServletContextName = false;
 
 			if (servletContextName.isEmpty()) {
-				query.append(
-					_FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_3);
+				query.append(_FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_3);
 			}
 			else {
 				bindServletContextName = true;
 
-				query.append(
-					_FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_2);
+				query.append(_FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_2);
 			}
 
 			String sql = query.toString();
@@ -200,8 +190,8 @@ public class ReleasePersistenceImpl
 				List<Release> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByServletContextName, finderArgs, list);
+					FinderCacheUtil.putResult(_finderPathFetchByServletContextName,
+						finderArgs, list);
 				}
 				else {
 					Release release = list.get(0);
@@ -212,8 +202,8 @@ public class ReleasePersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByServletContextName, finderArgs);
+				FinderCacheUtil.removeResult(_finderPathFetchByServletContextName,
+					finderArgs);
 
 				throw processException(e);
 			}
@@ -239,7 +229,6 @@ public class ReleasePersistenceImpl
 	@Override
 	public Release removeByServletContextName(String servletContextName)
 		throws NoSuchReleaseException {
-
 		Release release = findByServletContextName(servletContextName);
 
 		return remove(release);
@@ -257,10 +246,10 @@ public class ReleasePersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByServletContextName;
 
-		Object[] finderArgs = new Object[] {servletContextName};
+		Object[] finderArgs = new Object[] { servletContextName };
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -270,14 +259,12 @@ public class ReleasePersistenceImpl
 			boolean bindServletContextName = false;
 
 			if (servletContextName.isEmpty()) {
-				query.append(
-					_FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_3);
+				query.append(_FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_3);
 			}
 			else {
 				bindServletContextName = true;
 
-				query.append(
-					_FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_2);
+				query.append(_FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_2);
 			}
 
 			String sql = query.toString();
@@ -312,34 +299,17 @@ public class ReleasePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String
-		_FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_2 =
-			"lower(release.servletContextName) = ?";
-
-	private static final String
-		_FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_3 =
-			"(release.servletContextName IS NULL OR release.servletContextName = '')";
+	private static final String _FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_2 =
+		"lower(release.servletContextName) = ?";
+	private static final String _FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_3 =
+		"(release.servletContextName IS NULL OR release.servletContextName = '')";
 
 	public ReleasePersistenceImpl() {
 		setModelClass(Release.class);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("state", "state_");
-
-		try {
-			Field field = BasePersistenceImpl.class.getDeclaredField(
-				"_dbColumnNames");
-
-			field.setAccessible(true);
-
-			field.set(this, dbColumnNames);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
+		setModelImplClass(ReleaseImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(ReleaseModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -349,13 +319,11 @@ public class ReleasePersistenceImpl
 	 */
 	@Override
 	public void cacheResult(Release release) {
-		EntityCacheUtil.putResult(
-			ReleaseModelImpl.ENTITY_CACHE_ENABLED, ReleaseImpl.class,
-			release.getPrimaryKey(), release);
+		EntityCacheUtil.putResult(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+			ReleaseImpl.class, release.getPrimaryKey(), release);
 
-		FinderCacheUtil.putResult(
-			_finderPathFetchByServletContextName,
-			new Object[] {release.getServletContextName()}, release);
+		FinderCacheUtil.putResult(_finderPathFetchByServletContextName,
+			new Object[] { release.getServletContextName() }, release);
 
 		release.resetOriginalValues();
 	}
@@ -369,9 +337,8 @@ public class ReleasePersistenceImpl
 	public void cacheResult(List<Release> releases) {
 		for (Release release : releases) {
 			if (EntityCacheUtil.getResult(
-					ReleaseModelImpl.ENTITY_CACHE_ENABLED, ReleaseImpl.class,
-					release.getPrimaryKey()) == null) {
-
+						ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+						ReleaseImpl.class, release.getPrimaryKey()) == null) {
 				cacheResult(release);
 			}
 			else {
@@ -384,7 +351,7 @@ public class ReleasePersistenceImpl
 	 * Clears the cache for all releases.
 	 *
 	 * <p>
-	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -400,14 +367,13 @@ public class ReleasePersistenceImpl
 	 * Clears the cache for the release.
 	 *
 	 * <p>
-	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(Release release) {
-		EntityCacheUtil.removeResult(
-			ReleaseModelImpl.ENTITY_CACHE_ENABLED, ReleaseImpl.class,
-			release.getPrimaryKey());
+		EntityCacheUtil.removeResult(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+			ReleaseImpl.class, release.getPrimaryKey());
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -421,49 +387,45 @@ public class ReleasePersistenceImpl
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (Release release : releases) {
-			EntityCacheUtil.removeResult(
-				ReleaseModelImpl.ENTITY_CACHE_ENABLED, ReleaseImpl.class,
-				release.getPrimaryKey());
+			EntityCacheUtil.removeResult(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+				ReleaseImpl.class, release.getPrimaryKey());
 
 			clearUniqueFindersCache((ReleaseModelImpl)release, true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(ReleaseModelImpl releaseModelImpl) {
-		Object[] args = new Object[] {releaseModelImpl.getServletContextName()};
+		Object[] args = new Object[] { releaseModelImpl.getServletContextName() };
 
-		FinderCacheUtil.putResult(
-			_finderPathCountByServletContextName, args, Long.valueOf(1), false);
-		FinderCacheUtil.putResult(
-			_finderPathFetchByServletContextName, args, releaseModelImpl,
-			false);
+		FinderCacheUtil.putResult(_finderPathCountByServletContextName, args,
+			Long.valueOf(1), false);
+		FinderCacheUtil.putResult(_finderPathFetchByServletContextName, args,
+			releaseModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(
-		ReleaseModelImpl releaseModelImpl, boolean clearCurrent) {
-
+	protected void clearUniqueFindersCache(ReleaseModelImpl releaseModelImpl,
+		boolean clearCurrent) {
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-				releaseModelImpl.getServletContextName()
-			};
+					releaseModelImpl.getServletContextName()
+				};
 
-			FinderCacheUtil.removeResult(
-				_finderPathCountByServletContextName, args);
-			FinderCacheUtil.removeResult(
-				_finderPathFetchByServletContextName, args);
+			FinderCacheUtil.removeResult(_finderPathCountByServletContextName,
+				args);
+			FinderCacheUtil.removeResult(_finderPathFetchByServletContextName,
+				args);
 		}
 
 		if ((releaseModelImpl.getColumnBitmask() &
-			 _finderPathFetchByServletContextName.getColumnBitmask()) != 0) {
-
+				_finderPathFetchByServletContextName.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
-				releaseModelImpl.getOriginalServletContextName()
-			};
+					releaseModelImpl.getOriginalServletContextName()
+				};
 
-			FinderCacheUtil.removeResult(
-				_finderPathCountByServletContextName, args);
-			FinderCacheUtil.removeResult(
-				_finderPathFetchByServletContextName, args);
+			FinderCacheUtil.removeResult(_finderPathCountByServletContextName,
+				args);
+			FinderCacheUtil.removeResult(_finderPathFetchByServletContextName,
+				args);
 		}
 	}
 
@@ -505,22 +467,20 @@ public class ReleasePersistenceImpl
 	@Override
 	public Release remove(Serializable primaryKey)
 		throws NoSuchReleaseException {
-
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			Release release = (Release)session.get(
-				ReleaseImpl.class, primaryKey);
+			Release release = (Release)session.get(ReleaseImpl.class, primaryKey);
 
 			if (release == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchReleaseException(
-					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				throw new NoSuchReleaseException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
 			}
 
 			return remove(release);
@@ -544,8 +504,8 @@ public class ReleasePersistenceImpl
 			session = openSession();
 
 			if (!session.contains(release)) {
-				release = (Release)session.get(
-					ReleaseImpl.class, release.getPrimaryKeyObj());
+				release = (Release)session.get(ReleaseImpl.class,
+						release.getPrimaryKeyObj());
 			}
 
 			if (release != null) {
@@ -578,18 +538,17 @@ public class ReleasePersistenceImpl
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in release proxy " +
-						invocationHandler.getClass());
+					invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom Release implementation " +
-					release.getClass());
+				release.getClass());
 		}
 
 		ReleaseModelImpl releaseModelImpl = (ReleaseModelImpl)release;
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -635,19 +594,17 @@ public class ReleasePersistenceImpl
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
 		if (!ReleaseModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else if (isNew) {
-			FinderCacheUtil.removeResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		else
+		 if (isNew) {
+			FinderCacheUtil.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindAll,
+				FINDER_ARGS_EMPTY);
 		}
 
-		EntityCacheUtil.putResult(
-			ReleaseModelImpl.ENTITY_CACHE_ENABLED, ReleaseImpl.class,
-			release.getPrimaryKey(), release, false);
+		EntityCacheUtil.putResult(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+			ReleaseImpl.class, release.getPrimaryKey(), release, false);
 
 		clearUniqueFindersCache(releaseModelImpl, false);
 		cacheUniqueFindersCache(releaseModelImpl);
@@ -658,7 +615,7 @@ public class ReleasePersistenceImpl
 	}
 
 	/**
-	 * Returns the release with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
+	 * Returns the release with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the release
 	 * @return the release
@@ -667,7 +624,6 @@ public class ReleasePersistenceImpl
 	@Override
 	public Release findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchReleaseException {
-
 		Release release = fetchByPrimaryKey(primaryKey);
 
 		if (release == null) {
@@ -675,15 +631,15 @@ public class ReleasePersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchReleaseException(
-				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			throw new NoSuchReleaseException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
 		}
 
 		return release;
 	}
 
 	/**
-	 * Returns the release with the primary key or throws a <code>NoSuchReleaseException</code> if it could not be found.
+	 * Returns the release with the primary key or throws a {@link NoSuchReleaseException} if it could not be found.
 	 *
 	 * @param releaseId the primary key of the release
 	 * @return the release
@@ -692,58 +648,7 @@ public class ReleasePersistenceImpl
 	@Override
 	public Release findByPrimaryKey(long releaseId)
 		throws NoSuchReleaseException {
-
 		return findByPrimaryKey((Serializable)releaseId);
-	}
-
-	/**
-	 * Returns the release with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param primaryKey the primary key of the release
-	 * @return the release, or <code>null</code> if a release with the primary key could not be found
-	 */
-	@Override
-	public Release fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = EntityCacheUtil.getResult(
-			ReleaseModelImpl.ENTITY_CACHE_ENABLED, ReleaseImpl.class,
-			primaryKey);
-
-		if (serializable == nullModel) {
-			return null;
-		}
-
-		Release release = (Release)serializable;
-
-		if (release == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				release = (Release)session.get(ReleaseImpl.class, primaryKey);
-
-				if (release != null) {
-					cacheResult(release);
-				}
-				else {
-					EntityCacheUtil.putResult(
-						ReleaseModelImpl.ENTITY_CACHE_ENABLED,
-						ReleaseImpl.class, primaryKey, nullModel);
-				}
-			}
-			catch (Exception e) {
-				EntityCacheUtil.removeResult(
-					ReleaseModelImpl.ENTITY_CACHE_ENABLED, ReleaseImpl.class,
-					primaryKey);
-
-				throw processException(e);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return release;
 	}
 
 	/**
@@ -755,103 +660,6 @@ public class ReleasePersistenceImpl
 	@Override
 	public Release fetchByPrimaryKey(long releaseId) {
 		return fetchByPrimaryKey((Serializable)releaseId);
-	}
-
-	@Override
-	public Map<Serializable, Release> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, Release> map = new HashMap<Serializable, Release>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			Release release = fetchByPrimaryKey(primaryKey);
-
-			if (release != null) {
-				map.put(primaryKey, release);
-			}
-
-			return map;
-		}
-
-		Set<Serializable> uncachedPrimaryKeys = null;
-
-		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = EntityCacheUtil.getResult(
-				ReleaseModelImpl.ENTITY_CACHE_ENABLED, ReleaseImpl.class,
-				primaryKey);
-
-			if (serializable != nullModel) {
-				if (serializable == null) {
-					if (uncachedPrimaryKeys == null) {
-						uncachedPrimaryKeys = new HashSet<Serializable>();
-					}
-
-					uncachedPrimaryKeys.add(primaryKey);
-				}
-				else {
-					map.put(primaryKey, (Release)serializable);
-				}
-			}
-		}
-
-		if (uncachedPrimaryKeys == null) {
-			return map;
-		}
-
-		StringBundler query = new StringBundler(
-			uncachedPrimaryKeys.size() * 2 + 1);
-
-		query.append(_SQL_SELECT_RELEASE_WHERE_PKS_IN);
-
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
-
-			query.append(",");
-		}
-
-		query.setIndex(query.index() - 1);
-
-		query.append(")");
-
-		String sql = query.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query q = session.createQuery(sql);
-
-			for (Release release : (List<Release>)q.list()) {
-				map.put(release.getPrimaryKeyObj(), release);
-
-				cacheResult(release);
-
-				uncachedPrimaryKeys.remove(release.getPrimaryKeyObj());
-			}
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				EntityCacheUtil.putResult(
-					ReleaseModelImpl.ENTITY_CACHE_ENABLED, ReleaseImpl.class,
-					primaryKey, nullModel);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -868,7 +676,7 @@ public class ReleasePersistenceImpl
 	 * Returns a range of all the releases.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ReleaseModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ReleaseModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of releases
@@ -884,7 +692,7 @@ public class ReleasePersistenceImpl
 	 * Returns an ordered range of all the releases.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ReleaseModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ReleaseModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of releases
@@ -893,9 +701,8 @@ public class ReleasePersistenceImpl
 	 * @return the ordered range of releases
 	 */
 	@Override
-	public List<Release> findAll(
-		int start, int end, OrderByComparator<Release> orderByComparator) {
-
+	public List<Release> findAll(int start, int end,
+		OrderByComparator<Release> orderByComparator) {
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -903,7 +710,7 @@ public class ReleasePersistenceImpl
 	 * Returns an ordered range of all the releases.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ReleaseModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ReleaseModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of releases
@@ -913,31 +720,28 @@ public class ReleasePersistenceImpl
 	 * @return the ordered range of releases
 	 */
 	@Override
-	public List<Release> findAll(
-		int start, int end, OrderByComparator<Release> orderByComparator,
-		boolean retrieveFromCache) {
-
+	public List<Release> findAll(int start, int end,
+		OrderByComparator<Release> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] {start, end, orderByComparator};
+			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
 		List<Release> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Release>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Release>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 		}
 
 		if (list == null) {
@@ -945,13 +749,13 @@ public class ReleasePersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					2 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_RELEASE);
 
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 
 				sql = query.toString();
 			}
@@ -971,16 +775,16 @@ public class ReleasePersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<Release>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<Release>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Release>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<Release>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -1018,8 +822,8 @@ public class ReleasePersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		Long count = (Long)FinderCacheUtil.getResult(_finderPathCountAll,
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -1031,12 +835,12 @@ public class ReleasePersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				FinderCacheUtil.putResult(_finderPathCountAll,
+					FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+				FinderCacheUtil.removeResult(_finderPathCountAll,
+					FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -1054,6 +858,21 @@ public class ReleasePersistenceImpl
 	}
 
 	@Override
+	protected EntityCache getEntityCache() {
+		return EntityCacheUtil.getEntityCache();
+	}
+
+	@Override
+	protected String getPKDBName() {
+		return "releaseId";
+	}
+
+	@Override
+	protected String getSelectSQL() {
+		return _SQL_SELECT_RELEASE;
+	}
+
+	@Override
 	protected Map<String, Integer> getTableColumnsMap() {
 		return ReleaseModelImpl.TABLE_COLUMNS_MAP;
 	}
@@ -1062,35 +881,31 @@ public class ReleasePersistenceImpl
 	 * Initializes the release persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(
-			ReleaseModelImpl.ENTITY_CACHE_ENABLED,
-			ReleaseModelImpl.FINDER_CACHE_ENABLED, ReleaseImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+				ReleaseModelImpl.FINDER_CACHE_ENABLED, ReleaseImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			ReleaseModelImpl.ENTITY_CACHE_ENABLED,
-			ReleaseModelImpl.FINDER_CACHE_ENABLED, ReleaseImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-			new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+				ReleaseModelImpl.FINDER_CACHE_ENABLED, ReleaseImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+				new String[0]);
 
-		_finderPathCountAll = new FinderPath(
-			ReleaseModelImpl.ENTITY_CACHE_ENABLED,
-			ReleaseModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+		_finderPathCountAll = new FinderPath(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+				ReleaseModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+				new String[0]);
 
-		_finderPathFetchByServletContextName = new FinderPath(
-			ReleaseModelImpl.ENTITY_CACHE_ENABLED,
-			ReleaseModelImpl.FINDER_CACHE_ENABLED, ReleaseImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByServletContextName",
-			new String[] {String.class.getName()},
-			ReleaseModelImpl.SERVLETCONTEXTNAME_COLUMN_BITMASK);
+		_finderPathFetchByServletContextName = new FinderPath(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+				ReleaseModelImpl.FINDER_CACHE_ENABLED, ReleaseImpl.class,
+				FINDER_CLASS_NAME_ENTITY, "fetchByServletContextName",
+				new String[] { String.class.getName() },
+				ReleaseModelImpl.SERVLETCONTEXTNAME_COLUMN_BITMASK);
 
-		_finderPathCountByServletContextName = new FinderPath(
-			ReleaseModelImpl.ENTITY_CACHE_ENABLED,
-			ReleaseModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-			"countByServletContextName", new String[] {String.class.getName()});
+		_finderPathCountByServletContextName = new FinderPath(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+				ReleaseModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+				"countByServletContextName",
+				new String[] { String.class.getName() });
 	}
 
 	public void destroy() {
@@ -1100,33 +915,15 @@ public class ReleasePersistenceImpl
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
-	private static final String _SQL_SELECT_RELEASE =
-		"SELECT release FROM Release release";
-
-	private static final String _SQL_SELECT_RELEASE_WHERE_PKS_IN =
-		"SELECT release FROM Release release WHERE releaseId IN (";
-
-	private static final String _SQL_SELECT_RELEASE_WHERE =
-		"SELECT release FROM Release release WHERE ";
-
-	private static final String _SQL_COUNT_RELEASE =
-		"SELECT COUNT(release) FROM Release release";
-
-	private static final String _SQL_COUNT_RELEASE_WHERE =
-		"SELECT COUNT(release) FROM Release release WHERE ";
-
+	private static final String _SQL_SELECT_RELEASE = "SELECT release FROM Release release";
+	private static final String _SQL_SELECT_RELEASE_WHERE = "SELECT release FROM Release release WHERE ";
+	private static final String _SQL_COUNT_RELEASE = "SELECT COUNT(release) FROM Release release";
+	private static final String _SQL_COUNT_RELEASE_WHERE = "SELECT COUNT(release) FROM Release release WHERE ";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "release.";
-
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
-		"No Release exists with the primary key ";
-
-	private static final String _NO_SUCH_ENTITY_WITH_KEY =
-		"No Release exists with the key {";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ReleasePersistenceImpl.class);
-
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"state"});
-
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Release exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Release exists with the key {";
+	private static final Log _log = LogFactoryUtil.getLog(ReleasePersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+				"state"
+			});
 }

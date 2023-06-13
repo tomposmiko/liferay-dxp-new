@@ -17,9 +17,11 @@ package com.liferay.journal.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.journal.model.JournalArticleLocalization;
+
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -30,12 +32,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing JournalArticleLocalization in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see JournalArticleLocalization
  * @generated
  */
 @ProviderType
-public class JournalArticleLocalizationCacheModel
-	implements CacheModel<JournalArticleLocalization>, Externalizable {
-
+public class JournalArticleLocalizationCacheModel implements CacheModel<JournalArticleLocalization>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -46,13 +48,10 @@ public class JournalArticleLocalizationCacheModel
 			return false;
 		}
 
-		JournalArticleLocalizationCacheModel
-			journalArticleLocalizationCacheModel =
-				(JournalArticleLocalizationCacheModel)obj;
+		JournalArticleLocalizationCacheModel journalArticleLocalizationCacheModel =
+			(JournalArticleLocalizationCacheModel)obj;
 
-		if (articleLocalizationId ==
-				journalArticleLocalizationCacheModel.articleLocalizationId) {
-
+		if (articleLocalizationId == journalArticleLocalizationCacheModel.articleLocalizationId) {
 			return true;
 		}
 
@@ -87,11 +86,9 @@ public class JournalArticleLocalizationCacheModel
 
 	@Override
 	public JournalArticleLocalization toEntityModel() {
-		JournalArticleLocalizationImpl journalArticleLocalizationImpl =
-			new JournalArticleLocalizationImpl();
+		JournalArticleLocalizationImpl journalArticleLocalizationImpl = new JournalArticleLocalizationImpl();
 
-		journalArticleLocalizationImpl.setArticleLocalizationId(
-			articleLocalizationId);
+		journalArticleLocalizationImpl.setArticleLocalizationId(articleLocalizationId);
 		journalArticleLocalizationImpl.setCompanyId(companyId);
 		journalArticleLocalizationImpl.setArticlePK(articlePK);
 
@@ -134,7 +131,8 @@ public class JournalArticleLocalizationCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(articleLocalizationId);
 
 		objectOutput.writeLong(companyId);
@@ -169,5 +167,4 @@ public class JournalArticleLocalizationCacheModel
 	public String title;
 	public String description;
 	public String languageId;
-
 }

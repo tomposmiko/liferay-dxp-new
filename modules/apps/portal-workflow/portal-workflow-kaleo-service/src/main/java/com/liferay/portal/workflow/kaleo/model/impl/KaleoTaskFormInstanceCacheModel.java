@@ -16,9 +16,10 @@ package com.liferay.portal.workflow.kaleo.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance;
 
 import java.io.Externalizable;
@@ -32,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing KaleoTaskFormInstance in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see KaleoTaskFormInstance
  * @generated
  */
 @ProviderType
-public class KaleoTaskFormInstanceCacheModel
-	implements CacheModel<KaleoTaskFormInstance>, Externalizable {
-
+public class KaleoTaskFormInstanceCacheModel implements CacheModel<KaleoTaskFormInstance>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,12 +49,9 @@ public class KaleoTaskFormInstanceCacheModel
 			return false;
 		}
 
-		KaleoTaskFormInstanceCacheModel kaleoTaskFormInstanceCacheModel =
-			(KaleoTaskFormInstanceCacheModel)obj;
+		KaleoTaskFormInstanceCacheModel kaleoTaskFormInstanceCacheModel = (KaleoTaskFormInstanceCacheModel)obj;
 
-		if (kaleoTaskFormInstanceId ==
-				kaleoTaskFormInstanceCacheModel.kaleoTaskFormInstanceId) {
-
+		if (kaleoTaskFormInstanceId == kaleoTaskFormInstanceCacheModel.kaleoTaskFormInstanceId) {
 			return true;
 		}
 
@@ -110,11 +108,9 @@ public class KaleoTaskFormInstanceCacheModel
 
 	@Override
 	public KaleoTaskFormInstance toEntityModel() {
-		KaleoTaskFormInstanceImpl kaleoTaskFormInstanceImpl =
-			new KaleoTaskFormInstanceImpl();
+		KaleoTaskFormInstanceImpl kaleoTaskFormInstanceImpl = new KaleoTaskFormInstanceImpl();
 
-		kaleoTaskFormInstanceImpl.setKaleoTaskFormInstanceId(
-			kaleoTaskFormInstanceId);
+		kaleoTaskFormInstanceImpl.setKaleoTaskFormInstanceId(kaleoTaskFormInstanceId);
 		kaleoTaskFormInstanceImpl.setGroupId(groupId);
 		kaleoTaskFormInstanceImpl.setCompanyId(companyId);
 		kaleoTaskFormInstanceImpl.setUserId(userId);
@@ -140,12 +136,10 @@ public class KaleoTaskFormInstanceCacheModel
 			kaleoTaskFormInstanceImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		kaleoTaskFormInstanceImpl.setKaleoDefinitionVersionId(
-			kaleoDefinitionVersionId);
+		kaleoTaskFormInstanceImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		kaleoTaskFormInstanceImpl.setKaleoInstanceId(kaleoInstanceId);
 		kaleoTaskFormInstanceImpl.setKaleoTaskId(kaleoTaskId);
-		kaleoTaskFormInstanceImpl.setKaleoTaskInstanceTokenId(
-			kaleoTaskInstanceTokenId);
+		kaleoTaskFormInstanceImpl.setKaleoTaskInstanceTokenId(kaleoTaskInstanceTokenId);
 		kaleoTaskFormInstanceImpl.setKaleoTaskFormId(kaleoTaskFormId);
 
 		if (formValues == null) {
@@ -155,8 +149,7 @@ public class KaleoTaskFormInstanceCacheModel
 			kaleoTaskFormInstanceImpl.setFormValues(formValues);
 		}
 
-		kaleoTaskFormInstanceImpl.setFormValueEntryGroupId(
-			formValueEntryGroupId);
+		kaleoTaskFormInstanceImpl.setFormValueEntryGroupId(formValueEntryGroupId);
 		kaleoTaskFormInstanceImpl.setFormValueEntryId(formValueEntryId);
 
 		if (formValueEntryUuid == null) {
@@ -210,7 +203,8 @@ public class KaleoTaskFormInstanceCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(kaleoTaskFormInstanceId);
 
 		objectOutput.writeLong(groupId);
@@ -282,5 +276,4 @@ public class KaleoTaskFormInstanceCacheModel
 	public long formValueEntryId;
 	public String formValueEntryUuid;
 	public String metadata;
-
 }

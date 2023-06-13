@@ -83,11 +83,10 @@ public class KBArticleAttachmentKBUploadFileEntryHandler
 		ThemeDisplay themeDisplay, KBArticle kbArticle, String fileName) {
 
 		try {
-			FileEntry fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
-				themeDisplay.getScopeGroupId(),
-				kbArticle.getAttachmentsFolderId(), fileName);
+			if (PortletFileRepositoryUtil.getPortletFileEntry(
+					themeDisplay.getScopeGroupId(),
+					kbArticle.getAttachmentsFolderId(), fileName) != null) {
 
-			if (fileEntry != null) {
 				return true;
 			}
 

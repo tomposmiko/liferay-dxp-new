@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderFactoryImpl;
+import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderFactoryImpl;
 import com.liferay.portal.search.solr7.internal.connection.SolrClientManager;
 import com.liferay.portal.search.solr7.internal.connection.TestSolrClientManager;
 import com.liferay.portal.search.solr7.internal.document.DefaultSolrDocumentFactory;
@@ -203,6 +205,10 @@ public class SolrIndexingFixture implements IndexingFixture {
 			{
 				jsonFactory = _jsonFactory;
 				props = createProps();
+				searchRequestBuilderFactory =
+					new SearchRequestBuilderFactoryImpl();
+				searchResponseBuilderFactory =
+					new SearchResponseBuilderFactoryImpl();
 
 				setFacetProcessor(_facetProcessor);
 				setFilterTranslator(createSolrFilterTranslator());
@@ -230,8 +236,6 @@ public class SolrIndexingFixture implements IndexingFixture {
 				setSpellCheckIndexWriter(
 					createSolrSpellCheckIndexWriter(
 						solrClientManager, solrUpdateDocumentCommand));
-
-				activate(_properties);
 			}
 		};
 	}
@@ -272,7 +276,6 @@ public class SolrIndexingFixture implements IndexingFixture {
 	protected Map<String, Object> createSolrConfigurationProperties() {
 		Map<String, Object> properties = new HashMap<>();
 
-		properties.put("defaultCollection", "liferay");
 		properties.put("logExceptionsOnly", false);
 		properties.put("readURL", "http://localhost:8983/solr/liferay");
 		properties.put("writeURL", "http://localhost:8983/solr/liferay");
@@ -289,8 +292,6 @@ public class SolrIndexingFixture implements IndexingFixture {
 
 				setNGramQueryBuilder(createNGramQueryBuilder());
 				setSolrClientManager(solrClientManager);
-
-				activate(_properties);
 			}
 		};
 	}
@@ -306,8 +307,6 @@ public class SolrIndexingFixture implements IndexingFixture {
 
 				setSolrClientManager(solrClientManager);
 				setSolrUpdateDocumentCommand(solrUpdateDocumentCommand);
-
-				activate(_properties);
 			}
 		};
 	}
@@ -319,8 +318,6 @@ public class SolrIndexingFixture implements IndexingFixture {
 			{
 				setSolrClientManager(solrClientManager);
 				setSolrDocumentFactory(new DefaultSolrDocumentFactory());
-
-				activate(_properties);
 			}
 		};
 	}

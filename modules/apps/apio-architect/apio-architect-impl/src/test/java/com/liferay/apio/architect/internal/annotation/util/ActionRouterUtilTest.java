@@ -235,9 +235,8 @@ public class ActionRouterUtilTest {
 
 		Class<?>[] providers = getParamClasses(method);
 
-		Class<?>[] expected = {
-			Pagination.class, Credentials.class, Id.class, Body.class
-		};
+		Class<?>[] expected =
+			{Pagination.class, Credentials.class, Id.class, Body.class};
 
 		assertThat(providers, is(arrayContaining(expected)));
 	}

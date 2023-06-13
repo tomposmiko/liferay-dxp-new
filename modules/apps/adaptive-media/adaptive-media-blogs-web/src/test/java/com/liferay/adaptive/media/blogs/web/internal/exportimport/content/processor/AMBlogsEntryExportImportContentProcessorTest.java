@@ -18,7 +18,6 @@ import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 
 import org.junit.Assert;
@@ -34,14 +33,12 @@ public class AMBlogsEntryExportImportContentProcessorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ReflectionTestUtil.setFieldValue(
-			_amBlogsEntryExportImportContentProcessor,
-			"_htmlExportImportContentProcessor",
-			_htmlExportImportContentProcessor);
-		ReflectionTestUtil.setFieldValue(
-			_amBlogsEntryExportImportContentProcessor,
-			"_blogsEntryExportImportContentProcessor",
-			_blogsEntryExportImportContentProcessor);
+		_amBlogsEntryExportImportContentProcessor.
+			setHTMLExportImportContentProcessor(
+				_htmlExportImportContentProcessor);
+		_amBlogsEntryExportImportContentProcessor.
+			setBlogsEntryExportImportContentProcessor(
+				_blogsEntryExportImportContentProcessor);
 	}
 
 	@Test

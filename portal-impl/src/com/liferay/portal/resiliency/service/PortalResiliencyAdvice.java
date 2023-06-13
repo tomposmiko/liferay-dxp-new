@@ -19,33 +19,29 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.nio.intraband.rpc.IntrabandRPCUtil;
 import com.liferay.portal.kernel.resiliency.spi.SPI;
 import com.liferay.portal.kernel.resiliency.spi.SPIRegistryUtil;
-import com.liferay.portal.kernel.security.access.control.AccessControl;
 import com.liferay.portal.kernel.security.access.control.AccessControlThreadLocal;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
-import com.liferay.portal.spring.aop.AnnotationChainableMethodAdvice;
+import com.liferay.portal.spring.aop.AopMethodInvocation;
+import com.liferay.portal.spring.aop.ChainableMethodAdvice;
 
 import java.io.Serializable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+import java.util.Map;
 import java.util.concurrent.Future;
-
-import org.aopalliance.intercept.MethodInvocation;
 
 /**
  * @author Shuyang Zhou
  */
-public class PortalResiliencyAdvice
-	extends AnnotationChainableMethodAdvice<AccessControlled> {
+public class PortalResiliencyAdvice extends ChainableMethodAdvice {
 
 	@Override
-	public Object before(MethodInvocation methodInvocation) throws Throwable {
-		AccessControlled accessControlled = findAnnotation(methodInvocation);
-
-		if (accessControlled == AccessControl.NULL_ACCESS_CONTROLLED) {
-			return null;
-		}
+	public Object before(
+			AopMethodInvocation aopMethodInvocation, Object[] arguments)
+		throws Throwable {
 
 		boolean remoteAccess = AccessControlThreadLocal.isRemoteAccess();
 
@@ -53,39 +49,20 @@ public class PortalResiliencyAdvice
 			return null;
 		}
 
-		Object targetObject = methodInvocation.getThis();
-
-		Class<?> targetClass = targetObject.getClass();
-
-		String servletContextName =
-			ServletContextClassLoaderPool.getServletContextName(
-				targetClass.getClassLoader());
-
-		SPI spi = null;
-
-		if (servletContextName != null) {
-			spi = SPIRegistryUtil.getServletContextSPI(servletContextName);
-		}
-
-		if (spi == null) {
-			serviceBeanAopCacheManager.removeMethodInterceptor(
-				methodInvocation, this);
-
-			return null;
-		}
+		SPI spi = aopMethodInvocation.getAdviceMethodContext();
 
 		ServiceMethodProcessCallable serviceMethodProcessCallable =
 			new ServiceMethodProcessCallable(
 				IdentifiableOSGiServiceInvokerUtil.createMethodHandler(
-					methodInvocation.getThis(), methodInvocation.getMethod(),
-					methodInvocation.getArguments()));
+					aopMethodInvocation.getThis(),
+					aopMethodInvocation.getMethod(), arguments));
 
 		Future<Serializable> future = IntrabandRPCUtil.execute(
 			spi.getRegistrationReference(), serviceMethodProcessCallable);
 
 		Object result = future.get();
 
-		Method method = methodInvocation.getMethod();
+		Method method = aopMethodInvocation.getMethod();
 
 		Class<?> returnType = method.getReturnType();
 
@@ -97,8 +74,25 @@ public class PortalResiliencyAdvice
 	}
 
 	@Override
-	public AccessControlled getNullAnnotation() {
-		return AccessControl.NULL_ACCESS_CONTROLLED;
+	public Object createMethodContext(
+		Class<?> targetClass, Method method,
+		Map<Class<? extends Annotation>, Annotation> annotations) {
+
+		Annotation annotation = annotations.get(AccessControlled.class);
+
+		if (annotation == null) {
+			return null;
+		}
+
+		String servletContextName =
+			ServletContextClassLoaderPool.getServletContextName(
+				targetClass.getClassLoader());
+
+		if (servletContextName == null) {
+			return null;
+		}
+
+		return SPIRegistryUtil.getServletContextSPI(servletContextName);
 	}
 
 }

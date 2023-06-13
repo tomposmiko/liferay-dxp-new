@@ -33,8 +33,8 @@ LayoutPageTemplateCollection layoutPageTemplateCollection = layoutPageTemplateDi
 	<c:if test="<%= LayoutPageTemplateCollectionPermission.contains(permissionChecker, layoutPageTemplateCollection, ActionKeys.UPDATE) %>">
 		<portlet:renderURL var="editLayoutPageTemplateCollectionURL">
 			<portlet:param name="mvcRenderCommandName" value="/layout/edit_layout_page_template_collection" />
-			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="tabs1" value="page-templates" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="layoutPageTemplateCollectionId" value="<%= String.valueOf(layoutPageTemplateCollection.getLayoutPageTemplateCollectionId()) %>" />
 		</portlet:renderURL>
 

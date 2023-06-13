@@ -143,7 +143,6 @@ AUI.add(
 							{
 								className: instance.get('className'),
 								classPK: instance.get('classPK'),
-								ratingType: instance.get('type'),
 								score: score
 							});
 

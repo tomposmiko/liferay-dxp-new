@@ -32,13 +32,12 @@ import com.liferay.message.boards.service.MBStatsUserLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class MBStatsUserBaseImpl
-	extends MBStatsUserModelImpl implements MBStatsUser {
-
+public abstract class MBStatsUserBaseImpl extends MBStatsUserModelImpl
+	implements MBStatsUser {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a message boards stats user model instance should use the <code>MBStatsUser</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a message boards stats user model instance should use the {@link MBStatsUser} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class MBStatsUserBaseImpl
 			MBStatsUserLocalServiceUtil.updateMBStatsUser(this);
 		}
 	}
-
 }

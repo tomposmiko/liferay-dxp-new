@@ -178,12 +178,15 @@ public class JSPortletExtender {
 						_addServiceProperties(
 							properties, jsonObject.getJSONObject("portlet"));
 
-						return bundleContext.registerService(
-							new String[] {
-								ManagedService.class.getName(),
-								Portlet.class.getName()
-							},
-							new JSPortlet(name, version), properties);
+						ServiceRegistration<?> serviceRegistration =
+							bundleContext.registerService(
+								new String[] {
+									ManagedService.class.getName(),
+									Portlet.class.getName()
+								},
+								new JSPortlet(name, version), properties);
+
+						return serviceRegistration;
 					}
 					catch (Exception e) {
 						_log.error(

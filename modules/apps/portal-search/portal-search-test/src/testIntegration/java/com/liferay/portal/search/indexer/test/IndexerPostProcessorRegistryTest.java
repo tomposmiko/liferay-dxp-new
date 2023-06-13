@@ -15,6 +15,7 @@
 package com.liferay.portal.search.indexer.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.portal.kernel.model.Contact;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.search.BaseIndexer;
+import com.liferay.portal.kernel.search.BaseIndexerPostProcessor;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
@@ -32,6 +34,7 @@ import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -53,6 +56,8 @@ import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Gregory Amerson
+ * @author István Sajtos
+ * @author Tibor Lipusz
  */
 @RunWith(Arquillian.class)
 public class IndexerPostProcessorRegistryTest {
@@ -70,26 +75,14 @@ public class IndexerPostProcessorRegistryTest {
 		IndexerPostProcessor[] mbMessageIndexerPostProcessors =
 			mbMessageIndexer.getIndexerPostProcessors();
 
-		Assert.assertTrue(
-			Arrays.toString(mbMessageIndexerPostProcessors),
-			mbMessageIndexerPostProcessors.length > 0);
+		Assert.assertEquals(
+			Arrays.toString(mbMessageIndexerPostProcessors), 1,
+			mbMessageIndexerPostProcessors.length);
 
-		IndexerPostProcessor testMBMessageIndexerPostProcessor = null;
+		IndexerPostProcessor mbMessageIndexerPostProcessor =
+			mbMessageIndexerPostProcessors[0];
 
-		for (IndexerPostProcessor mbMessageIndexerPostProcessor :
-				mbMessageIndexerPostProcessors) {
-
-			if (mbMessageIndexerPostProcessor instanceof
-					TestMultipleIndexerPostProcessor) {
-
-				testMBMessageIndexerPostProcessor =
-					mbMessageIndexerPostProcessor;
-
-				break;
-			}
-		}
-
-		Assert.assertNotNull(testMBMessageIndexerPostProcessor);
+		Assert.assertNotNull(mbMessageIndexerPostProcessor);
 
 		Indexer<MBThread> mbThreadIndexer = IndexerRegistryUtil.getIndexer(
 			MBThread.class.getName());
@@ -97,28 +90,16 @@ public class IndexerPostProcessorRegistryTest {
 		IndexerPostProcessor[] mbThreadIndexerPostProcessors =
 			mbThreadIndexer.getIndexerPostProcessors();
 
-		Assert.assertTrue(
-			Arrays.toString(mbThreadIndexerPostProcessors),
-			mbThreadIndexerPostProcessors.length > 0);
-
-		IndexerPostProcessor testMBThreadIndexerPostProcessor = null;
-
-		for (IndexerPostProcessor mbThreadIndexerPostProcessor :
-				mbThreadIndexerPostProcessors) {
-
-			if (mbThreadIndexerPostProcessor instanceof
-					TestMultipleIndexerPostProcessor) {
-
-				testMBThreadIndexerPostProcessor = mbThreadIndexerPostProcessor;
-
-				break;
-			}
-		}
-
-		Assert.assertNotNull(testMBThreadIndexerPostProcessor);
 		Assert.assertEquals(
-			testMBMessageIndexerPostProcessor,
-			testMBThreadIndexerPostProcessor);
+			Arrays.toString(mbThreadIndexerPostProcessors), 1,
+			mbThreadIndexerPostProcessors.length);
+
+		IndexerPostProcessor mbThreadIndexerPostProcessor =
+			mbThreadIndexerPostProcessors[0];
+
+		Assert.assertNotNull(mbThreadIndexerPostProcessor);
+		Assert.assertEquals(
+			mbMessageIndexerPostProcessor, mbThreadIndexerPostProcessor);
 	}
 
 	@Test
@@ -129,25 +110,14 @@ public class IndexerPostProcessorRegistryTest {
 		IndexerPostProcessor[] userIndexerPostProcessors =
 			userIndexer.getIndexerPostProcessors();
 
-		Assert.assertTrue(
-			Arrays.toString(userIndexerPostProcessors),
-			userIndexerPostProcessors.length > 0);
+		Assert.assertEquals(
+			Arrays.toString(userIndexerPostProcessors), 1,
+			userIndexerPostProcessors.length);
 
-		IndexerPostProcessor testUserIndexerPostProcessor = null;
+		IndexerPostProcessor userIndexerPostProcessor =
+			userIndexerPostProcessors[0];
 
-		for (IndexerPostProcessor userIndexerPostProcessor :
-				userIndexerPostProcessors) {
-
-			if (userIndexerPostProcessor instanceof
-					TestMultipleEntityIndexerPostProcessor) {
-
-				testUserIndexerPostProcessor = userIndexerPostProcessor;
-
-				break;
-			}
-		}
-
-		Assert.assertNotNull(testUserIndexerPostProcessor);
+		Assert.assertNotNull(userIndexerPostProcessor);
 
 		Indexer<UserGroup> userGroupIndexer = IndexerRegistryUtil.getIndexer(
 			UserGroup.class.getName());
@@ -155,28 +125,16 @@ public class IndexerPostProcessorRegistryTest {
 		IndexerPostProcessor[] userGroupIndexerPostProcessors =
 			userGroupIndexer.getIndexerPostProcessors();
 
-		Assert.assertTrue(
-			Arrays.toString(userGroupIndexerPostProcessors),
-			userGroupIndexerPostProcessors.length > 0);
-
-		IndexerPostProcessor testUserGroupIndexerPostProcessor = null;
-
-		for (IndexerPostProcessor userGroupIndexerPostProcessor :
-				userGroupIndexerPostProcessors) {
-
-			if (userGroupIndexerPostProcessor instanceof
-					TestMultipleEntityIndexerPostProcessor) {
-
-				testUserGroupIndexerPostProcessor =
-					userGroupIndexerPostProcessor;
-
-				break;
-			}
-		}
-
-		Assert.assertNotNull(testUserGroupIndexerPostProcessor);
 		Assert.assertEquals(
-			testUserIndexerPostProcessor, testUserGroupIndexerPostProcessor);
+			Arrays.toString(userGroupIndexerPostProcessors), 1,
+			userGroupIndexerPostProcessors.length);
+
+		IndexerPostProcessor userGroupIndexerPostProcessor =
+			userGroupIndexerPostProcessors[0];
+
+		Assert.assertNotNull(userGroupIndexerPostProcessor);
+		Assert.assertEquals(
+			userIndexerPostProcessor, userGroupIndexerPostProcessor);
 	}
 
 	@Test
@@ -263,6 +221,29 @@ public class IndexerPostProcessorRegistryTest {
 	}
 
 	@Test
+	public void testQueuedIndexerPostProcessorWithIndexerClassName()
+		throws Exception {
+
+		Indexer<BlogsEntry> blogsEntryIndexer = IndexerRegistryUtil.getIndexer(
+			BlogsEntry.class.getName());
+
+		Class<?> clazz = blogsEntryIndexer.getClass();
+
+		testQueuedIndexerPostProcessor(blogsEntryIndexer, clazz.getName());
+	}
+
+	@Test
+	public void testQueuedIndexerPostProcessorWithModelClassName()
+		throws Exception {
+
+		Indexer<BlogsEntry> blogsEntryIndexer = IndexerRegistryUtil.getIndexer(
+			BlogsEntry.class.getName());
+
+		testQueuedIndexerPostProcessor(
+			blogsEntryIndexer, BlogsEntry.class.getName());
+	}
+
+	@Test
 	public void testSingleIndexerPostProcessor() throws Exception {
 		Indexer<Organization> organizationIndexer =
 			IndexerRegistryUtil.getIndexer(Organization.class.getName());
@@ -296,6 +277,49 @@ public class IndexerPostProcessorRegistryTest {
 			contactIndexerPostProcessors[0];
 
 		Assert.assertNotNull(contactIndexerPostProcessor);
+	}
+
+	protected void testQueuedIndexerPostProcessor(
+			Indexer<?> indexer, String indexerClassName)
+		throws Exception {
+
+		IndexerPostProcessor[] indexerPostProcessors =
+			indexer.getIndexerPostProcessors();
+
+		Assert.assertEquals(
+			Arrays.toString(indexerPostProcessors), 0,
+			indexerPostProcessors.length);
+
+		IndexerRegistryUtil.unregister(indexer);
+
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		IndexerPostProcessor indexerPostProcessor =
+			new BaseIndexerPostProcessor();
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		properties.put("indexer.class.name", indexerClassName);
+
+		ServiceRegistration<?> serviceRegistration =
+			bundleContext.registerService(
+				IndexerPostProcessor.class, indexerPostProcessor, properties);
+
+		try {
+			IndexerRegistryUtil.register(indexer);
+
+			indexerPostProcessors = indexer.getIndexerPostProcessors();
+
+			Assert.assertEquals(
+				Arrays.toString(indexerPostProcessors), 1,
+				indexerPostProcessors.length);
+			Assert.assertEquals(indexerPostProcessor, indexerPostProcessors[0]);
+		}
+		finally {
+			serviceRegistration.unregister();
+		}
 	}
 
 }

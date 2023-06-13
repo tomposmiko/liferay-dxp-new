@@ -66,7 +66,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true, service = {CacheRegistryItem.class, FinderCache.class}
 )
 public class FinderCacheImpl
-	implements CacheRegistryItem, FinderCache, PortalCacheManagerListener {
+	implements PortalCacheManagerListener, CacheRegistryItem, FinderCache {
 
 	@Override
 	public void clearCache() {

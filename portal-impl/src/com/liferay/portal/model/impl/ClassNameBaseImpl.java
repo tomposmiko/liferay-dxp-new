@@ -32,13 +32,12 @@ import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class ClassNameBaseImpl
-	extends ClassNameModelImpl implements ClassName {
-
+public abstract class ClassNameBaseImpl extends ClassNameModelImpl
+	implements ClassName {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a class name model instance should use the <code>ClassName</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a class name model instance should use the {@link ClassName} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class ClassNameBaseImpl
 			ClassNameLocalServiceUtil.updateClassName(this);
 		}
 	}
-
 }

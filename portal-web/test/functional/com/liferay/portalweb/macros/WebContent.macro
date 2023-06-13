@@ -79,37 +79,15 @@ definition {
 	macro addExistingRelatedAssetCP {
 		var key_webContentTitle = "${webContentTitle}";
 
-		Panel.expandPanel(panel = "Related Assets");
-
-		AssertClick(
-			locator1 = "AssetRelatedAssets#RELATED_ASSETS_SELECT",
-			value1 = "Select"
+		RelatedAssets.selectAsset(
+			assetTitle = "${assetTitle}",
+			assetType = "${assetType}",
+			scopeSite = "${scopeSite}"
 		);
 
-		AssertClick(
-			locator1 = "APConfiguration#ASSET_SELECTION_MANUAL_ASSET_ENTRIES_ASSET",
-			value1 = "${assetType}",
-			key_assetType = "${assetType}"
-		);
-
-		SelectFrame(locator1 = "AssetRelatedAssets#SELECT_ASSET_IFRAME");
-
-		if (isSet(scopeSite)) {
-			Click(locator1 = "Dropdown#FILTER_AND_ORDER");
-
-			MenuItem.click(menuItem = "${scopeSite}");
-		}
-
-		Search.searchCP(searchTerm = "${assetTitle}");
+		SelectFrame(value1 = "relative=top");
 
 		var key_assetTitle = "${assetTitle}";
-
-		AssertClick(
-			locator1 = "AssetRelatedAssets#ASSET_TABLE_CHOOSE",
-			value1 = "${assetTitle}"
-		);
-
-		SelectFrameTop();
 
 		AssertTextEquals(
 			locator1 = "AssetRelatedAssets#RELATED_ASSETS_TABLE_TYPE",
@@ -708,28 +686,6 @@ definition {
 		PortletEntry.publish();
 	}
 
-	macro addWithThreeTranslations {
-		WebContent.addCP(webContentContent = "WC Content", webContentTitle = "WC Title");
-
-		PortletEntry.changeLocale(fieldName = "Title", locale = "es-ES");
-
-		WebContent.addCP(
-			webContentContent = "WC Contenido",
-			webContentTitle = "WC Titulo"
-		);
-
-		PortletEntry.changeLocale(fieldName = "Title", locale = "de-DE");
-
-		WebContent.addCP(webContentContent = "WC Inhalt", webContentTitle = "WC Titel");
-
-		PortletEntry.changeLocale(fieldName = "Title", locale = "fi-FI");
-
-		WebContent.addCP(
-			webContentContent = "WC Pitoisuus",
-			webContentTitle = "WC Otsikko"
-		);
-	}
-
 	macro addWithWorkflowCP {
 		WebContent.addCP(
 			webContentContent = "${webContentContent}",
@@ -783,9 +739,9 @@ definition {
 	}
 
 	macro copyCP {
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Copy",
-			rowEntry = "${webContentTitle}"
+		WebContentNavigator.gotoEntryMenuItem(
+			entry = "${webContentTitle}",
+			menuItem = "Copy"
 		);
 
 		Alert.viewSuccessMessage();
@@ -840,9 +796,9 @@ definition {
 	}
 
 	macro deleteWithDisabledRB {
-		LexiconEntry.gotoEntryMenuItemNoError(
-			menuItem = "Delete",
-			rowEntry = "${entryTitle}"
+		WebContentNavigator.gotoEntryMenuItem(
+			entry = "${entryTitle}",
+			menuItem = "Delete"
 		);
 
 		AssertConfirm(
@@ -1021,9 +977,9 @@ definition {
 	}
 
 	macro expireSpecificVersionCP {
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "View History",
-			rowEntry = "${webContentTitle}"
+		WebContentNavigator.gotoEntryMenuItem(
+			entry = "${webContentTitle}",
+			menuItem = "View History"
 		);
 
 		if (isSet(webContentList)) {
@@ -1121,9 +1077,9 @@ definition {
 	}
 
 	macro moveToFolderCP {
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Move",
-			rowEntry = "${webContentTitle}"
+		WebContentNavigator.gotoEntryMenuItem(
+			entry = "${webContentTitle}",
+			menuItem = "Move"
 		);
 
 		AssertTextEquals(
@@ -1164,13 +1120,12 @@ definition {
 			var key_webContentTitle = "${webContentTitle}";
 		}
 
-		Click(locator1 = "WC#ENTRY_LIST_MENULIST_ICON");
-
-		AssertClick.assertPartialTextClickAt(
-			locator1 = "MenuItem#ANY_MENU_ITEM",
-			value1 = "Move to Recycle Bin",
-			key_menuItem = "Move to Recycle Bin"
+		WebContentNavigator.gotoEntryMenuItem(
+			entry = "${webContentTitle}",
+			menuItem = "Move to Recycle Bin"
 		);
+
+		AssertConfirm(value1 = "Are you sure you want to move this to the Recycle Bin?");
 
 		AssertElementPresent(locator1 = "Message#SUCCESS");
 	}
@@ -1356,12 +1311,10 @@ definition {
 	}
 
 	macro subscribeToSpecificArticle {
-		Click(
-			locator1 = "Icon#ROW_VERTICAL_ELLIPSIS",
-			key_rowEntry = "${webContentTitle}"
+		WebContentNavigator.gotoEntryMenuItem(
+			entry = "${webContentTitle}",
+			menuItem = "Subscribe"
 		);
-
-		MenuItem.click(menuItem = "Subscribe");
 
 		Alert.viewSuccessMessage();
 	}
@@ -1433,7 +1386,7 @@ definition {
 
 		AssertTextEquals(
 			locator1 = "WC#ENTRY_TABLE_WORKFLOW_STATUS",
-			value1 = "Approved"
+			value1 = "APPROVED"
 		);
 	}
 
@@ -2009,7 +1962,7 @@ definition {
 
 	macro viewStructureWithWorkflowCP {
 		WebContentNavigator.gotoViewStatus(
-			webContentStatus = "Pending",
+			webContentStatus = "PENDING",
 			webContentTitle = "${webContentTitle}"
 		);
 
@@ -2171,7 +2124,7 @@ definition {
 
 	macro viewWithWorkflowCP {
 		WebContentNavigator.gotoViewStatus(
-			webContentStatus = "Pending",
+			webContentStatus = "PENDING",
 			webContentTitle = "${webContentTitle}"
 		);
 

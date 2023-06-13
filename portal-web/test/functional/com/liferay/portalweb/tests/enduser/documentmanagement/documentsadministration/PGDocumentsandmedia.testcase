@@ -3,7 +3,6 @@ definition {
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property custom.properties = "default.layout.template.id=1_column";
-	property test.assert.warning.exceptions = "true";
 	property testray.main.component.name = "Documents Management";
 	var pageName = "Documents and Media Page";
 	var portletName = "Documents and Media";
@@ -61,7 +60,6 @@ definition {
 
 	@priority = "5"
 	test AddDocuments {
-		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
@@ -852,13 +850,13 @@ definition {
 
 		MenuItem.click(menuItem = "Google Docs");
 
-		GoogleDoc.gotoDrive(
+		GoogleDrive.gotoDrive(
 			userEmailAddress = PropsUtil.get("email.address.3"),
 			userPassword = PropsUtil.get("email.password.3"),
 			windowTitle = "Documents and Media Page - Liferay"
 		);
 
-		GoogleDoc.selectDocument(googleDocName = "taco.jpg");
+		GoogleDrive.selectDocument(googleDocName = "taco.jpg");
 
 		PortletEntry.publish();
 
@@ -970,6 +968,7 @@ definition {
 		);
 	}
 
+	@description = "This test edits a document inside a folder. It also asserts a major version increment since the change involved changing the actual file."
 	@priority = "4"
 	test EditFolderDocumentFile {
 		Navigator.gotoPage(pageName = "Documents and Media Page");
@@ -989,8 +988,7 @@ definition {
 
 		DMDocument.editPG(
 			dmDocumentFileEdit = "Document_2.doc",
-			dmDocumentTitle = "DM Document Title",
-			dmDocumentVersionNumber = "1.1"
+			dmDocumentTitle = "DM Document Title"
 		);
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
@@ -1000,7 +998,7 @@ definition {
 		DMDocument.viewAllPG(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
-			dmDocumentVersionNumber = "1.1"
+			dmDocumentVersionNumber = "2.0"
 		);
 	}
 
@@ -1206,13 +1204,13 @@ definition {
 
 		MenuItem.click(menuItem = "Google Docs");
 
-		GoogleDoc.gotoDrive(
+		GoogleDrive.gotoDrive(
 			userEmailAddress = PropsUtil.get("email.address.3"),
 			userPassword = PropsUtil.get("email.password.3"),
 			windowTitle = "Documents and Media Page - Liferay"
 		);
 
-		GoogleDoc.selectDocument(googleDocName = "taco.jpg");
+		GoogleDrive.selectDocument(googleDocName = "taco.jpg");
 
 		PortletEntry.publish();
 
@@ -1263,8 +1261,7 @@ definition {
 
 		DMDocument.editPG(
 			dmDocumentFileEdit = "Document_2.doc",
-			dmDocumentTitle = "DM Document Title",
-			dmDocumentVersionNumber = "1.1"
+			dmDocumentTitle = "DM Document Title"
 		);
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
@@ -1274,7 +1271,7 @@ definition {
 		DMDocument.viewAllPG(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
-			dmDocumentVersionNumber = "1.1"
+			dmDocumentVersionNumber = "2.0"
 		);
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
@@ -1298,7 +1295,7 @@ definition {
 		DMDocument.viewAllPG(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
-			dmDocumentVersionNumber = "2.0"
+			dmDocumentVersionNumber = "3.0"
 		);
 	}
 

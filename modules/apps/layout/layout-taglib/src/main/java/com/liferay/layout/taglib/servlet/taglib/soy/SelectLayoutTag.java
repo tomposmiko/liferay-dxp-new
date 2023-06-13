@@ -15,9 +15,11 @@
 package com.liferay.layout.taglib.servlet.taglib.soy;
 
 import com.liferay.exportimport.kernel.staging.StagingUtil;
+import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.frontend.taglib.soy.servlet.taglib.ComponentRendererTag;
 import com.liferay.frontend.taglib.util.TagAccessor;
 import com.liferay.frontend.taglib.util.TagResourceHandler;
+import com.liferay.layout.taglib.internal.frontend.js.loader.modules.extender.npm.NPMResolverProvider;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -87,7 +89,14 @@ public class SelectLayoutTag extends ComponentRendererTag {
 
 	@Override
 	public String getModule() {
-		return "layout-taglib/select_layout/js/SelectLayout.es";
+		NPMResolver npmResolver = NPMResolverProvider.getNPMResolver();
+
+		if (npmResolver == null) {
+			return StringPool.BLANK;
+		}
+
+		return npmResolver.resolveModuleName(
+			"layout-taglib/select_layout/js/SelectLayout.es");
 	}
 
 	public void setCheckDisplayPage(boolean checkDisplayPage) {

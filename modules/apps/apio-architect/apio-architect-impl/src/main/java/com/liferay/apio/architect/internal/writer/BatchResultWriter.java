@@ -112,8 +112,8 @@ public class BatchResultWriter<T> {
 			BatchResult<T> batchResult) {
 
 			return batchResultMessageMapper -> pathFunction ->
-				representorFunction ->
-					requestInfo -> () -> new BatchResultWriter<>(
+				representorFunction -> requestInfo ->
+					() -> new BatchResultWriter<>(
 						batchResult, batchResultMessageMapper, pathFunction,
 						representorFunction, requestInfo);
 		}

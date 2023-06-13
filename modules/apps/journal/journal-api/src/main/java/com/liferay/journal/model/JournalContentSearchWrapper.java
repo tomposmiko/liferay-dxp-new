@@ -16,15 +16,11 @@ package com.liferay.journal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -36,23 +32,11 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class JournalContentSearchWrapper
+public class JournalContentSearchWrapper extends BaseModelWrapper<JournalContentSearch>
 	implements JournalContentSearch, ModelWrapper<JournalContentSearch> {
-
 	public JournalContentSearchWrapper(
 		JournalContentSearch journalContentSearch) {
-
-		_journalContentSearch = journalContentSearch;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return JournalContentSearch.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return JournalContentSearch.class.getName();
+		super(journalContentSearch);
 	}
 
 	@Override
@@ -115,326 +99,184 @@ public class JournalContentSearchWrapper
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new JournalContentSearchWrapper(
-			(JournalContentSearch)_journalContentSearch.clone());
-	}
-
-	@Override
-	public int compareTo(JournalContentSearch journalContentSearch) {
-		return _journalContentSearch.compareTo(journalContentSearch);
-	}
-
 	/**
-	 * Returns the article ID of this journal content search.
-	 *
-	 * @return the article ID of this journal content search
-	 */
+	* Returns the article ID of this journal content search.
+	*
+	* @return the article ID of this journal content search
+	*/
 	@Override
 	public String getArticleId() {
-		return _journalContentSearch.getArticleId();
+		return model.getArticleId();
 	}
 
 	/**
-	 * Returns the company ID of this journal content search.
-	 *
-	 * @return the company ID of this journal content search
-	 */
+	* Returns the company ID of this journal content search.
+	*
+	* @return the company ID of this journal content search
+	*/
 	@Override
 	public long getCompanyId() {
-		return _journalContentSearch.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the content search ID of this journal content search.
-	 *
-	 * @return the content search ID of this journal content search
-	 */
+	* Returns the content search ID of this journal content search.
+	*
+	* @return the content search ID of this journal content search
+	*/
 	@Override
 	public long getContentSearchId() {
-		return _journalContentSearch.getContentSearchId();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _journalContentSearch.getExpandoBridge();
+		return model.getContentSearchId();
 	}
 
 	/**
-	 * Returns the group ID of this journal content search.
-	 *
-	 * @return the group ID of this journal content search
-	 */
+	* Returns the group ID of this journal content search.
+	*
+	* @return the group ID of this journal content search
+	*/
 	@Override
 	public long getGroupId() {
-		return _journalContentSearch.getGroupId();
+		return model.getGroupId();
 	}
 
 	/**
-	 * Returns the layout ID of this journal content search.
-	 *
-	 * @return the layout ID of this journal content search
-	 */
+	* Returns the layout ID of this journal content search.
+	*
+	* @return the layout ID of this journal content search
+	*/
 	@Override
 	public long getLayoutId() {
-		return _journalContentSearch.getLayoutId();
+		return model.getLayoutId();
 	}
 
 	/**
-	 * Returns the portlet ID of this journal content search.
-	 *
-	 * @return the portlet ID of this journal content search
-	 */
+	* Returns the portlet ID of this journal content search.
+	*
+	* @return the portlet ID of this journal content search
+	*/
 	@Override
 	public String getPortletId() {
-		return _journalContentSearch.getPortletId();
+		return model.getPortletId();
 	}
 
 	/**
-	 * Returns the primary key of this journal content search.
-	 *
-	 * @return the primary key of this journal content search
-	 */
+	* Returns the primary key of this journal content search.
+	*
+	* @return the primary key of this journal content search
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _journalContentSearch.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _journalContentSearch.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the private layout of this journal content search.
-	 *
-	 * @return the private layout of this journal content search
-	 */
+	* Returns the private layout of this journal content search.
+	*
+	* @return the private layout of this journal content search
+	*/
 	@Override
 	public boolean getPrivateLayout() {
-		return _journalContentSearch.getPrivateLayout();
-	}
-
-	@Override
-	public int hashCode() {
-		return _journalContentSearch.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _journalContentSearch.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _journalContentSearch.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _journalContentSearch.isNew();
+		return model.getPrivateLayout();
 	}
 
 	/**
-	 * Returns <code>true</code> if this journal content search is private layout.
-	 *
-	 * @return <code>true</code> if this journal content search is private layout; <code>false</code> otherwise
-	 */
+	* Returns <code>true</code> if this journal content search is private layout.
+	*
+	* @return <code>true</code> if this journal content search is private layout; <code>false</code> otherwise
+	*/
 	@Override
 	public boolean isPrivateLayout() {
-		return _journalContentSearch.isPrivateLayout();
+		return model.isPrivateLayout();
 	}
 
 	@Override
 	public void persist() {
-		_journalContentSearch.persist();
+		model.persist();
 	}
 
 	/**
-	 * Sets the article ID of this journal content search.
-	 *
-	 * @param articleId the article ID of this journal content search
-	 */
+	* Sets the article ID of this journal content search.
+	*
+	* @param articleId the article ID of this journal content search
+	*/
 	@Override
 	public void setArticleId(String articleId) {
-		_journalContentSearch.setArticleId(articleId);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_journalContentSearch.setCachedModel(cachedModel);
+		model.setArticleId(articleId);
 	}
 
 	/**
-	 * Sets the company ID of this journal content search.
-	 *
-	 * @param companyId the company ID of this journal content search
-	 */
+	* Sets the company ID of this journal content search.
+	*
+	* @param companyId the company ID of this journal content search
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_journalContentSearch.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the content search ID of this journal content search.
-	 *
-	 * @param contentSearchId the content search ID of this journal content search
-	 */
+	* Sets the content search ID of this journal content search.
+	*
+	* @param contentSearchId the content search ID of this journal content search
+	*/
 	@Override
 	public void setContentSearchId(long contentSearchId) {
-		_journalContentSearch.setContentSearchId(contentSearchId);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_journalContentSearch.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_journalContentSearch.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_journalContentSearch.setExpandoBridgeAttributes(serviceContext);
+		model.setContentSearchId(contentSearchId);
 	}
 
 	/**
-	 * Sets the group ID of this journal content search.
-	 *
-	 * @param groupId the group ID of this journal content search
-	 */
+	* Sets the group ID of this journal content search.
+	*
+	* @param groupId the group ID of this journal content search
+	*/
 	@Override
 	public void setGroupId(long groupId) {
-		_journalContentSearch.setGroupId(groupId);
+		model.setGroupId(groupId);
 	}
 
 	/**
-	 * Sets the layout ID of this journal content search.
-	 *
-	 * @param layoutId the layout ID of this journal content search
-	 */
+	* Sets the layout ID of this journal content search.
+	*
+	* @param layoutId the layout ID of this journal content search
+	*/
 	@Override
 	public void setLayoutId(long layoutId) {
-		_journalContentSearch.setLayoutId(layoutId);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_journalContentSearch.setNew(n);
+		model.setLayoutId(layoutId);
 	}
 
 	/**
-	 * Sets the portlet ID of this journal content search.
-	 *
-	 * @param portletId the portlet ID of this journal content search
-	 */
+	* Sets the portlet ID of this journal content search.
+	*
+	* @param portletId the portlet ID of this journal content search
+	*/
 	@Override
 	public void setPortletId(String portletId) {
-		_journalContentSearch.setPortletId(portletId);
+		model.setPortletId(portletId);
 	}
 
 	/**
-	 * Sets the primary key of this journal content search.
-	 *
-	 * @param primaryKey the primary key of this journal content search
-	 */
+	* Sets the primary key of this journal content search.
+	*
+	* @param primaryKey the primary key of this journal content search
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_journalContentSearch.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_journalContentSearch.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets whether this journal content search is private layout.
-	 *
-	 * @param privateLayout the private layout of this journal content search
-	 */
+	* Sets whether this journal content search is private layout.
+	*
+	* @param privateLayout the private layout of this journal content search
+	*/
 	@Override
 	public void setPrivateLayout(boolean privateLayout) {
-		_journalContentSearch.setPrivateLayout(privateLayout);
+		model.setPrivateLayout(privateLayout);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<JournalContentSearch>
-		toCacheModel() {
-
-		return _journalContentSearch.toCacheModel();
+	protected JournalContentSearchWrapper wrap(
+		JournalContentSearch journalContentSearch) {
+		return new JournalContentSearchWrapper(journalContentSearch);
 	}
-
-	@Override
-	public JournalContentSearch toEscapedModel() {
-		return new JournalContentSearchWrapper(
-			_journalContentSearch.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _journalContentSearch.toString();
-	}
-
-	@Override
-	public JournalContentSearch toUnescapedModel() {
-		return new JournalContentSearchWrapper(
-			_journalContentSearch.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _journalContentSearch.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof JournalContentSearchWrapper)) {
-			return false;
-		}
-
-		JournalContentSearchWrapper journalContentSearchWrapper =
-			(JournalContentSearchWrapper)obj;
-
-		if (Objects.equals(
-				_journalContentSearch,
-				journalContentSearchWrapper._journalContentSearch)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public JournalContentSearch getWrappedModel() {
-		return _journalContentSearch;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _journalContentSearch.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _journalContentSearch.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_journalContentSearch.resetOriginalValues();
-	}
-
-	private final JournalContentSearch _journalContentSearch;
-
 }

@@ -10,6 +10,8 @@ definition {
 	macro assertSiteScopeSearch {
 		AssetPublisherPortlet.gotoConfigurationPG();
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Panel.expandPanel(panel = "Scope");
 
 		AssertClick(locator1 = "Configuration#SCOPE_SELECT", value1 = "Select");
@@ -25,6 +27,8 @@ definition {
 
 	macro configureAddSiteScopes {
 		AssetPublisherPortlet.gotoConfigurationPG();
+
+		Navigator.gotoNavTab(navTab = "Asset Selection");
 
 		Panel.expandPanel(panel = "Scope");
 
@@ -62,6 +66,8 @@ definition {
 	macro configureAPSelectMoreThanOnePG {
 		AssetPublisherPortlet.gotoConfigurationPG(portletName = "${portletName}");
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Panel.expandPanel(panel = "Source");
 
 		Select(
@@ -94,7 +100,7 @@ definition {
 
 		Navigator.gotoNavTab(navTab = "Asset Selection");
 
-		Panel.expandPanel(panel = "Ordering and Grouping");
+		Panel.expandPanel(panel = "Ordering");
 
 		Select(
 			locator1 = "APConfiguration#ORDERING_AND_GROUPING_ORDER_BY_SELECT",
@@ -141,6 +147,8 @@ definition {
 	macro configureAssetTypePG {
 		AssetPublisherPortlet.gotoConfigurationPG();
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Panel.expandPanel(panel = "Source");
 
 		Select(
@@ -183,6 +191,8 @@ definition {
 
 	macro configureCategoriesFilterPG {
 		AssetPublisherPortlet.gotoConfigurationPG();
+
+		Navigator.gotoNavTab(navTab = "Asset Selection");
 
 		Panel.expandPanel(panel = "Filter");
 
@@ -287,14 +297,9 @@ definition {
 			value1 = "Categories"
 		);
 
-		Click(locator1 = "Button#SELECT_CATEGORIES");
-
-		AssetCategorization.selectCategory(categoryName = "${categoryName}");
-
-		AssertTextEquals(
-			locator1 = "AssetCategorization#CATEGORY",
-			value1 = "${categoryName}",
-			key_categoryName = "${categoryName}"
+		AssetCategorization.addCategory(
+			categoryName = "${categoryName}",
+			vocabularyName = "${vocabularyName}"
 		);
 
 		PortletEntry.save();
@@ -304,6 +309,8 @@ definition {
 
 	macro configureFilterByFieldPG {
 		AssetPublisherPortlet.gotoConfigurationPG();
+
+		Navigator.gotoNavTab(navTab = "Asset Selection");
 
 		Panel.expandPanel(panel = "Source");
 
@@ -371,6 +378,8 @@ definition {
 	macro configureManualAssetSelectionPG {
 		AssetPublisherPortlet.gotoConfigurationPG(portletName = "${portletName}");
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Click(locator1 = "APConfiguration#ASSET_SELECTION_MANUAL");
 
 		if (isSet(assetTitle)) {
@@ -393,12 +402,14 @@ definition {
 
 			var key_assetTitle = "${assetTitle}";
 
-			AssertClick(
-				locator1 = "APConfiguration#ASSET_SELECTION_MANUAL_ASSET_ENTRIES_SELECT_CONTENT_LINK",
-				value1 = "${assetTitle}"
+			Click(
+				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_CHECKBOX",
+				key_rowEntry = "${assetTitle}"
 			);
 
 			SelectFrameTop();
+
+			Button.clickAdd();
 
 			SelectFrame(locator1 = "IFrame#DIALOG");
 		}
@@ -428,6 +439,8 @@ definition {
 
 	macro configureSelectedPG {
 		AssetPublisherPortlet.gotoConfigurationPG();
+
+		Navigator.gotoNavTab(navTab = "Asset Selection");
 
 		Panel.expandPanel(panel = "Source");
 
@@ -504,6 +517,8 @@ definition {
 
 		AssetPublisherPortlet.gotoConfigurationPG();
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Panel.expandPanel(panel = "Scope");
 
 		AssertClick(locator1 = "Configuration#SCOPE_SELECT", value1 = "Select");
@@ -520,11 +535,9 @@ definition {
 
 			LexiconEntry.changeDisplayStyle(displayStyle = "table");
 
-			if (!("${siteScopeType}" == "Parent Site")) {
-				Type(locator1 = "TextInput#SITE_SEARCH_KEYWORDS", value1 = "${siteName}");
+			Type(locator1 = "TextInput#SITE_SEARCH_KEYWORDS", value1 = "${siteName}");
 
-				KeyPress(locator1 = "TextInput#SEARCH", value1 = "\RETURN");
-			}
+			KeyPress(locator1 = "TextInput#SEARCH", value1 = "\RETURN");
 
 			AssertTextEquals(
 				locator1 = "APConfigurationSites#SITES_TABLE_NAME",
@@ -575,6 +588,8 @@ definition {
 
 		AssetPublisherPortlet.gotoConfigurationPG(portletName = "${portletName}");
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Panel.expandPanel(panel = "Scope");
 
 		var key_siteName = "${siteName}";
@@ -598,6 +613,8 @@ definition {
 
 	macro configureTagsFilterPG {
 		AssetPublisherPortlet.gotoConfigurationPG();
+
+		Navigator.gotoNavTab(navTab = "Asset Selection");
 
 		Panel.expandPanel(panel = "Filter");
 
@@ -654,6 +671,8 @@ definition {
 	macro editConfigureCategoriesFilterPG {
 		AssetPublisherPortlet.gotoConfigurationPG();
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Panel.expandPanel(panel = "Filter");
 
 		if (isSet(queryContains)) {
@@ -682,6 +701,8 @@ definition {
 
 	macro editConfigureTagsFilterPG {
 		AssetPublisherPortlet.gotoConfigurationPG();
+
+		Navigator.gotoNavTab(navTab = "Asset Selection");
 
 		Panel.expandPanel(panel = "Filter");
 
@@ -787,6 +808,8 @@ definition {
 	macro removeSiteScope {
 		AssetPublisherPortlet.gotoConfigurationPG();
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Panel.expandPanel(panel = "Source");
 
 		for (var removeSiteScope : list "${removeSiteScopes}") {
@@ -843,6 +866,41 @@ definition {
 		);
 
 		Alert.viewSuccessMessage();
+
+		SelectFrameTop();
+	}
+
+	macro selectAssetList {
+		Portlet.gotoPortletOptions(
+			portletName = "Asset Publisher",
+			portletOption = "Configuration"
+		);
+
+		var assetListName = "${assetListName}";
+
+		SelectFrame(locator1 = "IFrame#DIALOG");
+
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
+		Panel.expandPanel(panel = "Asset Selection");
+
+		Click(locator1 = "APConfiguration#ASSET_SELECTION_ASSET_LIST");
+
+		Panel.expandPanel(panel = "Select Asset List");
+
+		Button.clickSelect();
+
+		SelectFrameTop();
+
+		SelectFrame(locator1 = "IFrame#DIALOG");
+
+		Click(locator1 = "APConfiguration#ASSET_LIST_CHOOSE_BUTTON");
+
+		SelectFrameTop();
+
+		SelectFrame(locator1 = "IFrame#DIALOG");
+
+		Button.clickSave();
 
 		SelectFrameTop();
 	}
@@ -926,6 +984,7 @@ definition {
 
 			AssertElementNotPresent(
 				locator1 = "Ratings#YOUR_RATING_STAR",
+				key_ratingStarPosition = "${ratingPosition}",
 				key_ratingStarPosition = MathUtil.sum("${ratingPosition}", "1")
 			);
 		}
@@ -1090,6 +1149,8 @@ definition {
 	macro viewConfigureSiteScopeContentSharingPG {
 		AssetPublisherPortlet.gotoConfigurationPG();
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Panel.expandPanel(panel = "Scope");
 
 		AssertClick(locator1 = "Configuration#SCOPE_SELECT", value1 = "Select");
@@ -1205,7 +1266,7 @@ definition {
 
 		AssertElementPresent(locator1 = "Ratings#AVERAGE_LABEL");
 
-		AssertElementPresent(locator1 = "Comments#SUBSCRIBE_TO_COMMENTS_LINK");
+		AssertElementPresent(locator1 = "Button#SUBSCRIBE");
 
 		AssertElementPresent(locator1 = "Icon#CUSTOM_EDIT");
 
@@ -1264,9 +1325,11 @@ definition {
 	macro viewDynamicAssetSelectionConfigurationPG {
 		AssetPublisherPortlet.gotoConfigurationPG(portletName = "${portletName}");
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Click(locator1 = "APConfiguration#ASSET_SELECTION_DYNAMIC");
 
-		for (var panel : list "Source,Filter,Custom User Attributes,Ordering and Grouping") {
+		for (var panel : list "Source,Filter,Custom User Attributes,Ordering") {
 			AssertElementPresent(locator1 = "Panel#PANEL_COLLAPSED", key_panel = "${panel}");
 		}
 
@@ -1288,6 +1351,8 @@ definition {
 
 	macro viewFilterAndFieldsPG {
 		AssetPublisherPortlet.gotoConfigurationPG(portletName = "${portletName}");
+
+		Navigator.gotoNavTab(navTab = "Asset Selection");
 
 		Panel.expandPanel(panel = "Source");
 
@@ -1340,6 +1405,8 @@ definition {
 	macro viewManualAssetSelectionConfigurationPG {
 		AssetPublisherPortlet.gotoConfigurationPG(portletName = "${portletName}");
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Panel.expandPanel(panel = "Asset Entries");
 
 		Click(locator1 = "APConfiguration#ASSET_SELECTION_MANUAL");
@@ -1390,7 +1457,11 @@ definition {
 	}
 
 	macro viewManualNoAssetsMessagePG {
-		AssertTextEquals(locator1 = "Message#INFO", value1 = "There are no results.");
+		AssertTextEquals(
+			locator1 = "Message#INFO_SPECIFIC_WIDGET",
+			value1 = "There are no results.",
+			key_widgetName = "Asset Publisher"
+		);
 	}
 
 	macro viewMultipleAssetOrderPGViaAP {
@@ -1553,6 +1624,8 @@ definition {
 	macro viewRestoredSetupPG {
 		AssetPublisherPortlet.gotoConfigurationPG(portletName = "${portletName}");
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Panel.expandPanel(panel = "Asset Entries");
 
 		AssertTextEquals(
@@ -1576,19 +1649,14 @@ definition {
 
 		AssetPublisherPortlet.gotoConfigurationPG();
 
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
 		Panel.expandPanel(panel = "Source");
 
 		AssertSelectedLabel(
 			locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT",
 			value1 = "${selectedAssetConfiguration}"
 		);
-
-		if (isSet(assetSubtypeConfiguration)) {
-			AssertSelectedLabel(
-				locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_SUBTYPE_SELECT",
-				value1 = "${assetSubtypeConfiguration}"
-			);
-		}
 
 		SelectFrameTop();
 	}

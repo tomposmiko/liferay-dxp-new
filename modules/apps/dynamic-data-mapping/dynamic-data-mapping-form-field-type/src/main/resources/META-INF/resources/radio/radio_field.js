@@ -107,14 +107,6 @@ AUI.add(
 						var formGroup = container.one('.form-group');
 
 						formGroup.insert(container.one('.form-feedback-indicator'), 'after');
-					},
-
-					showPendingErrorMessage: function() {
-						var instance = this;
-
-						if (!instance.hasFocus()) {
-							instance.showErrorMessage();
-						}
 					}
 				}
 			}

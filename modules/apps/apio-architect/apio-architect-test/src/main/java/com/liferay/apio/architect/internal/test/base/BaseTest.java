@@ -414,7 +414,8 @@ public class BaseTest {
 		Case($(), value -> List.of(value.toString()))
 	);
 
-	private static final BundleContext _bundleContext;
+	private static final BundleContext _bundleContext = FrameworkUtil.getBundle(
+		BaseTest.class).getBundleContext();
 	private static final Collection<ComponentDescriptionDTO>
 		_classedDisabledImplementations = new ArrayList<>();
 	private static final Collection<ServiceRegistration<?>>
@@ -425,12 +426,6 @@ public class BaseTest {
 			"(liferay.apio.architect.application=true)", JAX_RS_RESOURCE,
 			"true");
 	private static ServiceComponentRuntime _serviceComponentRuntime;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(BaseTest.class);
-
-		_bundleContext = bundle.getBundleContext();
-	}
 
 	private ServiceTracker<ClientBuilder, ClientBuilder> _clientBuilderTracker;
 	private final Collection<ComponentDescriptionDTO> _disabledImplementations =

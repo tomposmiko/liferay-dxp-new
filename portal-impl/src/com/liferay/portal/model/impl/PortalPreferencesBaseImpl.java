@@ -34,11 +34,10 @@ import com.liferay.portal.kernel.service.PortalPreferencesLocalServiceUtil;
 @ProviderType
 public abstract class PortalPreferencesBaseImpl
 	extends PortalPreferencesModelImpl implements PortalPreferences {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a portal preferences model instance should use the <code>PortalPreferences</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a portal preferences model instance should use the {@link PortalPreferences} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class PortalPreferencesBaseImpl
 			PortalPreferencesLocalServiceUtil.updatePortalPreferences(this);
 		}
 	}
-
 }

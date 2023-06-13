@@ -23,5 +23,5 @@ import javax.portlet.EventResponse;
  */
 @ProviderType
 public interface LiferayEventResponse
-	extends EventResponse, LiferayStateAwareResponse {
+	extends LiferayStateAwareResponse, EventResponse {
 }

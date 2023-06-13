@@ -114,8 +114,7 @@ public class ErrorUtil {
 		}
 	}
 
-	private static final Response _serverError = Response.serverError(
-	).build();
+	private static final Response _serverError = Response.serverError().build();
 
 	@Reference
 	private ErrorMessageMapperManager _errorMessageMapperManager;

@@ -15,7 +15,7 @@
 package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.snapshot;
 
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.engine.adapter.snapshot.RestoreSnapshotRequest;
 import com.liferay.portal.search.engine.adapter.snapshot.RestoreSnapshotResponse;
 
@@ -51,10 +51,13 @@ public class RestoreSnapshotRequestExecutorImpl
 
 		List<String> indexNames = restoreInfo.indices();
 
-		return new RestoreSnapshotResponse(
-			restoreInfo.name(),
-			indexNames.toArray(new String[indexNames.size()]),
-			restoreInfo.totalShards(), restoreInfo.failedShards());
+		RestoreSnapshotResponse restoreSnapshotResponse =
+			new RestoreSnapshotResponse(
+				restoreInfo.name(),
+				indexNames.toArray(new String[indexNames.size()]),
+				restoreInfo.totalShards(), restoreInfo.failedShards());
+
+		return restoreSnapshotResponse;
 	}
 
 	protected RestoreSnapshotRequestBuilder createRestoreSnapshotRequestBuilder(
@@ -62,7 +65,7 @@ public class RestoreSnapshotRequestExecutorImpl
 
 		RestoreSnapshotRequestBuilder restoreSnapshotRequestBuilder =
 			RestoreSnapshotAction.INSTANCE.newRequestBuilder(
-				elasticsearchConnectionManager.getClient());
+				elasticsearchClientResolver.getClient());
 
 		restoreSnapshotRequestBuilder.setIncludeAliases(
 			restoreSnapshotRequest.isIncludeAliases());
@@ -96,6 +99,6 @@ public class RestoreSnapshotRequestExecutorImpl
 	}
 
 	@Reference
-	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
+	protected ElasticsearchClientResolver elasticsearchClientResolver;
 
 }

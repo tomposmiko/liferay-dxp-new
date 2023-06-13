@@ -282,7 +282,9 @@ public class BookmarksEntryTrashHandlerTest
 	protected WorkflowedModel getWorkflowedModel(ClassedModel baseModel)
 		throws Exception {
 
-		return (BookmarksEntry)baseModel;
+		BookmarksEntry entry = (BookmarksEntry)baseModel;
+
+		return entry;
 	}
 
 	@Override

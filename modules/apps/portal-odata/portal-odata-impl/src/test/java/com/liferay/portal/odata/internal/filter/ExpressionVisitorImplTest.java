@@ -17,9 +17,7 @@ package com.liferay.portal.odata.internal.filter;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
-import com.liferay.portal.kernel.search.filter.ExistsFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
-import com.liferay.portal.kernel.search.filter.PrefixFilter;
 import com.liferay.portal.kernel.search.filter.RangeTermFilter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -34,7 +32,6 @@ import com.liferay.portal.odata.filter.expression.ExpressionVisitor;
 import com.liferay.portal.odata.filter.expression.LambdaFunctionExpression;
 import com.liferay.portal.odata.filter.expression.LiteralExpression;
 import com.liferay.portal.odata.filter.expression.MemberExpression;
-import com.liferay.portal.odata.filter.expression.MethodExpression;
 import com.liferay.portal.odata.filter.expression.UnaryExpression;
 import com.liferay.portal.odata.internal.filter.expression.BinaryExpressionImpl;
 import com.liferay.portal.odata.internal.filter.expression.CollectionPropertyExpressionImpl;
@@ -53,10 +50,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.assertj.core.api.AbstractThrowableAssert;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -119,34 +112,6 @@ public class ExpressionVisitorImplTest {
 		Assert.assertEquals(value, termFilter.getValue());
 	}
 
-	@Test
-	public void testVisitBinaryExpressionOperationWithEqualOperationAndNullValue() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		EntityField entityField = entityFieldsMap.get("title");
-
-		BooleanFilter booleanFilter =
-			(BooleanFilter)
-				_expressionVisitorImpl.visitBinaryExpressionOperation(
-					BinaryExpression.Operation.EQ, entityField, null);
-
-		Assert.assertTrue(booleanFilter.hasClauses());
-
-		List<BooleanClause<Filter>> booleanClauses =
-			booleanFilter.getMustNotBooleanClauses();
-
-		Assert.assertEquals(
-			booleanClauses.toString(), 1, booleanClauses.size());
-
-		BooleanClause<Filter> queryBooleanClause = booleanClauses.get(0);
-
-		ExistsFilter existsFilter =
-			(ExistsFilter)queryBooleanClause.getClause();
-
-		Assert.assertEquals(entityField.getName(), existsFilter.getField());
-	}
-
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testVisitBinaryExpressionOperationWithGreaterEqualOperation() {
@@ -191,40 +156,6 @@ public class ExpressionVisitorImplTest {
 		Assert.assertTrue(rangeTermFilter.isIncludesUpper());
 	}
 
-	@Test
-	public void testVisitBinaryExpressionOperationWithGreaterOperationAndNullValue() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		AbstractThrowableAssert exception = Assertions.assertThatThrownBy(
-			() -> _expressionVisitorImpl.visitBinaryExpressionOperation(
-				BinaryExpression.Operation.GT, entityFieldsMap.get("title"),
-				null)
-		).isInstanceOf(
-			UnsupportedOperationException.class
-		);
-
-		exception.hasMessage(
-			"Unsupported method _getGTFilter with null values");
-	}
-
-	@Test
-	public void testVisitBinaryExpressionOperationWithGreaterOrEqualOperationAndNullValue() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		AbstractThrowableAssert exception = Assertions.assertThatThrownBy(
-			() -> _expressionVisitorImpl.visitBinaryExpressionOperation(
-				BinaryExpression.Operation.GE, entityFieldsMap.get("title"),
-				null)
-		).isInstanceOf(
-			UnsupportedOperationException.class
-		);
-
-		exception.hasMessage(
-			"Unsupported method _getGEFilter with null values");
-	}
-
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testVisitBinaryExpressionOperationWithLowerEqualOperation() {
@@ -265,88 +196,6 @@ public class ExpressionVisitorImplTest {
 		Assert.assertEquals(entityField.getName(), rangeTermFilter.getField());
 		Assert.assertEquals(value, rangeTermFilter.getUpperBound());
 		Assert.assertNull(rangeTermFilter.getLowerBound());
-	}
-
-	@Test
-	public void testVisitBinaryExpressionOperationWithLowerOperationAndNullValue() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		AbstractThrowableAssert exception = Assertions.assertThatThrownBy(
-			() -> _expressionVisitorImpl.visitBinaryExpressionOperation(
-				BinaryExpression.Operation.LT, entityFieldsMap.get("title"),
-				null)
-		).isInstanceOf(
-			UnsupportedOperationException.class
-		);
-
-		exception.hasMessage(
-			"Unsupported method _getLTFilter with null values");
-	}
-
-	@Test
-	public void testVisitBinaryExpressionOperationWithLowerOrEqualOperationAndNullValue() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		AbstractThrowableAssert exception = Assertions.assertThatThrownBy(
-			() -> _expressionVisitorImpl.visitBinaryExpressionOperation(
-				BinaryExpression.Operation.LE, entityFieldsMap.get("title"),
-				null)
-		).isInstanceOf(
-			UnsupportedOperationException.class
-		);
-
-		exception.hasMessage(
-			"Unsupported method _getLEFilter with null values");
-	}
-
-	@Test
-	public void testVisitBinaryExpressionOperationWithNotEqualOperation() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		EntityField entityField = entityFieldsMap.get("title");
-
-		String value = "title1";
-
-		BooleanFilter booleanFilter =
-			(BooleanFilter)
-				_expressionVisitorImpl.visitBinaryExpressionOperation(
-					BinaryExpression.Operation.NE, entityField, value);
-
-		Assert.assertTrue(booleanFilter.hasClauses());
-
-		List<BooleanClause<Filter>> booleanClauses =
-			booleanFilter.getMustNotBooleanClauses();
-
-		Assert.assertEquals(
-			booleanClauses.toString(), 1, booleanClauses.size());
-
-		BooleanClause<Filter> queryBooleanClause = booleanClauses.get(0);
-
-		Assert.assertEquals(
-			BooleanClauseOccur.MUST_NOT,
-			queryBooleanClause.getBooleanClauseOccur());
-
-		TermFilter termFilter = (TermFilter)queryBooleanClause.getClause();
-
-		Assert.assertEquals(entityField.getName(), termFilter.getField());
-		Assert.assertEquals(value, termFilter.getValue());
-	}
-
-	@Test
-	public void testVisitBinaryExpressionOperationWithNotEqualOperationAndNullValue() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		EntityField entityField = entityFieldsMap.get("title");
-
-		ExistsFilter existsFilter =
-			(ExistsFilter)_expressionVisitorImpl.visitBinaryExpressionOperation(
-				BinaryExpression.Operation.NE, entityField, null);
-
-		Assert.assertEquals(entityField.getName(), existsFilter.getField());
 	}
 
 	@Test
@@ -556,24 +405,6 @@ public class ExpressionVisitorImplTest {
 		Assert.assertEquals("keywords", entityField2.getName());
 		Assert.assertEquals(
 			EntityField.Type.COLLECTION, entityField2.getType());
-	}
-
-	@Test
-	public void testVisitMethodExpressionWithStartsWith() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		EntityField entityField = entityFieldsMap.get("title");
-
-		String value = "title1";
-
-		PrefixFilter prefixFilter =
-			(PrefixFilter)_expressionVisitorImpl.visitMethodExpression(
-				Arrays.asList(Arrays.array(entityField, value)),
-				MethodExpression.Type.STARTS_WITH);
-
-		Assert.assertEquals(entityField.getName(), prefixFilter.getField());
-		Assert.assertEquals(value, prefixFilter.getPrefix());
 	}
 
 	@Test

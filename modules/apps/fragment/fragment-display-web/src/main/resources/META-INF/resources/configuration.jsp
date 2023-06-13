@@ -124,45 +124,52 @@ FragmentEntry fragmentEntry = fragmentEntryDisplayContext.getFragmentEntry();
 </liferay-frontend:edit-form>
 
 <aui:script use="liferay-item-selector-dialog">
-	$('#<portlet:namespace />fragmentEntrySelector').on(
-		'click',
-		function(event) {
-			event.preventDefault();
+	const fragmentEntrySelector = document.getElementById('<portlet:namespace />fragmentEntrySelector');
 
-			var itemSelectorDialog = new A.LiferayItemSelectorDialog(
-				{
-					eventName: '<%= fragmentEntryDisplayContext.getEventName() %>',
-					on: {
-						selectedItemChange: function(event) {
-							var selectedItem = event.newVal;
+	if (fragmentEntrySelector) {
+		fragmentEntrySelector.addEventListener(
+			'click',
+			function(event) {
+				event.preventDefault();
 
-							if (selectedItem) {
-								retrieveFragmentEntry(selectedItem.fragmentEntryId);
+				const itemSelectorDialog = new A.LiferayItemSelectorDialog(
+					{
+						eventName: '<%= fragmentEntryDisplayContext.getEventName() %>',
+						on: {
+							selectedItemChange: function(event) {
+								const selectedItem = event.newVal;
+
+								if (selectedItem) {
+									retrieveFragmentEntry(selectedItem.fragmentEntryId);
+								}
 							}
-						}
-					},
-					'strings.add': '<liferay-ui:message key="done" />',
-					title: '<liferay-ui:message key="select-fragment-entry" />',
-					url: '<%= fragmentEntryDisplayContext.getItemSelectorURL() %>'
-				}
-			);
+						},
+						'strings.add': '<liferay-ui:message key="done" />',
+						title: '<liferay-ui:message key="select-fragment-entry" />',
+						url: '<%= fragmentEntryDisplayContext.getItemSelectorURL() %>'
+					}
+				);
 
-			itemSelectorDialog.open();
-		}
-	);
+				itemSelectorDialog.open();
+			}
+		);
+	}
 
-	$('#<portlet:namespace/>removeFragmentEntry').on(
-		'click',
-		function() {
-			retrieveFragmentEntry(-1);
-		}
-	);
+	const removeFragmentEntry = document.getElementById('<portlet:namespace />removeFragmentEntry');
+
+	if (removeFragmentEntry) {
+		removeFragmentEntry.addEventListener(
+			'click',
+			function() {
+				retrieveFragmentEntry(-1);
+			}
+		);
+	}
 
 	function retrieveFragmentEntry(fragmentEntryId) {
-		var uri = '<%= configurationRenderURL %>';
-
-		uri = Liferay.Util.addParams('<portlet:namespace />fragmentEntryId=' + fragmentEntryId, uri);
-
-		location.href = uri;
+		location.href = Liferay.Util.addParams(
+			'<portlet:namespace />fragmentEntryId=' + fragmentEntryId,
+			'<%= configurationRenderURL %>'
+		);
 	}
 </aui:script>

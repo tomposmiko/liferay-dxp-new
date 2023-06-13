@@ -117,9 +117,7 @@ public class RootResourceTest extends BaseTest {
 
 	@Test
 	public void testEntryPointEndpoint() {
-		Response response = _makeRequestTo(
-			""
-		).get();
+		Response response = _makeRequestTo("").get();
 
 		String entity = response.readEntity(String.class);
 
@@ -202,11 +200,7 @@ public class RootResourceTest extends BaseTest {
 	}
 
 	private Response _makeRequestTo(String path, String method) {
-		return _makeRequestTo(
-			path
-		).method(
-			method
-		);
+		return _makeRequestTo(path).method(method);
 	}
 
 	private void _testEndpoint(String endpoint, String method) {
@@ -270,8 +264,8 @@ public class RootResourceTest extends BaseTest {
 
 			return new Documentation(
 				Optional::empty, Optional::empty, Optional::empty,
-				Collections::emptyMap, Stream.empty(), __ -> Stream.empty(),
-				() -> __ -> Locale::toString);
+				Collections::emptyMap, Stream.empty(),
+				__ -> Stream.empty(), () -> __ -> Locale::toString);
 		}
 
 		@Override

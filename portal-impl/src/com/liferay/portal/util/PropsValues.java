@@ -845,6 +845,13 @@ public class PropsValues {
 	public static final int DISCUSSION_MAX_COMMENTS = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.DISCUSSION_MAX_COMMENTS));
 
+	public static final boolean DISCUSSION_SUBSCRIBE = GetterUtil.getBoolean(
+		PropsUtil.get(PropsKeys.DISCUSSION_SUBSCRIBE));
+
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final boolean DISCUSSION_SUBSCRIBE_BY_DEFAULT =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.DISCUSSION_SUBSCRIBE_BY_DEFAULT));
@@ -1652,10 +1659,10 @@ public class PropsValues {
 	public static final String LOGIN_EMAIL_FROM_NAME = PropsUtil.get(
 		PropsKeys.LOGIN_EMAIL_FROM_NAME);
 
-	public static String[] LOGIN_EVENTS_POST = PropsUtil.getArray(
+	public static final String[] LOGIN_EVENTS_POST = PropsUtil.getArray(
 		PropsKeys.LOGIN_EVENTS_POST);
 
-	public static String[] LOGIN_EVENTS_PRE = PropsUtil.getArray(
+	public static final String[] LOGIN_EVENTS_PRE = PropsUtil.getArray(
 		PropsKeys.LOGIN_EVENTS_PRE);
 
 	public static String[] LOGIN_FORM_NAVIGATION_POST = PropsUtil.getArray(
@@ -2901,6 +2908,10 @@ public class PropsValues {
 	public static final String[] SPRING_INFRASTRUCTURE_CONFIGS =
 		PropsUtil.getArray(PropsKeys.SPRING_INFRASTRUCTURE_CONFIGS);
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String[] SPRING_PORTLET_CONFIGS = PropsUtil.getArray(
 		PropsKeys.SPRING_PORTLET_CONFIGS);
 
@@ -2916,10 +2927,18 @@ public class PropsValues {
 	public static final int SQL_DATA_MAX_PARAMETERS = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.SQL_DATA_MAX_PARAMETERS));
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
 	public static boolean STAGING_DELETE_TEMP_LAR_ON_FAILURE =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.STAGING_DELETE_TEMP_LAR_ON_FAILURE));
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
 	public static boolean STAGING_DELETE_TEMP_LAR_ON_SUCCESS =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.STAGING_DELETE_TEMP_LAR_ON_SUCCESS));
@@ -3045,6 +3064,10 @@ public class PropsValues {
 	public static int TRANSACTION_ISOLATION_PORTAL = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.TRANSACTION_ISOLATION_PORTAL));
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String TRANSACTION_MANAGER_IMPL = PropsUtil.get(
 		PropsKeys.TRANSACTION_MANAGER_IMPL);
 

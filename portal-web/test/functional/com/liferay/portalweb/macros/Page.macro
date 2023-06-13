@@ -227,20 +227,6 @@ definition {
 		return "${plid}";
 	}
 
-	macro getTextCountFromHtmlSource {
-		var pageSource = selenium.getHtmlSource();
-
-		echo("## * Page Source: ${pageSource}");
-
-		return "${pageSource}";
-
-		var count = StringUtil.count("${pageSource}", "${text}");
-
-		echo("## * Count: ${count}");
-
-		return "${count}";
-	}
-
 	macro gotoChildPagePG {
 		MouseOver(locator1 = "Home#PAGE", key_pageName = "${pageName}");
 
@@ -378,15 +364,33 @@ definition {
 		}
 	}
 
+	macro toggleShowInPagesHierarchyMenu {
+		if ("${toggleValue}" == "enable") {
+			Check.checkToggleSwitch(
+				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH",
+				key_toggleSwitchLabel = "Pages Hierarchy Menu"
+			);
+		}
+		else if ("${toggleValue}" == "disable") {
+			Uncheck.uncheckToggleSwitch(
+				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH",
+				key_toggleSwitchLabel = "Pages Hierarchy Menu"
+			);
+		}
+		else {
+			fail("Failed. Please set ${toggleValue} to enable or disable.");
+		}
+	}
+
 	macro uploadFileForLogo {
 		AssertClick(locator1 = "Button#CHANGE_LOGO", value1 = "Change");
 
 		SelectFrame(locator1 = "SitePages#LOGO_UPLOAD_IMAGE_IFRAME");
 
-		AssertElementPresent(locator1 = "SitePages#LOGO_UPLOAD_IMAGE_BUTTON");
+		AssertClick(locator1 = "SitePages#LOGO_UPLOAD_IMAGE_BUTTON", value1 = "Select");
 
-		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
-			locator1 = "TextInput#FILE",
+		SikuliUploadCommonFile(
+			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
 			value1 = "${logoFile}"
 		);
 

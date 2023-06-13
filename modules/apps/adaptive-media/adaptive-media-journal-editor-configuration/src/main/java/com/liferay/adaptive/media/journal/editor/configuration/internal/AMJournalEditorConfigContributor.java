@@ -131,6 +131,11 @@ public class AMJournalEditorConfigContributor
 			"filebrowserImageBrowseUrl", itemSelectorPortletURL.toString());
 	}
 
+	@Reference(unbind = "-")
+	public void setItemSelector(ItemSelector itemSelector) {
+		_itemSelector = itemSelector;
+	}
+
 	protected void addAMImageFileEntryItemSelectorReturnType(
 		ItemSelectorCriterion itemSelectorCriterion) {
 
@@ -148,7 +153,6 @@ public class AMJournalEditorConfigContributor
 
 	private static final String _IMG_TAG_RULE = "img[*](*){*};";
 
-	@Reference
 	private ItemSelector _itemSelector;
 
 }

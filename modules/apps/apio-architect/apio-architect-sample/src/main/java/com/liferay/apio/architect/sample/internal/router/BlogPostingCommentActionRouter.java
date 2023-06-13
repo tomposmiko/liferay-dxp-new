@@ -129,8 +129,8 @@ public class BlogPostingCommentActionRouter implements ActionRouter<Comment> {
 
 	@Retrieve
 	public PageItems<Comment> retrieveCommentsForAModel(
-		@GenericParentId
-			ModelNameModelIdIdentifier modelNameModelIdIdentifier) {
+		@GenericParentId ModelNameModelIdIdentifier
+			modelNameModelIdIdentifier) {
 
 		List<BlogPostingCommentModel> blogPostingCommentModels =
 			_blogPostingCommentModelService.getPage(

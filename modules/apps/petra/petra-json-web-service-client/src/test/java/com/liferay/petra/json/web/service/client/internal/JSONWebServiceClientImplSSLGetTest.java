@@ -36,7 +36,24 @@ public class JSONWebServiceClientImplSSLGetTest
 	@Test
 	public void test200OKOnGetIfTLS11() throws Exception {
 		JSONWebServiceClientImpl jsonWebServiceClientImpl =
-			_createJsonWebServiceClient();
+			new JSONWebServiceClientImpl();
+
+		Map<String, Object> properties = getBaseProperties();
+
+		properties.put(
+			"headers", "headerKey1=headerValue1;Accept=application/json;");
+		properties.put("hostPort", 9443);
+
+		KeyStoreLoader keyStoreLoader = new KeyStoreLoader();
+
+		KeyStore keyStore = keyStoreLoader.getKeystore(
+			"localhost.jks", "liferay");
+
+		properties.put("keyStore", keyStore);
+
+		properties.put("protocol", "https");
+
+		jsonWebServiceClientImpl.activate(properties);
 
 		Map<String, String> params = new HashMap<String, String>();
 
@@ -60,7 +77,24 @@ public class JSONWebServiceClientImplSSLGetTest
 	@Test
 	public void test200OKOnGetIfTLS12() throws Exception {
 		JSONWebServiceClientImpl jsonWebServiceClientImpl =
-			_createJsonWebServiceClient();
+			new JSONWebServiceClientImpl();
+
+		Map<String, Object> properties = getBaseProperties();
+
+		properties.put(
+			"headers", "headerKey1=headerValue1;Accept=application/json;");
+		properties.put("hostPort", 9443);
+
+		KeyStoreLoader keyStoreLoader = new KeyStoreLoader();
+
+		KeyStore keyStore = keyStoreLoader.getKeystore(
+			"localhost.jks", "liferay");
+
+		properties.put("keyStore", keyStore);
+
+		properties.put("protocol", "https");
+
+		jsonWebServiceClientImpl.activate(properties);
 
 		Map<String, String> params = new HashMap<String, String>();
 
@@ -83,10 +117,25 @@ public class JSONWebServiceClientImplSSLGetTest
 
 	@Test(expected = JSONWebServiceException.class)
 	public void testJSONWebServiceExceptionOnGetIfTLS10() throws Exception {
-		System.setProperty("https.protocols", "TLSv1.1");
-
 		JSONWebServiceClientImpl jsonWebServiceClientImpl =
-			_createJsonWebServiceClient();
+			new JSONWebServiceClientImpl();
+
+		Map<String, Object> properties = getBaseProperties();
+
+		properties.put(
+			"headers", "headerKey1=headerValue1;Accept=application/json;");
+		properties.put("hostPort", 9443);
+
+		KeyStoreLoader keyStoreLoader = new KeyStoreLoader();
+
+		KeyStore keyStore = keyStoreLoader.getKeystore(
+			"localhost.jks", "liferay");
+
+		properties.put("keyStore", keyStore);
+
+		properties.put("protocol", "https");
+
+		jsonWebServiceClientImpl.activate(properties);
 
 		Map<String, String> params = new HashMap<String, String>();
 
@@ -108,32 +157,6 @@ public class JSONWebServiceClientImplSSLGetTest
 		finally {
 			HTTPSServerSimulator.stop();
 		}
-	}
-
-	private JSONWebServiceClientImpl _createJsonWebServiceClient()
-		throws Exception {
-
-		JSONWebServiceClientImpl jsonWebServiceClientImpl =
-			new JSONWebServiceClientImpl();
-
-		Map<String, Object> properties = getBaseProperties();
-
-		properties.put(
-			"headers", "headerKey1=headerValue1;Accept=application/json;");
-		properties.put("hostPort", 9443);
-
-		KeyStoreLoader keyStoreLoader = new KeyStoreLoader();
-
-		KeyStore keyStore = keyStoreLoader.getKeystore(
-			"localhost.jks", "liferay");
-
-		properties.put("keyStore", keyStore);
-
-		properties.put("protocol", "https");
-
-		jsonWebServiceClientImpl.activate(properties);
-
-		return jsonWebServiceClientImpl;
 	}
 
 }

@@ -247,8 +247,6 @@ import java.sql.Types;
 
 import java.text.Format;
 
-import java.time.ZoneId;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -952,21 +950,19 @@ public class DataFactory {
 	public void initContext(Properties properties)
 		throws FileNotFoundException {
 
-		TimeZone timeZone = TimeZone.getDefault();
-
 		String timeZoneId = properties.getProperty("sample.sql.db.time.zone");
 
 		if (Validator.isNotNull(timeZoneId)) {
-			timeZone = TimeZone.getTimeZone(ZoneId.of(timeZoneId));
+			TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
 
-			TimeZone.setDefault(timeZone);
-		}
-		else {
-			properties.setProperty("sample.sql.db.time.zone", timeZone.getID());
-		}
+			if (timeZone != null) {
+				TimeZone.setDefault(timeZone);
 
-		_simpleDateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(
-			"yyyy-MM-dd HH:mm:ss", timeZone);
+				_simpleDateFormat =
+					FastDateFormatFactoryUtil.getSimpleDateFormat(
+						"yyyy-MM-dd HH:mm:ss", timeZone);
+			}
+		}
 
 		_maxAssetCategoryCount = GetterUtil.getInteger(
 			properties.getProperty("sample.sql.max.asset.category.count"));
@@ -3936,7 +3932,8 @@ public class DataFactory {
 	private List<RoleModel> _roleModels;
 	private final long _sampleUserId;
 	private UserModel _sampleUserModel;
-	private Format _simpleDateFormat;
+	private Format _simpleDateFormat =
+		FastDateFormatFactoryUtil.getSimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private RoleModel _siteMemberRoleModel;
 	private final SimpleCounter _socialActivityCounter;
 	private final SimpleCounter _timeCounter;

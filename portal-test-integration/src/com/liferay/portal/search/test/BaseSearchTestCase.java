@@ -206,8 +206,10 @@ public abstract class BaseSearchTestCase {
 		try {
 			WorkflowThreadLocal.setEnabled(true);
 
-			return addBaseModelWithWorkflow(
+			BaseModel<?> baseModel = addBaseModelWithWorkflow(
 				parentBaseModel, approved, keywords, serviceContext);
+
+			return baseModel;
 		}
 		finally {
 			WorkflowThreadLocal.setEnabled(workflowEnabled);

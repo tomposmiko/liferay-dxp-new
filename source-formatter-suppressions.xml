@@ -3,6 +3,7 @@
 <suppressions>
 	<checkstyle>
 		<suppress checks="AppendCheck" files="portal-kernel/test/unit/com/liferay/portal/kernel/util/StringBundlerTest\.java" />
+		<suppress checks="ChainingCheck" files="portal-kernel/src/com/liferay/portal/kernel/cal/Recurrence\.java" />
 		<suppress checks="ConcatCheck" files="portal-impl/test/integration/com/liferay/portal/xmlrpc/XmlRpcParserTest\.java" />
 		<suppress checks="ConcatCheck" files="portal-kernel/test/unit/com/liferay/portal/kernel/util/StringBundlerTest\.java" />
 		<suppress checks="ConstantNameCheck" files="portal-kernel/src/com/liferay/portal/kernel/nio/intraband/BaseIntraband\.java" />
@@ -83,8 +84,6 @@
 		<suppress checks="CDNCheck" files="test\.properties" />
 		<suppress checks="JavaCleanUpMethodVariablesCheck" files="util-taglib/src/com/liferay/taglib/util/IncludeTag\.java" />
 		<suppress checks="JavaCombineLinesCheck" files="portal-impl/src/com/liferay/portal/action/EditLayoutAction\.java" />
-		<suppress checks="JavaCombineLinesCheck" files="portal-impl/src/com/liferay/portal/model/impl/LayoutImpl\.java" />
-		<suppress checks="JavaCombineLinesCheck" files="portal-impl/test/unit/com/liferay/portal/upload/LiferayInputStreamTest\.java" />
 		<suppress checks="JavaDeserializationSecurityCheck" files="portal-impl/src/com/liferay/portal/bean/BeanPropertiesImpl\.java" />
 		<suppress checks="JavaDeserializationSecurityCheck" files="portal-kernel/src/com/liferay/portal/kernel/io/AnnotatedObjectInputStream\.java" />
 		<suppress checks="JavaDeserializationSecurityCheck" files="portal-kernel/src/com/liferay/portal/kernel/io/ProtectedObjectInputStream\.java" />
@@ -101,7 +100,6 @@
 		<suppress checks="JavaFinderImplCustomSQLCheck" files="portal-impl/src/com/liferay/portlet/asset/service/persistence/impl/AssetCategoryPropertyFinderImpl\.java" />
 		<suppress checks="JavaIllegalImportsCheck" files="util-slf4j/src/com/liferay/util/sl4fj/LiferayLoggerFactory\.java" />
 		<suppress checks="JavaLogParametersCheck" files="portal-impl/test/integration/com/liferay/portal/kernel/log/SanitizerLogWrapperTest\.java" />
-		<suppress checks="JavaPackagePathCheck" files=".*/ServletContextUtil\.java" />
 		<suppress checks="JavaStringBundlerConcatCheck" files="portal-kernel/test/unit/com/liferay/portal/kernel/util/StringBundlerTest\.java" />
 		<suppress checks="JavaStringBundlerInitialCapacityCheck" files="portal-kernel/test/unit/com/liferay/portal/kernel/util/StringBundlerTest\.java" />
 		<suppress checks="JavaUnsafeCastingCheck" files="portal-impl/src/com/liferay/portal/util/PortalImpl\.java" />
@@ -128,8 +126,6 @@
 		<suppress checks="JavaXMLSecurityCheck" files="util-java/src/com/liferay/util/xml/XMLMergerRunner\.java" />
 		<suppress checks="JSPLineBreakCheck" files="portal-web/docroot/html/portal/progress_poller\.jsp" />
 		<suppress checks="JSPStylingCheck" files="portal-web/docroot/html/portal/api/jsonws/action\.jsp" />
-		<suppress checks="LocaleUtilCheck" files="portal-kernel/src/com/liferay/portal/kernel/util/LocaleUtil\.java" />
-		<suppress checks="LocaleUtilCheck" files="portal-kernel/test/unit/com/liferay/portal/kernel/util/LocaleUtilTest\.java" />
 		<suppress checks="MethodCallsOrderCheck" files="portal-impl/src/com/liferay/portal/util/PortalImpl\.java" />
 		<suppress checks="PropertiesEmptyLinesCheck" files="build\.properties" />
 		<suppress checks="PropertiesLongLinesCheck" files="portal-impl/src/portal_ja\.properties" />

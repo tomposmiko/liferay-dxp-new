@@ -57,6 +57,7 @@ public class PermissionCheckerTestCallback
 
 		PermissionThreadLocal.setPermissionChecker(
 			new SimplePermissionChecker() {
+
 				{
 					init(TestPropsValues.getUser());
 				}

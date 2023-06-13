@@ -21,6 +21,9 @@ import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.model.impl.BlogsEntryImpl;
 import com.liferay.blogs.model.impl.BlogsEntryModelImpl;
 import com.liferay.blogs.service.persistence.BlogsEntryPersistence;
+
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -48,7 +51,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
@@ -56,7 +58,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -64,9 +65,6 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -80,26 +78,23 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see BlogsEntryPersistence
+ * @see com.liferay.blogs.service.persistence.BlogsEntryUtil
  * @generated
  */
 @ProviderType
-public class BlogsEntryPersistenceImpl
-	extends BasePersistenceImpl<BlogsEntry> implements BlogsEntryPersistence {
-
+public class BlogsEntryPersistenceImpl extends BasePersistenceImpl<BlogsEntry>
+	implements BlogsEntryPersistence {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use <code>BlogsEntryUtil</code> to access the blogs entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use {@link BlogsEntryUtil} to access the blogs entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY =
-		BlogsEntryImpl.class.getName();
-
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List1";
-
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List2";
-
+	public static final String FINDER_CLASS_NAME_ENTITY = BlogsEntryImpl.class.getName();
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -122,7 +117,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns a range of all the blogs entries where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -139,7 +134,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -149,10 +144,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByUuid(
-		String uuid, int start, int end,
+	public List<BlogsEntry> findByUuid(String uuid, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		return findByUuid(uuid, start, end, orderByComparator, true);
 	}
 
@@ -160,7 +153,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -171,11 +164,9 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByUuid(
-		String uuid, int start, int end,
+	public List<BlogsEntry> findByUuid(String uuid, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -183,22 +174,21 @@ public class BlogsEntryPersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid;
-			finderArgs = new Object[] {uuid};
+			finderArgs = new Object[] { uuid };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid;
-			finderArgs = new Object[] {uuid, start, end, orderByComparator};
+			finderArgs = new Object[] { uuid, start, end, orderByComparator };
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -215,8 +205,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -236,10 +226,11 @@ public class BlogsEntryPersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -259,16 +250,16 @@ public class BlogsEntryPersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -297,10 +288,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByUuid_First(
-			String uuid, OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByUuid_First(String uuid,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = fetchByUuid_First(uuid, orderByComparator);
 
 		if (blogsEntry != null) {
@@ -327,9 +317,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByUuid_First(
-		String uuid, OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByUuid_First(String uuid,
+		OrderByComparator<BlogsEntry> orderByComparator) {
 		List<BlogsEntry> list = findByUuid(uuid, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -348,10 +337,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByUuid_Last(
-			String uuid, OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByUuid_Last(String uuid,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = fetchByUuid_Last(uuid, orderByComparator);
 
 		if (blogsEntry != null) {
@@ -378,17 +366,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByUuid_Last(
-		String uuid, OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByUuid_Last(String uuid,
+		OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByUuid(uuid);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByUuid(
-			uuid, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByUuid(uuid, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -407,11 +394,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByUuid_PrevAndNext(
-			long entryId, String uuid,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByUuid_PrevAndNext(long entryId, String uuid,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		uuid = Objects.toString(uuid, "");
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -423,13 +408,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByUuid_PrevAndNext(
-				session, blogsEntry, uuid, orderByComparator, true);
+			array[0] = getByUuid_PrevAndNext(session, blogsEntry, uuid,
+					orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByUuid_PrevAndNext(
-				session, blogsEntry, uuid, orderByComparator, false);
+			array[2] = getByUuid_PrevAndNext(session, blogsEntry, uuid,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -441,15 +426,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByUuid_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, String uuid,
+	protected BlogsEntry getByUuid_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, String uuid,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -470,8 +454,7 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -543,9 +526,8 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -567,9 +549,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByUuid(String uuid) {
-		for (BlogsEntry blogsEntry :
-				findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByUuid(uuid, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -586,7 +567,7 @@ public class BlogsEntryPersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByUuid;
 
-		Object[] finderArgs = new Object[] {uuid};
+		Object[] finderArgs = new Object[] { uuid };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -638,17 +619,13 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_UUID_2 =
-		"blogsEntry.uuid = ?";
-
-	private static final String _FINDER_COLUMN_UUID_UUID_3 =
-		"(blogsEntry.uuid IS NULL OR blogsEntry.uuid = '')";
-
+	private static final String _FINDER_COLUMN_UUID_UUID_2 = "blogsEntry.uuid = ?";
+	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(blogsEntry.uuid IS NULL OR blogsEntry.uuid = '')";
 	private FinderPath _finderPathFetchByUUID_G;
 	private FinderPath _finderPathCountByUUID_G;
 
 	/**
-	 * Returns the blogs entry where uuid = &#63; and groupId = &#63; or throws a <code>NoSuchEntryException</code> if it could not be found.
+	 * Returns the blogs entry where uuid = &#63; and groupId = &#63; or throws a {@link NoSuchEntryException} if it could not be found.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
@@ -658,7 +635,6 @@ public class BlogsEntryPersistenceImpl
 	@Override
 	public BlogsEntry findByUUID_G(String uuid, long groupId)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = fetchByUUID_G(uuid, groupId);
 
 		if (blogsEntry == null) {
@@ -705,26 +681,24 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByUUID_G(
-		String uuid, long groupId, boolean retrieveFromCache) {
-
+	public BlogsEntry fetchByUUID_G(String uuid, long groupId,
+		boolean retrieveFromCache) {
 		uuid = Objects.toString(uuid, "");
 
-		Object[] finderArgs = new Object[] {uuid, groupId};
+		Object[] finderArgs = new Object[] { uuid, groupId };
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByUUID_G,
+					finderArgs, this);
 		}
 
 		if (result instanceof BlogsEntry) {
 			BlogsEntry blogsEntry = (BlogsEntry)result;
 
 			if (!Objects.equals(uuid, blogsEntry.getUuid()) ||
-				(groupId != blogsEntry.getGroupId())) {
-
+					(groupId != blogsEntry.getGroupId())) {
 				result = null;
 			}
 		}
@@ -767,8 +741,8 @@ public class BlogsEntryPersistenceImpl
 				List<BlogsEntry> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByUUID_G, finderArgs, list);
+					finderCache.putResult(_finderPathFetchByUUID_G, finderArgs,
+						list);
 				}
 				else {
 					BlogsEntry blogsEntry = list.get(0);
@@ -806,7 +780,6 @@ public class BlogsEntryPersistenceImpl
 	@Override
 	public BlogsEntry removeByUUID_G(String uuid, long groupId)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByUUID_G(uuid, groupId);
 
 		return remove(blogsEntry);
@@ -825,7 +798,7 @@ public class BlogsEntryPersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByUUID_G;
 
-		Object[] finderArgs = new Object[] {uuid, groupId};
+		Object[] finderArgs = new Object[] { uuid, groupId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -881,15 +854,9 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_G_UUID_2 =
-		"blogsEntry.uuid = ? AND ";
-
-	private static final String _FINDER_COLUMN_UUID_G_UUID_3 =
-		"(blogsEntry.uuid IS NULL OR blogsEntry.uuid = '') AND ";
-
-	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 =
-		"blogsEntry.groupId = ?";
-
+	private static final String _FINDER_COLUMN_UUID_G_UUID_2 = "blogsEntry.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(blogsEntry.uuid IS NULL OR blogsEntry.uuid = '') AND ";
+	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "blogsEntry.groupId = ?";
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
 	private FinderPath _finderPathCountByUuid_C;
@@ -903,15 +870,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByUuid_C(String uuid, long companyId) {
-		return findByUuid_C(
-			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -921,9 +888,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByUuid_C(
-		String uuid, long companyId, int start, int end) {
-
+	public List<BlogsEntry> findByUuid_C(String uuid, long companyId,
+		int start, int end) {
 		return findByUuid_C(uuid, companyId, start, end, null);
 	}
 
@@ -931,7 +897,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -942,19 +908,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByUuid_C(
-			uuid, companyId, start, end, orderByComparator, true);
+	public List<BlogsEntry> findByUuid_C(String uuid, long companyId,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator) {
+		return findByUuid_C(uuid, companyId, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -966,11 +929,9 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByUuid_C(String uuid, long companyId,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -978,30 +939,30 @@ public class BlogsEntryPersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid_C;
-			finderArgs = new Object[] {uuid, companyId};
+			finderArgs = new Object[] { uuid, companyId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
-				uuid, companyId, start, end, orderByComparator
-			};
+					uuid, companyId,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if (!uuid.equals(blogsEntry.getUuid()) ||
-						(companyId != blogsEntry.getCompanyId())) {
-
+							(companyId != blogsEntry.getCompanyId())) {
 						list = null;
 
 						break;
@@ -1014,8 +975,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1037,10 +998,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1062,16 +1024,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -1101,13 +1063,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByUuid_C_First(
-			String uuid, long companyId,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByUuid_C_First(String uuid, long companyId,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByUuid_C_First(
-			uuid, companyId, orderByComparator);
+		BlogsEntry blogsEntry = fetchByUuid_C_First(uuid, companyId,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -1137,12 +1097,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByUuid_C_First(
-		String uuid, long companyId,
+	public BlogsEntry fetchByUuid_C_First(String uuid, long companyId,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByUuid_C(
-			uuid, companyId, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByUuid_C(uuid, companyId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1161,13 +1119,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByUuid_C_Last(
-			String uuid, long companyId,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByUuid_C_Last(
-			uuid, companyId, orderByComparator);
+		BlogsEntry blogsEntry = fetchByUuid_C_Last(uuid, companyId,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -1197,18 +1153,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByUuid_C_Last(
-		String uuid, long companyId,
+	public BlogsEntry fetchByUuid_C_Last(String uuid, long companyId,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByUuid_C(uuid, companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByUuid_C(
-			uuid, companyId, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByUuid_C(uuid, companyId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1228,11 +1182,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByUuid_C_PrevAndNext(
-			long entryId, String uuid, long companyId,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByUuid_C_PrevAndNext(long entryId, String uuid,
+		long companyId, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		uuid = Objects.toString(uuid, "");
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -1244,13 +1196,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByUuid_C_PrevAndNext(
-				session, blogsEntry, uuid, companyId, orderByComparator, true);
+			array[0] = getByUuid_C_PrevAndNext(session, blogsEntry, uuid,
+					companyId, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByUuid_C_PrevAndNext(
-				session, blogsEntry, uuid, companyId, orderByComparator, false);
+			array[2] = getByUuid_C_PrevAndNext(session, blogsEntry, uuid,
+					companyId, orderByComparator, false);
 
 			return array;
 		}
@@ -1262,15 +1214,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByUuid_C_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, String uuid, long companyId,
+	protected BlogsEntry getByUuid_C_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, String uuid, long companyId,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1293,8 +1244,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1368,9 +1318,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1393,11 +1342,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByUuid_C(String uuid, long companyId) {
-		for (BlogsEntry blogsEntry :
-				findByUuid_C(
-					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (BlogsEntry blogsEntry : findByUuid_C(uuid, companyId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -1415,7 +1361,7 @@ public class BlogsEntryPersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByUuid_C;
 
-		Object[] finderArgs = new Object[] {uuid, companyId};
+		Object[] finderArgs = new Object[] { uuid, companyId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1471,15 +1417,9 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
-		"blogsEntry.uuid = ? AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
-		"(blogsEntry.uuid IS NULL OR blogsEntry.uuid = '') AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
-		"blogsEntry.companyId = ?";
-
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "blogsEntry.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(blogsEntry.uuid IS NULL OR blogsEntry.uuid = '') AND ";
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "blogsEntry.companyId = ?";
 	private FinderPath _finderPathWithPaginationFindByGroupId;
 	private FinderPath _finderPathWithoutPaginationFindByGroupId;
 	private FinderPath _finderPathCountByGroupId;
@@ -1492,15 +1432,14 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByGroupId(long groupId) {
-		return findByGroupId(
-			groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByGroupId(groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1517,7 +1456,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1527,10 +1466,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByGroupId(
-		long groupId, int start, int end,
+	public List<BlogsEntry> findByGroupId(long groupId, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		return findByGroupId(groupId, start, end, orderByComparator, true);
 	}
 
@@ -1538,7 +1475,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1549,32 +1486,29 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByGroupId(
-		long groupId, int start, int end,
+	public List<BlogsEntry> findByGroupId(long groupId, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByGroupId;
-			finderArgs = new Object[] {groupId};
+			finderArgs = new Object[] { groupId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByGroupId;
-			finderArgs = new Object[] {groupId, start, end, orderByComparator};
+			finderArgs = new Object[] { groupId, start, end, orderByComparator };
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -1591,8 +1525,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1603,10 +1537,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1624,16 +1559,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(groupId);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -1662,12 +1597,10 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByGroupId_First(
-			long groupId, OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByGroupId_First(long groupId,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByGroupId_First(
-			groupId, orderByComparator);
+		BlogsEntry blogsEntry = fetchByGroupId_First(groupId, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -1693,9 +1626,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByGroupId_First(
-		long groupId, OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByGroupId_First(long groupId,
+		OrderByComparator<BlogsEntry> orderByComparator) {
 		List<BlogsEntry> list = findByGroupId(groupId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -1714,10 +1646,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByGroupId_Last(
-			long groupId, OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByGroupId_Last(long groupId,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = fetchByGroupId_Last(groupId, orderByComparator);
 
 		if (blogsEntry != null) {
@@ -1744,17 +1675,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByGroupId_Last(
-		long groupId, OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByGroupId_Last(long groupId,
+		OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByGroupId(groupId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByGroupId(
-			groupId, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByGroupId(groupId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1773,11 +1703,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByGroupId_PrevAndNext(
-			long entryId, long groupId,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByGroupId_PrevAndNext(long entryId, long groupId,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -1787,13 +1715,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByGroupId_PrevAndNext(
-				session, blogsEntry, groupId, orderByComparator, true);
+			array[0] = getByGroupId_PrevAndNext(session, blogsEntry, groupId,
+					orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByGroupId_PrevAndNext(
-				session, blogsEntry, groupId, orderByComparator, false);
+			array[2] = getByGroupId_PrevAndNext(session, blogsEntry, groupId,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -1805,15 +1733,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByGroupId_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId,
+	protected BlogsEntry getByGroupId_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1825,8 +1752,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1896,9 +1822,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(groupId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1921,15 +1846,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> filterFindByGroupId(long groupId) {
-		return filterFindByGroupId(
-			groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return filterFindByGroupId(groupId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1938,9 +1863,7 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByGroupId(
-		long groupId, int start, int end) {
-
+	public List<BlogsEntry> filterFindByGroupId(long groupId, int start, int end) {
 		return filterFindByGroupId(groupId, start, end, null);
 	}
 
@@ -1948,7 +1871,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1958,10 +1881,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByGroupId(
-		long groupId, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public List<BlogsEntry> filterFindByGroupId(long groupId, int start,
+		int end, OrderByComparator<BlogsEntry> orderByComparator) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return findByGroupId(groupId, start, end, orderByComparator);
 		}
@@ -1969,8 +1890,8 @@ public class BlogsEntryPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				3 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(3 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(4);
@@ -1980,25 +1901,23 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -2010,9 +1929,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -2032,8 +1951,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(groupId);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -2053,14 +1971,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByGroupId_PrevAndNext(
-			long entryId, long groupId,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByGroupId_PrevAndNext(long entryId,
+		long groupId, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByGroupId_PrevAndNext(
-				entryId, groupId, orderByComparator);
+			return findByGroupId_PrevAndNext(entryId, groupId, orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -2072,13 +1987,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByGroupId_PrevAndNext(
-				session, blogsEntry, groupId, orderByComparator, true);
+			array[0] = filterGetByGroupId_PrevAndNext(session, blogsEntry,
+					groupId, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByGroupId_PrevAndNext(
-				session, blogsEntry, groupId, orderByComparator, false);
+			array[2] = filterGetByGroupId_PrevAndNext(session, blogsEntry,
+					groupId, orderByComparator, false);
 
 			return array;
 		}
@@ -2090,15 +2005,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByGroupId_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId,
+	protected BlogsEntry filterGetByGroupId_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2109,20 +2023,17 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2130,17 +2041,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -2166,15 +2073,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -2203,9 +2108,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -2224,9 +2129,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(groupId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2248,10 +2152,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByGroupId(long groupId) {
-		for (BlogsEntry blogsEntry :
-				findByGroupId(
-					groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByGroupId(groupId, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -2266,7 +2168,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByGroupId(long groupId) {
 		FinderPath finderPath = _finderPathCountByGroupId;
 
-		Object[] finderArgs = new Object[] {groupId};
+		Object[] finderArgs = new Object[] { groupId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2325,9 +2227,9 @@ public class BlogsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -2336,8 +2238,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -2355,9 +2257,7 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 =
-		"blogsEntry.groupId = ?";
-
+	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 = "blogsEntry.groupId = ?";
 	private FinderPath _finderPathWithPaginationFindByCompanyId;
 	private FinderPath _finderPathWithoutPaginationFindByCompanyId;
 	private FinderPath _finderPathCountByCompanyId;
@@ -2370,15 +2270,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByCompanyId(long companyId) {
-		return findByCompanyId(
-			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByCompanyId(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -2387,9 +2287,7 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByCompanyId(
-		long companyId, int start, int end) {
-
+	public List<BlogsEntry> findByCompanyId(long companyId, int start, int end) {
 		return findByCompanyId(companyId, start, end, null);
 	}
 
@@ -2397,7 +2295,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -2407,10 +2305,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByCompanyId(
-		long companyId, int start, int end,
+	public List<BlogsEntry> findByCompanyId(long companyId, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		return findByCompanyId(companyId, start, end, orderByComparator, true);
 	}
 
@@ -2418,7 +2314,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -2429,34 +2325,29 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByCompanyId(
-		long companyId, int start, int end,
+	public List<BlogsEntry> findByCompanyId(long companyId, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByCompanyId;
-			finderArgs = new Object[] {companyId};
+			finderArgs = new Object[] { companyId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByCompanyId;
-			finderArgs = new Object[] {
-				companyId, start, end, orderByComparator
-			};
+			finderArgs = new Object[] { companyId, start, end, orderByComparator };
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -2473,8 +2364,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -2485,10 +2376,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2506,16 +2398,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -2544,12 +2436,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByCompanyId_First(
-			long companyId, OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByCompanyId_First(long companyId,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByCompanyId_First(
-			companyId, orderByComparator);
+		BlogsEntry blogsEntry = fetchByCompanyId_First(companyId,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -2575,11 +2466,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByCompanyId_First(
-		long companyId, OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByCompanyId(
-			companyId, 0, 1, orderByComparator);
+	public BlogsEntry fetchByCompanyId_First(long companyId,
+		OrderByComparator<BlogsEntry> orderByComparator) {
+		List<BlogsEntry> list = findByCompanyId(companyId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2597,12 +2487,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByCompanyId_Last(
-			long companyId, OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByCompanyId_Last(long companyId,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByCompanyId_Last(
-			companyId, orderByComparator);
+		BlogsEntry blogsEntry = fetchByCompanyId_Last(companyId,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -2628,17 +2517,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByCompanyId_Last(
-		long companyId, OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByCompanyId_Last(long companyId,
+		OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByCompanyId(companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByCompanyId(
-			companyId, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByCompanyId(companyId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2657,11 +2545,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByCompanyId_PrevAndNext(
-			long entryId, long companyId,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByCompanyId_PrevAndNext(long entryId,
+		long companyId, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -2671,13 +2557,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByCompanyId_PrevAndNext(
-				session, blogsEntry, companyId, orderByComparator, true);
+			array[0] = getByCompanyId_PrevAndNext(session, blogsEntry,
+					companyId, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByCompanyId_PrevAndNext(
-				session, blogsEntry, companyId, orderByComparator, false);
+			array[2] = getByCompanyId_PrevAndNext(session, blogsEntry,
+					companyId, orderByComparator, false);
 
 			return array;
 		}
@@ -2689,15 +2575,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByCompanyId_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long companyId,
+	protected BlogsEntry getByCompanyId_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long companyId,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2709,8 +2594,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2780,9 +2664,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2804,10 +2687,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByCompanyId(long companyId) {
-		for (BlogsEntry blogsEntry :
-				findByCompanyId(
-					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByCompanyId(companyId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -2822,7 +2703,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByCompanyId(long companyId) {
 		FinderPath finderPath = _finderPathCountByCompanyId;
 
-		Object[] finderArgs = new Object[] {companyId};
+		Object[] finderArgs = new Object[] { companyId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2863,14 +2744,12 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
-		"blogsEntry.companyId = ?";
-
+	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 = "blogsEntry.companyId = ?";
 	private FinderPath _finderPathFetchByG_UT;
 	private FinderPath _finderPathCountByG_UT;
 
 	/**
-	 * Returns the blogs entry where groupId = &#63; and urlTitle = &#63; or throws a <code>NoSuchEntryException</code> if it could not be found.
+	 * Returns the blogs entry where groupId = &#63; and urlTitle = &#63; or throws a {@link NoSuchEntryException} if it could not be found.
 	 *
 	 * @param groupId the group ID
 	 * @param urlTitle the url title
@@ -2880,7 +2759,6 @@ public class BlogsEntryPersistenceImpl
 	@Override
 	public BlogsEntry findByG_UT(long groupId, String urlTitle)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = fetchByG_UT(groupId, urlTitle);
 
 		if (blogsEntry == null) {
@@ -2927,26 +2805,24 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_UT(
-		long groupId, String urlTitle, boolean retrieveFromCache) {
-
+	public BlogsEntry fetchByG_UT(long groupId, String urlTitle,
+		boolean retrieveFromCache) {
 		urlTitle = Objects.toString(urlTitle, "");
 
-		Object[] finderArgs = new Object[] {groupId, urlTitle};
+		Object[] finderArgs = new Object[] { groupId, urlTitle };
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_UT, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByG_UT, finderArgs,
+					this);
 		}
 
 		if (result instanceof BlogsEntry) {
 			BlogsEntry blogsEntry = (BlogsEntry)result;
 
 			if ((groupId != blogsEntry.getGroupId()) ||
-				!Objects.equals(urlTitle, blogsEntry.getUrlTitle())) {
-
+					!Objects.equals(urlTitle, blogsEntry.getUrlTitle())) {
 				result = null;
 			}
 		}
@@ -2989,8 +2865,8 @@ public class BlogsEntryPersistenceImpl
 				List<BlogsEntry> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByG_UT, finderArgs, list);
+					finderCache.putResult(_finderPathFetchByG_UT, finderArgs,
+						list);
 				}
 				else {
 					BlogsEntry blogsEntry = list.get(0);
@@ -3028,7 +2904,6 @@ public class BlogsEntryPersistenceImpl
 	@Override
 	public BlogsEntry removeByG_UT(long groupId, String urlTitle)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByG_UT(groupId, urlTitle);
 
 		return remove(blogsEntry);
@@ -3047,7 +2922,7 @@ public class BlogsEntryPersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByG_UT;
 
-		Object[] finderArgs = new Object[] {groupId, urlTitle};
+		Object[] finderArgs = new Object[] { groupId, urlTitle };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -3103,15 +2978,9 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_G_UT_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_UT_URLTITLE_2 =
-		"blogsEntry.urlTitle = ?";
-
-	private static final String _FINDER_COLUMN_G_UT_URLTITLE_3 =
-		"(blogsEntry.urlTitle IS NULL OR blogsEntry.urlTitle = '')";
-
+	private static final String _FINDER_COLUMN_G_UT_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_UT_URLTITLE_2 = "blogsEntry.urlTitle = ?";
+	private static final String _FINDER_COLUMN_G_UT_URLTITLE_3 = "(blogsEntry.urlTitle IS NULL OR blogsEntry.urlTitle = '')";
 	private FinderPath _finderPathWithPaginationFindByG_LtD;
 	private FinderPath _finderPathWithPaginationCountByG_LtD;
 
@@ -3124,15 +2993,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByG_LtD(long groupId, Date displayDate) {
-		return findByG_LtD(
-			groupId, displayDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByG_LtD(groupId, displayDate, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -3142,9 +3011,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_LtD(
-		long groupId, Date displayDate, int start, int end) {
-
+	public List<BlogsEntry> findByG_LtD(long groupId, Date displayDate,
+		int start, int end) {
 		return findByG_LtD(groupId, displayDate, start, end, null);
 	}
 
@@ -3152,7 +3020,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -3163,19 +3031,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_LtD(
-		long groupId, Date displayDate, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_LtD(
-			groupId, displayDate, start, end, orderByComparator, true);
+	public List<BlogsEntry> findByG_LtD(long groupId, Date displayDate,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator) {
+		return findByG_LtD(groupId, displayDate, start, end, orderByComparator,
+			true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -3187,32 +3053,31 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_LtD(
-		long groupId, Date displayDate, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByG_LtD(long groupId, Date displayDate,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_LtD;
 		finderArgs = new Object[] {
-			groupId, _getTime(displayDate), start, end, orderByComparator
-		};
+				groupId, _getTime(displayDate),
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(displayDate.getTime() <=
-							blogsEntry.getDisplayDate().getTime())) {
-
+							(displayDate.getTime() <= blogsEntry.getDisplayDate()
+																	.getTime())) {
 						list = null;
 
 						break;
@@ -3225,8 +3090,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -3248,10 +3113,11 @@ public class BlogsEntryPersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3273,16 +3139,16 @@ public class BlogsEntryPersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -3312,13 +3178,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_LtD_First(
-			long groupId, Date displayDate,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_LtD_First(long groupId, Date displayDate,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_LtD_First(
-			groupId, displayDate, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_LtD_First(groupId, displayDate,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -3348,12 +3212,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_LtD_First(
-		long groupId, Date displayDate,
+	public BlogsEntry fetchByG_LtD_First(long groupId, Date displayDate,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_LtD(
-			groupId, displayDate, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByG_LtD(groupId, displayDate, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3372,13 +3234,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_LtD_Last(
-			long groupId, Date displayDate,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_LtD_Last(long groupId, Date displayDate,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_LtD_Last(
-			groupId, displayDate, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_LtD_Last(groupId, displayDate,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -3408,18 +3268,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_LtD_Last(
-		long groupId, Date displayDate,
+	public BlogsEntry fetchByG_LtD_Last(long groupId, Date displayDate,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByG_LtD(groupId, displayDate);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_LtD(
-			groupId, displayDate, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByG_LtD(groupId, displayDate, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3439,11 +3297,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_LtD_PrevAndNext(
-			long entryId, long groupId, Date displayDate,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_LtD_PrevAndNext(long entryId, long groupId,
+		Date displayDate, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -3453,15 +3309,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_LtD_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, orderByComparator,
-				true);
+			array[0] = getByG_LtD_PrevAndNext(session, blogsEntry, groupId,
+					displayDate, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_LtD_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, orderByComparator,
-				false);
+			array[2] = getByG_LtD_PrevAndNext(session, blogsEntry, groupId,
+					displayDate, orderByComparator, false);
 
 			return array;
 		}
@@ -3473,15 +3327,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_LtD_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, Date displayDate,
+	protected BlogsEntry getByG_LtD_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, Date displayDate,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3504,8 +3357,7 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3579,9 +3431,8 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3605,15 +3456,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> filterFindByG_LtD(long groupId, Date displayDate) {
-		return filterFindByG_LtD(
-			groupId, displayDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return filterFindByG_LtD(groupId, displayDate, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -3623,9 +3474,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_LtD(
-		long groupId, Date displayDate, int start, int end) {
-
+	public List<BlogsEntry> filterFindByG_LtD(long groupId, Date displayDate,
+		int start, int end) {
 		return filterFindByG_LtD(groupId, displayDate, start, end, null);
 	}
 
@@ -3633,7 +3483,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -3644,20 +3494,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_LtD(
-		long groupId, Date displayDate, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public List<BlogsEntry> filterFindByG_LtD(long groupId, Date displayDate,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_LtD(
-				groupId, displayDate, start, end, orderByComparator);
+			return findByG_LtD(groupId, displayDate, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(5);
@@ -3667,8 +3515,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_LTD_GROUPID_2);
@@ -3685,18 +3532,17 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -3708,9 +3554,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -3734,8 +3580,7 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(new Timestamp(displayDate.getTime()));
 			}
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -3756,14 +3601,13 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_LtD_PrevAndNext(
-			long entryId, long groupId, Date displayDate,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_LtD_PrevAndNext(long entryId,
+		long groupId, Date displayDate,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_LtD_PrevAndNext(
-				entryId, groupId, displayDate, orderByComparator);
+			return findByG_LtD_PrevAndNext(entryId, groupId, displayDate,
+				orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -3775,15 +3619,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_LtD_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, orderByComparator,
-				true);
+			array[0] = filterGetByG_LtD_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_LtD_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, orderByComparator,
-				false);
+			array[2] = filterGetByG_LtD_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, orderByComparator, false);
 
 			return array;
 		}
@@ -3795,15 +3637,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_LtD_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, Date displayDate,
+	protected BlogsEntry filterGetByG_LtD_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, Date displayDate,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3814,8 +3655,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_LTD_GROUPID_2);
@@ -3832,13 +3672,11 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3846,17 +3684,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -3882,15 +3716,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -3919,9 +3751,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -3944,9 +3776,8 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3969,11 +3800,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByG_LtD(long groupId, Date displayDate) {
-		for (BlogsEntry blogsEntry :
-				findByG_LtD(
-					groupId, displayDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (BlogsEntry blogsEntry : findByG_LtD(groupId, displayDate,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -3989,7 +3817,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByG_LtD(long groupId, Date displayDate) {
 		FinderPath finderPath = _finderPathWithPaginationCountByG_LtD;
 
-		Object[] finderArgs = new Object[] {groupId, _getTime(displayDate)};
+		Object[] finderArgs = new Object[] { groupId, _getTime(displayDate) };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -4075,9 +3903,9 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_LTD_DISPLAYDATE_2);
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -4086,8 +3914,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -4109,15 +3937,9 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_LTD_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_LTD_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL";
-
-	private static final String _FINDER_COLUMN_G_LTD_DISPLAYDATE_2 =
-		"blogsEntry.displayDate < ?";
-
+	private static final String _FINDER_COLUMN_G_LTD_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_LTD_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL";
+	private static final String _FINDER_COLUMN_G_LTD_DISPLAYDATE_2 = "blogsEntry.displayDate < ?";
 	private FinderPath _finderPathWithPaginationFindByG_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_S;
 	private FinderPath _finderPathCountByG_S;
@@ -4131,15 +3953,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByG_S(long groupId, int status) {
-		return findByG_S(
-			groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByG_S(groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -4149,9 +3971,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_S(
-		long groupId, int status, int start, int end) {
-
+	public List<BlogsEntry> findByG_S(long groupId, int status, int start,
+		int end) {
 		return findByG_S(groupId, status, start, end, null);
 	}
 
@@ -4159,7 +3980,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -4170,10 +3991,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_S(
-		long groupId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public List<BlogsEntry> findByG_S(long groupId, int status, int start,
+		int end, OrderByComparator<BlogsEntry> orderByComparator) {
 		return findByG_S(groupId, status, start, end, orderByComparator, true);
 	}
 
@@ -4181,7 +4000,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -4193,40 +4012,38 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_S(
-		long groupId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByG_S(long groupId, int status, int start,
+		int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_S;
-			finderArgs = new Object[] {groupId, status};
+			finderArgs = new Object[] { groupId, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_S;
 			finderArgs = new Object[] {
-				groupId, status, start, end, orderByComparator
-			};
+					groupId, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(status != blogsEntry.getStatus())) {
-
+							(status != blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -4239,8 +4056,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -4253,10 +4070,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4276,16 +4094,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -4315,13 +4133,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_S_First(
-			long groupId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_S_First(long groupId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_S_First(
-			groupId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_S_First(groupId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -4351,12 +4167,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_S_First(
-		long groupId, int status,
+	public BlogsEntry fetchByG_S_First(long groupId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_S(
-			groupId, status, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByG_S(groupId, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -4375,13 +4189,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_S_Last(
-			long groupId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_S_Last(long groupId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_S_Last(
-			groupId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_S_Last(groupId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -4411,18 +4223,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_S_Last(
-		long groupId, int status,
+	public BlogsEntry fetchByG_S_Last(long groupId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByG_S(groupId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_S(
-			groupId, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByG_S(groupId, status, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -4442,11 +4252,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_S_PrevAndNext(
-			long entryId, long groupId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_S_PrevAndNext(long entryId, long groupId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -4456,13 +4264,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_S_PrevAndNext(
-				session, blogsEntry, groupId, status, orderByComparator, true);
+			array[0] = getByG_S_PrevAndNext(session, blogsEntry, groupId,
+					status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_S_PrevAndNext(
-				session, blogsEntry, groupId, status, orderByComparator, false);
+			array[2] = getByG_S_PrevAndNext(session, blogsEntry, groupId,
+					status, orderByComparator, false);
 
 			return array;
 		}
@@ -4474,15 +4282,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, int status,
+	protected BlogsEntry getByG_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -4496,8 +4303,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -4569,9 +4375,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4595,15 +4400,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> filterFindByG_S(long groupId, int status) {
-		return filterFindByG_S(
-			groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return filterFindByG_S(groupId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -4613,9 +4418,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_S(
-		long groupId, int status, int start, int end) {
-
+	public List<BlogsEntry> filterFindByG_S(long groupId, int status,
+		int start, int end) {
 		return filterFindByG_S(groupId, status, start, end, null);
 	}
 
@@ -4623,7 +4427,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -4634,10 +4438,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_S(
-		long groupId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public List<BlogsEntry> filterFindByG_S(long groupId, int status,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return findByG_S(groupId, status, start, end, orderByComparator);
 		}
@@ -4645,8 +4447,8 @@ public class BlogsEntryPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(5);
@@ -4656,8 +4458,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_S_GROUPID_2);
@@ -4665,18 +4466,17 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -4688,9 +4488,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -4712,8 +4512,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(status);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -4734,14 +4533,12 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_S_PrevAndNext(
-			long entryId, long groupId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_S_PrevAndNext(long entryId, long groupId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_S_PrevAndNext(
-				entryId, groupId, status, orderByComparator);
+			return findByG_S_PrevAndNext(entryId, groupId, status,
+				orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -4753,13 +4550,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_S_PrevAndNext(
-				session, blogsEntry, groupId, status, orderByComparator, true);
+			array[0] = filterGetByG_S_PrevAndNext(session, blogsEntry, groupId,
+					status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_S_PrevAndNext(
-				session, blogsEntry, groupId, status, orderByComparator, false);
+			array[2] = filterGetByG_S_PrevAndNext(session, blogsEntry, groupId,
+					status, orderByComparator, false);
 
 			return array;
 		}
@@ -4771,15 +4568,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, int status,
+	protected BlogsEntry filterGetByG_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -4790,8 +4586,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_S_GROUPID_2);
@@ -4799,13 +4594,11 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -4813,17 +4606,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -4849,15 +4638,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -4886,9 +4673,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -4909,9 +4696,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4934,11 +4720,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByG_S(long groupId, int status) {
-		for (BlogsEntry blogsEntry :
-				findByG_S(
-					groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (BlogsEntry blogsEntry : findByG_S(groupId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -4954,7 +4737,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByG_S(long groupId, int status) {
 		FinderPath finderPath = _finderPathCountByG_S;
 
-		Object[] finderArgs = new Object[] {groupId, status};
+		Object[] finderArgs = new Object[] { groupId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -5020,9 +4803,9 @@ public class BlogsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -5031,8 +4814,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -5052,12 +4835,8 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_S_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_S_STATUS_2 =
-		"blogsEntry.status = ?";
-
+	private static final String _FINDER_COLUMN_G_S_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_S_STATUS_2 = "blogsEntry.status = ?";
 	private FinderPath _finderPathWithPaginationFindByG_NotS;
 	private FinderPath _finderPathWithPaginationCountByG_NotS;
 
@@ -5070,15 +4849,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByG_NotS(long groupId, int status) {
-		return findByG_NotS(
-			groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByG_NotS(groupId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -5088,9 +4867,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_NotS(
-		long groupId, int status, int start, int end) {
-
+	public List<BlogsEntry> findByG_NotS(long groupId, int status, int start,
+		int end) {
 		return findByG_NotS(groupId, status, start, end, null);
 	}
 
@@ -5098,7 +4876,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -5109,19 +4887,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_NotS(
-		long groupId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_NotS(
-			groupId, status, start, end, orderByComparator, true);
+	public List<BlogsEntry> findByG_NotS(long groupId, int status, int start,
+		int end, OrderByComparator<BlogsEntry> orderByComparator) {
+		return findByG_NotS(groupId, status, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -5133,31 +4908,26 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_NotS(
-		long groupId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByG_NotS(long groupId, int status, int start,
+		int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_NotS;
-		finderArgs = new Object[] {
-			groupId, status, start, end, orderByComparator
-		};
+		finderArgs = new Object[] { groupId, status, start, end, orderByComparator };
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(status == blogsEntry.getStatus())) {
-
+							(status == blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -5170,8 +4940,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -5184,10 +4954,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -5207,16 +4978,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -5246,13 +5017,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_NotS_First(
-			long groupId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_NotS_First(long groupId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_NotS_First(
-			groupId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_NotS_First(groupId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -5282,12 +5051,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_NotS_First(
-		long groupId, int status,
+	public BlogsEntry fetchByG_NotS_First(long groupId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_NotS(
-			groupId, status, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByG_NotS(groupId, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5306,13 +5073,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_NotS_Last(
-			long groupId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_NotS_Last(long groupId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_NotS_Last(
-			groupId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_NotS_Last(groupId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -5342,18 +5107,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_NotS_Last(
-		long groupId, int status,
+	public BlogsEntry fetchByG_NotS_Last(long groupId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByG_NotS(groupId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_NotS(
-			groupId, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByG_NotS(groupId, status, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5373,11 +5136,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_NotS_PrevAndNext(
-			long entryId, long groupId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_NotS_PrevAndNext(long entryId, long groupId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -5387,13 +5148,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_NotS_PrevAndNext(
-				session, blogsEntry, groupId, status, orderByComparator, true);
+			array[0] = getByG_NotS_PrevAndNext(session, blogsEntry, groupId,
+					status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_NotS_PrevAndNext(
-				session, blogsEntry, groupId, status, orderByComparator, false);
+			array[2] = getByG_NotS_PrevAndNext(session, blogsEntry, groupId,
+					status, orderByComparator, false);
 
 			return array;
 		}
@@ -5405,15 +5166,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_NotS_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, int status,
+	protected BlogsEntry getByG_NotS_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -5427,8 +5187,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -5500,9 +5259,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -5526,15 +5284,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> filterFindByG_NotS(long groupId, int status) {
-		return filterFindByG_NotS(
-			groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return filterFindByG_NotS(groupId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -5544,9 +5302,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_NotS(
-		long groupId, int status, int start, int end) {
-
+	public List<BlogsEntry> filterFindByG_NotS(long groupId, int status,
+		int start, int end) {
 		return filterFindByG_NotS(groupId, status, start, end, null);
 	}
 
@@ -5554,7 +5311,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -5565,10 +5322,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_NotS(
-		long groupId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public List<BlogsEntry> filterFindByG_NotS(long groupId, int status,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return findByG_NotS(groupId, status, start, end, orderByComparator);
 		}
@@ -5576,8 +5331,8 @@ public class BlogsEntryPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(5);
@@ -5587,8 +5342,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_NOTS_GROUPID_2);
@@ -5596,18 +5350,17 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -5619,9 +5372,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -5643,8 +5396,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(status);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -5665,14 +5417,13 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_NotS_PrevAndNext(
-			long entryId, long groupId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_NotS_PrevAndNext(long entryId,
+		long groupId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_NotS_PrevAndNext(
-				entryId, groupId, status, orderByComparator);
+			return findByG_NotS_PrevAndNext(entryId, groupId, status,
+				orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -5684,13 +5435,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_NotS_PrevAndNext(
-				session, blogsEntry, groupId, status, orderByComparator, true);
+			array[0] = filterGetByG_NotS_PrevAndNext(session, blogsEntry,
+					groupId, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_NotS_PrevAndNext(
-				session, blogsEntry, groupId, status, orderByComparator, false);
+			array[2] = filterGetByG_NotS_PrevAndNext(session, blogsEntry,
+					groupId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -5702,15 +5453,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_NotS_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, int status,
+	protected BlogsEntry filterGetByG_NotS_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -5721,8 +5471,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_NOTS_GROUPID_2);
@@ -5730,13 +5479,11 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -5744,17 +5491,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -5780,15 +5523,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -5817,9 +5558,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -5840,9 +5581,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -5865,11 +5605,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByG_NotS(long groupId, int status) {
-		for (BlogsEntry blogsEntry :
-				findByG_NotS(
-					groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (BlogsEntry blogsEntry : findByG_NotS(groupId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -5885,7 +5622,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByG_NotS(long groupId, int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByG_NotS;
 
-		Object[] finderArgs = new Object[] {groupId, status};
+		Object[] finderArgs = new Object[] { groupId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -5951,9 +5688,9 @@ public class BlogsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_NOTS_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -5962,8 +5699,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -5983,12 +5720,8 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_NOTS_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_NOTS_STATUS_2 =
-		"blogsEntry.status != ?";
-
+	private static final String _FINDER_COLUMN_G_NOTS_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_NOTS_STATUS_2 = "blogsEntry.status != ?";
 	private FinderPath _finderPathWithPaginationFindByC_U;
 	private FinderPath _finderPathWithoutPaginationFindByC_U;
 	private FinderPath _finderPathCountByC_U;
@@ -6002,15 +5735,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByC_U(long companyId, long userId) {
-		return findByC_U(
-			companyId, userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByC_U(companyId, userId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where companyId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6020,9 +5753,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_U(
-		long companyId, long userId, int start, int end) {
-
+	public List<BlogsEntry> findByC_U(long companyId, long userId, int start,
+		int end) {
 		return findByC_U(companyId, userId, start, end, null);
 	}
 
@@ -6030,7 +5762,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6041,19 +5773,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_U(
-		long companyId, long userId, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByC_U(
-			companyId, userId, start, end, orderByComparator, true);
+	public List<BlogsEntry> findByC_U(long companyId, long userId, int start,
+		int end, OrderByComparator<BlogsEntry> orderByComparator) {
+		return findByC_U(companyId, userId, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6065,40 +5794,38 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_U(
-		long companyId, long userId, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByC_U(long companyId, long userId, int start,
+		int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_U;
-			finderArgs = new Object[] {companyId, userId};
+			finderArgs = new Object[] { companyId, userId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_U;
 			finderArgs = new Object[] {
-				companyId, userId, start, end, orderByComparator
-			};
+					companyId, userId,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((companyId != blogsEntry.getCompanyId()) ||
-						(userId != blogsEntry.getUserId())) {
-
+							(userId != blogsEntry.getUserId())) {
 						list = null;
 
 						break;
@@ -6111,8 +5838,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -6125,10 +5852,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_U_USERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6148,16 +5876,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(userId);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -6187,13 +5915,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_U_First(
-			long companyId, long userId,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_U_First(long companyId, long userId,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_U_First(
-			companyId, userId, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_U_First(companyId, userId,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -6223,12 +5949,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_U_First(
-		long companyId, long userId,
+	public BlogsEntry fetchByC_U_First(long companyId, long userId,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByC_U(
-			companyId, userId, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByC_U(companyId, userId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6247,13 +5971,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_U_Last(
-			long companyId, long userId,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_U_Last(long companyId, long userId,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_U_Last(
-			companyId, userId, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_U_Last(companyId, userId,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -6283,18 +6005,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_U_Last(
-		long companyId, long userId,
+	public BlogsEntry fetchByC_U_Last(long companyId, long userId,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByC_U(companyId, userId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByC_U(
-			companyId, userId, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByC_U(companyId, userId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6314,11 +6034,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByC_U_PrevAndNext(
-			long entryId, long companyId, long userId,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByC_U_PrevAndNext(long entryId, long companyId,
+		long userId, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -6328,15 +6046,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByC_U_PrevAndNext(
-				session, blogsEntry, companyId, userId, orderByComparator,
-				true);
+			array[0] = getByC_U_PrevAndNext(session, blogsEntry, companyId,
+					userId, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByC_U_PrevAndNext(
-				session, blogsEntry, companyId, userId, orderByComparator,
-				false);
+			array[2] = getByC_U_PrevAndNext(session, blogsEntry, companyId,
+					userId, orderByComparator, false);
 
 			return array;
 		}
@@ -6348,15 +6064,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByC_U_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long companyId, long userId,
+	protected BlogsEntry getByC_U_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long companyId, long userId,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -6370,8 +6085,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_U_USERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -6443,9 +6157,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(userId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -6468,11 +6181,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByC_U(long companyId, long userId) {
-		for (BlogsEntry blogsEntry :
-				findByC_U(
-					companyId, userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (BlogsEntry blogsEntry : findByC_U(companyId, userId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -6488,7 +6198,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByC_U(long companyId, long userId) {
 		FinderPath finderPath = _finderPathCountByC_U;
 
-		Object[] finderArgs = new Object[] {companyId, userId};
+		Object[] finderArgs = new Object[] { companyId, userId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -6533,12 +6243,8 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_U_COMPANYID_2 =
-		"blogsEntry.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_U_USERID_2 =
-		"blogsEntry.userId = ?";
-
+	private static final String _FINDER_COLUMN_C_U_COMPANYID_2 = "blogsEntry.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_U_USERID_2 = "blogsEntry.userId = ?";
 	private FinderPath _finderPathWithPaginationFindByC_LtD;
 	private FinderPath _finderPathWithPaginationCountByC_LtD;
 
@@ -6551,15 +6257,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByC_LtD(long companyId, Date displayDate) {
-		return findByC_LtD(
-			companyId, displayDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByC_LtD(companyId, displayDate, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where companyId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6569,9 +6275,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_LtD(
-		long companyId, Date displayDate, int start, int end) {
-
+	public List<BlogsEntry> findByC_LtD(long companyId, Date displayDate,
+		int start, int end) {
 		return findByC_LtD(companyId, displayDate, start, end, null);
 	}
 
@@ -6579,7 +6284,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6590,19 +6295,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_LtD(
-		long companyId, Date displayDate, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByC_LtD(
-			companyId, displayDate, start, end, orderByComparator, true);
+	public List<BlogsEntry> findByC_LtD(long companyId, Date displayDate,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator) {
+		return findByC_LtD(companyId, displayDate, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6614,32 +6317,31 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_LtD(
-		long companyId, Date displayDate, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByC_LtD(long companyId, Date displayDate,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByC_LtD;
 		finderArgs = new Object[] {
-			companyId, _getTime(displayDate), start, end, orderByComparator
-		};
+				companyId, _getTime(displayDate),
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((companyId != blogsEntry.getCompanyId()) ||
-						(displayDate.getTime() <=
-							blogsEntry.getDisplayDate().getTime())) {
-
+							(displayDate.getTime() <= blogsEntry.getDisplayDate()
+																	.getTime())) {
 						list = null;
 
 						break;
@@ -6652,8 +6354,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -6675,10 +6377,11 @@ public class BlogsEntryPersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6700,16 +6403,16 @@ public class BlogsEntryPersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -6739,13 +6442,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_LtD_First(
-			long companyId, Date displayDate,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_LtD_First(long companyId, Date displayDate,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_LtD_First(
-			companyId, displayDate, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_LtD_First(companyId, displayDate,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -6775,12 +6476,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_LtD_First(
-		long companyId, Date displayDate,
+	public BlogsEntry fetchByC_LtD_First(long companyId, Date displayDate,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByC_LtD(
-			companyId, displayDate, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByC_LtD(companyId, displayDate, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6799,13 +6498,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_LtD_Last(
-			long companyId, Date displayDate,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_LtD_Last(long companyId, Date displayDate,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_LtD_Last(
-			companyId, displayDate, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_LtD_Last(companyId, displayDate,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -6835,18 +6532,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_LtD_Last(
-		long companyId, Date displayDate,
+	public BlogsEntry fetchByC_LtD_Last(long companyId, Date displayDate,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByC_LtD(companyId, displayDate);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByC_LtD(
-			companyId, displayDate, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByC_LtD(companyId, displayDate, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6866,11 +6561,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByC_LtD_PrevAndNext(
-			long entryId, long companyId, Date displayDate,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByC_LtD_PrevAndNext(long entryId, long companyId,
+		Date displayDate, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -6880,15 +6573,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByC_LtD_PrevAndNext(
-				session, blogsEntry, companyId, displayDate, orderByComparator,
-				true);
+			array[0] = getByC_LtD_PrevAndNext(session, blogsEntry, companyId,
+					displayDate, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByC_LtD_PrevAndNext(
-				session, blogsEntry, companyId, displayDate, orderByComparator,
-				false);
+			array[2] = getByC_LtD_PrevAndNext(session, blogsEntry, companyId,
+					displayDate, orderByComparator, false);
 
 			return array;
 		}
@@ -6900,16 +6591,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByC_LtD_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long companyId,
-		Date displayDate, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry getByC_LtD_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long companyId, Date displayDate,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -6932,8 +6621,7 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -7007,9 +6695,8 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -7032,11 +6719,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByC_LtD(long companyId, Date displayDate) {
-		for (BlogsEntry blogsEntry :
-				findByC_LtD(
-					companyId, displayDate, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByC_LtD(companyId, displayDate,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -7052,7 +6736,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByC_LtD(long companyId, Date displayDate) {
 		FinderPath finderPath = _finderPathWithPaginationCountByC_LtD;
 
-		Object[] finderArgs = new Object[] {companyId, _getTime(displayDate)};
+		Object[] finderArgs = new Object[] { companyId, _getTime(displayDate) };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -7108,15 +6792,9 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_LTD_COMPANYID_2 =
-		"blogsEntry.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_LTD_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL";
-
-	private static final String _FINDER_COLUMN_C_LTD_DISPLAYDATE_2 =
-		"blogsEntry.displayDate < ?";
-
+	private static final String _FINDER_COLUMN_C_LTD_COMPANYID_2 = "blogsEntry.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_LTD_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL";
+	private static final String _FINDER_COLUMN_C_LTD_DISPLAYDATE_2 = "blogsEntry.displayDate < ?";
 	private FinderPath _finderPathWithPaginationFindByC_S;
 	private FinderPath _finderPathWithoutPaginationFindByC_S;
 	private FinderPath _finderPathCountByC_S;
@@ -7130,15 +6808,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByC_S(long companyId, int status) {
-		return findByC_S(
-			companyId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByC_S(companyId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where companyId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7148,9 +6826,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_S(
-		long companyId, int status, int start, int end) {
-
+	public List<BlogsEntry> findByC_S(long companyId, int status, int start,
+		int end) {
 		return findByC_S(companyId, status, start, end, null);
 	}
 
@@ -7158,7 +6835,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7169,19 +6846,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_S(
-		long companyId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByC_S(
-			companyId, status, start, end, orderByComparator, true);
+	public List<BlogsEntry> findByC_S(long companyId, int status, int start,
+		int end, OrderByComparator<BlogsEntry> orderByComparator) {
+		return findByC_S(companyId, status, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7193,40 +6867,38 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_S(
-		long companyId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByC_S(long companyId, int status, int start,
+		int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_S;
-			finderArgs = new Object[] {companyId, status};
+			finderArgs = new Object[] { companyId, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_S;
 			finderArgs = new Object[] {
-				companyId, status, start, end, orderByComparator
-			};
+					companyId, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((companyId != blogsEntry.getCompanyId()) ||
-						(status != blogsEntry.getStatus())) {
-
+							(status != blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -7239,8 +6911,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -7253,10 +6925,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -7276,16 +6949,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -7315,13 +6988,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_S_First(
-			long companyId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_S_First(long companyId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_S_First(
-			companyId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_S_First(companyId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -7351,12 +7022,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_S_First(
-		long companyId, int status,
+	public BlogsEntry fetchByC_S_First(long companyId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByC_S(
-			companyId, status, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByC_S(companyId, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -7375,13 +7044,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_S_Last(
-			long companyId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_S_Last(long companyId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_S_Last(
-			companyId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_S_Last(companyId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -7411,18 +7078,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_S_Last(
-		long companyId, int status,
+	public BlogsEntry fetchByC_S_Last(long companyId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByC_S(companyId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByC_S(
-			companyId, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByC_S(companyId, status, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -7442,11 +7107,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByC_S_PrevAndNext(
-			long entryId, long companyId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByC_S_PrevAndNext(long entryId, long companyId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -7456,15 +7119,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByC_S_PrevAndNext(
-				session, blogsEntry, companyId, status, orderByComparator,
-				true);
+			array[0] = getByC_S_PrevAndNext(session, blogsEntry, companyId,
+					status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByC_S_PrevAndNext(
-				session, blogsEntry, companyId, status, orderByComparator,
-				false);
+			array[2] = getByC_S_PrevAndNext(session, blogsEntry, companyId,
+					status, orderByComparator, false);
 
 			return array;
 		}
@@ -7476,15 +7137,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByC_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long companyId, int status,
+	protected BlogsEntry getByC_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long companyId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -7498,8 +7158,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -7571,9 +7230,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -7596,11 +7254,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByC_S(long companyId, int status) {
-		for (BlogsEntry blogsEntry :
-				findByC_S(
-					companyId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (BlogsEntry blogsEntry : findByC_S(companyId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -7616,7 +7271,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByC_S(long companyId, int status) {
 		FinderPath finderPath = _finderPathCountByC_S;
 
-		Object[] finderArgs = new Object[] {companyId, status};
+		Object[] finderArgs = new Object[] { companyId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -7661,12 +7316,8 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_S_COMPANYID_2 =
-		"blogsEntry.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_S_STATUS_2 =
-		"blogsEntry.status = ?";
-
+	private static final String _FINDER_COLUMN_C_S_COMPANYID_2 = "blogsEntry.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_S_STATUS_2 = "blogsEntry.status = ?";
 	private FinderPath _finderPathWithPaginationFindByC_NotS;
 	private FinderPath _finderPathWithPaginationCountByC_NotS;
 
@@ -7679,15 +7330,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByC_NotS(long companyId, int status) {
-		return findByC_NotS(
-			companyId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByC_NotS(companyId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where companyId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7697,9 +7348,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_NotS(
-		long companyId, int status, int start, int end) {
-
+	public List<BlogsEntry> findByC_NotS(long companyId, int status, int start,
+		int end) {
 		return findByC_NotS(companyId, status, start, end, null);
 	}
 
@@ -7707,7 +7357,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7718,19 +7368,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_NotS(
-		long companyId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByC_NotS(
-			companyId, status, start, end, orderByComparator, true);
+	public List<BlogsEntry> findByC_NotS(long companyId, int status, int start,
+		int end, OrderByComparator<BlogsEntry> orderByComparator) {
+		return findByC_NotS(companyId, status, start, end, orderByComparator,
+			true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7742,31 +7390,30 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_NotS(
-		long companyId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByC_NotS(long companyId, int status, int start,
+		int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByC_NotS;
 		finderArgs = new Object[] {
-			companyId, status, start, end, orderByComparator
-		};
+				companyId, status,
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((companyId != blogsEntry.getCompanyId()) ||
-						(status == blogsEntry.getStatus())) {
-
+							(status == blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -7779,8 +7426,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -7793,10 +7440,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -7816,16 +7464,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -7855,13 +7503,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_NotS_First(
-			long companyId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_NotS_First(long companyId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_NotS_First(
-			companyId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_NotS_First(companyId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -7891,12 +7537,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_NotS_First(
-		long companyId, int status,
+	public BlogsEntry fetchByC_NotS_First(long companyId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByC_NotS(
-			companyId, status, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByC_NotS(companyId, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -7915,13 +7559,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_NotS_Last(
-			long companyId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_NotS_Last(long companyId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_NotS_Last(
-			companyId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_NotS_Last(companyId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -7951,18 +7593,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_NotS_Last(
-		long companyId, int status,
+	public BlogsEntry fetchByC_NotS_Last(long companyId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByC_NotS(companyId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByC_NotS(
-			companyId, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByC_NotS(companyId, status, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -7982,11 +7622,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByC_NotS_PrevAndNext(
-			long entryId, long companyId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByC_NotS_PrevAndNext(long entryId, long companyId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -7996,15 +7634,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByC_NotS_PrevAndNext(
-				session, blogsEntry, companyId, status, orderByComparator,
-				true);
+			array[0] = getByC_NotS_PrevAndNext(session, blogsEntry, companyId,
+					status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByC_NotS_PrevAndNext(
-				session, blogsEntry, companyId, status, orderByComparator,
-				false);
+			array[2] = getByC_NotS_PrevAndNext(session, blogsEntry, companyId,
+					status, orderByComparator, false);
 
 			return array;
 		}
@@ -8016,15 +7652,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByC_NotS_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long companyId, int status,
+	protected BlogsEntry getByC_NotS_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long companyId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -8038,8 +7673,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -8111,9 +7745,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -8136,11 +7769,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByC_NotS(long companyId, int status) {
-		for (BlogsEntry blogsEntry :
-				findByC_NotS(
-					companyId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (BlogsEntry blogsEntry : findByC_NotS(companyId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -8156,7 +7786,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByC_NotS(long companyId, int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByC_NotS;
 
-		Object[] finderArgs = new Object[] {companyId, status};
+		Object[] finderArgs = new Object[] { companyId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -8201,12 +7831,8 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_NOTS_COMPANYID_2 =
-		"blogsEntry.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_NOTS_STATUS_2 =
-		"blogsEntry.status != ?";
-
+	private static final String _FINDER_COLUMN_C_NOTS_COMPANYID_2 = "blogsEntry.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_NOTS_STATUS_2 = "blogsEntry.status != ?";
 	private FinderPath _finderPathWithPaginationFindByLtD_S;
 	private FinderPath _finderPathWithPaginationCountByLtD_S;
 
@@ -8219,15 +7845,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByLtD_S(Date displayDate, int status) {
-		return findByLtD_S(
-			displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByLtD_S(displayDate, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param displayDate the display date
@@ -8237,9 +7863,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByLtD_S(
-		Date displayDate, int status, int start, int end) {
-
+	public List<BlogsEntry> findByLtD_S(Date displayDate, int status,
+		int start, int end) {
 		return findByLtD_S(displayDate, status, start, end, null);
 	}
 
@@ -8247,7 +7872,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param displayDate the display date
@@ -8258,19 +7883,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByLtD_S(
-		Date displayDate, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByLtD_S(
-			displayDate, status, start, end, orderByComparator, true);
+	public List<BlogsEntry> findByLtD_S(Date displayDate, int status,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator) {
+		return findByLtD_S(displayDate, status, start, end, orderByComparator,
+			true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param displayDate the display date
@@ -8282,32 +7905,31 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByLtD_S(
-		Date displayDate, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByLtD_S(Date displayDate, int status,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByLtD_S;
 		finderArgs = new Object[] {
-			_getTime(displayDate), status, start, end, orderByComparator
-		};
+				_getTime(displayDate), status,
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
-					if ((displayDate.getTime() <=
-							blogsEntry.getDisplayDate().getTime()) ||
-						(status != blogsEntry.getStatus())) {
-
+					if ((displayDate.getTime() <= blogsEntry.getDisplayDate()
+																.getTime()) ||
+							(status != blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -8320,8 +7942,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -8343,10 +7965,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_LTD_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -8368,16 +7991,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -8407,13 +8030,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByLtD_S_First(
-			Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByLtD_S_First(Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByLtD_S_First(
-			displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByLtD_S_First(displayDate, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -8443,12 +8064,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByLtD_S_First(
-		Date displayDate, int status,
+	public BlogsEntry fetchByLtD_S_First(Date displayDate, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByLtD_S(
-			displayDate, status, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByLtD_S(displayDate, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -8467,13 +8086,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByLtD_S_Last(
-			Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByLtD_S_Last(Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByLtD_S_Last(
-			displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByLtD_S_Last(displayDate, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -8503,18 +8120,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByLtD_S_Last(
-		Date displayDate, int status,
+	public BlogsEntry fetchByLtD_S_Last(Date displayDate, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByLtD_S(displayDate, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByLtD_S(
-			displayDate, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByLtD_S(displayDate, status, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -8534,11 +8149,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByLtD_S_PrevAndNext(
-			long entryId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByLtD_S_PrevAndNext(long entryId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -8548,15 +8161,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByLtD_S_PrevAndNext(
-				session, blogsEntry, displayDate, status, orderByComparator,
-				true);
+			array[0] = getByLtD_S_PrevAndNext(session, blogsEntry, displayDate,
+					status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByLtD_S_PrevAndNext(
-				session, blogsEntry, displayDate, status, orderByComparator,
-				false);
+			array[2] = getByLtD_S_PrevAndNext(session, blogsEntry, displayDate,
+					status, orderByComparator, false);
 
 			return array;
 		}
@@ -8568,15 +8179,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByLtD_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, Date displayDate, int status,
+	protected BlogsEntry getByLtD_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, Date displayDate, int status,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -8599,8 +8209,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_LTD_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -8674,9 +8283,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -8699,11 +8307,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByLtD_S(Date displayDate, int status) {
-		for (BlogsEntry blogsEntry :
-				findByLtD_S(
-					displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (BlogsEntry blogsEntry : findByLtD_S(displayDate, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -8719,7 +8324,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByLtD_S(Date displayDate, int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByLtD_S;
 
-		Object[] finderArgs = new Object[] {_getTime(displayDate), status};
+		Object[] finderArgs = new Object[] { _getTime(displayDate), status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -8775,15 +8380,9 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_LTD_S_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL AND ";
-
-	private static final String _FINDER_COLUMN_LTD_S_DISPLAYDATE_2 =
-		"blogsEntry.displayDate < ? AND ";
-
-	private static final String _FINDER_COLUMN_LTD_S_STATUS_2 =
-		"blogsEntry.status = ?";
-
+	private static final String _FINDER_COLUMN_LTD_S_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL AND ";
+	private static final String _FINDER_COLUMN_LTD_S_DISPLAYDATE_2 = "blogsEntry.displayDate < ? AND ";
+	private static final String _FINDER_COLUMN_LTD_S_STATUS_2 = "blogsEntry.status = ?";
 	private FinderPath _finderPathWithPaginationFindByG_U_LtD;
 	private FinderPath _finderPathWithPaginationCountByG_U_LtD;
 
@@ -8796,19 +8395,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD(
-		long groupId, long userId, Date displayDate) {
-
-		return findByG_U_LtD(
-			groupId, userId, displayDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> findByG_U_LtD(long groupId, long userId,
+		Date displayDate) {
+		return findByG_U_LtD(groupId, userId, displayDate, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and userId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -8819,9 +8416,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD(
-		long groupId, long userId, Date displayDate, int start, int end) {
-
+	public List<BlogsEntry> findByG_U_LtD(long groupId, long userId,
+		Date displayDate, int start, int end) {
 		return findByG_U_LtD(groupId, userId, displayDate, start, end, null);
 	}
 
@@ -8829,7 +8425,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -8841,19 +8437,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD(
-		long groupId, long userId, Date displayDate, int start, int end,
+	public List<BlogsEntry> findByG_U_LtD(long groupId, long userId,
+		Date displayDate, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_U_LtD(
-			groupId, userId, displayDate, start, end, orderByComparator, true);
+		return findByG_U_LtD(groupId, userId, displayDate, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -8866,34 +8461,33 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD(
-		long groupId, long userId, Date displayDate, int start, int end,
+	public List<BlogsEntry> findByG_U_LtD(long groupId, long userId,
+		Date displayDate, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_U_LtD;
 		finderArgs = new Object[] {
-			groupId, userId, _getTime(displayDate), start, end,
-			orderByComparator
-		};
+				groupId, userId, _getTime(displayDate),
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(userId != blogsEntry.getUserId()) ||
-						(displayDate.getTime() <=
-							blogsEntry.getDisplayDate().getTime())) {
-
+							(userId != blogsEntry.getUserId()) ||
+							(displayDate.getTime() <= blogsEntry.getDisplayDate()
+																	.getTime())) {
 						list = null;
 
 						break;
@@ -8906,8 +8500,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -8931,10 +8525,11 @@ public class BlogsEntryPersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -8958,16 +8553,16 @@ public class BlogsEntryPersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -8998,13 +8593,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_U_LtD_First(
-			long groupId, long userId, Date displayDate,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_U_LtD_First(long groupId, long userId,
+		Date displayDate, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_U_LtD_First(
-			groupId, userId, displayDate, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_U_LtD_First(groupId, userId,
+				displayDate, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -9038,12 +8631,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_U_LtD_First(
-		long groupId, long userId, Date displayDate,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_U_LtD(
-			groupId, userId, displayDate, 0, 1, orderByComparator);
+	public BlogsEntry fetchByG_U_LtD_First(long groupId, long userId,
+		Date displayDate, OrderByComparator<BlogsEntry> orderByComparator) {
+		List<BlogsEntry> list = findByG_U_LtD(groupId, userId, displayDate, 0,
+				1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -9063,13 +8654,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_U_LtD_Last(
-			long groupId, long userId, Date displayDate,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_U_LtD_Last(long groupId, long userId,
+		Date displayDate, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_U_LtD_Last(
-			groupId, userId, displayDate, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_U_LtD_Last(groupId, userId,
+				displayDate, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -9103,18 +8692,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_U_LtD_Last(
-		long groupId, long userId, Date displayDate,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByG_U_LtD_Last(long groupId, long userId,
+		Date displayDate, OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByG_U_LtD(groupId, userId, displayDate);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_U_LtD(
-			groupId, userId, displayDate, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByG_U_LtD(groupId, userId, displayDate,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -9135,11 +8722,10 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_U_LtD_PrevAndNext(
-			long entryId, long groupId, long userId, Date displayDate,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_U_LtD_PrevAndNext(long entryId, long groupId,
+		long userId, Date displayDate,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -9149,15 +8735,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_U_LtD_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate,
-				orderByComparator, true);
+			array[0] = getByG_U_LtD_PrevAndNext(session, blogsEntry, groupId,
+					userId, displayDate, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_U_LtD_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate,
-				orderByComparator, false);
+			array[2] = getByG_U_LtD_PrevAndNext(session, blogsEntry, groupId,
+					userId, displayDate, orderByComparator, false);
 
 			return array;
 		}
@@ -9169,16 +8753,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_U_LtD_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, long userId,
-		Date displayDate, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry getByG_U_LtD_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, long userId, Date displayDate,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -9203,8 +8785,7 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -9280,9 +8861,8 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -9306,19 +8886,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_LtD(
-		long groupId, long userId, Date displayDate) {
-
-		return filterFindByG_U_LtD(
-			groupId, userId, displayDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> filterFindByG_U_LtD(long groupId, long userId,
+		Date displayDate) {
+		return filterFindByG_U_LtD(groupId, userId, displayDate,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and userId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -9329,18 +8907,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_LtD(
-		long groupId, long userId, Date displayDate, int start, int end) {
-
-		return filterFindByG_U_LtD(
-			groupId, userId, displayDate, start, end, null);
+	public List<BlogsEntry> filterFindByG_U_LtD(long groupId, long userId,
+		Date displayDate, int start, int end) {
+		return filterFindByG_U_LtD(groupId, userId, displayDate, start, end,
+			null);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and userId = &#63; and displayDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -9352,20 +8929,19 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_LtD(
-		long groupId, long userId, Date displayDate, int start, int end,
+	public List<BlogsEntry> filterFindByG_U_LtD(long groupId, long userId,
+		Date displayDate, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_LtD(
-				groupId, userId, displayDate, start, end, orderByComparator);
+			return findByG_U_LtD(groupId, userId, displayDate, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -9375,8 +8951,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_LTD_GROUPID_2);
@@ -9395,18 +8970,17 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -9418,9 +8992,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -9446,8 +9020,7 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(new Timestamp(displayDate.getTime()));
 			}
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -9469,14 +9042,13 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_U_LtD_PrevAndNext(
-			long entryId, long groupId, long userId, Date displayDate,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_U_LtD_PrevAndNext(long entryId,
+		long groupId, long userId, Date displayDate,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_LtD_PrevAndNext(
-				entryId, groupId, userId, displayDate, orderByComparator);
+			return findByG_U_LtD_PrevAndNext(entryId, groupId, userId,
+				displayDate, orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -9488,15 +9060,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_U_LtD_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate,
-				orderByComparator, true);
+			array[0] = filterGetByG_U_LtD_PrevAndNext(session, blogsEntry,
+					groupId, userId, displayDate, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_U_LtD_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate,
-				orderByComparator, false);
+			array[2] = filterGetByG_U_LtD_PrevAndNext(session, blogsEntry,
+					groupId, userId, displayDate, orderByComparator, false);
 
 			return array;
 		}
@@ -9508,16 +9078,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_U_LtD_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, long userId,
-		Date displayDate, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry filterGetByG_U_LtD_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, long userId, Date displayDate,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -9528,8 +9096,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_LTD_GROUPID_2);
@@ -9548,13 +9115,11 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -9562,17 +9127,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -9598,15 +9159,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -9635,9 +9194,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -9662,9 +9221,8 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -9688,11 +9246,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByG_U_LtD(long groupId, long userId, Date displayDate) {
-		for (BlogsEntry blogsEntry :
-				findByG_U_LtD(
-					groupId, userId, displayDate, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByG_U_LtD(groupId, userId,
+				displayDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -9710,8 +9265,8 @@ public class BlogsEntryPersistenceImpl
 		FinderPath finderPath = _finderPathWithPaginationCountByG_U_LtD;
 
 		Object[] finderArgs = new Object[] {
-			groupId, userId, _getTime(displayDate)
-		};
+				groupId, userId, _getTime(displayDate)
+			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -9780,9 +9335,7 @@ public class BlogsEntryPersistenceImpl
 	 * @return the number of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_U_LtD(
-		long groupId, long userId, Date displayDate) {
-
+	public int filterCountByG_U_LtD(long groupId, long userId, Date displayDate) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_U_LtD(groupId, userId, displayDate);
 		}
@@ -9806,9 +9359,9 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_U_LTD_DISPLAYDATE_2);
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -9817,8 +9370,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -9842,18 +9395,10 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_U_LTD_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_LTD_USERID_2 =
-		"blogsEntry.userId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_LTD_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL";
-
-	private static final String _FINDER_COLUMN_G_U_LTD_DISPLAYDATE_2 =
-		"blogsEntry.displayDate < ?";
-
+	private static final String _FINDER_COLUMN_G_U_LTD_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_LTD_USERID_2 = "blogsEntry.userId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_LTD_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL";
+	private static final String _FINDER_COLUMN_G_U_LTD_DISPLAYDATE_2 = "blogsEntry.displayDate < ?";
 	private FinderPath _finderPathWithPaginationFindByG_U_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_U_S;
 	private FinderPath _finderPathCountByG_U_S;
@@ -9869,16 +9414,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public List<BlogsEntry> findByG_U_S(long groupId, long userId, int status) {
-		return findByG_U_S(
-			groupId, userId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByG_U_S(groupId, userId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -9889,9 +9433,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_S(
-		long groupId, long userId, int status, int start, int end) {
-
+	public List<BlogsEntry> findByG_U_S(long groupId, long userId, int status,
+		int start, int end) {
 		return findByG_U_S(groupId, userId, status, start, end, null);
 	}
 
@@ -9899,7 +9442,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -9911,19 +9454,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_S(
-		long groupId, long userId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_U_S(
-			groupId, userId, status, start, end, orderByComparator, true);
+	public List<BlogsEntry> findByG_U_S(long groupId, long userId, int status,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator) {
+		return findByG_U_S(groupId, userId, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -9936,41 +9477,39 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_S(
-		long groupId, long userId, int status, int start, int end,
-		OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByG_U_S(long groupId, long userId, int status,
+		int start, int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_U_S;
-			finderArgs = new Object[] {groupId, userId, status};
+			finderArgs = new Object[] { groupId, userId, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_U_S;
 			finderArgs = new Object[] {
-				groupId, userId, status, start, end, orderByComparator
-			};
+					groupId, userId, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(userId != blogsEntry.getUserId()) ||
-						(status != blogsEntry.getStatus())) {
-
+							(userId != blogsEntry.getUserId()) ||
+							(status != blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -9983,8 +9522,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -9999,10 +9538,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_U_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -10024,16 +9564,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -10064,13 +9604,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_U_S_First(
-			long groupId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_U_S_First(long groupId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_U_S_First(
-			groupId, userId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_U_S_First(groupId, userId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -10104,12 +9642,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_U_S_First(
-		long groupId, long userId, int status,
+	public BlogsEntry fetchByG_U_S_First(long groupId, long userId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_U_S(
-			groupId, userId, status, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByG_U_S(groupId, userId, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -10129,13 +9665,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_U_S_Last(
-			long groupId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_U_S_Last(long groupId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_U_S_Last(
-			groupId, userId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_U_S_Last(groupId, userId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -10169,18 +9703,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_U_S_Last(
-		long groupId, long userId, int status,
+	public BlogsEntry fetchByG_U_S_Last(long groupId, long userId, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByG_U_S(groupId, userId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_U_S(
-			groupId, userId, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByG_U_S(groupId, userId, status, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -10201,11 +9733,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_U_S_PrevAndNext(
-			long entryId, long groupId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_U_S_PrevAndNext(long entryId, long groupId,
+		long userId, int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -10215,15 +9745,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_U_S_PrevAndNext(
-				session, blogsEntry, groupId, userId, status, orderByComparator,
-				true);
+			array[0] = getByG_U_S_PrevAndNext(session, blogsEntry, groupId,
+					userId, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_U_S_PrevAndNext(
-				session, blogsEntry, groupId, userId, status, orderByComparator,
-				false);
+			array[2] = getByG_U_S_PrevAndNext(session, blogsEntry, groupId,
+					userId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -10235,16 +9763,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_U_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, long userId,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry getByG_U_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -10260,8 +9786,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -10335,9 +9860,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -10361,19 +9885,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_S(
-		long groupId, long userId, int status) {
-
-		return filterFindByG_U_S(
-			groupId, userId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> filterFindByG_U_S(long groupId, long userId,
+		int status) {
+		return filterFindByG_U_S(groupId, userId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -10384,9 +9906,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_S(
-		long groupId, long userId, int status, int start, int end) {
-
+	public List<BlogsEntry> filterFindByG_U_S(long groupId, long userId,
+		int status, int start, int end) {
 		return filterFindByG_U_S(groupId, userId, status, start, end, null);
 	}
 
@@ -10394,7 +9915,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -10406,20 +9927,19 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_S(
-		long groupId, long userId, int status, int start, int end,
+	public List<BlogsEntry> filterFindByG_U_S(long groupId, long userId,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_S(
-				groupId, userId, status, start, end, orderByComparator);
+			return findByG_U_S(groupId, userId, status, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -10429,8 +9949,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_S_GROUPID_2);
@@ -10440,18 +9959,17 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -10463,9 +9981,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -10489,8 +10007,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(status);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -10512,14 +10029,13 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_U_S_PrevAndNext(
-			long entryId, long groupId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_U_S_PrevAndNext(long entryId,
+		long groupId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_S_PrevAndNext(
-				entryId, groupId, userId, status, orderByComparator);
+			return findByG_U_S_PrevAndNext(entryId, groupId, userId, status,
+				orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -10531,15 +10047,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_U_S_PrevAndNext(
-				session, blogsEntry, groupId, userId, status, orderByComparator,
-				true);
+			array[0] = filterGetByG_U_S_PrevAndNext(session, blogsEntry,
+					groupId, userId, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_U_S_PrevAndNext(
-				session, blogsEntry, groupId, userId, status, orderByComparator,
-				false);
+			array[2] = filterGetByG_U_S_PrevAndNext(session, blogsEntry,
+					groupId, userId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -10551,16 +10065,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_U_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, long userId,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry filterGetByG_U_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -10571,8 +10083,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_S_GROUPID_2);
@@ -10582,13 +10093,11 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -10596,17 +10105,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -10632,15 +10137,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -10669,9 +10172,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -10694,9 +10197,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -10720,19 +10222,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_S(
-		long groupId, long userId, int[] statuses) {
-
-		return filterFindByG_U_S(
-			groupId, userId, statuses, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> filterFindByG_U_S(long groupId, long userId,
+		int[] statuses) {
+		return filterFindByG_U_S(groupId, userId, statuses, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and userId = &#63; and status = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -10743,9 +10243,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_S(
-		long groupId, long userId, int[] statuses, int start, int end) {
-
+	public List<BlogsEntry> filterFindByG_U_S(long groupId, long userId,
+		int[] statuses, int start, int end) {
 		return filterFindByG_U_S(groupId, userId, statuses, start, end, null);
 	}
 
@@ -10753,7 +10252,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries that the user has permission to view where groupId = &#63; and userId = &#63; and status = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -10765,13 +10264,12 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_S(
-		long groupId, long userId, int[] statuses, int start, int end,
+	public List<BlogsEntry> filterFindByG_U_S(long groupId, long userId,
+		int[] statuses, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_S(
-				groupId, userId, statuses, start, end, orderByComparator);
+			return findByG_U_S(groupId, userId, statuses, start, end,
+				orderByComparator);
 		}
 
 		if (statuses == null) {
@@ -10789,8 +10287,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_S_GROUPID_2);
@@ -10809,23 +10306,21 @@ public class BlogsEntryPersistenceImpl
 			query.append(")");
 		}
 
-		query.setStringAt(
-			removeConjunction(query.stringAt(query.index() - 1)),
+		query.setStringAt(removeConjunction(query.stringAt(query.index() - 1)),
 			query.index() - 1);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -10837,9 +10332,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -10861,8 +10356,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(userId);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -10876,7 +10370,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns all the blogs entries where groupId = &#63; and userId = &#63; and status = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -10885,19 +10379,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_S(
-		long groupId, long userId, int[] statuses) {
-
-		return findByG_U_S(
-			groupId, userId, statuses, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> findByG_U_S(long groupId, long userId,
+		int[] statuses) {
+		return findByG_U_S(groupId, userId, statuses, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and userId = &#63; and status = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -10908,9 +10400,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_S(
-		long groupId, long userId, int[] statuses, int start, int end) {
-
+	public List<BlogsEntry> findByG_U_S(long groupId, long userId,
+		int[] statuses, int start, int end) {
 		return findByG_U_S(groupId, userId, statuses, start, end, null);
 	}
 
@@ -10918,7 +10409,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and status = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -10930,19 +10421,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_S(
-		long groupId, long userId, int[] statuses, int start, int end,
+	public List<BlogsEntry> findByG_U_S(long groupId, long userId,
+		int[] statuses, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_U_S(
-			groupId, userId, statuses, start, end, orderByComparator, true);
+		return findByG_U_S(groupId, userId, statuses, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and status = &#63;, optionally using the finder cache.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -10955,11 +10445,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_S(
-		long groupId, long userId, int[] statuses, int start, int end,
+	public List<BlogsEntry> findByG_U_S(long groupId, long userId,
+		int[] statuses, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		if (statuses == null) {
 			statuses = new int[0];
 		}
@@ -10970,40 +10459,39 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		if (statuses.length == 1) {
-			return findByG_U_S(
-				groupId, userId, statuses[0], start, end, orderByComparator);
+			return findByG_U_S(groupId, userId, statuses[0], start, end,
+				orderByComparator);
 		}
 
 		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderArgs = new Object[] {
-				groupId, userId, StringUtil.merge(statuses)
-			};
+					groupId, userId, StringUtil.merge(statuses)
+				};
 		}
 		else {
 			finderArgs = new Object[] {
-				groupId, userId, StringUtil.merge(statuses), start, end,
-				orderByComparator
-			};
+					groupId, userId, StringUtil.merge(statuses),
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_U_S, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(_finderPathWithPaginationFindByG_U_S,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(userId != blogsEntry.getUserId()) ||
-						!ArrayUtil.contains(statuses, blogsEntry.getStatus())) {
-
+							(userId != blogsEntry.getUserId()) ||
+							!ArrayUtil.contains(statuses, blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -11033,15 +10521,15 @@ public class BlogsEntryPersistenceImpl
 				query.append(")");
 			}
 
-			query.setStringAt(
-				removeConjunction(query.stringAt(query.index() - 1)),
-				query.index() - 1);
+			query.setStringAt(removeConjunction(query.stringAt(query.index() -
+						1)), query.index() - 1);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -11061,26 +10549,26 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(userId);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
 
-				finderCache.putResult(
-					_finderPathWithPaginationFindByG_U_S, finderArgs, list);
+				finderCache.putResult(_finderPathWithPaginationFindByG_U_S,
+					finderArgs, list);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathWithPaginationFindByG_U_S, finderArgs);
+				finderCache.removeResult(_finderPathWithPaginationFindByG_U_S,
+					finderArgs);
 
 				throw processException(e);
 			}
@@ -11101,11 +10589,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByG_U_S(long groupId, long userId, int status) {
-		for (BlogsEntry blogsEntry :
-				findByG_U_S(
-					groupId, userId, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByG_U_S(groupId, userId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -11122,7 +10607,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByG_U_S(long groupId, long userId, int status) {
 		FinderPath finderPath = _finderPathCountByG_U_S;
 
-		Object[] finderArgs = new Object[] {groupId, userId, status};
+		Object[] finderArgs = new Object[] { groupId, userId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -11191,11 +10676,11 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		Object[] finderArgs = new Object[] {
-			groupId, userId, StringUtil.merge(statuses)
-		};
+				groupId, userId, StringUtil.merge(statuses)
+			};
 
-		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByG_U_S, finderArgs, this);
+		Long count = (Long)finderCache.getResult(_finderPathWithPaginationCountByG_U_S,
+				finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler();
@@ -11218,9 +10703,8 @@ public class BlogsEntryPersistenceImpl
 				query.append(")");
 			}
 
-			query.setStringAt(
-				removeConjunction(query.stringAt(query.index() - 1)),
-				query.index() - 1);
+			query.setStringAt(removeConjunction(query.stringAt(query.index() -
+						1)), query.index() - 1);
 
 			String sql = query.toString();
 
@@ -11239,12 +10723,12 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(
-					_finderPathWithPaginationCountByG_U_S, finderArgs, count);
+				finderCache.putResult(_finderPathWithPaginationCountByG_U_S,
+					finderArgs, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathWithPaginationCountByG_U_S, finderArgs);
+				finderCache.removeResult(_finderPathWithPaginationCountByG_U_S,
+					finderArgs);
 
 				throw processException(e);
 			}
@@ -11280,9 +10764,9 @@ public class BlogsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_U_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -11291,8 +10775,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -11357,13 +10841,12 @@ public class BlogsEntryPersistenceImpl
 			query.append(")");
 		}
 
-		query.setStringAt(
-			removeConjunction(query.stringAt(query.index() - 1)),
+		query.setStringAt(removeConjunction(query.stringAt(query.index() - 1)),
 			query.index() - 1);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -11372,8 +10855,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -11393,18 +10876,10 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_U_S_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_S_USERID_2 =
-		"blogsEntry.userId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_S_STATUS_2 =
-		"blogsEntry.status = ?";
-
-	private static final String _FINDER_COLUMN_G_U_S_STATUS_7 =
-		"blogsEntry.status IN (";
-
+	private static final String _FINDER_COLUMN_G_U_S_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_S_USERID_2 = "blogsEntry.userId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_S_STATUS_2 = "blogsEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_U_S_STATUS_7 = "blogsEntry.status IN (";
 	private FinderPath _finderPathWithPaginationFindByG_U_NotS;
 	private FinderPath _finderPathWithPaginationCountByG_U_NotS;
 
@@ -11417,19 +10892,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_NotS(
-		long groupId, long userId, int status) {
-
-		return findByG_U_NotS(
-			groupId, userId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> findByG_U_NotS(long groupId, long userId, int status) {
+		return findByG_U_NotS(groupId, userId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and userId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -11440,9 +10912,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_NotS(
-		long groupId, long userId, int status, int start, int end) {
-
+	public List<BlogsEntry> findByG_U_NotS(long groupId, long userId,
+		int status, int start, int end) {
 		return findByG_U_NotS(groupId, userId, status, start, end, null);
 	}
 
@@ -11450,7 +10921,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -11462,19 +10933,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_NotS(
-		long groupId, long userId, int status, int start, int end,
+	public List<BlogsEntry> findByG_U_NotS(long groupId, long userId,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_U_NotS(
-			groupId, userId, status, start, end, orderByComparator, true);
+		return findByG_U_NotS(groupId, userId, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -11487,32 +10957,32 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_NotS(
-		long groupId, long userId, int status, int start, int end,
+	public List<BlogsEntry> findByG_U_NotS(long groupId, long userId,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_U_NotS;
 		finderArgs = new Object[] {
-			groupId, userId, status, start, end, orderByComparator
-		};
+				groupId, userId, status,
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(userId != blogsEntry.getUserId()) ||
-						(status == blogsEntry.getStatus())) {
-
+							(userId != blogsEntry.getUserId()) ||
+							(status == blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -11525,8 +10995,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -11541,10 +11011,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_U_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -11566,16 +11037,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -11606,13 +11077,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_U_NotS_First(
-			long groupId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_U_NotS_First(long groupId, long userId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_U_NotS_First(
-			groupId, userId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_U_NotS_First(groupId, userId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -11646,12 +11115,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_U_NotS_First(
-		long groupId, long userId, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_U_NotS(
-			groupId, userId, status, 0, 1, orderByComparator);
+	public BlogsEntry fetchByG_U_NotS_First(long groupId, long userId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
+		List<BlogsEntry> list = findByG_U_NotS(groupId, userId, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -11671,13 +11138,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_U_NotS_Last(
-			long groupId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_U_NotS_Last(long groupId, long userId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_U_NotS_Last(
-			groupId, userId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_U_NotS_Last(groupId, userId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -11711,18 +11176,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_U_NotS_Last(
-		long groupId, long userId, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByG_U_NotS_Last(long groupId, long userId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByG_U_NotS(groupId, userId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_U_NotS(
-			groupId, userId, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByG_U_NotS(groupId, userId, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -11743,11 +11206,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_U_NotS_PrevAndNext(
-			long entryId, long groupId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_U_NotS_PrevAndNext(long entryId, long groupId,
+		long userId, int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -11757,15 +11218,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_U_NotS_PrevAndNext(
-				session, blogsEntry, groupId, userId, status, orderByComparator,
-				true);
+			array[0] = getByG_U_NotS_PrevAndNext(session, blogsEntry, groupId,
+					userId, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_U_NotS_PrevAndNext(
-				session, blogsEntry, groupId, userId, status, orderByComparator,
-				false);
+			array[2] = getByG_U_NotS_PrevAndNext(session, blogsEntry, groupId,
+					userId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -11777,16 +11236,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_U_NotS_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, long userId,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry getByG_U_NotS_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -11802,8 +11259,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -11877,9 +11333,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -11903,19 +11358,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_NotS(
-		long groupId, long userId, int status) {
-
-		return filterFindByG_U_NotS(
-			groupId, userId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> filterFindByG_U_NotS(long groupId, long userId,
+		int status) {
+		return filterFindByG_U_NotS(groupId, userId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and userId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -11926,9 +11379,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_NotS(
-		long groupId, long userId, int status, int start, int end) {
-
+	public List<BlogsEntry> filterFindByG_U_NotS(long groupId, long userId,
+		int status, int start, int end) {
 		return filterFindByG_U_NotS(groupId, userId, status, start, end, null);
 	}
 
@@ -11936,7 +11388,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and userId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -11948,20 +11400,19 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_NotS(
-		long groupId, long userId, int status, int start, int end,
+	public List<BlogsEntry> filterFindByG_U_NotS(long groupId, long userId,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_NotS(
-				groupId, userId, status, start, end, orderByComparator);
+			return findByG_U_NotS(groupId, userId, status, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -11971,8 +11422,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_NOTS_GROUPID_2);
@@ -11982,18 +11432,17 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -12005,9 +11454,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -12031,8 +11480,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(status);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -12054,14 +11502,13 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_U_NotS_PrevAndNext(
-			long entryId, long groupId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_U_NotS_PrevAndNext(long entryId,
+		long groupId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_NotS_PrevAndNext(
-				entryId, groupId, userId, status, orderByComparator);
+			return findByG_U_NotS_PrevAndNext(entryId, groupId, userId, status,
+				orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -12073,15 +11520,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_U_NotS_PrevAndNext(
-				session, blogsEntry, groupId, userId, status, orderByComparator,
-				true);
+			array[0] = filterGetByG_U_NotS_PrevAndNext(session, blogsEntry,
+					groupId, userId, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_U_NotS_PrevAndNext(
-				session, blogsEntry, groupId, userId, status, orderByComparator,
-				false);
+			array[2] = filterGetByG_U_NotS_PrevAndNext(session, blogsEntry,
+					groupId, userId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -12093,16 +11538,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_U_NotS_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, long userId,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry filterGetByG_U_NotS_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -12113,8 +11556,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_NOTS_GROUPID_2);
@@ -12124,13 +11566,11 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -12138,17 +11578,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -12174,15 +11610,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -12211,9 +11645,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -12236,9 +11670,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -12262,11 +11695,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByG_U_NotS(long groupId, long userId, int status) {
-		for (BlogsEntry blogsEntry :
-				findByG_U_NotS(
-					groupId, userId, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByG_U_NotS(groupId, userId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -12283,7 +11713,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByG_U_NotS(long groupId, long userId, int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByG_U_NotS;
 
-		Object[] finderArgs = new Object[] {groupId, userId, status};
+		Object[] finderArgs = new Object[] { groupId, userId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -12356,9 +11786,9 @@ public class BlogsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_U_NOTS_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -12367,8 +11797,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -12390,15 +11820,9 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_U_NOTS_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_NOTS_USERID_2 =
-		"blogsEntry.userId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_NOTS_STATUS_2 =
-		"blogsEntry.status != ?";
-
+	private static final String _FINDER_COLUMN_G_U_NOTS_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_NOTS_USERID_2 = "blogsEntry.userId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_NOTS_STATUS_2 = "blogsEntry.status != ?";
 	private FinderPath _finderPathWithPaginationFindByG_D_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_D_S;
 	private FinderPath _finderPathCountByG_D_S;
@@ -12412,19 +11836,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_D_S(
-		long groupId, Date displayDate, int status) {
-
-		return findByG_D_S(
-			groupId, displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> findByG_D_S(long groupId, Date displayDate,
+		int status) {
+		return findByG_D_S(groupId, displayDate, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and displayDate = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -12435,9 +11857,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_D_S(
-		long groupId, Date displayDate, int status, int start, int end) {
-
+	public List<BlogsEntry> findByG_D_S(long groupId, Date displayDate,
+		int status, int start, int end) {
 		return findByG_D_S(groupId, displayDate, status, start, end, null);
 	}
 
@@ -12445,7 +11866,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and displayDate = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -12457,19 +11878,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_D_S(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByG_D_S(long groupId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_D_S(
-			groupId, displayDate, status, start, end, orderByComparator, true);
+		return findByG_D_S(groupId, displayDate, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and displayDate = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -12482,43 +11902,41 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_D_S(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByG_D_S(long groupId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_D_S;
-			finderArgs = new Object[] {groupId, _getTime(displayDate), status};
+			finderArgs = new Object[] { groupId, _getTime(displayDate), status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_D_S;
 			finderArgs = new Object[] {
-				groupId, _getTime(displayDate), status, start, end,
-				orderByComparator
-			};
+					groupId, _getTime(displayDate), status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						!Objects.equals(
-							displayDate, blogsEntry.getDisplayDate()) ||
-						(status != blogsEntry.getStatus())) {
-
+							!Objects.equals(displayDate,
+								blogsEntry.getDisplayDate()) ||
+							(status != blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -12531,8 +11949,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -12556,10 +11974,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_D_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -12583,16 +12002,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -12623,13 +12042,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_D_S_First(
-			long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_D_S_First(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_D_S_First(
-			groupId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_D_S_First(groupId, displayDate,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -12663,12 +12080,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_D_S_First(
-		long groupId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_D_S(
-			groupId, displayDate, status, 0, 1, orderByComparator);
+	public BlogsEntry fetchByG_D_S_First(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
+		List<BlogsEntry> list = findByG_D_S(groupId, displayDate, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -12688,13 +12103,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_D_S_Last(
-			long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_D_S_Last(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_D_S_Last(
-			groupId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_D_S_Last(groupId, displayDate, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -12728,18 +12141,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_D_S_Last(
-		long groupId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByG_D_S_Last(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByG_D_S(groupId, displayDate, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_D_S(
-			groupId, displayDate, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByG_D_S(groupId, displayDate, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -12760,11 +12171,10 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_D_S_PrevAndNext(
-			long entryId, long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_D_S_PrevAndNext(long entryId, long groupId,
+		Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -12774,15 +12184,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_D_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, true);
+			array[0] = getByG_D_S_PrevAndNext(session, blogsEntry, groupId,
+					displayDate, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_D_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, false);
+			array[2] = getByG_D_S_PrevAndNext(session, blogsEntry, groupId,
+					displayDate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -12794,16 +12202,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_D_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, Date displayDate,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry getByG_D_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -12828,8 +12234,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_D_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -12905,9 +12310,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -12931,19 +12335,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_D_S(
-		long groupId, Date displayDate, int status) {
-
-		return filterFindByG_D_S(
-			groupId, displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> filterFindByG_D_S(long groupId, Date displayDate,
+		int status) {
+		return filterFindByG_D_S(groupId, displayDate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and displayDate = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -12954,18 +12356,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_D_S(
-		long groupId, Date displayDate, int status, int start, int end) {
-
-		return filterFindByG_D_S(
-			groupId, displayDate, status, start, end, null);
+	public List<BlogsEntry> filterFindByG_D_S(long groupId, Date displayDate,
+		int status, int start, int end) {
+		return filterFindByG_D_S(groupId, displayDate, status, start, end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and displayDate = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -12977,20 +12377,19 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_D_S(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> filterFindByG_D_S(long groupId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_D_S(
-				groupId, displayDate, status, start, end, orderByComparator);
+			return findByG_D_S(groupId, displayDate, status, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -13000,8 +12399,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_D_S_GROUPID_2);
@@ -13020,18 +12418,17 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_D_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -13043,9 +12440,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -13071,8 +12468,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(status);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -13094,14 +12490,13 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_D_S_PrevAndNext(
-			long entryId, long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_D_S_PrevAndNext(long entryId,
+		long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_D_S_PrevAndNext(
-				entryId, groupId, displayDate, status, orderByComparator);
+			return findByG_D_S_PrevAndNext(entryId, groupId, displayDate,
+				status, orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -13113,15 +12508,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_D_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, true);
+			array[0] = filterGetByG_D_S_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_D_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, false);
+			array[2] = filterGetByG_D_S_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -13133,16 +12526,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_D_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, Date displayDate,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry filterGetByG_D_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -13153,8 +12544,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_D_S_GROUPID_2);
@@ -13173,13 +12563,11 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_D_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -13187,17 +12575,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -13223,15 +12607,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -13260,9 +12642,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -13287,9 +12669,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -13313,11 +12694,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByG_D_S(long groupId, Date displayDate, int status) {
-		for (BlogsEntry blogsEntry :
-				findByG_D_S(
-					groupId, displayDate, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByG_D_S(groupId, displayDate, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -13335,8 +12713,8 @@ public class BlogsEntryPersistenceImpl
 		FinderPath finderPath = _finderPathCountByG_D_S;
 
 		Object[] finderArgs = new Object[] {
-			groupId, _getTime(displayDate), status
-		};
+				groupId, _getTime(displayDate), status
+			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -13429,9 +12807,9 @@ public class BlogsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_D_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -13440,8 +12818,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -13465,18 +12843,10 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_D_S_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_D_S_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL AND ";
-
-	private static final String _FINDER_COLUMN_G_D_S_DISPLAYDATE_2 =
-		"blogsEntry.displayDate = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_D_S_STATUS_2 =
-		"blogsEntry.status = ?";
-
+	private static final String _FINDER_COLUMN_G_D_S_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_D_S_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL AND ";
+	private static final String _FINDER_COLUMN_G_D_S_DISPLAYDATE_2 = "blogsEntry.displayDate = ? AND ";
+	private static final String _FINDER_COLUMN_G_D_S_STATUS_2 = "blogsEntry.status = ?";
 	private FinderPath _finderPathWithPaginationFindByG_GtD_S;
 	private FinderPath _finderPathWithPaginationCountByG_GtD_S;
 
@@ -13489,19 +12859,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_GtD_S(
-		long groupId, Date displayDate, int status) {
-
-		return findByG_GtD_S(
-			groupId, displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> findByG_GtD_S(long groupId, Date displayDate,
+		int status) {
+		return findByG_GtD_S(groupId, displayDate, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and displayDate &gt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -13512,9 +12880,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_GtD_S(
-		long groupId, Date displayDate, int status, int start, int end) {
-
+	public List<BlogsEntry> findByG_GtD_S(long groupId, Date displayDate,
+		int status, int start, int end) {
 		return findByG_GtD_S(groupId, displayDate, status, start, end, null);
 	}
 
@@ -13522,7 +12889,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and displayDate &gt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -13534,19 +12901,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_GtD_S(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByG_GtD_S(long groupId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_GtD_S(
-			groupId, displayDate, status, start, end, orderByComparator, true);
+		return findByG_GtD_S(groupId, displayDate, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and displayDate &gt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -13559,34 +12925,33 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_GtD_S(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByG_GtD_S(long groupId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_GtD_S;
 		finderArgs = new Object[] {
-			groupId, _getTime(displayDate), status, start, end,
-			orderByComparator
-		};
+				groupId, _getTime(displayDate), status,
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(displayDate.getTime() >=
-							blogsEntry.getDisplayDate().getTime()) ||
-						(status != blogsEntry.getStatus())) {
-
+							(displayDate.getTime() >= blogsEntry.getDisplayDate()
+																	.getTime()) ||
+							(status != blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -13599,8 +12964,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -13624,10 +12989,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_GTD_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -13651,16 +13017,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -13691,13 +13057,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_GtD_S_First(
-			long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_GtD_S_First(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_GtD_S_First(
-			groupId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_GtD_S_First(groupId, displayDate,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -13731,12 +13095,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_GtD_S_First(
-		long groupId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_GtD_S(
-			groupId, displayDate, status, 0, 1, orderByComparator);
+	public BlogsEntry fetchByG_GtD_S_First(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
+		List<BlogsEntry> list = findByG_GtD_S(groupId, displayDate, status, 0,
+				1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -13756,13 +13118,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_GtD_S_Last(
-			long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_GtD_S_Last(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_GtD_S_Last(
-			groupId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_GtD_S_Last(groupId, displayDate,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -13796,18 +13156,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_GtD_S_Last(
-		long groupId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByG_GtD_S_Last(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByG_GtD_S(groupId, displayDate, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_GtD_S(
-			groupId, displayDate, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByG_GtD_S(groupId, displayDate, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -13828,11 +13186,10 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_GtD_S_PrevAndNext(
-			long entryId, long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_GtD_S_PrevAndNext(long entryId, long groupId,
+		Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -13842,15 +13199,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_GtD_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, true);
+			array[0] = getByG_GtD_S_PrevAndNext(session, blogsEntry, groupId,
+					displayDate, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_GtD_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, false);
+			array[2] = getByG_GtD_S_PrevAndNext(session, blogsEntry, groupId,
+					displayDate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -13862,16 +13217,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_GtD_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, Date displayDate,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry getByG_GtD_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -13896,8 +13249,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_GTD_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -13973,9 +13325,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -13999,19 +13350,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_GtD_S(
-		long groupId, Date displayDate, int status) {
-
-		return filterFindByG_GtD_S(
-			groupId, displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> filterFindByG_GtD_S(long groupId, Date displayDate,
+		int status) {
+		return filterFindByG_GtD_S(groupId, displayDate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and displayDate &gt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14022,18 +13371,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_GtD_S(
-		long groupId, Date displayDate, int status, int start, int end) {
-
-		return filterFindByG_GtD_S(
-			groupId, displayDate, status, start, end, null);
+	public List<BlogsEntry> filterFindByG_GtD_S(long groupId, Date displayDate,
+		int status, int start, int end) {
+		return filterFindByG_GtD_S(groupId, displayDate, status, start, end,
+			null);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and displayDate &gt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14045,20 +13393,19 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_GtD_S(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> filterFindByG_GtD_S(long groupId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_GtD_S(
-				groupId, displayDate, status, start, end, orderByComparator);
+			return findByG_GtD_S(groupId, displayDate, status, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -14068,8 +13415,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_GTD_S_GROUPID_2);
@@ -14088,18 +13434,17 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_GTD_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -14111,9 +13456,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -14139,8 +13484,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(status);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -14162,14 +13506,13 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_GtD_S_PrevAndNext(
-			long entryId, long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_GtD_S_PrevAndNext(long entryId,
+		long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_GtD_S_PrevAndNext(
-				entryId, groupId, displayDate, status, orderByComparator);
+			return findByG_GtD_S_PrevAndNext(entryId, groupId, displayDate,
+				status, orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -14181,15 +13524,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_GtD_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, true);
+			array[0] = filterGetByG_GtD_S_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_GtD_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, false);
+			array[2] = filterGetByG_GtD_S_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -14201,16 +13542,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_GtD_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, Date displayDate,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry filterGetByG_GtD_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -14221,8 +13560,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_GTD_S_GROUPID_2);
@@ -14241,13 +13579,11 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_GTD_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -14255,17 +13591,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -14291,15 +13623,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -14328,9 +13658,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -14355,9 +13685,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -14381,11 +13710,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByG_GtD_S(long groupId, Date displayDate, int status) {
-		for (BlogsEntry blogsEntry :
-				findByG_GtD_S(
-					groupId, displayDate, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByG_GtD_S(groupId, displayDate,
+				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -14403,8 +13729,8 @@ public class BlogsEntryPersistenceImpl
 		FinderPath finderPath = _finderPathWithPaginationCountByG_GtD_S;
 
 		Object[] finderArgs = new Object[] {
-			groupId, _getTime(displayDate), status
-		};
+				groupId, _getTime(displayDate), status
+			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -14473,9 +13799,7 @@ public class BlogsEntryPersistenceImpl
 	 * @return the number of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_GtD_S(
-		long groupId, Date displayDate, int status) {
-
+	public int filterCountByG_GtD_S(long groupId, Date displayDate, int status) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_GtD_S(groupId, displayDate, status);
 		}
@@ -14499,9 +13823,9 @@ public class BlogsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_GTD_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -14510,8 +13834,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -14535,18 +13859,10 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_GTD_S_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_GTD_S_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL AND ";
-
-	private static final String _FINDER_COLUMN_G_GTD_S_DISPLAYDATE_2 =
-		"blogsEntry.displayDate > ? AND ";
-
-	private static final String _FINDER_COLUMN_G_GTD_S_STATUS_2 =
-		"blogsEntry.status = ?";
-
+	private static final String _FINDER_COLUMN_G_GTD_S_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_GTD_S_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL AND ";
+	private static final String _FINDER_COLUMN_G_GTD_S_DISPLAYDATE_2 = "blogsEntry.displayDate > ? AND ";
+	private static final String _FINDER_COLUMN_G_GTD_S_STATUS_2 = "blogsEntry.status = ?";
 	private FinderPath _finderPathWithPaginationFindByG_LtD_S;
 	private FinderPath _finderPathWithPaginationCountByG_LtD_S;
 
@@ -14559,19 +13875,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_LtD_S(
-		long groupId, Date displayDate, int status) {
-
-		return findByG_LtD_S(
-			groupId, displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> findByG_LtD_S(long groupId, Date displayDate,
+		int status) {
+		return findByG_LtD_S(groupId, displayDate, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14582,9 +13896,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_LtD_S(
-		long groupId, Date displayDate, int status, int start, int end) {
-
+	public List<BlogsEntry> findByG_LtD_S(long groupId, Date displayDate,
+		int status, int start, int end) {
 		return findByG_LtD_S(groupId, displayDate, status, start, end, null);
 	}
 
@@ -14592,7 +13905,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14604,19 +13917,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_LtD_S(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByG_LtD_S(long groupId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_LtD_S(
-			groupId, displayDate, status, start, end, orderByComparator, true);
+		return findByG_LtD_S(groupId, displayDate, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14629,34 +13941,33 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_LtD_S(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByG_LtD_S(long groupId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_LtD_S;
 		finderArgs = new Object[] {
-			groupId, _getTime(displayDate), status, start, end,
-			orderByComparator
-		};
+				groupId, _getTime(displayDate), status,
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(displayDate.getTime() <=
-							blogsEntry.getDisplayDate().getTime()) ||
-						(status != blogsEntry.getStatus())) {
-
+							(displayDate.getTime() <= blogsEntry.getDisplayDate()
+																	.getTime()) ||
+							(status != blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -14669,8 +13980,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -14694,10 +14005,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_LTD_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -14721,16 +14033,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -14761,13 +14073,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_LtD_S_First(
-			long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_LtD_S_First(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_LtD_S_First(
-			groupId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_LtD_S_First(groupId, displayDate,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -14801,12 +14111,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_LtD_S_First(
-		long groupId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_LtD_S(
-			groupId, displayDate, status, 0, 1, orderByComparator);
+	public BlogsEntry fetchByG_LtD_S_First(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
+		List<BlogsEntry> list = findByG_LtD_S(groupId, displayDate, status, 0,
+				1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -14826,13 +14134,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_LtD_S_Last(
-			long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_LtD_S_Last(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_LtD_S_Last(
-			groupId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_LtD_S_Last(groupId, displayDate,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -14866,18 +14172,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_LtD_S_Last(
-		long groupId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByG_LtD_S_Last(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByG_LtD_S(groupId, displayDate, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_LtD_S(
-			groupId, displayDate, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByG_LtD_S(groupId, displayDate, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -14898,11 +14202,10 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_LtD_S_PrevAndNext(
-			long entryId, long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_LtD_S_PrevAndNext(long entryId, long groupId,
+		Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -14912,15 +14215,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_LtD_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, true);
+			array[0] = getByG_LtD_S_PrevAndNext(session, blogsEntry, groupId,
+					displayDate, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_LtD_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, false);
+			array[2] = getByG_LtD_S_PrevAndNext(session, blogsEntry, groupId,
+					displayDate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -14932,16 +14233,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_LtD_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, Date displayDate,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry getByG_LtD_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -14966,8 +14265,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_LTD_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -15043,9 +14341,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -15069,19 +14366,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_LtD_S(
-		long groupId, Date displayDate, int status) {
-
-		return filterFindByG_LtD_S(
-			groupId, displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> filterFindByG_LtD_S(long groupId, Date displayDate,
+		int status) {
+		return filterFindByG_LtD_S(groupId, displayDate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -15092,18 +14387,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_LtD_S(
-		long groupId, Date displayDate, int status, int start, int end) {
-
-		return filterFindByG_LtD_S(
-			groupId, displayDate, status, start, end, null);
+	public List<BlogsEntry> filterFindByG_LtD_S(long groupId, Date displayDate,
+		int status, int start, int end) {
+		return filterFindByG_LtD_S(groupId, displayDate, status, start, end,
+			null);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -15115,20 +14409,19 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_LtD_S(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> filterFindByG_LtD_S(long groupId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_LtD_S(
-				groupId, displayDate, status, start, end, orderByComparator);
+			return findByG_LtD_S(groupId, displayDate, status, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -15138,8 +14431,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_LTD_S_GROUPID_2);
@@ -15158,18 +14450,17 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_LTD_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -15181,9 +14472,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -15209,8 +14500,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(status);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -15232,14 +14522,13 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_LtD_S_PrevAndNext(
-			long entryId, long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_LtD_S_PrevAndNext(long entryId,
+		long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_LtD_S_PrevAndNext(
-				entryId, groupId, displayDate, status, orderByComparator);
+			return findByG_LtD_S_PrevAndNext(entryId, groupId, displayDate,
+				status, orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -15251,15 +14540,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_LtD_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, true);
+			array[0] = filterGetByG_LtD_S_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_LtD_S_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, false);
+			array[2] = filterGetByG_LtD_S_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -15271,16 +14558,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_LtD_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, Date displayDate,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry filterGetByG_LtD_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -15291,8 +14576,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_LTD_S_GROUPID_2);
@@ -15311,13 +14595,11 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_LTD_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -15325,17 +14607,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -15361,15 +14639,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -15398,9 +14674,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -15425,9 +14701,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -15451,11 +14726,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByG_LtD_S(long groupId, Date displayDate, int status) {
-		for (BlogsEntry blogsEntry :
-				findByG_LtD_S(
-					groupId, displayDate, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByG_LtD_S(groupId, displayDate,
+				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -15473,8 +14745,8 @@ public class BlogsEntryPersistenceImpl
 		FinderPath finderPath = _finderPathWithPaginationCountByG_LtD_S;
 
 		Object[] finderArgs = new Object[] {
-			groupId, _getTime(displayDate), status
-		};
+				groupId, _getTime(displayDate), status
+			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -15543,9 +14815,7 @@ public class BlogsEntryPersistenceImpl
 	 * @return the number of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_LtD_S(
-		long groupId, Date displayDate, int status) {
-
+	public int filterCountByG_LtD_S(long groupId, Date displayDate, int status) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_LtD_S(groupId, displayDate, status);
 		}
@@ -15569,9 +14839,9 @@ public class BlogsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_LTD_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -15580,8 +14850,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -15605,18 +14875,10 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_LTD_S_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_LTD_S_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL AND ";
-
-	private static final String _FINDER_COLUMN_G_LTD_S_DISPLAYDATE_2 =
-		"blogsEntry.displayDate < ? AND ";
-
-	private static final String _FINDER_COLUMN_G_LTD_S_STATUS_2 =
-		"blogsEntry.status = ?";
-
+	private static final String _FINDER_COLUMN_G_LTD_S_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_LTD_S_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL AND ";
+	private static final String _FINDER_COLUMN_G_LTD_S_DISPLAYDATE_2 = "blogsEntry.displayDate < ? AND ";
+	private static final String _FINDER_COLUMN_G_LTD_S_STATUS_2 = "blogsEntry.status = ?";
 	private FinderPath _finderPathWithPaginationFindByG_LtD_NotS;
 	private FinderPath _finderPathWithPaginationCountByG_LtD_NotS;
 
@@ -15629,19 +14891,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_LtD_NotS(
-		long groupId, Date displayDate, int status) {
-
-		return findByG_LtD_NotS(
-			groupId, displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> findByG_LtD_NotS(long groupId, Date displayDate,
+		int status) {
+		return findByG_LtD_NotS(groupId, displayDate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -15652,9 +14912,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_LtD_NotS(
-		long groupId, Date displayDate, int status, int start, int end) {
-
+	public List<BlogsEntry> findByG_LtD_NotS(long groupId, Date displayDate,
+		int status, int start, int end) {
 		return findByG_LtD_NotS(groupId, displayDate, status, start, end, null);
 	}
 
@@ -15662,7 +14921,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -15674,19 +14933,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_LtD_NotS(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByG_LtD_NotS(long groupId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_LtD_NotS(
-			groupId, displayDate, status, start, end, orderByComparator, true);
+		return findByG_LtD_NotS(groupId, displayDate, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -15699,34 +14957,33 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_LtD_NotS(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByG_LtD_NotS(long groupId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_LtD_NotS;
 		finderArgs = new Object[] {
-			groupId, _getTime(displayDate), status, start, end,
-			orderByComparator
-		};
+				groupId, _getTime(displayDate), status,
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(displayDate.getTime() <=
-							blogsEntry.getDisplayDate().getTime()) ||
-						(status == blogsEntry.getStatus())) {
-
+							(displayDate.getTime() <= blogsEntry.getDisplayDate()
+																	.getTime()) ||
+							(status == blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -15739,8 +14996,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -15764,10 +15021,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_LTD_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -15791,16 +15049,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -15831,13 +15089,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_LtD_NotS_First(
-			long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_LtD_NotS_First(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_LtD_NotS_First(
-			groupId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_LtD_NotS_First(groupId, displayDate,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -15871,12 +15127,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_LtD_NotS_First(
-		long groupId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_LtD_NotS(
-			groupId, displayDate, status, 0, 1, orderByComparator);
+	public BlogsEntry fetchByG_LtD_NotS_First(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
+		List<BlogsEntry> list = findByG_LtD_NotS(groupId, displayDate, status,
+				0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -15896,13 +15150,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_LtD_NotS_Last(
-			long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_LtD_NotS_Last(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_LtD_NotS_Last(
-			groupId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_LtD_NotS_Last(groupId, displayDate,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -15936,18 +15188,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_LtD_NotS_Last(
-		long groupId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByG_LtD_NotS_Last(long groupId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByG_LtD_NotS(groupId, displayDate, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_LtD_NotS(
-			groupId, displayDate, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByG_LtD_NotS(groupId, displayDate, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -15968,11 +15218,10 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_LtD_NotS_PrevAndNext(
-			long entryId, long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_LtD_NotS_PrevAndNext(long entryId,
+		long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -15982,15 +15231,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_LtD_NotS_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, true);
+			array[0] = getByG_LtD_NotS_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_LtD_NotS_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, false);
+			array[2] = getByG_LtD_NotS_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -16002,16 +15249,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_LtD_NotS_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, Date displayDate,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry getByG_LtD_NotS_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -16036,8 +15281,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_LTD_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -16113,9 +15357,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -16139,19 +15382,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_LtD_NotS(
-		long groupId, Date displayDate, int status) {
-
-		return filterFindByG_LtD_NotS(
-			groupId, displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> filterFindByG_LtD_NotS(long groupId,
+		Date displayDate, int status) {
+		return filterFindByG_LtD_NotS(groupId, displayDate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -16162,18 +15403,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_LtD_NotS(
-		long groupId, Date displayDate, int status, int start, int end) {
-
-		return filterFindByG_LtD_NotS(
-			groupId, displayDate, status, start, end, null);
+	public List<BlogsEntry> filterFindByG_LtD_NotS(long groupId,
+		Date displayDate, int status, int start, int end) {
+		return filterFindByG_LtD_NotS(groupId, displayDate, status, start, end,
+			null);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -16185,20 +15425,19 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_LtD_NotS(
-		long groupId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> filterFindByG_LtD_NotS(long groupId,
+		Date displayDate, int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_LtD_NotS(
-				groupId, displayDate, status, start, end, orderByComparator);
+			return findByG_LtD_NotS(groupId, displayDate, status, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -16208,8 +15447,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_LTD_NOTS_GROUPID_2);
@@ -16228,18 +15466,17 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_LTD_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -16251,9 +15488,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -16279,8 +15516,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(status);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -16302,14 +15538,13 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_LtD_NotS_PrevAndNext(
-			long entryId, long groupId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_LtD_NotS_PrevAndNext(long entryId,
+		long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_LtD_NotS_PrevAndNext(
-				entryId, groupId, displayDate, status, orderByComparator);
+			return findByG_LtD_NotS_PrevAndNext(entryId, groupId, displayDate,
+				status, orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -16321,15 +15556,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_LtD_NotS_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, true);
+			array[0] = filterGetByG_LtD_NotS_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_LtD_NotS_PrevAndNext(
-				session, blogsEntry, groupId, displayDate, status,
-				orderByComparator, false);
+			array[2] = filterGetByG_LtD_NotS_PrevAndNext(session, blogsEntry,
+					groupId, displayDate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -16341,16 +15574,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_LtD_NotS_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, Date displayDate,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry filterGetByG_LtD_NotS_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -16361,8 +15592,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_LTD_NOTS_GROUPID_2);
@@ -16381,13 +15611,11 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_LTD_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -16395,17 +15623,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -16431,15 +15655,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -16468,9 +15690,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -16495,9 +15717,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -16521,11 +15742,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByG_LtD_NotS(long groupId, Date displayDate, int status) {
-		for (BlogsEntry blogsEntry :
-				findByG_LtD_NotS(
-					groupId, displayDate, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByG_LtD_NotS(groupId, displayDate,
+				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -16543,8 +15761,8 @@ public class BlogsEntryPersistenceImpl
 		FinderPath finderPath = _finderPathWithPaginationCountByG_LtD_NotS;
 
 		Object[] finderArgs = new Object[] {
-			groupId, _getTime(displayDate), status
-		};
+				groupId, _getTime(displayDate), status
+			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -16613,9 +15831,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the number of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_LtD_NotS(
-		long groupId, Date displayDate, int status) {
-
+	public int filterCountByG_LtD_NotS(long groupId, Date displayDate,
+		int status) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_LtD_NotS(groupId, displayDate, status);
 		}
@@ -16639,9 +15856,9 @@ public class BlogsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_LTD_NOTS_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -16650,8 +15867,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -16675,18 +15892,10 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_LTD_NOTS_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_LTD_NOTS_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL AND ";
-
-	private static final String _FINDER_COLUMN_G_LTD_NOTS_DISPLAYDATE_2 =
-		"blogsEntry.displayDate < ? AND ";
-
-	private static final String _FINDER_COLUMN_G_LTD_NOTS_STATUS_2 =
-		"blogsEntry.status != ?";
-
+	private static final String _FINDER_COLUMN_G_LTD_NOTS_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_LTD_NOTS_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL AND ";
+	private static final String _FINDER_COLUMN_G_LTD_NOTS_DISPLAYDATE_2 = "blogsEntry.displayDate < ? AND ";
+	private static final String _FINDER_COLUMN_G_LTD_NOTS_STATUS_2 = "blogsEntry.status != ?";
 	private FinderPath _finderPathWithPaginationFindByC_U_S;
 	private FinderPath _finderPathWithoutPaginationFindByC_U_S;
 	private FinderPath _finderPathCountByC_U_S;
@@ -16700,19 +15909,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_U_S(
-		long companyId, long userId, int status) {
-
-		return findByC_U_S(
-			companyId, userId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> findByC_U_S(long companyId, long userId, int status) {
+		return findByC_U_S(companyId, userId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where companyId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -16723,9 +15929,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_U_S(
-		long companyId, long userId, int status, int start, int end) {
-
+	public List<BlogsEntry> findByC_U_S(long companyId, long userId,
+		int status, int start, int end) {
 		return findByC_U_S(companyId, userId, status, start, end, null);
 	}
 
@@ -16733,7 +15938,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -16745,19 +15950,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_U_S(
-		long companyId, long userId, int status, int start, int end,
+	public List<BlogsEntry> findByC_U_S(long companyId, long userId,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByC_U_S(
-			companyId, userId, status, start, end, orderByComparator, true);
+		return findByC_U_S(companyId, userId, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -16770,41 +15974,40 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_U_S(
-		long companyId, long userId, int status, int start, int end,
+	public List<BlogsEntry> findByC_U_S(long companyId, long userId,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_U_S;
-			finderArgs = new Object[] {companyId, userId, status};
+			finderArgs = new Object[] { companyId, userId, status };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_U_S;
 			finderArgs = new Object[] {
-				companyId, userId, status, start, end, orderByComparator
-			};
+					companyId, userId, status,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((companyId != blogsEntry.getCompanyId()) ||
-						(userId != blogsEntry.getUserId()) ||
-						(status != blogsEntry.getStatus())) {
-
+							(userId != blogsEntry.getUserId()) ||
+							(status != blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -16817,8 +16020,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -16833,10 +16036,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_U_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -16858,16 +16062,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -16898,13 +16102,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_U_S_First(
-			long companyId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_U_S_First(long companyId, long userId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_U_S_First(
-			companyId, userId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_U_S_First(companyId, userId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -16938,12 +16140,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_U_S_First(
-		long companyId, long userId, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByC_U_S(
-			companyId, userId, status, 0, 1, orderByComparator);
+	public BlogsEntry fetchByC_U_S_First(long companyId, long userId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
+		List<BlogsEntry> list = findByC_U_S(companyId, userId, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -16963,13 +16163,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_U_S_Last(
-			long companyId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_U_S_Last(long companyId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_U_S_Last(
-			companyId, userId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_U_S_Last(companyId, userId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -17003,18 +16201,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_U_S_Last(
-		long companyId, long userId, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByC_U_S_Last(long companyId, long userId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByC_U_S(companyId, userId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByC_U_S(
-			companyId, userId, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByC_U_S(companyId, userId, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -17035,11 +16231,9 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByC_U_S_PrevAndNext(
-			long entryId, long companyId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByC_U_S_PrevAndNext(long entryId, long companyId,
+		long userId, int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -17049,15 +16243,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByC_U_S_PrevAndNext(
-				session, blogsEntry, companyId, userId, status,
-				orderByComparator, true);
+			array[0] = getByC_U_S_PrevAndNext(session, blogsEntry, companyId,
+					userId, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByC_U_S_PrevAndNext(
-				session, blogsEntry, companyId, userId, status,
-				orderByComparator, false);
+			array[2] = getByC_U_S_PrevAndNext(session, blogsEntry, companyId,
+					userId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -17069,16 +16261,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByC_U_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long companyId, long userId,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry getByC_U_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long companyId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -17094,8 +16284,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_U_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -17169,9 +16358,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -17195,11 +16383,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByC_U_S(long companyId, long userId, int status) {
-		for (BlogsEntry blogsEntry :
-				findByC_U_S(
-					companyId, userId, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByC_U_S(companyId, userId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -17216,7 +16401,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByC_U_S(long companyId, long userId, int status) {
 		FinderPath finderPath = _finderPathCountByC_U_S;
 
-		Object[] finderArgs = new Object[] {companyId, userId, status};
+		Object[] finderArgs = new Object[] { companyId, userId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -17265,15 +16450,9 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_U_S_COMPANYID_2 =
-		"blogsEntry.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_U_S_USERID_2 =
-		"blogsEntry.userId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_U_S_STATUS_2 =
-		"blogsEntry.status = ?";
-
+	private static final String _FINDER_COLUMN_C_U_S_COMPANYID_2 = "blogsEntry.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_U_S_USERID_2 = "blogsEntry.userId = ? AND ";
+	private static final String _FINDER_COLUMN_C_U_S_STATUS_2 = "blogsEntry.status = ?";
 	private FinderPath _finderPathWithPaginationFindByC_U_NotS;
 	private FinderPath _finderPathWithPaginationCountByC_U_NotS;
 
@@ -17286,19 +16465,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_U_NotS(
-		long companyId, long userId, int status) {
-
-		return findByC_U_NotS(
-			companyId, userId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<BlogsEntry> findByC_U_NotS(long companyId, long userId,
+		int status) {
+		return findByC_U_NotS(companyId, userId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where companyId = &#63; and userId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -17309,9 +16486,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_U_NotS(
-		long companyId, long userId, int status, int start, int end) {
-
+	public List<BlogsEntry> findByC_U_NotS(long companyId, long userId,
+		int status, int start, int end) {
 		return findByC_U_NotS(companyId, userId, status, start, end, null);
 	}
 
@@ -17319,7 +16495,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and userId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -17331,19 +16507,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_U_NotS(
-		long companyId, long userId, int status, int start, int end,
+	public List<BlogsEntry> findByC_U_NotS(long companyId, long userId,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByC_U_NotS(
-			companyId, userId, status, start, end, orderByComparator, true);
+		return findByC_U_NotS(companyId, userId, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and userId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -17356,32 +16531,32 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_U_NotS(
-		long companyId, long userId, int status, int start, int end,
+	public List<BlogsEntry> findByC_U_NotS(long companyId, long userId,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByC_U_NotS;
 		finderArgs = new Object[] {
-			companyId, userId, status, start, end, orderByComparator
-		};
+				companyId, userId, status,
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((companyId != blogsEntry.getCompanyId()) ||
-						(userId != blogsEntry.getUserId()) ||
-						(status == blogsEntry.getStatus())) {
-
+							(userId != blogsEntry.getUserId()) ||
+							(status == blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -17394,8 +16569,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -17410,10 +16585,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_U_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -17435,16 +16611,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -17475,13 +16651,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_U_NotS_First(
-			long companyId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_U_NotS_First(long companyId, long userId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_U_NotS_First(
-			companyId, userId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_U_NotS_First(companyId, userId,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -17515,12 +16689,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_U_NotS_First(
-		long companyId, long userId, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByC_U_NotS(
-			companyId, userId, status, 0, 1, orderByComparator);
+	public BlogsEntry fetchByC_U_NotS_First(long companyId, long userId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
+		List<BlogsEntry> list = findByC_U_NotS(companyId, userId, status, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -17540,13 +16712,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_U_NotS_Last(
-			long companyId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_U_NotS_Last(long companyId, long userId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_U_NotS_Last(
-			companyId, userId, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_U_NotS_Last(companyId, userId, status,
+				orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -17580,18 +16750,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_U_NotS_Last(
-		long companyId, long userId, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByC_U_NotS_Last(long companyId, long userId,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByC_U_NotS(companyId, userId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByC_U_NotS(
-			companyId, userId, status, count - 1, count, orderByComparator);
+		List<BlogsEntry> list = findByC_U_NotS(companyId, userId, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -17612,11 +16780,10 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByC_U_NotS_PrevAndNext(
-			long entryId, long companyId, long userId, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByC_U_NotS_PrevAndNext(long entryId,
+		long companyId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -17626,15 +16793,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByC_U_NotS_PrevAndNext(
-				session, blogsEntry, companyId, userId, status,
-				orderByComparator, true);
+			array[0] = getByC_U_NotS_PrevAndNext(session, blogsEntry,
+					companyId, userId, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByC_U_NotS_PrevAndNext(
-				session, blogsEntry, companyId, userId, status,
-				orderByComparator, false);
+			array[2] = getByC_U_NotS_PrevAndNext(session, blogsEntry,
+					companyId, userId, status, orderByComparator, false);
 
 			return array;
 		}
@@ -17646,16 +16811,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByC_U_NotS_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long companyId, long userId,
-		int status, OrderByComparator<BlogsEntry> orderByComparator,
-		boolean previous) {
-
+	protected BlogsEntry getByC_U_NotS_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long companyId, long userId, int status,
+		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -17671,8 +16834,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_U_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -17746,9 +16908,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -17772,11 +16933,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByC_U_NotS(long companyId, long userId, int status) {
-		for (BlogsEntry blogsEntry :
-				findByC_U_NotS(
-					companyId, userId, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByC_U_NotS(companyId, userId, status,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -17793,7 +16951,7 @@ public class BlogsEntryPersistenceImpl
 	public int countByC_U_NotS(long companyId, long userId, int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByC_U_NotS;
 
-		Object[] finderArgs = new Object[] {companyId, userId, status};
+		Object[] finderArgs = new Object[] { companyId, userId, status };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -17842,15 +17000,9 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_U_NOTS_COMPANYID_2 =
-		"blogsEntry.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_U_NOTS_USERID_2 =
-		"blogsEntry.userId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_U_NOTS_STATUS_2 =
-		"blogsEntry.status != ?";
-
+	private static final String _FINDER_COLUMN_C_U_NOTS_COMPANYID_2 = "blogsEntry.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_U_NOTS_USERID_2 = "blogsEntry.userId = ? AND ";
+	private static final String _FINDER_COLUMN_C_U_NOTS_STATUS_2 = "blogsEntry.status != ?";
 	private FinderPath _finderPathWithPaginationFindByC_LtD_S;
 	private FinderPath _finderPathWithPaginationCountByC_LtD_S;
 
@@ -17863,11 +17015,9 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_LtD_S(
-		long companyId, Date displayDate, int status) {
-
-		return findByC_LtD_S(
-			companyId, displayDate, status, QueryUtil.ALL_POS,
+	public List<BlogsEntry> findByC_LtD_S(long companyId, Date displayDate,
+		int status) {
+		return findByC_LtD_S(companyId, displayDate, status, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
 	}
 
@@ -17875,7 +17025,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns a range of all the blogs entries where companyId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -17886,9 +17036,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_LtD_S(
-		long companyId, Date displayDate, int status, int start, int end) {
-
+	public List<BlogsEntry> findByC_LtD_S(long companyId, Date displayDate,
+		int status, int start, int end) {
 		return findByC_LtD_S(companyId, displayDate, status, start, end, null);
 	}
 
@@ -17896,7 +17045,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -17908,20 +17057,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_LtD_S(
-		long companyId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByC_LtD_S(long companyId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByC_LtD_S(
-			companyId, displayDate, status, start, end, orderByComparator,
-			true);
+		return findByC_LtD_S(companyId, displayDate, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -17934,34 +17081,33 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_LtD_S(
-		long companyId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByC_LtD_S(long companyId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByC_LtD_S;
 		finderArgs = new Object[] {
-			companyId, _getTime(displayDate), status, start, end,
-			orderByComparator
-		};
+				companyId, _getTime(displayDate), status,
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((companyId != blogsEntry.getCompanyId()) ||
-						(displayDate.getTime() <=
-							blogsEntry.getDisplayDate().getTime()) ||
-						(status != blogsEntry.getStatus())) {
-
+							(displayDate.getTime() <= blogsEntry.getDisplayDate()
+																	.getTime()) ||
+							(status != blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -17974,8 +17120,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -17999,10 +17145,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_LTD_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -18026,16 +17173,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -18066,13 +17213,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_LtD_S_First(
-			long companyId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_LtD_S_First(long companyId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_LtD_S_First(
-			companyId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_LtD_S_First(companyId, displayDate,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -18106,12 +17251,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_LtD_S_First(
-		long companyId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByC_LtD_S(
-			companyId, displayDate, status, 0, 1, orderByComparator);
+	public BlogsEntry fetchByC_LtD_S_First(long companyId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
+		List<BlogsEntry> list = findByC_LtD_S(companyId, displayDate, status,
+				0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -18131,13 +17274,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_LtD_S_Last(
-			long companyId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_LtD_S_Last(long companyId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_LtD_S_Last(
-			companyId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_LtD_S_Last(companyId, displayDate,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -18171,19 +17312,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_LtD_S_Last(
-		long companyId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByC_LtD_S_Last(long companyId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByC_LtD_S(companyId, displayDate, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByC_LtD_S(
-			companyId, displayDate, status, count - 1, count,
-			orderByComparator);
+		List<BlogsEntry> list = findByC_LtD_S(companyId, displayDate, status,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -18204,11 +17342,10 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByC_LtD_S_PrevAndNext(
-			long entryId, long companyId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByC_LtD_S_PrevAndNext(long entryId, long companyId,
+		Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -18218,15 +17355,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByC_LtD_S_PrevAndNext(
-				session, blogsEntry, companyId, displayDate, status,
-				orderByComparator, true);
+			array[0] = getByC_LtD_S_PrevAndNext(session, blogsEntry, companyId,
+					displayDate, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByC_LtD_S_PrevAndNext(
-				session, blogsEntry, companyId, displayDate, status,
-				orderByComparator, false);
+			array[2] = getByC_LtD_S_PrevAndNext(session, blogsEntry, companyId,
+					displayDate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -18238,16 +17373,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByC_LtD_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long companyId,
-		Date displayDate, int status,
+	protected BlogsEntry getByC_LtD_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long companyId, Date displayDate, int status,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -18272,8 +17405,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_LTD_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -18349,9 +17481,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -18375,11 +17506,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByC_LtD_S(long companyId, Date displayDate, int status) {
-		for (BlogsEntry blogsEntry :
-				findByC_LtD_S(
-					companyId, displayDate, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (BlogsEntry blogsEntry : findByC_LtD_S(companyId, displayDate,
+				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -18397,8 +17525,8 @@ public class BlogsEntryPersistenceImpl
 		FinderPath finderPath = _finderPathWithPaginationCountByC_LtD_S;
 
 		Object[] finderArgs = new Object[] {
-			companyId, _getTime(displayDate), status
-		};
+				companyId, _getTime(displayDate), status
+			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -18458,18 +17586,10 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_LTD_S_COMPANYID_2 =
-		"blogsEntry.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_LTD_S_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL AND ";
-
-	private static final String _FINDER_COLUMN_C_LTD_S_DISPLAYDATE_2 =
-		"blogsEntry.displayDate < ? AND ";
-
-	private static final String _FINDER_COLUMN_C_LTD_S_STATUS_2 =
-		"blogsEntry.status = ?";
-
+	private static final String _FINDER_COLUMN_C_LTD_S_COMPANYID_2 = "blogsEntry.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_LTD_S_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL AND ";
+	private static final String _FINDER_COLUMN_C_LTD_S_DISPLAYDATE_2 = "blogsEntry.displayDate < ? AND ";
+	private static final String _FINDER_COLUMN_C_LTD_S_STATUS_2 = "blogsEntry.status = ?";
 	private FinderPath _finderPathWithPaginationFindByC_LtD_NotS;
 	private FinderPath _finderPathWithPaginationCountByC_LtD_NotS;
 
@@ -18482,19 +17602,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_LtD_NotS(
-		long companyId, Date displayDate, int status) {
-
-		return findByC_LtD_NotS(
-			companyId, displayDate, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BlogsEntry> findByC_LtD_NotS(long companyId, Date displayDate,
+		int status) {
+		return findByC_LtD_NotS(companyId, displayDate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where companyId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -18505,18 +17623,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_LtD_NotS(
-		long companyId, Date displayDate, int status, int start, int end) {
-
-		return findByC_LtD_NotS(
-			companyId, displayDate, status, start, end, null);
+	public List<BlogsEntry> findByC_LtD_NotS(long companyId, Date displayDate,
+		int status, int start, int end) {
+		return findByC_LtD_NotS(companyId, displayDate, status, start, end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -18528,20 +17644,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_LtD_NotS(
-		long companyId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByC_LtD_NotS(long companyId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByC_LtD_NotS(
-			companyId, displayDate, status, start, end, orderByComparator,
-			true);
+		return findByC_LtD_NotS(companyId, displayDate, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where companyId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -18554,34 +17668,33 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByC_LtD_NotS(
-		long companyId, Date displayDate, int status, int start, int end,
+	public List<BlogsEntry> findByC_LtD_NotS(long companyId, Date displayDate,
+		int status, int start, int end,
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByC_LtD_NotS;
 		finderArgs = new Object[] {
-			companyId, _getTime(displayDate), status, start, end,
-			orderByComparator
-		};
+				companyId, _getTime(displayDate), status,
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((companyId != blogsEntry.getCompanyId()) ||
-						(displayDate.getTime() <=
-							blogsEntry.getDisplayDate().getTime()) ||
-						(status == blogsEntry.getStatus())) {
-
+							(displayDate.getTime() <= blogsEntry.getDisplayDate()
+																	.getTime()) ||
+							(status == blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -18594,8 +17707,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -18619,10 +17732,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_LTD_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -18646,16 +17760,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -18686,13 +17800,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_LtD_NotS_First(
-			long companyId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_LtD_NotS_First(long companyId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_LtD_NotS_First(
-			companyId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_LtD_NotS_First(companyId, displayDate,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -18726,12 +17838,10 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_LtD_NotS_First(
-		long companyId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByC_LtD_NotS(
-			companyId, displayDate, status, 0, 1, orderByComparator);
+	public BlogsEntry fetchByC_LtD_NotS_First(long companyId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
+		List<BlogsEntry> list = findByC_LtD_NotS(companyId, displayDate,
+				status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -18751,13 +17861,11 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByC_LtD_NotS_Last(
-			long companyId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByC_LtD_NotS_Last(long companyId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByC_LtD_NotS_Last(
-			companyId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByC_LtD_NotS_Last(companyId, displayDate,
+				status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -18791,19 +17899,16 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByC_LtD_NotS_Last(
-		long companyId, Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public BlogsEntry fetchByC_LtD_NotS_Last(long companyId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator) {
 		int count = countByC_LtD_NotS(companyId, displayDate, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByC_LtD_NotS(
-			companyId, displayDate, status, count - 1, count,
-			orderByComparator);
+		List<BlogsEntry> list = findByC_LtD_NotS(companyId, displayDate,
+				status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -18824,11 +17929,10 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByC_LtD_NotS_PrevAndNext(
-			long entryId, long companyId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByC_LtD_NotS_PrevAndNext(long entryId,
+		long companyId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -18838,15 +17942,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByC_LtD_NotS_PrevAndNext(
-				session, blogsEntry, companyId, displayDate, status,
-				orderByComparator, true);
+			array[0] = getByC_LtD_NotS_PrevAndNext(session, blogsEntry,
+					companyId, displayDate, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByC_LtD_NotS_PrevAndNext(
-				session, blogsEntry, companyId, displayDate, status,
-				orderByComparator, false);
+			array[2] = getByC_LtD_NotS_PrevAndNext(session, blogsEntry,
+					companyId, displayDate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -18858,16 +17960,14 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByC_LtD_NotS_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long companyId,
-		Date displayDate, int status,
+	protected BlogsEntry getByC_LtD_NotS_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long companyId, Date displayDate, int status,
 		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -18892,8 +17992,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_LTD_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -18969,9 +18068,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -18994,14 +18092,9 @@ public class BlogsEntryPersistenceImpl
 	 * @param status the status
 	 */
 	@Override
-	public void removeByC_LtD_NotS(
-		long companyId, Date displayDate, int status) {
-
-		for (BlogsEntry blogsEntry :
-				findByC_LtD_NotS(
-					companyId, displayDate, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+	public void removeByC_LtD_NotS(long companyId, Date displayDate, int status) {
+		for (BlogsEntry blogsEntry : findByC_LtD_NotS(companyId, displayDate,
+				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -19019,8 +18112,8 @@ public class BlogsEntryPersistenceImpl
 		FinderPath finderPath = _finderPathWithPaginationCountByC_LtD_NotS;
 
 		Object[] finderArgs = new Object[] {
-			companyId, _getTime(displayDate), status
-		};
+				companyId, _getTime(displayDate), status
+			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -19080,18 +18173,10 @@ public class BlogsEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_LTD_NOTS_COMPANYID_2 =
-		"blogsEntry.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_LTD_NOTS_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL AND ";
-
-	private static final String _FINDER_COLUMN_C_LTD_NOTS_DISPLAYDATE_2 =
-		"blogsEntry.displayDate < ? AND ";
-
-	private static final String _FINDER_COLUMN_C_LTD_NOTS_STATUS_2 =
-		"blogsEntry.status != ?";
-
+	private static final String _FINDER_COLUMN_C_LTD_NOTS_COMPANYID_2 = "blogsEntry.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_LTD_NOTS_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL AND ";
+	private static final String _FINDER_COLUMN_C_LTD_NOTS_DISPLAYDATE_2 = "blogsEntry.displayDate < ? AND ";
+	private static final String _FINDER_COLUMN_C_LTD_NOTS_STATUS_2 = "blogsEntry.status != ?";
 	private FinderPath _finderPathWithPaginationFindByG_U_LtD_S;
 	private FinderPath _finderPathWithPaginationCountByG_U_LtD_S;
 
@@ -19105,19 +18190,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD_S(
-		long groupId, long userId, Date displayDate, int status) {
-
-		return findByG_U_LtD_S(
-			groupId, userId, displayDate, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BlogsEntry> findByG_U_LtD_S(long groupId, long userId,
+		Date displayDate, int status) {
+		return findByG_U_LtD_S(groupId, userId, displayDate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and userId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -19129,19 +18212,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD_S(
-		long groupId, long userId, Date displayDate, int status, int start,
-		int end) {
-
-		return findByG_U_LtD_S(
-			groupId, userId, displayDate, status, start, end, null);
+	public List<BlogsEntry> findByG_U_LtD_S(long groupId, long userId,
+		Date displayDate, int status, int start, int end) {
+		return findByG_U_LtD_S(groupId, userId, displayDate, status, start,
+			end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -19154,20 +18235,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD_S(
-		long groupId, long userId, Date displayDate, int status, int start,
-		int end, OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_U_LtD_S(
-			groupId, userId, displayDate, status, start, end, orderByComparator,
-			true);
+	public List<BlogsEntry> findByG_U_LtD_S(long groupId, long userId,
+		Date displayDate, int status, int start, int end,
+		OrderByComparator<BlogsEntry> orderByComparator) {
+		return findByG_U_LtD_S(groupId, userId, displayDate, status, start,
+			end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -19181,35 +18260,34 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD_S(
-		long groupId, long userId, Date displayDate, int status, int start,
-		int end, OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByG_U_LtD_S(long groupId, long userId,
+		Date displayDate, int status, int start, int end,
+		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_U_LtD_S;
 		finderArgs = new Object[] {
-			groupId, userId, _getTime(displayDate), status, start, end,
-			orderByComparator
-		};
+				groupId, userId, _getTime(displayDate), status,
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(userId != blogsEntry.getUserId()) ||
-						(displayDate.getTime() <=
-							blogsEntry.getDisplayDate().getTime()) ||
-						(status != blogsEntry.getStatus())) {
-
+							(userId != blogsEntry.getUserId()) ||
+							(displayDate.getTime() <= blogsEntry.getDisplayDate()
+																	.getTime()) ||
+							(status != blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -19222,8 +18300,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					6 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -19249,10 +18327,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_U_LTD_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -19278,16 +18357,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -19319,13 +18398,12 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_U_LtD_S_First(
-			long groupId, long userId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_U_LtD_S_First(long groupId, long userId,
+		Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_U_LtD_S_First(
-			groupId, userId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_U_LtD_S_First(groupId, userId,
+				displayDate, status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -19363,12 +18441,11 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_U_LtD_S_First(
-		long groupId, long userId, Date displayDate, int status,
+	public BlogsEntry fetchByG_U_LtD_S_First(long groupId, long userId,
+		Date displayDate, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_U_LtD_S(
-			groupId, userId, displayDate, status, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByG_U_LtD_S(groupId, userId, displayDate,
+				status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -19389,13 +18466,12 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_U_LtD_S_Last(
-			long groupId, long userId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_U_LtD_S_Last(long groupId, long userId,
+		Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_U_LtD_S_Last(
-			groupId, userId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_U_LtD_S_Last(groupId, userId,
+				displayDate, status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -19433,19 +18509,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_U_LtD_S_Last(
-		long groupId, long userId, Date displayDate, int status,
+	public BlogsEntry fetchByG_U_LtD_S_Last(long groupId, long userId,
+		Date displayDate, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByG_U_LtD_S(groupId, userId, displayDate, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_U_LtD_S(
-			groupId, userId, displayDate, status, count - 1, count,
-			orderByComparator);
+		List<BlogsEntry> list = findByG_U_LtD_S(groupId, userId, displayDate,
+				status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -19467,11 +18541,10 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_U_LtD_S_PrevAndNext(
-			long entryId, long groupId, long userId, Date displayDate,
-			int status, OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_U_LtD_S_PrevAndNext(long entryId, long groupId,
+		long userId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -19481,15 +18554,13 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_U_LtD_S_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate, status,
-				orderByComparator, true);
+			array[0] = getByG_U_LtD_S_PrevAndNext(session, blogsEntry, groupId,
+					userId, displayDate, status, orderByComparator, true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_U_LtD_S_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate, status,
-				orderByComparator, false);
+			array[2] = getByG_U_LtD_S_PrevAndNext(session, blogsEntry, groupId,
+					userId, displayDate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -19501,16 +18572,15 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_U_LtD_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, long userId,
-		Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
+	protected BlogsEntry getByG_U_LtD_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, long userId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -19537,8 +18607,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_LTD_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -19616,9 +18685,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -19643,19 +18711,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_LtD_S(
-		long groupId, long userId, Date displayDate, int status) {
-
-		return filterFindByG_U_LtD_S(
-			groupId, userId, displayDate, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BlogsEntry> filterFindByG_U_LtD_S(long groupId, long userId,
+		Date displayDate, int status) {
+		return filterFindByG_U_LtD_S(groupId, userId, displayDate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and userId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -19667,19 +18733,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_LtD_S(
-		long groupId, long userId, Date displayDate, int status, int start,
-		int end) {
-
-		return filterFindByG_U_LtD_S(
-			groupId, userId, displayDate, status, start, end, null);
+	public List<BlogsEntry> filterFindByG_U_LtD_S(long groupId, long userId,
+		Date displayDate, int status, int start, int end) {
+		return filterFindByG_U_LtD_S(groupId, userId, displayDate, status,
+			start, end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and userId = &#63; and displayDate &lt; &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -19692,21 +18756,19 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_LtD_S(
-		long groupId, long userId, Date displayDate, int status, int start,
-		int end, OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public List<BlogsEntry> filterFindByG_U_LtD_S(long groupId, long userId,
+		Date displayDate, int status, int start, int end,
+		OrderByComparator<BlogsEntry> orderByComparator) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_LtD_S(
-				groupId, userId, displayDate, status, start, end,
-				orderByComparator);
+			return findByG_U_LtD_S(groupId, userId, displayDate, status, start,
+				end, orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -19716,8 +18778,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_LTD_S_GROUPID_2);
@@ -19738,18 +18799,17 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_LTD_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -19761,9 +18821,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -19791,8 +18851,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(status);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -19815,15 +18874,13 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_U_LtD_S_PrevAndNext(
-			long entryId, long groupId, long userId, Date displayDate,
-			int status, OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_U_LtD_S_PrevAndNext(long entryId,
+		long groupId, long userId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_LtD_S_PrevAndNext(
-				entryId, groupId, userId, displayDate, status,
-				orderByComparator);
+			return findByG_U_LtD_S_PrevAndNext(entryId, groupId, userId,
+				displayDate, status, orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -19835,15 +18892,15 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_U_LtD_S_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate, status,
-				orderByComparator, true);
+			array[0] = filterGetByG_U_LtD_S_PrevAndNext(session, blogsEntry,
+					groupId, userId, displayDate, status, orderByComparator,
+					true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_U_LtD_S_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate, status,
-				orderByComparator, false);
+			array[2] = filterGetByG_U_LtD_S_PrevAndNext(session, blogsEntry,
+					groupId, userId, displayDate, status, orderByComparator,
+					false);
 
 			return array;
 		}
@@ -19855,16 +18912,15 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_U_LtD_S_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, long userId,
-		Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
+	protected BlogsEntry filterGetByG_U_LtD_S_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, long userId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(8 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -19875,8 +18931,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_LTD_S_GROUPID_2);
@@ -19897,13 +18952,11 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_LTD_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -19911,17 +18964,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -19947,15 +18996,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -19984,9 +19031,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -20013,9 +19060,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -20039,14 +19085,10 @@ public class BlogsEntryPersistenceImpl
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_U_LtD_S(
-		long groupId, long userId, Date displayDate, int status) {
-
-		for (BlogsEntry blogsEntry :
-				findByG_U_LtD_S(
-					groupId, userId, displayDate, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+	public void removeByG_U_LtD_S(long groupId, long userId, Date displayDate,
+		int status) {
+		for (BlogsEntry blogsEntry : findByG_U_LtD_S(groupId, userId,
+				displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -20061,14 +19103,13 @@ public class BlogsEntryPersistenceImpl
 	 * @return the number of matching blogs entries
 	 */
 	@Override
-	public int countByG_U_LtD_S(
-		long groupId, long userId, Date displayDate, int status) {
-
+	public int countByG_U_LtD_S(long groupId, long userId, Date displayDate,
+		int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByG_U_LtD_S;
 
 		Object[] finderArgs = new Object[] {
-			groupId, userId, _getTime(displayDate), status
-		};
+				groupId, userId, _getTime(displayDate), status
+			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -20142,9 +19183,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the number of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_U_LtD_S(
-		long groupId, long userId, Date displayDate, int status) {
-
+	public int filterCountByG_U_LtD_S(long groupId, long userId,
+		Date displayDate, int status) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_U_LtD_S(groupId, userId, displayDate, status);
 		}
@@ -20170,9 +19210,9 @@ public class BlogsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_U_LTD_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -20181,8 +19221,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -20208,21 +19248,11 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_U_LTD_S_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_LTD_S_USERID_2 =
-		"blogsEntry.userId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_LTD_S_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL AND ";
-
-	private static final String _FINDER_COLUMN_G_U_LTD_S_DISPLAYDATE_2 =
-		"blogsEntry.displayDate < ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_LTD_S_STATUS_2 =
-		"blogsEntry.status = ?";
-
+	private static final String _FINDER_COLUMN_G_U_LTD_S_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_LTD_S_USERID_2 = "blogsEntry.userId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_LTD_S_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL AND ";
+	private static final String _FINDER_COLUMN_G_U_LTD_S_DISPLAYDATE_2 = "blogsEntry.displayDate < ? AND ";
+	private static final String _FINDER_COLUMN_G_U_LTD_S_STATUS_2 = "blogsEntry.status = ?";
 	private FinderPath _finderPathWithPaginationFindByG_U_LtD_NotS;
 	private FinderPath _finderPathWithPaginationCountByG_U_LtD_NotS;
 
@@ -20236,19 +19266,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD_NotS(
-		long groupId, long userId, Date displayDate, int status) {
-
-		return findByG_U_LtD_NotS(
-			groupId, userId, displayDate, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BlogsEntry> findByG_U_LtD_NotS(long groupId, long userId,
+		Date displayDate, int status) {
+		return findByG_U_LtD_NotS(groupId, userId, displayDate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries where groupId = &#63; and userId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -20260,19 +19288,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD_NotS(
-		long groupId, long userId, Date displayDate, int status, int start,
-		int end) {
-
-		return findByG_U_LtD_NotS(
-			groupId, userId, displayDate, status, start, end, null);
+	public List<BlogsEntry> findByG_U_LtD_NotS(long groupId, long userId,
+		Date displayDate, int status, int start, int end) {
+		return findByG_U_LtD_NotS(groupId, userId, displayDate, status, start,
+			end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -20285,20 +19311,18 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD_NotS(
-		long groupId, long userId, Date displayDate, int status, int start,
-		int end, OrderByComparator<BlogsEntry> orderByComparator) {
-
-		return findByG_U_LtD_NotS(
-			groupId, userId, displayDate, status, start, end, orderByComparator,
-			true);
+	public List<BlogsEntry> findByG_U_LtD_NotS(long groupId, long userId,
+		Date displayDate, int status, int start, int end,
+		OrderByComparator<BlogsEntry> orderByComparator) {
+		return findByG_U_LtD_NotS(groupId, userId, displayDate, status, start,
+			end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries where groupId = &#63; and userId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -20312,35 +19336,34 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findByG_U_LtD_NotS(
-		long groupId, long userId, Date displayDate, int status, int start,
-		int end, OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findByG_U_LtD_NotS(long groupId, long userId,
+		Date displayDate, int status, int start, int end,
+		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_U_LtD_NotS;
 		finderArgs = new Object[] {
-			groupId, userId, _getTime(displayDate), status, start, end,
-			orderByComparator
-		};
+				groupId, userId, _getTime(displayDate), status,
+				
+				start, end, orderByComparator
+			};
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
 					if ((groupId != blogsEntry.getGroupId()) ||
-						(userId != blogsEntry.getUserId()) ||
-						(displayDate.getTime() <=
-							blogsEntry.getDisplayDate().getTime()) ||
-						(status == blogsEntry.getStatus())) {
-
+							(userId != blogsEntry.getUserId()) ||
+							(displayDate.getTime() <= blogsEntry.getDisplayDate()
+																	.getTime()) ||
+							(status == blogsEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -20353,8 +19376,8 @@ public class BlogsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					6 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -20380,10 +19403,11 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_U_LTD_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(BlogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -20409,16 +19433,16 @@ public class BlogsEntryPersistenceImpl
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -20450,13 +19474,12 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_U_LtD_NotS_First(
-			long groupId, long userId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_U_LtD_NotS_First(long groupId, long userId,
+		Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_U_LtD_NotS_First(
-			groupId, userId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_U_LtD_NotS_First(groupId, userId,
+				displayDate, status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -20494,12 +19517,11 @@ public class BlogsEntryPersistenceImpl
 	 * @return the first matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_U_LtD_NotS_First(
-		long groupId, long userId, Date displayDate, int status,
+	public BlogsEntry fetchByG_U_LtD_NotS_First(long groupId, long userId,
+		Date displayDate, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
-		List<BlogsEntry> list = findByG_U_LtD_NotS(
-			groupId, userId, displayDate, status, 0, 1, orderByComparator);
+		List<BlogsEntry> list = findByG_U_LtD_NotS(groupId, userId,
+				displayDate, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -20520,13 +19542,12 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry findByG_U_LtD_NotS_Last(
-			long groupId, long userId, Date displayDate, int status,
-			OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry findByG_U_LtD_NotS_Last(long groupId, long userId,
+		Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		BlogsEntry blogsEntry = fetchByG_U_LtD_NotS_Last(
-			groupId, userId, displayDate, status, orderByComparator);
+		BlogsEntry blogsEntry = fetchByG_U_LtD_NotS_Last(groupId, userId,
+				displayDate, status, orderByComparator);
 
 		if (blogsEntry != null) {
 			return blogsEntry;
@@ -20564,19 +19585,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the last matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchByG_U_LtD_NotS_Last(
-		long groupId, long userId, Date displayDate, int status,
+	public BlogsEntry fetchByG_U_LtD_NotS_Last(long groupId, long userId,
+		Date displayDate, int status,
 		OrderByComparator<BlogsEntry> orderByComparator) {
-
 		int count = countByG_U_LtD_NotS(groupId, userId, displayDate, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BlogsEntry> list = findByG_U_LtD_NotS(
-			groupId, userId, displayDate, status, count - 1, count,
-			orderByComparator);
+		List<BlogsEntry> list = findByG_U_LtD_NotS(groupId, userId,
+				displayDate, status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -20598,11 +19617,10 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] findByG_U_LtD_NotS_PrevAndNext(
-			long entryId, long groupId, long userId, Date displayDate,
-			int status, OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] findByG_U_LtD_NotS_PrevAndNext(long entryId,
+		long groupId, long userId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -20612,15 +19630,15 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = getByG_U_LtD_NotS_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate, status,
-				orderByComparator, true);
+			array[0] = getByG_U_LtD_NotS_PrevAndNext(session, blogsEntry,
+					groupId, userId, displayDate, status, orderByComparator,
+					true);
 
 			array[1] = blogsEntry;
 
-			array[2] = getByG_U_LtD_NotS_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate, status,
-				orderByComparator, false);
+			array[2] = getByG_U_LtD_NotS_PrevAndNext(session, blogsEntry,
+					groupId, userId, displayDate, status, orderByComparator,
+					false);
 
 			return array;
 		}
@@ -20632,16 +19650,15 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry getByG_U_LtD_NotS_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, long userId,
-		Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
+	protected BlogsEntry getByG_U_LtD_NotS_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, long userId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -20668,8 +19685,7 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_LTD_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -20747,9 +19763,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -20774,19 +19789,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_LtD_NotS(
-		long groupId, long userId, Date displayDate, int status) {
-
-		return filterFindByG_U_LtD_NotS(
-			groupId, userId, displayDate, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BlogsEntry> filterFindByG_U_LtD_NotS(long groupId, long userId,
+		Date displayDate, int status) {
+		return filterFindByG_U_LtD_NotS(groupId, userId, displayDate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the blogs entries that the user has permission to view where groupId = &#63; and userId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -20798,19 +19811,17 @@ public class BlogsEntryPersistenceImpl
 	 * @return the range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_LtD_NotS(
-		long groupId, long userId, Date displayDate, int status, int start,
-		int end) {
-
-		return filterFindByG_U_LtD_NotS(
-			groupId, userId, displayDate, status, start, end, null);
+	public List<BlogsEntry> filterFindByG_U_LtD_NotS(long groupId, long userId,
+		Date displayDate, int status, int start, int end) {
+		return filterFindByG_U_LtD_NotS(groupId, userId, displayDate, status,
+			start, end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the blogs entries that the user has permissions to view where groupId = &#63; and userId = &#63; and displayDate &lt; &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -20823,21 +19834,19 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public List<BlogsEntry> filterFindByG_U_LtD_NotS(
-		long groupId, long userId, Date displayDate, int status, int start,
-		int end, OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public List<BlogsEntry> filterFindByG_U_LtD_NotS(long groupId, long userId,
+		Date displayDate, int status, int start, int end,
+		OrderByComparator<BlogsEntry> orderByComparator) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_LtD_NotS(
-				groupId, userId, displayDate, status, start, end,
-				orderByComparator);
+			return findByG_U_LtD_NotS(groupId, userId, displayDate, status,
+				start, end, orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -20847,8 +19856,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_LTD_NOTS_GROUPID_2);
@@ -20869,18 +19877,17 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_LTD_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -20892,9 +19899,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -20922,8 +19929,7 @@ public class BlogsEntryPersistenceImpl
 
 			qPos.add(status);
 
-			return (List<BlogsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<BlogsEntry>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -20946,15 +19952,13 @@ public class BlogsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry[] filterFindByG_U_LtD_NotS_PrevAndNext(
-			long entryId, long groupId, long userId, Date displayDate,
-			int status, OrderByComparator<BlogsEntry> orderByComparator)
+	public BlogsEntry[] filterFindByG_U_LtD_NotS_PrevAndNext(long entryId,
+		long groupId, long userId, Date displayDate, int status,
+		OrderByComparator<BlogsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_LtD_NotS_PrevAndNext(
-				entryId, groupId, userId, displayDate, status,
-				orderByComparator);
+			return findByG_U_LtD_NotS_PrevAndNext(entryId, groupId, userId,
+				displayDate, status, orderByComparator);
 		}
 
 		BlogsEntry blogsEntry = findByPrimaryKey(entryId);
@@ -20966,15 +19970,15 @@ public class BlogsEntryPersistenceImpl
 
 			BlogsEntry[] array = new BlogsEntryImpl[3];
 
-			array[0] = filterGetByG_U_LtD_NotS_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate, status,
-				orderByComparator, true);
+			array[0] = filterGetByG_U_LtD_NotS_PrevAndNext(session, blogsEntry,
+					groupId, userId, displayDate, status, orderByComparator,
+					true);
 
 			array[1] = blogsEntry;
 
-			array[2] = filterGetByG_U_LtD_NotS_PrevAndNext(
-				session, blogsEntry, groupId, userId, displayDate, status,
-				orderByComparator, false);
+			array[2] = filterGetByG_U_LtD_NotS_PrevAndNext(session, blogsEntry,
+					groupId, userId, displayDate, status, orderByComparator,
+					false);
 
 			return array;
 		}
@@ -20986,16 +19990,15 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	protected BlogsEntry filterGetByG_U_LtD_NotS_PrevAndNext(
-		Session session, BlogsEntry blogsEntry, long groupId, long userId,
-		Date displayDate, int status,
-		OrderByComparator<BlogsEntry> orderByComparator, boolean previous) {
-
+	protected BlogsEntry filterGetByG_U_LtD_NotS_PrevAndNext(Session session,
+		BlogsEntry blogsEntry, long groupId, long userId, Date displayDate,
+		int status, OrderByComparator<BlogsEntry> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(8 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -21006,8 +20009,7 @@ public class BlogsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_LTD_NOTS_GROUPID_2);
@@ -21028,13 +20030,11 @@ public class BlogsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_U_LTD_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -21042,17 +20042,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -21078,15 +20074,13 @@ public class BlogsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -21115,9 +20109,9 @@ public class BlogsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -21144,9 +20138,8 @@ public class BlogsEntryPersistenceImpl
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(blogsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					blogsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -21170,14 +20163,10 @@ public class BlogsEntryPersistenceImpl
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_U_LtD_NotS(
-		long groupId, long userId, Date displayDate, int status) {
-
-		for (BlogsEntry blogsEntry :
-				findByG_U_LtD_NotS(
-					groupId, userId, displayDate, status, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+	public void removeByG_U_LtD_NotS(long groupId, long userId,
+		Date displayDate, int status) {
+		for (BlogsEntry blogsEntry : findByG_U_LtD_NotS(groupId, userId,
+				displayDate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(blogsEntry);
 		}
 	}
@@ -21192,14 +20181,13 @@ public class BlogsEntryPersistenceImpl
 	 * @return the number of matching blogs entries
 	 */
 	@Override
-	public int countByG_U_LtD_NotS(
-		long groupId, long userId, Date displayDate, int status) {
-
+	public int countByG_U_LtD_NotS(long groupId, long userId, Date displayDate,
+		int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByG_U_LtD_NotS;
 
 		Object[] finderArgs = new Object[] {
-			groupId, userId, _getTime(displayDate), status
-		};
+				groupId, userId, _getTime(displayDate), status
+			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -21273,9 +20261,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the number of matching blogs entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_U_LtD_NotS(
-		long groupId, long userId, Date displayDate, int status) {
-
+	public int filterCountByG_U_LtD_NotS(long groupId, long userId,
+		Date displayDate, int status) {
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_U_LtD_NotS(groupId, userId, displayDate, status);
 		}
@@ -21301,9 +20288,9 @@ public class BlogsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_G_U_LTD_NOTS_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), BlogsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				BlogsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -21312,8 +20299,8 @@ public class BlogsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -21339,41 +20326,18 @@ public class BlogsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_U_LTD_NOTS_GROUPID_2 =
-		"blogsEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_LTD_NOTS_USERID_2 =
-		"blogsEntry.userId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_LTD_NOTS_DISPLAYDATE_1 =
-		"blogsEntry.displayDate IS NULL AND ";
-
-	private static final String _FINDER_COLUMN_G_U_LTD_NOTS_DISPLAYDATE_2 =
-		"blogsEntry.displayDate < ? AND ";
-
-	private static final String _FINDER_COLUMN_G_U_LTD_NOTS_STATUS_2 =
-		"blogsEntry.status != ?";
+	private static final String _FINDER_COLUMN_G_U_LTD_NOTS_GROUPID_2 = "blogsEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_LTD_NOTS_USERID_2 = "blogsEntry.userId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_LTD_NOTS_DISPLAYDATE_1 = "blogsEntry.displayDate IS NULL AND ";
+	private static final String _FINDER_COLUMN_G_U_LTD_NOTS_DISPLAYDATE_2 = "blogsEntry.displayDate < ? AND ";
+	private static final String _FINDER_COLUMN_G_U_LTD_NOTS_STATUS_2 = "blogsEntry.status != ?";
 
 	public BlogsEntryPersistenceImpl() {
 		setModelClass(BlogsEntry.class);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("uuid", "uuid_");
-
-		try {
-			Field field = BasePersistenceImpl.class.getDeclaredField(
-				"_dbColumnNames");
-
-			field.setAccessible(true);
-
-			field.set(this, dbColumnNames);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
+		setModelImplClass(BlogsEntryImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -21383,18 +20347,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(BlogsEntry blogsEntry) {
-		entityCache.putResult(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED, BlogsEntryImpl.class,
-			blogsEntry.getPrimaryKey(), blogsEntry);
+		entityCache.putResult(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+			BlogsEntryImpl.class, blogsEntry.getPrimaryKey(), blogsEntry);
 
-		finderCache.putResult(
-			_finderPathFetchByUUID_G,
-			new Object[] {blogsEntry.getUuid(), blogsEntry.getGroupId()},
+		finderCache.putResult(_finderPathFetchByUUID_G,
+			new Object[] { blogsEntry.getUuid(), blogsEntry.getGroupId() },
 			blogsEntry);
 
-		finderCache.putResult(
-			_finderPathFetchByG_UT,
-			new Object[] {blogsEntry.getGroupId(), blogsEntry.getUrlTitle()},
+		finderCache.putResult(_finderPathFetchByG_UT,
+			new Object[] { blogsEntry.getGroupId(), blogsEntry.getUrlTitle() },
 			blogsEntry);
 
 		blogsEntry.resetOriginalValues();
@@ -21409,9 +20370,8 @@ public class BlogsEntryPersistenceImpl
 	public void cacheResult(List<BlogsEntry> blogsEntries) {
 		for (BlogsEntry blogsEntry : blogsEntries) {
 			if (entityCache.getResult(
-					BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-					BlogsEntryImpl.class, blogsEntry.getPrimaryKey()) == null) {
-
+						BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+						BlogsEntryImpl.class, blogsEntry.getPrimaryKey()) == null) {
 				cacheResult(blogsEntry);
 			}
 			else {
@@ -21424,7 +20384,7 @@ public class BlogsEntryPersistenceImpl
 	 * Clears the cache for all blogs entries.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -21440,14 +20400,13 @@ public class BlogsEntryPersistenceImpl
 	 * Clears the cache for the blogs entry.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(BlogsEntry blogsEntry) {
-		entityCache.removeResult(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED, BlogsEntryImpl.class,
-			blogsEntry.getPrimaryKey());
+		entityCache.removeResult(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+			BlogsEntryImpl.class, blogsEntry.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -21461,9 +20420,8 @@ public class BlogsEntryPersistenceImpl
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (BlogsEntry blogsEntry : blogsEntries) {
-			entityCache.removeResult(
-				BlogsEntryModelImpl.ENTITY_CACHE_ENABLED, BlogsEntryImpl.class,
-				blogsEntry.getPrimaryKey());
+			entityCache.removeResult(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryImpl.class, blogsEntry.getPrimaryKey());
 
 			clearUniqueFindersCache((BlogsEntryModelImpl)blogsEntry, true);
 		}
@@ -21471,45 +20429,44 @@ public class BlogsEntryPersistenceImpl
 
 	protected void cacheUniqueFindersCache(
 		BlogsEntryModelImpl blogsEntryModelImpl) {
-
 		Object[] args = new Object[] {
-			blogsEntryModelImpl.getUuid(), blogsEntryModelImpl.getGroupId()
-		};
+				blogsEntryModelImpl.getUuid(), blogsEntryModelImpl.getGroupId()
+			};
 
-		finderCache.putResult(
-			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByUUID_G, args, blogsEntryModelImpl, false);
+		finderCache.putResult(_finderPathCountByUUID_G, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(_finderPathFetchByUUID_G, args,
+			blogsEntryModelImpl, false);
 
 		args = new Object[] {
-			blogsEntryModelImpl.getGroupId(), blogsEntryModelImpl.getUrlTitle()
-		};
+				blogsEntryModelImpl.getGroupId(),
+				blogsEntryModelImpl.getUrlTitle()
+			};
 
-		finderCache.putResult(
-			_finderPathCountByG_UT, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByG_UT, args, blogsEntryModelImpl, false);
+		finderCache.putResult(_finderPathCountByG_UT, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(_finderPathFetchByG_UT, args,
+			blogsEntryModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		BlogsEntryModelImpl blogsEntryModelImpl, boolean clearCurrent) {
-
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-				blogsEntryModelImpl.getUuid(), blogsEntryModelImpl.getGroupId()
-			};
+					blogsEntryModelImpl.getUuid(),
+					blogsEntryModelImpl.getGroupId()
+				};
 
 			finderCache.removeResult(_finderPathCountByUUID_G, args);
 			finderCache.removeResult(_finderPathFetchByUUID_G, args);
 		}
 
 		if ((blogsEntryModelImpl.getColumnBitmask() &
-			 _finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
-
+				_finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
-				blogsEntryModelImpl.getOriginalUuid(),
-				blogsEntryModelImpl.getOriginalGroupId()
-			};
+					blogsEntryModelImpl.getOriginalUuid(),
+					blogsEntryModelImpl.getOriginalGroupId()
+				};
 
 			finderCache.removeResult(_finderPathCountByUUID_G, args);
 			finderCache.removeResult(_finderPathFetchByUUID_G, args);
@@ -21517,21 +20474,20 @@ public class BlogsEntryPersistenceImpl
 
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-				blogsEntryModelImpl.getGroupId(),
-				blogsEntryModelImpl.getUrlTitle()
-			};
+					blogsEntryModelImpl.getGroupId(),
+					blogsEntryModelImpl.getUrlTitle()
+				};
 
 			finderCache.removeResult(_finderPathCountByG_UT, args);
 			finderCache.removeResult(_finderPathFetchByG_UT, args);
 		}
 
 		if ((blogsEntryModelImpl.getColumnBitmask() &
-			 _finderPathFetchByG_UT.getColumnBitmask()) != 0) {
-
+				_finderPathFetchByG_UT.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
-				blogsEntryModelImpl.getOriginalGroupId(),
-				blogsEntryModelImpl.getOriginalUrlTitle()
-			};
+					blogsEntryModelImpl.getOriginalGroupId(),
+					blogsEntryModelImpl.getOriginalUrlTitle()
+				};
 
 			finderCache.removeResult(_finderPathCountByG_UT, args);
 			finderCache.removeResult(_finderPathFetchByG_UT, args);
@@ -21582,22 +20538,21 @@ public class BlogsEntryPersistenceImpl
 	@Override
 	public BlogsEntry remove(Serializable primaryKey)
 		throws NoSuchEntryException {
-
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			BlogsEntry blogsEntry = (BlogsEntry)session.get(
-				BlogsEntryImpl.class, primaryKey);
+			BlogsEntry blogsEntry = (BlogsEntry)session.get(BlogsEntryImpl.class,
+					primaryKey);
 
 			if (blogsEntry == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchEntryException(
-					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				throw new NoSuchEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
 			}
 
 			return remove(blogsEntry);
@@ -21621,8 +20576,8 @@ public class BlogsEntryPersistenceImpl
 			session = openSession();
 
 			if (!session.contains(blogsEntry)) {
-				blogsEntry = (BlogsEntry)session.get(
-					BlogsEntryImpl.class, blogsEntry.getPrimaryKeyObj());
+				blogsEntry = (BlogsEntry)session.get(BlogsEntryImpl.class,
+						blogsEntry.getPrimaryKeyObj());
 			}
 
 			if (blogsEntry != null) {
@@ -21655,16 +20610,15 @@ public class BlogsEntryPersistenceImpl
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in blogsEntry proxy " +
-						invocationHandler.getClass());
+					invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom BlogsEntry implementation " +
-					blogsEntry.getClass());
+				blogsEntry.getClass());
 		}
 
-		BlogsEntryModelImpl blogsEntryModelImpl =
-			(BlogsEntryModelImpl)blogsEntry;
+		BlogsEntryModelImpl blogsEntryModelImpl = (BlogsEntryModelImpl)blogsEntry;
 
 		if (Validator.isNull(blogsEntry.getUuid())) {
 			String uuid = PortalUUIDUtil.generate();
@@ -21672,8 +20626,7 @@ public class BlogsEntryPersistenceImpl
 			blogsEntry.setUuid(uuid);
 		}
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -21709,20 +20662,17 @@ public class BlogsEntryPersistenceImpl
 			}
 
 			try {
-				blogsEntry.setTitle(
-					SanitizerUtil.sanitize(
-						companyId, groupId, userId, BlogsEntry.class.getName(),
-						entryId, ContentTypes.TEXT_PLAIN, Sanitizer.MODE_ALL,
+				blogsEntry.setTitle(SanitizerUtil.sanitize(companyId, groupId,
+						userId, BlogsEntry.class.getName(), entryId,
+						ContentTypes.TEXT_PLAIN, Sanitizer.MODE_ALL,
 						blogsEntry.getTitle(), null));
 
-				blogsEntry.setContent(
-					SanitizerUtil.sanitize(
-						companyId, groupId, userId, BlogsEntry.class.getName(),
-						entryId, ContentTypes.TEXT_HTML, Sanitizer.MODE_ALL,
+				blogsEntry.setContent(SanitizerUtil.sanitize(companyId,
+						groupId, userId, BlogsEntry.class.getName(), entryId,
+						ContentTypes.TEXT_HTML, Sanitizer.MODE_ALL,
 						blogsEntry.getContent(), null));
 
-				blogsEntry.setCoverImageCaption(
-					SanitizerUtil.sanitize(
+				blogsEntry.setCoverImageCaption(SanitizerUtil.sanitize(
 						companyId, groupId, userId, BlogsEntry.class.getName(),
 						entryId, ContentTypes.TEXT_HTML, Sanitizer.MODE_ALL,
 						blogsEntry.getCoverImageCaption(), null));
@@ -21758,322 +20708,302 @@ public class BlogsEntryPersistenceImpl
 		if (!BlogsEntryModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else if (isNew) {
-			Object[] args = new Object[] {blogsEntryModelImpl.getUuid()};
+		else
+		 if (isNew) {
+			Object[] args = new Object[] { blogsEntryModelImpl.getUuid() };
 
 			finderCache.removeResult(_finderPathCountByUuid, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByUuid, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
+				args);
 
 			args = new Object[] {
-				blogsEntryModelImpl.getUuid(),
-				blogsEntryModelImpl.getCompanyId()
-			};
-
-			finderCache.removeResult(_finderPathCountByUuid_C, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByUuid_C, args);
-
-			args = new Object[] {blogsEntryModelImpl.getGroupId()};
-
-			finderCache.removeResult(_finderPathCountByGroupId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByGroupId, args);
-
-			args = new Object[] {blogsEntryModelImpl.getCompanyId()};
-
-			finderCache.removeResult(_finderPathCountByCompanyId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByCompanyId, args);
-
-			args = new Object[] {
-				blogsEntryModelImpl.getGroupId(),
-				blogsEntryModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_S, args);
-
-			args = new Object[] {
-				blogsEntryModelImpl.getCompanyId(),
-				blogsEntryModelImpl.getUserId()
-			};
-
-			finderCache.removeResult(_finderPathCountByC_U, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByC_U, args);
-
-			args = new Object[] {
-				blogsEntryModelImpl.getCompanyId(),
-				blogsEntryModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByC_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByC_S, args);
-
-			args = new Object[] {
-				blogsEntryModelImpl.getGroupId(),
-				blogsEntryModelImpl.getUserId(), blogsEntryModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_U_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_U_S, args);
-
-			args = new Object[] {
-				blogsEntryModelImpl.getGroupId(),
-				blogsEntryModelImpl.getDisplayDate(),
-				blogsEntryModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_D_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_D_S, args);
-
-			args = new Object[] {
-				blogsEntryModelImpl.getCompanyId(),
-				blogsEntryModelImpl.getUserId(), blogsEntryModelImpl.getStatus()
-			};
-
-			finderCache.removeResult(_finderPathCountByC_U_S, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByC_U_S, args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
-		}
-		else {
-			if ((blogsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUuid.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					blogsEntryModelImpl.getOriginalUuid()
-				};
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid, args);
-
-				args = new Object[] {blogsEntryModelImpl.getUuid()};
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid, args);
-			}
-
-			if ((blogsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					blogsEntryModelImpl.getOriginalUuid(),
-					blogsEntryModelImpl.getOriginalCompanyId()
-				};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid_C, args);
-
-				args = new Object[] {
 					blogsEntryModelImpl.getUuid(),
 					blogsEntryModelImpl.getCompanyId()
 				};
 
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid_C, args);
-			}
+			finderCache.removeResult(_finderPathCountByUuid_C, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+				args);
 
-			if ((blogsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByGroupId.
-					 getColumnBitmask()) != 0) {
+			args = new Object[] { blogsEntryModelImpl.getGroupId() };
 
-				Object[] args = new Object[] {
-					blogsEntryModelImpl.getOriginalGroupId()
-				};
+			finderCache.removeResult(_finderPathCountByGroupId, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByGroupId,
+				args);
 
-				finderCache.removeResult(_finderPathCountByGroupId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByGroupId, args);
+			args = new Object[] { blogsEntryModelImpl.getCompanyId() };
 
-				args = new Object[] {blogsEntryModelImpl.getGroupId()};
+			finderCache.removeResult(_finderPathCountByCompanyId, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+				args);
 
-				finderCache.removeResult(_finderPathCountByGroupId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByGroupId, args);
-			}
-
-			if ((blogsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByCompanyId.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					blogsEntryModelImpl.getOriginalCompanyId()
-				};
-
-				finderCache.removeResult(_finderPathCountByCompanyId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByCompanyId, args);
-
-				args = new Object[] {blogsEntryModelImpl.getCompanyId()};
-
-				finderCache.removeResult(_finderPathCountByCompanyId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByCompanyId, args);
-			}
-
-			if ((blogsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					blogsEntryModelImpl.getOriginalGroupId(),
-					blogsEntryModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					blogsEntryModelImpl.getGroupId(),
 					blogsEntryModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByG_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByG_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_S, args);
 
-			if ((blogsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByC_U.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					blogsEntryModelImpl.getOriginalCompanyId(),
-					blogsEntryModelImpl.getOriginalUserId()
-				};
-
-				finderCache.removeResult(_finderPathCountByC_U, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByC_U, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					blogsEntryModelImpl.getCompanyId(),
 					blogsEntryModelImpl.getUserId()
 				};
 
-				finderCache.removeResult(_finderPathCountByC_U, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByC_U, args);
-			}
+			finderCache.removeResult(_finderPathCountByC_U, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByC_U, args);
 
-			if ((blogsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByC_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					blogsEntryModelImpl.getOriginalCompanyId(),
-					blogsEntryModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByC_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByC_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					blogsEntryModelImpl.getCompanyId(),
 					blogsEntryModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByC_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByC_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByC_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByC_S, args);
 
-			if ((blogsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_U_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					blogsEntryModelImpl.getOriginalGroupId(),
-					blogsEntryModelImpl.getOriginalUserId(),
-					blogsEntryModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_U_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_U_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					blogsEntryModelImpl.getGroupId(),
 					blogsEntryModelImpl.getUserId(),
 					blogsEntryModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByG_U_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_U_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByG_U_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_S,
+				args);
 
-			if ((blogsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_D_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					blogsEntryModelImpl.getOriginalGroupId(),
-					blogsEntryModelImpl.getOriginalDisplayDate(),
-					blogsEntryModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_D_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_D_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					blogsEntryModelImpl.getGroupId(),
 					blogsEntryModelImpl.getDisplayDate(),
 					blogsEntryModelImpl.getStatus()
 				};
 
-				finderCache.removeResult(_finderPathCountByG_D_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_D_S, args);
-			}
+			finderCache.removeResult(_finderPathCountByG_D_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_D_S,
+				args);
 
-			if ((blogsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByC_U_S.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					blogsEntryModelImpl.getOriginalCompanyId(),
-					blogsEntryModelImpl.getOriginalUserId(),
-					blogsEntryModelImpl.getOriginalStatus()
-				};
-
-				finderCache.removeResult(_finderPathCountByC_U_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByC_U_S, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					blogsEntryModelImpl.getCompanyId(),
 					blogsEntryModelImpl.getUserId(),
 					blogsEntryModelImpl.getStatus()
 				};
 
+			finderCache.removeResult(_finderPathCountByC_U_S, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByC_U_S,
+				args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
+				FINDER_ARGS_EMPTY);
+		}
+
+		else {
+			if ((blogsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByUuid.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						blogsEntryModelImpl.getOriginalUuid()
+					};
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
+					args);
+
+				args = new Object[] { blogsEntryModelImpl.getUuid() };
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
+					args);
+			}
+
+			if ((blogsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						blogsEntryModelImpl.getOriginalUuid(),
+						blogsEntryModelImpl.getOriginalCompanyId()
+					};
+
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+					args);
+
+				args = new Object[] {
+						blogsEntryModelImpl.getUuid(),
+						blogsEntryModelImpl.getCompanyId()
+					};
+
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+					args);
+			}
+
+			if ((blogsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByGroupId.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						blogsEntryModelImpl.getOriginalGroupId()
+					};
+
+				finderCache.removeResult(_finderPathCountByGroupId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByGroupId,
+					args);
+
+				args = new Object[] { blogsEntryModelImpl.getGroupId() };
+
+				finderCache.removeResult(_finderPathCountByGroupId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByGroupId,
+					args);
+			}
+
+			if ((blogsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByCompanyId.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						blogsEntryModelImpl.getOriginalCompanyId()
+					};
+
+				finderCache.removeResult(_finderPathCountByCompanyId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+					args);
+
+				args = new Object[] { blogsEntryModelImpl.getCompanyId() };
+
+				finderCache.removeResult(_finderPathCountByCompanyId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+					args);
+			}
+
+			if ((blogsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						blogsEntryModelImpl.getOriginalGroupId(),
+						blogsEntryModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_S,
+					args);
+
+				args = new Object[] {
+						blogsEntryModelImpl.getGroupId(),
+						blogsEntryModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_S,
+					args);
+			}
+
+			if ((blogsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByC_U.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						blogsEntryModelImpl.getOriginalCompanyId(),
+						blogsEntryModelImpl.getOriginalUserId()
+					};
+
+				finderCache.removeResult(_finderPathCountByC_U, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByC_U,
+					args);
+
+				args = new Object[] {
+						blogsEntryModelImpl.getCompanyId(),
+						blogsEntryModelImpl.getUserId()
+					};
+
+				finderCache.removeResult(_finderPathCountByC_U, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByC_U,
+					args);
+			}
+
+			if ((blogsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByC_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						blogsEntryModelImpl.getOriginalCompanyId(),
+						blogsEntryModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByC_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByC_S,
+					args);
+
+				args = new Object[] {
+						blogsEntryModelImpl.getCompanyId(),
+						blogsEntryModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByC_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByC_S,
+					args);
+			}
+
+			if ((blogsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_U_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						blogsEntryModelImpl.getOriginalGroupId(),
+						blogsEntryModelImpl.getOriginalUserId(),
+						blogsEntryModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_U_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_S,
+					args);
+
+				args = new Object[] {
+						blogsEntryModelImpl.getGroupId(),
+						blogsEntryModelImpl.getUserId(),
+						blogsEntryModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_U_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_S,
+					args);
+			}
+
+			if ((blogsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_D_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						blogsEntryModelImpl.getOriginalGroupId(),
+						blogsEntryModelImpl.getOriginalDisplayDate(),
+						blogsEntryModelImpl.getOriginalStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_D_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_D_S,
+					args);
+
+				args = new Object[] {
+						blogsEntryModelImpl.getGroupId(),
+						blogsEntryModelImpl.getDisplayDate(),
+						blogsEntryModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_D_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_D_S,
+					args);
+			}
+
+			if ((blogsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByC_U_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						blogsEntryModelImpl.getOriginalCompanyId(),
+						blogsEntryModelImpl.getOriginalUserId(),
+						blogsEntryModelImpl.getOriginalStatus()
+					};
+
 				finderCache.removeResult(_finderPathCountByC_U_S, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByC_U_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByC_U_S,
+					args);
+
+				args = new Object[] {
+						blogsEntryModelImpl.getCompanyId(),
+						blogsEntryModelImpl.getUserId(),
+						blogsEntryModelImpl.getStatus()
+					};
+
+				finderCache.removeResult(_finderPathCountByC_U_S, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByC_U_S,
+					args);
 			}
 		}
 
-		entityCache.putResult(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED, BlogsEntryImpl.class,
-			blogsEntry.getPrimaryKey(), blogsEntry, false);
+		entityCache.putResult(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+			BlogsEntryImpl.class, blogsEntry.getPrimaryKey(), blogsEntry, false);
 
 		clearUniqueFindersCache(blogsEntryModelImpl, false);
 		cacheUniqueFindersCache(blogsEntryModelImpl);
@@ -22084,7 +21014,7 @@ public class BlogsEntryPersistenceImpl
 	}
 
 	/**
-	 * Returns the blogs entry with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
+	 * Returns the blogs entry with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the blogs entry
 	 * @return the blogs entry
@@ -22093,7 +21023,6 @@ public class BlogsEntryPersistenceImpl
 	@Override
 	public BlogsEntry findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchEntryException {
-
 		BlogsEntry blogsEntry = fetchByPrimaryKey(primaryKey);
 
 		if (blogsEntry == null) {
@@ -22101,15 +21030,15 @@ public class BlogsEntryPersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchEntryException(
-				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			throw new NoSuchEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
 		}
 
 		return blogsEntry;
 	}
 
 	/**
-	 * Returns the blogs entry with the primary key or throws a <code>NoSuchEntryException</code> if it could not be found.
+	 * Returns the blogs entry with the primary key or throws a {@link NoSuchEntryException} if it could not be found.
 	 *
 	 * @param entryId the primary key of the blogs entry
 	 * @return the blogs entry
@@ -22118,59 +21047,7 @@ public class BlogsEntryPersistenceImpl
 	@Override
 	public BlogsEntry findByPrimaryKey(long entryId)
 		throws NoSuchEntryException {
-
 		return findByPrimaryKey((Serializable)entryId);
-	}
-
-	/**
-	 * Returns the blogs entry with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param primaryKey the primary key of the blogs entry
-	 * @return the blogs entry, or <code>null</code> if a blogs entry with the primary key could not be found
-	 */
-	@Override
-	public BlogsEntry fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED, BlogsEntryImpl.class,
-			primaryKey);
-
-		if (serializable == nullModel) {
-			return null;
-		}
-
-		BlogsEntry blogsEntry = (BlogsEntry)serializable;
-
-		if (blogsEntry == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				blogsEntry = (BlogsEntry)session.get(
-					BlogsEntryImpl.class, primaryKey);
-
-				if (blogsEntry != null) {
-					cacheResult(blogsEntry);
-				}
-				else {
-					entityCache.putResult(
-						BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-						BlogsEntryImpl.class, primaryKey, nullModel);
-				}
-			}
-			catch (Exception e) {
-				entityCache.removeResult(
-					BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-					BlogsEntryImpl.class, primaryKey);
-
-				throw processException(e);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return blogsEntry;
 	}
 
 	/**
@@ -22182,104 +21059,6 @@ public class BlogsEntryPersistenceImpl
 	@Override
 	public BlogsEntry fetchByPrimaryKey(long entryId) {
 		return fetchByPrimaryKey((Serializable)entryId);
-	}
-
-	@Override
-	public Map<Serializable, BlogsEntry> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, BlogsEntry> map =
-			new HashMap<Serializable, BlogsEntry>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			BlogsEntry blogsEntry = fetchByPrimaryKey(primaryKey);
-
-			if (blogsEntry != null) {
-				map.put(primaryKey, blogsEntry);
-			}
-
-			return map;
-		}
-
-		Set<Serializable> uncachedPrimaryKeys = null;
-
-		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(
-				BlogsEntryModelImpl.ENTITY_CACHE_ENABLED, BlogsEntryImpl.class,
-				primaryKey);
-
-			if (serializable != nullModel) {
-				if (serializable == null) {
-					if (uncachedPrimaryKeys == null) {
-						uncachedPrimaryKeys = new HashSet<Serializable>();
-					}
-
-					uncachedPrimaryKeys.add(primaryKey);
-				}
-				else {
-					map.put(primaryKey, (BlogsEntry)serializable);
-				}
-			}
-		}
-
-		if (uncachedPrimaryKeys == null) {
-			return map;
-		}
-
-		StringBundler query = new StringBundler(
-			uncachedPrimaryKeys.size() * 2 + 1);
-
-		query.append(_SQL_SELECT_BLOGSENTRY_WHERE_PKS_IN);
-
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
-
-			query.append(",");
-		}
-
-		query.setIndex(query.index() - 1);
-
-		query.append(")");
-
-		String sql = query.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query q = session.createQuery(sql);
-
-			for (BlogsEntry blogsEntry : (List<BlogsEntry>)q.list()) {
-				map.put(blogsEntry.getPrimaryKeyObj(), blogsEntry);
-
-				cacheResult(blogsEntry);
-
-				uncachedPrimaryKeys.remove(blogsEntry.getPrimaryKeyObj());
-			}
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(
-					BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-					BlogsEntryImpl.class, primaryKey, nullModel);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -22296,7 +21075,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns a range of all the blogs entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of blogs entries
@@ -22312,7 +21091,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of blogs entries
@@ -22321,9 +21100,8 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findAll(
-		int start, int end, OrderByComparator<BlogsEntry> orderByComparator) {
-
+	public List<BlogsEntry> findAll(int start, int end,
+		OrderByComparator<BlogsEntry> orderByComparator) {
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -22331,7 +21109,7 @@ public class BlogsEntryPersistenceImpl
 	 * Returns an ordered range of all the blogs entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>BlogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BlogsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of blogs entries
@@ -22341,31 +21119,29 @@ public class BlogsEntryPersistenceImpl
 	 * @return the ordered range of blogs entries
 	 */
 	@Override
-	public List<BlogsEntry> findAll(
-		int start, int end, OrderByComparator<BlogsEntry> orderByComparator,
+	public List<BlogsEntry> findAll(int start, int end,
+		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] {start, end, orderByComparator};
+			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
 		List<BlogsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<BlogsEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 		}
 
 		if (list == null) {
@@ -22373,13 +21149,13 @@ public class BlogsEntryPersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					2 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_BLOGSENTRY);
 
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 
 				sql = query.toString();
 			}
@@ -22399,16 +21175,16 @@ public class BlogsEntryPersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BlogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<BlogsEntry>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -22446,8 +21222,8 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(_finderPathCountAll,
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -22459,12 +21235,11 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
+					count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -22482,6 +21257,21 @@ public class BlogsEntryPersistenceImpl
 	}
 
 	@Override
+	protected EntityCache getEntityCache() {
+		return entityCache;
+	}
+
+	@Override
+	protected String getPKDBName() {
+		return "entryId";
+	}
+
+	@Override
+	protected String getSelectSQL() {
+		return _SQL_SELECT_BLOGSENTRY;
+	}
+
+	@Override
 	protected Map<String, Integer> getTableColumnsMap() {
 		return BlogsEntryModelImpl.TABLE_COLUMNS_MAP;
 	}
@@ -22490,604 +21280,576 @@ public class BlogsEntryPersistenceImpl
 	 * Initializes the blogs entry persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-			new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+				new String[0]);
 
-		_finderPathCountAll = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+		_finderPathCountAll = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+				new String[0]);
 
-		_finderPathWithPaginationFindByUuid = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
-			new String[] {
-				String.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByUuid = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-			new String[] {String.class.getName()},
-			BlogsEntryModelImpl.UUID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
-			BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
-
-		_finderPathCountByUuid = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
-			new String[] {String.class.getName()});
-
-		_finderPathFetchByUUID_G = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
-			new String[] {String.class.getName(), Long.class.getName()},
-			BlogsEntryModelImpl.UUID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK);
-
-		_finderPathCountByUUID_G = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
-			new String[] {String.class.getName(), Long.class.getName()});
-
-		_finderPathWithPaginationFindByUuid_C = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
-			new String[] {
-				String.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByUuid = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
+				new String[] {
+					String.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			BlogsEntryModelImpl.UUID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
-			BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+				new String[] { String.class.getName() },
+				BlogsEntryModelImpl.UUID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
+				BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathCountByUuid_C = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
-			new String[] {String.class.getName(), Long.class.getName()});
+		_finderPathCountByUuid = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
+				new String[] { String.class.getName() });
 
-		_finderPathWithPaginationFindByGroupId = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+		_finderPathFetchByUUID_G = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
+				new String[] { String.class.getName(), Long.class.getName() },
+				BlogsEntryModelImpl.UUID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK);
 
-		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
-			new String[] {Long.class.getName()},
-			BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
-			BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathCountByUUID_G = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
+				new String[] { String.class.getName(), Long.class.getName() });
 
-		_finderPathCountByGroupId = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
-			new String[] {Long.class.getName()});
-
-		_finderPathWithPaginationFindByCompanyId = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
-			new String[] {Long.class.getName()},
-			BlogsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
-			BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
-
-		_finderPathCountByCompanyId = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
-			new String[] {Long.class.getName()});
-
-		_finderPathFetchByG_UT = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByG_UT",
-			new String[] {Long.class.getName(), String.class.getName()},
-			BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.URLTITLE_COLUMN_BITMASK);
-
-		_finderPathCountByG_UT = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_UT",
-			new String[] {Long.class.getName(), String.class.getName()});
-
-		_finderPathWithPaginationFindByG_LtD = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_LtD",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+				new String[] {
+					String.class.getName(), Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByG_LtD = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_LtD",
-			new String[] {Long.class.getName(), Date.class.getName()});
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+				new String[] { String.class.getName(), Long.class.getName() },
+				BlogsEntryModelImpl.UUID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
+				BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByG_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_S",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
+		_finderPathCountByUuid_C = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+				new String[] { String.class.getName(), Long.class.getName() });
+
+		_finderPathWithPaginationFindByGroupId = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
+				new String[] {
+					Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByG_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_S",
-			new String[] {Long.class.getName(), Integer.class.getName()},
-			BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.STATUS_COLUMN_BITMASK |
-			BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
-			BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByGroupId = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
+				new String[] { Long.class.getName() },
+				BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
+				BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathCountByG_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_S",
-			new String[] {Long.class.getName(), Integer.class.getName()});
+		_finderPathCountByGroupId = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
+				new String[] { Long.class.getName() });
 
-		_finderPathWithPaginationFindByG_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_NotS",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
+				new String[] {
+					Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByG_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_NotS",
-			new String[] {Long.class.getName(), Integer.class.getName()});
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+				new String[] { Long.class.getName() },
+				BlogsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
+				BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByC_U = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathCountByCompanyId = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
+				new String[] { Long.class.getName() });
+
+		_finderPathFetchByG_UT = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_ENTITY, "fetchByG_UT",
+				new String[] { Long.class.getName(), String.class.getName() },
+				BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.URLTITLE_COLUMN_BITMASK);
+
+		_finderPathCountByG_UT = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_UT",
+				new String[] { Long.class.getName(), String.class.getName() });
+
+		_finderPathWithPaginationFindByG_LtD = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_LtD",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByC_U = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_U",
-			new String[] {Long.class.getName(), Long.class.getName()},
-			BlogsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.USERID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
-			BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithPaginationCountByG_LtD = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_LtD",
+				new String[] { Long.class.getName(), Date.class.getName() });
 
-		_finderPathCountByC_U = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U",
-			new String[] {Long.class.getName(), Long.class.getName()});
-
-		_finderPathWithPaginationFindByC_LtD = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_LtD",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
+		_finderPathWithPaginationFindByG_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_S",
+				new String[] {
+					Long.class.getName(), Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByC_LtD = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_LtD",
-			new String[] {Long.class.getName(), Date.class.getName()});
+		_finderPathWithoutPaginationFindByG_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_S",
+				new String[] { Long.class.getName(), Integer.class.getName() },
+				BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.STATUS_COLUMN_BITMASK |
+				BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
+				BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByC_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_S",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
+		_finderPathCountByG_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_S",
+				new String[] { Long.class.getName(), Integer.class.getName() });
+
+		_finderPathWithPaginationFindByG_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_NotS",
+				new String[] {
+					Long.class.getName(), Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByC_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_S",
-			new String[] {Long.class.getName(), Integer.class.getName()},
-			BlogsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.STATUS_COLUMN_BITMASK |
-			BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
-			BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithPaginationCountByG_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_NotS",
+				new String[] { Long.class.getName(), Integer.class.getName() });
 
-		_finderPathCountByC_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_S",
-			new String[] {Long.class.getName(), Integer.class.getName()});
-
-		_finderPathWithPaginationFindByC_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_NotS",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
+		_finderPathWithPaginationFindByC_U = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByC_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_NotS",
-			new String[] {Long.class.getName(), Integer.class.getName()});
+		_finderPathWithoutPaginationFindByC_U = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_U",
+				new String[] { Long.class.getName(), Long.class.getName() },
+				BlogsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.USERID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
+				BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByLtD_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByLtD_S",
-			new String[] {
-				Date.class.getName(), Integer.class.getName(),
+		_finderPathCountByC_U = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U",
+				new String[] { Long.class.getName(), Long.class.getName() });
+
+		_finderPathWithPaginationFindByC_LtD = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_LtD",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByLtD_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByLtD_S",
-			new String[] {Date.class.getName(), Integer.class.getName()});
+		_finderPathWithPaginationCountByC_LtD = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_LtD",
+				new String[] { Long.class.getName(), Date.class.getName() });
 
-		_finderPathWithPaginationFindByG_U_LtD = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_LtD",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Date.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithPaginationCountByG_U_LtD = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_LtD",
-			new String[] {
-				Long.class.getName(), Long.class.getName(), Date.class.getName()
-			});
-
-		_finderPathWithPaginationFindByG_U_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByC_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_S",
+				new String[] {
+					Long.class.getName(), Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByG_U_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			},
-			BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.USERID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.STATUS_COLUMN_BITMASK |
-			BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
-			BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByC_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_S",
+				new String[] { Long.class.getName(), Integer.class.getName() },
+				BlogsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.STATUS_COLUMN_BITMASK |
+				BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
+				BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathCountByG_U_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathCountByC_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_S",
+				new String[] { Long.class.getName(), Integer.class.getName() });
 
-		_finderPathWithPaginationCountByG_U_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			});
-
-		_finderPathWithPaginationFindByG_U_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_NotS",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByC_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_NotS",
+				new String[] {
+					Long.class.getName(), Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByG_U_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_NotS",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathWithPaginationCountByC_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_NotS",
+				new String[] { Long.class.getName(), Integer.class.getName() });
 
-		_finderPathWithPaginationFindByG_D_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_D_S",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
+		_finderPathWithPaginationFindByLtD_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByLtD_S",
+				new String[] {
+					Date.class.getName(), Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByG_D_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_D_S",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
-				Integer.class.getName()
-			},
-			BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
-			BlogsEntryModelImpl.STATUS_COLUMN_BITMASK |
-			BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithPaginationCountByLtD_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByLtD_S",
+				new String[] { Date.class.getName(), Integer.class.getName() });
 
-		_finderPathCountByG_D_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_D_S",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
-				Integer.class.getName()
-			});
-
-		_finderPathWithPaginationFindByG_GtD_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_GtD_S",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
+		_finderPathWithPaginationFindByG_U_LtD = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_LtD",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Date.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByG_GtD_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_GtD_S",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathWithPaginationCountByG_U_LtD = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_LtD",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Date.class.getName()
+				});
 
-		_finderPathWithPaginationFindByG_LtD_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_LtD_S",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
+		_finderPathWithPaginationFindByG_U_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByG_LtD_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_LtD_S",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathWithoutPaginationFindByG_U_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				},
+				BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.USERID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.STATUS_COLUMN_BITMASK |
+				BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
+				BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByG_LtD_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_LtD_NotS",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
+		_finderPathCountByG_U_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				});
+
+		_finderPathWithPaginationCountByG_U_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByG_U_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_NotS",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByG_LtD_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_LtD_NotS",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathWithPaginationCountByG_U_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_NotS",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				});
 
-		_finderPathWithPaginationFindByC_U_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByG_D_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_D_S",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByC_U_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_U_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			},
-			BlogsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.USERID_COLUMN_BITMASK |
-			BlogsEntryModelImpl.STATUS_COLUMN_BITMASK |
-			BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
-			BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_D_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_D_S",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName()
+				},
+				BlogsEntryModelImpl.GROUPID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
+				BlogsEntryModelImpl.STATUS_COLUMN_BITMASK |
+				BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathCountByC_U_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathCountByG_D_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_D_S",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName()
+				});
 
-		_finderPathWithPaginationFindByC_U_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U_NotS",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByG_GtD_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_GtD_S",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByC_U_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_U_NotS",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathWithPaginationCountByG_GtD_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_GtD_S",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName()
+				});
 
-		_finderPathWithPaginationFindByC_LtD_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_LtD_S",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
+		_finderPathWithPaginationFindByG_LtD_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_LtD_S",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByC_LtD_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_LtD_S",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathWithPaginationCountByG_LtD_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_LtD_S",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName()
+				});
 
-		_finderPathWithPaginationFindByC_LtD_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_LtD_NotS",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
+		_finderPathWithPaginationFindByG_LtD_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_LtD_NotS",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByC_LtD_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_LtD_NotS",
-			new String[] {
-				Long.class.getName(), Date.class.getName(),
-				Integer.class.getName()
-			});
+		_finderPathWithPaginationCountByG_LtD_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_LtD_NotS",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName()
+				});
 
-		_finderPathWithPaginationFindByG_U_LtD_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_LtD_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Date.class.getName(), Integer.class.getName(),
+		_finderPathWithPaginationFindByC_U_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByG_U_LtD_S = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_LtD_S",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Date.class.getName(), Integer.class.getName()
-			});
+		_finderPathWithoutPaginationFindByC_U_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_U_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				},
+				BlogsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.USERID_COLUMN_BITMASK |
+				BlogsEntryModelImpl.STATUS_COLUMN_BITMASK |
+				BlogsEntryModelImpl.DISPLAYDATE_COLUMN_BITMASK |
+				BlogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByG_U_LtD_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_LtD_NotS",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Date.class.getName(), Integer.class.getName(),
+		_finderPathCountByC_U_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByC_U_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U_NotS",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithPaginationCountByG_U_LtD_NotS = new FinderPath(
-			BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_LtD_NotS",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Date.class.getName(), Integer.class.getName()
-			});
+		_finderPathWithPaginationCountByC_U_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_U_NotS",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByC_LtD_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_LtD_S",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithPaginationCountByC_LtD_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_LtD_S",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByC_LtD_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_LtD_NotS",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithPaginationCountByC_LtD_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_LtD_NotS",
+				new String[] {
+					Long.class.getName(), Date.class.getName(),
+					Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByG_U_LtD_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_LtD_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Date.class.getName(), Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithPaginationCountByG_U_LtD_S = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_LtD_S",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Date.class.getName(), Integer.class.getName()
+				});
+
+		_finderPathWithPaginationFindByG_U_LtD_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, BlogsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_LtD_NotS",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Date.class.getName(), Integer.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithPaginationCountByG_U_LtD_NotS = new FinderPath(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				BlogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_LtD_NotS",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Date.class.getName(), Integer.class.getName()
+				});
 	}
 
 	public void destroy() {
@@ -23099,10 +21861,8 @@ public class BlogsEntryPersistenceImpl
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
-
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
 
@@ -23114,56 +21874,25 @@ public class BlogsEntryPersistenceImpl
 		return date.getTime();
 	}
 
-	private static final String _SQL_SELECT_BLOGSENTRY =
-		"SELECT blogsEntry FROM BlogsEntry blogsEntry";
-
-	private static final String _SQL_SELECT_BLOGSENTRY_WHERE_PKS_IN =
-		"SELECT blogsEntry FROM BlogsEntry blogsEntry WHERE entryId IN (";
-
-	private static final String _SQL_SELECT_BLOGSENTRY_WHERE =
-		"SELECT blogsEntry FROM BlogsEntry blogsEntry WHERE ";
-
-	private static final String _SQL_COUNT_BLOGSENTRY =
-		"SELECT COUNT(blogsEntry) FROM BlogsEntry blogsEntry";
-
-	private static final String _SQL_COUNT_BLOGSENTRY_WHERE =
-		"SELECT COUNT(blogsEntry) FROM BlogsEntry blogsEntry WHERE ";
-
-	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN =
-		"blogsEntry.entryId";
-
-	private static final String _FILTER_SQL_SELECT_BLOGSENTRY_WHERE =
-		"SELECT DISTINCT {blogsEntry.*} FROM BlogsEntry blogsEntry WHERE ";
-
-	private static final String
-		_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1 =
-			"SELECT {BlogsEntry.*} FROM (SELECT DISTINCT blogsEntry.entryId FROM BlogsEntry blogsEntry WHERE ";
-
-	private static final String
-		_FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2 =
-			") TEMP_TABLE INNER JOIN BlogsEntry ON TEMP_TABLE.entryId = BlogsEntry.entryId";
-
-	private static final String _FILTER_SQL_COUNT_BLOGSENTRY_WHERE =
-		"SELECT COUNT(DISTINCT blogsEntry.entryId) AS COUNT_VALUE FROM BlogsEntry blogsEntry WHERE ";
-
+	private static final String _SQL_SELECT_BLOGSENTRY = "SELECT blogsEntry FROM BlogsEntry blogsEntry";
+	private static final String _SQL_SELECT_BLOGSENTRY_WHERE = "SELECT blogsEntry FROM BlogsEntry blogsEntry WHERE ";
+	private static final String _SQL_COUNT_BLOGSENTRY = "SELECT COUNT(blogsEntry) FROM BlogsEntry blogsEntry";
+	private static final String _SQL_COUNT_BLOGSENTRY_WHERE = "SELECT COUNT(blogsEntry) FROM BlogsEntry blogsEntry WHERE ";
+	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "blogsEntry.entryId";
+	private static final String _FILTER_SQL_SELECT_BLOGSENTRY_WHERE = "SELECT DISTINCT {blogsEntry.*} FROM BlogsEntry blogsEntry WHERE ";
+	private static final String _FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_1 =
+		"SELECT {BlogsEntry.*} FROM (SELECT DISTINCT blogsEntry.entryId FROM BlogsEntry blogsEntry WHERE ";
+	private static final String _FILTER_SQL_SELECT_BLOGSENTRY_NO_INLINE_DISTINCT_WHERE_2 =
+		") TEMP_TABLE INNER JOIN BlogsEntry ON TEMP_TABLE.entryId = BlogsEntry.entryId";
+	private static final String _FILTER_SQL_COUNT_BLOGSENTRY_WHERE = "SELECT COUNT(DISTINCT blogsEntry.entryId) AS COUNT_VALUE FROM BlogsEntry blogsEntry WHERE ";
 	private static final String _FILTER_ENTITY_ALIAS = "blogsEntry";
-
 	private static final String _FILTER_ENTITY_TABLE = "BlogsEntry";
-
 	private static final String _ORDER_BY_ENTITY_ALIAS = "blogsEntry.";
-
 	private static final String _ORDER_BY_ENTITY_TABLE = "BlogsEntry.";
-
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
-		"No BlogsEntry exists with the primary key ";
-
-	private static final String _NO_SUCH_ENTITY_WITH_KEY =
-		"No BlogsEntry exists with the key {";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		BlogsEntryPersistenceImpl.class);
-
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"uuid"});
-
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No BlogsEntry exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No BlogsEntry exists with the key {";
+	private static final Log _log = LogFactoryUtil.getLog(BlogsEntryPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+				"uuid"
+			});
 }

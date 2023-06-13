@@ -187,8 +187,11 @@ public class DDMFormInstanceRecordStagedModelDataHandlerTest
 
 		localizedValue.addString(locale, fieldValue);
 
-		return DDMFormValuesTestUtil.createDDMFormFieldValue(
-			fieldName, localizedValue);
+		DDMFormFieldValue ddmFormFieldValue =
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				fieldName, localizedValue);
+
+		return ddmFormFieldValue;
 	}
 
 	@Override

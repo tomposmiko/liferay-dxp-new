@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -33,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing WorkflowDefinitionLink in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see WorkflowDefinitionLink
  * @generated
  */
 @ProviderType
-public class WorkflowDefinitionLinkCacheModel
-	implements CacheModel<WorkflowDefinitionLink>, Externalizable, MVCCModel {
-
+public class WorkflowDefinitionLinkCacheModel implements CacheModel<WorkflowDefinitionLink>,
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,13 +50,10 @@ public class WorkflowDefinitionLinkCacheModel
 			return false;
 		}
 
-		WorkflowDefinitionLinkCacheModel workflowDefinitionLinkCacheModel =
-			(WorkflowDefinitionLinkCacheModel)obj;
+		WorkflowDefinitionLinkCacheModel workflowDefinitionLinkCacheModel = (WorkflowDefinitionLinkCacheModel)obj;
 
-		if ((workflowDefinitionLinkId ==
-				workflowDefinitionLinkCacheModel.workflowDefinitionLinkId) &&
-			(mvccVersion == workflowDefinitionLinkCacheModel.mvccVersion)) {
-
+		if ((workflowDefinitionLinkId == workflowDefinitionLinkCacheModel.workflowDefinitionLinkId) &&
+				(mvccVersion == workflowDefinitionLinkCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -116,12 +114,10 @@ public class WorkflowDefinitionLinkCacheModel
 
 	@Override
 	public WorkflowDefinitionLink toEntityModel() {
-		WorkflowDefinitionLinkImpl workflowDefinitionLinkImpl =
-			new WorkflowDefinitionLinkImpl();
+		WorkflowDefinitionLinkImpl workflowDefinitionLinkImpl = new WorkflowDefinitionLinkImpl();
 
 		workflowDefinitionLinkImpl.setMvccVersion(mvccVersion);
-		workflowDefinitionLinkImpl.setWorkflowDefinitionLinkId(
-			workflowDefinitionLinkId);
+		workflowDefinitionLinkImpl.setWorkflowDefinitionLinkId(workflowDefinitionLinkId);
 		workflowDefinitionLinkImpl.setGroupId(groupId);
 		workflowDefinitionLinkImpl.setCompanyId(companyId);
 		workflowDefinitionLinkImpl.setUserId(userId);
@@ -155,12 +151,10 @@ public class WorkflowDefinitionLinkCacheModel
 			workflowDefinitionLinkImpl.setWorkflowDefinitionName("");
 		}
 		else {
-			workflowDefinitionLinkImpl.setWorkflowDefinitionName(
-				workflowDefinitionName);
+			workflowDefinitionLinkImpl.setWorkflowDefinitionName(workflowDefinitionName);
 		}
 
-		workflowDefinitionLinkImpl.setWorkflowDefinitionVersion(
-			workflowDefinitionVersion);
+		workflowDefinitionLinkImpl.setWorkflowDefinitionVersion(workflowDefinitionVersion);
 
 		workflowDefinitionLinkImpl.resetOriginalValues();
 
@@ -193,7 +187,8 @@ public class WorkflowDefinitionLinkCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(workflowDefinitionLinkId);
@@ -243,5 +238,4 @@ public class WorkflowDefinitionLinkCacheModel
 	public long typePK;
 	public String workflowDefinitionName;
 	public int workflowDefinitionVersion;
-
 }

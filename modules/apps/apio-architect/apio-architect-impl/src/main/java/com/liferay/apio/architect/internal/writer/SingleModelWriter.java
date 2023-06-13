@@ -139,8 +139,8 @@ public class SingleModelWriter<T> {
 
 		fieldsWriter.writeNestedResources(
 			_representorFunction::apply, _singleModel, null,
-			(nestedSingleModel, nestedPathElements,
-			 nestedRepresentorFunction) -> writeEmbeddedModelFields(
+			(nestedSingleModel, nestedPathElements, nestedRepresentorFunction)
+				-> writeEmbeddedModelFields(
 				nestedSingleModel, _jsonObjectBuilder, nestedPathElements,
 				nestedRepresentorFunction));
 
@@ -239,8 +239,8 @@ public class SingleModelWriter<T> {
 
 		fieldsWriter.writeNestedResources(
 			baseRepresentorFunction, singleModel, embeddedPathElements,
-			(nestedSingleModel, nestedPathElements,
-			 nestedRepresentorFunction) -> writeEmbeddedModelFields(
+			(nestedSingleModel, nestedPathElements, nestedRepresentorFunction)
+				-> writeEmbeddedModelFields(
 				nestedSingleModel, jsonObjectBuilder, nestedPathElements,
 				nestedRepresentorFunction));
 
@@ -551,8 +551,8 @@ public class SingleModelWriter<T> {
 					jsonObjectBuilder, embeddedPathElements, field, value));
 
 		fieldsWriter.writeLinks(
-			(fieldName, link) ->
-				_singleModelMessageMapper.mapEmbeddedResourceLink(
+			(fieldName, link) -> _singleModelMessageMapper.
+				mapEmbeddedResourceLink(
 					jsonObjectBuilder, embeddedPathElements, fieldName, link));
 
 		fieldsWriter.writeTypes(
@@ -680,8 +680,8 @@ public class SingleModelWriter<T> {
 
 		fieldsWriter.writeNestedResources(
 			baseRepresentorFunction, singleModel, embeddedPathElements,
-			(nestedSingleModel, nestedPathElements,
-			 nestedRepresentorFunction) -> writeEmbeddedModelFields(
+			(nestedSingleModel, nestedPathElements, nestedRepresentorFunction)
+				-> writeEmbeddedModelFields(
 				nestedSingleModel, itemJsonObjectBuilder, nestedPathElements,
 				nestedRepresentorFunction));
 

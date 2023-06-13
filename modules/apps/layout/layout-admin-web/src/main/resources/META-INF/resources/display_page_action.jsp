@@ -44,6 +44,20 @@ LayoutPageTemplateEntry layoutPageTemplateEntry = (LayoutPageTemplateEntry)row.g
 	</c:if>
 
 	<c:if test="<%= LayoutPageTemplateEntryPermission.contains(permissionChecker, layoutPageTemplateEntry, ActionKeys.UPDATE) %>">
+		<portlet:renderURL var="configureDisplayPageURL">
+			<portlet:param name="mvcRenderCommandName" value="/layout/edit_layout" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+			<portlet:param name="backURL" value="<%= currentURL %>" />
+			<portlet:param name="selPlid" value="<%= String.valueOf(layoutPageTemplateEntry.getPlid()) %>" />
+		</portlet:renderURL>
+
+		<liferay-ui:icon
+			message="configure"
+			url="<%= configureDisplayPageURL %>"
+		/>
+	</c:if>
+
+	<c:if test="<%= LayoutPageTemplateEntryPermission.contains(permissionChecker, layoutPageTemplateEntry, ActionKeys.UPDATE) %>">
 		<portlet:actionURL name="/layout/update_layout_page_template_entry" var="updateDisplayPageURL">
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="layoutPageTemplateCollectionId" value="<%= String.valueOf(layoutPageTemplateEntry.getLayoutPageTemplateCollectionId()) %>" />
@@ -87,7 +101,7 @@ LayoutPageTemplateEntry layoutPageTemplateEntry = (LayoutPageTemplateEntry)row.g
 		<portlet:actionURL name="/layout/edit_layout_page_template_settings" var="editLayoutPageTemplateSettingsURL">
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="layoutPageTemplateEntryId" value="<%= String.valueOf(layoutPageTemplateEntry.getLayoutPageTemplateEntryId()) %>" />
-			<portlet:param name="defaultTemplate" value="<%= Boolean.TRUE.toString() %>" />
+			<portlet:param name="defaultTemplate" value="<%= layoutPageTemplateEntry.getDefaultTemplate() ? Boolean.FALSE.toString() : Boolean.TRUE.toString() %>" />
 		</portlet:actionURL>
 
 		<%
@@ -97,6 +111,9 @@ LayoutPageTemplateEntry layoutPageTemplateEntry = (LayoutPageTemplateEntry)row.g
 
 		if ((defaultLayoutPageTemplateEntry != null) && (defaultLayoutPageTemplateEntry.getLayoutPageTemplateEntryId() != layoutPageTemplateEntry.getLayoutPageTemplateEntryId())) {
 			taglibOnClickPrimary = "if (confirm('" + UnicodeLanguageUtil.format(request, "do-you-want-to-replace-x-for-x-as-the-default-display-page", new String[] {layoutPageTemplateEntry.getName(), defaultLayoutPageTemplateEntry.getName()}) + "')) { submitForm(document.hrefFm, '" + editLayoutPageTemplateSettingsURL + "'); } ";
+		}
+		else if (layoutPageTemplateEntry.getDefaultTemplate()) {
+			taglibOnClickPrimary = "if (confirm('" + LanguageUtil.get(request, "unmark-default-confirmation") + "')) { submitForm(document.hrefFm, '" + editLayoutPageTemplateSettingsURL + "'); } ";
 		}
 		%>
 

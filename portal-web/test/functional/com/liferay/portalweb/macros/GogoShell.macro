@@ -50,7 +50,7 @@ definition {
 		);
 	}
 
-	macro viewOutput {
+	macro viewOutPut {
 		AssertTextEquals.assertPartialText(
 			locator1 = "GogoShell#OUTPUT_FIELD",
 			value1 = "${outputContent}"

@@ -1,0 +1,3 @@
+Bundle-Name: Liferay Headless Collaboration API
+Bundle-SymbolicName: com.liferay.headless.collaboration.api
+Bundle-Version: 1.0.0

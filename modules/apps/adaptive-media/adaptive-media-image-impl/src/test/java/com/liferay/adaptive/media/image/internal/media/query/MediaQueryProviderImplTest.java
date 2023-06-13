@@ -33,7 +33,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 
 import java.net.URI;
 
@@ -81,13 +80,10 @@ public class MediaQueryProviderImplTest {
 			_fileVersion
 		);
 
-		ReflectionTestUtil.setFieldValue(
-			_mediaQueryProvider, "_amImageConfigurationHelper",
+		_mediaQueryProvider.setAMImageConfigurationHelper(
 			_amImageConfigurationHelper);
-		ReflectionTestUtil.setFieldValue(
-			_mediaQueryProvider, "_amImageFinder", _amImageFinder);
-		ReflectionTestUtil.setFieldValue(
-			_mediaQueryProvider, "_amImageURLFactory", _amImageURLFactory);
+		_mediaQueryProvider.setAMImageFinder(_amImageFinder);
+		_mediaQueryProvider.setAMImageURLFactory(_amImageURLFactory);
 	}
 
 	@Test

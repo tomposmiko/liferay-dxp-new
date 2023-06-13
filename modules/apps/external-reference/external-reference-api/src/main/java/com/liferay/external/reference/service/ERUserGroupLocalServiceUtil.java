@@ -18,45 +18,45 @@ import aQute.bnd.annotation.ProviderType;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
+
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * Provides the local service utility for ERUserGroup. This utility wraps
- * <code>com.liferay.external.reference.service.impl.ERUserGroupLocalServiceImpl</code> and
- * is an access point for service operations in application layer code running
+ * {@link com.liferay.external.reference.service.impl.ERUserGroupLocalServiceImpl} and is the
+ * primary access point for service operations in application layer code running
  * on the local server. Methods of this service will not have security checks
  * based on the propagated JAAS credentials because this service can only be
  * accessed from within the same VM.
  *
  * @author Brian Wing Shun Chan
  * @see ERUserGroupLocalService
+ * @see com.liferay.external.reference.service.base.ERUserGroupLocalServiceBaseImpl
+ * @see com.liferay.external.reference.service.impl.ERUserGroupLocalServiceImpl
  * @generated
  */
 @ProviderType
 public class ERUserGroupLocalServiceUtil {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this class directly. Add custom service methods to <code>com.liferay.external.reference.service.impl.ERUserGroupLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify this class directly. Add custom service methods to {@link com.liferay.external.reference.service.impl.ERUserGroupLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static com.liferay.portal.kernel.model.UserGroup
-			addOrUpdateUserGroup(
-				String externalReferenceCode, long userId, long companyId,
-				String name, String description,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.portal.kernel.model.UserGroup addOrUpdateUserGroup(
+		String externalReferenceCode, long userId, long companyId, String name,
+		String description,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().addOrUpdateUserGroup(
-			externalReferenceCode, userId, companyId, name, description,
-			serviceContext);
+		return getService()
+				   .addOrUpdateUserGroup(externalReferenceCode, userId,
+			companyId, name, description, serviceContext);
 	}
 
 	/**
-	 * Returns the OSGi service identifier.
-	 *
-	 * @return the OSGi service identifier
-	 */
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
@@ -65,22 +65,17 @@ public class ERUserGroupLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker
-		<ERUserGroupLocalService, ERUserGroupLocalService> _serviceTracker;
+	private static ServiceTracker<ERUserGroupLocalService, ERUserGroupLocalService> _serviceTracker;
 
 	static {
 		Bundle bundle = FrameworkUtil.getBundle(ERUserGroupLocalService.class);
 
-		ServiceTracker<ERUserGroupLocalService, ERUserGroupLocalService>
-			serviceTracker =
-				new ServiceTracker
-					<ERUserGroupLocalService, ERUserGroupLocalService>(
-						bundle.getBundleContext(),
-						ERUserGroupLocalService.class, null);
+		ServiceTracker<ERUserGroupLocalService, ERUserGroupLocalService> serviceTracker =
+			new ServiceTracker<ERUserGroupLocalService, ERUserGroupLocalService>(bundle.getBundleContext(),
+				ERUserGroupLocalService.class, null);
 
 		serviceTracker.open();
 
 		_serviceTracker = serviceTracker;
 	}
-
 }

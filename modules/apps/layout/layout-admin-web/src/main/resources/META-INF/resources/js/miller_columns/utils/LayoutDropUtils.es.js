@@ -9,7 +9,7 @@ import {
 	getItemColumn,
 	getItemColumnIndex
 } from './LayoutGetUtils.es';
-import {DRAG_POSITIONS, DROP_TARGET_TYPES} from './LayoutDragDrop.es';
+import {DROP_TARGET_BORDERS, DROP_TARGET_ITEM_TYPES} from './LayoutDragDrop.es';
 
 /**
  * @param {object} sourceItem
@@ -19,7 +19,6 @@ import {DRAG_POSITIONS, DROP_TARGET_TYPES} from './LayoutDragDrop.es';
  * @return {boolean} Returns whether a drop is valid or not
  * @review
  */
-
 function dropIsValid(
 	sourceItem,
 	sourceItemColumnIndex,
@@ -29,14 +28,14 @@ function dropIsValid(
 	let targetColumnIsChild = false;
 	let targetEqualsSource = false;
 
-	if (targetType === DROP_TARGET_TYPES.column) {
+	if (targetType === DROP_TARGET_ITEM_TYPES.column) {
 		targetColumnIsChild = columnIsItemChild(
 			targetId,
 			sourceItem,
 			sourceItemColumnIndex
 		);
 	}
-	else if (targetType === DROP_TARGET_TYPES.item) {
+	else if (targetType === DROP_TARGET_ITEM_TYPES.item) {
 		targetEqualsSource = (sourceItem.plid === targetId);
 	}
 
@@ -53,7 +52,6 @@ function dropIsValid(
  * @return {object}
  * @review
  */
-
 function dropItemInsideColumn(layoutColumns, sourceItem, targetColumnIndex) {
 	const nextLayoutColumns = appendItemToColumn(
 		sourceItem,
@@ -86,7 +84,6 @@ function dropItemInsideColumn(layoutColumns, sourceItem, targetColumnIndex) {
  * @return {object}
  * @review
  */
-
 function dropItemInsideItem(
 	layoutColumns,
 	sourceItem,
@@ -133,7 +130,6 @@ function dropItemInsideItem(
  * @return {object}
  * @review
  */
-
 function dropItemNextToItem(layoutColumns, sourceItem, dropPosition, targetItem) {
 	const nextLayoutColumns = removeItem(sourceItem.plid, layoutColumns);
 
@@ -146,7 +142,7 @@ function dropItemNextToItem(layoutColumns, sourceItem, dropPosition, targetItem)
 		(targetColumnItem) => targetColumnItem.plid === targetItem.plid
 	);
 
-	const priority = (dropPosition === DRAG_POSITIONS.bottom) ?
+	const priority = (dropPosition === DROP_TARGET_BORDERS.bottom) ?
 		(targetItemIndex + 1) : targetItemIndex;
 
 	const nextTargetColumn = [...targetColumn];

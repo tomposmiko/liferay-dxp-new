@@ -147,7 +147,7 @@ definition {
 	}
 
 	macro _importSite {
-		Pause(locator1 = "12000");
+		Pause(locator1 = "18000");
 
 		Click(locator1 = "Button#CONTINUE");
 
@@ -205,20 +205,24 @@ definition {
 
 		AssertElementPresent(locator1 = "Button#SELECT_FILE");
 
+		AssertClick(locator1 = "Button#SELECT_FILE", value1 = "Select File");
+
+		SikuliClick(locator1 = "OS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG");
+
 		if ("${uploadFrom}" == "dependencies") {
-			UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
-				locator1 = "TextInput#FILE",
+			SikuliUploadCommonFile(
+				locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
 				value1 = "${larFileName}"
 			);
 		}
 		else {
-			UploadTempFile.uploadTempFileHiddenNoMouseOver(
-				locator1 = "TextInput#FILE",
+			SikuliUploadTempFile(
+				locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
 				value1 = "${larFileName}"
 			);
 		}
 
-		Pause(locator1 = "20000");
+		Pause(locator1 = "30000");
 
 		if ("${cannotImport}" == "true") {
 			AssertTextEquals(
@@ -301,19 +305,23 @@ definition {
 
 		Pause(locator1 = "5000");
 
-		AssertElementPresent(locator1 = "Button#SELECT_FILE");
+		AssertClick(locator1 = "Button#SELECT_FILE", value1 = "Select File");
+
+		Pause(locator1 = "13000");
+
+		SikuliClick(locator1 = "OS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG");
 
 		Pause(locator1 = "13000");
 
 		if ("${uploadFrom}" == "dependencies") {
-			UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
-				locator1 = "TextInput#FILE",
+			SikuliUploadCommonFile(
+				locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
 				value1 = "${larFileName}"
 			);
 		}
 		else {
-			UploadTempFile.uploadTempFileHiddenNoMouseOver(
-				locator1 = "TextInput#FILE",
+			SikuliUploadTempFile(
+				locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
 				value1 = "${larFileName}"
 			);
 		}
@@ -525,20 +533,6 @@ definition {
 		Click(locator1 = "Dropdown#FILTER_AND_ORDER");
 
 		MenuItem.click(menuItem = "Completed");
-	}
-
-	macro getLarFileName {
-		var valueName = selenium.getAttribute("//ul/li/div/h5//a@href");
-
-		echo("value name ${valueName}");
-
-		var portalURL = PropsUtil.get("portal.url");
-
-		var larFileName = RegexUtil.replace("${valueName}", "${portalURL}/documents/portlet_file_entry/[0-9]*/([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("lar file name ${larFileName}");
-
-		return "${larFileName}";
 	}
 
 	macro gotoExport {

@@ -24,20 +24,19 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * <code>BackgroundTaskServiceUtil</code> service
- * utility. The static methods of this class call the same methods of the
- * service utility. However, the signatures are different because it is
- * difficult for SOAP to support certain types.
+ * {@link BackgroundTaskServiceUtil} service utility. The
+ * static methods of this class calls the same methods of the service utility.
+ * However, the signatures are different because it is difficult for SOAP to
+ * support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a <code>java.util.List</code>,
- * that is translated to an array of
- * <code>com.liferay.portal.background.task.model.BackgroundTaskSoap</code>. If the method in the
- * service utility returns a
- * <code>com.liferay.portal.background.task.model.BackgroundTask</code>, that is translated to a
- * <code>com.liferay.portal.background.task.model.BackgroundTaskSoap</code>. Methods that SOAP
- * cannot safely wire are skipped.
+ * if the method in the service utility returns a {@link java.util.List}, that
+ * is translated to an array of {@link com.liferay.portal.background.task.model.BackgroundTaskSoap}.
+ * If the method in the service utility returns a
+ * {@link com.liferay.portal.background.task.model.BackgroundTask}, that is translated to a
+ * {@link com.liferay.portal.background.task.model.BackgroundTaskSoap}. Methods that SOAP cannot
+ * safely wire are skipped.
  * </p>
  *
  * <p>
@@ -59,18 +58,18 @@ import java.rmi.RemoteException;
  *
  * @author Brian Wing Shun Chan
  * @see BackgroundTaskServiceHttp
+ * @see com.liferay.portal.background.task.model.BackgroundTaskSoap
+ * @see BackgroundTaskServiceUtil
  * @generated
  */
 @ProviderType
 public class BackgroundTaskServiceSoap {
-
-	public static int getBackgroundTasksCount(
-			long groupId, String taskExecutorClassName, String completed)
+	public static int getBackgroundTasksCount(long groupId,
+		String taskExecutorClassName, String completed)
 		throws RemoteException {
-
 		try {
-			int returnValue = BackgroundTaskServiceUtil.getBackgroundTasksCount(
-				groupId, taskExecutorClassName, completed);
+			int returnValue = BackgroundTaskServiceUtil.getBackgroundTasksCount(groupId,
+					taskExecutorClassName, completed);
 
 			return returnValue;
 		}
@@ -83,11 +82,8 @@ public class BackgroundTaskServiceSoap {
 
 	public static String getBackgroundTaskStatusJSON(long backgroundTaskId)
 		throws RemoteException {
-
 		try {
-			String returnValue =
-				BackgroundTaskServiceUtil.getBackgroundTaskStatusJSON(
-					backgroundTaskId);
+			String returnValue = BackgroundTaskServiceUtil.getBackgroundTaskStatusJSON(backgroundTaskId);
 
 			return returnValue;
 		}
@@ -98,7 +94,5 @@ public class BackgroundTaskServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		BackgroundTaskServiceSoap.class);
-
+	private static Log _log = LogFactoryUtil.getLog(BackgroundTaskServiceSoap.class);
 }

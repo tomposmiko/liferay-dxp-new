@@ -16,15 +16,11 @@ package com.liferay.marketplace.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
-import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
+import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -36,20 +32,10 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class ModuleWrapper implements Module, ModelWrapper<Module> {
-
+public class ModuleWrapper extends BaseModelWrapper<Module> implements Module,
+	ModelWrapper<Module> {
 	public ModuleWrapper(Module module) {
-		_module = module;
-	}
-
-	@Override
-	public Class<?> getModelClass() {
-		return Module.class;
-	}
-
-	@Override
-	public String getModelClassName() {
-		return Module.class.getName();
+		super(module);
 	}
 
 	@Override
@@ -93,8 +79,7 @@ public class ModuleWrapper implements Module, ModelWrapper<Module> {
 			setAppId(appId);
 		}
 
-		String bundleSymbolicName = (String)attributes.get(
-			"bundleSymbolicName");
+		String bundleSymbolicName = (String)attributes.get("bundleSymbolicName");
 
 		if (bundleSymbolicName != null) {
 			setBundleSymbolicName(bundleSymbolicName);
@@ -113,312 +98,178 @@ public class ModuleWrapper implements Module, ModelWrapper<Module> {
 		}
 	}
 
-	@Override
-	public Object clone() {
-		return new ModuleWrapper((Module)_module.clone());
-	}
-
-	@Override
-	public int compareTo(Module module) {
-		return _module.compareTo(module);
-	}
-
 	/**
-	 * Returns the app ID of this module.
-	 *
-	 * @return the app ID of this module
-	 */
+	* Returns the app ID of this module.
+	*
+	* @return the app ID of this module
+	*/
 	@Override
 	public long getAppId() {
-		return _module.getAppId();
+		return model.getAppId();
 	}
 
 	/**
-	 * Returns the bundle symbolic name of this module.
-	 *
-	 * @return the bundle symbolic name of this module
-	 */
+	* Returns the bundle symbolic name of this module.
+	*
+	* @return the bundle symbolic name of this module
+	*/
 	@Override
 	public String getBundleSymbolicName() {
-		return _module.getBundleSymbolicName();
+		return model.getBundleSymbolicName();
 	}
 
 	/**
-	 * Returns the bundle version of this module.
-	 *
-	 * @return the bundle version of this module
-	 */
+	* Returns the bundle version of this module.
+	*
+	* @return the bundle version of this module
+	*/
 	@Override
 	public String getBundleVersion() {
-		return _module.getBundleVersion();
+		return model.getBundleVersion();
 	}
 
 	/**
-	 * Returns the company ID of this module.
-	 *
-	 * @return the company ID of this module
-	 */
+	* Returns the company ID of this module.
+	*
+	* @return the company ID of this module
+	*/
 	@Override
 	public long getCompanyId() {
-		return _module.getCompanyId();
+		return model.getCompanyId();
 	}
 
 	/**
-	 * Returns the context name of this module.
-	 *
-	 * @return the context name of this module
-	 */
+	* Returns the context name of this module.
+	*
+	* @return the context name of this module
+	*/
 	@Override
 	public String getContextName() {
-		return _module.getContextName();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _module.getExpandoBridge();
+		return model.getContextName();
 	}
 
 	/**
-	 * Returns the module ID of this module.
-	 *
-	 * @return the module ID of this module
-	 */
+	* Returns the module ID of this module.
+	*
+	* @return the module ID of this module
+	*/
 	@Override
 	public long getModuleId() {
-		return _module.getModuleId();
+		return model.getModuleId();
 	}
 
 	/**
-	 * Returns the primary key of this module.
-	 *
-	 * @return the primary key of this module
-	 */
+	* Returns the primary key of this module.
+	*
+	* @return the primary key of this module
+	*/
 	@Override
 	public long getPrimaryKey() {
-		return _module.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _module.getPrimaryKeyObj();
+		return model.getPrimaryKey();
 	}
 
 	/**
-	 * Returns the uuid of this module.
-	 *
-	 * @return the uuid of this module
-	 */
+	* Returns the uuid of this module.
+	*
+	* @return the uuid of this module
+	*/
 	@Override
 	public String getUuid() {
-		return _module.getUuid();
-	}
-
-	@Override
-	public int hashCode() {
-		return _module.hashCode();
+		return model.getUuid();
 	}
 
 	@Override
 	public boolean isBundle() {
-		return _module.isBundle();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _module.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _module.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _module.isNew();
+		return model.isBundle();
 	}
 
 	@Override
 	public void persist() {
-		_module.persist();
+		model.persist();
 	}
 
 	/**
-	 * Sets the app ID of this module.
-	 *
-	 * @param appId the app ID of this module
-	 */
+	* Sets the app ID of this module.
+	*
+	* @param appId the app ID of this module
+	*/
 	@Override
 	public void setAppId(long appId) {
-		_module.setAppId(appId);
+		model.setAppId(appId);
 	}
 
 	/**
-	 * Sets the bundle symbolic name of this module.
-	 *
-	 * @param bundleSymbolicName the bundle symbolic name of this module
-	 */
+	* Sets the bundle symbolic name of this module.
+	*
+	* @param bundleSymbolicName the bundle symbolic name of this module
+	*/
 	@Override
 	public void setBundleSymbolicName(String bundleSymbolicName) {
-		_module.setBundleSymbolicName(bundleSymbolicName);
+		model.setBundleSymbolicName(bundleSymbolicName);
 	}
 
 	/**
-	 * Sets the bundle version of this module.
-	 *
-	 * @param bundleVersion the bundle version of this module
-	 */
+	* Sets the bundle version of this module.
+	*
+	* @param bundleVersion the bundle version of this module
+	*/
 	@Override
 	public void setBundleVersion(String bundleVersion) {
-		_module.setBundleVersion(bundleVersion);
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_module.setCachedModel(cachedModel);
+		model.setBundleVersion(bundleVersion);
 	}
 
 	/**
-	 * Sets the company ID of this module.
-	 *
-	 * @param companyId the company ID of this module
-	 */
+	* Sets the company ID of this module.
+	*
+	* @param companyId the company ID of this module
+	*/
 	@Override
 	public void setCompanyId(long companyId) {
-		_module.setCompanyId(companyId);
+		model.setCompanyId(companyId);
 	}
 
 	/**
-	 * Sets the context name of this module.
-	 *
-	 * @param contextName the context name of this module
-	 */
+	* Sets the context name of this module.
+	*
+	* @param contextName the context name of this module
+	*/
 	@Override
 	public void setContextName(String contextName) {
-		_module.setContextName(contextName);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-
-		_module.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_module.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_module.setExpandoBridgeAttributes(serviceContext);
+		model.setContextName(contextName);
 	}
 
 	/**
-	 * Sets the module ID of this module.
-	 *
-	 * @param moduleId the module ID of this module
-	 */
+	* Sets the module ID of this module.
+	*
+	* @param moduleId the module ID of this module
+	*/
 	@Override
 	public void setModuleId(long moduleId) {
-		_module.setModuleId(moduleId);
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_module.setNew(n);
+		model.setModuleId(moduleId);
 	}
 
 	/**
-	 * Sets the primary key of this module.
-	 *
-	 * @param primaryKey the primary key of this module
-	 */
+	* Sets the primary key of this module.
+	*
+	* @param primaryKey the primary key of this module
+	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
-		_module.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		_module.setPrimaryKeyObj(primaryKeyObj);
+		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	 * Sets the uuid of this module.
-	 *
-	 * @param uuid the uuid of this module
-	 */
+	* Sets the uuid of this module.
+	*
+	* @param uuid the uuid of this module
+	*/
 	@Override
 	public void setUuid(String uuid) {
-		_module.setUuid(uuid);
+		model.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<Module> toCacheModel() {
-		return _module.toCacheModel();
+	protected ModuleWrapper wrap(Module module) {
+		return new ModuleWrapper(module);
 	}
-
-	@Override
-	public Module toEscapedModel() {
-		return new ModuleWrapper(_module.toEscapedModel());
-	}
-
-	@Override
-	public String toString() {
-		return _module.toString();
-	}
-
-	@Override
-	public Module toUnescapedModel() {
-		return new ModuleWrapper(_module.toUnescapedModel());
-	}
-
-	@Override
-	public String toXmlString() {
-		return _module.toXmlString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (!(obj instanceof ModuleWrapper)) {
-			return false;
-		}
-
-		ModuleWrapper moduleWrapper = (ModuleWrapper)obj;
-
-		if (Objects.equals(_module, moduleWrapper._module)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public Module getWrappedModel() {
-		return _module;
-	}
-
-	@Override
-	public boolean isEntityCacheEnabled() {
-		return _module.isEntityCacheEnabled();
-	}
-
-	@Override
-	public boolean isFinderCacheEnabled() {
-		return _module.isFinderCacheEnabled();
-	}
-
-	@Override
-	public void resetOriginalValues() {
-		_module.resetOriginalValues();
-	}
-
-	private final Module _module;
-
 }

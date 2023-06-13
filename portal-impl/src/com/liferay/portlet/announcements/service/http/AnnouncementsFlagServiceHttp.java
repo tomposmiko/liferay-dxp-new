@@ -17,6 +17,7 @@ package com.liferay.portlet.announcements.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.announcements.kernel.service.AnnouncementsFlagServiceUtil;
+
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.HttpPrincipal;
@@ -26,11 +27,10 @@ import com.liferay.portal.kernel.util.MethodKey;
 
 /**
  * Provides the HTTP utility for the
- * <code>AnnouncementsFlagServiceUtil</code> service
- * utility. The
+ * {@link AnnouncementsFlagServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it requires an additional
- * <code>HttpPrincipal</code> parameter.
+ * {@link HttpPrincipal} parameter.
  *
  * <p>
  * The benefits of using the HTTP utility is that it is fast and allows for
@@ -49,36 +49,30 @@ import com.liferay.portal.kernel.util.MethodKey;
  *
  * @author Brian Wing Shun Chan
  * @see AnnouncementsFlagServiceSoap
+ * @see HttpPrincipal
+ * @see AnnouncementsFlagServiceUtil
  * @generated
  */
 @ProviderType
 public class AnnouncementsFlagServiceHttp {
-
-	public static void addFlag(
-			HttpPrincipal httpPrincipal, long entryId, int value)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public static void addFlag(HttpPrincipal httpPrincipal, long entryId,
+		int value) throws com.liferay.portal.kernel.exception.PortalException {
 		try {
-			MethodKey methodKey = new MethodKey(
-				AnnouncementsFlagServiceUtil.class, "addFlag",
-				_addFlagParameterTypes0);
+			MethodKey methodKey = new MethodKey(AnnouncementsFlagServiceUtil.class,
+					"addFlag", _addFlagParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, entryId, value);
+			MethodHandler methodHandler = new MethodHandler(methodKey, entryId,
+					value);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
@@ -90,11 +84,9 @@ public class AnnouncementsFlagServiceHttp {
 
 	public static void deleteFlag(HttpPrincipal httpPrincipal, long flagId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				AnnouncementsFlagServiceUtil.class, "deleteFlag",
-				_deleteFlagParameterTypes1);
+			MethodKey methodKey = new MethodKey(AnnouncementsFlagServiceUtil.class,
+					"deleteFlag", _deleteFlagParameterTypes1);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, flagId);
 
@@ -102,15 +94,11 @@ public class AnnouncementsFlagServiceHttp {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
@@ -120,17 +108,15 @@ public class AnnouncementsFlagServiceHttp {
 		}
 	}
 
-	public static com.liferay.announcements.kernel.model.AnnouncementsFlag
-			getFlag(HttpPrincipal httpPrincipal, long entryId, int value)
+	public static com.liferay.announcements.kernel.model.AnnouncementsFlag getFlag(
+		HttpPrincipal httpPrincipal, long entryId, int value)
 		throws com.liferay.portal.kernel.exception.PortalException {
-
 		try {
-			MethodKey methodKey = new MethodKey(
-				AnnouncementsFlagServiceUtil.class, "getFlag",
-				_getFlagParameterTypes2);
+			MethodKey methodKey = new MethodKey(AnnouncementsFlagServiceUtil.class,
+					"getFlag", _getFlagParameterTypes2);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, entryId, value);
+			MethodHandler methodHandler = new MethodHandler(methodKey, entryId,
+					value);
 
 			Object returnObj = null;
 
@@ -138,19 +124,14 @@ public class AnnouncementsFlagServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.announcements.kernel.model.AnnouncementsFlag)
-				returnObj;
+			return (com.liferay.announcements.kernel.model.AnnouncementsFlag)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -159,17 +140,14 @@ public class AnnouncementsFlagServiceHttp {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		AnnouncementsFlagServiceHttp.class);
-
+	private static Log _log = LogFactoryUtil.getLog(AnnouncementsFlagServiceHttp.class);
 	private static final Class<?>[] _addFlagParameterTypes0 = new Class[] {
-		long.class, int.class
-	};
+			long.class, int.class
+		};
 	private static final Class<?>[] _deleteFlagParameterTypes1 = new Class[] {
-		long.class
-	};
+			long.class
+		};
 	private static final Class<?>[] _getFlagParameterTypes2 = new Class[] {
-		long.class, int.class
-	};
-
+			long.class, int.class
+		};
 }

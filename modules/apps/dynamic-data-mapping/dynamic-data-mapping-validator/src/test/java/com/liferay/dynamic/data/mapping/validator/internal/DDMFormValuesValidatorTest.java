@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.validator.internal;
 
+import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunctionTracker;
 import com.liferay.dynamic.data.mapping.expression.internal.DDMExpressionFactoryImpl;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
@@ -35,20 +36,23 @@ import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidationExcepti
 import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidationException.RequiredValue;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Marcellus Tavares
  */
-public class DDMFormValuesValidatorTest {
+@RunWith(PowerMockRunner.class)
+public class DDMFormValuesValidatorTest extends PowerMockito {
 
 	@Before
 	public void setUp() throws Exception {
@@ -759,15 +763,26 @@ public class DDMFormValuesValidatorTest {
 	}
 
 	protected void setUpDDMFormValuesValidator() throws Exception {
+		DDMExpressionFactoryImpl ddmExpressionFactoryImpl =
+			new DDMExpressionFactoryImpl();
+
+		field(
+			DDMExpressionFactoryImpl.class, "ddmExpressionFunctionTracker"
+		).set(
+			ddmExpressionFactoryImpl, mock(DDMExpressionFunctionTracker.class)
+		);
+
 		_ddmFormValuesValidatorImpl.setDDMExpressionFactory(
-			new DDMExpressionFactoryImpl());
+			ddmExpressionFactoryImpl);
 
 		_ddmFormValuesValidatorImpl.setJSONFactory(new JSONFactoryImpl());
 
-		ReflectionTestUtil.setFieldValue(
-			_ddmFormValuesValidatorImpl, "_ddmFormFieldTypeServicesTracker",
-			ProxyFactory.newDummyInstance(
-				DDMFormFieldTypeServicesTracker.class));
+		field(
+			DDMFormValuesValidatorImpl.class, "_ddmFormFieldTypeServicesTracker"
+		).set(
+			_ddmFormValuesValidatorImpl,
+			mock(DDMFormFieldTypeServicesTracker.class)
+		);
 	}
 
 	private final DDMFormValuesValidatorImpl _ddmFormValuesValidatorImpl =

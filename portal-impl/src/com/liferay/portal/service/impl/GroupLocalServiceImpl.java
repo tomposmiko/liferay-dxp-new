@@ -94,7 +94,6 @@ import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.security.permission.RolePermissions;
 import com.liferay.portal.kernel.security.permission.UserBag;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -708,12 +707,14 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		nameMap.put(LocaleUtil.getDefault(), String.valueOf(layout.getPlid()));
 
-		return groupLocalService.addGroup(
+		Group scopeGroup = groupLocalService.addGroup(
 			userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			Layout.class.getName(), layout.getPlid(),
 			GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap, null, 0, true,
 			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false, true,
 			null);
+
+		return scopeGroup;
 	}
 
 	/**
@@ -1393,11 +1394,14 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 *         <code>null</code> if a matching group could not be found
 	 */
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public Group fetchGroup(long companyId, String groupKey) {
-		String companyIdHexString = StringUtil.toHexString(companyId);
-
-		Group group = _systemGroupsMap.get(companyIdHexString.concat(groupKey));
+		Group group = _systemGroupsMap.get(
+			StringUtil.toHexString(
+				companyId
+			).concat(
+				groupKey
+			));
 
 		if (group != null) {
 			return group;
@@ -1649,13 +1653,16 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * @throws PortalException if a portal exception occurred
 	 */
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public Group getGroup(long companyId, String groupKey)
 		throws PortalException {
 
-		String companyIdHexString = StringUtil.toHexString(companyId);
-
-		Group group = _systemGroupsMap.get(companyIdHexString.concat(groupKey));
+		Group group = _systemGroupsMap.get(
+			StringUtil.toHexString(
+				companyId
+			).concat(
+				groupKey
+			));
 
 		if (group != null) {
 			return group;
@@ -2514,7 +2521,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	@Override
-	@Skip
+	@Transactional(enabled = false)
 	public boolean isLiveGroupActive(Group group) {
 		if (group == null) {
 			return false;
@@ -4630,12 +4637,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 						}
 					}
 
-					if (StringUtil.endsWith(friendlyURL, CharPool.DASH)) {
-						friendlyURL = friendlyURL + ++i;
-					}
-					else {
-						friendlyURL = friendlyURL + CharPool.DASH + ++i;
-					}
+					friendlyURL = friendlyURL + CharPool.DASH + ++i;
 				}
 				else if (type == GroupFriendlyURLException.ENDS_WITH_DASH) {
 					friendlyURL = StringUtil.replaceLast(
@@ -5019,6 +5021,29 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 						GroupFriendlyURLException.POSSIBLE_DUPLICATE);
 
 				gfurle.setKeywordConflict(groupIdFriendlyURL);
+
+				throw gfurle;
+			}
+		}
+
+		String screenName = friendlyURL.substring(1);
+
+		User user = userPersistence.fetchByC_SN(companyId, screenName);
+
+		if (user != null) {
+			long userClassNameId = classNameLocalService.getClassNameId(
+				User.class);
+
+			if ((classNameId == userClassNameId) &&
+				(classPK == user.getUserId())) {
+			}
+			else {
+				GroupFriendlyURLException gfurle =
+					new GroupFriendlyURLException(
+						GroupFriendlyURLException.DUPLICATE);
+
+				gfurle.setDuplicateClassPK(user.getUserId());
+				gfurle.setDuplicateClassName(User.class.getName());
 
 				throw gfurle;
 			}

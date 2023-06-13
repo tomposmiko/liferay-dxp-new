@@ -16,9 +16,11 @@ package com.liferay.portlet.social.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+
 import com.liferay.social.kernel.model.SocialActivity;
 
 import java.io.Externalizable;
@@ -30,12 +32,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing SocialActivity in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see SocialActivity
  * @generated
  */
 @ProviderType
-public class SocialActivityCacheModel
-	implements CacheModel<SocialActivity>, Externalizable {
-
+public class SocialActivityCacheModel implements CacheModel<SocialActivity>,
+	Externalizable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -46,8 +48,7 @@ public class SocialActivityCacheModel
 			return false;
 		}
 
-		SocialActivityCacheModel socialActivityCacheModel =
-			(SocialActivityCacheModel)obj;
+		SocialActivityCacheModel socialActivityCacheModel = (SocialActivityCacheModel)obj;
 
 		if (activityId == socialActivityCacheModel.activityId) {
 			return true;
@@ -160,7 +161,8 @@ public class SocialActivityCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(activityId);
 
 		objectOutput.writeLong(groupId);
@@ -209,5 +211,4 @@ public class SocialActivityCacheModel
 	public int type;
 	public String extraData;
 	public long receiverUserId;
-
 }

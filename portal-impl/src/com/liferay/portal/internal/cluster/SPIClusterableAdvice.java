@@ -16,35 +16,32 @@ package com.liferay.portal.internal.cluster;
 
 import com.liferay.portal.kernel.cluster.Clusterable;
 import com.liferay.portal.kernel.cluster.ClusterableInvokerUtil;
-import com.liferay.portal.kernel.cluster.NullClusterable;
 import com.liferay.portal.kernel.nio.intraband.rpc.IntrabandRPCUtil;
 import com.liferay.portal.kernel.resiliency.spi.SPI;
 import com.liferay.portal.kernel.resiliency.spi.SPIUtil;
-import com.liferay.portal.spring.aop.AnnotationChainableMethodAdvice;
+import com.liferay.portal.spring.aop.AopMethodInvocation;
+import com.liferay.portal.spring.aop.ChainableMethodAdvice;
 
 import java.io.Serializable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+import java.util.Map;
 import java.util.concurrent.Future;
-
-import org.aopalliance.intercept.MethodInvocation;
 
 /**
  * @author Shuyang Zhou
  */
-public class SPIClusterableAdvice
-	extends AnnotationChainableMethodAdvice<Clusterable> {
+public class SPIClusterableAdvice extends ChainableMethodAdvice {
 
 	@Override
-	public void afterReturning(MethodInvocation methodInvocation, Object result)
+	public void afterReturning(
+			AopMethodInvocation aopMethodInvocation, Object[] arguments,
+			Object result)
 		throws Throwable {
 
-		Clusterable clusterable = findAnnotation(methodInvocation);
-
-		if (clusterable == NullClusterable.NULL_CLUSTERABLE) {
-			return;
-		}
+		Clusterable clusterable = aopMethodInvocation.getAdviceMethodContext();
 
 		SPI spi = SPIUtil.getSPI();
 
@@ -52,18 +49,16 @@ public class SPIClusterableAdvice
 			spi.getRegistrationReference(),
 			new MethodHandlerProcessCallable<Serializable>(
 				ClusterableInvokerUtil.createMethodHandler(
-					clusterable.acceptor(), methodInvocation.getThis(),
-					methodInvocation.getMethod(),
-					methodInvocation.getArguments())));
+					clusterable.acceptor(), aopMethodInvocation.getThis(),
+					aopMethodInvocation.getMethod(), arguments)));
 	}
 
 	@Override
-	public Object before(MethodInvocation methodInvocation) throws Throwable {
-		Clusterable clusterable = findAnnotation(methodInvocation);
+	public Object before(
+			AopMethodInvocation aopMethodInvocation, Object[] arguments)
+		throws Throwable {
 
-		if (clusterable == NullClusterable.NULL_CLUSTERABLE) {
-			return null;
-		}
+		Clusterable clusterable = aopMethodInvocation.getAdviceMethodContext();
 
 		if (!clusterable.onMaster()) {
 			return null;
@@ -75,13 +70,12 @@ public class SPIClusterableAdvice
 			spi.getRegistrationReference(),
 			new MethodHandlerProcessCallable<Serializable>(
 				ClusterableInvokerUtil.createMethodHandler(
-					clusterable.acceptor(), methodInvocation.getThis(),
-					methodInvocation.getMethod(),
-					methodInvocation.getArguments())));
+					clusterable.acceptor(), aopMethodInvocation.getThis(),
+					aopMethodInvocation.getMethod(), arguments)));
 
 		Object result = futureResult.get();
 
-		Method method = methodInvocation.getMethod();
+		Method method = aopMethodInvocation.getMethod();
 
 		Class<?> returnType = method.getReturnType();
 
@@ -93,8 +87,11 @@ public class SPIClusterableAdvice
 	}
 
 	@Override
-	public Clusterable getNullAnnotation() {
-		return NullClusterable.NULL_CLUSTERABLE;
+	public Object createMethodContext(
+		Class<?> targetClass, Method method,
+		Map<Class<? extends Annotation>, Annotation> annotations) {
+
+		return annotations.get(Clusterable.class);
 	}
 
 }

@@ -21,6 +21,9 @@ import com.liferay.changeset.model.ChangesetEntry;
 import com.liferay.changeset.model.impl.ChangesetEntryImpl;
 import com.liferay.changeset.model.impl.ChangesetEntryModelImpl;
 import com.liferay.changeset.service.persistence.ChangesetEntryPersistence;
+
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -37,7 +40,6 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
@@ -46,12 +48,8 @@ import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * The persistence implementation for the changeset entry service.
@@ -61,27 +59,23 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see ChangesetEntryPersistence
+ * @see com.liferay.changeset.service.persistence.ChangesetEntryUtil
  * @generated
  */
 @ProviderType
-public class ChangesetEntryPersistenceImpl
-	extends BasePersistenceImpl<ChangesetEntry>
+public class ChangesetEntryPersistenceImpl extends BasePersistenceImpl<ChangesetEntry>
 	implements ChangesetEntryPersistence {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use <code>ChangesetEntryUtil</code> to access the changeset entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use {@link ChangesetEntryUtil} to access the changeset entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY =
-		ChangesetEntryImpl.class.getName();
-
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List1";
-
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List2";
-
+	public static final String FINDER_CLASS_NAME_ENTITY = ChangesetEntryImpl.class.getName();
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -97,15 +91,14 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public List<ChangesetEntry> findByGroupId(long groupId) {
-		return findByGroupId(
-			groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByGroupId(groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the changeset entries where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -114,9 +107,7 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByGroupId(
-		long groupId, int start, int end) {
-
+	public List<ChangesetEntry> findByGroupId(long groupId, int start, int end) {
 		return findByGroupId(groupId, start, end, null);
 	}
 
@@ -124,7 +115,7 @@ public class ChangesetEntryPersistenceImpl
 	 * Returns an ordered range of all the changeset entries where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -134,10 +125,8 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the ordered range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByGroupId(
-		long groupId, int start, int end,
+	public List<ChangesetEntry> findByGroupId(long groupId, int start, int end,
 		OrderByComparator<ChangesetEntry> orderByComparator) {
-
 		return findByGroupId(groupId, start, end, orderByComparator, true);
 	}
 
@@ -145,7 +134,7 @@ public class ChangesetEntryPersistenceImpl
 	 * Returns an ordered range of all the changeset entries where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -156,32 +145,29 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the ordered range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByGroupId(
-		long groupId, int start, int end,
+	public List<ChangesetEntry> findByGroupId(long groupId, int start, int end,
 		OrderByComparator<ChangesetEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByGroupId;
-			finderArgs = new Object[] {groupId};
+			finderArgs = new Object[] { groupId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByGroupId;
-			finderArgs = new Object[] {groupId, start, end, orderByComparator};
+			finderArgs = new Object[] { groupId, start, end, orderByComparator };
 		}
 
 		List<ChangesetEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<ChangesetEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ChangesetEntry changesetEntry : list) {
@@ -198,8 +184,8 @@ public class ChangesetEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -210,10 +196,11 @@ public class ChangesetEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(ChangesetEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -231,16 +218,16 @@ public class ChangesetEntryPersistenceImpl
 				qPos.add(groupId);
 
 				if (!pagination) {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -269,12 +256,11 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry findByGroupId_First(
-			long groupId, OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry findByGroupId_First(long groupId,
+		OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = fetchByGroupId_First(
-			groupId, orderByComparator);
+		ChangesetEntry changesetEntry = fetchByGroupId_First(groupId,
+				orderByComparator);
 
 		if (changesetEntry != null) {
 			return changesetEntry;
@@ -300,11 +286,10 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the first matching changeset entry, or <code>null</code> if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry fetchByGroupId_First(
-		long groupId, OrderByComparator<ChangesetEntry> orderByComparator) {
-
-		List<ChangesetEntry> list = findByGroupId(
-			groupId, 0, 1, orderByComparator);
+	public ChangesetEntry fetchByGroupId_First(long groupId,
+		OrderByComparator<ChangesetEntry> orderByComparator) {
+		List<ChangesetEntry> list = findByGroupId(groupId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -322,12 +307,11 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry findByGroupId_Last(
-			long groupId, OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry findByGroupId_Last(long groupId,
+		OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = fetchByGroupId_Last(
-			groupId, orderByComparator);
+		ChangesetEntry changesetEntry = fetchByGroupId_Last(groupId,
+				orderByComparator);
 
 		if (changesetEntry != null) {
 			return changesetEntry;
@@ -353,17 +337,16 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the last matching changeset entry, or <code>null</code> if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry fetchByGroupId_Last(
-		long groupId, OrderByComparator<ChangesetEntry> orderByComparator) {
-
+	public ChangesetEntry fetchByGroupId_Last(long groupId,
+		OrderByComparator<ChangesetEntry> orderByComparator) {
 		int count = countByGroupId(groupId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<ChangesetEntry> list = findByGroupId(
-			groupId, count - 1, count, orderByComparator);
+		List<ChangesetEntry> list = findByGroupId(groupId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -382,11 +365,9 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a changeset entry with the primary key could not be found
 	 */
 	@Override
-	public ChangesetEntry[] findByGroupId_PrevAndNext(
-			long changesetEntryId, long groupId,
-			OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry[] findByGroupId_PrevAndNext(long changesetEntryId,
+		long groupId, OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		ChangesetEntry changesetEntry = findByPrimaryKey(changesetEntryId);
 
 		Session session = null;
@@ -396,13 +377,13 @@ public class ChangesetEntryPersistenceImpl
 
 			ChangesetEntry[] array = new ChangesetEntryImpl[3];
 
-			array[0] = getByGroupId_PrevAndNext(
-				session, changesetEntry, groupId, orderByComparator, true);
+			array[0] = getByGroupId_PrevAndNext(session, changesetEntry,
+					groupId, orderByComparator, true);
 
 			array[1] = changesetEntry;
 
-			array[2] = getByGroupId_PrevAndNext(
-				session, changesetEntry, groupId, orderByComparator, false);
+			array[2] = getByGroupId_PrevAndNext(session, changesetEntry,
+					groupId, orderByComparator, false);
 
 			return array;
 		}
@@ -414,15 +395,14 @@ public class ChangesetEntryPersistenceImpl
 		}
 	}
 
-	protected ChangesetEntry getByGroupId_PrevAndNext(
-		Session session, ChangesetEntry changesetEntry, long groupId,
+	protected ChangesetEntry getByGroupId_PrevAndNext(Session session,
+		ChangesetEntry changesetEntry, long groupId,
 		OrderByComparator<ChangesetEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -434,8 +414,7 @@ public class ChangesetEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -505,10 +484,8 @@ public class ChangesetEntryPersistenceImpl
 		qPos.add(groupId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						changesetEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					changesetEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -530,10 +507,8 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByGroupId(long groupId) {
-		for (ChangesetEntry changesetEntry :
-				findByGroupId(
-					groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (ChangesetEntry changesetEntry : findByGroupId(groupId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(changesetEntry);
 		}
 	}
@@ -548,7 +523,7 @@ public class ChangesetEntryPersistenceImpl
 	public int countByGroupId(long groupId) {
 		FinderPath finderPath = _finderPathCountByGroupId;
 
-		Object[] finderArgs = new Object[] {groupId};
+		Object[] finderArgs = new Object[] { groupId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -589,9 +564,7 @@ public class ChangesetEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 =
-		"changesetEntry.groupId = ?";
-
+	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 = "changesetEntry.groupId = ?";
 	private FinderPath _finderPathWithPaginationFindByCompanyId;
 	private FinderPath _finderPathWithoutPaginationFindByCompanyId;
 	private FinderPath _finderPathCountByCompanyId;
@@ -604,15 +577,15 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public List<ChangesetEntry> findByCompanyId(long companyId) {
-		return findByCompanyId(
-			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByCompanyId(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the changeset entries where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -621,9 +594,8 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByCompanyId(
-		long companyId, int start, int end) {
-
+	public List<ChangesetEntry> findByCompanyId(long companyId, int start,
+		int end) {
 		return findByCompanyId(companyId, start, end, null);
 	}
 
@@ -631,7 +603,7 @@ public class ChangesetEntryPersistenceImpl
 	 * Returns an ordered range of all the changeset entries where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -641,10 +613,8 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the ordered range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByCompanyId(
-		long companyId, int start, int end,
-		OrderByComparator<ChangesetEntry> orderByComparator) {
-
+	public List<ChangesetEntry> findByCompanyId(long companyId, int start,
+		int end, OrderByComparator<ChangesetEntry> orderByComparator) {
 		return findByCompanyId(companyId, start, end, orderByComparator, true);
 	}
 
@@ -652,7 +622,7 @@ public class ChangesetEntryPersistenceImpl
 	 * Returns an ordered range of all the changeset entries where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -663,34 +633,29 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the ordered range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByCompanyId(
-		long companyId, int start, int end,
-		OrderByComparator<ChangesetEntry> orderByComparator,
+	public List<ChangesetEntry> findByCompanyId(long companyId, int start,
+		int end, OrderByComparator<ChangesetEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByCompanyId;
-			finderArgs = new Object[] {companyId};
+			finderArgs = new Object[] { companyId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByCompanyId;
-			finderArgs = new Object[] {
-				companyId, start, end, orderByComparator
-			};
+			finderArgs = new Object[] { companyId, start, end, orderByComparator };
 		}
 
 		List<ChangesetEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<ChangesetEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ChangesetEntry changesetEntry : list) {
@@ -707,8 +672,8 @@ public class ChangesetEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -719,10 +684,11 @@ public class ChangesetEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(ChangesetEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -740,16 +706,16 @@ public class ChangesetEntryPersistenceImpl
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -778,12 +744,11 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry findByCompanyId_First(
-			long companyId, OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry findByCompanyId_First(long companyId,
+		OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = fetchByCompanyId_First(
-			companyId, orderByComparator);
+		ChangesetEntry changesetEntry = fetchByCompanyId_First(companyId,
+				orderByComparator);
 
 		if (changesetEntry != null) {
 			return changesetEntry;
@@ -809,11 +774,10 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the first matching changeset entry, or <code>null</code> if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry fetchByCompanyId_First(
-		long companyId, OrderByComparator<ChangesetEntry> orderByComparator) {
-
-		List<ChangesetEntry> list = findByCompanyId(
-			companyId, 0, 1, orderByComparator);
+	public ChangesetEntry fetchByCompanyId_First(long companyId,
+		OrderByComparator<ChangesetEntry> orderByComparator) {
+		List<ChangesetEntry> list = findByCompanyId(companyId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -831,12 +795,11 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry findByCompanyId_Last(
-			long companyId, OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry findByCompanyId_Last(long companyId,
+		OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = fetchByCompanyId_Last(
-			companyId, orderByComparator);
+		ChangesetEntry changesetEntry = fetchByCompanyId_Last(companyId,
+				orderByComparator);
 
 		if (changesetEntry != null) {
 			return changesetEntry;
@@ -862,17 +825,16 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the last matching changeset entry, or <code>null</code> if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry fetchByCompanyId_Last(
-		long companyId, OrderByComparator<ChangesetEntry> orderByComparator) {
-
+	public ChangesetEntry fetchByCompanyId_Last(long companyId,
+		OrderByComparator<ChangesetEntry> orderByComparator) {
 		int count = countByCompanyId(companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<ChangesetEntry> list = findByCompanyId(
-			companyId, count - 1, count, orderByComparator);
+		List<ChangesetEntry> list = findByCompanyId(companyId, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -891,11 +853,9 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a changeset entry with the primary key could not be found
 	 */
 	@Override
-	public ChangesetEntry[] findByCompanyId_PrevAndNext(
-			long changesetEntryId, long companyId,
-			OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry[] findByCompanyId_PrevAndNext(long changesetEntryId,
+		long companyId, OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		ChangesetEntry changesetEntry = findByPrimaryKey(changesetEntryId);
 
 		Session session = null;
@@ -905,13 +865,13 @@ public class ChangesetEntryPersistenceImpl
 
 			ChangesetEntry[] array = new ChangesetEntryImpl[3];
 
-			array[0] = getByCompanyId_PrevAndNext(
-				session, changesetEntry, companyId, orderByComparator, true);
+			array[0] = getByCompanyId_PrevAndNext(session, changesetEntry,
+					companyId, orderByComparator, true);
 
 			array[1] = changesetEntry;
 
-			array[2] = getByCompanyId_PrevAndNext(
-				session, changesetEntry, companyId, orderByComparator, false);
+			array[2] = getByCompanyId_PrevAndNext(session, changesetEntry,
+					companyId, orderByComparator, false);
 
 			return array;
 		}
@@ -923,15 +883,14 @@ public class ChangesetEntryPersistenceImpl
 		}
 	}
 
-	protected ChangesetEntry getByCompanyId_PrevAndNext(
-		Session session, ChangesetEntry changesetEntry, long companyId,
+	protected ChangesetEntry getByCompanyId_PrevAndNext(Session session,
+		ChangesetEntry changesetEntry, long companyId,
 		OrderByComparator<ChangesetEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -943,8 +902,7 @@ public class ChangesetEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1014,10 +972,8 @@ public class ChangesetEntryPersistenceImpl
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						changesetEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					changesetEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1039,10 +995,8 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByCompanyId(long companyId) {
-		for (ChangesetEntry changesetEntry :
-				findByCompanyId(
-					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (ChangesetEntry changesetEntry : findByCompanyId(companyId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(changesetEntry);
 		}
 	}
@@ -1057,7 +1011,7 @@ public class ChangesetEntryPersistenceImpl
 	public int countByCompanyId(long companyId) {
 		FinderPath finderPath = _finderPathCountByCompanyId;
 
-		Object[] finderArgs = new Object[] {companyId};
+		Object[] finderArgs = new Object[] { companyId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1098,9 +1052,7 @@ public class ChangesetEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
-		"changesetEntry.companyId = ?";
-
+	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 = "changesetEntry.companyId = ?";
 	private FinderPath _finderPathWithPaginationFindByChangesetCollectionId;
 	private FinderPath _finderPathWithoutPaginationFindByChangesetCollectionId;
 	private FinderPath _finderPathCountByChangesetCollectionId;
@@ -1114,16 +1066,15 @@ public class ChangesetEntryPersistenceImpl
 	@Override
 	public List<ChangesetEntry> findByChangesetCollectionId(
 		long changesetCollectionId) {
-
-		return findByChangesetCollectionId(
-			changesetCollectionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByChangesetCollectionId(changesetCollectionId,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the changeset entries where changesetCollectionId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param changesetCollectionId the changeset collection ID
@@ -1134,16 +1085,15 @@ public class ChangesetEntryPersistenceImpl
 	@Override
 	public List<ChangesetEntry> findByChangesetCollectionId(
 		long changesetCollectionId, int start, int end) {
-
-		return findByChangesetCollectionId(
-			changesetCollectionId, start, end, null);
+		return findByChangesetCollectionId(changesetCollectionId, start, end,
+			null);
 	}
 
 	/**
 	 * Returns an ordered range of all the changeset entries where changesetCollectionId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param changesetCollectionId the changeset collection ID
@@ -1156,16 +1106,15 @@ public class ChangesetEntryPersistenceImpl
 	public List<ChangesetEntry> findByChangesetCollectionId(
 		long changesetCollectionId, int start, int end,
 		OrderByComparator<ChangesetEntry> orderByComparator) {
-
-		return findByChangesetCollectionId(
-			changesetCollectionId, start, end, orderByComparator, true);
+		return findByChangesetCollectionId(changesetCollectionId, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the changeset entries where changesetCollectionId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param changesetCollectionId the changeset collection ID
@@ -1180,37 +1129,34 @@ public class ChangesetEntryPersistenceImpl
 		long changesetCollectionId, int start, int end,
 		OrderByComparator<ChangesetEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
-			finderPath =
-				_finderPathWithoutPaginationFindByChangesetCollectionId;
-			finderArgs = new Object[] {changesetCollectionId};
+			finderPath = _finderPathWithoutPaginationFindByChangesetCollectionId;
+			finderArgs = new Object[] { changesetCollectionId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByChangesetCollectionId;
 			finderArgs = new Object[] {
-				changesetCollectionId, start, end, orderByComparator
-			};
+					changesetCollectionId,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<ChangesetEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<ChangesetEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ChangesetEntry changesetEntry : list) {
-					if ((changesetCollectionId !=
-							changesetEntry.getChangesetCollectionId())) {
-
+					if ((changesetCollectionId != changesetEntry.getChangesetCollectionId())) {
 						list = null;
 
 						break;
@@ -1223,8 +1169,8 @@ public class ChangesetEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1232,14 +1178,14 @@ public class ChangesetEntryPersistenceImpl
 
 			query.append(_SQL_SELECT_CHANGESETENTRY_WHERE);
 
-			query.append(
-				_FINDER_COLUMN_CHANGESETCOLLECTIONID_CHANGESETCOLLECTIONID_2);
+			query.append(_FINDER_COLUMN_CHANGESETCOLLECTIONID_CHANGESETCOLLECTIONID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(ChangesetEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1257,16 +1203,16 @@ public class ChangesetEntryPersistenceImpl
 				qPos.add(changesetCollectionId);
 
 				if (!pagination) {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1296,12 +1242,11 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public ChangesetEntry findByChangesetCollectionId_First(
-			long changesetCollectionId,
-			OrderByComparator<ChangesetEntry> orderByComparator)
+		long changesetCollectionId,
+		OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = fetchByChangesetCollectionId_First(
-			changesetCollectionId, orderByComparator);
+		ChangesetEntry changesetEntry = fetchByChangesetCollectionId_First(changesetCollectionId,
+				orderByComparator);
 
 		if (changesetEntry != null) {
 			return changesetEntry;
@@ -1330,9 +1275,8 @@ public class ChangesetEntryPersistenceImpl
 	public ChangesetEntry fetchByChangesetCollectionId_First(
 		long changesetCollectionId,
 		OrderByComparator<ChangesetEntry> orderByComparator) {
-
-		List<ChangesetEntry> list = findByChangesetCollectionId(
-			changesetCollectionId, 0, 1, orderByComparator);
+		List<ChangesetEntry> list = findByChangesetCollectionId(changesetCollectionId,
+				0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1351,12 +1295,11 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public ChangesetEntry findByChangesetCollectionId_Last(
-			long changesetCollectionId,
-			OrderByComparator<ChangesetEntry> orderByComparator)
+		long changesetCollectionId,
+		OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = fetchByChangesetCollectionId_Last(
-			changesetCollectionId, orderByComparator);
+		ChangesetEntry changesetEntry = fetchByChangesetCollectionId_Last(changesetCollectionId,
+				orderByComparator);
 
 		if (changesetEntry != null) {
 			return changesetEntry;
@@ -1385,15 +1328,14 @@ public class ChangesetEntryPersistenceImpl
 	public ChangesetEntry fetchByChangesetCollectionId_Last(
 		long changesetCollectionId,
 		OrderByComparator<ChangesetEntry> orderByComparator) {
-
 		int count = countByChangesetCollectionId(changesetCollectionId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<ChangesetEntry> list = findByChangesetCollectionId(
-			changesetCollectionId, count - 1, count, orderByComparator);
+		List<ChangesetEntry> list = findByChangesetCollectionId(changesetCollectionId,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1413,10 +1355,9 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public ChangesetEntry[] findByChangesetCollectionId_PrevAndNext(
-			long changesetEntryId, long changesetCollectionId,
-			OrderByComparator<ChangesetEntry> orderByComparator)
+		long changesetEntryId, long changesetCollectionId,
+		OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		ChangesetEntry changesetEntry = findByPrimaryKey(changesetEntryId);
 
 		Session session = null;
@@ -1426,15 +1367,15 @@ public class ChangesetEntryPersistenceImpl
 
 			ChangesetEntry[] array = new ChangesetEntryImpl[3];
 
-			array[0] = getByChangesetCollectionId_PrevAndNext(
-				session, changesetEntry, changesetCollectionId,
-				orderByComparator, true);
+			array[0] = getByChangesetCollectionId_PrevAndNext(session,
+					changesetEntry, changesetCollectionId, orderByComparator,
+					true);
 
 			array[1] = changesetEntry;
 
-			array[2] = getByChangesetCollectionId_PrevAndNext(
-				session, changesetEntry, changesetCollectionId,
-				orderByComparator, false);
+			array[2] = getByChangesetCollectionId_PrevAndNext(session,
+					changesetEntry, changesetCollectionId, orderByComparator,
+					false);
 
 			return array;
 		}
@@ -1450,12 +1391,11 @@ public class ChangesetEntryPersistenceImpl
 		Session session, ChangesetEntry changesetEntry,
 		long changesetCollectionId,
 		OrderByComparator<ChangesetEntry> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1464,12 +1404,10 @@ public class ChangesetEntryPersistenceImpl
 
 		query.append(_SQL_SELECT_CHANGESETENTRY_WHERE);
 
-		query.append(
-			_FINDER_COLUMN_CHANGESETCOLLECTIONID_CHANGESETCOLLECTIONID_2);
+		query.append(_FINDER_COLUMN_CHANGESETCOLLECTIONID_CHANGESETCOLLECTIONID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1539,10 +1477,8 @@ public class ChangesetEntryPersistenceImpl
 		qPos.add(changesetCollectionId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						changesetEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					changesetEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1564,11 +1500,9 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByChangesetCollectionId(long changesetCollectionId) {
-		for (ChangesetEntry changesetEntry :
-				findByChangesetCollectionId(
-					changesetCollectionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (ChangesetEntry changesetEntry : findByChangesetCollectionId(
+				changesetCollectionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				null)) {
 			remove(changesetEntry);
 		}
 	}
@@ -1583,7 +1517,7 @@ public class ChangesetEntryPersistenceImpl
 	public int countByChangesetCollectionId(long changesetCollectionId) {
 		FinderPath finderPath = _finderPathCountByChangesetCollectionId;
 
-		Object[] finderArgs = new Object[] {changesetCollectionId};
+		Object[] finderArgs = new Object[] { changesetCollectionId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1592,8 +1526,7 @@ public class ChangesetEntryPersistenceImpl
 
 			query.append(_SQL_COUNT_CHANGESETENTRY_WHERE);
 
-			query.append(
-				_FINDER_COLUMN_CHANGESETCOLLECTIONID_CHANGESETCOLLECTIONID_2);
+			query.append(_FINDER_COLUMN_CHANGESETCOLLECTIONID_CHANGESETCOLLECTIONID_2);
 
 			String sql = query.toString();
 
@@ -1625,10 +1558,8 @@ public class ChangesetEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String
-		_FINDER_COLUMN_CHANGESETCOLLECTIONID_CHANGESETCOLLECTIONID_2 =
-			"changesetEntry.changesetCollectionId = ?";
-
+	private static final String _FINDER_COLUMN_CHANGESETCOLLECTIONID_CHANGESETCOLLECTIONID_2 =
+		"changesetEntry.changesetCollectionId = ?";
 	private FinderPath _finderPathWithPaginationFindByG_C;
 	private FinderPath _finderPathWithoutPaginationFindByG_C;
 	private FinderPath _finderPathCountByG_C;
@@ -1642,15 +1573,15 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public List<ChangesetEntry> findByG_C(long groupId, long classNameId) {
-		return findByG_C(
-			groupId, classNameId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByG_C(groupId, classNameId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the changeset entries where groupId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1660,9 +1591,8 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByG_C(
-		long groupId, long classNameId, int start, int end) {
-
+	public List<ChangesetEntry> findByG_C(long groupId, long classNameId,
+		int start, int end) {
 		return findByG_C(groupId, classNameId, start, end, null);
 	}
 
@@ -1670,7 +1600,7 @@ public class ChangesetEntryPersistenceImpl
 	 * Returns an ordered range of all the changeset entries where groupId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1681,19 +1611,17 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the ordered range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByG_C(
-		long groupId, long classNameId, int start, int end,
-		OrderByComparator<ChangesetEntry> orderByComparator) {
-
-		return findByG_C(
-			groupId, classNameId, start, end, orderByComparator, true);
+	public List<ChangesetEntry> findByG_C(long groupId, long classNameId,
+		int start, int end, OrderByComparator<ChangesetEntry> orderByComparator) {
+		return findByG_C(groupId, classNameId, start, end, orderByComparator,
+			true);
 	}
 
 	/**
 	 * Returns an ordered range of all the changeset entries where groupId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1705,40 +1633,39 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the ordered range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByG_C(
-		long groupId, long classNameId, int start, int end,
+	public List<ChangesetEntry> findByG_C(long groupId, long classNameId,
+		int start, int end,
 		OrderByComparator<ChangesetEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_C;
-			finderArgs = new Object[] {groupId, classNameId};
+			finderArgs = new Object[] { groupId, classNameId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_C;
 			finderArgs = new Object[] {
-				groupId, classNameId, start, end, orderByComparator
-			};
+					groupId, classNameId,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<ChangesetEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<ChangesetEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ChangesetEntry changesetEntry : list) {
 					if ((groupId != changesetEntry.getGroupId()) ||
-						(classNameId != changesetEntry.getClassNameId())) {
-
+							(classNameId != changesetEntry.getClassNameId())) {
 						list = null;
 
 						break;
@@ -1751,8 +1678,8 @@ public class ChangesetEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1765,10 +1692,11 @@ public class ChangesetEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_G_C_CLASSNAMEID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(ChangesetEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1788,16 +1716,16 @@ public class ChangesetEntryPersistenceImpl
 				qPos.add(classNameId);
 
 				if (!pagination) {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1827,13 +1755,11 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry findByG_C_First(
-			long groupId, long classNameId,
-			OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry findByG_C_First(long groupId, long classNameId,
+		OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = fetchByG_C_First(
-			groupId, classNameId, orderByComparator);
+		ChangesetEntry changesetEntry = fetchByG_C_First(groupId, classNameId,
+				orderByComparator);
 
 		if (changesetEntry != null) {
 			return changesetEntry;
@@ -1863,12 +1789,10 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the first matching changeset entry, or <code>null</code> if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry fetchByG_C_First(
-		long groupId, long classNameId,
+	public ChangesetEntry fetchByG_C_First(long groupId, long classNameId,
 		OrderByComparator<ChangesetEntry> orderByComparator) {
-
-		List<ChangesetEntry> list = findByG_C(
-			groupId, classNameId, 0, 1, orderByComparator);
+		List<ChangesetEntry> list = findByG_C(groupId, classNameId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1887,13 +1811,11 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry findByG_C_Last(
-			long groupId, long classNameId,
-			OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry findByG_C_Last(long groupId, long classNameId,
+		OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = fetchByG_C_Last(
-			groupId, classNameId, orderByComparator);
+		ChangesetEntry changesetEntry = fetchByG_C_Last(groupId, classNameId,
+				orderByComparator);
 
 		if (changesetEntry != null) {
 			return changesetEntry;
@@ -1923,18 +1845,16 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the last matching changeset entry, or <code>null</code> if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry fetchByG_C_Last(
-		long groupId, long classNameId,
+	public ChangesetEntry fetchByG_C_Last(long groupId, long classNameId,
 		OrderByComparator<ChangesetEntry> orderByComparator) {
-
 		int count = countByG_C(groupId, classNameId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<ChangesetEntry> list = findByG_C(
-			groupId, classNameId, count - 1, count, orderByComparator);
+		List<ChangesetEntry> list = findByG_C(groupId, classNameId, count - 1,
+				count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1954,11 +1874,10 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a changeset entry with the primary key could not be found
 	 */
 	@Override
-	public ChangesetEntry[] findByG_C_PrevAndNext(
-			long changesetEntryId, long groupId, long classNameId,
-			OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry[] findByG_C_PrevAndNext(long changesetEntryId,
+		long groupId, long classNameId,
+		OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		ChangesetEntry changesetEntry = findByPrimaryKey(changesetEntryId);
 
 		Session session = null;
@@ -1968,15 +1887,13 @@ public class ChangesetEntryPersistenceImpl
 
 			ChangesetEntry[] array = new ChangesetEntryImpl[3];
 
-			array[0] = getByG_C_PrevAndNext(
-				session, changesetEntry, groupId, classNameId,
-				orderByComparator, true);
+			array[0] = getByG_C_PrevAndNext(session, changesetEntry, groupId,
+					classNameId, orderByComparator, true);
 
 			array[1] = changesetEntry;
 
-			array[2] = getByG_C_PrevAndNext(
-				session, changesetEntry, groupId, classNameId,
-				orderByComparator, false);
+			array[2] = getByG_C_PrevAndNext(session, changesetEntry, groupId,
+					classNameId, orderByComparator, false);
 
 			return array;
 		}
@@ -1988,16 +1905,14 @@ public class ChangesetEntryPersistenceImpl
 		}
 	}
 
-	protected ChangesetEntry getByG_C_PrevAndNext(
-		Session session, ChangesetEntry changesetEntry, long groupId,
-		long classNameId, OrderByComparator<ChangesetEntry> orderByComparator,
-		boolean previous) {
-
+	protected ChangesetEntry getByG_C_PrevAndNext(Session session,
+		ChangesetEntry changesetEntry, long groupId, long classNameId,
+		OrderByComparator<ChangesetEntry> orderByComparator, boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2011,8 +1926,7 @@ public class ChangesetEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_G_C_CLASSNAMEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2084,10 +1998,8 @@ public class ChangesetEntryPersistenceImpl
 		qPos.add(classNameId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						changesetEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					changesetEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2110,11 +2022,8 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByG_C(long groupId, long classNameId) {
-		for (ChangesetEntry changesetEntry :
-				findByG_C(
-					groupId, classNameId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (ChangesetEntry changesetEntry : findByG_C(groupId, classNameId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(changesetEntry);
 		}
 	}
@@ -2130,7 +2039,7 @@ public class ChangesetEntryPersistenceImpl
 	public int countByG_C(long groupId, long classNameId) {
 		FinderPath finderPath = _finderPathCountByG_C;
 
-		Object[] finderArgs = new Object[] {groupId, classNameId};
+		Object[] finderArgs = new Object[] { groupId, classNameId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2175,12 +2084,8 @@ public class ChangesetEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_G_C_GROUPID_2 =
-		"changesetEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_C_CLASSNAMEID_2 =
-		"changesetEntry.classNameId = ?";
-
+	private static final String _FINDER_COLUMN_G_C_GROUPID_2 = "changesetEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_C_CLASSNAMEID_2 = "changesetEntry.classNameId = ?";
 	private FinderPath _finderPathWithPaginationFindByC_C;
 	private FinderPath _finderPathWithoutPaginationFindByC_C;
 	private FinderPath _finderPathCountByC_C;
@@ -2193,11 +2098,9 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByC_C(
-		long changesetCollectionId, long classNameId) {
-
-		return findByC_C(
-			changesetCollectionId, classNameId, QueryUtil.ALL_POS,
+	public List<ChangesetEntry> findByC_C(long changesetCollectionId,
+		long classNameId) {
+		return findByC_C(changesetCollectionId, classNameId, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
 	}
 
@@ -2205,7 +2108,7 @@ public class ChangesetEntryPersistenceImpl
 	 * Returns a range of all the changeset entries where changesetCollectionId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param changesetCollectionId the changeset collection ID
@@ -2215,9 +2118,8 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByC_C(
-		long changesetCollectionId, long classNameId, int start, int end) {
-
+	public List<ChangesetEntry> findByC_C(long changesetCollectionId,
+		long classNameId, int start, int end) {
 		return findByC_C(changesetCollectionId, classNameId, start, end, null);
 	}
 
@@ -2225,7 +2127,7 @@ public class ChangesetEntryPersistenceImpl
 	 * Returns an ordered range of all the changeset entries where changesetCollectionId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param changesetCollectionId the changeset collection ID
@@ -2236,20 +2138,18 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the ordered range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByC_C(
-		long changesetCollectionId, long classNameId, int start, int end,
+	public List<ChangesetEntry> findByC_C(long changesetCollectionId,
+		long classNameId, int start, int end,
 		OrderByComparator<ChangesetEntry> orderByComparator) {
-
-		return findByC_C(
-			changesetCollectionId, classNameId, start, end, orderByComparator,
-			true);
+		return findByC_C(changesetCollectionId, classNameId, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the changeset entries where changesetCollectionId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param changesetCollectionId the changeset collection ID
@@ -2261,42 +2161,39 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the ordered range of matching changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findByC_C(
-		long changesetCollectionId, long classNameId, int start, int end,
+	public List<ChangesetEntry> findByC_C(long changesetCollectionId,
+		long classNameId, int start, int end,
 		OrderByComparator<ChangesetEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_C;
-			finderArgs = new Object[] {changesetCollectionId, classNameId};
+			finderArgs = new Object[] { changesetCollectionId, classNameId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_C;
 			finderArgs = new Object[] {
-				changesetCollectionId, classNameId, start, end,
-				orderByComparator
-			};
+					changesetCollectionId, classNameId,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<ChangesetEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<ChangesetEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ChangesetEntry changesetEntry : list) {
-					if ((changesetCollectionId !=
-							changesetEntry.getChangesetCollectionId()) ||
-						(classNameId != changesetEntry.getClassNameId())) {
-
+					if ((changesetCollectionId != changesetEntry.getChangesetCollectionId()) ||
+							(classNameId != changesetEntry.getClassNameId())) {
 						list = null;
 
 						break;
@@ -2309,8 +2206,8 @@ public class ChangesetEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -2323,10 +2220,11 @@ public class ChangesetEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_C_CLASSNAMEID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(ChangesetEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2346,16 +2244,16 @@ public class ChangesetEntryPersistenceImpl
 				qPos.add(classNameId);
 
 				if (!pagination) {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2385,13 +2283,11 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry findByC_C_First(
-			long changesetCollectionId, long classNameId,
-			OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry findByC_C_First(long changesetCollectionId,
+		long classNameId, OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = fetchByC_C_First(
-			changesetCollectionId, classNameId, orderByComparator);
+		ChangesetEntry changesetEntry = fetchByC_C_First(changesetCollectionId,
+				classNameId, orderByComparator);
 
 		if (changesetEntry != null) {
 			return changesetEntry;
@@ -2421,12 +2317,10 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the first matching changeset entry, or <code>null</code> if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry fetchByC_C_First(
-		long changesetCollectionId, long classNameId,
-		OrderByComparator<ChangesetEntry> orderByComparator) {
-
-		List<ChangesetEntry> list = findByC_C(
-			changesetCollectionId, classNameId, 0, 1, orderByComparator);
+	public ChangesetEntry fetchByC_C_First(long changesetCollectionId,
+		long classNameId, OrderByComparator<ChangesetEntry> orderByComparator) {
+		List<ChangesetEntry> list = findByC_C(changesetCollectionId,
+				classNameId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2445,13 +2339,11 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry findByC_C_Last(
-			long changesetCollectionId, long classNameId,
-			OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry findByC_C_Last(long changesetCollectionId,
+		long classNameId, OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = fetchByC_C_Last(
-			changesetCollectionId, classNameId, orderByComparator);
+		ChangesetEntry changesetEntry = fetchByC_C_Last(changesetCollectionId,
+				classNameId, orderByComparator);
 
 		if (changesetEntry != null) {
 			return changesetEntry;
@@ -2481,19 +2373,16 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the last matching changeset entry, or <code>null</code> if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry fetchByC_C_Last(
-		long changesetCollectionId, long classNameId,
-		OrderByComparator<ChangesetEntry> orderByComparator) {
-
+	public ChangesetEntry fetchByC_C_Last(long changesetCollectionId,
+		long classNameId, OrderByComparator<ChangesetEntry> orderByComparator) {
 		int count = countByC_C(changesetCollectionId, classNameId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<ChangesetEntry> list = findByC_C(
-			changesetCollectionId, classNameId, count - 1, count,
-			orderByComparator);
+		List<ChangesetEntry> list = findByC_C(changesetCollectionId,
+				classNameId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2513,11 +2402,10 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a changeset entry with the primary key could not be found
 	 */
 	@Override
-	public ChangesetEntry[] findByC_C_PrevAndNext(
-			long changesetEntryId, long changesetCollectionId, long classNameId,
-			OrderByComparator<ChangesetEntry> orderByComparator)
+	public ChangesetEntry[] findByC_C_PrevAndNext(long changesetEntryId,
+		long changesetCollectionId, long classNameId,
+		OrderByComparator<ChangesetEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		ChangesetEntry changesetEntry = findByPrimaryKey(changesetEntryId);
 
 		Session session = null;
@@ -2527,15 +2415,13 @@ public class ChangesetEntryPersistenceImpl
 
 			ChangesetEntry[] array = new ChangesetEntryImpl[3];
 
-			array[0] = getByC_C_PrevAndNext(
-				session, changesetEntry, changesetCollectionId, classNameId,
-				orderByComparator, true);
+			array[0] = getByC_C_PrevAndNext(session, changesetEntry,
+					changesetCollectionId, classNameId, orderByComparator, true);
 
 			array[1] = changesetEntry;
 
-			array[2] = getByC_C_PrevAndNext(
-				session, changesetEntry, changesetCollectionId, classNameId,
-				orderByComparator, false);
+			array[2] = getByC_C_PrevAndNext(session, changesetEntry,
+					changesetCollectionId, classNameId, orderByComparator, false);
 
 			return array;
 		}
@@ -2547,16 +2433,15 @@ public class ChangesetEntryPersistenceImpl
 		}
 	}
 
-	protected ChangesetEntry getByC_C_PrevAndNext(
-		Session session, ChangesetEntry changesetEntry,
-		long changesetCollectionId, long classNameId,
-		OrderByComparator<ChangesetEntry> orderByComparator, boolean previous) {
-
+	protected ChangesetEntry getByC_C_PrevAndNext(Session session,
+		ChangesetEntry changesetEntry, long changesetCollectionId,
+		long classNameId, OrderByComparator<ChangesetEntry> orderByComparator,
+		boolean previous) {
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2570,8 +2455,7 @@ public class ChangesetEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_CLASSNAMEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2643,10 +2527,8 @@ public class ChangesetEntryPersistenceImpl
 		qPos.add(classNameId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						changesetEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					changesetEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2669,11 +2551,8 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByC_C(long changesetCollectionId, long classNameId) {
-		for (ChangesetEntry changesetEntry :
-				findByC_C(
-					changesetCollectionId, classNameId, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (ChangesetEntry changesetEntry : findByC_C(changesetCollectionId,
+				classNameId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(changesetEntry);
 		}
 	}
@@ -2689,7 +2568,7 @@ public class ChangesetEntryPersistenceImpl
 	public int countByC_C(long changesetCollectionId, long classNameId) {
 		FinderPath finderPath = _finderPathCountByC_C;
 
-		Object[] finderArgs = new Object[] {changesetCollectionId, classNameId};
+		Object[] finderArgs = new Object[] { changesetCollectionId, classNameId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2734,17 +2613,13 @@ public class ChangesetEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_C_CHANGESETCOLLECTIONID_2 =
-		"changesetEntry.changesetCollectionId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_C_CLASSNAMEID_2 =
-		"changesetEntry.classNameId = ?";
-
+	private static final String _FINDER_COLUMN_C_C_CHANGESETCOLLECTIONID_2 = "changesetEntry.changesetCollectionId = ? AND ";
+	private static final String _FINDER_COLUMN_C_C_CLASSNAMEID_2 = "changesetEntry.classNameId = ?";
 	private FinderPath _finderPathFetchByC_C_C;
 	private FinderPath _finderPathCountByC_C_C;
 
 	/**
-	 * Returns the changeset entry where changesetCollectionId = &#63; and classNameId = &#63; and classPK = &#63; or throws a <code>NoSuchEntryException</code> if it could not be found.
+	 * Returns the changeset entry where changesetCollectionId = &#63; and classNameId = &#63; and classPK = &#63; or throws a {@link NoSuchEntryException} if it could not be found.
 	 *
 	 * @param changesetCollectionId the changeset collection ID
 	 * @param classNameId the class name ID
@@ -2753,12 +2628,10 @@ public class ChangesetEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry findByC_C_C(
-			long changesetCollectionId, long classNameId, long classPK)
-		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = fetchByC_C_C(
-			changesetCollectionId, classNameId, classPK);
+	public ChangesetEntry findByC_C_C(long changesetCollectionId,
+		long classNameId, long classPK) throws NoSuchEntryException {
+		ChangesetEntry changesetEntry = fetchByC_C_C(changesetCollectionId,
+				classNameId, classPK);
 
 		if (changesetEntry == null) {
 			StringBundler msg = new StringBundler(8);
@@ -2795,9 +2668,8 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the matching changeset entry, or <code>null</code> if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry fetchByC_C_C(
-		long changesetCollectionId, long classNameId, long classPK) {
-
+	public ChangesetEntry fetchByC_C_C(long changesetCollectionId,
+		long classNameId, long classPK) {
 		return fetchByC_C_C(changesetCollectionId, classNameId, classPK, true);
 	}
 
@@ -2811,29 +2683,25 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the matching changeset entry, or <code>null</code> if a matching changeset entry could not be found
 	 */
 	@Override
-	public ChangesetEntry fetchByC_C_C(
-		long changesetCollectionId, long classNameId, long classPK,
-		boolean retrieveFromCache) {
-
+	public ChangesetEntry fetchByC_C_C(long changesetCollectionId,
+		long classNameId, long classPK, boolean retrieveFromCache) {
 		Object[] finderArgs = new Object[] {
-			changesetCollectionId, classNameId, classPK
-		};
+				changesetCollectionId, classNameId, classPK
+			};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_C_C, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_C_C, finderArgs,
+					this);
 		}
 
 		if (result instanceof ChangesetEntry) {
 			ChangesetEntry changesetEntry = (ChangesetEntry)result;
 
-			if ((changesetCollectionId !=
-					changesetEntry.getChangesetCollectionId()) ||
-				(classNameId != changesetEntry.getClassNameId()) ||
-				(classPK != changesetEntry.getClassPK())) {
-
+			if ((changesetCollectionId != changesetEntry.getChangesetCollectionId()) ||
+					(classNameId != changesetEntry.getClassNameId()) ||
+					(classPK != changesetEntry.getClassPK())) {
 				result = null;
 			}
 		}
@@ -2869,8 +2737,8 @@ public class ChangesetEntryPersistenceImpl
 				List<ChangesetEntry> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByC_C_C, finderArgs, list);
+					finderCache.putResult(_finderPathFetchByC_C_C, finderArgs,
+						list);
 				}
 				else {
 					ChangesetEntry changesetEntry = list.get(0);
@@ -2907,12 +2775,10 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the changeset entry that was removed
 	 */
 	@Override
-	public ChangesetEntry removeByC_C_C(
-			long changesetCollectionId, long classNameId, long classPK)
-		throws NoSuchEntryException {
-
-		ChangesetEntry changesetEntry = findByC_C_C(
-			changesetCollectionId, classNameId, classPK);
+	public ChangesetEntry removeByC_C_C(long changesetCollectionId,
+		long classNameId, long classPK) throws NoSuchEntryException {
+		ChangesetEntry changesetEntry = findByC_C_C(changesetCollectionId,
+				classNameId, classPK);
 
 		return remove(changesetEntry);
 	}
@@ -2926,14 +2792,13 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the number of matching changeset entries
 	 */
 	@Override
-	public int countByC_C_C(
-		long changesetCollectionId, long classNameId, long classPK) {
-
+	public int countByC_C_C(long changesetCollectionId, long classNameId,
+		long classPK) {
 		FinderPath finderPath = _finderPathCountByC_C_C;
 
 		Object[] finderArgs = new Object[] {
-			changesetCollectionId, classNameId, classPK
-		};
+				changesetCollectionId, classNameId, classPK
+			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2982,17 +2847,16 @@ public class ChangesetEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_C_C_CHANGESETCOLLECTIONID_2 =
-		"changesetEntry.changesetCollectionId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_C_C_CLASSNAMEID_2 =
-		"changesetEntry.classNameId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_C_C_CLASSPK_2 =
-		"changesetEntry.classPK = ?";
+	private static final String _FINDER_COLUMN_C_C_C_CHANGESETCOLLECTIONID_2 = "changesetEntry.changesetCollectionId = ? AND ";
+	private static final String _FINDER_COLUMN_C_C_C_CLASSNAMEID_2 = "changesetEntry.classNameId = ? AND ";
+	private static final String _FINDER_COLUMN_C_C_C_CLASSPK_2 = "changesetEntry.classPK = ?";
 
 	public ChangesetEntryPersistenceImpl() {
 		setModelClass(ChangesetEntry.class);
+
+		setModelImplClass(ChangesetEntryImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -3002,18 +2866,15 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(ChangesetEntry changesetEntry) {
-		entityCache.putResult(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
 			ChangesetEntryImpl.class, changesetEntry.getPrimaryKey(),
 			changesetEntry);
 
-		finderCache.putResult(
-			_finderPathFetchByC_C_C,
+		finderCache.putResult(_finderPathFetchByC_C_C,
 			new Object[] {
 				changesetEntry.getChangesetCollectionId(),
 				changesetEntry.getClassNameId(), changesetEntry.getClassPK()
-			},
-			changesetEntry);
+			}, changesetEntry);
 
 		changesetEntry.resetOriginalValues();
 	}
@@ -3027,10 +2888,8 @@ public class ChangesetEntryPersistenceImpl
 	public void cacheResult(List<ChangesetEntry> changesetEntries) {
 		for (ChangesetEntry changesetEntry : changesetEntries) {
 			if (entityCache.getResult(
-					ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-					ChangesetEntryImpl.class, changesetEntry.getPrimaryKey()) ==
-						null) {
-
+						ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+						ChangesetEntryImpl.class, changesetEntry.getPrimaryKey()) == null) {
 				cacheResult(changesetEntry);
 			}
 			else {
@@ -3043,7 +2902,7 @@ public class ChangesetEntryPersistenceImpl
 	 * Clears the cache for all changeset entries.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -3059,13 +2918,12 @@ public class ChangesetEntryPersistenceImpl
 	 * Clears the cache for the changeset entry.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(ChangesetEntry changesetEntry) {
-		entityCache.removeResult(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.removeResult(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
 			ChangesetEntryImpl.class, changesetEntry.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -3080,52 +2938,48 @@ public class ChangesetEntryPersistenceImpl
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (ChangesetEntry changesetEntry : changesetEntries) {
-			entityCache.removeResult(
-				ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+			entityCache.removeResult(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
 				ChangesetEntryImpl.class, changesetEntry.getPrimaryKey());
 
-			clearUniqueFindersCache(
-				(ChangesetEntryModelImpl)changesetEntry, true);
+			clearUniqueFindersCache((ChangesetEntryModelImpl)changesetEntry,
+				true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
 		ChangesetEntryModelImpl changesetEntryModelImpl) {
-
 		Object[] args = new Object[] {
-			changesetEntryModelImpl.getChangesetCollectionId(),
-			changesetEntryModelImpl.getClassNameId(),
-			changesetEntryModelImpl.getClassPK()
-		};
-
-		finderCache.putResult(
-			_finderPathCountByC_C_C, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByC_C_C, args, changesetEntryModelImpl, false);
-	}
-
-	protected void clearUniqueFindersCache(
-		ChangesetEntryModelImpl changesetEntryModelImpl, boolean clearCurrent) {
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
 				changesetEntryModelImpl.getChangesetCollectionId(),
 				changesetEntryModelImpl.getClassNameId(),
 				changesetEntryModelImpl.getClassPK()
 			};
+
+		finderCache.putResult(_finderPathCountByC_C_C, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(_finderPathFetchByC_C_C, args,
+			changesetEntryModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		ChangesetEntryModelImpl changesetEntryModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					changesetEntryModelImpl.getChangesetCollectionId(),
+					changesetEntryModelImpl.getClassNameId(),
+					changesetEntryModelImpl.getClassPK()
+				};
 
 			finderCache.removeResult(_finderPathCountByC_C_C, args);
 			finderCache.removeResult(_finderPathFetchByC_C_C, args);
 		}
 
 		if ((changesetEntryModelImpl.getColumnBitmask() &
-			 _finderPathFetchByC_C_C.getColumnBitmask()) != 0) {
-
+				_finderPathFetchByC_C_C.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
-				changesetEntryModelImpl.getOriginalChangesetCollectionId(),
-				changesetEntryModelImpl.getOriginalClassNameId(),
-				changesetEntryModelImpl.getOriginalClassPK()
-			};
+					changesetEntryModelImpl.getOriginalChangesetCollectionId(),
+					changesetEntryModelImpl.getOriginalClassNameId(),
+					changesetEntryModelImpl.getOriginalClassPK()
+				};
 
 			finderCache.removeResult(_finderPathCountByC_C_C, args);
 			finderCache.removeResult(_finderPathFetchByC_C_C, args);
@@ -3160,7 +3014,6 @@ public class ChangesetEntryPersistenceImpl
 	@Override
 	public ChangesetEntry remove(long changesetEntryId)
 		throws NoSuchEntryException {
-
 		return remove((Serializable)changesetEntryId);
 	}
 
@@ -3174,22 +3027,21 @@ public class ChangesetEntryPersistenceImpl
 	@Override
 	public ChangesetEntry remove(Serializable primaryKey)
 		throws NoSuchEntryException {
-
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			ChangesetEntry changesetEntry = (ChangesetEntry)session.get(
-				ChangesetEntryImpl.class, primaryKey);
+			ChangesetEntry changesetEntry = (ChangesetEntry)session.get(ChangesetEntryImpl.class,
+					primaryKey);
 
 			if (changesetEntry == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchEntryException(
-					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				throw new NoSuchEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
 			}
 
 			return remove(changesetEntry);
@@ -3213,9 +3065,8 @@ public class ChangesetEntryPersistenceImpl
 			session = openSession();
 
 			if (!session.contains(changesetEntry)) {
-				changesetEntry = (ChangesetEntry)session.get(
-					ChangesetEntryImpl.class,
-					changesetEntry.getPrimaryKeyObj());
+				changesetEntry = (ChangesetEntry)session.get(ChangesetEntryImpl.class,
+						changesetEntry.getPrimaryKeyObj());
 			}
 
 			if (changesetEntry != null) {
@@ -3244,24 +3095,21 @@ public class ChangesetEntryPersistenceImpl
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(changesetEntry.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(
-					changesetEntry);
+				invocationHandler = ProxyUtil.getInvocationHandler(changesetEntry);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in changesetEntry proxy " +
-						invocationHandler.getClass());
+					invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom ChangesetEntry implementation " +
-					changesetEntry.getClass());
+				changesetEntry.getClass());
 		}
 
-		ChangesetEntryModelImpl changesetEntryModelImpl =
-			(ChangesetEntryModelImpl)changesetEntry;
+		ChangesetEntryModelImpl changesetEntryModelImpl = (ChangesetEntryModelImpl)changesetEntry;
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -3279,8 +3127,8 @@ public class ChangesetEntryPersistenceImpl
 				changesetEntry.setModifiedDate(now);
 			}
 			else {
-				changesetEntry.setModifiedDate(
-					serviceContext.getModifiedDate(now));
+				changesetEntry.setModifiedDate(serviceContext.getModifiedDate(
+						now));
 			}
 		}
 
@@ -3310,163 +3158,150 @@ public class ChangesetEntryPersistenceImpl
 		if (!ChangesetEntryModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else if (isNew) {
-			Object[] args = new Object[] {changesetEntryModelImpl.getGroupId()};
+		else
+		 if (isNew) {
+			Object[] args = new Object[] { changesetEntryModelImpl.getGroupId() };
 
 			finderCache.removeResult(_finderPathCountByGroupId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByGroupId, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByGroupId,
+				args);
 
-			args = new Object[] {changesetEntryModelImpl.getCompanyId()};
+			args = new Object[] { changesetEntryModelImpl.getCompanyId() };
 
 			finderCache.removeResult(_finderPathCountByCompanyId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByCompanyId, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+				args);
 
 			args = new Object[] {
-				changesetEntryModelImpl.getChangesetCollectionId()
-			};
-
-			finderCache.removeResult(
-				_finderPathCountByChangesetCollectionId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByChangesetCollectionId, args);
-
-			args = new Object[] {
-				changesetEntryModelImpl.getGroupId(),
-				changesetEntryModelImpl.getClassNameId()
-			};
-
-			finderCache.removeResult(_finderPathCountByG_C, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByG_C, args);
-
-			args = new Object[] {
-				changesetEntryModelImpl.getChangesetCollectionId(),
-				changesetEntryModelImpl.getClassNameId()
-			};
-
-			finderCache.removeResult(_finderPathCountByC_C, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByC_C, args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
-		}
-		else {
-			if ((changesetEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByGroupId.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					changesetEntryModelImpl.getOriginalGroupId()
-				};
-
-				finderCache.removeResult(_finderPathCountByGroupId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByGroupId, args);
-
-				args = new Object[] {changesetEntryModelImpl.getGroupId()};
-
-				finderCache.removeResult(_finderPathCountByGroupId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByGroupId, args);
-			}
-
-			if ((changesetEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByCompanyId.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					changesetEntryModelImpl.getOriginalCompanyId()
-				};
-
-				finderCache.removeResult(_finderPathCountByCompanyId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByCompanyId, args);
-
-				args = new Object[] {changesetEntryModelImpl.getCompanyId()};
-
-				finderCache.removeResult(_finderPathCountByCompanyId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByCompanyId, args);
-			}
-
-			if ((changesetEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByChangesetCollectionId.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					changesetEntryModelImpl.getOriginalChangesetCollectionId()
-				};
-
-				finderCache.removeResult(
-					_finderPathCountByChangesetCollectionId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByChangesetCollectionId,
-					args);
-
-				args = new Object[] {
 					changesetEntryModelImpl.getChangesetCollectionId()
 				};
 
-				finderCache.removeResult(
-					_finderPathCountByChangesetCollectionId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByChangesetCollectionId,
-					args);
-			}
+			finderCache.removeResult(_finderPathCountByChangesetCollectionId,
+				args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByChangesetCollectionId,
+				args);
 
-			if ((changesetEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByG_C.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					changesetEntryModelImpl.getOriginalGroupId(),
-					changesetEntryModelImpl.getOriginalClassNameId()
-				};
-
-				finderCache.removeResult(_finderPathCountByG_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_C, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					changesetEntryModelImpl.getGroupId(),
 					changesetEntryModelImpl.getClassNameId()
 				};
 
-				finderCache.removeResult(_finderPathCountByG_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByG_C, args);
-			}
+			finderCache.removeResult(_finderPathCountByG_C, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByG_C, args);
 
-			if ((changesetEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByC_C.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					changesetEntryModelImpl.getOriginalChangesetCollectionId(),
-					changesetEntryModelImpl.getOriginalClassNameId()
-				};
-
-				finderCache.removeResult(_finderPathCountByC_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByC_C, args);
-
-				args = new Object[] {
+			args = new Object[] {
 					changesetEntryModelImpl.getChangesetCollectionId(),
 					changesetEntryModelImpl.getClassNameId()
 				};
 
+			finderCache.removeResult(_finderPathCountByC_C, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByC_C, args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
+				FINDER_ARGS_EMPTY);
+		}
+
+		else {
+			if ((changesetEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByGroupId.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						changesetEntryModelImpl.getOriginalGroupId()
+					};
+
+				finderCache.removeResult(_finderPathCountByGroupId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByGroupId,
+					args);
+
+				args = new Object[] { changesetEntryModelImpl.getGroupId() };
+
+				finderCache.removeResult(_finderPathCountByGroupId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByGroupId,
+					args);
+			}
+
+			if ((changesetEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByCompanyId.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						changesetEntryModelImpl.getOriginalCompanyId()
+					};
+
+				finderCache.removeResult(_finderPathCountByCompanyId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+					args);
+
+				args = new Object[] { changesetEntryModelImpl.getCompanyId() };
+
+				finderCache.removeResult(_finderPathCountByCompanyId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
+					args);
+			}
+
+			if ((changesetEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByChangesetCollectionId.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						changesetEntryModelImpl.getOriginalChangesetCollectionId()
+					};
+
+				finderCache.removeResult(_finderPathCountByChangesetCollectionId,
+					args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByChangesetCollectionId,
+					args);
+
+				args = new Object[] {
+						changesetEntryModelImpl.getChangesetCollectionId()
+					};
+
+				finderCache.removeResult(_finderPathCountByChangesetCollectionId,
+					args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByChangesetCollectionId,
+					args);
+			}
+
+			if ((changesetEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByG_C.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						changesetEntryModelImpl.getOriginalGroupId(),
+						changesetEntryModelImpl.getOriginalClassNameId()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_C, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C,
+					args);
+
+				args = new Object[] {
+						changesetEntryModelImpl.getGroupId(),
+						changesetEntryModelImpl.getClassNameId()
+					};
+
+				finderCache.removeResult(_finderPathCountByG_C, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C,
+					args);
+			}
+
+			if ((changesetEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByC_C.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						changesetEntryModelImpl.getOriginalChangesetCollectionId(),
+						changesetEntryModelImpl.getOriginalClassNameId()
+					};
+
 				finderCache.removeResult(_finderPathCountByC_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByC_C, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByC_C,
+					args);
+
+				args = new Object[] {
+						changesetEntryModelImpl.getChangesetCollectionId(),
+						changesetEntryModelImpl.getClassNameId()
+					};
+
+				finderCache.removeResult(_finderPathCountByC_C, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByC_C,
+					args);
 			}
 		}
 
-		entityCache.putResult(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
 			ChangesetEntryImpl.class, changesetEntry.getPrimaryKey(),
 			changesetEntry, false);
 
@@ -3479,7 +3314,7 @@ public class ChangesetEntryPersistenceImpl
 	}
 
 	/**
-	 * Returns the changeset entry with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
+	 * Returns the changeset entry with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the changeset entry
 	 * @return the changeset entry
@@ -3488,7 +3323,6 @@ public class ChangesetEntryPersistenceImpl
 	@Override
 	public ChangesetEntry findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchEntryException {
-
 		ChangesetEntry changesetEntry = fetchByPrimaryKey(primaryKey);
 
 		if (changesetEntry == null) {
@@ -3496,15 +3330,15 @@ public class ChangesetEntryPersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchEntryException(
-				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			throw new NoSuchEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
 		}
 
 		return changesetEntry;
 	}
 
 	/**
-	 * Returns the changeset entry with the primary key or throws a <code>NoSuchEntryException</code> if it could not be found.
+	 * Returns the changeset entry with the primary key or throws a {@link NoSuchEntryException} if it could not be found.
 	 *
 	 * @param changesetEntryId the primary key of the changeset entry
 	 * @return the changeset entry
@@ -3513,59 +3347,7 @@ public class ChangesetEntryPersistenceImpl
 	@Override
 	public ChangesetEntry findByPrimaryKey(long changesetEntryId)
 		throws NoSuchEntryException {
-
 		return findByPrimaryKey((Serializable)changesetEntryId);
-	}
-
-	/**
-	 * Returns the changeset entry with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param primaryKey the primary key of the changeset entry
-	 * @return the changeset entry, or <code>null</code> if a changeset entry with the primary key could not be found
-	 */
-	@Override
-	public ChangesetEntry fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryImpl.class, primaryKey);
-
-		if (serializable == nullModel) {
-			return null;
-		}
-
-		ChangesetEntry changesetEntry = (ChangesetEntry)serializable;
-
-		if (changesetEntry == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				changesetEntry = (ChangesetEntry)session.get(
-					ChangesetEntryImpl.class, primaryKey);
-
-				if (changesetEntry != null) {
-					cacheResult(changesetEntry);
-				}
-				else {
-					entityCache.putResult(
-						ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-						ChangesetEntryImpl.class, primaryKey, nullModel);
-				}
-			}
-			catch (Exception e) {
-				entityCache.removeResult(
-					ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-					ChangesetEntryImpl.class, primaryKey);
-
-				throw processException(e);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return changesetEntry;
 	}
 
 	/**
@@ -3577,106 +3359,6 @@ public class ChangesetEntryPersistenceImpl
 	@Override
 	public ChangesetEntry fetchByPrimaryKey(long changesetEntryId) {
 		return fetchByPrimaryKey((Serializable)changesetEntryId);
-	}
-
-	@Override
-	public Map<Serializable, ChangesetEntry> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, ChangesetEntry> map =
-			new HashMap<Serializable, ChangesetEntry>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			ChangesetEntry changesetEntry = fetchByPrimaryKey(primaryKey);
-
-			if (changesetEntry != null) {
-				map.put(primaryKey, changesetEntry);
-			}
-
-			return map;
-		}
-
-		Set<Serializable> uncachedPrimaryKeys = null;
-
-		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(
-				ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-				ChangesetEntryImpl.class, primaryKey);
-
-			if (serializable != nullModel) {
-				if (serializable == null) {
-					if (uncachedPrimaryKeys == null) {
-						uncachedPrimaryKeys = new HashSet<Serializable>();
-					}
-
-					uncachedPrimaryKeys.add(primaryKey);
-				}
-				else {
-					map.put(primaryKey, (ChangesetEntry)serializable);
-				}
-			}
-		}
-
-		if (uncachedPrimaryKeys == null) {
-			return map;
-		}
-
-		StringBundler query = new StringBundler(
-			uncachedPrimaryKeys.size() * 2 + 1);
-
-		query.append(_SQL_SELECT_CHANGESETENTRY_WHERE_PKS_IN);
-
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
-
-			query.append(",");
-		}
-
-		query.setIndex(query.index() - 1);
-
-		query.append(")");
-
-		String sql = query.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query q = session.createQuery(sql);
-
-			for (ChangesetEntry changesetEntry :
-					(List<ChangesetEntry>)q.list()) {
-
-				map.put(changesetEntry.getPrimaryKeyObj(), changesetEntry);
-
-				cacheResult(changesetEntry);
-
-				uncachedPrimaryKeys.remove(changesetEntry.getPrimaryKeyObj());
-			}
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(
-					ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-					ChangesetEntryImpl.class, primaryKey, nullModel);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -3693,7 +3375,7 @@ public class ChangesetEntryPersistenceImpl
 	 * Returns a range of all the changeset entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of changeset entries
@@ -3709,7 +3391,7 @@ public class ChangesetEntryPersistenceImpl
 	 * Returns an ordered range of all the changeset entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of changeset entries
@@ -3718,10 +3400,8 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the ordered range of changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findAll(
-		int start, int end,
+	public List<ChangesetEntry> findAll(int start, int end,
 		OrderByComparator<ChangesetEntry> orderByComparator) {
-
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -3729,7 +3409,7 @@ public class ChangesetEntryPersistenceImpl
 	 * Returns an ordered range of all the changeset entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of changeset entries
@@ -3739,31 +3419,29 @@ public class ChangesetEntryPersistenceImpl
 	 * @return the ordered range of changeset entries
 	 */
 	@Override
-	public List<ChangesetEntry> findAll(
-		int start, int end, OrderByComparator<ChangesetEntry> orderByComparator,
+	public List<ChangesetEntry> findAll(int start, int end,
+		OrderByComparator<ChangesetEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] {start, end, orderByComparator};
+			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
 		List<ChangesetEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<ChangesetEntry>)finderCache.getResult(finderPath,
+					finderArgs, this);
 		}
 
 		if (list == null) {
@@ -3771,13 +3449,13 @@ public class ChangesetEntryPersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					2 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_CHANGESETENTRY);
 
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 
 				sql = query.toString();
 			}
@@ -3797,16 +3475,16 @@ public class ChangesetEntryPersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<ChangesetEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<ChangesetEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3844,8 +3522,8 @@ public class ChangesetEntryPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(_finderPathCountAll,
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -3857,12 +3535,11 @@ public class ChangesetEntryPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
+					count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -3875,6 +3552,21 @@ public class ChangesetEntryPersistenceImpl
 	}
 
 	@Override
+	protected EntityCache getEntityCache() {
+		return entityCache;
+	}
+
+	@Override
+	protected String getPKDBName() {
+		return "changesetEntryId";
+	}
+
+	@Override
+	protected String getSelectSQL() {
+		return _SQL_SELECT_CHANGESETENTRY;
+	}
+
+	@Override
 	protected Map<String, Integer> getTableColumnsMap() {
 		return ChangesetEntryModelImpl.TABLE_COLUMNS_MAP;
 	}
@@ -3883,167 +3575,161 @@ public class ChangesetEntryPersistenceImpl
 	 * Initializes the changeset entry persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-			"findAll", new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+				new String[0]);
 
-		_finderPathCountAll = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+		_finderPathCountAll = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+				new String[0]);
 
-		_finderPathWithPaginationFindByGroupId = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByGroupId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+		_finderPathWithPaginationFindByGroupId = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
+				new String[] {
+					Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-			"findByGroupId", new String[] {Long.class.getName()},
-			ChangesetEntryModelImpl.GROUPID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByGroupId = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
+				new String[] { Long.class.getName() },
+				ChangesetEntryModelImpl.GROUPID_COLUMN_BITMASK);
 
-		_finderPathCountByGroupId = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
-			new String[] {Long.class.getName()});
+		_finderPathCountByGroupId = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
+				new String[] { Long.class.getName() });
 
-		_finderPathWithPaginationFindByCompanyId = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByCompanyId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
+				new String[] {
+					Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-			"findByCompanyId", new String[] {Long.class.getName()},
-			ChangesetEntryModelImpl.COMPANYID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+				new String[] { Long.class.getName() },
+				ChangesetEntryModelImpl.COMPANYID_COLUMN_BITMASK);
 
-		_finderPathCountByCompanyId = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
-			new String[] {Long.class.getName()});
+		_finderPathCountByCompanyId = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
+				new String[] { Long.class.getName() });
 
-		_finderPathWithPaginationFindByChangesetCollectionId = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByChangesetCollectionId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+		_finderPathWithPaginationFindByChangesetCollectionId = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+				"findByChangesetCollectionId",
+				new String[] {
+					Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByChangesetCollectionId =
-			new FinderPath(
-				ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+		_finderPathWithoutPaginationFindByChangesetCollectionId = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
 				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
 				ChangesetEntryImpl.class,
 				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 				"findByChangesetCollectionId",
-				new String[] {Long.class.getName()},
+				new String[] { Long.class.getName() },
 				ChangesetEntryModelImpl.CHANGESETCOLLECTIONID_COLUMN_BITMASK);
 
-		_finderPathCountByChangesetCollectionId = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-			"countByChangesetCollectionId",
-			new String[] {Long.class.getName()});
+		_finderPathCountByChangesetCollectionId = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+				"countByChangesetCollectionId",
+				new String[] { Long.class.getName() });
 
-		_finderPathWithPaginationFindByG_C = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByG_C",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByG_C = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByG_C = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-			"findByG_C",
-			new String[] {Long.class.getName(), Long.class.getName()},
-			ChangesetEntryModelImpl.GROUPID_COLUMN_BITMASK |
-			ChangesetEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_C = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C",
+				new String[] { Long.class.getName(), Long.class.getName() },
+				ChangesetEntryModelImpl.GROUPID_COLUMN_BITMASK |
+				ChangesetEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK);
 
-		_finderPathCountByG_C = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C",
-			new String[] {Long.class.getName(), Long.class.getName()});
+		_finderPathCountByG_C = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C",
+				new String[] { Long.class.getName(), Long.class.getName() });
 
-		_finderPathWithPaginationFindByC_C = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByC_C",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByC_C = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByC_C = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-			"findByC_C",
-			new String[] {Long.class.getName(), Long.class.getName()},
-			ChangesetEntryModelImpl.CHANGESETCOLLECTIONID_COLUMN_BITMASK |
-			ChangesetEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByC_C = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C",
+				new String[] { Long.class.getName(), Long.class.getName() },
+				ChangesetEntryModelImpl.CHANGESETCOLLECTIONID_COLUMN_BITMASK |
+				ChangesetEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK);
 
-		_finderPathCountByC_C = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
-			new String[] {Long.class.getName(), Long.class.getName()});
+		_finderPathCountByC_C = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
+				new String[] { Long.class.getName(), Long.class.getName() });
 
-		_finderPathFetchByC_C_C = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
-			ChangesetEntryImpl.class, FINDER_CLASS_NAME_ENTITY, "fetchByC_C_C",
-			new String[] {
-				Long.class.getName(), Long.class.getName(), Long.class.getName()
-			},
-			ChangesetEntryModelImpl.CHANGESETCOLLECTIONID_COLUMN_BITMASK |
-			ChangesetEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-			ChangesetEntryModelImpl.CLASSPK_COLUMN_BITMASK);
+		_finderPathFetchByC_C_C = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED,
+				ChangesetEntryImpl.class, FINDER_CLASS_NAME_ENTITY,
+				"fetchByC_C_C",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName()
+				},
+				ChangesetEntryModelImpl.CHANGESETCOLLECTIONID_COLUMN_BITMASK |
+				ChangesetEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+				ChangesetEntryModelImpl.CLASSPK_COLUMN_BITMASK);
 
-		_finderPathCountByC_C_C = new FinderPath(
-			ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C",
-			new String[] {
-				Long.class.getName(), Long.class.getName(), Long.class.getName()
-			});
+		_finderPathCountByC_C_C = new FinderPath(ChangesetEntryModelImpl.ENTITY_CACHE_ENABLED,
+				ChangesetEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName()
+				});
 	}
 
 	public void destroy() {
@@ -4055,37 +3741,16 @@ public class ChangesetEntryPersistenceImpl
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
-
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-
-	private static final String _SQL_SELECT_CHANGESETENTRY =
-		"SELECT changesetEntry FROM ChangesetEntry changesetEntry";
-
-	private static final String _SQL_SELECT_CHANGESETENTRY_WHERE_PKS_IN =
-		"SELECT changesetEntry FROM ChangesetEntry changesetEntry WHERE changesetEntryId IN (";
-
-	private static final String _SQL_SELECT_CHANGESETENTRY_WHERE =
-		"SELECT changesetEntry FROM ChangesetEntry changesetEntry WHERE ";
-
-	private static final String _SQL_COUNT_CHANGESETENTRY =
-		"SELECT COUNT(changesetEntry) FROM ChangesetEntry changesetEntry";
-
-	private static final String _SQL_COUNT_CHANGESETENTRY_WHERE =
-		"SELECT COUNT(changesetEntry) FROM ChangesetEntry changesetEntry WHERE ";
-
+	private static final String _SQL_SELECT_CHANGESETENTRY = "SELECT changesetEntry FROM ChangesetEntry changesetEntry";
+	private static final String _SQL_SELECT_CHANGESETENTRY_WHERE = "SELECT changesetEntry FROM ChangesetEntry changesetEntry WHERE ";
+	private static final String _SQL_COUNT_CHANGESETENTRY = "SELECT COUNT(changesetEntry) FROM ChangesetEntry changesetEntry";
+	private static final String _SQL_COUNT_CHANGESETENTRY_WHERE = "SELECT COUNT(changesetEntry) FROM ChangesetEntry changesetEntry WHERE ";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "changesetEntry.";
-
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
-		"No ChangesetEntry exists with the primary key ";
-
-	private static final String _NO_SUCH_ENTITY_WITH_KEY =
-		"No ChangesetEntry exists with the key {";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ChangesetEntryPersistenceImpl.class);
-
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No ChangesetEntry exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No ChangesetEntry exists with the key {";
+	private static final Log _log = LogFactoryUtil.getLog(ChangesetEntryPersistenceImpl.class);
 }

@@ -18,16 +18,17 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+
 import com.liferay.screens.service.ScreensDDMStructureVersionServiceUtil;
 
 import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * <code>ScreensDDMStructureVersionServiceUtil</code> service
- * utility. The static methods of this class call the same methods of the
- * service utility. However, the signatures are different because it is
- * difficult for SOAP to support certain types.
+ * {@link ScreensDDMStructureVersionServiceUtil} service utility. The
+ * static methods of this class calls the same methods of the service utility.
+ * However, the signatures are different because it is difficult for SOAP to
+ * support certain types.
  *
  * <p>
  * The benefits of using the SOAP utility is that it is cross platform
@@ -48,18 +49,15 @@ import java.rmi.RemoteException;
  *
  * @author José Manuel Navarro
  * @see ScreensDDMStructureVersionServiceHttp
+ * @see ScreensDDMStructureVersionServiceUtil
  * @generated
  */
 @ProviderType
 public class ScreensDDMStructureVersionServiceSoap {
-
 	public static String getDDMStructureVersion(long structureId)
 		throws RemoteException {
-
 		try {
-			com.liferay.portal.kernel.json.JSONObject returnValue =
-				ScreensDDMStructureVersionServiceUtil.getDDMStructureVersion(
-					structureId);
+			com.liferay.portal.kernel.json.JSONObject returnValue = ScreensDDMStructureVersionServiceUtil.getDDMStructureVersion(structureId);
 
 			return returnValue.toString();
 		}
@@ -70,7 +68,5 @@ public class ScreensDDMStructureVersionServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		ScreensDDMStructureVersionServiceSoap.class);
-
+	private static Log _log = LogFactoryUtil.getLog(ScreensDDMStructureVersionServiceSoap.class);
 }

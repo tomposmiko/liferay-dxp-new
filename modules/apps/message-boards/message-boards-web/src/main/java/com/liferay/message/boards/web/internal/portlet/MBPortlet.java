@@ -73,14 +73,13 @@ public class MBPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		renderRequest.setAttribute(AssetWebKeys.ASSET_HELPER, _assetHelper);
-
 		renderRequest.setAttribute(TrashWebKeys.TRASH_HELPER, _trashHelper);
 
 		super.render(renderRequest, renderResponse);
 	}
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.message.boards.web)(release.schema.version=1.0.0))",
+		target = "(&(release.bundle.symbolic.name=com.liferay.message.boards.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=1.1.0))))",
 		unbind = "-"
 	)
 	protected void setRelease(Release release) {

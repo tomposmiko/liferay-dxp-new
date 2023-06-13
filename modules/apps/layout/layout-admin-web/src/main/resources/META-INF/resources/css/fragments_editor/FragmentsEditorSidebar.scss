@@ -1,56 +1,62 @@
+@import "./FragmentsEditorSidebarSection";
+
+@import "./FragmentsEditorSidebarSectionsButtons.scss";
+
 @import "./variables";
 
-body:not(.has-contextual-sidebar) .contextual-sidebar-content {
-	padding-right: $contextualSidebarContentPadding;
-}
-
-.drag-card.dragging {
-	opacity: 0.7;
-	width: $sidebarCardWidth;
-	z-index: $sidebarCardZIndex;
-}
-
-.fragments-editor .contextual-sidebar.fragments-editor-sidebar {
-	height: calc(100vh - #{$controlMenuHeight} - #{$managementBarHeight});
-	margin-top: 2px;
-	top: $controlMenuHeight + $managementBarHeight;
+.fragments-editor-sidebar {
+	box-shadow: none;
+	height: 100vh;
+	padding-left: $sidebarWidth - $sidebarButtonsWidth;
+	position: fixed;
+	right: 0;
+	top: $managementBarHeight;
+	transition: padding-left ease $productMenuTransitionDuration;
+	will-change: padding-left;
 	z-index: $sidebarZIndex;
 
-	.btn-link {
-		z-index: $sidebarCardPlusButtonZIndex;
-	}
-
-	.drag-card {
-		overflow: hidden;
-	}
-
-	.drag-handler {
-		background-color: transparent;
-		cursor: move;
-		display: block;
+	&-content {
+		background-color: $sidebarContentBackgroundColor;
+		display: flex;
 		height: 100%;
-		position: absolute;
+	}
+
+	&-section {
+		border-left: $sidebarLeftBorderWidth solid $sidebarLeftBorderColor;
+		height: 100vh;
+		overflow-x: hidden;
+		overflow-y: auto;
+		position: fixed;
+		right: $sidebarButtonsWidth;
 		top: 0;
-		width: 100%;
-		z-index: $sidebarCardZIndex;
+		transform: translateX(0);
+		transition: transform ease $productMenuTransitionDuration;
+		width: $sidebarWidth - $sidebarButtonsWidth;
+		will-change: transform;
+		z-index: $sidebarSectionZIndex;
 	}
 
-	button.component-action {
-		cursor: pointer;
+	&--collapsed {
+		padding-left: 0;
 	}
 
-	.sidebar-body {
-		padding-top: 0;
-	}
-
-	.sidebar-body > .sidebar-section:first-child {
-		border-bottom: solid thin #CDCED9;
+	&--collapsed > &-content > &-section {
+		transform: translateX(calc(100% + #{$sidebarButtonsWidth + $sidebarLeftBorderWidth}));
 	}
 
 	@media (min-width: 768px) {
-		& {
-			height: calc(100vh - #{$desktopControlMenuHeight} - #{$managementBarHeight});
-			top: $desktopControlMenuHeight + $managementBarHeight;
+		height: calc(100vh - #{$desktopManagementBarHeight});
+		top: $desktopManagementBarHeight;
+	}
+
+	body.has-control-menu &,
+	body.has-control-menu &-section {
+		height: calc(100vh - #{$controlMenuHeight + $managementBarHeight});
+		top: $controlMenuHeight + $managementBarHeight;
+
+		@media (min-width: 768px) {
+			height: calc(100vh - #{$desktopControlMenuHeight + $desktopManagementBarHeight});
+			top: $desktopControlMenuHeight + $desktopManagementBarHeight;
 		}
 	}
 }

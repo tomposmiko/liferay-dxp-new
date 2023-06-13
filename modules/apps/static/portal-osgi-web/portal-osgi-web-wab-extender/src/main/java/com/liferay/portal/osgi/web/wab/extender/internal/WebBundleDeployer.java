@@ -140,7 +140,9 @@ public class WebBundleDeployer {
 	public boolean isFragmentBundle(Bundle bundle) {
 		BundleRevision bundleRevision = bundle.adapt(BundleRevision.class);
 
-		if ((bundleRevision.getTypes() & BundleRevision.TYPE_FRAGMENT) == 0) {
+		if ((bundleRevision.getTypes() & BundleRevision.TYPE_FRAGMENT) ==
+				BundleRevision.TYPE_FRAGMENT) {
+
 			return false;
 		}
 

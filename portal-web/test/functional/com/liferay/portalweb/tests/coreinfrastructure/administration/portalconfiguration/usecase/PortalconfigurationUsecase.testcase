@@ -374,8 +374,6 @@ definition {
 			userEmailAddress = "test@liferay.com"
 		);
 
-		Navigator.openSpecificURL(url = "http://www.charlie.com:8080/group/guest");
-
 		AssertTextEquals(
 			locator1 = "Home#PAGE",
 			value1 = "Private Page",

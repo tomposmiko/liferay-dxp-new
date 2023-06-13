@@ -15,6 +15,7 @@
 package com.liferay.dynamic.data.lists.service.base;
 
 import com.liferay.asset.kernel.service.persistence.AssetEntryPersistence;
+
 import com.liferay.dynamic.data.lists.model.DDLRecord;
 import com.liferay.dynamic.data.lists.service.DDLRecordService;
 import com.liferay.dynamic.data.lists.service.persistence.DDLRecordFinder;
@@ -22,6 +23,7 @@ import com.liferay.dynamic.data.lists.service.persistence.DDLRecordPersistence;
 import com.liferay.dynamic.data.lists.service.persistence.DDLRecordSetFinder;
 import com.liferay.dynamic.data.lists.service.persistence.DDLRecordSetPersistence;
 import com.liferay.dynamic.data.lists.service.persistence.DDLRecordVersionPersistence;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -34,6 +36,7 @@ import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.service.persistence.WorkflowInstanceLinkPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+
 import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
 
 import javax.sql.DataSource;
@@ -47,16 +50,15 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.dynamic.data.lists.service.impl.DDLRecordServiceImpl
+ * @see com.liferay.dynamic.data.lists.service.DDLRecordServiceUtil
  * @generated
  */
-public abstract class DDLRecordServiceBaseImpl
-	extends BaseServiceImpl
+public abstract class DDLRecordServiceBaseImpl extends BaseServiceImpl
 	implements DDLRecordService, IdentifiableOSGiService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>DDLRecordService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.lists.service.DDLRecordServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.dynamic.data.lists.service.DDLRecordServiceUtil} to access the ddl record remote service.
 	 */
 
 	/**
@@ -64,9 +66,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the ddl record local service
 	 */
-	public com.liferay.dynamic.data.lists.service.DDLRecordLocalService
-		getDDLRecordLocalService() {
-
+	public com.liferay.dynamic.data.lists.service.DDLRecordLocalService getDDLRecordLocalService() {
 		return ddlRecordLocalService;
 	}
 
@@ -76,9 +76,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 * @param ddlRecordLocalService the ddl record local service
 	 */
 	public void setDDLRecordLocalService(
-		com.liferay.dynamic.data.lists.service.DDLRecordLocalService
-			ddlRecordLocalService) {
-
+		com.liferay.dynamic.data.lists.service.DDLRecordLocalService ddlRecordLocalService) {
 		this.ddlRecordLocalService = ddlRecordLocalService;
 	}
 
@@ -116,7 +114,6 @@ public abstract class DDLRecordServiceBaseImpl
 	 */
 	public void setDDLRecordPersistence(
 		DDLRecordPersistence ddlRecordPersistence) {
-
 		this.ddlRecordPersistence = ddlRecordPersistence;
 	}
 
@@ -143,9 +140,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -155,9 +150,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -166,9 +159,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -179,7 +170,6 @@ public abstract class DDLRecordServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -199,7 +189,6 @@ public abstract class DDLRecordServiceBaseImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
-
 		this.userService = userService;
 	}
 
@@ -226,9 +215,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the workflow instance link local service
 	 */
-	public com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-		getWorkflowInstanceLinkLocalService() {
-
+	public com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService getWorkflowInstanceLinkLocalService() {
 		return workflowInstanceLinkLocalService;
 	}
 
@@ -238,11 +225,8 @@ public abstract class DDLRecordServiceBaseImpl
 	 * @param workflowInstanceLinkLocalService the workflow instance link local service
 	 */
 	public void setWorkflowInstanceLinkLocalService(
-		com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-			workflowInstanceLinkLocalService) {
-
-		this.workflowInstanceLinkLocalService =
-			workflowInstanceLinkLocalService;
+		com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService) {
+		this.workflowInstanceLinkLocalService = workflowInstanceLinkLocalService;
 	}
 
 	/**
@@ -250,9 +234,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the workflow instance link persistence
 	 */
-	public WorkflowInstanceLinkPersistence
-		getWorkflowInstanceLinkPersistence() {
-
+	public WorkflowInstanceLinkPersistence getWorkflowInstanceLinkPersistence() {
 		return workflowInstanceLinkPersistence;
 	}
 
@@ -263,7 +245,6 @@ public abstract class DDLRecordServiceBaseImpl
 	 */
 	public void setWorkflowInstanceLinkPersistence(
 		WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence) {
-
 		this.workflowInstanceLinkPersistence = workflowInstanceLinkPersistence;
 	}
 
@@ -272,9 +253,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the asset entry local service
 	 */
-	public com.liferay.asset.kernel.service.AssetEntryLocalService
-		getAssetEntryLocalService() {
-
+	public com.liferay.asset.kernel.service.AssetEntryLocalService getAssetEntryLocalService() {
 		return assetEntryLocalService;
 	}
 
@@ -284,9 +263,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 * @param assetEntryLocalService the asset entry local service
 	 */
 	public void setAssetEntryLocalService(
-		com.liferay.asset.kernel.service.AssetEntryLocalService
-			assetEntryLocalService) {
-
+		com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService) {
 		this.assetEntryLocalService = assetEntryLocalService;
 	}
 
@@ -295,9 +272,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the asset entry remote service
 	 */
-	public com.liferay.asset.kernel.service.AssetEntryService
-		getAssetEntryService() {
-
+	public com.liferay.asset.kernel.service.AssetEntryService getAssetEntryService() {
 		return assetEntryService;
 	}
 
@@ -308,7 +283,6 @@ public abstract class DDLRecordServiceBaseImpl
 	 */
 	public void setAssetEntryService(
 		com.liferay.asset.kernel.service.AssetEntryService assetEntryService) {
-
 		this.assetEntryService = assetEntryService;
 	}
 
@@ -328,7 +302,6 @@ public abstract class DDLRecordServiceBaseImpl
 	 */
 	public void setAssetEntryPersistence(
 		AssetEntryPersistence assetEntryPersistence) {
-
 		this.assetEntryPersistence = assetEntryPersistence;
 	}
 
@@ -337,9 +310,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the ratings stats local service
 	 */
-	public com.liferay.ratings.kernel.service.RatingsStatsLocalService
-		getRatingsStatsLocalService() {
-
+	public com.liferay.ratings.kernel.service.RatingsStatsLocalService getRatingsStatsLocalService() {
 		return ratingsStatsLocalService;
 	}
 
@@ -349,9 +320,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 * @param ratingsStatsLocalService the ratings stats local service
 	 */
 	public void setRatingsStatsLocalService(
-		com.liferay.ratings.kernel.service.RatingsStatsLocalService
-			ratingsStatsLocalService) {
-
+		com.liferay.ratings.kernel.service.RatingsStatsLocalService ratingsStatsLocalService) {
 		this.ratingsStatsLocalService = ratingsStatsLocalService;
 	}
 
@@ -371,7 +340,6 @@ public abstract class DDLRecordServiceBaseImpl
 	 */
 	public void setRatingsStatsPersistence(
 		RatingsStatsPersistence ratingsStatsPersistence) {
-
 		this.ratingsStatsPersistence = ratingsStatsPersistence;
 	}
 
@@ -380,9 +348,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the ddl record set local service
 	 */
-	public com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService
-		getDDLRecordSetLocalService() {
-
+	public com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService getDDLRecordSetLocalService() {
 		return ddlRecordSetLocalService;
 	}
 
@@ -392,9 +358,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 * @param ddlRecordSetLocalService the ddl record set local service
 	 */
 	public void setDDLRecordSetLocalService(
-		com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService
-			ddlRecordSetLocalService) {
-
+		com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService ddlRecordSetLocalService) {
 		this.ddlRecordSetLocalService = ddlRecordSetLocalService;
 	}
 
@@ -403,9 +367,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the ddl record set remote service
 	 */
-	public com.liferay.dynamic.data.lists.service.DDLRecordSetService
-		getDDLRecordSetService() {
-
+	public com.liferay.dynamic.data.lists.service.DDLRecordSetService getDDLRecordSetService() {
 		return ddlRecordSetService;
 	}
 
@@ -415,9 +377,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 * @param ddlRecordSetService the ddl record set remote service
 	 */
 	public void setDDLRecordSetService(
-		com.liferay.dynamic.data.lists.service.DDLRecordSetService
-			ddlRecordSetService) {
-
+		com.liferay.dynamic.data.lists.service.DDLRecordSetService ddlRecordSetService) {
 		this.ddlRecordSetService = ddlRecordSetService;
 	}
 
@@ -437,7 +397,6 @@ public abstract class DDLRecordServiceBaseImpl
 	 */
 	public void setDDLRecordSetPersistence(
 		DDLRecordSetPersistence ddlRecordSetPersistence) {
-
 		this.ddlRecordSetPersistence = ddlRecordSetPersistence;
 	}
 
@@ -464,9 +423,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the ddl record version local service
 	 */
-	public com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService
-		getDDLRecordVersionLocalService() {
-
+	public com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService getDDLRecordVersionLocalService() {
 		return ddlRecordVersionLocalService;
 	}
 
@@ -476,9 +433,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 * @param ddlRecordVersionLocalService the ddl record version local service
 	 */
 	public void setDDLRecordVersionLocalService(
-		com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService
-			ddlRecordVersionLocalService) {
-
+		com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService ddlRecordVersionLocalService) {
 		this.ddlRecordVersionLocalService = ddlRecordVersionLocalService;
 	}
 
@@ -487,9 +442,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 *
 	 * @return the ddl record version remote service
 	 */
-	public com.liferay.dynamic.data.lists.service.DDLRecordVersionService
-		getDDLRecordVersionService() {
-
+	public com.liferay.dynamic.data.lists.service.DDLRecordVersionService getDDLRecordVersionService() {
 		return ddlRecordVersionService;
 	}
 
@@ -499,9 +452,7 @@ public abstract class DDLRecordServiceBaseImpl
 	 * @param ddlRecordVersionService the ddl record version remote service
 	 */
 	public void setDDLRecordVersionService(
-		com.liferay.dynamic.data.lists.service.DDLRecordVersionService
-			ddlRecordVersionService) {
-
+		com.liferay.dynamic.data.lists.service.DDLRecordVersionService ddlRecordVersionService) {
 		this.ddlRecordVersionService = ddlRecordVersionService;
 	}
 
@@ -521,7 +472,6 @@ public abstract class DDLRecordServiceBaseImpl
 	 */
 	public void setDDLRecordVersionPersistence(
 		DDLRecordVersionPersistence ddlRecordVersionPersistence) {
-
 		this.ddlRecordVersionPersistence = ddlRecordVersionPersistence;
 	}
 
@@ -563,8 +513,8 @@ public abstract class DDLRecordServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -573,106 +523,48 @@ public abstract class DDLRecordServiceBaseImpl
 		}
 	}
 
-	@BeanReference(
-		type = com.liferay.dynamic.data.lists.service.DDLRecordLocalService.class
-	)
-	protected com.liferay.dynamic.data.lists.service.DDLRecordLocalService
-		ddlRecordLocalService;
-
+	@BeanReference(type = com.liferay.dynamic.data.lists.service.DDLRecordLocalService.class)
+	protected com.liferay.dynamic.data.lists.service.DDLRecordLocalService ddlRecordLocalService;
 	@BeanReference(type = DDLRecordService.class)
 	protected DDLRecordService ddlRecordService;
-
 	@BeanReference(type = DDLRecordPersistence.class)
 	protected DDLRecordPersistence ddlRecordPersistence;
-
 	@BeanReference(type = DDLRecordFinder.class)
 	protected DDLRecordFinder ddlRecordFinder;
-
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserService.class
-	)
+	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserService.class)
 	protected com.liferay.portal.kernel.service.UserService userService;
-
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-		workflowInstanceLinkLocalService;
-
+	@ServiceReference(type = com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService.class)
+	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService;
 	@ServiceReference(type = WorkflowInstanceLinkPersistence.class)
 	protected WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetEntryLocalService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetEntryLocalService
-		assetEntryLocalService;
-
-	@ServiceReference(
-		type = com.liferay.asset.kernel.service.AssetEntryService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetEntryService
-		assetEntryService;
-
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetEntryLocalService.class)
+	protected com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService;
+	@ServiceReference(type = com.liferay.asset.kernel.service.AssetEntryService.class)
+	protected com.liferay.asset.kernel.service.AssetEntryService assetEntryService;
 	@ServiceReference(type = AssetEntryPersistence.class)
 	protected AssetEntryPersistence assetEntryPersistence;
-
-	@ServiceReference(
-		type = com.liferay.ratings.kernel.service.RatingsStatsLocalService.class
-	)
-	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService
-		ratingsStatsLocalService;
-
+	@ServiceReference(type = com.liferay.ratings.kernel.service.RatingsStatsLocalService.class)
+	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService ratingsStatsLocalService;
 	@ServiceReference(type = RatingsStatsPersistence.class)
 	protected RatingsStatsPersistence ratingsStatsPersistence;
-
-	@BeanReference(
-		type = com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService.class
-	)
-	protected com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService
-		ddlRecordSetLocalService;
-
-	@BeanReference(
-		type = com.liferay.dynamic.data.lists.service.DDLRecordSetService.class
-	)
-	protected com.liferay.dynamic.data.lists.service.DDLRecordSetService
-		ddlRecordSetService;
-
+	@BeanReference(type = com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService.class)
+	protected com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService ddlRecordSetLocalService;
+	@BeanReference(type = com.liferay.dynamic.data.lists.service.DDLRecordSetService.class)
+	protected com.liferay.dynamic.data.lists.service.DDLRecordSetService ddlRecordSetService;
 	@BeanReference(type = DDLRecordSetPersistence.class)
 	protected DDLRecordSetPersistence ddlRecordSetPersistence;
-
 	@BeanReference(type = DDLRecordSetFinder.class)
 	protected DDLRecordSetFinder ddlRecordSetFinder;
-
-	@BeanReference(
-		type = com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService.class
-	)
-	protected
-		com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService
-			ddlRecordVersionLocalService;
-
-	@BeanReference(
-		type = com.liferay.dynamic.data.lists.service.DDLRecordVersionService.class
-	)
-	protected com.liferay.dynamic.data.lists.service.DDLRecordVersionService
-		ddlRecordVersionService;
-
+	@BeanReference(type = com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService.class)
+	protected com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService ddlRecordVersionLocalService;
+	@BeanReference(type = com.liferay.dynamic.data.lists.service.DDLRecordVersionService.class)
+	protected com.liferay.dynamic.data.lists.service.DDLRecordVersionService ddlRecordVersionService;
 	@BeanReference(type = DDLRecordVersionPersistence.class)
 	protected DDLRecordVersionPersistence ddlRecordVersionPersistence;
-
 }

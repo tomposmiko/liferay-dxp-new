@@ -17,7 +17,7 @@ package com.liferay.structured.content.apio.internal.architect.resource.test;
 import com.liferay.apio.architect.language.AcceptLanguage;
 import com.liferay.apio.architect.pagination.PageItems;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerTracker;
 import com.liferay.dynamic.data.mapping.kernel.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureConstants;
@@ -58,6 +58,7 @@ import com.liferay.structured.content.apio.architect.model.StructuredContentValu
 import com.liferay.structured.content.apio.architect.resource.StructuredContentField;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +66,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import javax.ws.rs.BadRequestException;
+
+import org.assertj.core.api.AbstractThrowableAssert;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -102,7 +108,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -155,6 +161,46 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 	}
 
 	@Test
+	public void testAddJournalArticleWithDifferentLocaleThanDefaultLocaleInStructure()
+		throws Throwable {
+
+		DDMStructureTestHelper ddmStructureTestHelper =
+			new DDMStructureTestHelper(
+				PortalUtil.getClassNameId(JournalArticle.class), _group);
+
+		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
+			PortalUtil.getClassNameId(JournalArticle.class),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			deserialize(
+				_ddmFormDeserializerTracker,
+				read("test-journal-all-fields-structure.json")),
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+
+		DDMTemplateTestUtil.addTemplate(
+			_group.getGroupId(), ddmStructure.getStructureId(),
+			PortalUtil.getClassNameId(JournalArticle.class),
+			TemplateConstants.LANG_TYPE_VM,
+			read("test-journal-all-fields-template.xsl"), LocaleUtil.US);
+
+		StructuredContent structuredContent = _getStructuredContent(
+			ddmStructure.getStructureId(), "Título",
+			Collections.singletonList(
+				_getStructuredContentValue("MyBoolean", "true")));
+
+		AbstractThrowableAssert exception = Assertions.assertThatThrownBy(
+			() -> addJournalArticle(
+				_group.getGroupId(), structuredContent, () -> LocaleUtil.SPAIN,
+				getThemeDisplay(_group, LocaleUtil.SPAIN))
+		).isInstanceOf(
+			BadRequestException.class
+		);
+
+		exception.hasMessage(
+			"Unable to add Structured Content without title in default " +
+				"language");
+	}
+
+	@Test
 	public void testGetDataTypeWithBoolean() throws Exception {
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
@@ -164,7 +210,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -194,7 +240,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -224,7 +270,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -258,7 +304,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -289,7 +335,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -322,7 +368,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -358,7 +404,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -391,7 +437,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -422,7 +468,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -453,7 +499,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -487,7 +533,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -521,7 +567,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -554,7 +600,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -585,7 +631,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -618,7 +664,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -649,7 +695,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -680,7 +726,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -1030,7 +1076,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -1096,7 +1142,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-separator-field-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -1144,7 +1190,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -1321,7 +1367,7 @@ public class DefaultStructuredContentNestedCollectionResourceTest
 	private static final AcceptLanguage _acceptLanguage = () -> LocaleUtil.US;
 
 	@Inject
-	private DDMFormJSONDeserializer _ddmFormJSONDeserializer;
+	private DDMFormDeserializerTracker _ddmFormDeserializerTracker;
 
 	@DeleteAfterTestRun
 	private Group _group;

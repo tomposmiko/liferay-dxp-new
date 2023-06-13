@@ -178,7 +178,7 @@ public class ScopeLocatorImplTest extends PowerMockito {
 	public void testScopeMapperByNameAndCompany() throws Exception {
 		String applicationName2 = "com.liferay.test2";
 
-		ScopeMapper defaultScopeMapper = ScopeMapper.PASS_THROUGH_SCOPE_MAPPER;
+		ScopeMapper defaultScopeMapper = ScopeMapper.PASSTHROUGH_SCOPEMAPPER;
 
 		ScopeFinder scopeFinder = () -> scopesSet1;
 
@@ -311,7 +311,7 @@ public class ScopeLocatorImplTest extends PowerMockito {
 		Builder builder = new Builder();
 
 		ScopeLocatorImpl scopeLocatorImpl = builder.withPrefixHandlerFactories(
-			propertyAccessor -> PrefixHandler.PASS_THROUGH_PREFIX_HANDLER,
+			propertyAccessor -> PrefixHandler.PASSTHROUGH_PREFIXHANDLER,
 			registrator -> {
 				registrator.register(
 					_COMPANY_ID, _APPLICATION_NAME, testPrefixHandlerFactory);
@@ -394,15 +394,14 @@ public class ScopeLocatorImplTest extends PowerMockito {
 
 			if (!_prefixHandlerFactoriesInitialized) {
 				withPrefixHandlerFactories(
-					propertyAccessor ->
-						PrefixHandler.PASS_THROUGH_PREFIX_HANDLER,
+					propertyAccessor -> PrefixHandler.PASSTHROUGH_PREFIXHANDLER,
 					registrator -> {
 					});
 			}
 
 			if (!_scopeMappersInitialized) {
 				withScopeMappers(
-					ScopeMapper.PASS_THROUGH_SCOPE_MAPPER,
+					ScopeMapper.PASSTHROUGH_SCOPEMAPPER,
 					registrator -> {
 					});
 			}

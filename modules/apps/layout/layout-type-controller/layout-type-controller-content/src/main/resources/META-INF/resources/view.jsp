@@ -17,15 +17,61 @@
 <%@ include file="/init.jsp" %>
 
 <%
-FragmentsEditorDisplayContext fragmentsEditorDisplayContext = new FragmentsEditorDisplayContext(request, renderResponse);
+FragmentsEditorDisplayContext fragmentsEditorDisplayContext = (FragmentsEditorDisplayContext)request.getAttribute(ContentLayoutTypeControllerWebKeys.LIFERAY_SHARED_FRAGMENTS_EDITOR_DISPLAY_CONTEXT);
 %>
 
 <liferay-editor:resources
 	editorName="alloyeditor"
 />
 
+<liferay-util:html-top>
+	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathModule() + "/layout-admin-web/css/fragments_editor/FragmentsEditorEditMode.css") %>" rel="stylesheet">
+</liferay-util:html-top>
+
 <soy:component-renderer
-	context="<%= fragmentsEditorDisplayContext.getEditorContext() %>"
-	module="layout-admin-web/js/fragments_editor/FragmentsEditor.es"
-	templateNamespace="com.liferay.layout.admin.web.FragmentsEditor.render"
+	componentId='<%= renderResponse.getNamespace() + "sidebar" %>'
+	context="<%= fragmentsEditorDisplayContext.getFragmentsEditorSidebarContext() %>"
+	module="layout-admin-web/js/fragments_editor/components/sidebar/FragmentsEditorSidebar.es"
+	templateNamespace="com.liferay.layout.admin.web.FragmentsEditorSidebar.render"
+	useNamespace="<%= false %>"
 />
+
+<soy:component-renderer
+	componentId='<%= renderResponse.getNamespace() + "fragments" %>'
+	context="<%= fragmentsEditorDisplayContext.getFragmentEntryLinkListContext() %>"
+	module="layout-admin-web/js/fragments_editor/components/fragment_entry_link/FragmentEntryLinkList.es"
+	templateNamespace="com.liferay.layout.admin.web.FragmentEntryLinkList.render"
+	useNamespace="<%= false %>"
+/>
+
+<%
+JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
+%>
+
+<aui:script require="layout-admin-web/js/fragments_editor/components/edit_mode/DisabledAreaMask.es as DisabledAreaMaskModule, layout-admin-web/js/fragments_editor/components/edit_mode/EditModeWrapper.es as EditModeWrapperModule, layout-admin-web/js/fragments_editor/reducers/reducers.es as ReducersModule, layout-admin-web/js/fragments_editor/store/store.es as StoreModule">
+	StoreModule.createStore(
+		<%= jsonSerializer.serializeDeep(fragmentsEditorDisplayContext.getEditorContext()) %>,
+		ReducersModule.reducers,
+		[
+			'<portlet:namespace />editModeWrapper',
+			'<portlet:namespace />fragments',
+			'<portlet:namespace />sidebar',
+			'<portlet:namespace />toolbar'
+		]
+	);
+
+	const disabledAreaMask = new DisabledAreaMaskModule.DisabledAreaMask();
+	const editModeWrapper = new EditModeWrapperModule.EditModeWrapper();
+
+	Liferay.component('<portlet:namespace />editModeWrapper', editModeWrapper);
+
+	function handleDestroyPortlet () {
+		disabledAreaMask.dispose();
+		editModeWrapper.dispose();
+
+		Liferay.destroyComponent('<portlet:namespace />editModeWrapper');
+		Liferay.detach('destroyPortlet', handleDestroyPortlet);
+	}
+
+	Liferay.on('destroyPortlet', handleDestroyPortlet);
+</aui:script>

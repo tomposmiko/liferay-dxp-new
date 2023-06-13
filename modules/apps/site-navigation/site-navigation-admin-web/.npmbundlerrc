@@ -1,18 +1,6 @@
 {
-	"config": {
-		"imports": {
-			"frontend-js-metal-web": {
-				"metal": ">=2.16.5",
-				"metal-component": ">=2.16.5",
-				"metal-dom": ">=2.16.5",
-				"metal-drag-drop": ">=2.16.5",
-				"metal-events": ">=2.16.5",
-				"metal-position": ">=2.1.1",
-				"metal-soy": ">=2.16.5",
-				"metal-state": ">=2.16.5",
-				"metal-web-component": ">=2.16.5"
-			}
-		}
-	},
-	"output": "classes/META-INF/resources/"
+    "ignore": [
+        "**/config.js"
+    ],
+    "preset": "liferay-npm-bundler-preset-liferay-dev"
 }

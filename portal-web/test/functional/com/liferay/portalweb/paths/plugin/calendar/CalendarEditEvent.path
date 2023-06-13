@@ -14,11 +14,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>EDIT_EVENT_IFRAME</td>
-	<td>//iframe[contains(@class,'dialog-iframe-node ')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>FORM_CONTENT</td>
 	<td>//div[@id='Content']</td>
 	<td></td>
@@ -147,8 +142,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>REPEAT_MONTHLY_CURRENT_DAY</td>
+	<td>//td[contains(@class,'calendar-recurrence-month-radio')]//input[contains(@id,'_weekday') and @type='hidden']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>REPEAT_MONTHLY_CURRENT_MONTH_POSITION</td>
 	<td>//td[contains(@class,'calendar-recurrence-month-radio')]//input[contains(@id,'_position') and @type='hidden']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPEAT_WEEKLY_CURRENT_DAY</td>
+	<td>//td[contains(@class,'calendar-recurrence-weekday-checkbox')]//input[@disabled='']</td>
 	<td></td>
 </tr>
 <tr>

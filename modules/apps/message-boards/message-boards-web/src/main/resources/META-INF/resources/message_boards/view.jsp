@@ -60,10 +60,10 @@ if (orderByType.equals("asc")) {
 	orderByAsc = true;
 }
 
-OrderByComparator threadOrderByComparator = null;
+OrderByComparator orderByComparator = null;
 
 if (orderByCol.equals("modified-date")) {
-	threadOrderByComparator = new ThreadModifiedDateComparator(orderByAsc);
+	orderByComparator = new ThreadModifiedDateComparator(orderByAsc);
 }
 
 MBListDisplayContext mbListDisplayContext = mbDisplayContextProvider.getMbListDisplayContext(request, response, categoryId);
@@ -380,7 +380,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 					mbListDisplayContext.setCategoryEntriesDelta(categoryEntriesSearchContainer);
 
 					categoryEntriesSearchContainer.setOrderByCol(orderByCol);
-					categoryEntriesSearchContainer.setOrderByComparator(new CategoryTitleComparator(true));
+					categoryEntriesSearchContainer.setOrderByComparator(orderByComparator);
 					categoryEntriesSearchContainer.setOrderByType(orderByType);
 
 					mbListDisplayContext.populateCategoriesResultsAndTotal(categoryEntriesSearchContainer);
@@ -398,7 +398,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 					mbListDisplayContext.setThreadEntriesDelta(categoryEntriesSearchContainer);
 
 					threadEntriesSearchContainer.setOrderByCol(orderByCol);
-					threadEntriesSearchContainer.setOrderByComparator(threadOrderByComparator);
+					threadEntriesSearchContainer.setOrderByComparator(orderByComparator);
 					threadEntriesSearchContainer.setOrderByType(orderByType);
 
 					mbListDisplayContext.populateThreadsResultsAndTotal(threadEntriesSearchContainer);
@@ -513,7 +513,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 					mbListDisplayContext.setThreadEntriesDelta(threadEntriesSearchContainer);
 
 					threadEntriesSearchContainer.setOrderByCol(orderByCol);
-					threadEntriesSearchContainer.setOrderByComparator(threadOrderByComparator);
+					threadEntriesSearchContainer.setOrderByComparator(orderByComparator);
 					threadEntriesSearchContainer.setOrderByType(orderByType);
 
 					mbListDisplayContext.populateThreadsResultsAndTotal(threadEntriesSearchContainer);

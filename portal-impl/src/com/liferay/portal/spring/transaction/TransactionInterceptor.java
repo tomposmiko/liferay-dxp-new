@@ -14,120 +14,51 @@
 
 package com.liferay.portal.spring.transaction;
 
-import aQute.bnd.annotation.ProviderType;
-
-import com.liferay.petra.reflect.AnnotationLocator;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.spring.aop.AopMethodInvocation;
+import com.liferay.portal.spring.aop.ChainableMethodAdvice;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
-import org.springframework.transaction.interceptor.TransactionAttributeSource;
 
 /**
  * @author Shuyang Zhou
  */
-@ProviderType
-public class TransactionInterceptor implements MethodInterceptor {
+public class TransactionInterceptor extends ChainableMethodAdvice {
 
-	public TransactionAttribute getTransactionAttribute(
-		MethodInvocation methodInvocation) {
+	@Override
+	public Object createMethodContext(
+		Class<?> targetClass, Method method,
+		Map<Class<? extends Annotation>, Annotation> annotations) {
 
-		Object targetBean = methodInvocation.getThis();
+		Transactional transactional = (Transactional)annotations.get(
+			Transactional.class);
 
-		Class<?> targetClass = targetBean.getClass();
-
-		Map<Method, TransactionAttribute> transactionAttributes =
-			_transactionAttributes.get(targetClass);
-
-		if (transactionAttributes == null) {
-			transactionAttributes = new ConcurrentHashMap<>();
-
-			Map<Method, TransactionAttribute> previousTransactionAttributes =
-				_transactionAttributes.putIfAbsent(
-					targetClass, transactionAttributes);
-
-			if (previousTransactionAttributes != null) {
-				transactionAttributes = previousTransactionAttributes;
-			}
-		}
-
-		Method method = methodInvocation.getMethod();
-
-		TransactionAttribute transactionAttribute = transactionAttributes.get(
-			method);
+		TransactionAttribute transactionAttribute =
+			TransactionAttributeBuilder.build(transactional);
 
 		if (transactionAttribute == null) {
-			Transactional transactional = AnnotationLocator.locate(
-				method, targetClass, Transactional.class);
-
-			transactionAttribute = TransactionAttributeBuilder.build(
-				transactional);
-
-			if (transactionAttribute == null) {
-				transactionAttributes.put(method, _nullTransactionAttribute);
-			}
-			else {
-				transactionAttributes.put(method, transactionAttribute);
-			}
-
-			return transactionAttribute;
-		}
-
-		if (transactionAttribute == _nullTransactionAttribute) {
 			return null;
 		}
 
-		return transactionAttribute;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public TransactionAttributeSource getTransactionAttributeSource() {
-		return transactionAttributeSource;
+		return new TransactionAttributeAdapter(transactionAttribute);
 	}
 
 	@Override
-	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-		TransactionAttribute transactionAttribute = getTransactionAttribute(
-			methodInvocation);
-
-		if (transactionAttribute == null) {
-			return methodInvocation.proceed();
-		}
+	public Object invoke(
+			AopMethodInvocation aopMethodInvocation, Object[] arguments)
+		throws Throwable {
 
 		TransactionAttributeAdapter transactionAttributeAdapter =
-			new TransactionAttributeAdapter(transactionAttribute);
+			aopMethodInvocation.getAdviceMethodContext();
 
 		return transactionExecutor.execute(
-			transactionAttributeAdapter, methodInvocation);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setPlatformTransactionManager(
-		PlatformTransactionManager platformTransactionManager) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setTransactionAttributeSource(
-		TransactionAttributeSource transactionAttributeSource) {
+			transactionAttributeAdapter,
+			() -> aopMethodInvocation.proceed(arguments));
 	}
 
 	public void setTransactionExecutor(
@@ -136,24 +67,6 @@ public class TransactionInterceptor implements MethodInterceptor {
 		this.transactionExecutor = transactionExecutor;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected PlatformTransactionManager platformTransactionManager;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected TransactionAttributeSource transactionAttributeSource;
-
 	protected TransactionExecutor transactionExecutor;
-
-	private static final TransactionAttribute _nullTransactionAttribute =
-		new DefaultTransactionAttribute();
-
-	private final ConcurrentMap<Class<?>, Map<Method, TransactionAttribute>>
-		_transactionAttributes = new ConcurrentHashMap<>();
 
 }

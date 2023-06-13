@@ -24,7 +24,7 @@ definition {
 	}
 
 	@priority = "4"
-	test AddWikiFrontPageContentJavascript {
+	test AssertNoWikiJavascript {
 		ProductMenu.gotoPortlet(
 			category = "Build",
 			panel = "Site Administration",
@@ -44,16 +44,45 @@ definition {
 					document.getElementById('demo').innerHTML = 'FAIL';
 				</script>
 			''';
-		var wikiPageText = "PASS";
 
 		WikiPage.addFrontPagePG(
 			htmlSource = "true",
 			wikiPageContent = "${wikiPageContent}"
 		);
 
-		WikiPage.viewPG(
-			wikiPageContent = "${wikiPageText}",
-			wikiPageTitle = "FrontPage"
+		WikiPage.viewPG(wikiPageContent = "PASS", wikiPageTitle = "FrontPage");
+	}
+
+	@priority = "4"
+	test AssertWebContentJavascript {
+		ProductMenu.gotoPortlet(
+			category = "Build",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
+		SitePages.addPublicPage(pageName = "Web Content Display Page");
+
+		Navigator.gotoPage(pageName = "Web Content Display Page");
+
+		Portlet.addPG(portletName = "Web Content Display");
+
+		var webContentContent = '''
+				<p id='demo'>FAIL</p>
+
+				<script type='text/javascript'>
+					document.getElementById('demo').innerHTML = 'PASS';
+				</script>
+			''';
+
+		WebContent.addPGViaWCD(
+			webContentContent = "${webContentContent}",
+			webContentTitle = "WC WebContent Title"
+		);
+
+		WebContent.viewPGViaWCD(
+			webContentContent = "PASS",
+			webContentTitle = "Web Content Title"
 		);
 	}
 }

@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.index;
 
-import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.engine.adapter.index.IndicesOptions;
 import com.liferay.portal.search.engine.adapter.index.OpenIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.OpenIndexResponse;
@@ -41,7 +41,10 @@ public class OpenIndexRequestExecutorImpl implements OpenIndexRequestExecutor {
 		AcknowledgedResponse acknowledgedResponse =
 			openIndexRequestBuilder.get();
 
-		return new OpenIndexResponse(acknowledgedResponse.isAcknowledged());
+		OpenIndexResponse openIndexResponse = new OpenIndexResponse(
+			acknowledgedResponse.isAcknowledged());
+
+		return openIndexResponse;
 	}
 
 	protected OpenIndexRequestBuilder createOpenIndexRequestBuilder(
@@ -49,7 +52,7 @@ public class OpenIndexRequestExecutorImpl implements OpenIndexRequestExecutor {
 
 		OpenIndexRequestBuilder openIndexRequestBuilder =
 			OpenIndexAction.INSTANCE.newRequestBuilder(
-				elasticsearchConnectionManager.getClient());
+				elasticsearchClientResolver.getClient());
 
 		openIndexRequestBuilder.setIndices(openIndexRequest.getIndexNames());
 
@@ -77,7 +80,7 @@ public class OpenIndexRequestExecutorImpl implements OpenIndexRequestExecutor {
 	}
 
 	@Reference
-	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
+	protected ElasticsearchClientResolver elasticsearchClientResolver;
 
 	@Reference
 	protected IndicesOptionsTranslator indicesOptionsTranslator;

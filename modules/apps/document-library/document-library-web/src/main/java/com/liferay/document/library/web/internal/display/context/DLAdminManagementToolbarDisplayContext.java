@@ -24,11 +24,15 @@ import com.liferay.document.library.portlet.toolbar.contributor.DLPortletToolbar
 import com.liferay.document.library.web.internal.constants.DLWebKeys;
 import com.liferay.document.library.web.internal.display.context.logic.DLPortletInstanceSettingsHelper;
 import com.liferay.document.library.web.internal.display.context.util.DLRequestHelper;
+import com.liferay.document.library.web.internal.security.permission.resource.DLFileEntryPermission;
+import com.liferay.document.library.web.internal.security.permission.resource.DLFolderPermission;
 import com.liferay.document.library.web.internal.settings.DLPortletInstanceSettings;
 import com.liferay.document.library.web.internal.util.DLTrashUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -40,6 +44,10 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -49,9 +57,11 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.util.RepositoryUtil;
 import com.liferay.staging.StagingGroupHelper;
 import com.liferay.staging.StagingGroupHelperUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,11 +103,7 @@ public class DLAdminManagementToolbarDisplayContext {
 	}
 
 	public List<DropdownItem> getActionDropdownItems() {
-		User user = _themeDisplay.getUser();
-
-		if (!_dlPortletInstanceSettingsHelper.isShowActions() ||
-			user.isDefaultUser()) {
-
+		if (!_dlPortletInstanceSettingsHelper.isShowActions()) {
 			return null;
 		}
 
@@ -126,6 +132,11 @@ public class DLAdminManagementToolbarDisplayContext {
 									LanguageUtil.get(_request, "download"));
 								dropdownItem.setQuickAction(true);
 							}));
+				}
+
+				User user = _themeDisplay.getUser();
+
+				if (stagedActions && !user.isDefaultUser()) {
 					add(
 						SafeConsumer.ignore(
 							dropdownItem -> {
@@ -135,32 +146,43 @@ public class DLAdminManagementToolbarDisplayContext {
 									LanguageUtil.get(_request, "move"));
 								dropdownItem.setQuickAction(true);
 							}));
+					add(
+						SafeConsumer.ignore(
+							dropdownItem -> {
+								dropdownItem.putData("action", "editTags");
+								dropdownItem.setIcon("tag");
+								dropdownItem.setLabel(
+									LanguageUtil.get(_request, "edit-tags"));
+								dropdownItem.setQuickAction(true);
+							}));
 				}
 
-				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.putData("action", "deleteEntries");
+				if (!user.isDefaultUser()) {
+					add(
+						SafeConsumer.ignore(
+							dropdownItem -> {
+								dropdownItem.putData("action", "deleteEntries");
 
-							if (_dlTrashUtil.isTrashEnabled(
-									scopeGroup.getGroupId(),
-									_getRepositoryId())) {
+								if (_dlTrashUtil.isTrashEnabled(
+										scopeGroup.getGroupId(),
+										_getRepositoryId())) {
 
-								dropdownItem.setIcon("trash");
-								dropdownItem.setLabel(
-									LanguageUtil.get(
-										_request, "move-to-recycle-bin"));
-							}
-							else {
-								dropdownItem.setIcon("times");
-								dropdownItem.setLabel(
-									LanguageUtil.get(_request, "delete"));
-							}
+									dropdownItem.setIcon("trash");
+									dropdownItem.setLabel(
+										LanguageUtil.get(
+											_request, "move-to-recycle-bin"));
+								}
+								else {
+									dropdownItem.setIcon("times");
+									dropdownItem.setLabel(
+										LanguageUtil.get(_request, "delete"));
+								}
 
-							dropdownItem.setQuickAction(true);
-						}));
+								dropdownItem.setQuickAction(true);
+							}));
+				}
 
-				if (stagedActions) {
+				if (stagedActions && !user.isDefaultUser()) {
 					add(
 						SafeConsumer.ignore(
 							dropdownItem -> {
@@ -184,6 +206,75 @@ public class DLAdminManagementToolbarDisplayContext {
 				}
 			}
 		};
+	}
+
+	public List<String> getAvailableActionDropdownItems(FileEntry fileEntry)
+		throws PortalException {
+
+		List<String> availableActionDropdownItems = new ArrayList<>();
+
+		PermissionChecker permissionChecker =
+			_themeDisplay.getPermissionChecker();
+
+		if (DLFileEntryPermission.contains(
+				permissionChecker, fileEntry, ActionKeys.DELETE)) {
+
+			availableActionDropdownItems.add("deleteEntries");
+		}
+
+		if (DLFileEntryPermission.contains(
+				permissionChecker, fileEntry, ActionKeys.UPDATE)) {
+
+			availableActionDropdownItems.add("move");
+
+			if (fileEntry.isCheckedOut()) {
+				availableActionDropdownItems.add("checkin");
+			}
+			else {
+				availableActionDropdownItems.add("checkout");
+			}
+
+			availableActionDropdownItems.add("editTags");
+		}
+
+		if (DLFileEntryPermission.contains(
+				permissionChecker, fileEntry, ActionKeys.VIEW)) {
+
+			availableActionDropdownItems.add("download");
+		}
+
+		return availableActionDropdownItems;
+	}
+
+	public List<String> getAvailableActionDropdownItems(Folder folder)
+		throws PortalException {
+
+		List<String> availableActionDropdownItems = new ArrayList<>();
+
+		PermissionChecker permissionChecker =
+			_themeDisplay.getPermissionChecker();
+
+		if (DLFolderPermission.contains(
+				permissionChecker, folder, ActionKeys.DELETE)) {
+
+			availableActionDropdownItems.add("deleteEntries");
+		}
+
+		if (DLFolderPermission.contains(
+				permissionChecker, folder, ActionKeys.UPDATE) &&
+			!folder.isMountPoint()) {
+
+			availableActionDropdownItems.add("move");
+		}
+
+		if (DLFolderPermission.contains(
+				permissionChecker, folder, ActionKeys.VIEW) &&
+			!RepositoryUtil.isExternalRepository(folder.getRepositoryId())) {
+
+			availableActionDropdownItems.add("download");
+		}
+
+		return availableActionDropdownItems;
 	}
 
 	public String getClearResultsURL() {
@@ -258,6 +349,87 @@ public class DLAdminManagementToolbarDisplayContext {
 							dropdownGroupItem.setLabel(
 								LanguageUtil.get(_request, "order-by"));
 						});
+				}
+			}
+		};
+	}
+
+	public List<LabelItem> getFilterLabelItems() {
+		return new LabelItemList() {
+			{
+				long fileEntryTypeId = _getFileEntryTypeId();
+
+				if (fileEntryTypeId != -1) {
+					add(
+						SafeConsumer.ignore(
+							labelItem -> {
+								PortletURL removeLabelURL =
+									PortletURLUtil.clone(
+										_currentURLObj,
+										_liferayPortletResponse);
+
+								removeLabelURL.setParameter(
+									"fileEntryTypeId", (String)null);
+
+								labelItem.putData(
+									"removeLabelURL",
+									removeLabelURL.toString());
+
+								labelItem.setCloseable(true);
+
+								String fileEntryTypeName = LanguageUtil.get(
+									_request, "basic-document");
+
+								if (fileEntryTypeId !=
+										DLFileEntryTypeConstants.
+											FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT) {
+
+									DLFileEntryType fileEntryType =
+										DLFileEntryTypeLocalServiceUtil.
+											getFileEntryType(fileEntryTypeId);
+
+									fileEntryTypeName = fileEntryType.getName(
+										_request.getLocale());
+								}
+
+								String label = String.format(
+									"%s: %s",
+									LanguageUtil.get(_request, "document-type"),
+									fileEntryTypeName);
+
+								labelItem.setLabel(label);
+							}));
+				}
+
+				String navigation = _getNavigation();
+
+				if (navigation.equals("mine")) {
+					add(
+						SafeConsumer.ignore(
+							labelItem -> {
+								PortletURL removeLabelURL =
+									PortletURLUtil.clone(
+										_currentURLObj,
+										_liferayPortletResponse);
+
+								removeLabelURL.setParameter(
+									"navigation", (String)null);
+
+								labelItem.putData(
+									"removeLabelURL",
+									removeLabelURL.toString());
+
+								labelItem.setCloseable(true);
+
+								User user = _themeDisplay.getUser();
+
+								String label = String.format(
+									"%s: %s",
+									LanguageUtil.get(_request, "owner"),
+									user.getFullName());
+
+								labelItem.setLabel(label);
+							}));
 				}
 			}
 		};
@@ -393,12 +565,10 @@ public class DLAdminManagementToolbarDisplayContext {
 
 	public boolean isDisabled() {
 		try {
-			int count =
-				DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(
+			if (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(
 					_getRepositoryId(), _getFolderId(),
-					WorkflowConstants.STATUS_ANY, true);
+					WorkflowConstants.STATUS_ANY, true) <= 0) {
 
-			if (count <= 0) {
 				return true;
 			}
 
@@ -553,7 +723,7 @@ public class DLAdminManagementToolbarDisplayContext {
 								"action", "openDocumentTypesSelector");
 
 							String label = LanguageUtil.get(
-								_request, "document-types");
+								_request, "document-type");
 
 							if (fileEntryTypeId != -1) {
 								String fileEntryTypeName = LanguageUtil.get(

@@ -1372,14 +1372,6 @@ public class LayoutImportController implements ImportController {
 				continue;
 			}
 
-			boolean layoutPrototypeGlobal = GetterUtil.getBoolean(
-				layoutElement.attributeValue(
-					"layout-prototype-global", "true"));
-
-			if (!layoutPrototypeGlobal) {
-				continue;
-			}
-
 			String layoutPrototypeUuid = GetterUtil.getString(
 				layoutElement.attributeValue("layout-prototype-uuid"));
 

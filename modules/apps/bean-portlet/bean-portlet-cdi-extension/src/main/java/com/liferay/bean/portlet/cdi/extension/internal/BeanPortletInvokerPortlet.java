@@ -18,9 +18,6 @@ import com.liferay.bean.portlet.cdi.extension.internal.scope.ScopedBeanManager;
 import com.liferay.bean.portlet.cdi.extension.internal.scope.ScopedBeanManagerThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.InvokerPortlet;
-import com.liferay.portal.kernel.util.ClassUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
@@ -32,17 +29,17 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.portlet.ActionParameters;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.Event;
+import javax.portlet.EventPortlet;
 import javax.portlet.EventRequest;
 import javax.portlet.EventResponse;
+import javax.portlet.HeaderPortlet;
 import javax.portlet.HeaderRequest;
 import javax.portlet.HeaderResponse;
-import javax.portlet.MimeResponse;
 import javax.portlet.Portlet;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletContext;
@@ -55,40 +52,18 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.portlet.ResourceServingPortlet;
 
 /**
  * @author Neil Griffin
  */
-public class BeanPortletInvokerPortlet implements InvokerPortlet {
+public class BeanPortletInvokerPortlet
+	implements EventPortlet, HeaderPortlet, Portlet, ResourceServingPortlet {
 
 	public BeanPortletInvokerPortlet(
 		Map<MethodType, List<BeanMethod>> beanMethods) {
 
 		_beanMethods = beanMethods;
-
-		boolean facesPortlet = false;
-
-		beanMethods:
-		for (Map.Entry<MethodType, List<BeanMethod>> entry :
-				beanMethods.entrySet()) {
-
-			for (BeanMethod beanMethod : entry.getValue()) {
-				Method method = beanMethod.getMethod();
-
-				Class<?> declaringClass = method.getDeclaringClass();
-
-				if (ClassUtil.isSubclass(
-						declaringClass,
-						"javax.portlet.faces.GenericFacesPortlet")) {
-
-					facesPortlet = true;
-
-					break beanMethods;
-				}
-			}
-		}
-
-		_facesPortlet = facesPortlet;
 	}
 
 	@Override
@@ -102,75 +77,10 @@ public class BeanPortletInvokerPortlet implements InvokerPortlet {
 	}
 
 	@Override
-	public Integer getExpCache() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Portlet getPortlet() {
-		return this;
-	}
-
-	@Override
-	public ClassLoader getPortletClassLoader() {
-		Class<? extends BeanPortletInvokerPortlet> portletClass = getClass();
-
-		return portletClass.getClassLoader();
-	}
-
-	@Override
-	public PortletConfig getPortletConfig() {
-		return _portletConfig;
-	}
-
-	@Override
-	public PortletContext getPortletContext() {
-		return _portletConfig.getPortletContext();
-	}
-
-	@Override
-	public Portlet getPortletInstance() {
-		return this;
-	}
-
-	@Override
 	public void init(PortletConfig portletConfig) throws PortletException {
 		_invokeBeanMethods(_beanMethods.get(MethodType.INIT), portletConfig);
 
 		_portletConfig = portletConfig;
-	}
-
-	@Override
-	public boolean isCheckAuthToken() {
-		return GetterUtil.getBoolean(
-			_portletConfig.getInitParameter("check-auth-token"));
-	}
-
-	public boolean isFacesPortlet() {
-		return _facesPortlet;
-	}
-
-	@Override
-	public boolean isHeaderPortlet() {
-		return true;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public boolean isStrutsBridgePortlet() {
-		return false;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public boolean isStrutsPortlet() {
-		return false;
 	}
 
 	@Override
@@ -234,15 +144,9 @@ public class BeanPortletInvokerPortlet implements InvokerPortlet {
 			_beanMethods.get(MethodType.SERVE_RESOURCE));
 	}
 
-	@Override
-	public void setPortletFilters() throws PortletException {
-		throw new UnsupportedOperationException();
-	}
-
 	private void _invokeBeanMethod(BeanMethod beanMethod, Object... args)
 		throws IOException, PortletException, ReflectiveOperationException {
 
-		String include = null;
 		Method method = beanMethod.getMethod();
 
 		MethodType methodType = beanMethod.getMethodType();
@@ -256,20 +160,16 @@ public class BeanPortletInvokerPortlet implements InvokerPortlet {
 			String actionName = actionParameters.getValue(
 				ActionRequest.ACTION_NAME);
 
-			String beanMethodActionName = beanMethod.getActionName();
-
-			if (Validator.isNull(beanMethodActionName) ||
-				beanMethodActionName.equals(actionName)) {
+			if ((actionName == null) ||
+				actionName.equals(beanMethod.getActionName())) {
 
 				beanMethod.invoke(args);
 			}
 		}
-		else if ((methodType == MethodType.HEADER) ||
-				 (methodType == MethodType.RENDER)) {
+		else if (methodType == MethodType.RENDER) {
+			RenderRequest renderRequest = (RenderRequest)args[0];
 
-			PortletRequest portletRequest = (PortletRequest)args[0];
-
-			PortletMode portletMode = portletRequest.getPortletMode();
+			PortletMode portletMode = renderRequest.getPortletMode();
 
 			PortletMode beanMethodPortletMode = beanMethod.getPortletMode();
 
@@ -280,94 +180,51 @@ public class BeanPortletInvokerPortlet implements InvokerPortlet {
 					String markup = (String)beanMethod.invoke();
 
 					if (markup != null) {
-						MimeResponse mimeResponse = (MimeResponse)args[1];
+						RenderResponse renderResponse = (RenderResponse)args[1];
 
-						PrintWriter printWriter = mimeResponse.getWriter();
+						PrintWriter writer = renderResponse.getWriter();
 
-						printWriter.write(markup);
+						writer.write(markup);
 					}
 				}
 				else {
 					beanMethod.invoke(args);
 				}
-
-				include = methodType.getInclude(method);
 			}
 		}
-		else if (methodType == MethodType.SERVE_RESOURCE) {
-			ResourceRequest resourceRequest = (ResourceRequest)args[0];
+		else if ((methodType == MethodType.SERVE_RESOURCE) &&
+				 (method.getParameterCount() == 0)) {
 
-			String resourceID = resourceRequest.getResourceID();
+			String markup = (String)beanMethod.invoke();
 
-			String beanMethodResourceID = beanMethod.getResourceID();
-
-			if (Validator.isNull(beanMethodResourceID) ||
-				beanMethodResourceID.equals(resourceID)) {
-
+			if (markup != null) {
 				ResourceResponse resourceResponse = (ResourceResponse)args[1];
 
-				String contentType = methodType.getContentType(method);
+				PrintWriter writer = resourceResponse.getWriter();
 
-				if (Validator.isNotNull(contentType) &&
-					!Objects.equals(contentType, "*/*")) {
-
-					resourceResponse.setContentType(contentType);
-				}
-
-				String characterEncoding = methodType.getCharacterEncoding(
-					method);
-
-				if (Validator.isNotNull(characterEncoding)) {
-					resourceResponse.setCharacterEncoding(characterEncoding);
-				}
-
-				if (method.getParameterCount() == 0) {
-					String markup = (String)beanMethod.invoke();
-
-					if (Validator.isNotNull(markup)) {
-						PrintWriter printWriter = resourceResponse.getWriter();
-
-						printWriter.write(markup);
-					}
-				}
-				else {
-					beanMethod.invoke(args);
-				}
-
-				include = methodType.getInclude(method);
+				writer.write(markup);
 			}
 		}
 		else {
 			beanMethod.invoke(args);
 		}
 
-		if (Validator.isNull(include)) {
-			return;
-		}
+		String include = methodType.getInclude(method);
 
-		PortletMode beanMethodPortletMode = beanMethod.getPortletMode();
+		if (Validator.isNotNull(include)) {
+			PortletContext portletContext = _portletConfig.getPortletContext();
 
-		if (beanMethodPortletMode != null) {
-			PortletRequest portletRequest = (PortletRequest)args[0];
+			PortletRequestDispatcher portletRequestDispatcher =
+				portletContext.getRequestDispatcher(include);
 
-			if (!beanMethodPortletMode.equals(
-					portletRequest.getPortletMode())) {
-
-				return;
+			if (portletRequestDispatcher == null) {
+				_log.error(
+					"Unable to acquire dispatcher for include=" + include);
 			}
-		}
-
-		PortletContext portletContext = _portletConfig.getPortletContext();
-
-		PortletRequestDispatcher portletRequestDispatcher =
-			portletContext.getRequestDispatcher(include);
-
-		if (portletRequestDispatcher == null) {
-			_log.error("Unable to acquire dispatcher to include " + include);
-		}
-		else {
-			portletRequestDispatcher.include(
-				(PortletRequest)args[0], (PortletResponse)args[1]);
+			else {
+				portletRequestDispatcher.include(
+					(PortletRequest)args[0], (PortletResponse)args[1]);
+			}
 		}
 	}
 
@@ -421,7 +278,6 @@ public class BeanPortletInvokerPortlet implements InvokerPortlet {
 		BeanPortletInvokerPortlet.class);
 
 	private final Map<MethodType, List<BeanMethod>> _beanMethods;
-	private final boolean _facesPortlet;
 	private PortletConfig _portletConfig;
 
 }

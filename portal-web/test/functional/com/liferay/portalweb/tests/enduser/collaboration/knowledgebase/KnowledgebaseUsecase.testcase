@@ -2939,6 +2939,12 @@ definition {
 			parentPageName = "Welcome"
 		);
 
+		ProductMenu.gotoPortlet(
+			category = "Build",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
 		SitePages.configureChildPage(
 			columnName = "1 Column",
 			pageName = "Knowledge Base Display Page",

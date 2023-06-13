@@ -14,9 +14,7 @@
 
 package com.liferay.portal.cache.ehcache.internal;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.petra.reflect.ReflectionUtil;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.cache.BasePortalCacheManager;
 import com.liferay.portal.cache.configuration.PortalCacheConfiguration;
 import com.liferay.portal.cache.configuration.PortalCacheManagerConfiguration;
@@ -28,11 +26,8 @@ import com.liferay.portal.cache.ehcache.spi.event.ConfigurableEhcachePortalCache
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheListener;
 import com.liferay.portal.kernel.cache.PortalCacheListenerScope;
-import com.liferay.portal.kernel.cache.PortalCacheManager;
-import com.liferay.portal.kernel.cache.configurator.PortalCacheConfiguratorSettings;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -61,7 +56,6 @@ import net.sf.ehcache.util.FailSafeTimer;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Joseph Shum
@@ -77,14 +71,26 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 		return _cacheManager;
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #reconfigurePortalCaches(URL, ClassLoader)}
+	 */
+	@Deprecated
 	@Override
 	public void reconfigurePortalCaches(URL configurationURL) {
+		reconfigurePortalCaches(configurationURL, null);
+	}
+
+	@Override
+	public void reconfigurePortalCaches(
+		URL configurationURL, ClassLoader classLoader) {
+
 		ObjectValuePair<Configuration, PortalCacheManagerConfiguration>
 			configurationObjectValuePair =
 				baseEhcachePortalCacheManagerConfigurator.
 					getConfigurationObjectValuePair(
 						getPortalCacheManagerName(), configurationURL,
-						_usingDefault);
+						classLoader, _usingDefault);
 
 		reconfigEhcache(configurationObjectValuePair.getKey());
 
@@ -97,24 +103,6 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 
 	public void setDefaultConfigFile(String defaultConfigFile) {
 		_defaultConfigFile = defaultConfigFile;
-	}
-
-	protected Ehcache createEhcache(
-		String portalCacheName, CacheConfiguration cacheConfiguration) {
-
-		if (_cacheManager.cacheExists(portalCacheName)) {
-			if (_log.isInfoEnabled()) {
-				_log.info("Overriding existing cache " + portalCacheName);
-			}
-
-			_cacheManager.removeCache(portalCacheName);
-		}
-
-		Cache cache = new Cache(cacheConfiguration);
-
-		_cacheManager.addCache(cache);
-
-		return cache;
 	}
 
 	@Override
@@ -179,17 +167,6 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 		return _portalCacheManagerConfiguration;
 	}
 
-	protected void initPortalCacheConfiguratorSettingsServiceTracker() {
-		String filterString = StringBundler.concat(
-			"(&(objectClass=", PortalCacheConfiguratorSettings.class.getName(),
-			")(", PortalCacheManager.PORTAL_CACHE_MANAGER_NAME, "=",
-			getPortalCacheManagerName(), "))");
-
-		_configuratorSettingsServiceTracker = ServiceTrackerFactory.open(
-			bundleContext, filterString,
-			new PortalCacheConfiguratorSettingsServiceTrackerCustomizer());
-	}
-
 	@Override
 	protected void initPortalCacheManager() {
 		setBlockingPortalCacheAllowed(
@@ -206,12 +183,13 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 			_configFile = _defaultConfigFile;
 		}
 
-		URL configFileURL =
-			BaseEhcachePortalCacheManagerConfigurator.class.getResource(
-				_configFile);
+		ClassLoader classLoader =
+			BaseEhcachePortalCacheManagerConfigurator.class.getClassLoader();
+
+		URL configFileURL = classLoader.getResource(_configFile);
 
 		if (configFileURL == null) {
-			ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
+			classLoader = PortalClassLoaderUtil.getClassLoader();
 
 			configFileURL = classLoader.getResource(_configFile);
 		}
@@ -222,7 +200,7 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 			configurationObjectValuePair =
 				baseEhcachePortalCacheManagerConfigurator.
 					getConfigurationObjectValuePair(
-						getPortalCacheManagerName(), configFileURL,
+						getPortalCacheManagerName(), configFileURL, classLoader,
 						_usingDefault);
 
 		_cacheManager = new CacheManager(configurationObjectValuePair.getKey());
@@ -300,8 +278,18 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 			String portalCacheName = cacheConfiguration.getName();
 
 			synchronized (_cacheManager) {
-				Ehcache ehcache = createEhcache(
-					portalCacheName, cacheConfiguration);
+				if (_cacheManager.cacheExists(portalCacheName)) {
+					if (_log.isInfoEnabled()) {
+						_log.info(
+							"Overriding existing cache " + portalCacheName);
+					}
+
+					_cacheManager.removeCache(portalCacheName);
+				}
+
+				Ehcache ehcache = new Cache(cacheConfiguration);
+
+				_cacheManager.addCache(ehcache);
 
 				PortalCache<K, V> portalCache = portalCaches.get(
 					portalCacheName);
@@ -323,52 +311,6 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 				}
 			}
 		}
-	}
-
-	protected boolean reconfigure(
-		PortalCacheConfiguratorSettings portalCacheConfiguratorSettings) {
-
-		String portalCacheConfigurationLocation =
-			portalCacheConfiguratorSettings.
-				getPortalCacheConfigrationLocation();
-
-		if (Validator.isNull(portalCacheConfigurationLocation)) {
-			return false;
-		}
-
-		ClassLoader classLoader =
-			portalCacheConfiguratorSettings.getClassLoader();
-
-		URL url = classLoader.getResource(portalCacheConfigurationLocation);
-
-		if (url == null) {
-			return false;
-		}
-
-		Thread currentThread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
-
-		currentThread.setContextClassLoader(
-			AggregateClassLoader.getAggregateClassLoader(
-				PortalClassLoaderUtil.getClassLoader(),
-				portalCacheConfiguratorSettings.getClassLoader()));
-
-		try {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					StringBundler.concat(
-						"Reconfiguring caches in cache manager ",
-						getPortalCacheManagerName(), " using ", url));
-			}
-
-			reconfigurePortalCaches(url);
-		}
-		finally {
-			currentThread.setContextClassLoader(contextClassLoader);
-		}
-
-		return true;
 	}
 
 	@Override
@@ -409,38 +351,5 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 		_mBeanServerServiceTracker;
 	private PortalCacheManagerConfiguration _portalCacheManagerConfiguration;
 	private boolean _usingDefault;
-
-	private class PortalCacheConfiguratorSettingsServiceTrackerCustomizer
-		implements ServiceTrackerCustomizer
-			<PortalCacheConfiguratorSettings, PortalCacheConfiguratorSettings> {
-
-		@Override
-		public PortalCacheConfiguratorSettings addingService(
-			ServiceReference<PortalCacheConfiguratorSettings>
-				serviceReference) {
-
-			PortalCacheConfiguratorSettings portalCacheConfiguratorSettings =
-				bundleContext.getService(serviceReference);
-
-			reconfigure(portalCacheConfiguratorSettings);
-
-			return portalCacheConfiguratorSettings;
-		}
-
-		@Override
-		public void modifiedService(
-			ServiceReference<PortalCacheConfiguratorSettings> serviceReference,
-			PortalCacheConfiguratorSettings portalCacheConfiguratorSettings) {
-		}
-
-		@Override
-		public void removedService(
-			ServiceReference<PortalCacheConfiguratorSettings> serviceReference,
-			PortalCacheConfiguratorSettings portalCacheConfiguratorSettings) {
-
-			bundleContext.ungetService(serviceReference);
-		}
-
-	}
 
 }

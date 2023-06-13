@@ -24,11 +24,9 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 
 <c:choose>
 	<c:when test="<%= formInstanceId == 0 %>">
-		<c:if test="<%= !ddmFormDisplayContext.isContentPage() %>">
-			<div class="alert alert-info">
-				<liferay-ui:message key="select-an-existing-form-or-add-a-form-to-be-displayed-in-this-application" />
-			</div>
-		</c:if>
+		<div class="alert alert-info">
+			<liferay-ui:message key="select-an-existing-form-or-add-a-form-to-be-displayed-in-this-application" />
+		</div>
 	</c:when>
 	<c:otherwise>
 
@@ -164,7 +162,7 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 						}
 
 						Liferay.detach('destroyPortlet', <portlet:namespace />clearPortletHandlers);
-					};
+					}
 
 					Liferay.on('destroyPortlet', <portlet:namespace />clearPortletHandlers);
 
@@ -245,7 +243,7 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 
 								var time = Liferay.Session.get('sessionLength') || tenSeconds;
 
-								<portlet:namespace />intervalId = setInterval(<portlet:namespace />extendSession, (time/2));
+								<portlet:namespace />intervalId = setInterval(<portlet:namespace />extendSession, (time / 2));
 							}
 
 							function <portlet:namespace />extendSession() {

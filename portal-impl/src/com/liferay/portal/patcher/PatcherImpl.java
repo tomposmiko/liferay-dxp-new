@@ -236,8 +236,10 @@ public class PatcherImpl implements Patcher {
 			properties = getProperties();
 		}
 
-		return StringUtil.split(
+		String[] installedPatchNames = StringUtil.split(
 			properties.getProperty(PROPERTY_INSTALLED_PATCHES));
+
+		return installedPatchNames;
 	}
 
 	private Properties _getProperties(String fileName) {

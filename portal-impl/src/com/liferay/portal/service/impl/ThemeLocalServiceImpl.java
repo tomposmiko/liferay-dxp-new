@@ -14,6 +14,7 @@
 
 package com.liferay.portal.service.impl;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.image.SpriteProcessor;
 import com.liferay.portal.kernel.image.SpriteProcessorUtil;
@@ -27,12 +28,13 @@ import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.plugin.Version;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
-import com.liferay.portal.kernel.spring.aop.Skip;
+import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.theme.PortletDecoratorFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeCompanyId;
 import com.liferay.portal.kernel.theme.ThemeCompanyLimit;
 import com.liferay.portal.kernel.theme.ThemeGroupId;
 import com.liferay.portal.kernel.theme.ThemeGroupLimit;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ColorSchemeFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -69,7 +71,7 @@ import javax.servlet.ServletContext;
  * @author Jorge Ferrer
  * @author Raymond Augé
  */
-@Skip
+@Transactional(enabled = false)
 public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 
 	@Override
@@ -694,6 +696,24 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 				theme = ThemeFactoryUtil.getTheme(themeId);
 			}
 
+			String templateExtension = GetterUtil.getString(
+				themeElement.elementText("template-extension"),
+				theme.getTemplateExtension());
+
+			if (!templateExtension.equals(TemplateConstants.LANG_TYPE_FTL)) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						StringBundler.concat(
+							templateExtension, " is no longer supported for ",
+							"theme. Please Update theme ", themeId,
+							" to use FreeMarker for forward compatibility."));
+				}
+
+				continue;
+			}
+
+			theme.setTemplateExtension(templateExtension);
+
 			theme.setTimestamp(timestamp);
 
 			PluginSetting pluginSetting =
@@ -763,10 +783,6 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 				themeElement.elementText("virtual-path"),
 				theme.getVirtualPath());
 
-			String templateExtension = GetterUtil.getString(
-				themeElement.elementText("template-extension"),
-				theme.getTemplateExtension());
-
 			theme.setName(name);
 			theme.setRootPath(rootPath);
 			theme.setTemplatesPath(templatesPath);
@@ -774,7 +790,6 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 			theme.setImagesPath(imagesPath);
 			theme.setJavaScriptPath(javaScriptPath);
 			theme.setVirtualPath(virtualPath);
-			theme.setTemplateExtension(templateExtension);
 
 			Element settingsElement = themeElement.element("settings");
 

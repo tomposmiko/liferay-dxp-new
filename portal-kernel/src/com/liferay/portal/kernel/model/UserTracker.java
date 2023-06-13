@@ -24,20 +24,19 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see UserTrackerModel
+ * @see com.liferay.portal.model.impl.UserTrackerImpl
+ * @see com.liferay.portal.model.impl.UserTrackerModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.portal.model.impl.UserTrackerImpl")
 @ProviderType
-public interface UserTracker extends PersistedModel, UserTrackerModel {
-
+public interface UserTracker extends UserTrackerModel, PersistedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.UserTrackerImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.UserTrackerImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<UserTracker, Long> USER_TRACKER_ID_ACCESSOR =
-		new Accessor<UserTracker, Long>() {
-
+	public static final Accessor<UserTracker, Long> USER_TRACKER_ID_ACCESSOR = new Accessor<UserTracker, Long>() {
 			@Override
 			public Long get(UserTracker userTracker) {
 				return userTracker.getUserTrackerId();
@@ -52,10 +51,11 @@ public interface UserTracker extends PersistedModel, UserTrackerModel {
 			public Class<UserTracker> getTypeClass() {
 				return UserTracker.class;
 			}
-
 		};
 
 	public void addPath(UserTrackerPath path);
+
+	public int compareTo(UserTracker userTracker);
 
 	public String getEmailAddress();
 
@@ -64,5 +64,4 @@ public interface UserTracker extends PersistedModel, UserTrackerModel {
 	public int getHits();
 
 	public java.util.List<UserTrackerPath> getPaths();
-
 }

@@ -1,4 +1,10 @@
+@import "./fragments_editor/DragDrop";
+
+@import "./fragments_editor/ElementTopper";
+
 @import "./fragments_editor/FragmentEntryLink";
+
+@import "./fragments_editor/FloatingToolbar";
 
 @import "./fragments_editor/FragmentEntryLinkEditables";
 
@@ -9,6 +15,8 @@
 @import "./fragments_editor/FragmentsEditorSidebar";
 
 @import "./fragments_editor/SelectMappingDialog";
+
+@import "./fragments_editor/SidebarLayoutsSection";
 
 @import "./miller_columns/Layout";
 
@@ -39,5 +47,10 @@
 
 	.layout-type-img {
 		width: 100%;
+	}
+
+	.searchcontainer-content .breadcrumb {
+		margin-bottom: 0;
+		padding: 0;
 	}
 }

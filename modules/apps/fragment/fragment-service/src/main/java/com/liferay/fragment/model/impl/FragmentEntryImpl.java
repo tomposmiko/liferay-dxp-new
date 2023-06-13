@@ -16,16 +16,19 @@ package com.liferay.fragment.model.impl;
 
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.util.DLUtil;
+import com.liferay.fragment.constants.FragmentEntryTypeConstants;
 import com.liferay.fragment.constants.FragmentExportImportConstants;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.util.FragmentEntryRenderUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.zip.ZipWriter;
 
 /**
@@ -40,13 +43,8 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 	@Override
 	public String getImagePreviewURL(ThemeDisplay themeDisplay) {
-		if (getPreviewFileEntryId() <= 0) {
-			return StringPool.BLANK;
-		}
-
 		try {
-			FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
-				getPreviewFileEntryId());
+			FileEntry fileEntry = _getPreviewFileEntry();
 
 			if (fileEntry == null) {
 				return StringPool.BLANK;
@@ -59,6 +57,11 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 		}
 
 		return StringPool.BLANK;
+	}
+
+	@Override
+	public String getTypeLabel() {
+		return FragmentEntryTypeConstants.getTypeLabel(getType());
 	}
 
 	@Override
@@ -75,19 +78,56 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		jsonObject.put("cssPath", "src/index.css");
-		jsonObject.put("htmlPath", "src/index.html");
-		jsonObject.put("jsPath", "src/index.js");
+		jsonObject.put("cssPath", "index.css");
+		jsonObject.put("htmlPath", "index.html");
+		jsonObject.put("jsPath", "index.js");
 		jsonObject.put("name", getName());
+
+		FileEntry previewFileEntry = _getPreviewFileEntry();
+
+		if (previewFileEntry != null) {
+			jsonObject.put(
+				"thumbnailPath",
+				"thumbnail." + previewFileEntry.getExtension());
+		}
+
+		String typeLabel = getTypeLabel();
+
+		if (Validator.isNotNull(typeLabel)) {
+			jsonObject.put("type", typeLabel);
+		}
 
 		zipWriter.addEntry(
 			path + StringPool.SLASH +
 				FragmentExportImportConstants.FILE_NAME_FRAGMENT_CONFIG,
 			jsonObject.toString());
 
-		zipWriter.addEntry(path + "/src/index.css", getCss());
-		zipWriter.addEntry(path + "/src/index.js", getJs());
-		zipWriter.addEntry(path + "/src/index.html", getHtml());
+		zipWriter.addEntry(path + "/index.css", getCss());
+		zipWriter.addEntry(path + "/index.js", getJs());
+		zipWriter.addEntry(path + "/index.html", getHtml());
+
+		if (previewFileEntry != null) {
+			zipWriter.addEntry(
+				path + "/thumbnail." + previewFileEntry.getExtension(),
+				previewFileEntry.getContentStream());
+		}
+	}
+
+	private FileEntry _getPreviewFileEntry() {
+		if (getPreviewFileEntryId() <= 0) {
+			return null;
+		}
+
+		try {
+			return DLAppLocalServiceUtil.getFileEntry(getPreviewFileEntryId());
+		}
+		catch (PortalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to get file entry preview ", pe);
+			}
+		}
+
+		return null;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

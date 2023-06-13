@@ -78,7 +78,7 @@ public class PortalImplActualURLTest {
 			StringPool.BLANK, serviceContext);
 
 		String actualURL = PortalUtil.getActualURL(
-			_group.getGroupId(), true, Portal.PATH_MAIN,
+			userGroup.getGroup().getGroupId(), true, Portal.PATH_MAIN,
 			"/~/" + userGroup.getUserGroupId() + "/child-layout",
 			new HashMap<String, String[]>(), getRequestContext());
 
@@ -86,7 +86,7 @@ public class PortalImplActualURLTest {
 
 		try {
 			PortalUtil.getActualURL(
-				_group.getGroupId(), true, Portal.PATH_MAIN,
+				userGroup.getGroup().getGroupId(), true, Portal.PATH_MAIN,
 				"/~/" + userGroup.getUserGroupId() +
 					"/nonexistent-child-layout",
 				new HashMap<String, String[]>(), getRequestContext());

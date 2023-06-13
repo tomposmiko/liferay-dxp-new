@@ -24,20 +24,19 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see AddressModel
+ * @see com.liferay.portal.model.impl.AddressImpl
+ * @see com.liferay.portal.model.impl.AddressModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.portal.model.impl.AddressImpl")
 @ProviderType
 public interface Address extends AddressModel, PersistedModel {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.AddressImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.AddressImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<Address, Long> ADDRESS_ID_ACCESSOR =
-		new Accessor<Address, Long>() {
-
+	public static final Accessor<Address, Long> ADDRESS_ID_ACCESSOR = new Accessor<Address, Long>() {
 			@Override
 			public Long get(Address address) {
 				return address.getAddressId();
@@ -52,7 +51,6 @@ public interface Address extends AddressModel, PersistedModel {
 			public Class<Address> getTypeClass() {
 				return Address.class;
 			}
-
 		};
 
 	public Country getCountry();
@@ -60,5 +58,4 @@ public interface Address extends AddressModel, PersistedModel {
 	public Region getRegion();
 
 	public ListType getType();
-
 }

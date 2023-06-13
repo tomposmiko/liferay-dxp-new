@@ -32,7 +32,7 @@ public class UserAddressesScreenNavigationEntry
 
 	@Override
 	public String getActionCommandName() {
-		return "/users_admin/update_addresses";
+		return "/users_admin/update_contact_information";
 	}
 
 	@Override
@@ -48,6 +48,16 @@ public class UserAddressesScreenNavigationEntry
 	@Override
 	public String getJspPath() {
 		return "/user/addresses.jsp";
+	}
+
+	@Override
+	public boolean isShowControls() {
+		return false;
+	}
+
+	@Override
+	public boolean isShowTitle() {
+		return false;
 	}
 
 	@Override

@@ -25,10 +25,12 @@ import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetEntryService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
+import com.liferay.asset.list.model.AssetListEntry;
+import com.liferay.asset.list.service.AssetListEntryService;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.util.AssetEntryResult;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
-import com.liferay.asset.publisher.web.configuration.AssetPublisherWebConfiguration;
+import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherWebConfiguration;
 import com.liferay.asset.util.AssetHelper;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -38,8 +40,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
-import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -50,16 +50,16 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
@@ -312,6 +312,19 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 			boolean deleteMissingAssetEntries, boolean checkPermission)
 		throws Exception {
 
+		String selectionStyle = GetterUtil.getString(
+			portletPreferences.getValue("selectionStyle", null), "manual");
+
+		long assetListEntryId = GetterUtil.getLong(
+			portletPreferences.getValue("assetListEntryId", null));
+
+		AssetListEntry assetListEntry =
+			_assetListEntryService.fetchAssetListEntry(assetListEntryId);
+
+		if (selectionStyle.equals("asset-list") && (assetListEntry != null)) {
+			return assetListEntry.getAssetEntries();
+		}
+
 		List<AssetEntry> assetEntries = getAssetEntries(
 			portletRequest, portletPreferences, permissionChecker, groupIds,
 			deleteMissingAssetEntries, checkPermission);
@@ -532,17 +545,28 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 		redirectURL.setParameter(
 			"assetEntryId", String.valueOf(assetEntry.getEntryId()));
 
-		String redirectURLToOriginalLayout =
-			_resetURLToOriginalLayoutIfLinkedToAnotherLayout(
-				liferayPortletRequest, redirectURL.toString());
-
-		viewFullContentURL.setParameter(
-			"redirect", redirectURLToOriginalLayout);
+		viewFullContentURL.setParameter("redirect", redirectURL.toString());
 
 		AssetRendererFactory<?> assetRendererFactory =
 			assetRenderer.getAssetRendererFactory();
 
 		viewFullContentURL.setParameter("type", assetRendererFactory.getType());
+
+		String urlTitle = assetRenderer.getUrlTitle(
+			liferayPortletRequest.getLocale());
+
+		if (Validator.isNotNull(urlTitle)) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)liferayPortletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			if (assetRenderer.getGroupId() != themeDisplay.getScopeGroupId()) {
+				viewFullContentURL.setParameter(
+					"groupId", String.valueOf(assetRenderer.getGroupId()));
+			}
+
+			viewFullContentURL.setParameter("urlTitle", urlTitle);
+		}
 
 		String viewURL = null;
 
@@ -569,9 +593,6 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 		if (Validator.isNull(viewURL)) {
 			viewURL = viewFullContentURL.toString();
 		}
-
-		viewURL = _replacePortletIdIfLinkedToAnotherLayout(
-			liferayPortletRequest, viewURL);
 
 		return viewURL;
 	}
@@ -1072,104 +1093,6 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 		portletPreferences.store();
 	}
 
-	private String _replacePortletIdIfLinkedToAnotherLayout(
-		LiferayPortletRequest liferayPortletRequest, String viewUrl) {
-
-		Layout layout = _layoutLocalService.fetchLayout(
-			liferayPortletRequest.getPlid());
-
-		PortletPreferences portletPreferences =
-			liferayPortletRequest.getPreferences();
-
-		String portletSetupLinkToLayoutUuid = portletPreferences.getValue(
-			"portletSetupLinkToLayoutUuid", StringPool.BLANK);
-
-		if ((layout != null) &&
-			Validator.isNotNull(portletSetupLinkToLayoutUuid)) {
-
-			Layout linkedLayout =
-				_layoutLocalService.fetchLayoutByUuidAndGroupId(
-					portletSetupLinkToLayoutUuid, layout.getGroupId(),
-					layout.isPrivateLayout());
-
-			if (linkedLayout != null) {
-				String newPortletId = linkedLayout.getTypeSettingsProperty(
-					LayoutTypePortletConstants.
-						DEFAULT_ASSET_PUBLISHER_PORTLET_ID,
-					StringPool.BLANK);
-
-				if (Validator.isNotNull(newPortletId)) {
-					String oldPortletName =
-						liferayPortletRequest.getPortletName();
-
-					viewUrl = StringUtil.replace(
-						viewUrl, oldPortletName + "_redirect",
-						newPortletId + "_redirect");
-
-					String newId = newPortletId.split("_INSTANCE_")[1];
-					String oldId = oldPortletName.split("_INSTANCE_")[1];
-
-					viewUrl = StringUtil.replace(
-						viewUrl, StringPool.SLASH + oldId + StringPool.SLASH,
-						StringPool.SLASH + newId + StringPool.SLASH);
-
-					Portlet oldPortlet = _portletLocalService.getPortletById(
-						oldPortletName);
-
-					String oldPortletMapping =
-						oldPortlet.getFriendlyURLMapping();
-
-					Portlet newPortlet = _portletLocalService.getPortletById(
-						newPortletId);
-
-					String newPortletMapping =
-						newPortlet.getFriendlyURLMapping();
-
-					viewUrl = StringUtil.replace(
-						viewUrl,
-						StringPool.SLASH + oldPortletMapping + StringPool.SLASH,
-						StringPool.SLASH + newPortletMapping +
-							StringPool.SLASH);
-				}
-			}
-		}
-
-		return viewUrl;
-	}
-
-	private String _resetURLToOriginalLayoutIfLinkedToAnotherLayout(
-		LiferayPortletRequest liferayPortletRequest, String url) {
-
-		Layout layout = _layoutLocalService.fetchLayout(
-			liferayPortletRequest.getPlid());
-
-		PortletPreferences portletPreferences =
-			liferayPortletRequest.getPreferences();
-
-		String portletSetupLinkToLayoutUuid = portletPreferences.getValue(
-			"portletSetupLinkToLayoutUuid", StringPool.BLANK);
-
-		if ((layout != null) &&
-			Validator.isNotNull(portletSetupLinkToLayoutUuid)) {
-
-			Layout linkedLayout =
-				_layoutLocalService.fetchLayoutByUuidAndGroupId(
-					portletSetupLinkToLayoutUuid, layout.getGroupId(),
-					layout.isPrivateLayout());
-
-			if (linkedLayout != null) {
-				String newFriendlyURL = linkedLayout.getFriendlyURL();
-				String oldFriendlyURL = layout.getFriendlyURL();
-
-				url = StringUtil.replace(
-					url, newFriendlyURL + StringPool.QUESTION,
-					oldFriendlyURL + StringPool.QUESTION);
-			}
-		}
-
-		return url;
-	}
-
 	private void _setCategoriesAndTags(
 		AssetEntryQuery assetEntryQuery, PortletPreferences portletPreferences,
 		long[] scopeGroupIds, long[] overrideAllAssetCategoryIds,
@@ -1291,6 +1214,9 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 	@Reference
 	private AssetHelper _assetHelper;
 
+	@Reference
+	private AssetListEntryService _assetListEntryService;
+
 	private AssetPublisherWebConfiguration _assetPublisherWebConfiguration;
 
 	@Reference
@@ -1307,8 +1233,5 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private PortletLocalService _portletLocalService;
 
 }

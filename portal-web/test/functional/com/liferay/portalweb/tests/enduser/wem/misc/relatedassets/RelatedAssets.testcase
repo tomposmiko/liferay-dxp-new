@@ -128,8 +128,7 @@ definition {
 		WebContent.addExistingRelatedAssetCP(
 			assetTitle = "Web Content Title 1",
 			assetType = "Basic Web Content",
-			siteName = "Site Name",
-			webContentTitle = "Web Content Title 2"
+			siteName = "Site Name"
 		);
 
 		Navigator.openStagingSiteURL(siteName = "Site Name");
@@ -177,7 +176,8 @@ definition {
 
 		AssetPublisherPortlet.configureFilterByCategories(
 			categoryName = "Category Name",
-			portletName = "Related Assets"
+			portletName = "Related Assets",
+			vocabularyName = "Vocabulary Name"
 		);
 
 		Navigator.gotoPrivateStagedSitePage(
@@ -190,7 +190,7 @@ definition {
 
 	@description = "This is a use case for LPS-72472."
 	@priority = "4"
-	test AssertRelatedAssetsWithGlobalWebContent {
+	test AssertRelatedAssetsWithGlobalWebConent {
 		ProductMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
@@ -327,6 +327,10 @@ definition {
 
 		Portlet.addPG(portletName = "Asset Publisher");
 
+		AssetPublisherPortlet.configureAssetLinkBehaviorPG(
+			assetLinkBehavior = "Show Full Content"
+		);
+
 		Navigator.gotoSitePage(pageName = "Test Page 1", siteName = "Site Name");
 
 		Portlet.addPG(portletName = "Related Assets");
@@ -420,9 +424,7 @@ definition {
 		WebContent.addExistingRelatedAssetCP(
 			assetTitle = "Blogs Entry Title",
 			assetType = "Blogs Entry",
-			siteName = "Site Name",
-			siteURL = "true",
-			webContentTitle = "Web Content Title"
+			siteName = "Site Name"
 		);
 
 		Navigator.gotoSitePage(pageName = "Test Page 1", siteName = "Site Name");

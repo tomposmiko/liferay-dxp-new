@@ -131,7 +131,7 @@ public class DDLDisplayContext {
 				add(
 					dropdownItem -> {
 						dropdownItem.putData("action", "deleteRecordSets");
-						dropdownItem.setIcon("trash");
+						dropdownItem.setIcon("times-circle");
 						dropdownItem.setLabel(
 							LanguageUtil.get(
 								_ddlRequestHelper.getRequest(), "delete"));
@@ -347,14 +347,18 @@ public class DDLDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		return ParamUtil.getString(
+		String orderByCol = ParamUtil.getString(
 			_ddlRequestHelper.getRenderRequest(), "orderByCol",
 			"modified-date");
+
+		return orderByCol;
 	}
 
 	public String getOrderByType() {
-		return ParamUtil.getString(
+		String orderByType = ParamUtil.getString(
 			_ddlRequestHelper.getRenderRequest(), "orderByType", "asc");
+
+		return orderByType;
 	}
 
 	public PortletURL getPortletURL() {

@@ -366,6 +366,8 @@ public class SearchResultsPortlet extends MVCPortlet {
 			renderRequest);
 
 		urlString = http.removeParameter(
+			urlString, paginationDeltaParameterName);
+		urlString = http.removeParameter(
 			urlString, paginationStartParameterName);
 
 		return urlString;

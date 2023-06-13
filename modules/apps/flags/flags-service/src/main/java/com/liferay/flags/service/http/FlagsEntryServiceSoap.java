@@ -17,6 +17,7 @@ package com.liferay.flags.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.flags.service.FlagsEntryServiceUtil;
+
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -24,10 +25,10 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * <code>FlagsEntryServiceUtil</code> service
- * utility. The static methods of this class call the same methods of the
- * service utility. However, the signatures are different because it is
- * difficult for SOAP to support certain types.
+ * {@link FlagsEntryServiceUtil} service utility. The
+ * static methods of this class calls the same methods of the service utility.
+ * However, the signatures are different because it is difficult for SOAP to
+ * support certain types.
  *
  * <p>
  * The benefits of using the SOAP utility is that it is cross platform
@@ -48,22 +49,20 @@ import java.rmi.RemoteException;
  *
  * @author Brian Wing Shun Chan
  * @see FlagsEntryServiceHttp
+ * @see FlagsEntryServiceUtil
  * @generated
  */
 @ProviderType
 public class FlagsEntryServiceSoap {
-
-	public static void addEntry(
-			String className, long classPK, String reporterEmailAddress,
-			long reportedUserId, String contentTitle, String contentURL,
-			String reason,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static void addEntry(String className, long classPK,
+		String reporterEmailAddress, long reportedUserId, String contentTitle,
+		String contentURL, String reason,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
-
 		try {
-			FlagsEntryServiceUtil.addEntry(
-				className, classPK, reporterEmailAddress, reportedUserId,
-				contentTitle, contentURL, reason, serviceContext);
+			FlagsEntryServiceUtil.addEntry(className, classPK,
+				reporterEmailAddress, reportedUserId, contentTitle, contentURL,
+				reason, serviceContext);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -72,7 +71,5 @@ public class FlagsEntryServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		FlagsEntryServiceSoap.class);
-
+	private static Log _log = LogFactoryUtil.getLog(FlagsEntryServiceSoap.class);
 }

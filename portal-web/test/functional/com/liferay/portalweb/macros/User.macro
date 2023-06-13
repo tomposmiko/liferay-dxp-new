@@ -102,6 +102,74 @@ definition {
 		SelectFrame(value1 = "relative=top");
 	}
 
+	macro addContactInformation {
+		if (isSet(contactType)) {
+			var key_contactType = "${contactType}";
+
+			Click.mouseDownMouseUp(
+				locator1 = "UsersAndOrganizationsEditUser#CONTACT_ADD_BUTTON"
+			);
+
+			if ("${makePrimary}" == "true") {
+				Check(locator1 = "Checkbox#ANY_CHECKBOX", checkboxName = "Make Primary");
+			}
+
+			// Addresses
+
+			if (isSet(street1)) {
+				Type(locator1 = "TextInput#STREET_1", value1 = "${street1}");
+			}
+
+			if (isSet(city)) {
+				Type(locator1 = "TextInput#CITY", value1 = "${city}");
+			}
+
+			if (isSet(country)) {
+				Select(locator1 = "Select#COUNTRY", value1 = "${country}");
+			}
+
+			if (isSet(region)) {
+				Select(locator1 = "Select#REGION", value1 = "${region}");
+			}
+
+			if (isSet(postalCode)) {
+				Type(locator1 = "TextInput#POSTAL_CODE", value1 = "${postalCode}");
+			}
+
+			// Phone Numbers
+
+			if (isSet(number)) {
+				Type(locator1 = "TextInput#NUMBER", value1 = "${number}");
+			}
+
+			if (isSet(extension)) {
+				Type(locator1 = "TextInput#EXTENSION", value1 = "${extension}");
+			}
+
+			// Additional Email Addresses
+
+			if (isSet(address)) {
+				Type(locator1 = "TextInput#ADDRESS", value1 = "${address}");
+			}
+
+			// Websites
+
+			if (isSet(url)) {
+				Type(locator1 = "TextInput#URL", value1 = "${url}");
+			}
+		}
+
+		// Instant Messenger
+
+		if (isSet(skype)) {
+			Type(locator1 = "TextInput#SKYPE", value1 = "${skype}");
+		}
+
+		Click(locator1 = "Button#SAVE");
+
+		Alert.viewSuccessMessage();
+	}
+
 	macro addCP {
 		LexiconEntry.gotoAdd();
 
@@ -629,7 +697,7 @@ definition {
 
 		UserNavigator.gotoRoles();
 
-		AssertClick(
+		AssertClick.assertTextClickCaseInsensitive(
 			locator1 = "UsersAndOrganizationsEditUser#ROLES_REGULAR_ROLES_SELECT_LINK",
 			value1 = "Select"
 		);
@@ -842,6 +910,32 @@ definition {
 		}
 	}
 
+	macro changeProfileImage {
+		Button.click(button = "Change");
+
+		IFrame.selectModalFrame();
+
+		Click(locator1 = "UsersAndOrganizationsEditUser#UPLOAD_IMAGE_SELECT");
+
+		SikuliUploadCommonFile(
+			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+			value1 = "${imageName}"
+		);
+
+		Pause(locator1 = "5000");
+
+		WaitForElementNotPresent(locator1 = "Button#ANY_DISABLED", key_text = "Done");
+
+		Button.click(button = "Done");
+
+		IFrame.selectTopFrame();
+
+		AssertVisible(
+			locator1 = "UsersAndOrganizationsEditUser#DETAILS_PROFILE_IMAGE",
+			key_imageName = "${imageName}"
+		);
+	}
+
 	macro createAccount {
 		SignInNavigator.gotoCreateAccount();
 
@@ -943,6 +1037,15 @@ definition {
 		}
 	}
 
+	macro deleteProfileImage {
+		Button.click(button = "Delete");
+
+		AssertVisible(
+			locator1 = "UsersAndOrganizationsEditUser#DETAILS_PROFILE_IMAGE",
+			key_imageName = "user_male_portrait"
+		);
+	}
+
 	macro editDetailsViaMyAccount {
 		AssertElementPresent.assertElementPresent(locator1 = "TextInput#FIRST_NAME");
 
@@ -974,7 +1077,7 @@ definition {
 
 		MenuItem.click(menuItem = "Edit");
 
-		Select(locator1 = "Select#DEFAULT_LANGUAGE_2", value1 = "${languageName}");
+		Select(locator1 = "Select#DEFAULT_LANGUAGE", value1 = "${languageName}");
 
 		PortletEntry.save();
 	}
@@ -1112,6 +1215,19 @@ definition {
 		PortletEntry.save();
 	}
 
+	macro editPrimary {
+		if ("${makePrimary}" == "true") {
+			Check(locator1 = "Checkbox#ANY_CHECKBOX", checkboxName = "Make Primary");
+		}
+		else if ("${makePrimary}" == "false") {
+			Uncheck(locator1 = "Checkbox#ANY_CHECKBOX", checkboxName = "Make Primary");
+		}
+
+		Click(locator1 = "Button#SAVE");
+
+		Alert.viewSuccessMessage();
+	}
+
 	macro editUserDisplaySettingsCP {
 		var key_userScreenName = "${userScreenName}";
 
@@ -1243,7 +1359,7 @@ definition {
 
 		var key_siteName = "${siteName}";
 
-		AssertClick(
+		AssertClick.assertTextClickCaseInsensitive(
 			locator1 = "UsersAndOrganizationsEditUser#SITES_SELECT_LINK",
 			value1 = "SELECT"
 		);
@@ -1328,7 +1444,7 @@ definition {
 		);
 
 		Alert.viewSuccessMessageText(
-			successMessage = "An email has been sent to the provided email address."
+			successMessage = "Your password was sent to the provided email address."
 		);
 	}
 
@@ -1680,10 +1796,28 @@ definition {
 		UserBar.signOut();
 	}
 
+	macro makePrimary {
+		Click.waitForMenuToggleJSClick(
+			locator1 = "Icon#TABLE_VERTICAL_ELLIPSIS",
+			key_rowEntry = "${rowEntry}"
+		);
+
+		MenuItem.click(menuItem = "Make Primary");
+	}
+
 	macro openUsersAdmin {
 		Navigator.openWithAppendToBaseURL(
 			urlAppend = "group/control_panel/manage?p_p_id=com_liferay_users_admin_web_portlet_UsersAdminPortlet"
 		);
+	}
+
+	macro removeContactInformation {
+		Click.waitForMenuToggleJSClick(
+			locator1 = "Icon#TABLE_VERTICAL_ELLIPSIS",
+			key_rowEntry = "${rowEntry}"
+		);
+
+		MenuItem.click(menuItem = "Remove");
 	}
 
 	macro resetPassword {
@@ -1909,6 +2043,35 @@ definition {
 		Alert.viewSuccessMessage();
 	}
 
+	macro viewAddress {
+		var key_primaryValue = "${street1}";
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "UsersAndOrganizations#USER_ADDRESS_TABLE",
+			value1 = "${city}"
+		);
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "UsersAndOrganizations#USER_ADDRESS_TABLE",
+			value1 = "${country}"
+		);
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "UsersAndOrganizations#USER_ADDRESS_TABLE",
+			value1 = "${postalCode}"
+		);
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "UsersAndOrganizations#USER_ADDRESS_TABLE",
+			value1 = "${region}"
+		);
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "UsersAndOrganizations#USER_ADDRESS_TABLE",
+			value1 = "${street1}"
+		);
+	}
+
 	macro viewCaptchaPG {
 		if ("${captchaType}" == "captcha") {
 			AssertElementPresent.assertElementPresent(
@@ -1921,6 +2084,52 @@ definition {
 			AssertElementPresent.assertElementPresent(
 				locator1 = "SignInCreateAccount#RECAPTCHA_LABEL"
 			);
+		}
+	}
+
+	macro viewContactInformation {
+		if (isSet(searchContainerType)) {
+			var key_searchContainerType = "${searchContainerType}";
+
+			// Phone Numbers
+
+			if (isSet(number)) {
+				AssertTextEquals.assertPartialText(
+					locator1 = "UsersAndOrganizations#USER_CONTACT_INFORMATION_PHONE_NUMBER_TABLE",
+					value1 = "${number}"
+				);
+			}
+
+			if (isSet(extension)) {
+				AssertTextEquals.assertPartialText(
+					locator1 = "UsersAndOrganizations#USER_CONTACT_INFORMATION_EXTENSION_TABLE",
+					value1 = "${extension}"
+				);
+			}
+
+			// Additional Email Addresses
+
+			if (isSet(address)) {
+				AssertTextEquals.assertPartialText(
+					locator1 = "UsersAndOrganizations#USER_CONTACT_INFORMATION_EMAIL_ADDRESS_TABLE",
+					value1 = "${address}"
+				);
+			}
+
+			// Websites
+
+			if (isSet(url)) {
+				AssertTextEquals.assertPartialText(
+					locator1 = "UsersAndOrganizations#USER_CONTACT_INFORMATION_EMAIL_ADDRESS_TABLE",
+					value1 = "${url}"
+				);
+			}
+		}
+
+		// Instant Messenger
+
+		if (isSet(skype)) {
+			AssertTextEquals.assertValue(locator1 = "TextInput#SKYPE", value1 = "${skype}");
 		}
 	}
 
@@ -1997,6 +2206,25 @@ definition {
 		}
 	}
 
+	macro viewIsPrimary {
+		if (isSet(primaryValue)) {
+			var key_primaryValue = "${primaryValue}";
+
+			AssertElementPresent(
+				locator1 = "UsersAndOrganizations#USER_ADDRESS_PRIMARY_TABLE"
+			);
+		}
+
+		if (isSet(searchContainerType)) {
+			var key_contactInfoPrimaryValue = "${contactInfoPrimaryValue}";
+			var key_searchContainerType = "${searchContainerType}";
+
+			AssertElementPresent(
+				locator1 = "UsersAndOrganizations#USER_CONTACT_INFORMATION_PRIMARY_TABLE"
+			);
+		}
+	}
+
 	macro viewLoggedInPG {
 		ProductMenuHelper.expandPanel(panel = "Control Panel");
 
@@ -2062,6 +2290,25 @@ definition {
 		AssertElementPresent(locator1 = "Checkbox#REMEMBER_ME");
 
 		AssertTextEquals(locator1 = "Button#SIGN_IN", value1 = "Sign In");
+	}
+
+	macro viewNotPrimary {
+		if (isSet(primaryValue)) {
+			var key_primaryValue = "${primaryValue}";
+
+			AssertElementNotPresent(
+				locator1 = "UsersAndOrganizations#USER_ADDRESS_PRIMARY_TABLE"
+			);
+		}
+
+		if (isSet(searchContainerType)) {
+			var key_contactInfoPrimaryValue = "${contactInfoPrimaryValue}";
+			var key_searchContainerType = "${searchContainerType}";
+
+			AssertElementNotPresent(
+				locator1 = "UsersAndOrganizations#USER_CONTACT_INFORMATION_PRIMARY_TABLE"
+			);
+		}
 	}
 
 	macro viewNoUsersFoundCP {

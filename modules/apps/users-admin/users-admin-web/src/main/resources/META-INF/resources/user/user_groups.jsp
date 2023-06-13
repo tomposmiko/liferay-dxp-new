@@ -30,16 +30,14 @@ currentURLObj.setParameter("historyKey", renderResponse.getNamespace() + "userGr
 
 <liferay-ui:membership-policy-error />
 
-<h3 class="sheet-subtitle">
-	<span class="autofit-padded-no-gutters autofit-row">
-		<span class="autofit-col autofit-col-expand">
-			<span class="heading-text">
-				<liferay-ui:message key="user-groups" />
-			</span>
-		</span>
+<h3 class="autofit-row sheet-subtitle">
+	<span class="autofit-col autofit-col-expand">
+		<span class="heading-text"><liferay-ui:message key="user-groups" /></span>
+	</span>
 
-		<c:if test="<%= !portletName.equals(myAccountPortletId) %>">
-			<span class="autofit-col">
+	<c:if test="<%= !portletName.equals(myAccountPortletId) %>">
+		<span class="autofit-col">
+			<span class="heading-end">
 				<liferay-ui:icon
 					cssClass="modify-link"
 					id="openUserGroupsLink"
@@ -49,8 +47,8 @@ currentURLObj.setParameter("historyKey", renderResponse.getNamespace() + "userGr
 					url="javascript:;"
 				/>
 			</span>
-		</c:if>
-	</span>
+		</span>
+	</c:if>
 </h3>
 
 <liferay-util:buffer

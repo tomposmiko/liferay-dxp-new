@@ -20,6 +20,7 @@ import com.liferay.changeset.model.ChangesetEntry;
 import com.liferay.changeset.service.ChangesetEntryLocalService;
 import com.liferay.changeset.service.persistence.ChangesetCollectionPersistence;
 import com.liferay.changeset.service.persistence.ChangesetEntryPersistence;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -61,17 +62,17 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.changeset.service.impl.ChangesetEntryLocalServiceImpl
+ * @see com.liferay.changeset.service.ChangesetEntryLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class ChangesetEntryLocalServiceBaseImpl
-	extends BaseLocalServiceImpl
-	implements ChangesetEntryLocalService, IdentifiableOSGiService {
-
+	extends BaseLocalServiceImpl implements ChangesetEntryLocalService,
+		IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>ChangesetEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.changeset.service.ChangesetEntryLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.changeset.service.ChangesetEntryLocalServiceUtil} to access the changeset entry local service.
 	 */
 
 	/**
@@ -111,7 +112,6 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	@Override
 	public ChangesetEntry deleteChangesetEntry(long changesetEntryId)
 		throws PortalException {
-
 		return changesetEntryPersistence.remove(changesetEntryId);
 	}
 
@@ -131,8 +131,8 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(
-			ChangesetEntry.class, clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(ChangesetEntry.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -150,7 +150,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.changeset.model.impl.ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.changeset.model.impl.ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -159,18 +159,17 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(
-		DynamicQuery dynamicQuery, int start, int end) {
-
-		return changesetEntryPersistence.findWithDynamicQuery(
-			dynamicQuery, start, end);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end) {
+		return changesetEntryPersistence.findWithDynamicQuery(dynamicQuery,
+			start, end);
 	}
 
 	/**
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.changeset.model.impl.ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.changeset.model.impl.ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -180,12 +179,10 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(
-		DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator<T> orderByComparator) {
-
-		return changesetEntryPersistence.findWithDynamicQuery(
-			dynamicQuery, start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator) {
+		return changesetEntryPersistence.findWithDynamicQuery(dynamicQuery,
+			start, end, orderByComparator);
 	}
 
 	/**
@@ -207,11 +204,10 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(
-		DynamicQuery dynamicQuery, Projection projection) {
-
-		return changesetEntryPersistence.countWithDynamicQuery(
-			dynamicQuery, projection);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery,
+		Projection projection) {
+		return changesetEntryPersistence.countWithDynamicQuery(dynamicQuery,
+			projection);
 	}
 
 	@Override
@@ -229,14 +225,12 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	@Override
 	public ChangesetEntry getChangesetEntry(long changesetEntryId)
 		throws PortalException {
-
 		return changesetEntryPersistence.findByPrimaryKey(changesetEntryId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery =
-			new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(changesetEntryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -248,14 +242,10 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery
-		getIndexableActionableDynamicQuery() {
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
 
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
-			new IndexableActionableDynamicQuery();
-
-		indexableActionableDynamicQuery.setBaseLocalService(
-			changesetEntryLocalService);
+		indexableActionableDynamicQuery.setBaseLocalService(changesetEntryLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(ChangesetEntry.class);
 
@@ -267,7 +257,6 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-
 		actionableDynamicQuery.setBaseLocalService(changesetEntryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(ChangesetEntry.class);
@@ -281,15 +270,12 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
-		return changesetEntryLocalService.deleteChangesetEntry(
-			(ChangesetEntry)persistedModel);
+		return changesetEntryLocalService.deleteChangesetEntry((ChangesetEntry)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
-
 		return changesetEntryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -297,7 +283,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 * Returns a range of all the changeset entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.changeset.model.impl.ChangesetEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.changeset.model.impl.ChangesetEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of changeset entries
@@ -336,9 +322,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 *
 	 * @return the changeset collection local service
 	 */
-	public com.liferay.changeset.service.ChangesetCollectionLocalService
-		getChangesetCollectionLocalService() {
-
+	public com.liferay.changeset.service.ChangesetCollectionLocalService getChangesetCollectionLocalService() {
 		return changesetCollectionLocalService;
 	}
 
@@ -348,9 +332,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 * @param changesetCollectionLocalService the changeset collection local service
 	 */
 	public void setChangesetCollectionLocalService(
-		com.liferay.changeset.service.ChangesetCollectionLocalService
-			changesetCollectionLocalService) {
-
+		com.liferay.changeset.service.ChangesetCollectionLocalService changesetCollectionLocalService) {
 		this.changesetCollectionLocalService = changesetCollectionLocalService;
 	}
 
@@ -370,7 +352,6 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 */
 	public void setChangesetCollectionPersistence(
 		ChangesetCollectionPersistence changesetCollectionPersistence) {
-
 		this.changesetCollectionPersistence = changesetCollectionPersistence;
 	}
 
@@ -390,7 +371,6 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 */
 	public void setChangesetEntryLocalService(
 		ChangesetEntryLocalService changesetEntryLocalService) {
-
 		this.changesetEntryLocalService = changesetEntryLocalService;
 	}
 
@@ -410,7 +390,6 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 */
 	public void setChangesetEntryPersistence(
 		ChangesetEntryPersistence changesetEntryPersistence) {
-
 		this.changesetEntryPersistence = changesetEntryPersistence;
 	}
 
@@ -419,9 +398,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -431,9 +408,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -442,9 +417,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 *
 	 * @return the class name local service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService
-		getClassNameLocalService() {
-
+	public com.liferay.portal.kernel.service.ClassNameLocalService getClassNameLocalService() {
 		return classNameLocalService;
 	}
 
@@ -454,9 +427,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 * @param classNameLocalService the class name local service
 	 */
 	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService
-			classNameLocalService) {
-
+		com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService) {
 		this.classNameLocalService = classNameLocalService;
 	}
 
@@ -476,7 +447,6 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 */
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
-
 		this.classNamePersistence = classNamePersistence;
 	}
 
@@ -485,9 +455,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService
-		getResourceLocalService() {
-
+	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
 		return resourceLocalService;
 	}
 
@@ -497,9 +465,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService
-			resourceLocalService) {
-
+		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -508,9 +474,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
 		return userLocalService;
 	}
 
@@ -521,7 +485,6 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
 		this.userLocalService = userLocalService;
 	}
 
@@ -544,8 +507,7 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register(
-			"com.liferay.changeset.model.ChangesetEntry",
+		persistedModelLocalServiceRegistry.register("com.liferay.changeset.model.ChangesetEntry",
 			changesetEntryLocalService);
 	}
 
@@ -586,8 +548,8 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -596,53 +558,26 @@ public abstract class ChangesetEntryLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(
-		type = com.liferay.changeset.service.ChangesetCollectionLocalService.class
-	)
-	protected com.liferay.changeset.service.ChangesetCollectionLocalService
-		changesetCollectionLocalService;
-
+	@BeanReference(type = com.liferay.changeset.service.ChangesetCollectionLocalService.class)
+	protected com.liferay.changeset.service.ChangesetCollectionLocalService changesetCollectionLocalService;
 	@BeanReference(type = ChangesetCollectionPersistence.class)
 	protected ChangesetCollectionPersistence changesetCollectionPersistence;
-
 	@BeanReference(type = ChangesetEntryLocalService.class)
 	protected ChangesetEntryLocalService changesetEntryLocalService;
-
 	@BeanReference(type = ChangesetEntryPersistence.class)
 	protected ChangesetEntryPersistence changesetEntryPersistence;
-
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ClassNameLocalService
-		classNameLocalService;
-
+	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService;
 	@ServiceReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ResourceLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
+	@ServiceReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
+	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry
-		persistedModelLocalServiceRegistry;
-
+	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }

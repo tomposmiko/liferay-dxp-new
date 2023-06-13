@@ -16,11 +16,12 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.PortletItem;
-import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -33,12 +34,12 @@ import java.util.Date;
  * The cache model class for representing PortletItem in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @see PortletItem
  * @generated
  */
 @ProviderType
-public class PortletItemCacheModel
-	implements CacheModel<PortletItem>, Externalizable, MVCCModel {
-
+public class PortletItemCacheModel implements CacheModel<PortletItem>,
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,12 +50,10 @@ public class PortletItemCacheModel
 			return false;
 		}
 
-		PortletItemCacheModel portletItemCacheModel =
-			(PortletItemCacheModel)obj;
+		PortletItemCacheModel portletItemCacheModel = (PortletItemCacheModel)obj;
 
 		if ((portletItemId == portletItemCacheModel.portletItemId) &&
-			(mvccVersion == portletItemCacheModel.mvccVersion)) {
-
+				(mvccVersion == portletItemCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -182,7 +181,8 @@ public class PortletItemCacheModel
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+	public void writeExternal(ObjectOutput objectOutput)
+		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(portletItemId);
@@ -231,5 +231,4 @@ public class PortletItemCacheModel
 	public String name;
 	public String portletId;
 	public long classNameId;
-
 }

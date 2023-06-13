@@ -19,6 +19,7 @@ import com.liferay.oauth2.provider.scope.RequiresNoScope;
 import com.liferay.oauth2.provider.scope.RequiresScope;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
+import com.liferay.petra.reflect.AnnotationLocator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 
@@ -51,7 +52,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	property = {
-		"osgi.jaxrs.application.select=(|(oauth2.scope.checker.type=annotations)(oauth2.scopechecker.type=annotations))",
+		"osgi.jaxrs.application.select=(oauth2.scopechecker.type=annotations)",
 		"osgi.jaxrs.extension=true",
 		"osgi.jaxrs.extension.select=(osgi.jaxrs.name=Liferay.OAuth2)",
 		"osgi.jaxrs.name=Liferay.OAuth2.annotations.feature"
@@ -114,13 +115,11 @@ public class AnnotationFeature implements Feature {
 
 			Method resourceMethod = _resourceInfo.getResourceMethod();
 
-			RequiresNoScope requiresNoScope =
-				RequiresScopeAnnotationFinder.getScopeAnnotation(
-					resourceMethod, RequiresNoScope.class);
+			RequiresNoScope requiresNoScope = resourceMethod.getAnnotation(
+				RequiresNoScope.class);
 
-			RequiresScope requiresScope =
-				RequiresScopeAnnotationFinder.getScopeAnnotation(
-					resourceMethod, RequiresScope.class);
+			RequiresScope requiresScope = resourceMethod.getAnnotation(
+				RequiresScope.class);
 
 			if ((requiresNoScope != null) && (requiresScope != null)) {
 				StringBundler sb = new StringBundler(6);
@@ -147,11 +146,10 @@ public class AnnotationFeature implements Feature {
 
 			Class<?> resourceClass = _resourceInfo.getResourceClass();
 
-			requiresNoScope = RequiresScopeAnnotationFinder.getScopeAnnotation(
-				resourceClass, RequiresNoScope.class);
+			requiresNoScope = resourceClass.getAnnotation(
+				RequiresNoScope.class);
 
-			requiresScope = RequiresScopeAnnotationFinder.getScopeAnnotation(
-				resourceClass, RequiresScope.class);
+			requiresScope = resourceClass.getAnnotation(RequiresScope.class);
 
 			if ((requiresNoScope != null) && (requiresScope != null)) {
 				StringBundler sb = new StringBundler(4);
@@ -160,6 +158,30 @@ public class AnnotationFeature implements Feature {
 				sb.append(resourceClass.getName());
 				sb.append("has both @RequiresNoScope and @RequiresScope ");
 				sb.append("annotations defined");
+
+				throw new RuntimeException(sb.toString());
+			}
+
+			if (requiresNoScope != null) {
+				return true;
+			}
+
+			if (checkRequiresScope(requiresScope)) {
+				return true;
+			}
+
+			requiresNoScope = AnnotationLocator.locate(
+				resourceClass, RequiresNoScope.class);
+
+			requiresScope = AnnotationLocator.locate(
+				resourceClass, RequiresScope.class);
+
+			if ((requiresNoScope != null) && (requiresScope != null)) {
+				StringBundler sb = new StringBundler(3);
+
+				sb.append("Class ");
+				sb.append(resourceClass.getName());
+				sb.append("inherits both @RequiresNoScope and @RequiresScope");
 
 				throw new RuntimeException(sb.toString());
 			}

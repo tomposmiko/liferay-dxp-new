@@ -1,4 +1,115 @@
 definition {
+	@summary = "Helper function to add fields '${templateFieldNames}' to the template"
+	macro _addFields {
+		if (isSet(templateFieldNames)) {
+			for (var fieldName : list "${templateFieldNames}") {
+				var key_fieldName = "${fieldName}";
+
+				AssertClick(locator1 = "DDMEditTemplate#SCRIPT_FIELD", value1 = "${fieldName}");
+			}
+		}
+	}
+
+	@summary = "Helper function to add description '${description}' to the template"
+	macro _inputDescription {
+		if (isSet(templateDescription)) {
+			Panel.expandPanel(panel = "Details");
+
+			PortletEntry.inputDescription(description = "${templateDescription}");
+		}
+	}
+
+	@summary = "Helper function to add a script to the template"
+	macro _inputScript {
+		if (isSet(templateScript)) {
+			Type.typeAceEditor(
+				locator1 = "DDMEditTemplate#SCRIPT_CONTENT_FIELD_TEXT_AREA",
+				value1 = "${templateScript}"
+			);
+		}
+	}
+
+	@summary = "Helper function to link structure '${structureName}' to the template"
+	macro _inputStructure {
+		if (isSet(structureName)) {
+			Panel.expandPanel(panel = "Details");
+
+			AssertClick(
+				locator1 = "DDMEditTemplate#DETAILS_SELECT_STRUCTURE",
+				value1 = "Select"
+			);
+
+			SelectFrameTop();
+
+			SelectFrame(locator1 = "IFrame#DIALOG");
+
+			Click(locator1 = "Icon#BASIC_SEARCH");
+
+			var key_ddlDataDefinitionName = "${structureName}";
+
+			AssertClickNoError(
+				locator1 = "DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME_LINK",
+				value1 = "${structureName}"
+			);
+
+			SelectFrameTop();
+		}
+	}
+
+	@summary = "Helper function to add a script to a template via file"
+	macro _inputTemplateFile {
+		if (isSet(templateFile)) {
+			UploadCommonFile(
+				locator1 = "DDMEditTemplate#SCRIPT_FILE_FIELD",
+				value1 = "${templateFile}"
+			);
+		}
+	}
+
+	@summary = "Helper function to select template language 'templateLanguage' to read the template in"
+	macro _inputTemplateLanguage {
+		Panel.expandPanel(panel = "Details");
+
+		if ("${templateLanguage}" == "vm") {
+			Select(
+				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
+				value1 = "Velocity (.vm)"
+			);
+		}
+		else if ("${templateLanguage}" == "xsl") {
+			Select(
+				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
+				value1 = "Extensible Stylesheet Language (.xsl)"
+			);
+		}
+		else {
+			Select(
+				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
+				value1 = "FreeMarker (.ftl)"
+			);
+		}
+
+		if ("${templateLanguage}" == "vm") {
+			AssertSelectedLabel(
+				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
+				value1 = "Velocity (.vm)"
+			);
+		}
+		else if ("${templateLanguage}" == "xsl") {
+			AssertSelectedLabel(
+				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
+				value1 = "Extensible Stylesheet Language (.xsl)"
+			);
+		}
+		else {
+			AssertSelectedLabel(
+				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
+				value1 = "FreeMarker (.ftl)"
+			);
+		}
+	}
+
+	@summary = "Click on the add button to add a template named '${templateName}' for structure '${structureName}', input most basic fields and then save the template"
 	macro addCP {
 		LexiconEntry.gotoAdd();
 
@@ -16,19 +127,8 @@ definition {
 		DDLDataDefinition.save();
 	}
 
-	macro addFields {
-		if (isSet(templateFieldNames)) {
-			for (var fieldName : list "${templateFieldNames}") {
-				var key_fieldName = "${fieldName}";
-
-				AssertClick(locator1 = "DDMEditTemplate#SCRIPT_FIELD", value1 = "${fieldName}");
-			}
-		}
-	}
-
+	@summary = "Attempt to add a blank template"
 	macro addNullCP {
-		Navigator.gotoNavItem(navItem = "Templates");
-
 		LexiconEntry.gotoAdd();
 
 		AssertElementNotPresent(locator1 = "TextInput#REQUIRED_ALERT");
@@ -40,6 +140,7 @@ definition {
 		SelectFrame(value1 = "relative=top");
 	}
 
+	@summary = "Give the roles '${roles}' permissions to view the template '${templateName}'"
 	macro addRoleViewPermissions {
 		LexiconEntry.gotoEntryMenuItem(
 			menuItem = "Permissions",
@@ -56,9 +157,8 @@ definition {
 		SelectFrameTop();
 	}
 
+	@summary = "Attempt to delete the template '${templateName}'"
 	macro deleteCP {
-		Navigator.gotoNavItem(navItem = "Templates");
-
 		var key_ddlTemplateName = "${templateName}";
 
 		Click(locator1 = "DDMSelectTemplate#TEMPLATE_TABLE_ELLIPSIS");
@@ -82,23 +182,7 @@ definition {
 		}
 	}
 
-	macro inputDescription {
-		if (isSet(templateDescription)) {
-			Panel.expandPanel(panel = "Details");
-
-			PortletEntry.inputDescription(description = "${templateDescription}");
-		}
-	}
-
-	macro inputScript {
-		if (isSet(templateScript)) {
-			Type.typeAceEditor(
-				locator1 = "DDMEditTemplate#SCRIPT_CONTENT_FIELD_TEXT_AREA",
-				value1 = "${templateScript}"
-			);
-		}
-	}
-
+	@summary = "Input a small image with the url '${templateSmallImageURL}'"
 	macro inputSmallImage {
 		Panel.expandPanel(panel = "Details");
 
@@ -121,46 +205,19 @@ definition {
 		);
 	}
 
-	macro inputStructure {
-		if (isSet(structureName)) {
-			Panel.expandPanel(panel = "Details");
-
-			AssertClick(
-				locator1 = "DDMEditTemplate#DETAILS_SELECT_STRUCTURE",
-				value1 = "Select"
-			);
-
-			SelectFrameTop();
-
-			SelectFrame(locator1 = "IFrame#DIALOG");
-
-			Click(locator1 = "Icon#BASIC_SEARCH");
-
-			var key_ddlDataDefinitionName = "${structureName}";
-
-			AssertClickNoError(
-				locator1 = "DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME_LINK",
-				value1 = "${structureName}"
-			);
-
-			AssertConfirm(
-				value1 = "Selecting a new structure deletes all unsaved content. Do you want to proceed?"
-			);
-
-			SelectFrameTop();
-		}
-	}
-
+	@summary = "Input most basic fields inside a template"
 	macro inputTemplateAddScreenFields {
-		PortletEntry.inputName(name = "${templateName}");
+		if (isSet(templateName)) {
+			PortletEntry.inputName(name = "${templateName}");
+		}
 
-		WebContentTemplates.inputStructure(structureName = "${structureName}");
+		WebContentTemplates._inputStructure(structureName = "${structureName}");
 
-		WebContentTemplates.inputDescription(
+		WebContentTemplates._inputDescription(
 			templateDescription = "${templateDescription}"
 		);
 
-		WebContentTemplates.inputTemplateLanguage(
+		WebContentTemplates._inputTemplateLanguage(
 			templateLanguage = "${templateLanguage}"
 		);
 
@@ -170,86 +227,16 @@ definition {
 			);
 		}
 
-		WebContentTemplates.inputScript(templateScript = "${templateScript}");
+		WebContentTemplates._inputScript(templateScript = "${templateScript}");
 
-		if ("${templateLanguage}" == "xsl") {
-			WebContentTemplates.inputTemplateFile(templateFile = "${templateFile}");
-		}
-		else {
-			WebContentTemplates.addFields(templateFieldNames = "${templateFieldNames}");
+		WebContentTemplates._addFields(templateFieldNames = "${templateFieldNames}");
 
-			WebContentTemplates.inputTemplateFile(templateFile = "${templateFile}");
-		}
+		WebContentTemplates._inputTemplateFile(templateFile = "${templateFile}");
 	}
 
-	macro inputTemplateFile {
-		if (isSet(templateFile)) {
-			UploadCommonFile(
-				locator1 = "DDMEditTemplate#SCRIPT_FILE_FIELD",
-				value1 = "${templateFile}"
-			);
-		}
-	}
-
-	macro inputTemplateLanguage {
-		Panel.expandPanel(panel = "Details");
-
-		if ("${templateLanguage}" == "vm") {
-			Select(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "Velocity (.vm)"
-			);
-		}
-		else if ("${templateLanguage}" == "xsl") {
-			Select(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "Extensible Stylesheet Language (.xsl)"
-			);
-		}
-		else {
-			Select(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "FreeMarker (.ftl)"
-			);
-		}
-
-		if ("${templateLanguage}" == "vm") {
-			AssertSelectedLabel(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "Velocity (.vm)"
-			);
-		}
-		else if ("${templateLanguage}" == "xsl") {
-			AssertSelectedLabel(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "Extensible Stylesheet Language (.xsl)"
-			);
-		}
-		else {
-			AssertSelectedLabel(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "FreeMarker (.ftl)"
-			);
-		}
-	}
-
+	@summary = "Add localization for the template name"
 	macro localizeTemplateName {
 		var key_ddlTemplateName = "${templateName}";
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content",
-			panel = "Site Administration",
-			portlet = "Web Content"
-		);
-
-		Navigator.gotoNavItem(navItem = "Templates");
-
-		AssertTextEquals(
-			locator1 = "DDMSelectTemplate#TEMPLATE_TABLE_NAME",
-			value1 = "${templateName}"
-		);
 
 		WebContentNavigator.gotoViewTemplate(templateName = "${templateName}");
 
@@ -266,6 +253,7 @@ definition {
 		}
 	}
 
+	@summary = "Teardown templates in the guest site"
 	macro tearDownCP {
 		Navigator.openURL();
 
@@ -308,9 +296,8 @@ definition {
 		Portlet.viewEmptyMessage(message = "There are no results.");
 	}
 
+	@summary = "Assert that certain template attributes are present for the template '${templateName}'"
 	macro viewCP {
-		Navigator.gotoNavItem(navItem = "Templates");
-
 		var key_ddlTemplateName = "${templateName}";
 
 		AssertTextEquals(
@@ -396,6 +383,7 @@ definition {
 		}
 	}
 
+	@summary = "Assert that the table entry for template '${templateName}' is present"
 	macro viewTableEntryCP {
 		var key_ddlTemplateName = "${templateName}";
 

@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.search.legacy.searcher.SearchResponseBuilderFactory;
 import com.liferay.portal.search.web.internal.display.context.PortletRequestThemeDisplaySupplier;
 import com.liferay.portal.search.web.internal.display.context.ThemeDisplaySupplier;
 import com.liferay.portal.search.web.internal.portlet.preferences.PortletPreferencesLookup;
@@ -66,9 +67,13 @@ public class PortletSharedSearchRequestImpl
 
 	@Override
 	public PortletSharedSearchResponse search(RenderRequest renderRequest) {
-		return portletSharedTaskExecutor.executeOnlyOnce(
-			() -> doSearch(renderRequest),
-			PortletSharedSearchResponse.class.getSimpleName(), renderRequest);
+		PortletSharedSearchResponse portletSharedSearchResponse =
+			portletSharedTaskExecutor.executeOnlyOnce(
+				() -> doSearch(renderRequest),
+				PortletSharedSearchResponse.class.getSimpleName(),
+				renderRequest);
+
+		return portletSharedSearchResponse;
 	}
 
 	@Activate
@@ -110,9 +115,11 @@ public class PortletSharedSearchRequestImpl
 		String emptyResultsMessage = null;
 		String cssClass = null;
 
-		return new SearchContainer<>(
+		SearchContainer<Document> searchContainer = new SearchContainer<>(
 			portletRequest, displayTerms, searchTerms, curParam, cur, delta,
 			portletURL, headerNames, emptyResultsMessage, cssClass);
+
+		return searchContainer;
 	}
 
 	protected SearchContext buildSearchContext(ThemeDisplay themeDisplay) {
@@ -166,7 +173,7 @@ public class PortletSharedSearchRequestImpl
 
 		SearchRequest searchRequest = new SearchRequestImpl(
 			searchContextBuilder, searchContainerBuilder,
-			facetedSearcherManager);
+			searchResponseBuilderFactory, facetedSearcherManager);
 
 		Stream<Portlet> portletsStream = getPortlets(themeDisplay);
 
@@ -205,10 +212,13 @@ public class PortletSharedSearchRequestImpl
 			portletSharedSearchContributorOptional =
 				getPortletSharedSearchContributor(portlet.getPortletName());
 
-		return portletSharedSearchContributorOptional.map(
-			portletSharedSearchContributor -> getSearchSettingsContributor(
-				portletSharedSearchContributor, portlet, themeDisplay,
-				renderRequest));
+		Optional<SearchSettingsContributor> searchSettingsContributorOptional =
+			portletSharedSearchContributorOptional.map(
+				portletSharedSearchContributor -> getSearchSettingsContributor(
+					portletSharedSearchContributor, portlet, themeDisplay,
+					renderRequest));
+
+		return searchSettingsContributorOptional;
 	}
 
 	protected SearchSettingsContributor getSearchSettingsContributor(
@@ -244,6 +254,9 @@ public class PortletSharedSearchRequestImpl
 
 	@Reference
 	protected PortletSharedTaskExecutor portletSharedTaskExecutor;
+
+	@Reference
+	protected SearchResponseBuilderFactory searchResponseBuilderFactory;
 
 	private ServiceTrackerMap<String, PortletSharedSearchContributor>
 		_portletSharedSearchContributors;

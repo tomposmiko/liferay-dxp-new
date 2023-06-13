@@ -83,8 +83,11 @@ public class TimerMessageListener extends BaseMessageListener {
 		long kaleoTimerInstanceTokenId = message.getLong(
 			"kaleoTimerInstanceTokenId");
 
-		return _kaleoTimerInstanceTokenLocalService.getKaleoTimerInstanceToken(
-			kaleoTimerInstanceTokenId);
+		KaleoTimerInstanceToken kaleoTimerInstanceToken =
+			_kaleoTimerInstanceTokenLocalService.getKaleoTimerInstanceToken(
+				kaleoTimerInstanceTokenId);
+
+		return kaleoTimerInstanceToken;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

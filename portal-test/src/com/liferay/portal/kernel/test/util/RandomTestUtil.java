@@ -15,14 +15,11 @@
 package com.liferay.portal.kernel.test.util;
 
 import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
-import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.test.randomizerbumpers.RandomizerBumper;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PwdGenerator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-
-import java.io.InputStream;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -40,66 +37,20 @@ public class RandomTestUtil {
 		return new Date();
 	}
 
-	public static double nextDouble() {
+	public static double nextDouble() throws Exception {
 		return CounterLocalServiceUtil.increment();
 	}
 
-	public static int nextInt() {
+	public static int nextInt() throws Exception {
 		return (int)CounterLocalServiceUtil.increment();
 	}
 
-	public static long nextLong() {
+	public static long nextLong() throws Exception {
 		return CounterLocalServiceUtil.increment();
 	}
 
 	public static boolean randomBoolean() {
 		return _random.nextBoolean();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 * TestDataConstants#TEST_BYTE_ARRAY}
-	 */
-	@Deprecated
-	@SafeVarargs
-	public static byte[] randomBytes(
-		int size, RandomizerBumper<byte[]>... randomizerBumpers) {
-
-		byte[] bytes = new byte[size];
-
-		generation:
-		for (int i = 0; i < _RANDOMIZER_BUMPER_TRIES_MAX; i++) {
-			_random.nextBytes(bytes);
-
-			for (RandomizerBumper<byte[]> randomizerBumper :
-					randomizerBumpers) {
-
-				if (!randomizerBumper.accept(bytes)) {
-					continue generation;
-				}
-			}
-
-			return bytes;
-		}
-
-		throw new IllegalStateException(
-			StringBundler.concat(
-				"Unable to generate a random byte array that is acceptable by ",
-				"all randomizer bumpers ", Arrays.toString(randomizerBumpers),
-				" after ", String.valueOf(_RANDOMIZER_BUMPER_TRIES_MAX),
-				" tries"));
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 * TestDataConstants#TEST_BYTE_ARRAY}
-	 */
-	@Deprecated
-	@SafeVarargs
-	public static byte[] randomBytes(
-		RandomizerBumper<byte[]>... randomizerBumpers) {
-
-		return randomBytes(8, randomizerBumpers);
 	}
 
 	public static double randomDouble() {
@@ -113,17 +64,6 @@ public class RandomTestUtil {
 		}
 
 		return -value;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@SafeVarargs
-	public static InputStream randomInputStream(
-		RandomizerBumper<byte[]>... randomizerBumpers) {
-
-		return new UnsyncByteArrayInputStream(randomBytes(randomizerBumpers));
 	}
 
 	public static int randomInt() {

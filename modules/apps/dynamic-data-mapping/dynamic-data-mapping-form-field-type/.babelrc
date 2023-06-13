@@ -1,3 +1,25 @@
 {
-	"presets": ["es2015", "liferay-project"]
+    "env": {
+        "test": {
+            "plugins": [
+                ["module-resolver", {
+                    "alias": {
+                        "dynamic-data-mapping-form-field-type/*": "./src/main/resources/META-INF/resources",
+                        "source/*": "./src/main/resources/META-INF/resources/metal"
+                    }
+                }]
+            ]
+        }
+    },
+    "ignore": [
+        "config.js",
+        "**/*_field.js",
+        "**/*_support.js"
+    ],
+    "plugins": [
+        "transform-class-properties",
+        "transform-decorators-legacy",
+        "transform-object-rest-spread"
+    ],
+    "presets": ["env"]
 }

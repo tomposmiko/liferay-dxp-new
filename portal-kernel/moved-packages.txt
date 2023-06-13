@@ -1,2 +1,0 @@
-com.liferay.message.boards.kernel.service
-com.liferay.message.boards.kernel.service.persistence

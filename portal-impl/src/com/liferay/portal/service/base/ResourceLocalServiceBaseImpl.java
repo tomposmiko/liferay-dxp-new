@@ -16,7 +16,6 @@ package com.liferay.portal.service.base;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.counter.kernel.service.persistence.CounterPersistence;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -42,17 +41,16 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.portal.service.impl.ResourceLocalServiceImpl
+ * @see com.liferay.portal.kernel.service.ResourceLocalServiceUtil
  * @generated
  */
 @ProviderType
-public abstract class ResourceLocalServiceBaseImpl
-	extends BaseLocalServiceImpl
+public abstract class ResourceLocalServiceBaseImpl extends BaseLocalServiceImpl
 	implements ResourceLocalService, IdentifiableOSGiService {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>ResourceLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.ResourceLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.portal.kernel.service.ResourceLocalServiceUtil} to access the resource local service.
 	 */
 
 	/**
@@ -71,7 +69,6 @@ public abstract class ResourceLocalServiceBaseImpl
 	 */
 	public void setResourceLocalService(
 		ResourceLocalService resourceLocalService) {
-
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -80,9 +77,7 @@ public abstract class ResourceLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -92,28 +87,8 @@ public abstract class ResourceLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
-	}
-
-	/**
-	 * Returns the counter persistence.
-	 *
-	 * @return the counter persistence
-	 */
-	public CounterPersistence getCounterPersistence() {
-		return counterPersistence;
-	}
-
-	/**
-	 * Sets the counter persistence.
-	 *
-	 * @param counterPersistence the counter persistence
-	 */
-	public void setCounterPersistence(CounterPersistence counterPersistence) {
-		this.counterPersistence = counterPersistence;
 	}
 
 	/**
@@ -121,9 +96,7 @@ public abstract class ResourceLocalServiceBaseImpl
 	 *
 	 * @return the resource permission local service
 	 */
-	public com.liferay.portal.kernel.service.ResourcePermissionLocalService
-		getResourcePermissionLocalService() {
-
+	public com.liferay.portal.kernel.service.ResourcePermissionLocalService getResourcePermissionLocalService() {
 		return resourcePermissionLocalService;
 	}
 
@@ -133,9 +106,7 @@ public abstract class ResourceLocalServiceBaseImpl
 	 * @param resourcePermissionLocalService the resource permission local service
 	 */
 	public void setResourcePermissionLocalService(
-		com.liferay.portal.kernel.service.ResourcePermissionLocalService
-			resourcePermissionLocalService) {
-
+		com.liferay.portal.kernel.service.ResourcePermissionLocalService resourcePermissionLocalService) {
 		this.resourcePermissionLocalService = resourcePermissionLocalService;
 	}
 
@@ -155,7 +126,6 @@ public abstract class ResourceLocalServiceBaseImpl
 	 */
 	public void setResourcePermissionPersistence(
 		ResourcePermissionPersistence resourcePermissionPersistence) {
-
 		this.resourcePermissionPersistence = resourcePermissionPersistence;
 	}
 
@@ -175,7 +145,6 @@ public abstract class ResourceLocalServiceBaseImpl
 	 */
 	public void setResourcePermissionFinder(
 		ResourcePermissionFinder resourcePermissionFinder) {
-
 		this.resourcePermissionFinder = resourcePermissionFinder;
 	}
 
@@ -209,8 +178,8 @@ public abstract class ResourceLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
-				dataSource, sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -221,26 +190,12 @@ public abstract class ResourceLocalServiceBaseImpl
 
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-
-	@BeanReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
-	protected com.liferay.counter.kernel.service.CounterLocalService
-		counterLocalService;
-
-	@BeanReference(type = CounterPersistence.class)
-	protected CounterPersistence counterPersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ResourcePermissionLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourcePermissionLocalService
-		resourcePermissionLocalService;
-
+	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.ResourcePermissionLocalService.class)
+	protected com.liferay.portal.kernel.service.ResourcePermissionLocalService resourcePermissionLocalService;
 	@BeanReference(type = ResourcePermissionPersistence.class)
 	protected ResourcePermissionPersistence resourcePermissionPersistence;
-
 	@BeanReference(type = ResourcePermissionFinder.class)
 	protected ResourcePermissionFinder resourcePermissionFinder;
-
 }

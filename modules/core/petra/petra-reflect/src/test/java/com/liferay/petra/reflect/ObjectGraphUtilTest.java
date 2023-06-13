@@ -16,7 +16,6 @@ package com.liferay.petra.reflect;
 
 import com.liferay.petra.reflect.ObjectGraphUtil.AnnotatedFieldMappingVisitor;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
-import com.liferay.portal.kernel.util.ObjectValuePair;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
@@ -26,10 +25,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,13 +50,13 @@ public class ObjectGraphUtilTest {
 	public void setUp() {
 		_recordVisitor = new RecordVisitor();
 
-		_objectValuePairs = _recordVisitor._objectValuePairs;
+		_entries = _recordVisitor._entries;
 
 		_recordAnnotatedFieldMappingVisitor =
 			new RecordAnnotatedFieldMappingVisitor();
 
-		_annotatedFieldMappingObjectValuePairs =
-			_recordAnnotatedFieldMappingVisitor._objectValuePairs;
+		_annotatedFieldMappingEntries =
+			_recordAnnotatedFieldMappingVisitor._entries;
 	}
 
 	@Test
@@ -157,14 +158,13 @@ public class ObjectGraphUtilTest {
 			_recordAnnotatedFieldMappingVisitor.mapValue(null, linkedType1));
 
 		Assert.assertEquals(
-			_annotatedFieldMappingObjectValuePairs.toString(), 1,
-			_annotatedFieldMappingObjectValuePairs.size());
+			_annotatedFieldMappingEntries.toString(), 1,
+			_annotatedFieldMappingEntries.size());
 
-		ObjectValuePair<Field, Object> objectValuePair =
-			_annotatedFieldMappingObjectValuePairs.get(0);
+		Map.Entry<Field, Object> entry = _annotatedFieldMappingEntries.get(0);
 
-		Assert.assertNull(objectValuePair.getKey());
-		Assert.assertSame(linkedType1, objectValuePair.getValue());
+		Assert.assertNull(entry.getKey());
+		Assert.assertSame(linkedType1, entry.getValue());
 	}
 
 	@Test
@@ -179,19 +179,18 @@ public class ObjectGraphUtilTest {
 		Assert.assertArrayEquals(linkedType1Array, mappedLinkedType1Array);
 
 		Assert.assertEquals(
-			_annotatedFieldMappingObjectValuePairs.toString(), 2,
-			_annotatedFieldMappingObjectValuePairs.size());
+			_annotatedFieldMappingEntries.toString(), 2,
+			_annotatedFieldMappingEntries.size());
 
-		ObjectValuePair<Field, Object> objectValuePair =
-			_annotatedFieldMappingObjectValuePairs.get(0);
+		Map.Entry<Field, Object> entry = _annotatedFieldMappingEntries.get(0);
 
-		Assert.assertNull(objectValuePair.getKey());
-		Assert.assertSame(linkedType1Array[0], objectValuePair.getValue());
+		Assert.assertNull(entry.getKey());
+		Assert.assertSame(linkedType1Array[0], entry.getValue());
 
-		objectValuePair = _annotatedFieldMappingObjectValuePairs.get(1);
+		entry = _annotatedFieldMappingEntries.get(1);
 
-		Assert.assertNull(objectValuePair.getKey());
-		Assert.assertSame(linkedType1Array[1], objectValuePair.getValue());
+		Assert.assertNull(entry.getKey());
+		Assert.assertSame(linkedType1Array[1], entry.getValue());
 	}
 
 	@Test
@@ -202,7 +201,7 @@ public class ObjectGraphUtilTest {
 			_recordAnnotatedFieldMappingVisitor.visit(
 				ReflectionUtil.getDeclaredField(NullReference.class, "_object"),
 				new NullReference()));
-		Assert.assertTrue(_annotatedFieldMappingObjectValuePairs.isEmpty());
+		Assert.assertTrue(_annotatedFieldMappingEntries.isEmpty());
 	}
 
 	@Test
@@ -211,7 +210,7 @@ public class ObjectGraphUtilTest {
 			_recordAnnotatedFieldMappingVisitor.visit(
 				ReflectionUtil.getDeclaredField(StaticField.class, "_INT"),
 				new StaticField()));
-		Assert.assertTrue(_annotatedFieldMappingObjectValuePairs.isEmpty());
+		Assert.assertTrue(_annotatedFieldMappingEntries.isEmpty());
 	}
 
 	@Test
@@ -224,13 +223,13 @@ public class ObjectGraphUtilTest {
 				ReflectionUtil.getDeclaredField(LinkedType1.class, "_object1"),
 				linkedType1));
 
-		Assert.assertTrue(_annotatedFieldMappingObjectValuePairs.isEmpty());
+		Assert.assertTrue(_annotatedFieldMappingEntries.isEmpty());
 		Assert.assertSame(
 			linkedType1._object2,
 			_recordAnnotatedFieldMappingVisitor.visit(
 				ReflectionUtil.getDeclaredField(LinkedType1.class, "_object2"),
 				linkedType1));
-		Assert.assertTrue(_annotatedFieldMappingObjectValuePairs.isEmpty());
+		Assert.assertTrue(_annotatedFieldMappingEntries.isEmpty());
 
 		Field field = ReflectionUtil.getDeclaredField(
 			LinkedType1.class, "_linkedType3");
@@ -239,14 +238,13 @@ public class ObjectGraphUtilTest {
 			_recordAnnotatedFieldMappingVisitor.visit(field, linkedType1));
 
 		Assert.assertEquals(
-			_annotatedFieldMappingObjectValuePairs.toString(), 1,
-			_annotatedFieldMappingObjectValuePairs.size());
+			_annotatedFieldMappingEntries.toString(), 1,
+			_annotatedFieldMappingEntries.size());
 
-		ObjectValuePair<Field, Object> objectValuePair =
-			_annotatedFieldMappingObjectValuePairs.get(0);
+		Map.Entry<Field, Object> entry = _annotatedFieldMappingEntries.get(0);
 
-		Assert.assertEquals(field, objectValuePair.getKey());
-		Assert.assertSame(linkedType1._linkedType3, objectValuePair.getValue());
+		Assert.assertEquals(field, entry.getKey());
+		Assert.assertSame(linkedType1._linkedType3, entry.getValue());
 	}
 
 	@Test
@@ -260,16 +258,14 @@ public class ObjectGraphUtilTest {
 
 		ObjectGraphUtil.walkObjectGraph(nullReference, _recordVisitor);
 
-		Assert.assertEquals(
-			_objectValuePairs.toString(), 1, _objectValuePairs.size());
+		Assert.assertEquals(_entries.toString(), 1, _entries.size());
 
-		ObjectValuePair<Field, Object> objectValuePair = _objectValuePairs.get(
-			0);
+		Map.Entry<Field, Object> entry = _entries.get(0);
 
 		Assert.assertEquals(
 			ReflectionUtil.getDeclaredField(NullReference.class, "_object"),
-			objectValuePair.getKey());
-		Assert.assertSame(nullReference, objectValuePair.getValue());
+			entry.getKey());
+		Assert.assertSame(nullReference, entry.getValue());
 	}
 
 	@Test
@@ -301,7 +297,7 @@ public class ObjectGraphUtilTest {
 	public void testWalkObjectGraphObject() {
 		ObjectGraphUtil.walkObjectGraph(new Object(), _recordVisitor);
 
-		Assert.assertTrue(_objectValuePairs.isEmpty());
+		Assert.assertTrue(_entries.isEmpty());
 	}
 
 	@Test
@@ -310,16 +306,14 @@ public class ObjectGraphUtilTest {
 
 		ObjectGraphUtil.walkObjectGraph(primitive, _recordVisitor);
 
-		Assert.assertEquals(
-			_objectValuePairs.toString(), 1, _objectValuePairs.size());
+		Assert.assertEquals(_entries.toString(), 1, _entries.size());
 
-		ObjectValuePair<Field, Object> objectValuePair = _objectValuePairs.get(
-			0);
+		Map.Entry<Field, Object> entry = _entries.get(0);
 
 		Assert.assertEquals(
 			ReflectionUtil.getDeclaredField(Primitive.class, "_int"),
-			objectValuePair.getKey());
-		Assert.assertSame(primitive, objectValuePair.getValue());
+			entry.getKey());
+		Assert.assertSame(primitive, entry.getValue());
 	}
 
 	@Test
@@ -328,16 +322,14 @@ public class ObjectGraphUtilTest {
 
 		ObjectGraphUtil.walkObjectGraph(primitiveArray, _recordVisitor);
 
-		Assert.assertEquals(
-			_objectValuePairs.toString(), 1, _objectValuePairs.size());
+		Assert.assertEquals(_entries.toString(), 1, _entries.size());
 
-		ObjectValuePair<Field, Object> objectValuePair = _objectValuePairs.get(
-			0);
+		Map.Entry<Field, Object> entry = _entries.get(0);
 
 		Assert.assertEquals(
 			ReflectionUtil.getDeclaredField(PrimitiveArray.class, "_ints"),
-			objectValuePair.getKey());
-		Assert.assertSame(primitiveArray, objectValuePair.getValue());
+			entry.getKey());
+		Assert.assertSame(primitiveArray, entry.getValue());
 	}
 
 	@Test
@@ -346,17 +338,15 @@ public class ObjectGraphUtilTest {
 
 		ObjectGraphUtil.walkObjectGraph(selfReference, _recordVisitor);
 
-		Assert.assertEquals(
-			_objectValuePairs.toString(), 1, _objectValuePairs.size());
+		Assert.assertEquals(_entries.toString(), 1, _entries.size());
 
-		ObjectValuePair<Field, Object> objectValuePair = _objectValuePairs.get(
-			0);
+		Map.Entry<Field, Object> entry = _entries.get(0);
 
 		Assert.assertEquals(
 			ReflectionUtil.getDeclaredField(
 				SelfReference.class, "_selfReference"),
-			objectValuePair.getKey());
-		Assert.assertSame(selfReference, objectValuePair.getValue());
+			entry.getKey());
+		Assert.assertSame(selfReference, entry.getValue());
 	}
 
 	@Test
@@ -365,29 +355,26 @@ public class ObjectGraphUtilTest {
 
 		ObjectGraphUtil.walkObjectGraph(selfReferenceArray, _recordVisitor);
 
-		Assert.assertEquals(
-			_objectValuePairs.toString(), 1, _objectValuePairs.size());
+		Assert.assertEquals(_entries.toString(), 1, _entries.size());
 
-		ObjectValuePair<Field, Object> objectValuePair = _objectValuePairs.get(
-			0);
+		Map.Entry<Field, Object> entry = _entries.get(0);
 
 		Assert.assertEquals(
 			ReflectionUtil.getDeclaredField(
 				SelfReferenceArray.class, "_selfReferenceArray"),
-			objectValuePair.getKey());
-		Assert.assertSame(selfReferenceArray, objectValuePair.getValue());
+			entry.getKey());
+		Assert.assertSame(selfReferenceArray, entry.getValue());
 	}
 
 	@Test
 	public void testWalkObjectGraphStaticField() {
 		ObjectGraphUtil.walkObjectGraph(new StaticField(), _recordVisitor);
 
-		Assert.assertTrue(_objectValuePairs.isEmpty());
+		Assert.assertTrue(_entries.isEmpty());
 	}
 
-	private List<ObjectValuePair<Field, Object>>
-		_annotatedFieldMappingObjectValuePairs;
-	private List<ObjectValuePair<Field, Object>> _objectValuePairs;
+	private List<Map.Entry<Field, Object>> _annotatedFieldMappingEntries;
+	private List<Map.Entry<Field, Object>> _entries;
 	private RecordAnnotatedFieldMappingVisitor
 		_recordAnnotatedFieldMappingVisitor;
 	private RecordVisitor _recordVisitor;
@@ -441,8 +428,7 @@ public class ObjectGraphUtilTest {
 
 		@Override
 		protected Object doMap(Field field, Object value) {
-			_objectValuePairs.add(
-				new ObjectValuePair<Field, Object>(field, value));
+			_entries.add(new AbstractMap.SimpleImmutableEntry<>(field, value));
 
 			return value;
 		}
@@ -457,8 +443,7 @@ public class ObjectGraphUtilTest {
 					Arrays.asList(LinkedType1.class, LinkedType3.class)));
 		}
 
-		private List<ObjectValuePair<Field, Object>> _objectValuePairs =
-			new ArrayList<>();
+		private List<Map.Entry<Field, Object>> _entries = new ArrayList<>();
 
 	}
 
@@ -466,13 +451,12 @@ public class ObjectGraphUtilTest {
 
 		@Override
 		public Object visit(Field field, Object target) throws Exception {
-			_objectValuePairs.add(
-				new ObjectValuePair<Field, Object>(field, target));
+			_entries.add(new AbstractMap.SimpleImmutableEntry<>(field, target));
 
 			return field.get(target);
 		}
 
-		private final List<ObjectValuePair<Field, Object>> _objectValuePairs =
+		private final List<Map.Entry<Field, Object>> _entries =
 			new ArrayList<>();
 
 	}

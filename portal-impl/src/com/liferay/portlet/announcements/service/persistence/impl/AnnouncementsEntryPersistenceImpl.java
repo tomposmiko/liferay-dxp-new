@@ -19,7 +19,11 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.announcements.kernel.exception.NoSuchEntryException;
 import com.liferay.announcements.kernel.model.AnnouncementsEntry;
 import com.liferay.announcements.kernel.service.persistence.AnnouncementsEntryPersistence;
+
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -46,22 +50,18 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+
 import com.liferay.portlet.announcements.model.impl.AnnouncementsEntryImpl;
 import com.liferay.portlet.announcements.model.impl.AnnouncementsEntryModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -75,27 +75,23 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see AnnouncementsEntryPersistence
+ * @see com.liferay.announcements.kernel.service.persistence.AnnouncementsEntryUtil
  * @generated
  */
 @ProviderType
-public class AnnouncementsEntryPersistenceImpl
-	extends BasePersistenceImpl<AnnouncementsEntry>
+public class AnnouncementsEntryPersistenceImpl extends BasePersistenceImpl<AnnouncementsEntry>
 	implements AnnouncementsEntryPersistence {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use <code>AnnouncementsEntryUtil</code> to access the announcements entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use {@link AnnouncementsEntryUtil} to access the announcements entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY =
-		AnnouncementsEntryImpl.class.getName();
-
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List1";
-
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List2";
-
+	public static final String FINDER_CLASS_NAME_ENTITY = AnnouncementsEntryImpl.class.getName();
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -118,7 +114,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns a range of all the announcements entries where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -127,9 +123,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByUuid(
-		String uuid, int start, int end) {
-
+	public List<AnnouncementsEntry> findByUuid(String uuid, int start, int end) {
 		return findByUuid(uuid, start, end, null);
 	}
 
@@ -137,7 +131,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -147,10 +141,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByUuid(
-		String uuid, int start, int end,
+	public List<AnnouncementsEntry> findByUuid(String uuid, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
 		return findByUuid(uuid, start, end, orderByComparator, true);
 	}
 
@@ -158,7 +150,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -169,11 +161,9 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByUuid(
-		String uuid, int start, int end,
+	public List<AnnouncementsEntry> findByUuid(String uuid, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -181,22 +171,21 @@ public class AnnouncementsEntryPersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid;
-			finderArgs = new Object[] {uuid};
+			finderArgs = new Object[] { uuid };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid;
-			finderArgs = new Object[] {uuid, start, end, orderByComparator};
+			finderArgs = new Object[] { uuid, start, end, orderByComparator };
 		}
 
 		List<AnnouncementsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AnnouncementsEntry announcementsEntry : list) {
@@ -213,8 +202,8 @@ public class AnnouncementsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -234,10 +223,11 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AnnouncementsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -257,16 +247,16 @@ public class AnnouncementsEntryPersistenceImpl
 				}
 
 				if (!pagination) {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -295,13 +285,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByUuid_First(
-			String uuid,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByUuid_First(String uuid,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByUuid_First(
-			uuid, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByUuid_First(uuid,
+				orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -327,11 +315,9 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the first matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByUuid_First(
-		String uuid, OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		List<AnnouncementsEntry> list = findByUuid(
-			uuid, 0, 1, orderByComparator);
+	public AnnouncementsEntry fetchByUuid_First(String uuid,
+		OrderByComparator<AnnouncementsEntry> orderByComparator) {
+		List<AnnouncementsEntry> list = findByUuid(uuid, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -349,13 +335,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByUuid_Last(
-			String uuid,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByUuid_Last(String uuid,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByUuid_Last(
-			uuid, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByUuid_Last(uuid,
+				orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -381,17 +365,16 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the last matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByUuid_Last(
-		String uuid, OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
+	public AnnouncementsEntry fetchByUuid_Last(String uuid,
+		OrderByComparator<AnnouncementsEntry> orderByComparator) {
 		int count = countByUuid(uuid);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<AnnouncementsEntry> list = findByUuid(
-			uuid, count - 1, count, orderByComparator);
+		List<AnnouncementsEntry> list = findByUuid(uuid, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -410,11 +393,9 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] findByUuid_PrevAndNext(
-			long entryId, String uuid,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] findByUuid_PrevAndNext(long entryId,
+		String uuid, OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		uuid = Objects.toString(uuid, "");
 
 		AnnouncementsEntry announcementsEntry = findByPrimaryKey(entryId);
@@ -426,13 +407,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = getByUuid_PrevAndNext(
-				session, announcementsEntry, uuid, orderByComparator, true);
+			array[0] = getByUuid_PrevAndNext(session, announcementsEntry, uuid,
+					orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = getByUuid_PrevAndNext(
-				session, announcementsEntry, uuid, orderByComparator, false);
+			array[2] = getByUuid_PrevAndNext(session, announcementsEntry, uuid,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -444,16 +425,15 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	protected AnnouncementsEntry getByUuid_PrevAndNext(
-		Session session, AnnouncementsEntry announcementsEntry, String uuid,
+	protected AnnouncementsEntry getByUuid_PrevAndNext(Session session,
+		AnnouncementsEntry announcementsEntry, String uuid,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -474,8 +454,7 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -547,10 +526,8 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -573,15 +550,14 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public List<AnnouncementsEntry> filterFindByUuid(String uuid) {
-		return filterFindByUuid(
-			uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return filterFindByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries that the user has permission to view where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -590,9 +566,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByUuid(
-		String uuid, int start, int end) {
-
+	public List<AnnouncementsEntry> filterFindByUuid(String uuid, int start,
+		int end) {
 		return filterFindByUuid(uuid, start, end, null);
 	}
 
@@ -600,7 +575,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries that the user has permissions to view where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -610,10 +585,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByUuid(
-		String uuid, int start, int end,
-		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
+	public List<AnnouncementsEntry> filterFindByUuid(String uuid, int start,
+		int end, OrderByComparator<AnnouncementsEntry> orderByComparator) {
 		if (!InlineSQLHelperUtil.isEnabled()) {
 			return findByUuid(uuid, start, end, orderByComparator);
 		}
@@ -623,8 +596,8 @@ public class AnnouncementsEntryPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				3 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(3 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(4);
@@ -634,8 +607,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		boolean bindUuid = false;
@@ -650,18 +622,17 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -673,9 +644,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -697,8 +668,8 @@ public class AnnouncementsEntryPersistenceImpl
 				qPos.add(uuid);
 			}
 
-			return (List<AnnouncementsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<AnnouncementsEntry>)QueryUtil.list(q, getDialect(),
+				start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -718,11 +689,9 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] filterFindByUuid_PrevAndNext(
-			long entryId, String uuid,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] filterFindByUuid_PrevAndNext(long entryId,
+		String uuid, OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled()) {
 			return findByUuid_PrevAndNext(entryId, uuid, orderByComparator);
 		}
@@ -738,13 +707,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = filterGetByUuid_PrevAndNext(
-				session, announcementsEntry, uuid, orderByComparator, true);
+			array[0] = filterGetByUuid_PrevAndNext(session, announcementsEntry,
+					uuid, orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = filterGetByUuid_PrevAndNext(
-				session, announcementsEntry, uuid, orderByComparator, false);
+			array[2] = filterGetByUuid_PrevAndNext(session, announcementsEntry,
+					uuid, orderByComparator, false);
 
 			return array;
 		}
@@ -756,16 +725,15 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	protected AnnouncementsEntry filterGetByUuid_PrevAndNext(
-		Session session, AnnouncementsEntry announcementsEntry, String uuid,
+	protected AnnouncementsEntry filterGetByUuid_PrevAndNext(Session session,
+		AnnouncementsEntry announcementsEntry, String uuid,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -776,8 +744,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		boolean bindUuid = false;
@@ -792,13 +759,11 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -806,17 +771,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -842,15 +803,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -879,9 +838,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -902,10 +861,8 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -927,9 +884,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByUuid(String uuid) {
-		for (AnnouncementsEntry announcementsEntry :
-				findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (AnnouncementsEntry announcementsEntry : findByUuid(uuid,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(announcementsEntry);
 		}
 	}
@@ -946,10 +902,10 @@ public class AnnouncementsEntryPersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByUuid;
 
-		Object[] finderArgs = new Object[] {uuid};
+		Object[] finderArgs = new Object[] { uuid };
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -1028,9 +984,9 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_UUID_UUID_2_SQL);
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -1039,8 +995,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -1060,18 +1016,10 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_UUID_UUID_2 =
-		"announcementsEntry.uuid = ?";
-
-	private static final String _FINDER_COLUMN_UUID_UUID_3 =
-		"(announcementsEntry.uuid IS NULL OR announcementsEntry.uuid = '')";
-
-	private static final String _FINDER_COLUMN_UUID_UUID_2_SQL =
-		"announcementsEntry.uuid_ = ?";
-
-	private static final String _FINDER_COLUMN_UUID_UUID_3_SQL =
-		"(announcementsEntry.uuid_ IS NULL OR announcementsEntry.uuid_ = '')";
-
+	private static final String _FINDER_COLUMN_UUID_UUID_2 = "announcementsEntry.uuid = ?";
+	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(announcementsEntry.uuid IS NULL OR announcementsEntry.uuid = '')";
+	private static final String _FINDER_COLUMN_UUID_UUID_2_SQL = "announcementsEntry.uuid_ = ?";
+	private static final String _FINDER_COLUMN_UUID_UUID_3_SQL = "(announcementsEntry.uuid_ IS NULL OR announcementsEntry.uuid_ = '')";
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
 	private FinderPath _finderPathCountByUuid_C;
@@ -1085,15 +1033,15 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public List<AnnouncementsEntry> findByUuid_C(String uuid, long companyId) {
-		return findByUuid_C(
-			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1103,9 +1051,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByUuid_C(
-		String uuid, long companyId, int start, int end) {
-
+	public List<AnnouncementsEntry> findByUuid_C(String uuid, long companyId,
+		int start, int end) {
 		return findByUuid_C(uuid, companyId, start, end, null);
 	}
 
@@ -1113,7 +1060,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1124,19 +1071,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByUuid_C(
-		String uuid, long companyId, int start, int end,
+	public List<AnnouncementsEntry> findByUuid_C(String uuid, long companyId,
+		int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		return findByUuid_C(
-			uuid, companyId, start, end, orderByComparator, true);
+		return findByUuid_C(uuid, companyId, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the announcements entries where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1148,11 +1093,10 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByUuid_C(
-		String uuid, long companyId, int start, int end,
+	public List<AnnouncementsEntry> findByUuid_C(String uuid, long companyId,
+		int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -1160,30 +1104,30 @@ public class AnnouncementsEntryPersistenceImpl
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid_C;
-			finderArgs = new Object[] {uuid, companyId};
+			finderArgs = new Object[] { uuid, companyId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
-				uuid, companyId, start, end, orderByComparator
-			};
+					uuid, companyId,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<AnnouncementsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AnnouncementsEntry announcementsEntry : list) {
 					if (!uuid.equals(announcementsEntry.getUuid()) ||
-						(companyId != announcementsEntry.getCompanyId())) {
-
+							(companyId != announcementsEntry.getCompanyId())) {
 						list = null;
 
 						break;
@@ -1196,8 +1140,8 @@ public class AnnouncementsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1219,10 +1163,11 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AnnouncementsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1244,16 +1189,16 @@ public class AnnouncementsEntryPersistenceImpl
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1283,13 +1228,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByUuid_C_First(
-			String uuid, long companyId,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByUuid_C_First(String uuid, long companyId,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByUuid_C_First(
-			uuid, companyId, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByUuid_C_First(uuid,
+				companyId, orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -1319,12 +1262,10 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the first matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByUuid_C_First(
-		String uuid, long companyId,
+	public AnnouncementsEntry fetchByUuid_C_First(String uuid, long companyId,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		List<AnnouncementsEntry> list = findByUuid_C(
-			uuid, companyId, 0, 1, orderByComparator);
+		List<AnnouncementsEntry> list = findByUuid_C(uuid, companyId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1343,13 +1284,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByUuid_C_Last(
-			String uuid, long companyId,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByUuid_C_Last(
-			uuid, companyId, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByUuid_C_Last(uuid,
+				companyId, orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -1379,18 +1318,16 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the last matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByUuid_C_Last(
-		String uuid, long companyId,
+	public AnnouncementsEntry fetchByUuid_C_Last(String uuid, long companyId,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
 		int count = countByUuid_C(uuid, companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<AnnouncementsEntry> list = findByUuid_C(
-			uuid, companyId, count - 1, count, orderByComparator);
+		List<AnnouncementsEntry> list = findByUuid_C(uuid, companyId,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1410,11 +1347,10 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] findByUuid_C_PrevAndNext(
-			long entryId, String uuid, long companyId,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] findByUuid_C_PrevAndNext(long entryId,
+		String uuid, long companyId,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		uuid = Objects.toString(uuid, "");
 
 		AnnouncementsEntry announcementsEntry = findByPrimaryKey(entryId);
@@ -1426,15 +1362,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = getByUuid_C_PrevAndNext(
-				session, announcementsEntry, uuid, companyId, orderByComparator,
-				true);
+			array[0] = getByUuid_C_PrevAndNext(session, announcementsEntry,
+					uuid, companyId, orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = getByUuid_C_PrevAndNext(
-				session, announcementsEntry, uuid, companyId, orderByComparator,
-				false);
+			array[2] = getByUuid_C_PrevAndNext(session, announcementsEntry,
+					uuid, companyId, orderByComparator, false);
 
 			return array;
 		}
@@ -1446,16 +1380,15 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	protected AnnouncementsEntry getByUuid_C_PrevAndNext(
-		Session session, AnnouncementsEntry announcementsEntry, String uuid,
-		long companyId, OrderByComparator<AnnouncementsEntry> orderByComparator,
+	protected AnnouncementsEntry getByUuid_C_PrevAndNext(Session session,
+		AnnouncementsEntry announcementsEntry, String uuid, long companyId,
+		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1478,8 +1411,7 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1553,10 +1485,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1579,18 +1509,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByUuid_C(
-		String uuid, long companyId) {
-
-		return filterFindByUuid_C(
-			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<AnnouncementsEntry> filterFindByUuid_C(String uuid,
+		long companyId) {
+		return filterFindByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries that the user has permission to view where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1600,9 +1529,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByUuid_C(
-		String uuid, long companyId, int start, int end) {
-
+	public List<AnnouncementsEntry> filterFindByUuid_C(String uuid,
+		long companyId, int start, int end) {
 		return filterFindByUuid_C(uuid, companyId, start, end, null);
 	}
 
@@ -1610,7 +1538,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries that the user has permissions to view where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1621,10 +1549,9 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByUuid_C(
-		String uuid, long companyId, int start, int end,
+	public List<AnnouncementsEntry> filterFindByUuid_C(String uuid,
+		long companyId, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
 			return findByUuid_C(uuid, companyId, start, end, orderByComparator);
 		}
@@ -1634,8 +1561,8 @@ public class AnnouncementsEntryPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(5);
@@ -1645,8 +1572,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		boolean bindUuid = false;
@@ -1663,18 +1589,17 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -1686,9 +1611,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -1712,8 +1637,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			qPos.add(companyId);
 
-			return (List<AnnouncementsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<AnnouncementsEntry>)QueryUtil.list(q, getDialect(),
+				start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -1734,14 +1659,13 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] filterFindByUuid_C_PrevAndNext(
-			long entryId, String uuid, long companyId,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] filterFindByUuid_C_PrevAndNext(long entryId,
+		String uuid, long companyId,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
-			return findByUuid_C_PrevAndNext(
-				entryId, uuid, companyId, orderByComparator);
+			return findByUuid_C_PrevAndNext(entryId, uuid, companyId,
+				orderByComparator);
 		}
 
 		uuid = Objects.toString(uuid, "");
@@ -1755,15 +1679,14 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = filterGetByUuid_C_PrevAndNext(
-				session, announcementsEntry, uuid, companyId, orderByComparator,
-				true);
+			array[0] = filterGetByUuid_C_PrevAndNext(session,
+					announcementsEntry, uuid, companyId, orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = filterGetByUuid_C_PrevAndNext(
-				session, announcementsEntry, uuid, companyId, orderByComparator,
-				false);
+			array[2] = filterGetByUuid_C_PrevAndNext(session,
+					announcementsEntry, uuid, companyId, orderByComparator,
+					false);
 
 			return array;
 		}
@@ -1777,14 +1700,14 @@ public class AnnouncementsEntryPersistenceImpl
 
 	protected AnnouncementsEntry filterGetByUuid_C_PrevAndNext(
 		Session session, AnnouncementsEntry announcementsEntry, String uuid,
-		long companyId, OrderByComparator<AnnouncementsEntry> orderByComparator,
+		long companyId,
+		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1795,8 +1718,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		boolean bindUuid = false;
@@ -1813,13 +1735,11 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1827,17 +1747,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -1863,15 +1779,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -1900,9 +1814,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -1925,10 +1839,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1951,11 +1863,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByUuid_C(String uuid, long companyId) {
-		for (AnnouncementsEntry announcementsEntry :
-				findByUuid_C(
-					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (AnnouncementsEntry announcementsEntry : findByUuid_C(uuid,
+				companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(announcementsEntry);
 		}
 	}
@@ -1973,10 +1882,10 @@ public class AnnouncementsEntryPersistenceImpl
 
 		FinderPath finderPath = _finderPathCountByUuid_C;
 
-		Object[] finderArgs = new Object[] {uuid, companyId};
+		Object[] finderArgs = new Object[] { uuid, companyId };
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -2062,9 +1971,9 @@ public class AnnouncementsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -2073,8 +1982,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -2096,21 +2005,11 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
-		"announcementsEntry.uuid = ? AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
-		"(announcementsEntry.uuid IS NULL OR announcementsEntry.uuid = '') AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2_SQL =
-		"announcementsEntry.uuid_ = ? AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3_SQL =
-		"(announcementsEntry.uuid_ IS NULL OR announcementsEntry.uuid_ = '') AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
-		"announcementsEntry.companyId = ?";
-
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "announcementsEntry.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(announcementsEntry.uuid IS NULL OR announcementsEntry.uuid = '') AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2_SQL = "announcementsEntry.uuid_ = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3_SQL = "(announcementsEntry.uuid_ IS NULL OR announcementsEntry.uuid_ = '') AND ";
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "announcementsEntry.companyId = ?";
 	private FinderPath _finderPathWithPaginationFindByUserId;
 	private FinderPath _finderPathWithoutPaginationFindByUserId;
 	private FinderPath _finderPathCountByUserId;
@@ -2130,7 +2029,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns a range of all the announcements entries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -2139,9 +2038,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByUserId(
-		long userId, int start, int end) {
-
+	public List<AnnouncementsEntry> findByUserId(long userId, int start, int end) {
 		return findByUserId(userId, start, end, null);
 	}
 
@@ -2149,7 +2046,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -2159,10 +2056,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByUserId(
-		long userId, int start, int end,
-		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
+	public List<AnnouncementsEntry> findByUserId(long userId, int start,
+		int end, OrderByComparator<AnnouncementsEntry> orderByComparator) {
 		return findByUserId(userId, start, end, orderByComparator, true);
 	}
 
@@ -2170,7 +2065,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -2181,32 +2076,29 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByUserId(
-		long userId, int start, int end,
-		OrderByComparator<AnnouncementsEntry> orderByComparator,
+	public List<AnnouncementsEntry> findByUserId(long userId, int start,
+		int end, OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUserId;
-			finderArgs = new Object[] {userId};
+			finderArgs = new Object[] { userId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUserId;
-			finderArgs = new Object[] {userId, start, end, orderByComparator};
+			finderArgs = new Object[] { userId, start, end, orderByComparator };
 		}
 
 		List<AnnouncementsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AnnouncementsEntry announcementsEntry : list) {
@@ -2223,8 +2115,8 @@ public class AnnouncementsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -2235,10 +2127,11 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AnnouncementsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2256,16 +2149,16 @@ public class AnnouncementsEntryPersistenceImpl
 				qPos.add(userId);
 
 				if (!pagination) {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2294,13 +2187,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByUserId_First(
-			long userId,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByUserId_First(long userId,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByUserId_First(
-			userId, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByUserId_First(userId,
+				orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -2326,11 +2217,10 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the first matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByUserId_First(
-		long userId, OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		List<AnnouncementsEntry> list = findByUserId(
-			userId, 0, 1, orderByComparator);
+	public AnnouncementsEntry fetchByUserId_First(long userId,
+		OrderByComparator<AnnouncementsEntry> orderByComparator) {
+		List<AnnouncementsEntry> list = findByUserId(userId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2348,13 +2238,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByUserId_Last(
-			long userId,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByUserId_Last(long userId,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByUserId_Last(
-			userId, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByUserId_Last(userId,
+				orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -2380,17 +2268,16 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the last matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByUserId_Last(
-		long userId, OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
+	public AnnouncementsEntry fetchByUserId_Last(long userId,
+		OrderByComparator<AnnouncementsEntry> orderByComparator) {
 		int count = countByUserId(userId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<AnnouncementsEntry> list = findByUserId(
-			userId, count - 1, count, orderByComparator);
+		List<AnnouncementsEntry> list = findByUserId(userId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2409,11 +2296,9 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] findByUserId_PrevAndNext(
-			long entryId, long userId,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] findByUserId_PrevAndNext(long entryId,
+		long userId, OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		AnnouncementsEntry announcementsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -2423,13 +2308,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = getByUserId_PrevAndNext(
-				session, announcementsEntry, userId, orderByComparator, true);
+			array[0] = getByUserId_PrevAndNext(session, announcementsEntry,
+					userId, orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = getByUserId_PrevAndNext(
-				session, announcementsEntry, userId, orderByComparator, false);
+			array[2] = getByUserId_PrevAndNext(session, announcementsEntry,
+					userId, orderByComparator, false);
 
 			return array;
 		}
@@ -2441,16 +2326,15 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	protected AnnouncementsEntry getByUserId_PrevAndNext(
-		Session session, AnnouncementsEntry announcementsEntry, long userId,
+	protected AnnouncementsEntry getByUserId_PrevAndNext(Session session,
+		AnnouncementsEntry announcementsEntry, long userId,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2462,8 +2346,7 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2533,10 +2416,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(userId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2559,15 +2440,15 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public List<AnnouncementsEntry> filterFindByUserId(long userId) {
-		return filterFindByUserId(
-			userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return filterFindByUserId(userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries that the user has permission to view where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -2576,9 +2457,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByUserId(
-		long userId, int start, int end) {
-
+	public List<AnnouncementsEntry> filterFindByUserId(long userId, int start,
+		int end) {
 		return filterFindByUserId(userId, start, end, null);
 	}
 
@@ -2586,7 +2466,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries that the user has permissions to view where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -2596,10 +2476,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByUserId(
-		long userId, int start, int end,
-		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
+	public List<AnnouncementsEntry> filterFindByUserId(long userId, int start,
+		int end, OrderByComparator<AnnouncementsEntry> orderByComparator) {
 		if (!InlineSQLHelperUtil.isEnabled()) {
 			return findByUserId(userId, start, end, orderByComparator);
 		}
@@ -2607,8 +2485,8 @@ public class AnnouncementsEntryPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				3 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(3 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(4);
@@ -2618,25 +2496,23 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -2648,9 +2524,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -2670,8 +2546,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			qPos.add(userId);
 
-			return (List<AnnouncementsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<AnnouncementsEntry>)QueryUtil.list(q, getDialect(),
+				start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -2691,11 +2567,9 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] filterFindByUserId_PrevAndNext(
-			long entryId, long userId,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] filterFindByUserId_PrevAndNext(long entryId,
+		long userId, OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled()) {
 			return findByUserId_PrevAndNext(entryId, userId, orderByComparator);
 		}
@@ -2709,13 +2583,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = filterGetByUserId_PrevAndNext(
-				session, announcementsEntry, userId, orderByComparator, true);
+			array[0] = filterGetByUserId_PrevAndNext(session,
+					announcementsEntry, userId, orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = filterGetByUserId_PrevAndNext(
-				session, announcementsEntry, userId, orderByComparator, false);
+			array[2] = filterGetByUserId_PrevAndNext(session,
+					announcementsEntry, userId, orderByComparator, false);
 
 			return array;
 		}
@@ -2731,12 +2605,11 @@ public class AnnouncementsEntryPersistenceImpl
 		Session session, AnnouncementsEntry announcementsEntry, long userId,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2747,20 +2620,17 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2768,17 +2638,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -2804,15 +2670,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -2841,9 +2705,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -2862,10 +2726,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(userId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2887,10 +2749,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByUserId(long userId) {
-		for (AnnouncementsEntry announcementsEntry :
-				findByUserId(
-					userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (AnnouncementsEntry announcementsEntry : findByUserId(userId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(announcementsEntry);
 		}
 	}
@@ -2905,10 +2765,10 @@ public class AnnouncementsEntryPersistenceImpl
 	public int countByUserId(long userId) {
 		FinderPath finderPath = _finderPathCountByUserId;
 
-		Object[] finderArgs = new Object[] {userId};
+		Object[] finderArgs = new Object[] { userId };
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -2965,9 +2825,9 @@ public class AnnouncementsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_USERID_USERID_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -2976,8 +2836,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -2995,9 +2855,7 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_USERID_USERID_2 =
-		"announcementsEntry.userId = ?";
-
+	private static final String _FINDER_COLUMN_USERID_USERID_2 = "announcementsEntry.userId = ?";
 	private FinderPath _finderPathWithPaginationFindByC_C;
 	private FinderPath _finderPathWithoutPaginationFindByC_C;
 	private FinderPath _finderPathCountByC_C;
@@ -3011,15 +2869,15 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public List<AnnouncementsEntry> findByC_C(long classNameId, long classPK) {
-		return findByC_C(
-			classNameId, classPK, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByC_C(classNameId, classPK, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -3029,9 +2887,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C(
-		long classNameId, long classPK, int start, int end) {
-
+	public List<AnnouncementsEntry> findByC_C(long classNameId, long classPK,
+		int start, int end) {
 		return findByC_C(classNameId, classPK, start, end, null);
 	}
 
@@ -3039,7 +2896,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -3050,19 +2907,18 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C(
-		long classNameId, long classPK, int start, int end,
+	public List<AnnouncementsEntry> findByC_C(long classNameId, long classPK,
+		int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		return findByC_C(
-			classNameId, classPK, start, end, orderByComparator, true);
+		return findByC_C(classNameId, classPK, start, end, orderByComparator,
+			true);
 	}
 
 	/**
 	 * Returns an ordered range of all the announcements entries where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -3074,40 +2930,39 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C(
-		long classNameId, long classPK, int start, int end,
+	public List<AnnouncementsEntry> findByC_C(long classNameId, long classPK,
+		int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_C;
-			finderArgs = new Object[] {classNameId, classPK};
+			finderArgs = new Object[] { classNameId, classPK };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_C;
 			finderArgs = new Object[] {
-				classNameId, classPK, start, end, orderByComparator
-			};
+					classNameId, classPK,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<AnnouncementsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AnnouncementsEntry announcementsEntry : list) {
 					if ((classNameId != announcementsEntry.getClassNameId()) ||
-						(classPK != announcementsEntry.getClassPK())) {
-
+							(classPK != announcementsEntry.getClassPK())) {
 						list = null;
 
 						break;
@@ -3120,8 +2975,8 @@ public class AnnouncementsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -3134,10 +2989,11 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_C_CLASSPK_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AnnouncementsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3157,16 +3013,16 @@ public class AnnouncementsEntryPersistenceImpl
 				qPos.add(classPK);
 
 				if (!pagination) {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3196,13 +3052,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByC_C_First(
-			long classNameId, long classPK,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByC_C_First(long classNameId, long classPK,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByC_C_First(
-			classNameId, classPK, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByC_C_First(classNameId,
+				classPK, orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -3232,12 +3086,10 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the first matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByC_C_First(
-		long classNameId, long classPK,
+	public AnnouncementsEntry fetchByC_C_First(long classNameId, long classPK,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		List<AnnouncementsEntry> list = findByC_C(
-			classNameId, classPK, 0, 1, orderByComparator);
+		List<AnnouncementsEntry> list = findByC_C(classNameId, classPK, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3256,13 +3108,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByC_C_Last(
-			long classNameId, long classPK,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByC_C_Last(long classNameId, long classPK,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByC_C_Last(
-			classNameId, classPK, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByC_C_Last(classNameId,
+				classPK, orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -3292,18 +3142,16 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the last matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByC_C_Last(
-		long classNameId, long classPK,
+	public AnnouncementsEntry fetchByC_C_Last(long classNameId, long classPK,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
 		int count = countByC_C(classNameId, classPK);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<AnnouncementsEntry> list = findByC_C(
-			classNameId, classPK, count - 1, count, orderByComparator);
+		List<AnnouncementsEntry> list = findByC_C(classNameId, classPK,
+				count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3323,11 +3171,10 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] findByC_C_PrevAndNext(
-			long entryId, long classNameId, long classPK,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] findByC_C_PrevAndNext(long entryId,
+		long classNameId, long classPK,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		AnnouncementsEntry announcementsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -3337,15 +3184,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = getByC_C_PrevAndNext(
-				session, announcementsEntry, classNameId, classPK,
-				orderByComparator, true);
+			array[0] = getByC_C_PrevAndNext(session, announcementsEntry,
+					classNameId, classPK, orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = getByC_C_PrevAndNext(
-				session, announcementsEntry, classNameId, classPK,
-				orderByComparator, false);
+			array[2] = getByC_C_PrevAndNext(session, announcementsEntry,
+					classNameId, classPK, orderByComparator, false);
 
 			return array;
 		}
@@ -3357,17 +3202,15 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	protected AnnouncementsEntry getByC_C_PrevAndNext(
-		Session session, AnnouncementsEntry announcementsEntry,
-		long classNameId, long classPK,
+	protected AnnouncementsEntry getByC_C_PrevAndNext(Session session,
+		AnnouncementsEntry announcementsEntry, long classNameId, long classPK,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3381,8 +3224,7 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_CLASSPK_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3454,10 +3296,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(classPK);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3480,18 +3320,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C(
-		long classNameId, long classPK) {
-
-		return filterFindByC_C(
-			classNameId, classPK, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<AnnouncementsEntry> filterFindByC_C(long classNameId,
+		long classPK) {
+		return filterFindByC_C(classNameId, classPK, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries that the user has permission to view where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -3501,9 +3340,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C(
-		long classNameId, long classPK, int start, int end) {
-
+	public List<AnnouncementsEntry> filterFindByC_C(long classNameId,
+		long classPK, int start, int end) {
 		return filterFindByC_C(classNameId, classPK, start, end, null);
 	}
 
@@ -3511,7 +3349,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries that the user has permissions to view where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -3522,20 +3360,18 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C(
-		long classNameId, long classPK, int start, int end,
+	public List<AnnouncementsEntry> filterFindByC_C(long classNameId,
+		long classPK, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled()) {
-			return findByC_C(
-				classNameId, classPK, start, end, orderByComparator);
+			return findByC_C(classNameId, classPK, start, end, orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(5);
@@ -3545,8 +3381,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_C_C_CLASSNAMEID_2);
@@ -3554,18 +3389,17 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_CLASSPK_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -3577,9 +3411,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -3601,8 +3435,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			qPos.add(classPK);
 
-			return (List<AnnouncementsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<AnnouncementsEntry>)QueryUtil.list(q, getDialect(),
+				start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -3623,14 +3457,13 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] filterFindByC_C_PrevAndNext(
-			long entryId, long classNameId, long classPK,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] filterFindByC_C_PrevAndNext(long entryId,
+		long classNameId, long classPK,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled()) {
-			return findByC_C_PrevAndNext(
-				entryId, classNameId, classPK, orderByComparator);
+			return findByC_C_PrevAndNext(entryId, classNameId, classPK,
+				orderByComparator);
 		}
 
 		AnnouncementsEntry announcementsEntry = findByPrimaryKey(entryId);
@@ -3642,15 +3475,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = filterGetByC_C_PrevAndNext(
-				session, announcementsEntry, classNameId, classPK,
-				orderByComparator, true);
+			array[0] = filterGetByC_C_PrevAndNext(session, announcementsEntry,
+					classNameId, classPK, orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = filterGetByC_C_PrevAndNext(
-				session, announcementsEntry, classNameId, classPK,
-				orderByComparator, false);
+			array[2] = filterGetByC_C_PrevAndNext(session, announcementsEntry,
+					classNameId, classPK, orderByComparator, false);
 
 			return array;
 		}
@@ -3662,17 +3493,15 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	protected AnnouncementsEntry filterGetByC_C_PrevAndNext(
-		Session session, AnnouncementsEntry announcementsEntry,
-		long classNameId, long classPK,
+	protected AnnouncementsEntry filterGetByC_C_PrevAndNext(Session session,
+		AnnouncementsEntry announcementsEntry, long classNameId, long classPK,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3683,8 +3512,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_C_C_CLASSNAMEID_2);
@@ -3692,13 +3520,11 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_CLASSPK_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3706,17 +3532,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -3742,15 +3564,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -3779,9 +3599,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -3802,10 +3622,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(classPK);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3828,11 +3646,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByC_C(long classNameId, long classPK) {
-		for (AnnouncementsEntry announcementsEntry :
-				findByC_C(
-					classNameId, classPK, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
+		for (AnnouncementsEntry announcementsEntry : findByC_C(classNameId,
+				classPK, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(announcementsEntry);
 		}
 	}
@@ -3848,10 +3663,10 @@ public class AnnouncementsEntryPersistenceImpl
 	public int countByC_C(long classNameId, long classPK) {
 		FinderPath finderPath = _finderPathCountByC_C;
 
-		Object[] finderArgs = new Object[] {classNameId, classPK};
+		Object[] finderArgs = new Object[] { classNameId, classPK };
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -3915,9 +3730,9 @@ public class AnnouncementsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_C_C_CLASSPK_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -3926,8 +3741,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -3947,12 +3762,8 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_C_C_CLASSNAMEID_2 =
-		"announcementsEntry.classNameId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_C_CLASSPK_2 =
-		"announcementsEntry.classPK = ?";
-
+	private static final String _FINDER_COLUMN_C_C_CLASSNAMEID_2 = "announcementsEntry.classNameId = ? AND ";
+	private static final String _FINDER_COLUMN_C_C_CLASSPK_2 = "announcementsEntry.classPK = ?";
 	private FinderPath _finderPathWithPaginationFindByC_C_C;
 	private FinderPath _finderPathWithoutPaginationFindByC_C_C;
 	private FinderPath _finderPathCountByC_C_C;
@@ -3966,11 +3777,9 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_C(
-		long companyId, long classNameId, long classPK) {
-
-		return findByC_C_C(
-			companyId, classNameId, classPK, QueryUtil.ALL_POS,
+	public List<AnnouncementsEntry> findByC_C_C(long companyId,
+		long classNameId, long classPK) {
+		return findByC_C_C(companyId, classNameId, classPK, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
 	}
 
@@ -3978,7 +3787,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns a range of all the announcements entries where companyId = &#63; and classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -3989,9 +3798,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_C(
-		long companyId, long classNameId, long classPK, int start, int end) {
-
+	public List<AnnouncementsEntry> findByC_C_C(long companyId,
+		long classNameId, long classPK, int start, int end) {
 		return findByC_C_C(companyId, classNameId, classPK, start, end, null);
 	}
 
@@ -3999,7 +3807,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries where companyId = &#63; and classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -4011,20 +3819,18 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_C(
-		long companyId, long classNameId, long classPK, int start, int end,
+	public List<AnnouncementsEntry> findByC_C_C(long companyId,
+		long classNameId, long classPK, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		return findByC_C_C(
-			companyId, classNameId, classPK, start, end, orderByComparator,
-			true);
+		return findByC_C_C(companyId, classNameId, classPK, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the announcements entries where companyId = &#63; and classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -4037,41 +3843,40 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_C(
-		long companyId, long classNameId, long classPK, int start, int end,
+	public List<AnnouncementsEntry> findByC_C_C(long companyId,
+		long classNameId, long classPK, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_C_C;
-			finderArgs = new Object[] {companyId, classNameId, classPK};
+			finderArgs = new Object[] { companyId, classNameId, classPK };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_C_C;
 			finderArgs = new Object[] {
-				companyId, classNameId, classPK, start, end, orderByComparator
-			};
+					companyId, classNameId, classPK,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<AnnouncementsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AnnouncementsEntry announcementsEntry : list) {
 					if ((companyId != announcementsEntry.getCompanyId()) ||
-						(classNameId != announcementsEntry.getClassNameId()) ||
-						(classPK != announcementsEntry.getClassPK())) {
-
+							(classNameId != announcementsEntry.getClassNameId()) ||
+							(classPK != announcementsEntry.getClassPK())) {
 						list = null;
 
 						break;
@@ -4084,8 +3889,8 @@ public class AnnouncementsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -4100,10 +3905,11 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_C_C_CLASSPK_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AnnouncementsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4125,16 +3931,16 @@ public class AnnouncementsEntryPersistenceImpl
 				qPos.add(classPK);
 
 				if (!pagination) {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -4165,13 +3971,12 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByC_C_C_First(
-			long companyId, long classNameId, long classPK,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByC_C_C_First(long companyId,
+		long classNameId, long classPK,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByC_C_C_First(
-			companyId, classNameId, classPK, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByC_C_C_First(companyId,
+				classNameId, classPK, orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -4205,12 +4010,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the first matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByC_C_C_First(
-		long companyId, long classNameId, long classPK,
+	public AnnouncementsEntry fetchByC_C_C_First(long companyId,
+		long classNameId, long classPK,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		List<AnnouncementsEntry> list = findByC_C_C(
-			companyId, classNameId, classPK, 0, 1, orderByComparator);
+		List<AnnouncementsEntry> list = findByC_C_C(companyId, classNameId,
+				classPK, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -4230,13 +4034,12 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByC_C_C_Last(
-			long companyId, long classNameId, long classPK,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByC_C_C_Last(long companyId,
+		long classNameId, long classPK,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByC_C_C_Last(
-			companyId, classNameId, classPK, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByC_C_C_Last(companyId,
+				classNameId, classPK, orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -4270,19 +4073,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the last matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByC_C_C_Last(
-		long companyId, long classNameId, long classPK,
+	public AnnouncementsEntry fetchByC_C_C_Last(long companyId,
+		long classNameId, long classPK,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
 		int count = countByC_C_C(companyId, classNameId, classPK);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<AnnouncementsEntry> list = findByC_C_C(
-			companyId, classNameId, classPK, count - 1, count,
-			orderByComparator);
+		List<AnnouncementsEntry> list = findByC_C_C(companyId, classNameId,
+				classPK, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -4303,11 +4104,10 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] findByC_C_C_PrevAndNext(
-			long entryId, long companyId, long classNameId, long classPK,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] findByC_C_C_PrevAndNext(long entryId,
+		long companyId, long classNameId, long classPK,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		AnnouncementsEntry announcementsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -4317,15 +4117,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = getByC_C_C_PrevAndNext(
-				session, announcementsEntry, companyId, classNameId, classPK,
-				orderByComparator, true);
+			array[0] = getByC_C_C_PrevAndNext(session, announcementsEntry,
+					companyId, classNameId, classPK, orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = getByC_C_C_PrevAndNext(
-				session, announcementsEntry, companyId, classNameId, classPK,
-				orderByComparator, false);
+			array[2] = getByC_C_C_PrevAndNext(session, announcementsEntry,
+					companyId, classNameId, classPK, orderByComparator, false);
 
 			return array;
 		}
@@ -4337,17 +4135,16 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	protected AnnouncementsEntry getByC_C_C_PrevAndNext(
-		Session session, AnnouncementsEntry announcementsEntry, long companyId,
+	protected AnnouncementsEntry getByC_C_C_PrevAndNext(Session session,
+		AnnouncementsEntry announcementsEntry, long companyId,
 		long classNameId, long classPK,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -4363,8 +4160,7 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_C_CLASSPK_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -4438,10 +4234,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(classPK);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4465,19 +4259,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C_C(
-		long companyId, long classNameId, long classPK) {
-
-		return filterFindByC_C_C(
-			companyId, classNameId, classPK, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<AnnouncementsEntry> filterFindByC_C_C(long companyId,
+		long classNameId, long classPK) {
+		return filterFindByC_C_C(companyId, classNameId, classPK,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries that the user has permission to view where companyId = &#63; and classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -4488,18 +4280,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C_C(
-		long companyId, long classNameId, long classPK, int start, int end) {
-
-		return filterFindByC_C_C(
-			companyId, classNameId, classPK, start, end, null);
+	public List<AnnouncementsEntry> filterFindByC_C_C(long companyId,
+		long classNameId, long classPK, int start, int end) {
+		return filterFindByC_C_C(companyId, classNameId, classPK, start, end,
+			null);
 	}
 
 	/**
 	 * Returns an ordered range of all the announcements entries that the user has permissions to view where companyId = &#63; and classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -4511,20 +4302,19 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C_C(
-		long companyId, long classNameId, long classPK, int start, int end,
+	public List<AnnouncementsEntry> filterFindByC_C_C(long companyId,
+		long classNameId, long classPK, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
-			return findByC_C_C(
-				companyId, classNameId, classPK, start, end, orderByComparator);
+			return findByC_C_C(companyId, classNameId, classPK, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -4534,8 +4324,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_C_C_C_COMPANYID_2);
@@ -4545,18 +4334,17 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_C_CLASSPK_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -4568,9 +4356,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -4594,8 +4382,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			qPos.add(classPK);
 
-			return (List<AnnouncementsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<AnnouncementsEntry>)QueryUtil.list(q, getDialect(),
+				start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -4617,14 +4405,13 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] filterFindByC_C_C_PrevAndNext(
-			long entryId, long companyId, long classNameId, long classPK,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] filterFindByC_C_C_PrevAndNext(long entryId,
+		long companyId, long classNameId, long classPK,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
-			return findByC_C_C_PrevAndNext(
-				entryId, companyId, classNameId, classPK, orderByComparator);
+			return findByC_C_C_PrevAndNext(entryId, companyId, classNameId,
+				classPK, orderByComparator);
 		}
 
 		AnnouncementsEntry announcementsEntry = findByPrimaryKey(entryId);
@@ -4636,15 +4423,15 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = filterGetByC_C_C_PrevAndNext(
-				session, announcementsEntry, companyId, classNameId, classPK,
-				orderByComparator, true);
+			array[0] = filterGetByC_C_C_PrevAndNext(session,
+					announcementsEntry, companyId, classNameId, classPK,
+					orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = filterGetByC_C_C_PrevAndNext(
-				session, announcementsEntry, companyId, classNameId, classPK,
-				orderByComparator, false);
+			array[2] = filterGetByC_C_C_PrevAndNext(session,
+					announcementsEntry, companyId, classNameId, classPK,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -4656,17 +4443,16 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	protected AnnouncementsEntry filterGetByC_C_C_PrevAndNext(
-		Session session, AnnouncementsEntry announcementsEntry, long companyId,
+	protected AnnouncementsEntry filterGetByC_C_C_PrevAndNext(Session session,
+		AnnouncementsEntry announcementsEntry, long companyId,
 		long classNameId, long classPK,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -4677,8 +4463,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_C_C_C_COMPANYID_2);
@@ -4688,13 +4473,11 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_C_CLASSPK_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -4702,17 +4485,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -4738,15 +4517,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -4775,9 +4552,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -4800,10 +4577,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(classPK);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4827,11 +4602,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByC_C_C(long companyId, long classNameId, long classPK) {
-		for (AnnouncementsEntry announcementsEntry :
-				findByC_C_C(
-					companyId, classNameId, classPK, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (AnnouncementsEntry announcementsEntry : findByC_C_C(companyId,
+				classNameId, classPK, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(announcementsEntry);
 		}
 	}
@@ -4848,10 +4620,10 @@ public class AnnouncementsEntryPersistenceImpl
 	public int countByC_C_C(long companyId, long classNameId, long classPK) {
 		FinderPath finderPath = _finderPathCountByC_C_C;
 
-		Object[] finderArgs = new Object[] {companyId, classNameId, classPK};
+		Object[] finderArgs = new Object[] { companyId, classNameId, classPK };
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(4);
@@ -4907,9 +4679,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the number of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByC_C_C(
-		long companyId, long classNameId, long classPK) {
-
+	public int filterCountByC_C_C(long companyId, long classNameId, long classPK) {
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
 			return countByC_C_C(companyId, classNameId, classPK);
 		}
@@ -4924,9 +4694,9 @@ public class AnnouncementsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_C_C_C_CLASSPK_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -4935,8 +4705,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -4958,15 +4728,9 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_C_C_C_COMPANYID_2 =
-		"announcementsEntry.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_C_C_CLASSNAMEID_2 =
-		"announcementsEntry.classNameId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_C_C_CLASSPK_2 =
-		"announcementsEntry.classPK = ?";
-
+	private static final String _FINDER_COLUMN_C_C_C_COMPANYID_2 = "announcementsEntry.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_C_C_CLASSNAMEID_2 = "announcementsEntry.classNameId = ? AND ";
+	private static final String _FINDER_COLUMN_C_C_C_CLASSPK_2 = "announcementsEntry.classPK = ?";
 	private FinderPath _finderPathWithPaginationFindByC_C_A;
 	private FinderPath _finderPathWithoutPaginationFindByC_C_A;
 	private FinderPath _finderPathCountByC_C_A;
@@ -4980,19 +4744,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_A(
-		long classNameId, long classPK, boolean alert) {
-
-		return findByC_C_A(
-			classNameId, classPK, alert, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<AnnouncementsEntry> findByC_C_A(long classNameId, long classPK,
+		boolean alert) {
+		return findByC_C_A(classNameId, classPK, alert, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries where classNameId = &#63; and classPK = &#63; and alert = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -5003,9 +4765,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_A(
-		long classNameId, long classPK, boolean alert, int start, int end) {
-
+	public List<AnnouncementsEntry> findByC_C_A(long classNameId, long classPK,
+		boolean alert, int start, int end) {
 		return findByC_C_A(classNameId, classPK, alert, start, end, null);
 	}
 
@@ -5013,7 +4774,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries where classNameId = &#63; and classPK = &#63; and alert = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -5025,19 +4786,18 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_A(
-		long classNameId, long classPK, boolean alert, int start, int end,
+	public List<AnnouncementsEntry> findByC_C_A(long classNameId, long classPK,
+		boolean alert, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		return findByC_C_A(
-			classNameId, classPK, alert, start, end, orderByComparator, true);
+		return findByC_C_A(classNameId, classPK, alert, start, end,
+			orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the announcements entries where classNameId = &#63; and classPK = &#63; and alert = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -5050,41 +4810,40 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_A(
-		long classNameId, long classPK, boolean alert, int start, int end,
+	public List<AnnouncementsEntry> findByC_C_A(long classNameId, long classPK,
+		boolean alert, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_C_A;
-			finderArgs = new Object[] {classNameId, classPK, alert};
+			finderArgs = new Object[] { classNameId, classPK, alert };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_C_A;
 			finderArgs = new Object[] {
-				classNameId, classPK, alert, start, end, orderByComparator
-			};
+					classNameId, classPK, alert,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<AnnouncementsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AnnouncementsEntry announcementsEntry : list) {
 					if ((classNameId != announcementsEntry.getClassNameId()) ||
-						(classPK != announcementsEntry.getClassPK()) ||
-						(alert != announcementsEntry.isAlert())) {
-
+							(classPK != announcementsEntry.getClassPK()) ||
+							(alert != announcementsEntry.isAlert())) {
 						list = null;
 
 						break;
@@ -5097,8 +4856,8 @@ public class AnnouncementsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					5 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(5 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -5113,10 +4872,11 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_C_A_ALERT_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AnnouncementsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -5138,16 +4898,16 @@ public class AnnouncementsEntryPersistenceImpl
 				qPos.add(alert);
 
 				if (!pagination) {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -5178,13 +4938,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByC_C_A_First(
-			long classNameId, long classPK, boolean alert,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByC_C_A_First(long classNameId, long classPK,
+		boolean alert, OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByC_C_A_First(
-			classNameId, classPK, alert, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByC_C_A_First(classNameId,
+				classPK, alert, orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -5218,12 +4976,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the first matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByC_C_A_First(
-		long classNameId, long classPK, boolean alert,
+	public AnnouncementsEntry fetchByC_C_A_First(long classNameId,
+		long classPK, boolean alert,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		List<AnnouncementsEntry> list = findByC_C_A(
-			classNameId, classPK, alert, 0, 1, orderByComparator);
+		List<AnnouncementsEntry> list = findByC_C_A(classNameId, classPK,
+				alert, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5243,13 +5000,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByC_C_A_Last(
-			long classNameId, long classPK, boolean alert,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByC_C_A_Last(long classNameId, long classPK,
+		boolean alert, OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByC_C_A_Last(
-			classNameId, classPK, alert, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByC_C_A_Last(classNameId,
+				classPK, alert, orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -5283,18 +5038,16 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the last matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByC_C_A_Last(
-		long classNameId, long classPK, boolean alert,
-		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
+	public AnnouncementsEntry fetchByC_C_A_Last(long classNameId, long classPK,
+		boolean alert, OrderByComparator<AnnouncementsEntry> orderByComparator) {
 		int count = countByC_C_A(classNameId, classPK, alert);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<AnnouncementsEntry> list = findByC_C_A(
-			classNameId, classPK, alert, count - 1, count, orderByComparator);
+		List<AnnouncementsEntry> list = findByC_C_A(classNameId, classPK,
+				alert, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5315,11 +5068,10 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] findByC_C_A_PrevAndNext(
-			long entryId, long classNameId, long classPK, boolean alert,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] findByC_C_A_PrevAndNext(long entryId,
+		long classNameId, long classPK, boolean alert,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		AnnouncementsEntry announcementsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -5329,15 +5081,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = getByC_C_A_PrevAndNext(
-				session, announcementsEntry, classNameId, classPK, alert,
-				orderByComparator, true);
+			array[0] = getByC_C_A_PrevAndNext(session, announcementsEntry,
+					classNameId, classPK, alert, orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = getByC_C_A_PrevAndNext(
-				session, announcementsEntry, classNameId, classPK, alert,
-				orderByComparator, false);
+			array[2] = getByC_C_A_PrevAndNext(session, announcementsEntry,
+					classNameId, classPK, alert, orderByComparator, false);
 
 			return array;
 		}
@@ -5349,17 +5099,15 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	protected AnnouncementsEntry getByC_C_A_PrevAndNext(
-		Session session, AnnouncementsEntry announcementsEntry,
-		long classNameId, long classPK, boolean alert,
-		OrderByComparator<AnnouncementsEntry> orderByComparator,
+	protected AnnouncementsEntry getByC_C_A_PrevAndNext(Session session,
+		AnnouncementsEntry announcementsEntry, long classNameId, long classPK,
+		boolean alert, OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -5375,8 +5123,7 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_A_ALERT_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -5450,10 +5197,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(alert);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -5477,19 +5222,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C_A(
-		long classNameId, long classPK, boolean alert) {
-
-		return filterFindByC_C_A(
-			classNameId, classPK, alert, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+	public List<AnnouncementsEntry> filterFindByC_C_A(long classNameId,
+		long classPK, boolean alert) {
+		return filterFindByC_C_A(classNameId, classPK, alert,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries that the user has permission to view where classNameId = &#63; and classPK = &#63; and alert = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -5500,9 +5243,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C_A(
-		long classNameId, long classPK, boolean alert, int start, int end) {
-
+	public List<AnnouncementsEntry> filterFindByC_C_A(long classNameId,
+		long classPK, boolean alert, int start, int end) {
 		return filterFindByC_C_A(classNameId, classPK, alert, start, end, null);
 	}
 
@@ -5510,7 +5252,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries that the user has permissions to view where classNameId = &#63; and classPK = &#63; and alert = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -5522,20 +5264,19 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C_A(
-		long classNameId, long classPK, boolean alert, int start, int end,
+	public List<AnnouncementsEntry> filterFindByC_C_A(long classNameId,
+		long classPK, boolean alert, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled()) {
-			return findByC_C_A(
-				classNameId, classPK, alert, start, end, orderByComparator);
+			return findByC_C_A(classNameId, classPK, alert, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				5 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -5545,8 +5286,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_C_C_A_CLASSNAMEID_2);
@@ -5556,18 +5296,17 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_A_ALERT_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -5579,9 +5318,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -5605,8 +5344,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			qPos.add(alert);
 
-			return (List<AnnouncementsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<AnnouncementsEntry>)QueryUtil.list(q, getDialect(),
+				start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -5628,14 +5367,13 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] filterFindByC_C_A_PrevAndNext(
-			long entryId, long classNameId, long classPK, boolean alert,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] filterFindByC_C_A_PrevAndNext(long entryId,
+		long classNameId, long classPK, boolean alert,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled()) {
-			return findByC_C_A_PrevAndNext(
-				entryId, classNameId, classPK, alert, orderByComparator);
+			return findByC_C_A_PrevAndNext(entryId, classNameId, classPK,
+				alert, orderByComparator);
 		}
 
 		AnnouncementsEntry announcementsEntry = findByPrimaryKey(entryId);
@@ -5647,15 +5385,15 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = filterGetByC_C_A_PrevAndNext(
-				session, announcementsEntry, classNameId, classPK, alert,
-				orderByComparator, true);
+			array[0] = filterGetByC_C_A_PrevAndNext(session,
+					announcementsEntry, classNameId, classPK, alert,
+					orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = filterGetByC_C_A_PrevAndNext(
-				session, announcementsEntry, classNameId, classPK, alert,
-				orderByComparator, false);
+			array[2] = filterGetByC_C_A_PrevAndNext(session,
+					announcementsEntry, classNameId, classPK, alert,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -5667,17 +5405,15 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	protected AnnouncementsEntry filterGetByC_C_A_PrevAndNext(
-		Session session, AnnouncementsEntry announcementsEntry,
-		long classNameId, long classPK, boolean alert,
-		OrderByComparator<AnnouncementsEntry> orderByComparator,
+	protected AnnouncementsEntry filterGetByC_C_A_PrevAndNext(Session session,
+		AnnouncementsEntry announcementsEntry, long classNameId, long classPK,
+		boolean alert, OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -5688,8 +5424,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_C_C_A_CLASSNAMEID_2);
@@ -5699,13 +5434,11 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_A_ALERT_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -5713,17 +5446,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -5749,15 +5478,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -5786,9 +5513,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -5811,10 +5538,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(alert);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -5838,11 +5563,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public void removeByC_C_A(long classNameId, long classPK, boolean alert) {
-		for (AnnouncementsEntry announcementsEntry :
-				findByC_C_A(
-					classNameId, classPK, alert, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+		for (AnnouncementsEntry announcementsEntry : findByC_C_A(classNameId,
+				classPK, alert, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(announcementsEntry);
 		}
 	}
@@ -5859,10 +5581,10 @@ public class AnnouncementsEntryPersistenceImpl
 	public int countByC_C_A(long classNameId, long classPK, boolean alert) {
 		FinderPath finderPath = _finderPathCountByC_C_A;
 
-		Object[] finderArgs = new Object[] {classNameId, classPK, alert};
+		Object[] finderArgs = new Object[] { classNameId, classPK, alert };
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(4);
@@ -5918,9 +5640,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the number of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByC_C_A(
-		long classNameId, long classPK, boolean alert) {
-
+	public int filterCountByC_C_A(long classNameId, long classPK, boolean alert) {
 		if (!InlineSQLHelperUtil.isEnabled()) {
 			return countByC_C_A(classNameId, classPK, alert);
 		}
@@ -5935,9 +5655,9 @@ public class AnnouncementsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_C_C_A_ALERT_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -5946,8 +5666,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -5969,15 +5689,9 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_C_C_A_CLASSNAMEID_2 =
-		"announcementsEntry.classNameId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_C_A_CLASSPK_2 =
-		"announcementsEntry.classPK = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_C_A_ALERT_2 =
-		"announcementsEntry.alert = ?";
-
+	private static final String _FINDER_COLUMN_C_C_A_CLASSNAMEID_2 = "announcementsEntry.classNameId = ? AND ";
+	private static final String _FINDER_COLUMN_C_C_A_CLASSPK_2 = "announcementsEntry.classPK = ? AND ";
+	private static final String _FINDER_COLUMN_C_C_A_ALERT_2 = "announcementsEntry.alert = ?";
 	private FinderPath _finderPathWithPaginationFindByC_C_C_A;
 	private FinderPath _finderPathWithoutPaginationFindByC_C_C_A;
 	private FinderPath _finderPathCountByC_C_C_A;
@@ -5992,19 +5706,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_C_A(
-		long companyId, long classNameId, long classPK, boolean alert) {
-
-		return findByC_C_C_A(
-			companyId, classNameId, classPK, alert, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<AnnouncementsEntry> findByC_C_C_A(long companyId,
+		long classNameId, long classPK, boolean alert) {
+		return findByC_C_C_A(companyId, classNameId, classPK, alert,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries where companyId = &#63; and classNameId = &#63; and classPK = &#63; and alert = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6016,19 +5728,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_C_A(
-		long companyId, long classNameId, long classPK, boolean alert,
-		int start, int end) {
-
-		return findByC_C_C_A(
-			companyId, classNameId, classPK, alert, start, end, null);
+	public List<AnnouncementsEntry> findByC_C_C_A(long companyId,
+		long classNameId, long classPK, boolean alert, int start, int end) {
+		return findByC_C_C_A(companyId, classNameId, classPK, alert, start,
+			end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the announcements entries where companyId = &#63; and classNameId = &#63; and classPK = &#63; and alert = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6041,21 +5751,18 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_C_A(
-		long companyId, long classNameId, long classPK, boolean alert,
-		int start, int end,
+	public List<AnnouncementsEntry> findByC_C_C_A(long companyId,
+		long classNameId, long classPK, boolean alert, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		return findByC_C_C_A(
-			companyId, classNameId, classPK, alert, start, end,
-			orderByComparator, true);
+		return findByC_C_C_A(companyId, classNameId, classPK, alert, start,
+			end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the announcements entries where companyId = &#63; and classNameId = &#63; and classPK = &#63; and alert = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6069,44 +5776,41 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findByC_C_C_A(
-		long companyId, long classNameId, long classPK, boolean alert,
-		int start, int end,
+	public List<AnnouncementsEntry> findByC_C_C_A(long companyId,
+		long classNameId, long classPK, boolean alert, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_C_C_A;
-			finderArgs = new Object[] {companyId, classNameId, classPK, alert};
+			finderArgs = new Object[] { companyId, classNameId, classPK, alert };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_C_C_A;
 			finderArgs = new Object[] {
-				companyId, classNameId, classPK, alert, start, end,
-				orderByComparator
-			};
+					companyId, classNameId, classPK, alert,
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<AnnouncementsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AnnouncementsEntry announcementsEntry : list) {
 					if ((companyId != announcementsEntry.getCompanyId()) ||
-						(classNameId != announcementsEntry.getClassNameId()) ||
-						(classPK != announcementsEntry.getClassPK()) ||
-						(alert != announcementsEntry.isAlert())) {
-
+							(classNameId != announcementsEntry.getClassNameId()) ||
+							(classPK != announcementsEntry.getClassPK()) ||
+							(alert != announcementsEntry.isAlert())) {
 						list = null;
 
 						break;
@@ -6119,8 +5823,8 @@ public class AnnouncementsEntryPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					6 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -6137,10 +5841,11 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FINDER_COLUMN_C_C_C_A_ALERT_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AnnouncementsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6164,16 +5869,16 @@ public class AnnouncementsEntryPersistenceImpl
 				qPos.add(alert);
 
 				if (!pagination) {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -6205,13 +5910,12 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByC_C_C_A_First(
-			long companyId, long classNameId, long classPK, boolean alert,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByC_C_C_A_First(long companyId,
+		long classNameId, long classPK, boolean alert,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByC_C_C_A_First(
-			companyId, classNameId, classPK, alert, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByC_C_C_A_First(companyId,
+				classNameId, classPK, alert, orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -6249,12 +5953,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the first matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByC_C_C_A_First(
-		long companyId, long classNameId, long classPK, boolean alert,
+	public AnnouncementsEntry fetchByC_C_C_A_First(long companyId,
+		long classNameId, long classPK, boolean alert,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
-		List<AnnouncementsEntry> list = findByC_C_C_A(
-			companyId, classNameId, classPK, alert, 0, 1, orderByComparator);
+		List<AnnouncementsEntry> list = findByC_C_C_A(companyId, classNameId,
+				classPK, alert, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6275,13 +5978,12 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry findByC_C_C_A_Last(
-			long companyId, long classNameId, long classPK, boolean alert,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry findByC_C_C_A_Last(long companyId,
+		long classNameId, long classPK, boolean alert,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
-		AnnouncementsEntry announcementsEntry = fetchByC_C_C_A_Last(
-			companyId, classNameId, classPK, alert, orderByComparator);
+		AnnouncementsEntry announcementsEntry = fetchByC_C_C_A_Last(companyId,
+				classNameId, classPK, alert, orderByComparator);
 
 		if (announcementsEntry != null) {
 			return announcementsEntry;
@@ -6319,19 +6021,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the last matching announcements entry, or <code>null</code> if a matching announcements entry could not be found
 	 */
 	@Override
-	public AnnouncementsEntry fetchByC_C_C_A_Last(
-		long companyId, long classNameId, long classPK, boolean alert,
+	public AnnouncementsEntry fetchByC_C_C_A_Last(long companyId,
+		long classNameId, long classPK, boolean alert,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
 		int count = countByC_C_C_A(companyId, classNameId, classPK, alert);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<AnnouncementsEntry> list = findByC_C_C_A(
-			companyId, classNameId, classPK, alert, count - 1, count,
-			orderByComparator);
+		List<AnnouncementsEntry> list = findByC_C_C_A(companyId, classNameId,
+				classPK, alert, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6353,12 +6053,10 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] findByC_C_C_A_PrevAndNext(
-			long entryId, long companyId, long classNameId, long classPK,
-			boolean alert,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] findByC_C_C_A_PrevAndNext(long entryId,
+		long companyId, long classNameId, long classPK, boolean alert,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		AnnouncementsEntry announcementsEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -6368,15 +6066,15 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = getByC_C_C_A_PrevAndNext(
-				session, announcementsEntry, companyId, classNameId, classPK,
-				alert, orderByComparator, true);
+			array[0] = getByC_C_C_A_PrevAndNext(session, announcementsEntry,
+					companyId, classNameId, classPK, alert, orderByComparator,
+					true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = getByC_C_C_A_PrevAndNext(
-				session, announcementsEntry, companyId, classNameId, classPK,
-				alert, orderByComparator, false);
+			array[2] = getByC_C_C_A_PrevAndNext(session, announcementsEntry,
+					companyId, classNameId, classPK, alert, orderByComparator,
+					false);
 
 			return array;
 		}
@@ -6388,17 +6086,16 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	protected AnnouncementsEntry getByC_C_C_A_PrevAndNext(
-		Session session, AnnouncementsEntry announcementsEntry, long companyId,
+	protected AnnouncementsEntry getByC_C_C_A_PrevAndNext(Session session,
+		AnnouncementsEntry announcementsEntry, long companyId,
 		long classNameId, long classPK, boolean alert,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -6416,8 +6113,7 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_C_A_ALERT_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -6493,10 +6189,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(alert);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -6521,19 +6215,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C_C_A(
-		long companyId, long classNameId, long classPK, boolean alert) {
-
-		return filterFindByC_C_C_A(
-			companyId, classNameId, classPK, alert, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<AnnouncementsEntry> filterFindByC_C_C_A(long companyId,
+		long classNameId, long classPK, boolean alert) {
+		return filterFindByC_C_C_A(companyId, classNameId, classPK, alert,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the announcements entries that the user has permission to view where companyId = &#63; and classNameId = &#63; and classPK = &#63; and alert = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6545,19 +6237,17 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C_C_A(
-		long companyId, long classNameId, long classPK, boolean alert,
-		int start, int end) {
-
-		return filterFindByC_C_C_A(
-			companyId, classNameId, classPK, alert, start, end, null);
+	public List<AnnouncementsEntry> filterFindByC_C_C_A(long companyId,
+		long classNameId, long classPK, boolean alert, int start, int end) {
+		return filterFindByC_C_C_A(companyId, classNameId, classPK, alert,
+			start, end, null);
 	}
 
 	/**
 	 * Returns an ordered range of all the announcements entries that the user has permissions to view where companyId = &#63; and classNameId = &#63; and classPK = &#63; and alert = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6570,22 +6260,19 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public List<AnnouncementsEntry> filterFindByC_C_C_A(
-		long companyId, long classNameId, long classPK, boolean alert,
-		int start, int end,
+	public List<AnnouncementsEntry> filterFindByC_C_C_A(long companyId,
+		long classNameId, long classPK, boolean alert, int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
-			return findByC_C_C_A(
-				companyId, classNameId, classPK, alert, start, end,
-				orderByComparator);
+			return findByC_C_C_A(companyId, classNameId, classPK, alert, start,
+				end, orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				6 + (orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -6595,8 +6282,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_C_C_C_A_COMPANYID_2);
@@ -6608,18 +6294,17 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_C_A_ALERT_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
 			}
 		}
 		else {
@@ -6631,9 +6316,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -6659,8 +6344,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			qPos.add(alert);
 
-			return (List<AnnouncementsEntry>)QueryUtil.list(
-				q, getDialect(), start, end);
+			return (List<AnnouncementsEntry>)QueryUtil.list(q, getDialect(),
+				start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -6683,16 +6368,13 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @throws NoSuchEntryException if a announcements entry with the primary key could not be found
 	 */
 	@Override
-	public AnnouncementsEntry[] filterFindByC_C_C_A_PrevAndNext(
-			long entryId, long companyId, long classNameId, long classPK,
-			boolean alert,
-			OrderByComparator<AnnouncementsEntry> orderByComparator)
+	public AnnouncementsEntry[] filterFindByC_C_C_A_PrevAndNext(long entryId,
+		long companyId, long classNameId, long classPK, boolean alert,
+		OrderByComparator<AnnouncementsEntry> orderByComparator)
 		throws NoSuchEntryException {
-
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
-			return findByC_C_C_A_PrevAndNext(
-				entryId, companyId, classNameId, classPK, alert,
-				orderByComparator);
+			return findByC_C_C_A_PrevAndNext(entryId, companyId, classNameId,
+				classPK, alert, orderByComparator);
 		}
 
 		AnnouncementsEntry announcementsEntry = findByPrimaryKey(entryId);
@@ -6704,15 +6386,15 @@ public class AnnouncementsEntryPersistenceImpl
 
 			AnnouncementsEntry[] array = new AnnouncementsEntryImpl[3];
 
-			array[0] = filterGetByC_C_C_A_PrevAndNext(
-				session, announcementsEntry, companyId, classNameId, classPK,
-				alert, orderByComparator, true);
+			array[0] = filterGetByC_C_C_A_PrevAndNext(session,
+					announcementsEntry, companyId, classNameId, classPK, alert,
+					orderByComparator, true);
 
 			array[1] = announcementsEntry;
 
-			array[2] = filterGetByC_C_C_A_PrevAndNext(
-				session, announcementsEntry, companyId, classNameId, classPK,
-				alert, orderByComparator, false);
+			array[2] = filterGetByC_C_C_A_PrevAndNext(session,
+					announcementsEntry, companyId, classNameId, classPK, alert,
+					orderByComparator, false);
 
 			return array;
 		}
@@ -6729,12 +6411,11 @@ public class AnnouncementsEntryPersistenceImpl
 		long classNameId, long classPK, boolean alert,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(8 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -6745,8 +6426,7 @@ public class AnnouncementsEntryPersistenceImpl
 			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE);
 		}
 		else {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_C_C_C_A_COMPANYID_2);
@@ -6758,13 +6438,11 @@ public class AnnouncementsEntryPersistenceImpl
 		query.append(_FINDER_COLUMN_C_C_C_A_ALERT_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(
-				_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -6772,17 +6450,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
-							true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -6808,15 +6482,13 @@ public class AnnouncementsEntryPersistenceImpl
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
 				else {
-					query.append(
-						getColumnName(
-							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
+
+				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -6845,9 +6517,9 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -6872,10 +6544,8 @@ public class AnnouncementsEntryPersistenceImpl
 		qPos.add(alert);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						announcementsEntry)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					announcementsEntry)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -6899,14 +6569,11 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @param alert the alert
 	 */
 	@Override
-	public void removeByC_C_C_A(
-		long companyId, long classNameId, long classPK, boolean alert) {
-
-		for (AnnouncementsEntry announcementsEntry :
-				findByC_C_C_A(
-					companyId, classNameId, classPK, alert, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
-
+	public void removeByC_C_C_A(long companyId, long classNameId, long classPK,
+		boolean alert) {
+		for (AnnouncementsEntry announcementsEntry : findByC_C_C_A(companyId,
+				classNameId, classPK, alert, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
 			remove(announcementsEntry);
 		}
 	}
@@ -6921,17 +6588,16 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the number of matching announcements entries
 	 */
 	@Override
-	public int countByC_C_C_A(
-		long companyId, long classNameId, long classPK, boolean alert) {
-
+	public int countByC_C_C_A(long companyId, long classNameId, long classPK,
+		boolean alert) {
 		FinderPath finderPath = _finderPathCountByC_C_C_A;
 
 		Object[] finderArgs = new Object[] {
-			companyId, classNameId, classPK, alert
-		};
+				companyId, classNameId, classPK, alert
+			};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(5);
@@ -6992,9 +6658,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the number of matching announcements entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByC_C_C_A(
-		long companyId, long classNameId, long classPK, boolean alert) {
-
+	public int filterCountByC_C_C_A(long companyId, long classNameId,
+		long classPK, boolean alert) {
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
 			return countByC_C_C_A(companyId, classNameId, classPK, alert);
 		}
@@ -7011,9 +6676,9 @@ public class AnnouncementsEntryPersistenceImpl
 
 		query.append(_FINDER_COLUMN_C_C_C_A_ALERT_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(
-			query.toString(), AnnouncementsEntry.class.getName(),
-			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				AnnouncementsEntry.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -7022,8 +6687,8 @@ public class AnnouncementsEntryPersistenceImpl
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(
-				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -7047,39 +6712,17 @@ public class AnnouncementsEntryPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_C_C_C_A_COMPANYID_2 =
-		"announcementsEntry.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_C_C_A_CLASSNAMEID_2 =
-		"announcementsEntry.classNameId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_C_C_A_CLASSPK_2 =
-		"announcementsEntry.classPK = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_C_C_A_ALERT_2 =
-		"announcementsEntry.alert = ?";
+	private static final String _FINDER_COLUMN_C_C_C_A_COMPANYID_2 = "announcementsEntry.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_C_C_A_CLASSNAMEID_2 = "announcementsEntry.classNameId = ? AND ";
+	private static final String _FINDER_COLUMN_C_C_C_A_CLASSPK_2 = "announcementsEntry.classPK = ? AND ";
+	private static final String _FINDER_COLUMN_C_C_C_A_ALERT_2 = "announcementsEntry.alert = ?";
 
 	public AnnouncementsEntryPersistenceImpl() {
 		setModelClass(AnnouncementsEntry.class);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("uuid", "uuid_");
-		dbColumnNames.put("type", "type_");
-
-		try {
-			Field field = BasePersistenceImpl.class.getDeclaredField(
-				"_dbColumnNames");
-
-			field.setAccessible(true);
-
-			field.set(this, dbColumnNames);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
+		setModelImplClass(AnnouncementsEntryImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -7089,8 +6732,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(AnnouncementsEntry announcementsEntry) {
-		EntityCacheUtil.putResult(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.putResult(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
 			AnnouncementsEntryImpl.class, announcementsEntry.getPrimaryKey(),
 			announcementsEntry);
 
@@ -7106,10 +6748,9 @@ public class AnnouncementsEntryPersistenceImpl
 	public void cacheResult(List<AnnouncementsEntry> announcementsEntries) {
 		for (AnnouncementsEntry announcementsEntry : announcementsEntries) {
 			if (EntityCacheUtil.getResult(
-					AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-					AnnouncementsEntryImpl.class,
-					announcementsEntry.getPrimaryKey()) == null) {
-
+						AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+						AnnouncementsEntryImpl.class,
+						announcementsEntry.getPrimaryKey()) == null) {
 				cacheResult(announcementsEntry);
 			}
 			else {
@@ -7122,7 +6763,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Clears the cache for all announcements entries.
 	 *
 	 * <p>
-	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -7138,13 +6779,12 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Clears the cache for the announcements entry.
 	 *
 	 * <p>
-	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(AnnouncementsEntry announcementsEntry) {
-		EntityCacheUtil.removeResult(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.removeResult(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
 			AnnouncementsEntryImpl.class, announcementsEntry.getPrimaryKey());
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -7157,10 +6797,8 @@ public class AnnouncementsEntryPersistenceImpl
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (AnnouncementsEntry announcementsEntry : announcementsEntries) {
-			EntityCacheUtil.removeResult(
-				AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-				AnnouncementsEntryImpl.class,
-				announcementsEntry.getPrimaryKey());
+			EntityCacheUtil.removeResult(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class, announcementsEntry.getPrimaryKey());
 		}
 	}
 
@@ -7208,23 +6846,21 @@ public class AnnouncementsEntryPersistenceImpl
 	@Override
 	public AnnouncementsEntry remove(Serializable primaryKey)
 		throws NoSuchEntryException {
-
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			AnnouncementsEntry announcementsEntry =
-				(AnnouncementsEntry)session.get(
-					AnnouncementsEntryImpl.class, primaryKey);
+			AnnouncementsEntry announcementsEntry = (AnnouncementsEntry)session.get(AnnouncementsEntryImpl.class,
+					primaryKey);
 
 			if (announcementsEntry == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchEntryException(
-					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				throw new NoSuchEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
 			}
 
 			return remove(announcementsEntry);
@@ -7243,16 +6879,14 @@ public class AnnouncementsEntryPersistenceImpl
 	@Override
 	protected AnnouncementsEntry removeImpl(
 		AnnouncementsEntry announcementsEntry) {
-
 		Session session = null;
 
 		try {
 			session = openSession();
 
 			if (!session.contains(announcementsEntry)) {
-				announcementsEntry = (AnnouncementsEntry)session.get(
-					AnnouncementsEntryImpl.class,
-					announcementsEntry.getPrimaryKeyObj());
+				announcementsEntry = (AnnouncementsEntry)session.get(AnnouncementsEntryImpl.class,
+						announcementsEntry.getPrimaryKeyObj());
 			}
 
 			if (announcementsEntry != null) {
@@ -7274,30 +6908,26 @@ public class AnnouncementsEntryPersistenceImpl
 	}
 
 	@Override
-	public AnnouncementsEntry updateImpl(
-		AnnouncementsEntry announcementsEntry) {
-
+	public AnnouncementsEntry updateImpl(AnnouncementsEntry announcementsEntry) {
 		boolean isNew = announcementsEntry.isNew();
 
 		if (!(announcementsEntry instanceof AnnouncementsEntryModelImpl)) {
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(announcementsEntry.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(
-					announcementsEntry);
+				invocationHandler = ProxyUtil.getInvocationHandler(announcementsEntry);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in announcementsEntry proxy " +
-						invocationHandler.getClass());
+					invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom AnnouncementsEntry implementation " +
-					announcementsEntry.getClass());
+				announcementsEntry.getClass());
 		}
 
-		AnnouncementsEntryModelImpl announcementsEntryModelImpl =
-			(AnnouncementsEntryModelImpl)announcementsEntry;
+		AnnouncementsEntryModelImpl announcementsEntryModelImpl = (AnnouncementsEntryModelImpl)announcementsEntry;
 
 		if (Validator.isNull(announcementsEntry.getUuid())) {
 			String uuid = PortalUUIDUtil.generate();
@@ -7305,8 +6935,7 @@ public class AnnouncementsEntryPersistenceImpl
 			announcementsEntry.setUuid(uuid);
 		}
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -7315,8 +6944,8 @@ public class AnnouncementsEntryPersistenceImpl
 				announcementsEntry.setCreateDate(now);
 			}
 			else {
-				announcementsEntry.setCreateDate(
-					serviceContext.getCreateDate(now));
+				announcementsEntry.setCreateDate(serviceContext.getCreateDate(
+						now));
 			}
 		}
 
@@ -7325,8 +6954,8 @@ public class AnnouncementsEntryPersistenceImpl
 				announcementsEntry.setModifiedDate(now);
 			}
 			else {
-				announcementsEntry.setModifiedDate(
-					serviceContext.getModifiedDate(now));
+				announcementsEntry.setModifiedDate(serviceContext.getModifiedDate(
+						now));
 			}
 		}
 
@@ -7344,8 +6973,7 @@ public class AnnouncementsEntryPersistenceImpl
 			}
 
 			try {
-				announcementsEntry.setContent(
-					SanitizerUtil.sanitize(
+				announcementsEntry.setContent(SanitizerUtil.sanitize(
 						companyId, groupId, userId,
 						AnnouncementsEntry.class.getName(), entryId,
 						ContentTypes.TEXT_HTML, Sanitizer.MODE_ALL,
@@ -7367,8 +6995,7 @@ public class AnnouncementsEntryPersistenceImpl
 				announcementsEntry.setNew(false);
 			}
 			else {
-				announcementsEntry = (AnnouncementsEntry)session.merge(
-					announcementsEntry);
+				announcementsEntry = (AnnouncementsEntry)session.merge(announcementsEntry);
 			}
 		}
 		catch (Exception e) {
@@ -7381,243 +7008,226 @@ public class AnnouncementsEntryPersistenceImpl
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
 		if (!AnnouncementsEntryModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else if (isNew) {
-			Object[] args = new Object[] {
-				announcementsEntryModelImpl.getUuid()
-			};
+		else
+		 if (isNew) {
+			Object[] args = new Object[] { announcementsEntryModelImpl.getUuid() };
 
 			FinderCacheUtil.removeResult(_finderPathCountByUuid, args);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindByUuid, args);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid,
+				args);
 
 			args = new Object[] {
-				announcementsEntryModelImpl.getUuid(),
-				announcementsEntryModelImpl.getCompanyId()
-			};
-
-			FinderCacheUtil.removeResult(_finderPathCountByUuid_C, args);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindByUuid_C, args);
-
-			args = new Object[] {announcementsEntryModelImpl.getUserId()};
-
-			FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindByUserId, args);
-
-			args = new Object[] {
-				announcementsEntryModelImpl.getClassNameId(),
-				announcementsEntryModelImpl.getClassPK()
-			};
-
-			FinderCacheUtil.removeResult(_finderPathCountByC_C, args);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindByC_C, args);
-
-			args = new Object[] {
-				announcementsEntryModelImpl.getCompanyId(),
-				announcementsEntryModelImpl.getClassNameId(),
-				announcementsEntryModelImpl.getClassPK()
-			};
-
-			FinderCacheUtil.removeResult(_finderPathCountByC_C_C, args);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindByC_C_C, args);
-
-			args = new Object[] {
-				announcementsEntryModelImpl.getClassNameId(),
-				announcementsEntryModelImpl.getClassPK(),
-				announcementsEntryModelImpl.isAlert()
-			};
-
-			FinderCacheUtil.removeResult(_finderPathCountByC_C_A, args);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindByC_C_A, args);
-
-			args = new Object[] {
-				announcementsEntryModelImpl.getCompanyId(),
-				announcementsEntryModelImpl.getClassNameId(),
-				announcementsEntryModelImpl.getClassPK(),
-				announcementsEntryModelImpl.isAlert()
-			};
-
-			FinderCacheUtil.removeResult(_finderPathCountByC_C_C_A, args);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindByC_C_C_A, args);
-
-			FinderCacheUtil.removeResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY);
-			FinderCacheUtil.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
-		}
-		else {
-			if ((announcementsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUuid.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					announcementsEntryModelImpl.getOriginalUuid()
-				};
-
-				FinderCacheUtil.removeResult(_finderPathCountByUuid, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByUuid, args);
-
-				args = new Object[] {announcementsEntryModelImpl.getUuid()};
-
-				FinderCacheUtil.removeResult(_finderPathCountByUuid, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByUuid, args);
-			}
-
-			if ((announcementsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					announcementsEntryModelImpl.getOriginalUuid(),
-					announcementsEntryModelImpl.getOriginalCompanyId()
-				};
-
-				FinderCacheUtil.removeResult(_finderPathCountByUuid_C, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByUuid_C, args);
-
-				args = new Object[] {
 					announcementsEntryModelImpl.getUuid(),
 					announcementsEntryModelImpl.getCompanyId()
 				};
 
+			FinderCacheUtil.removeResult(_finderPathCountByUuid_C, args);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+				args);
+
+			args = new Object[] { announcementsEntryModelImpl.getUserId() };
+
+			FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUserId,
+				args);
+
+			args = new Object[] {
+					announcementsEntryModelImpl.getClassNameId(),
+					announcementsEntryModelImpl.getClassPK()
+				};
+
+			FinderCacheUtil.removeResult(_finderPathCountByC_C, args);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C,
+				args);
+
+			args = new Object[] {
+					announcementsEntryModelImpl.getCompanyId(),
+					announcementsEntryModelImpl.getClassNameId(),
+					announcementsEntryModelImpl.getClassPK()
+				};
+
+			FinderCacheUtil.removeResult(_finderPathCountByC_C_C, args);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C,
+				args);
+
+			args = new Object[] {
+					announcementsEntryModelImpl.getClassNameId(),
+					announcementsEntryModelImpl.getClassPK(),
+					announcementsEntryModelImpl.isAlert()
+				};
+
+			FinderCacheUtil.removeResult(_finderPathCountByC_C_A, args);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_A,
+				args);
+
+			args = new Object[] {
+					announcementsEntryModelImpl.getCompanyId(),
+					announcementsEntryModelImpl.getClassNameId(),
+					announcementsEntryModelImpl.getClassPK(),
+					announcementsEntryModelImpl.isAlert()
+				};
+
+			FinderCacheUtil.removeResult(_finderPathCountByC_C_C_A, args);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C_A,
+				args);
+
+			FinderCacheUtil.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindAll,
+				FINDER_ARGS_EMPTY);
+		}
+
+		else {
+			if ((announcementsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByUuid.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						announcementsEntryModelImpl.getOriginalUuid()
+					};
+
+				FinderCacheUtil.removeResult(_finderPathCountByUuid, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid,
+					args);
+
+				args = new Object[] { announcementsEntryModelImpl.getUuid() };
+
+				FinderCacheUtil.removeResult(_finderPathCountByUuid, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid,
+					args);
+			}
+
+			if ((announcementsEntryModelImpl.getColumnBitmask() &
+					_finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						announcementsEntryModelImpl.getOriginalUuid(),
+						announcementsEntryModelImpl.getOriginalCompanyId()
+					};
+
 				FinderCacheUtil.removeResult(_finderPathCountByUuid_C, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByUuid_C, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+					args);
+
+				args = new Object[] {
+						announcementsEntryModelImpl.getUuid(),
+						announcementsEntryModelImpl.getCompanyId()
+					};
+
+				FinderCacheUtil.removeResult(_finderPathCountByUuid_C, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid_C,
+					args);
 			}
 
 			if ((announcementsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUserId.getColumnBitmask()) !=
-					 0) {
-
+					_finderPathWithoutPaginationFindByUserId.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-					announcementsEntryModelImpl.getOriginalUserId()
-				};
+						announcementsEntryModelImpl.getOriginalUserId()
+					};
 
 				FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByUserId, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUserId,
+					args);
 
-				args = new Object[] {announcementsEntryModelImpl.getUserId()};
+				args = new Object[] { announcementsEntryModelImpl.getUserId() };
 
 				FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByUserId, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUserId,
+					args);
 			}
 
 			if ((announcementsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByC_C.getColumnBitmask()) !=
-					 0) {
-
+					_finderPathWithoutPaginationFindByC_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-					announcementsEntryModelImpl.getOriginalClassNameId(),
-					announcementsEntryModelImpl.getOriginalClassPK()
-				};
+						announcementsEntryModelImpl.getOriginalClassNameId(),
+						announcementsEntryModelImpl.getOriginalClassPK()
+					};
 
 				FinderCacheUtil.removeResult(_finderPathCountByC_C, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByC_C, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C,
+					args);
 
 				args = new Object[] {
-					announcementsEntryModelImpl.getClassNameId(),
-					announcementsEntryModelImpl.getClassPK()
-				};
+						announcementsEntryModelImpl.getClassNameId(),
+						announcementsEntryModelImpl.getClassPK()
+					};
 
 				FinderCacheUtil.removeResult(_finderPathCountByC_C, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByC_C, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C,
+					args);
 			}
 
 			if ((announcementsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByC_C_C.getColumnBitmask()) !=
-					 0) {
-
+					_finderPathWithoutPaginationFindByC_C_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-					announcementsEntryModelImpl.getOriginalCompanyId(),
-					announcementsEntryModelImpl.getOriginalClassNameId(),
-					announcementsEntryModelImpl.getOriginalClassPK()
-				};
+						announcementsEntryModelImpl.getOriginalCompanyId(),
+						announcementsEntryModelImpl.getOriginalClassNameId(),
+						announcementsEntryModelImpl.getOriginalClassPK()
+					};
 
 				FinderCacheUtil.removeResult(_finderPathCountByC_C_C, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByC_C_C, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C,
+					args);
 
 				args = new Object[] {
-					announcementsEntryModelImpl.getCompanyId(),
-					announcementsEntryModelImpl.getClassNameId(),
-					announcementsEntryModelImpl.getClassPK()
-				};
+						announcementsEntryModelImpl.getCompanyId(),
+						announcementsEntryModelImpl.getClassNameId(),
+						announcementsEntryModelImpl.getClassPK()
+					};
 
 				FinderCacheUtil.removeResult(_finderPathCountByC_C_C, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByC_C_C, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C,
+					args);
 			}
 
 			if ((announcementsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByC_C_A.getColumnBitmask()) !=
-					 0) {
-
+					_finderPathWithoutPaginationFindByC_C_A.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-					announcementsEntryModelImpl.getOriginalClassNameId(),
-					announcementsEntryModelImpl.getOriginalClassPK(),
-					announcementsEntryModelImpl.getOriginalAlert()
-				};
+						announcementsEntryModelImpl.getOriginalClassNameId(),
+						announcementsEntryModelImpl.getOriginalClassPK(),
+						announcementsEntryModelImpl.getOriginalAlert()
+					};
 
 				FinderCacheUtil.removeResult(_finderPathCountByC_C_A, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByC_C_A, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_A,
+					args);
 
 				args = new Object[] {
-					announcementsEntryModelImpl.getClassNameId(),
-					announcementsEntryModelImpl.getClassPK(),
-					announcementsEntryModelImpl.isAlert()
-				};
+						announcementsEntryModelImpl.getClassNameId(),
+						announcementsEntryModelImpl.getClassPK(),
+						announcementsEntryModelImpl.isAlert()
+					};
 
 				FinderCacheUtil.removeResult(_finderPathCountByC_C_A, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByC_C_A, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_A,
+					args);
 			}
 
 			if ((announcementsEntryModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByC_C_C_A.
-					 getColumnBitmask()) != 0) {
-
+					_finderPathWithoutPaginationFindByC_C_C_A.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-					announcementsEntryModelImpl.getOriginalCompanyId(),
-					announcementsEntryModelImpl.getOriginalClassNameId(),
-					announcementsEntryModelImpl.getOriginalClassPK(),
-					announcementsEntryModelImpl.getOriginalAlert()
-				};
+						announcementsEntryModelImpl.getOriginalCompanyId(),
+						announcementsEntryModelImpl.getOriginalClassNameId(),
+						announcementsEntryModelImpl.getOriginalClassPK(),
+						announcementsEntryModelImpl.getOriginalAlert()
+					};
 
 				FinderCacheUtil.removeResult(_finderPathCountByC_C_C_A, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByC_C_C_A, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C_A,
+					args);
 
 				args = new Object[] {
-					announcementsEntryModelImpl.getCompanyId(),
-					announcementsEntryModelImpl.getClassNameId(),
-					announcementsEntryModelImpl.getClassPK(),
-					announcementsEntryModelImpl.isAlert()
-				};
+						announcementsEntryModelImpl.getCompanyId(),
+						announcementsEntryModelImpl.getClassNameId(),
+						announcementsEntryModelImpl.getClassPK(),
+						announcementsEntryModelImpl.isAlert()
+					};
 
 				FinderCacheUtil.removeResult(_finderPathCountByC_C_C_A, args);
-				FinderCacheUtil.removeResult(
-					_finderPathWithoutPaginationFindByC_C_C_A, args);
+				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C_A,
+					args);
 			}
 		}
 
-		EntityCacheUtil.putResult(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.putResult(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
 			AnnouncementsEntryImpl.class, announcementsEntry.getPrimaryKey(),
 			announcementsEntry, false);
 
@@ -7627,7 +7237,7 @@ public class AnnouncementsEntryPersistenceImpl
 	}
 
 	/**
-	 * Returns the announcements entry with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
+	 * Returns the announcements entry with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the announcements entry
 	 * @return the announcements entry
@@ -7636,7 +7246,6 @@ public class AnnouncementsEntryPersistenceImpl
 	@Override
 	public AnnouncementsEntry findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchEntryException {
-
 		AnnouncementsEntry announcementsEntry = fetchByPrimaryKey(primaryKey);
 
 		if (announcementsEntry == null) {
@@ -7644,15 +7253,15 @@ public class AnnouncementsEntryPersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchEntryException(
-				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			throw new NoSuchEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
 		}
 
 		return announcementsEntry;
 	}
 
 	/**
-	 * Returns the announcements entry with the primary key or throws a <code>NoSuchEntryException</code> if it could not be found.
+	 * Returns the announcements entry with the primary key or throws a {@link NoSuchEntryException} if it could not be found.
 	 *
 	 * @param entryId the primary key of the announcements entry
 	 * @return the announcements entry
@@ -7661,60 +7270,7 @@ public class AnnouncementsEntryPersistenceImpl
 	@Override
 	public AnnouncementsEntry findByPrimaryKey(long entryId)
 		throws NoSuchEntryException {
-
 		return findByPrimaryKey((Serializable)entryId);
-	}
-
-	/**
-	 * Returns the announcements entry with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param primaryKey the primary key of the announcements entry
-	 * @return the announcements entry, or <code>null</code> if a announcements entry with the primary key could not be found
-	 */
-	@Override
-	public AnnouncementsEntry fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = EntityCacheUtil.getResult(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class, primaryKey);
-
-		if (serializable == nullModel) {
-			return null;
-		}
-
-		AnnouncementsEntry announcementsEntry =
-			(AnnouncementsEntry)serializable;
-
-		if (announcementsEntry == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				announcementsEntry = (AnnouncementsEntry)session.get(
-					AnnouncementsEntryImpl.class, primaryKey);
-
-				if (announcementsEntry != null) {
-					cacheResult(announcementsEntry);
-				}
-				else {
-					EntityCacheUtil.putResult(
-						AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-						AnnouncementsEntryImpl.class, primaryKey, nullModel);
-				}
-			}
-			catch (Exception e) {
-				EntityCacheUtil.removeResult(
-					AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-					AnnouncementsEntryImpl.class, primaryKey);
-
-				throw processException(e);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return announcementsEntry;
 	}
 
 	/**
@@ -7726,109 +7282,6 @@ public class AnnouncementsEntryPersistenceImpl
 	@Override
 	public AnnouncementsEntry fetchByPrimaryKey(long entryId) {
 		return fetchByPrimaryKey((Serializable)entryId);
-	}
-
-	@Override
-	public Map<Serializable, AnnouncementsEntry> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, AnnouncementsEntry> map =
-			new HashMap<Serializable, AnnouncementsEntry>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			AnnouncementsEntry announcementsEntry = fetchByPrimaryKey(
-				primaryKey);
-
-			if (announcementsEntry != null) {
-				map.put(primaryKey, announcementsEntry);
-			}
-
-			return map;
-		}
-
-		Set<Serializable> uncachedPrimaryKeys = null;
-
-		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = EntityCacheUtil.getResult(
-				AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-				AnnouncementsEntryImpl.class, primaryKey);
-
-			if (serializable != nullModel) {
-				if (serializable == null) {
-					if (uncachedPrimaryKeys == null) {
-						uncachedPrimaryKeys = new HashSet<Serializable>();
-					}
-
-					uncachedPrimaryKeys.add(primaryKey);
-				}
-				else {
-					map.put(primaryKey, (AnnouncementsEntry)serializable);
-				}
-			}
-		}
-
-		if (uncachedPrimaryKeys == null) {
-			return map;
-		}
-
-		StringBundler query = new StringBundler(
-			uncachedPrimaryKeys.size() * 2 + 1);
-
-		query.append(_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE_PKS_IN);
-
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
-
-			query.append(",");
-		}
-
-		query.setIndex(query.index() - 1);
-
-		query.append(")");
-
-		String sql = query.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query q = session.createQuery(sql);
-
-			for (AnnouncementsEntry announcementsEntry :
-					(List<AnnouncementsEntry>)q.list()) {
-
-				map.put(
-					announcementsEntry.getPrimaryKeyObj(), announcementsEntry);
-
-				cacheResult(announcementsEntry);
-
-				uncachedPrimaryKeys.remove(
-					announcementsEntry.getPrimaryKeyObj());
-			}
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				EntityCacheUtil.putResult(
-					AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-					AnnouncementsEntryImpl.class, primaryKey, nullModel);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -7845,7 +7298,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns a range of all the announcements entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of announcements entries
@@ -7861,7 +7314,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of announcements entries
@@ -7870,10 +7323,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findAll(
-		int start, int end,
+	public List<AnnouncementsEntry> findAll(int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator) {
-
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -7881,7 +7332,7 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Returns an ordered range of all the announcements entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AnnouncementsEntryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of announcements entries
@@ -7891,32 +7342,29 @@ public class AnnouncementsEntryPersistenceImpl
 	 * @return the ordered range of announcements entries
 	 */
 	@Override
-	public List<AnnouncementsEntry> findAll(
-		int start, int end,
+	public List<AnnouncementsEntry> findAll(int start, int end,
 		OrderByComparator<AnnouncementsEntry> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] {start, end, orderByComparator};
+			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
 		List<AnnouncementsEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			list = (List<AnnouncementsEntry>)FinderCacheUtil.getResult(finderPath,
+					finderArgs, this);
 		}
 
 		if (list == null) {
@@ -7924,13 +7372,13 @@ public class AnnouncementsEntryPersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					2 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_ANNOUNCEMENTSENTRY);
 
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 
 				sql = query.toString();
 			}
@@ -7950,16 +7398,16 @@ public class AnnouncementsEntryPersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AnnouncementsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<AnnouncementsEntry>)QueryUtil.list(q,
+							getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -7997,8 +7445,8 @@ public class AnnouncementsEntryPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		Long count = (Long)FinderCacheUtil.getResult(_finderPathCountAll,
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -8010,12 +7458,12 @@ public class AnnouncementsEntryPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				FinderCacheUtil.putResult(_finderPathCountAll,
+					FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+				FinderCacheUtil.removeResult(_finderPathCountAll,
+					FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -8033,6 +7481,21 @@ public class AnnouncementsEntryPersistenceImpl
 	}
 
 	@Override
+	protected EntityCache getEntityCache() {
+		return EntityCacheUtil.getEntityCache();
+	}
+
+	@Override
+	protected String getPKDBName() {
+		return "entryId";
+	}
+
+	@Override
+	protected String getSelectSQL() {
+		return _SQL_SELECT_ANNOUNCEMENTSENTRY;
+	}
+
+	@Override
 	protected Map<String, Integer> getTableColumnsMap() {
 		return AnnouncementsEntryModelImpl.TABLE_COLUMNS_MAP;
 	}
@@ -8041,237 +7504,226 @@ public class AnnouncementsEntryPersistenceImpl
 	 * Initializes the announcements entry persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-			new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+				new String[0]);
 
-		_finderPathCountAll = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+		_finderPathCountAll = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+				new String[0]);
 
-		_finderPathWithPaginationFindByUuid = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
-			new String[] {
-				String.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByUuid = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-			new String[] {String.class.getName()},
-			AnnouncementsEntryModelImpl.UUID_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
-
-		_finderPathCountByUuid = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
-			new String[] {String.class.getName()});
-
-		_finderPathWithPaginationFindByUuid_C = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
-			new String[] {
-				String.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByUuid = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
+				new String[] {
+					String.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			AnnouncementsEntryModelImpl.UUID_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+				new String[] { String.class.getName() },
+				AnnouncementsEntryModelImpl.UUID_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
 
-		_finderPathCountByUuid_C = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
-			new String[] {String.class.getName(), Long.class.getName()});
+		_finderPathCountByUuid = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
+				new String[] { String.class.getName() });
 
-		_finderPathWithPaginationFindByUserId = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByUserId = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
-			new String[] {Long.class.getName()},
-			AnnouncementsEntryModelImpl.USERID_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
-
-		_finderPathCountByUserId = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
-			new String[] {Long.class.getName()});
-
-		_finderPathWithPaginationFindByC_C = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+				new String[] {
+					String.class.getName(), Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByC_C = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C",
-			new String[] {Long.class.getName(), Long.class.getName()},
-			AnnouncementsEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.CLASSPK_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+				new String[] { String.class.getName(), Long.class.getName() },
+				AnnouncementsEntryModelImpl.UUID_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
 
-		_finderPathCountByC_C = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
-			new String[] {Long.class.getName(), Long.class.getName()});
+		_finderPathCountByUuid_C = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+				new String[] { String.class.getName(), Long.class.getName() });
 
-		_finderPathWithPaginationFindByC_C_C = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByC_C_C = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C",
-			new String[] {
-				Long.class.getName(), Long.class.getName(), Long.class.getName()
-			},
-			AnnouncementsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.CLASSPK_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
-
-		_finderPathCountByC_C_C = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C",
-			new String[] {
-				Long.class.getName(), Long.class.getName(), Long.class.getName()
-			});
-
-		_finderPathWithPaginationFindByC_C_A = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_A",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
-
-		_finderPathWithoutPaginationFindByC_C_A = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_A",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName()
-			},
-			AnnouncementsEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.CLASSPK_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.ALERT_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
-
-		_finderPathCountByC_C_A = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_A",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Boolean.class.getName()
-			});
-
-		_finderPathWithPaginationFindByC_C_C_A = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C_A",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Long.class.getName(), Boolean.class.getName(),
+		_finderPathWithPaginationFindByUserId = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
+				new String[] {
+					Long.class.getName(),
+					
 				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByC_C_C_A = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
-			AnnouncementsEntryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C_A",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Long.class.getName(), Boolean.class.getName()
-			},
-			AnnouncementsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.CLASSPK_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.ALERT_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
-			AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUserId = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
+				new String[] { Long.class.getName() },
+				AnnouncementsEntryModelImpl.USERID_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
 
-		_finderPathCountByC_C_C_A = new FinderPath(
-			AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C_A",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				Long.class.getName(), Boolean.class.getName()
-			});
+		_finderPathCountByUserId = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
+				new String[] { Long.class.getName() });
+
+		_finderPathWithPaginationFindByC_C = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByC_C = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C",
+				new String[] { Long.class.getName(), Long.class.getName() },
+				AnnouncementsEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.CLASSPK_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
+
+		_finderPathCountByC_C = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
+				new String[] { Long.class.getName(), Long.class.getName() });
+
+		_finderPathWithPaginationFindByC_C_C = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByC_C_C = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName()
+				},
+				AnnouncementsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.CLASSPK_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
+
+		_finderPathCountByC_C_C = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName()
+				});
+
+		_finderPathWithPaginationFindByC_C_A = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_A",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByC_C_A = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_A",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName()
+				},
+				AnnouncementsEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.CLASSPK_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.ALERT_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
+
+		_finderPathCountByC_C_A = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_A",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Boolean.class.getName()
+				});
+
+		_finderPathWithPaginationFindByC_C_C_A = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C_A",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName(), Boolean.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
+
+		_finderPathWithoutPaginationFindByC_C_C_A = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED,
+				AnnouncementsEntryImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C_A",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName(), Boolean.class.getName()
+				},
+				AnnouncementsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.CLASSPK_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.ALERT_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.PRIORITY_COLUMN_BITMASK |
+				AnnouncementsEntryModelImpl.MODIFIEDDATE_COLUMN_BITMASK);
+
+		_finderPathCountByC_C_C_A = new FinderPath(AnnouncementsEntryModelImpl.ENTITY_CACHE_ENABLED,
+				AnnouncementsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C_A",
+				new String[] {
+					Long.class.getName(), Long.class.getName(),
+					Long.class.getName(), Boolean.class.getName()
+				});
 	}
 
 	public void destroy() {
@@ -8283,57 +7735,25 @@ public class AnnouncementsEntryPersistenceImpl
 
 	@BeanReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-
-	private static final String _SQL_SELECT_ANNOUNCEMENTSENTRY =
-		"SELECT announcementsEntry FROM AnnouncementsEntry announcementsEntry";
-
-	private static final String _SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE_PKS_IN =
-		"SELECT announcementsEntry FROM AnnouncementsEntry announcementsEntry WHERE entryId IN (";
-
-	private static final String _SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE =
-		"SELECT announcementsEntry FROM AnnouncementsEntry announcementsEntry WHERE ";
-
-	private static final String _SQL_COUNT_ANNOUNCEMENTSENTRY =
-		"SELECT COUNT(announcementsEntry) FROM AnnouncementsEntry announcementsEntry";
-
-	private static final String _SQL_COUNT_ANNOUNCEMENTSENTRY_WHERE =
-		"SELECT COUNT(announcementsEntry) FROM AnnouncementsEntry announcementsEntry WHERE ";
-
-	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN =
-		"announcementsEntry.entryId";
-
-	private static final String _FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE =
-		"SELECT DISTINCT {announcementsEntry.*} FROM AnnouncementsEntry announcementsEntry WHERE ";
-
-	private static final String
-		_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1 =
-			"SELECT {AnnouncementsEntry.*} FROM (SELECT DISTINCT announcementsEntry.entryId FROM AnnouncementsEntry announcementsEntry WHERE ";
-
-	private static final String
-		_FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2 =
-			") TEMP_TABLE INNER JOIN AnnouncementsEntry ON TEMP_TABLE.entryId = AnnouncementsEntry.entryId";
-
-	private static final String _FILTER_SQL_COUNT_ANNOUNCEMENTSENTRY_WHERE =
-		"SELECT COUNT(DISTINCT announcementsEntry.entryId) AS COUNT_VALUE FROM AnnouncementsEntry announcementsEntry WHERE ";
-
+	private static final String _SQL_SELECT_ANNOUNCEMENTSENTRY = "SELECT announcementsEntry FROM AnnouncementsEntry announcementsEntry";
+	private static final String _SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE = "SELECT announcementsEntry FROM AnnouncementsEntry announcementsEntry WHERE ";
+	private static final String _SQL_COUNT_ANNOUNCEMENTSENTRY = "SELECT COUNT(announcementsEntry) FROM AnnouncementsEntry announcementsEntry";
+	private static final String _SQL_COUNT_ANNOUNCEMENTSENTRY_WHERE = "SELECT COUNT(announcementsEntry) FROM AnnouncementsEntry announcementsEntry WHERE ";
+	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "announcementsEntry.entryId";
+	private static final String _FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_WHERE = "SELECT DISTINCT {announcementsEntry.*} FROM AnnouncementsEntry announcementsEntry WHERE ";
+	private static final String _FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_1 =
+		"SELECT {AnnouncementsEntry.*} FROM (SELECT DISTINCT announcementsEntry.entryId FROM AnnouncementsEntry announcementsEntry WHERE ";
+	private static final String _FILTER_SQL_SELECT_ANNOUNCEMENTSENTRY_NO_INLINE_DISTINCT_WHERE_2 =
+		") TEMP_TABLE INNER JOIN AnnouncementsEntry ON TEMP_TABLE.entryId = AnnouncementsEntry.entryId";
+	private static final String _FILTER_SQL_COUNT_ANNOUNCEMENTSENTRY_WHERE = "SELECT COUNT(DISTINCT announcementsEntry.entryId) AS COUNT_VALUE FROM AnnouncementsEntry announcementsEntry WHERE ";
 	private static final String _FILTER_ENTITY_ALIAS = "announcementsEntry";
-
 	private static final String _FILTER_ENTITY_TABLE = "AnnouncementsEntry";
-
 	private static final String _ORDER_BY_ENTITY_ALIAS = "announcementsEntry.";
-
 	private static final String _ORDER_BY_ENTITY_TABLE = "AnnouncementsEntry.";
-
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
-		"No AnnouncementsEntry exists with the primary key ";
-
-	private static final String _NO_SUCH_ENTITY_WITH_KEY =
-		"No AnnouncementsEntry exists with the key {";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AnnouncementsEntryPersistenceImpl.class);
-
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"uuid", "type"});
-
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No AnnouncementsEntry exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No AnnouncementsEntry exists with the key {";
+	private static final Log _log = LogFactoryUtil.getLog(AnnouncementsEntryPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+				"uuid", "type"
+			});
 }

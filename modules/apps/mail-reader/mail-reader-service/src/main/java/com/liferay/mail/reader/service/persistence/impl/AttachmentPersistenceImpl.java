@@ -21,6 +21,9 @@ import com.liferay.mail.reader.model.Attachment;
 import com.liferay.mail.reader.model.impl.AttachmentImpl;
 import com.liferay.mail.reader.model.impl.AttachmentModelImpl;
 import com.liferay.mail.reader.service.persistence.AttachmentPersistence;
+
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -36,18 +39,13 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,26 +58,23 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see AttachmentPersistence
+ * @see com.liferay.mail.reader.service.persistence.AttachmentUtil
  * @generated
  */
 @ProviderType
-public class AttachmentPersistenceImpl
-	extends BasePersistenceImpl<Attachment> implements AttachmentPersistence {
-
+public class AttachmentPersistenceImpl extends BasePersistenceImpl<Attachment>
+	implements AttachmentPersistence {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use <code>AttachmentUtil</code> to access the attachment persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use {@link AttachmentUtil} to access the attachment persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY =
-		AttachmentImpl.class.getName();
-
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List1";
-
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
-		FINDER_CLASS_NAME_ENTITY + ".List2";
-
+	public static final String FINDER_CLASS_NAME_ENTITY = AttachmentImpl.class.getName();
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -95,15 +90,15 @@ public class AttachmentPersistenceImpl
 	 */
 	@Override
 	public List<Attachment> findByMessageId(long messageId) {
-		return findByMessageId(
-			messageId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByMessageId(messageId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the attachments where messageId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AttachmentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AttachmentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param messageId the message ID
@@ -112,9 +107,7 @@ public class AttachmentPersistenceImpl
 	 * @return the range of matching attachments
 	 */
 	@Override
-	public List<Attachment> findByMessageId(
-		long messageId, int start, int end) {
-
+	public List<Attachment> findByMessageId(long messageId, int start, int end) {
 		return findByMessageId(messageId, start, end, null);
 	}
 
@@ -122,7 +115,7 @@ public class AttachmentPersistenceImpl
 	 * Returns an ordered range of all the attachments where messageId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AttachmentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AttachmentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param messageId the message ID
@@ -132,10 +125,8 @@ public class AttachmentPersistenceImpl
 	 * @return the ordered range of matching attachments
 	 */
 	@Override
-	public List<Attachment> findByMessageId(
-		long messageId, int start, int end,
+	public List<Attachment> findByMessageId(long messageId, int start, int end,
 		OrderByComparator<Attachment> orderByComparator) {
-
 		return findByMessageId(messageId, start, end, orderByComparator, true);
 	}
 
@@ -143,7 +134,7 @@ public class AttachmentPersistenceImpl
 	 * Returns an ordered range of all the attachments where messageId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AttachmentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AttachmentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param messageId the message ID
@@ -154,34 +145,29 @@ public class AttachmentPersistenceImpl
 	 * @return the ordered range of matching attachments
 	 */
 	@Override
-	public List<Attachment> findByMessageId(
-		long messageId, int start, int end,
+	public List<Attachment> findByMessageId(long messageId, int start, int end,
 		OrderByComparator<Attachment> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByMessageId;
-			finderArgs = new Object[] {messageId};
+			finderArgs = new Object[] { messageId };
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByMessageId;
-			finderArgs = new Object[] {
-				messageId, start, end, orderByComparator
-			};
+			finderArgs = new Object[] { messageId, start, end, orderByComparator };
 		}
 
 		List<Attachment> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Attachment>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Attachment>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Attachment attachment : list) {
@@ -198,8 +184,8 @@ public class AttachmentPersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -210,10 +196,11 @@ public class AttachmentPersistenceImpl
 			query.append(_FINDER_COLUMN_MESSAGEID_MESSAGEID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 			}
-			else if (pagination) {
+			else
+			 if (pagination) {
 				query.append(AttachmentModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -231,16 +218,16 @@ public class AttachmentPersistenceImpl
 				qPos.add(messageId);
 
 				if (!pagination) {
-					list = (List<Attachment>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<Attachment>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Attachment>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<Attachment>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -269,12 +256,11 @@ public class AttachmentPersistenceImpl
 	 * @throws NoSuchAttachmentException if a matching attachment could not be found
 	 */
 	@Override
-	public Attachment findByMessageId_First(
-			long messageId, OrderByComparator<Attachment> orderByComparator)
+	public Attachment findByMessageId_First(long messageId,
+		OrderByComparator<Attachment> orderByComparator)
 		throws NoSuchAttachmentException {
-
-		Attachment attachment = fetchByMessageId_First(
-			messageId, orderByComparator);
+		Attachment attachment = fetchByMessageId_First(messageId,
+				orderByComparator);
 
 		if (attachment != null) {
 			return attachment;
@@ -300,11 +286,10 @@ public class AttachmentPersistenceImpl
 	 * @return the first matching attachment, or <code>null</code> if a matching attachment could not be found
 	 */
 	@Override
-	public Attachment fetchByMessageId_First(
-		long messageId, OrderByComparator<Attachment> orderByComparator) {
-
-		List<Attachment> list = findByMessageId(
-			messageId, 0, 1, orderByComparator);
+	public Attachment fetchByMessageId_First(long messageId,
+		OrderByComparator<Attachment> orderByComparator) {
+		List<Attachment> list = findByMessageId(messageId, 0, 1,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -322,12 +307,11 @@ public class AttachmentPersistenceImpl
 	 * @throws NoSuchAttachmentException if a matching attachment could not be found
 	 */
 	@Override
-	public Attachment findByMessageId_Last(
-			long messageId, OrderByComparator<Attachment> orderByComparator)
+	public Attachment findByMessageId_Last(long messageId,
+		OrderByComparator<Attachment> orderByComparator)
 		throws NoSuchAttachmentException {
-
-		Attachment attachment = fetchByMessageId_Last(
-			messageId, orderByComparator);
+		Attachment attachment = fetchByMessageId_Last(messageId,
+				orderByComparator);
 
 		if (attachment != null) {
 			return attachment;
@@ -353,17 +337,16 @@ public class AttachmentPersistenceImpl
 	 * @return the last matching attachment, or <code>null</code> if a matching attachment could not be found
 	 */
 	@Override
-	public Attachment fetchByMessageId_Last(
-		long messageId, OrderByComparator<Attachment> orderByComparator) {
-
+	public Attachment fetchByMessageId_Last(long messageId,
+		OrderByComparator<Attachment> orderByComparator) {
 		int count = countByMessageId(messageId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Attachment> list = findByMessageId(
-			messageId, count - 1, count, orderByComparator);
+		List<Attachment> list = findByMessageId(messageId, count - 1, count,
+				orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -382,11 +365,9 @@ public class AttachmentPersistenceImpl
 	 * @throws NoSuchAttachmentException if a attachment with the primary key could not be found
 	 */
 	@Override
-	public Attachment[] findByMessageId_PrevAndNext(
-			long attachmentId, long messageId,
-			OrderByComparator<Attachment> orderByComparator)
+	public Attachment[] findByMessageId_PrevAndNext(long attachmentId,
+		long messageId, OrderByComparator<Attachment> orderByComparator)
 		throws NoSuchAttachmentException {
-
 		Attachment attachment = findByPrimaryKey(attachmentId);
 
 		Session session = null;
@@ -396,13 +377,13 @@ public class AttachmentPersistenceImpl
 
 			Attachment[] array = new AttachmentImpl[3];
 
-			array[0] = getByMessageId_PrevAndNext(
-				session, attachment, messageId, orderByComparator, true);
+			array[0] = getByMessageId_PrevAndNext(session, attachment,
+					messageId, orderByComparator, true);
 
 			array[1] = attachment;
 
-			array[2] = getByMessageId_PrevAndNext(
-				session, attachment, messageId, orderByComparator, false);
+			array[2] = getByMessageId_PrevAndNext(session, attachment,
+					messageId, orderByComparator, false);
 
 			return array;
 		}
@@ -414,15 +395,14 @@ public class AttachmentPersistenceImpl
 		}
 	}
 
-	protected Attachment getByMessageId_PrevAndNext(
-		Session session, Attachment attachment, long messageId,
+	protected Attachment getByMessageId_PrevAndNext(Session session,
+		Attachment attachment, long messageId,
 		OrderByComparator<Attachment> orderByComparator, boolean previous) {
-
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -434,8 +414,7 @@ public class AttachmentPersistenceImpl
 		query.append(_FINDER_COLUMN_MESSAGEID_MESSAGEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -505,9 +484,8 @@ public class AttachmentPersistenceImpl
 		qPos.add(messageId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(attachment)) {
-
+			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
+					attachment)) {
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -529,10 +507,8 @@ public class AttachmentPersistenceImpl
 	 */
 	@Override
 	public void removeByMessageId(long messageId) {
-		for (Attachment attachment :
-				findByMessageId(
-					messageId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
+		for (Attachment attachment : findByMessageId(messageId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 			remove(attachment);
 		}
 	}
@@ -547,7 +523,7 @@ public class AttachmentPersistenceImpl
 	public int countByMessageId(long messageId) {
 		FinderPath finderPath = _finderPathCountByMessageId;
 
-		Object[] finderArgs = new Object[] {messageId};
+		Object[] finderArgs = new Object[] { messageId };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -588,29 +564,14 @@ public class AttachmentPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_MESSAGEID_MESSAGEID_2 =
-		"attachment.messageId = ?";
+	private static final String _FINDER_COLUMN_MESSAGEID_MESSAGEID_2 = "attachment.messageId = ?";
 
 	public AttachmentPersistenceImpl() {
 		setModelClass(Attachment.class);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("size", "size_");
-
-		try {
-			Field field = BasePersistenceImpl.class.getDeclaredField(
-				"_dbColumnNames");
-
-			field.setAccessible(true);
-
-			field.set(this, dbColumnNames);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
+		setModelImplClass(AttachmentImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(AttachmentModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -620,9 +581,8 @@ public class AttachmentPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(Attachment attachment) {
-		entityCache.putResult(
-			AttachmentModelImpl.ENTITY_CACHE_ENABLED, AttachmentImpl.class,
-			attachment.getPrimaryKey(), attachment);
+		entityCache.putResult(AttachmentModelImpl.ENTITY_CACHE_ENABLED,
+			AttachmentImpl.class, attachment.getPrimaryKey(), attachment);
 
 		attachment.resetOriginalValues();
 	}
@@ -636,9 +596,8 @@ public class AttachmentPersistenceImpl
 	public void cacheResult(List<Attachment> attachments) {
 		for (Attachment attachment : attachments) {
 			if (entityCache.getResult(
-					AttachmentModelImpl.ENTITY_CACHE_ENABLED,
-					AttachmentImpl.class, attachment.getPrimaryKey()) == null) {
-
+						AttachmentModelImpl.ENTITY_CACHE_ENABLED,
+						AttachmentImpl.class, attachment.getPrimaryKey()) == null) {
 				cacheResult(attachment);
 			}
 			else {
@@ -651,7 +610,7 @@ public class AttachmentPersistenceImpl
 	 * Clears the cache for all attachments.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -667,14 +626,13 @@ public class AttachmentPersistenceImpl
 	 * Clears the cache for the attachment.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(Attachment attachment) {
-		entityCache.removeResult(
-			AttachmentModelImpl.ENTITY_CACHE_ENABLED, AttachmentImpl.class,
-			attachment.getPrimaryKey());
+		entityCache.removeResult(AttachmentModelImpl.ENTITY_CACHE_ENABLED,
+			AttachmentImpl.class, attachment.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -686,9 +644,8 @@ public class AttachmentPersistenceImpl
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (Attachment attachment : attachments) {
-			entityCache.removeResult(
-				AttachmentModelImpl.ENTITY_CACHE_ENABLED, AttachmentImpl.class,
-				attachment.getPrimaryKey());
+			entityCache.removeResult(AttachmentModelImpl.ENTITY_CACHE_ENABLED,
+				AttachmentImpl.class, attachment.getPrimaryKey());
 		}
 	}
 
@@ -720,7 +677,6 @@ public class AttachmentPersistenceImpl
 	@Override
 	public Attachment remove(long attachmentId)
 		throws NoSuchAttachmentException {
-
 		return remove((Serializable)attachmentId);
 	}
 
@@ -734,22 +690,21 @@ public class AttachmentPersistenceImpl
 	@Override
 	public Attachment remove(Serializable primaryKey)
 		throws NoSuchAttachmentException {
-
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			Attachment attachment = (Attachment)session.get(
-				AttachmentImpl.class, primaryKey);
+			Attachment attachment = (Attachment)session.get(AttachmentImpl.class,
+					primaryKey);
 
 			if (attachment == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchAttachmentException(
-					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				throw new NoSuchAttachmentException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+					primaryKey);
 			}
 
 			return remove(attachment);
@@ -773,8 +728,8 @@ public class AttachmentPersistenceImpl
 			session = openSession();
 
 			if (!session.contains(attachment)) {
-				attachment = (Attachment)session.get(
-					AttachmentImpl.class, attachment.getPrimaryKeyObj());
+				attachment = (Attachment)session.get(AttachmentImpl.class,
+						attachment.getPrimaryKeyObj());
 			}
 
 			if (attachment != null) {
@@ -807,16 +762,15 @@ public class AttachmentPersistenceImpl
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in attachment proxy " +
-						invocationHandler.getClass());
+					invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom Attachment implementation " +
-					attachment.getClass());
+				attachment.getClass());
 		}
 
-		AttachmentModelImpl attachmentModelImpl =
-			(AttachmentModelImpl)attachment;
+		AttachmentModelImpl attachmentModelImpl = (AttachmentModelImpl)attachment;
 
 		Session session = null;
 
@@ -844,41 +798,40 @@ public class AttachmentPersistenceImpl
 		if (!AttachmentModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else if (isNew) {
-			Object[] args = new Object[] {attachmentModelImpl.getMessageId()};
+		else
+		 if (isNew) {
+			Object[] args = new Object[] { attachmentModelImpl.getMessageId() };
 
 			finderCache.removeResult(_finderPathCountByMessageId, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByMessageId, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByMessageId,
+				args);
 
 			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
+				FINDER_ARGS_EMPTY);
 		}
+
 		else {
 			if ((attachmentModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByMessageId.
-					 getColumnBitmask()) != 0) {
-
+					_finderPathWithoutPaginationFindByMessageId.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-					attachmentModelImpl.getOriginalMessageId()
-				};
+						attachmentModelImpl.getOriginalMessageId()
+					};
 
 				finderCache.removeResult(_finderPathCountByMessageId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByMessageId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByMessageId,
+					args);
 
-				args = new Object[] {attachmentModelImpl.getMessageId()};
+				args = new Object[] { attachmentModelImpl.getMessageId() };
 
 				finderCache.removeResult(_finderPathCountByMessageId, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByMessageId, args);
+				finderCache.removeResult(_finderPathWithoutPaginationFindByMessageId,
+					args);
 			}
 		}
 
-		entityCache.putResult(
-			AttachmentModelImpl.ENTITY_CACHE_ENABLED, AttachmentImpl.class,
-			attachment.getPrimaryKey(), attachment, false);
+		entityCache.putResult(AttachmentModelImpl.ENTITY_CACHE_ENABLED,
+			AttachmentImpl.class, attachment.getPrimaryKey(), attachment, false);
 
 		attachment.resetOriginalValues();
 
@@ -886,7 +839,7 @@ public class AttachmentPersistenceImpl
 	}
 
 	/**
-	 * Returns the attachment with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
+	 * Returns the attachment with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the attachment
 	 * @return the attachment
@@ -895,7 +848,6 @@ public class AttachmentPersistenceImpl
 	@Override
 	public Attachment findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchAttachmentException {
-
 		Attachment attachment = fetchByPrimaryKey(primaryKey);
 
 		if (attachment == null) {
@@ -903,15 +855,15 @@ public class AttachmentPersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchAttachmentException(
-				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			throw new NoSuchAttachmentException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
 		}
 
 		return attachment;
 	}
 
 	/**
-	 * Returns the attachment with the primary key or throws a <code>NoSuchAttachmentException</code> if it could not be found.
+	 * Returns the attachment with the primary key or throws a {@link NoSuchAttachmentException} if it could not be found.
 	 *
 	 * @param attachmentId the primary key of the attachment
 	 * @return the attachment
@@ -920,59 +872,7 @@ public class AttachmentPersistenceImpl
 	@Override
 	public Attachment findByPrimaryKey(long attachmentId)
 		throws NoSuchAttachmentException {
-
 		return findByPrimaryKey((Serializable)attachmentId);
-	}
-
-	/**
-	 * Returns the attachment with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param primaryKey the primary key of the attachment
-	 * @return the attachment, or <code>null</code> if a attachment with the primary key could not be found
-	 */
-	@Override
-	public Attachment fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(
-			AttachmentModelImpl.ENTITY_CACHE_ENABLED, AttachmentImpl.class,
-			primaryKey);
-
-		if (serializable == nullModel) {
-			return null;
-		}
-
-		Attachment attachment = (Attachment)serializable;
-
-		if (attachment == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				attachment = (Attachment)session.get(
-					AttachmentImpl.class, primaryKey);
-
-				if (attachment != null) {
-					cacheResult(attachment);
-				}
-				else {
-					entityCache.putResult(
-						AttachmentModelImpl.ENTITY_CACHE_ENABLED,
-						AttachmentImpl.class, primaryKey, nullModel);
-				}
-			}
-			catch (Exception e) {
-				entityCache.removeResult(
-					AttachmentModelImpl.ENTITY_CACHE_ENABLED,
-					AttachmentImpl.class, primaryKey);
-
-				throw processException(e);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return attachment;
 	}
 
 	/**
@@ -984,104 +884,6 @@ public class AttachmentPersistenceImpl
 	@Override
 	public Attachment fetchByPrimaryKey(long attachmentId) {
 		return fetchByPrimaryKey((Serializable)attachmentId);
-	}
-
-	@Override
-	public Map<Serializable, Attachment> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, Attachment> map =
-			new HashMap<Serializable, Attachment>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			Attachment attachment = fetchByPrimaryKey(primaryKey);
-
-			if (attachment != null) {
-				map.put(primaryKey, attachment);
-			}
-
-			return map;
-		}
-
-		Set<Serializable> uncachedPrimaryKeys = null;
-
-		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(
-				AttachmentModelImpl.ENTITY_CACHE_ENABLED, AttachmentImpl.class,
-				primaryKey);
-
-			if (serializable != nullModel) {
-				if (serializable == null) {
-					if (uncachedPrimaryKeys == null) {
-						uncachedPrimaryKeys = new HashSet<Serializable>();
-					}
-
-					uncachedPrimaryKeys.add(primaryKey);
-				}
-				else {
-					map.put(primaryKey, (Attachment)serializable);
-				}
-			}
-		}
-
-		if (uncachedPrimaryKeys == null) {
-			return map;
-		}
-
-		StringBundler query = new StringBundler(
-			uncachedPrimaryKeys.size() * 2 + 1);
-
-		query.append(_SQL_SELECT_ATTACHMENT_WHERE_PKS_IN);
-
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
-
-			query.append(",");
-		}
-
-		query.setIndex(query.index() - 1);
-
-		query.append(")");
-
-		String sql = query.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query q = session.createQuery(sql);
-
-			for (Attachment attachment : (List<Attachment>)q.list()) {
-				map.put(attachment.getPrimaryKeyObj(), attachment);
-
-				cacheResult(attachment);
-
-				uncachedPrimaryKeys.remove(attachment.getPrimaryKeyObj());
-			}
-
-			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(
-					AttachmentModelImpl.ENTITY_CACHE_ENABLED,
-					AttachmentImpl.class, primaryKey, nullModel);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -1098,7 +900,7 @@ public class AttachmentPersistenceImpl
 	 * Returns a range of all the attachments.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AttachmentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AttachmentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of attachments
@@ -1114,7 +916,7 @@ public class AttachmentPersistenceImpl
 	 * Returns an ordered range of all the attachments.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AttachmentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AttachmentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of attachments
@@ -1123,9 +925,8 @@ public class AttachmentPersistenceImpl
 	 * @return the ordered range of attachments
 	 */
 	@Override
-	public List<Attachment> findAll(
-		int start, int end, OrderByComparator<Attachment> orderByComparator) {
-
+	public List<Attachment> findAll(int start, int end,
+		OrderByComparator<Attachment> orderByComparator) {
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -1133,7 +934,7 @@ public class AttachmentPersistenceImpl
 	 * Returns an ordered range of all the attachments.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AttachmentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AttachmentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of attachments
@@ -1143,31 +944,29 @@ public class AttachmentPersistenceImpl
 	 * @return the ordered range of attachments
 	 */
 	@Override
-	public List<Attachment> findAll(
-		int start, int end, OrderByComparator<Attachment> orderByComparator,
+	public List<Attachment> findAll(int start, int end,
+		OrderByComparator<Attachment> orderByComparator,
 		boolean retrieveFromCache) {
-
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
+				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] {start, end, orderByComparator};
+			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
 		List<Attachment> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Attachment>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Attachment>)finderCache.getResult(finderPath,
+					finderArgs, this);
 		}
 
 		if (list == null) {
@@ -1175,13 +974,13 @@ public class AttachmentPersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
-					2 + (orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_ATTACHMENT);
 
-				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
 
 				sql = query.toString();
 			}
@@ -1201,16 +1000,16 @@ public class AttachmentPersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<Attachment>)QueryUtil.list(
-						q, getDialect(), start, end, false);
+					list = (List<Attachment>)QueryUtil.list(q, getDialect(),
+							start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Attachment>)QueryUtil.list(
-						q, getDialect(), start, end);
+					list = (List<Attachment>)QueryUtil.list(q, getDialect(),
+							start, end);
 				}
 
 				cacheResult(list);
@@ -1248,8 +1047,8 @@ public class AttachmentPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(_finderPathCountAll,
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -1261,12 +1060,11 @@ public class AttachmentPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
+					count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -1284,6 +1082,21 @@ public class AttachmentPersistenceImpl
 	}
 
 	@Override
+	protected EntityCache getEntityCache() {
+		return entityCache;
+	}
+
+	@Override
+	protected String getPKDBName() {
+		return "attachmentId";
+	}
+
+	@Override
+	protected String getSelectSQL() {
+		return _SQL_SELECT_ATTACHMENT;
+	}
+
+	@Override
 	protected Map<String, Integer> getTableColumnsMap() {
 		return AttachmentModelImpl.TABLE_COLUMNS_MAP;
 	}
@@ -1292,44 +1105,40 @@ public class AttachmentPersistenceImpl
 	 * Initializes the attachment persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(
-			AttachmentModelImpl.ENTITY_CACHE_ENABLED,
-			AttachmentModelImpl.FINDER_CACHE_ENABLED, AttachmentImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(AttachmentModelImpl.ENTITY_CACHE_ENABLED,
+				AttachmentModelImpl.FINDER_CACHE_ENABLED, AttachmentImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			AttachmentModelImpl.ENTITY_CACHE_ENABLED,
-			AttachmentModelImpl.FINDER_CACHE_ENABLED, AttachmentImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-			new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(AttachmentModelImpl.ENTITY_CACHE_ENABLED,
+				AttachmentModelImpl.FINDER_CACHE_ENABLED, AttachmentImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+				new String[0]);
 
-		_finderPathCountAll = new FinderPath(
-			AttachmentModelImpl.ENTITY_CACHE_ENABLED,
-			AttachmentModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+		_finderPathCountAll = new FinderPath(AttachmentModelImpl.ENTITY_CACHE_ENABLED,
+				AttachmentModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+				new String[0]);
 
-		_finderPathWithPaginationFindByMessageId = new FinderPath(
-			AttachmentModelImpl.ENTITY_CACHE_ENABLED,
-			AttachmentModelImpl.FINDER_CACHE_ENABLED, AttachmentImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByMessageId",
-			new String[] {
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+		_finderPathWithPaginationFindByMessageId = new FinderPath(AttachmentModelImpl.ENTITY_CACHE_ENABLED,
+				AttachmentModelImpl.FINDER_CACHE_ENABLED, AttachmentImpl.class,
+				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByMessageId",
+				new String[] {
+					Long.class.getName(),
+					
+				Integer.class.getName(), Integer.class.getName(),
+					OrderByComparator.class.getName()
+				});
 
-		_finderPathWithoutPaginationFindByMessageId = new FinderPath(
-			AttachmentModelImpl.ENTITY_CACHE_ENABLED,
-			AttachmentModelImpl.FINDER_CACHE_ENABLED, AttachmentImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByMessageId",
-			new String[] {Long.class.getName()},
-			AttachmentModelImpl.MESSAGEID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByMessageId = new FinderPath(AttachmentModelImpl.ENTITY_CACHE_ENABLED,
+				AttachmentModelImpl.FINDER_CACHE_ENABLED, AttachmentImpl.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByMessageId",
+				new String[] { Long.class.getName() },
+				AttachmentModelImpl.MESSAGEID_COLUMN_BITMASK);
 
-		_finderPathCountByMessageId = new FinderPath(
-			AttachmentModelImpl.ENTITY_CACHE_ENABLED,
-			AttachmentModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByMessageId",
-			new String[] {Long.class.getName()});
+		_finderPathCountByMessageId = new FinderPath(AttachmentModelImpl.ENTITY_CACHE_ENABLED,
+				AttachmentModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByMessageId",
+				new String[] { Long.class.getName() });
 	}
 
 	public void destroy() {
@@ -1341,40 +1150,19 @@ public class AttachmentPersistenceImpl
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
-
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-
-	private static final String _SQL_SELECT_ATTACHMENT =
-		"SELECT attachment FROM Attachment attachment";
-
-	private static final String _SQL_SELECT_ATTACHMENT_WHERE_PKS_IN =
-		"SELECT attachment FROM Attachment attachment WHERE attachmentId IN (";
-
-	private static final String _SQL_SELECT_ATTACHMENT_WHERE =
-		"SELECT attachment FROM Attachment attachment WHERE ";
-
-	private static final String _SQL_COUNT_ATTACHMENT =
-		"SELECT COUNT(attachment) FROM Attachment attachment";
-
-	private static final String _SQL_COUNT_ATTACHMENT_WHERE =
-		"SELECT COUNT(attachment) FROM Attachment attachment WHERE ";
-
+	private static final String _SQL_SELECT_ATTACHMENT = "SELECT attachment FROM Attachment attachment";
+	private static final String _SQL_SELECT_ATTACHMENT_WHERE = "SELECT attachment FROM Attachment attachment WHERE ";
+	private static final String _SQL_COUNT_ATTACHMENT = "SELECT COUNT(attachment) FROM Attachment attachment";
+	private static final String _SQL_COUNT_ATTACHMENT_WHERE = "SELECT COUNT(attachment) FROM Attachment attachment WHERE ";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "attachment.";
-
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
-		"No Attachment exists with the primary key ";
-
-	private static final String _NO_SUCH_ENTITY_WITH_KEY =
-		"No Attachment exists with the key {";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AttachmentPersistenceImpl.class);
-
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"size"});
-
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Attachment exists with the primary key ";
+	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Attachment exists with the key {";
+	private static final Log _log = LogFactoryUtil.getLog(AttachmentPersistenceImpl.class);
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
+				"size"
+			});
 }

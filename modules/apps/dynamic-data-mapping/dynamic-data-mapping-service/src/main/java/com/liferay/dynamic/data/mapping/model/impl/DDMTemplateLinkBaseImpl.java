@@ -32,13 +32,12 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateLinkLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class DDMTemplateLinkBaseImpl
-	extends DDMTemplateLinkModelImpl implements DDMTemplateLink {
-
+public abstract class DDMTemplateLinkBaseImpl extends DDMTemplateLinkModelImpl
+	implements DDMTemplateLink {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a ddm template link model instance should use the <code>DDMTemplateLink</code> interface instead.
+	 * Never modify or reference this class directly. All methods that expect a ddm template link model instance should use the {@link DDMTemplateLink} interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -49,5 +48,4 @@ public abstract class DDMTemplateLinkBaseImpl
 			DDMTemplateLinkLocalServiceUtil.updateDDMTemplateLink(this);
 		}
 	}
-
 }

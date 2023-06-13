@@ -113,14 +113,6 @@ public class IconTag extends IncludeTag {
 		_linkCssClass = linkCssClass;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setLinkTitle(String linkTitle) {
-		_linkTitle = linkTitle;
-	}
-
 	public void setLocalizeMessage(boolean localizeMessage) {
 		_localizeMessage = localizeMessage;
 	}
@@ -181,7 +173,6 @@ public class IconTag extends IncludeTag {
 		_label = null;
 		_lang = null;
 		_linkCssClass = null;
-		_linkTitle = null;
 		_localizeMessage = true;
 		_markupView = null;
 		_message = null;
@@ -460,7 +451,6 @@ public class IconTag extends IncludeTag {
 			"liferay-ui:icon:label", String.valueOf(isLabel()));
 		request.setAttribute("liferay-ui:icon:lang", _lang);
 		request.setAttribute("liferay-ui:icon:linkCssClass", _linkCssClass);
-		request.setAttribute("liferay-ui:icon:linkTitle", _linkTitle);
 		request.setAttribute(
 			"liferay-ui:icon:localizeMessage",
 			String.valueOf(_localizeMessage));
@@ -671,9 +661,7 @@ public class IconTag extends IncludeTag {
 		}
 
 		if (isAUIImage()) {
-			String pathThemeImages = themeDisplay.getPathThemeImages();
-
-			return pathThemeImages.concat("/spacer.png");
+			return themeDisplay.getPathThemeImages().concat("/spacer.png");
 		}
 		else if (Validator.isNotNull(_image)) {
 			StringBundler sb = new StringBundler(4);
@@ -721,7 +709,6 @@ public class IconTag extends IncludeTag {
 	private Boolean _label;
 	private String _lang;
 	private String _linkCssClass;
-	private String _linkTitle;
 	private boolean _localizeMessage = true;
 	private String _markupView;
 	private String _message;

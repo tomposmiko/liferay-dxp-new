@@ -17,7 +17,7 @@ package com.liferay.structured.content.apio.internal.architect.resource.test;
 import com.liferay.apio.architect.language.AcceptLanguage;
 import com.liferay.apio.architect.pagination.PageItems;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerTracker;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
@@ -33,7 +33,6 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.apio.test.util.PaginationRequest;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -110,8 +109,6 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsSortByCheckboxStructureFieldAsc()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -120,7 +117,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -136,7 +133,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle1 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -144,7 +141,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle2 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -175,8 +172,6 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsSortByCheckboxStructureFieldDesc()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -185,7 +180,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -201,7 +196,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle1 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -209,7 +204,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle2 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -546,8 +541,6 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 	@Test
 	public void testGetPageItemsSortByDateStructureFieldAsc() throws Throwable {
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -556,7 +549,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -572,7 +565,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle1 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -580,7 +573,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle2 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -611,8 +604,6 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsSortByDateStructureFieldDesc()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -621,7 +612,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -637,7 +628,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle1 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -645,7 +636,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle2 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -676,8 +667,6 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsSortByDecimalStructureFieldAsc()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -686,7 +675,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -702,7 +691,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle1 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -710,7 +699,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle2 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -741,8 +730,6 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsSortByDecimalStructureFieldDesc()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -751,7 +738,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -767,7 +754,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle1 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -775,7 +762,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle2 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -806,8 +793,6 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsSortByIntegerStructureFieldDesc()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -816,7 +801,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -832,7 +817,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle1 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -840,7 +825,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle2 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -871,8 +856,6 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsSortByRadioStructureFieldAsc()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -881,7 +864,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -897,7 +880,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle1 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -905,7 +888,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle2 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -936,8 +919,6 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsSortByRadioStructureFieldDesc()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -946,7 +927,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -962,7 +943,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle1 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -970,7 +951,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle2 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -1001,8 +982,6 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsSortByStringStructureFieldAsc()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -1011,7 +990,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -1027,7 +1006,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle1 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -1035,7 +1014,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle2 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -1066,8 +1045,6 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 	public void testGetPageItemsSortByStringStructureFieldDesc()
 		throws Throwable {
 
-		User user = TestPropsValues.getUser();
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(
 				PortalUtil.getClassNameId(JournalArticle.class), _group);
@@ -1076,7 +1053,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			deserialize(
-				_ddmFormJSONDeserializer,
+				_ddmFormDeserializerTracker,
 				read("test-journal-all-fields-structure.json")),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
@@ -1092,7 +1069,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle1 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-1.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -1100,7 +1077,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 
 		JournalArticle journalArticle2 =
 			JournalArticleLocalServiceUtil.addArticle(
-				user.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
 				null, read("test-journal-all-fields-content-2.xml"),
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
@@ -1367,7 +1344,7 @@ public class ResourceSortingStructuredContentNestedCollectionResourceTest
 	private static ServiceTracker<SortParser, SortParser> _serviceTracker;
 
 	@Inject
-	private DDMFormJSONDeserializer _ddmFormJSONDeserializer;
+	private DDMFormDeserializerTracker _ddmFormDeserializerTracker;
 
 	@DeleteAfterTestRun
 	private Group _group;

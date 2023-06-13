@@ -100,7 +100,7 @@ AUI.add(
 
 				new renderer(context, container);
 
-				return container.firstChild.innerHTML;
+				return container.firstElementChild.innerHTML;
 			},
 
 			_renderList: function(options, showPlaceholderOption) {

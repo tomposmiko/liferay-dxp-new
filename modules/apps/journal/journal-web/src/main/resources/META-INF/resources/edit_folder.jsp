@@ -25,8 +25,6 @@ long folderId = BeanParamUtil.getLong(folder, request, "folderId");
 
 long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
-boolean mergeWithParentFolderDisabled = ParamUtil.getBoolean(request, "mergeWithParentFolderDisabled");
-
 boolean rootFolder = ParamUtil.getBoolean(request, "rootFolder");
 
 boolean workflowEnabled = WorkflowEngineManagerUtil.isDeployed() && (WorkflowHandlerRegistryUtil.getWorkflowHandler(JournalArticle.class.getName()) != null);
@@ -200,8 +198,6 @@ renderResponse.setTitle(title);
 
 						<aui:button disabled="<%= parentFolderId <= 0 %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
 					</div>
-
-					<aui:input disabled="<%= mergeWithParentFolderDisabled %>" label="merge-with-parent-folder" name="mergeWithParentFolder" type="toggle-switch" />
 				</liferay-frontend:fieldset>
 			</c:if>
 
@@ -223,6 +219,7 @@ renderResponse.setTitle(title);
 				<liferay-frontend:fieldset
 					collapsed="<%= true %>"
 					collapsible="<%= true %>"
+					cssClass="structure-restrictions"
 					helpMessage='<%= rootFolder ? "" : "structure-restrictions-help" %>'
 					label='<%= rootFolder ? "" : (workflowEnabled ? "structure-restrictions-and-workflow" : "structure-restrictions") %>'
 				>
@@ -257,13 +254,14 @@ renderResponse.setTitle(title);
 									modelVar="ddmStructure"
 								>
 									<liferay-ui:search-container-column-text
+										cssClass="table-cell-expand table-cell-minw-200 table-title"
 										name="name"
-										truncate="<%= true %>"
 										value="<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>"
 									/>
 
 									<c:if test="<%= workflowEnabled %>">
 										<liferay-ui:search-container-column-text
+											cssClass="table-cell-expand table-cell-minw-200"
 											name="workflow"
 										>
 											<aui:select label="" name='<%= "workflowDefinition" + ddmStructure.getStructureId() %>'>
@@ -307,7 +305,7 @@ renderResponse.setTitle(title);
 								/>
 							</liferay-ui:search-container>
 
-							<aui:button id="selectStructure" value="choose-structure" />
+							<aui:button id="selectDDMStructure" value="choose-structure" />
 						</div>
 					</c:if>
 
@@ -399,7 +397,7 @@ renderResponse.setTitle(title);
 <aui:script use="liferay-search-container">
 	var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />ddmStructuresSearchContainer');
 
-	$('#<portlet:namespace />selectStructure').on(
+	$('#<portlet:namespace />selectDDMStructure').on(
 		'click',
 		function(event) {
 			Liferay.Util.selectEntity(
@@ -408,9 +406,9 @@ renderResponse.setTitle(title);
 						constrain: true,
 						modal: true
 					},
-					eventName: '<portlet:namespace />selectStructure',
+					eventName: '<portlet:namespace />selectDDMStructure',
 					title: '<%= UnicodeLanguageUtil.get(request, "structures") %>',
-					uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/select_structure.jsp" /></portlet:renderURL>'
+					uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/select_ddm_structure.jsp" /></portlet:renderURL>'
 				},
 				function(event) {
 					var ddmStructureLink = '<a class="modify-link" data-rowId="' + event.ddmstructureid + '" href="javascript:;"><%= UnicodeFormatter.toString(removeDDMStructureIcon) %></a>';
@@ -455,18 +453,3 @@ renderResponse.setTitle(title);
 		Liferay.Util.toggleRadio('<portlet:namespace />restrictionTypeWorkflow', '<portlet:namespace />restrictionTypeWorkflowDiv', '<portlet:namespace />restrictionTypeDefinedDiv');
 	</c:if>
 </aui:script>
-
-<%
-if (folder != null) {
-	JournalPortletUtil.addPortletBreadcrumbEntries(folderId, request, journalDisplayContext.getPortletURL());
-
-	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "edit"), currentURL);
-}
-else {
-	if (parentFolderId > 0) {
-		JournalPortletUtil.addPortletBreadcrumbEntries(parentFolderId, request, journalDisplayContext.getPortletURL());
-	}
-
-	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "add-folder"), currentURL);
-}
-%>

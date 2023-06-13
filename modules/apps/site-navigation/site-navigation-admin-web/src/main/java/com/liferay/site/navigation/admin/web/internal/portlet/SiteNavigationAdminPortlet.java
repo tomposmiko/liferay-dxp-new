@@ -14,10 +14,15 @@
 
 package com.liferay.site.navigation.admin.web.internal.portlet;
 
-import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
+import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.site.navigation.admin.constants.SiteNavigationAdminPortletKeys;
 import com.liferay.site.navigation.admin.web.internal.constants.SiteNavigationAdminWebKeys;
+import com.liferay.site.navigation.admin.web.internal.display.context.SiteNavigationAdminDisplayContext;
+import com.liferay.site.navigation.service.SiteNavigationMenuLocalService;
+import com.liferay.site.navigation.service.SiteNavigationMenuService;
 import com.liferay.site.navigation.type.SiteNavigationMenuItemTypeRegistry;
 
 import java.io.IOException;
@@ -26,6 +31,8 @@ import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -64,22 +71,38 @@ public class SiteNavigationAdminPortlet extends MVCPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		renderRequest.setAttribute(
-			"npmResolvedPackageName",
-			_npmResolver.resolveModuleName("site-navigation-menu-web"));
+		LiferayPortletRequest liferayPortletRequest =
+			_portal.getLiferayPortletRequest(renderRequest);
+		LiferayPortletResponse liferayPortletResponse =
+			_portal.getLiferayPortletResponse(renderResponse);
+		HttpServletRequest request = _portal.getHttpServletRequest(
+			renderRequest);
+
+		SiteNavigationAdminDisplayContext siteNavigationAdminDisplayContext =
+			new SiteNavigationAdminDisplayContext(
+				liferayPortletRequest, liferayPortletResponse, request,
+				_siteNavigationMenuItemTypeRegistry,
+				_siteNavigationMenuLocalService, _siteNavigationMenuService);
 
 		renderRequest.setAttribute(
-			SiteNavigationAdminWebKeys.SITE_NAVIGATION_MENU_ITEM_TYPE_REGISTRY,
-			_siteNavigationMenuItemTypeRegistry);
+			SiteNavigationAdminWebKeys.
+				SITE_NAVIGATION_MENU_ADMIN_DISPLAY_CONTEXT,
+			siteNavigationAdminDisplayContext);
 
 		super.doDispatch(renderRequest, renderResponse);
 	}
 
 	@Reference
-	private NPMResolver _npmResolver;
+	private Portal _portal;
 
 	@Reference
 	private SiteNavigationMenuItemTypeRegistry
 		_siteNavigationMenuItemTypeRegistry;
+
+	@Reference
+	private SiteNavigationMenuLocalService _siteNavigationMenuLocalService;
+
+	@Reference
+	private SiteNavigationMenuService _siteNavigationMenuService;
 
 }

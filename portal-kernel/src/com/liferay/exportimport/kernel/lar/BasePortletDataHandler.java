@@ -192,20 +192,17 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 		// Setup
 
-		long count1 =
-			PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
+		if ((PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
 				PortletKeys.PREFS_OWNER_ID_DEFAULT,
-				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid, portlet, false);
-		long count2 =
-			PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid, portlet, false) >
+					0) ||
+			(PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
 				groupId, PortletKeys.PREFS_OWNER_TYPE_GROUP,
-				portlet.getRootPortletId(), false);
-		long count3 =
-			PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
+				portlet.getRootPortletId(), false) > 0) ||
+			(PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
 				companyId, PortletKeys.PREFS_OWNER_TYPE_COMPANY,
-				portlet.getRootPortletId(), false);
+				portlet.getRootPortletId(), false) > 0)) {
 
-		if ((count1 > 0) || (count2 > 0) || (count3 > 0)) {
 			PortletDataHandlerControl[] portletDataHandlerControls = null;
 
 			if (isDisplayPortlet()) {
@@ -220,11 +217,10 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 		// Archived setups
 
-		count1 = PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
-			-1, PortletKeys.PREFS_OWNER_TYPE_ARCHIVED,
-			portlet.getRootPortletId(), false);
+		if (PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
+				-1, PortletKeys.PREFS_OWNER_TYPE_ARCHIVED,
+				portlet.getRootPortletId(), false) > 0) {
 
-		if (count1 > 0) {
 			configurationControls.add(
 				new PortletDataHandlerBoolean(
 					null, PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS,
@@ -233,13 +229,13 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 		// User preferences
 
-		count1 = PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
-			-1, PortletKeys.PREFS_OWNER_TYPE_USER, plid, portlet, false);
-		count2 = PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
-			groupId, PortletKeys.PREFS_OWNER_TYPE_USER,
-			PortletKeys.PREFS_PLID_SHARED, portlet, false);
+		if ((PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
+				-1, PortletKeys.PREFS_OWNER_TYPE_USER, plid, portlet, false) >
+					0) ||
+			(PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
+				groupId, PortletKeys.PREFS_OWNER_TYPE_USER,
+				PortletKeys.PREFS_PLID_SHARED, portlet, false) > 0)) {
 
-		if ((count1 > 0) || (count2 > 0)) {
 			configurationControls.add(
 				new PortletDataHandlerBoolean(
 					null, PortletDataHandlerKeys.PORTLET_USER_PREFERENCES,

@@ -120,11 +120,12 @@ public class FriendlyURLEntryLocalServiceImpl
 
 		friendlyURLEntryMappingPersistence.update(friendlyURLEntryMapping);
 
-		_updateFriendlyURLEntryLocalizations(
-			friendlyURLEntryId, group.getCompanyId(), groupId, classNameId,
-			classPK, urlTitleMap);
+		friendlyURLEntryPersistence.update(friendlyURLEntry);
 
-		return friendlyURLEntryPersistence.update(friendlyURLEntry);
+		_updateFriendlyURLEntryLocalizations(
+			friendlyURLEntry, classNameId, classPK, urlTitleMap);
+
+		return friendlyURLEntry;
 	}
 
 	@Override
@@ -349,8 +350,10 @@ public class FriendlyURLEntryLocalServiceImpl
 				Math.min(
 					maxLength - suffix.length(), normalizedUrlTitle.length()));
 
+			String decodedUrlTitle = HttpUtil.decodePath(prefix + suffix);
+
 			curUrlTitle = FriendlyURLNormalizerUtil.normalizeWithEncoding(
-				HttpUtil.decodePath(prefix + suffix));
+				decodedUrlTitle);
 		}
 
 		return curUrlTitle;
@@ -396,11 +399,12 @@ public class FriendlyURLEntryLocalServiceImpl
 		friendlyURLEntry.setClassPK(classPK);
 		friendlyURLEntry.setDefaultLanguageId(defaultLanguageId);
 
-		_updateFriendlyURLEntryLocalizations(
-			friendlyURLEntryId, friendlyURLEntry.getCompanyId(),
-			friendlyURLEntry.getGroupId(), classNameId, classPK, urlTitleMap);
+		friendlyURLEntryPersistence.update(friendlyURLEntry);
 
-		return friendlyURLEntryPersistence.update(friendlyURLEntry);
+		_updateFriendlyURLEntryLocalizations(
+			friendlyURLEntry, classNameId, classPK, urlTitleMap);
+
+		return friendlyURLEntry;
 	}
 
 	@Override
@@ -449,9 +453,8 @@ public class FriendlyURLEntryLocalServiceImpl
 		int maxLength = ModelHintsUtil.getMaxLength(
 			FriendlyURLEntryLocalization.class.getName(), "urlTitle");
 
-		String normalizedUrlTitle =
-			FriendlyURLNormalizerUtil.normalizeWithEncoding(
-				HttpUtil.decodePath(urlTitle));
+		String normalizedUrlTitle = FriendlyURLNormalizerUtil.normalize(
+			urlTitle);
 
 		if (normalizedUrlTitle.length() > maxLength) {
 			throw new FriendlyURLLengthException(
@@ -510,8 +513,9 @@ public class FriendlyURLEntryLocalServiceImpl
 	}
 
 	private void _updateFriendlyURLEntryLocalizations(
-		long friendlyURLEntryId, long companyId, long groupId, long classNameId,
-		long classPK, Map<String, String> urlTitleMap) {
+			FriendlyURLEntry friendlyURLEntry, long classNameId, long classPK,
+			Map<String, String> urlTitleMap)
+		throws PortalException {
 
 		for (Map.Entry<String, String> entry : urlTitleMap.entrySet()) {
 			String urlTitle = HttpUtil.decodePath(entry.getValue());
@@ -525,56 +529,24 @@ public class FriendlyURLEntryLocalServiceImpl
 
 			FriendlyURLEntryLocalization existingFriendlyURLEntryLocalization =
 				friendlyURLEntryLocalizationPersistence.fetchByG_C_U(
-					groupId, classNameId, normalizedUrlTitle);
+					friendlyURLEntry.getGroupId(), classNameId,
+					normalizedUrlTitle);
 
 			if ((existingFriendlyURLEntryLocalization != null) &&
 				(existingFriendlyURLEntryLocalization.getClassPK() ==
 					classPK)) {
 
-				String existingLanguageId =
-					existingFriendlyURLEntryLocalization.getLanguageId();
-
-				if (!existingLanguageId.equals(entry.getKey())) {
-					String existingUrlTitle =
-						existingFriendlyURLEntryLocalization.getUrlTitle();
-
-					if (existingUrlTitle.equals(
-							urlTitleMap.get(existingLanguageId))) {
-
-						continue;
-					}
-
-					existingFriendlyURLEntryLocalization.setLanguageId(
-						entry.getKey());
-				}
-
 				existingFriendlyURLEntryLocalization.setFriendlyURLEntryId(
-					friendlyURLEntryId);
+					friendlyURLEntry.getFriendlyURLEntryId());
 
-				friendlyURLEntryLocalizationPersistence.update(
+				updateFriendlyURLLocalization(
 					existingFriendlyURLEntryLocalization);
 
 				continue;
 			}
 
-			long friendlyURLEntryLocalizationId = counterLocalService.increment(
-				FriendlyURLEntryLocalization.class.getName());
-
-			FriendlyURLEntryLocalization friendlyURLEntryLocalization =
-				friendlyURLEntryLocalizationPersistence.create(
-					friendlyURLEntryLocalizationId);
-
-			friendlyURLEntryLocalization.setCompanyId(companyId);
-			friendlyURLEntryLocalization.setFriendlyURLEntryId(
-				friendlyURLEntryId);
-			friendlyURLEntryLocalization.setGroupId(groupId);
-			friendlyURLEntryLocalization.setClassNameId(classNameId);
-			friendlyURLEntryLocalization.setClassPK(classPK);
-			friendlyURLEntryLocalization.setUrlTitle(normalizedUrlTitle);
-			friendlyURLEntryLocalization.setLanguageId(entry.getKey());
-
-			friendlyURLEntryLocalizationPersistence.update(
-				friendlyURLEntryLocalization);
+			updateFriendlyURLEntryLocalization(
+				friendlyURLEntry, entry.getKey(), normalizedUrlTitle);
 		}
 	}
 

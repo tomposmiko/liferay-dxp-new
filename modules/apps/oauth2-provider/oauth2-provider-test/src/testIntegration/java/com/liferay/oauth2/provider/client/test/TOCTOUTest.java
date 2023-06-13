@@ -34,7 +34,6 @@ import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -101,9 +100,7 @@ public class TOCTOUTest extends BaseClientTestCase {
 					"end-user TOCTOU protection");
 		}
 		catch (ClientErrorException cee) {
-			Response response = cee.getResponse();
-
-			Assert.assertEquals(403, response.getStatus());
+			Assert.assertEquals(403, cee.getResponse().getStatus());
 		}
 
 		// Try again with a fresh narrowed down token for "everything.read".
@@ -124,9 +121,7 @@ public class TOCTOUTest extends BaseClientTestCase {
 					"TOCTOU protection");
 		}
 		catch (ClientErrorException cee) {
-			Response response = cee.getResponse();
-
-			Assert.assertEquals(403, response.getStatus());
+			Assert.assertEquals(403, cee.getResponse().getStatus());
 		}
 
 		// Resave the OAuth2 app scope assignment
@@ -143,9 +138,7 @@ public class TOCTOUTest extends BaseClientTestCase {
 					"TOCTOU protection");
 		}
 		catch (ClientErrorException cee) {
-			Response response = cee.getResponse();
-
-			Assert.assertEquals(403, response.getStatus());
+			Assert.assertEquals(403, cee.getResponse().getStatus());
 		}
 
 		// Try again with a fresh token (implicitly for "everything.read"). It
@@ -236,7 +229,7 @@ public class TOCTOUTest extends BaseClientTestCase {
 
 			Dictionary<String, Object> properties = new HashMapDictionary<>();
 
-			properties.put("oauth2.scope.checker.type", "annotations");
+			properties.put("oauth2.scopechecker.type", "annotations");
 
 			registerJaxRsApplication(
 				new TestRunnablePostHandlingApplication(

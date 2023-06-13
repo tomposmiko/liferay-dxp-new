@@ -62,9 +62,8 @@ public class IconPortletTag extends IconTag {
 				themeDisplay.getLocale());
 
 			if (Validator.isNotNull(_portlet.getIcon())) {
-				String staticResourcePath = _portlet.getStaticResourcePath();
-
-				src = staticResourcePath.concat(_portlet.getIcon());
+				src = _portlet.getStaticResourcePath().concat(
+					_portlet.getIcon());
 			}
 			else {
 				src = themeDisplay.getPathContext() + "/html/icons/default.png";
