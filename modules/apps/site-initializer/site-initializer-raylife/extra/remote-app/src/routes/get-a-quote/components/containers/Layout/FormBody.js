@@ -15,11 +15,11 @@
 import React, {useEffect, useState} from 'react';
 
 import {useStepWizard} from '../../../hooks/useStepWizard';
-import {AVAILABLE_STEPS, STEP_ORDERED} from '../../../utils/constants';
+import {AVAILABLE_STEPS} from '../../../utils/constants';
 import {getLoadedContentFlag} from '../../../utils/util';
 
-export function Forms({currentStepIndex, form}) {
-	const {setSection} = useStepWizard();
+export function Forms({form, formActionContext: {isMobileDevice}}) {
+	const {selectedStep, setSection} = useStepWizard();
 	const [loaded, setLoaded] = useState(false);
 	const [loadedSections, setLoadedSections] = useState(false);
 	const {backToEdit} = getLoadedContentFlag();
@@ -33,16 +33,18 @@ export function Forms({currentStepIndex, form}) {
 
 	useEffect(() => {
 		if (backToEdit) {
-			loadSections();
+			return loadSections();
 		}
-		else {
-			setLoadedSections(true);
-		}
+
+		setLoadedSections(true);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [loaded]);
 
+	// eslint-disable-next-line no-unused-vars
 	const loadSections = () => {
-		const sectionFormKeys = Object.keys(form);
+		const sectionFormKeys = Object.keys(form).filter(
+			(section) => section !== 'raylife-form-input'
+		);
 
 		const stepName = sectionFormKeys[
 			sectionFormKeys.length - 1
@@ -83,8 +85,7 @@ export function Forms({currentStepIndex, form}) {
 		return null;
 	}
 
-	const Component =
-		STEP_ORDERED[currentStepIndex]?.Component || (() => <></>);
+	const Component = selectedStep?.Component || (() => <></>);
 
-	return <Component form={form} />;
+	return <Component form={form} isMobile={isMobileDevice} />;
 }

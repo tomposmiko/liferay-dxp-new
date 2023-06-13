@@ -137,7 +137,7 @@ public class JournalManagementToolbarDisplayContext
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									httpServletRequest,
-									"export-for-translation"));
+									"export-for-translations"));
 							dropdownItem.setQuickAction(true);
 						}
 					).build());
@@ -387,7 +387,7 @@ public class JournalManagementToolbarDisplayContext
 						ddmStructureName);
 			}
 		).add(
-			() -> status != _journalDisplayContext.getDefaultStatus(),
+			() -> status != WorkflowConstants.STATUS_ANY,
 			labelItem -> {
 				labelItem.putData(
 					"removeLabelURL",
@@ -395,7 +395,7 @@ public class JournalManagementToolbarDisplayContext
 						PortletURLUtil.clone(
 							currentURLObj, liferayPortletResponse)
 					).setParameter(
-						"status", (String)null
+						"status", WorkflowConstants.STATUS_ANY
 					).buildString());
 
 				labelItem.setCloseable(true);

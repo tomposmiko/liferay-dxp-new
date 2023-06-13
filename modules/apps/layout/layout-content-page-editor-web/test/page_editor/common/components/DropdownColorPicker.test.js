@@ -13,7 +13,12 @@
  */
 
 import '@testing-library/jest-dom/extend-expect';
-import {act, cleanup, fireEvent, render} from '@testing-library/react';
+import {
+	fireEvent,
+	render,
+	waitFor,
+	waitForElementToBeRemoved,
+} from '@testing-library/react';
 import React from 'react';
 
 import {DropdownColorPicker} from '../../../../src/main/resources/META-INF/resources/page_editor/common/components/DropdownColorPicker';
@@ -51,9 +56,9 @@ const COLORS = {
 
 const renderDropdownColorPicker = ({
 	active = false,
-	fieldName,
 	label = 'default',
 	onSetActive = () => {},
+	onTokenIsDisabled = () => {},
 	onValueChange = () => {},
 	showSelector = true,
 	value = '#fff',
@@ -63,9 +68,9 @@ const renderDropdownColorPicker = ({
 			active={active}
 			colors={COLORS}
 			config={CONFIG}
-			fieldName={fieldName}
 			label={label}
 			onSetActive={onSetActive}
+			onTokenIsDisabled={onTokenIsDisabled}
 			onValueChange={onValueChange}
 			showSelector={showSelector}
 			value={value}
@@ -73,11 +78,6 @@ const renderDropdownColorPicker = ({
 	);
 
 describe('DropdownColorPicker', () => {
-	afterEach(() => {
-		cleanup();
-		jest.useFakeTimers();
-	});
-
 	it('renders the DropdownColorPicker without label and sploch', () => {
 		const {getByTitle} = renderDropdownColorPicker({showSelector: false});
 
@@ -120,45 +120,44 @@ describe('DropdownColorPicker', () => {
 		palette.forEach((item) => expect(item).toBeInTheDocument());
 	});
 
-	it('filters by category', () => {
+	it('filters by category', async () => {
 		const {getByLabelText, queryByText} = renderDropdownColorPicker({
 			active: true,
 		});
 		const searchForm = getByLabelText('search-form');
 
-		act(() => {
-			fireEvent.change(searchForm, {
-				target: {value: 'Category 1'},
-			});
-			jest.runAllTimers();
+		fireEvent.change(searchForm, {
+			target: {value: 'Category 1'},
 		});
+
+		await waitForElementToBeRemoved(queryByText('Category 2'));
 
 		expect(queryByText('Category 1')).toBeInTheDocument();
-		expect(queryByText('Category 2')).not.toBeInTheDocument();
 	});
 
-	it('filters by tokenSet', () => {
+	it('filters by tokenSet', async () => {
 		const {getByLabelText, queryByText} = renderDropdownColorPicker({
 			active: true,
 		});
 		const searchForm = getByLabelText('search-form');
 
-		act(() => {
-			fireEvent.change(searchForm, {
-				target: {value: 'TokenSet 1'},
-			});
-			jest.runAllTimers();
+		fireEvent.change(searchForm, {
+			target: {value: 'TokenSet 1'},
 		});
 
-		[queryByText('Category 1'), queryByText('TokenSet 1')].forEach((item) =>
-			expect(item).toBeInTheDocument()
-		);
-		[queryByText('Category 2'), queryByText('TokenSet 2')].forEach((item) =>
-			expect(item).not.toBeInTheDocument()
-		);
+		await waitFor(() => {
+			[
+				queryByText('Category 1'),
+				queryByText('TokenSet 1'),
+			].forEach((item) => expect(item).toBeInTheDocument());
+			[
+				queryByText('Category 2'),
+				queryByText('TokenSet 2'),
+			].forEach((item) => expect(item).not.toBeInTheDocument());
+		});
 	});
 
-	it('filters by color', () => {
+	it('filters by color', async () => {
 		const {
 			getByLabelText,
 			getByTitle,
@@ -167,49 +166,36 @@ describe('DropdownColorPicker', () => {
 		} = renderDropdownColorPicker({active: true});
 		const searchForm = getByLabelText('search-form');
 
-		act(() => {
-			fireEvent.change(searchForm, {
-				target: {value: 'Color 1'},
-			});
-			jest.runAllTimers();
+		fireEvent.change(searchForm, {
+			target: {value: 'Color 1'},
 		});
 
-		[
-			queryByText('Category 1'),
-			queryByText('TokenSet 1'),
-			getByTitle('Color 1'),
-		].forEach((item) => expect(item).toBeInTheDocument());
-		[
-			queryByText('Category 2'),
-			queryByTitle('Color 2'),
-			queryByTitle('Color 3'),
-		].forEach((item) => expect(item).not.toBeInTheDocument());
+		await waitFor(() => {
+			[
+				queryByText('Category 1'),
+				queryByText('TokenSet 1'),
+				getByTitle('Color 1'),
+			].forEach((item) => expect(item).toBeInTheDocument());
+			[
+				queryByText('Category 2'),
+				queryByTitle('Color 2'),
+				queryByTitle('Color 3'),
+			].forEach((item) => expect(item).not.toBeInTheDocument());
+		});
 	});
 
-	it('shows empty results', () => {
-		const {getByLabelText, queryByText} = renderDropdownColorPicker({
+	it('shows empty results', async () => {
+		const {findByText, getByLabelText} = renderDropdownColorPicker({
 			active: true,
 		});
 		const searchForm = getByLabelText('search-form');
 
-		act(() => {
-			fireEvent.change(searchForm, {
-				target: {value: 'Color 123'},
-			});
-			jest.runAllTimers();
+		fireEvent.change(searchForm, {
+			target: {value: 'Color 123'},
 		});
 
-		expect(queryByText('no-results-found')).toBeInTheDocument();
-	});
+		const noResultsMessage = await findByText('no-results-found');
 
-	it('disables the color splotch if the field name matches the token', () => {
-		const {getByTitle} = renderDropdownColorPicker({
-			active: true,
-			fieldName: 'color3',
-		});
-
-		expect(getByTitle('Color 1')).not.toBeDisabled();
-		expect(getByTitle('Color 2')).not.toBeDisabled();
-		expect(getByTitle('Color 3')).toBeDisabled();
+		expect(noResultsMessage).toBeInTheDocument();
 	});
 });

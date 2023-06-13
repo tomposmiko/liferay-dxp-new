@@ -117,7 +117,7 @@ definition {
 
 		task ("Add the user1 user1 as member") {
 			Click(
-				key_TableMember = "user1 user1",
+				key_tableMember = "user1 user1",
 				locator1 = "ACSegments#TABLE_CHECKBOX");
 
 			Click(locator1 = "ACSegments#ADD_BUTTON");
@@ -135,7 +135,7 @@ definition {
 
 		task ("Add the userfn userln as member") {
 			Click(
-				key_TableMember = "userfn userln",
+				key_tableMember = "userfn userln",
 				locator1 = "ACSegments#TABLE_CHECKBOX");
 
 			Click(locator1 = "ACSegments#ADD_BUTTON");
@@ -211,6 +211,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8477 | Test Summary: Cancel creating a static segment"
 	@priority = "3"
 	test CanCancelCreatingStaticSegment {
+		property portal.upstream = "quarantine";
+
+		// AC Refactor ticket: LRAC-9707
+
 		task ("Sign in as new user") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "userea@liferay.com",
@@ -687,7 +691,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8482 | Test Summary: Create a nested criteria"
 	@priority = "3"
 	test CanCreateNestedCriteria {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "SegmentsCreation#CanCreateNestedCriteria";
+
+		// AC Refactor ticket: LRAC-9707
 
 		var usernameList = "userea,user1,test";
 		var emailList = "userea@liferay.com,user1@liferay.com,test@liferay.com";
@@ -1244,6 +1251,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8472 | Test Summary: Paginate static segment 'Add Members' creation model"
 	@priority = "3"
 	test CanPaginateStaticSegmentAddMembers {
+		property portal.upstream = "quarantine";
+
+		// AC Refactor ticket: LRAC-9707
+
 		var usernameList = "user1,user2,user3,user4,user5";
 		var emailList = "userea@liferay.com,user1@liferay.com,user2@liferay.com,user3@liferay.com,user4@liferay.com,user5@liferay.com";
 		var nameList = "user1 user1,user2 user2,user3 user3,user4 user4,user5 user5";
@@ -1304,7 +1315,7 @@ definition {
 			ACUtils.viewNameList(nameList = "${nameList}");
 
 			AssertElementNotPresent(
-				key_TableMember = "userfn userln",
+				key_tableMember = "userfn userln",
 				locator1 = "ACSegments#TABLE_CHECKBOX");
 		}
 
@@ -1320,6 +1331,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8475 | Test Summary: Dynamic segment members preview in real time"
 	@priority = "3"
 	test CanPreviewDynamicSegmentMembers {
+		property portal.upstream = "quarantine";
+
 		var emailList = "userea@liferay.com,user1@liferay.com";
 		var usernameList = "userfn userln,user1 user1";
 
@@ -1498,7 +1511,7 @@ definition {
 			var getFirst = StringUtil.upperCase("${getFirst}");
 
 			AssertTextEquals(
-				key_SegmentType = "${getFirst}",
+				key_segmentType = "${getFirst}",
 				locator1 = "ACSegments#SELECT_SEGMENT_TYPE",
 				value1 = "${segmentType}");
 		}

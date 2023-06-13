@@ -1961,6 +1961,18 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>com.liferay.image.impl.jar!im4java.jar</file-name>
+				<version>1.2.0</version>
+				<project-name>im4java</project-name>
+				<project-url>http://sourceforge.net/projects/im4java/</project-url>
+				<licenses>
+					<license>
+						<license-name>GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1</license-name>
+						<license-url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>com.liferay.imageio.plugins.jar!common-image.jar</file-name>
 				<version>3.3.2</version>
 				<project-name>TwelveMonkeys :: Common :: Image</project-name>
@@ -2582,6 +2594,29 @@
 					<license>
 						<license-name>LGPL 2.1</license-name>
 						<license-url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.ccpp.api.jar!ccpp.jar</file-name>
+				<version>1.0</version>
+				<project-name>CC/PP API</project-name>
+				<project-url>http://www.jcp.org/en/jsr/detail?id=188</project-url>
+				<licenses>
+					<license>
+						<license-name>Sun Microsystems, Inc. Binary Code License Agreement</license-name>
+						<license-url>http://java.sun.com/j2ee/ccpp</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.ccpp.impl.jar!oro.jar</file-name>
+				<version>2.0.8</version>
+				<project-name>oro:oro</project-name>
+				<licenses>
+					<license>
+						<license-name>Apache Software License, Version 1.1</license-name>
+						<license-url>https://www.apache.org/licenses/LICENSE-1.1</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -5225,7 +5260,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/com.liferay.jenkins.results.parser.jar</file-name>
-				<version>1.0.908</version>
+				<version>1.0.981</version>
 				<project-name>Liferay Jenkins Results Parser</project-name>
 				<licenses>
 					<license>
@@ -5236,7 +5271,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/com.liferay.poshi.core.jar</file-name>
-				<version>1.0.32</version>
+				<version>1.0.45</version>
 				<project-name>Liferay Poshi Core</project-name>
 				<licenses>
 					<license>
@@ -6192,30 +6227,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/ccpp-ri.jar</file-name>
-				<version>1.0</version>
-				<project-name>CC/PP Processing</project-name>
-				<project-url>http://java.sun.com/j2ee/ccpp</project-url>
-				<licenses>
-					<license>
-						<license-name>Common Development and Distribution License 1.0</license-name>
-						<license-url>https://opensource.org/licenses/CDDL-1.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/ccpp.jar</file-name>
-				<version>1.0</version>
-				<project-name>CC/PP Processing</project-name>
-				<project-url>http://java.sun.com/j2ee/ccpp</project-url>
-				<licenses>
-					<license>
-						<license-name>Common Development and Distribution License 1.0</license-name>
-						<license-url>https://opensource.org/licenses/CDDL-1.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/cglib-nodep.jar</file-name>
 				<version>2.2.2</version>
 				<project-name>Code Generation Library</project-name>
@@ -6402,7 +6413,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/commons-lang3.jar</file-name>
-				<version>3.9</version>
+				<version>3.12.0</version>
 				<project-name>Commons Lang</project-name>
 				<project-url>http://commons.apache.org/proper/commons-lang/</project-url>
 				<licenses>
@@ -6583,19 +6594,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/im4java.jar</file-name>
-				<version>1.2.0</version>
-				<project-name>im4java</project-name>
-				<project-url>http://im4java.sourceforge.net</project-url>
-				<licenses>
-					<license>
-						<license-name>LGPL 2.1</license-name>
-						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
-						<copyright-notice>Copyright (c) Bernhard Bablok 2008-2010</copyright-notice>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/istack-commons-runtime.jar</file-name>
 				<version>3.0.7</version>
 				<project-name>Jaxb Istack Commons</project-name>
@@ -6677,18 +6675,6 @@
 					<license>
 						<license-name>BSD Style License</license-name>
 						<license-url>http://en.wikipedia.org/wiki/BSD_licenses</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/jakarta-regexp.jar</file-name>
-				<version>1.5</version>
-				<project-name>Jakarta Regexp</project-name>
-				<project-url>http://jakarta.apache.org/regexp</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -6826,18 +6812,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/jcifs.jar</file-name>
-				<version>1.3.14-kohsuke-1</version>
-				<project-name>jCIFS</project-name>
-				<project-url>http://jcifs.samba.org</project-url>
-				<licenses>
-					<license>
-						<license-name>LGPL 2.1</license-name>
-						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/jcl-over-slf4j.jar</file-name>
 				<version>1.7.2</version>
 				<project-name>SLF4J</project-name>
@@ -6873,19 +6847,6 @@
 					<license>
 						<license-name>Apache License 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/jena.jar</file-name>
-				<version>1.4</version>
-				<project-name>Jena</project-name>
-				<project-url>http://jena.sourceforge.net</project-url>
-				<licenses>
-					<license>
-						<license-name>BSD Style License</license-name>
-						<license-url>http://en.wikipedia.org/wiki/BSD_licenses</license-url>
-						<copyright-notice>Copyright (c) 2000-2008 Hewlett-Packard Company, LP</copyright-notice>
 					</license>
 				</licenses>
 			</library>
@@ -6942,18 +6903,6 @@
 				<version>4.1.0</version>
 				<project-name>Java Native Access</project-name>
 				<project-url>https://github.com/twall/jna</project-url>
-				<licenses>
-					<license>
-						<license-name>LGPL 2.1</license-name>
-						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/jodconverter.jar</file-name>
-				<version>2.2.2</version>
-				<project-name>JODConverter</project-name>
-				<project-url>http://jodconverter.sourceforge.net</project-url>
 				<licenses>
 					<license>
 						<license-name>LGPL 2.1</license-name>
@@ -7023,18 +6972,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/juh.jar</file-name>
-				<version>2.3.1</version>
-				<project-name>OpenOffice.org Java Uno</project-name>
-				<project-url>http://udk.openoffice.org</project-url>
-				<licenses>
-					<license>
-						<license-name>LGPL 2.1</license-name>
-						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/juniversalchardet.jar</file-name>
 				<version>1.0.3</version>
 				<project-name>Universal Character Detection</project-name>
@@ -7043,18 +6980,6 @@
 					<license>
 						<license-name>MPL 1.1</license-name>
 						<license-url>http://www.mozilla.org/MPL/1.1</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/jurt.jar</file-name>
-				<version>2.3.1</version>
-				<project-name>OpenOffice.org Java Uno</project-name>
-				<project-url>http://udk.openoffice.org</project-url>
-				<licenses>
-					<license>
-						<license-name>LGPL 2.1</license-name>
-						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -7194,18 +7119,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/monte-cc.jar</file-name>
-				<version>0.7.7</version>
-				<project-name>Monte Media Library</project-name>
-				<project-url>http://www.randelshofer.ch/monte</project-url>
-				<licenses>
-					<license>
-						<license-name>LGPL 3.0</license-name>
-						<license-url>https://www.gnu.org/licenses/lgpl-3.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/mp4parser.jar</file-name>
 				<version>1.9.41.2.LIFERAY-PATCHED-2</version>
 				<project-name>ISO Parser</project-name>
@@ -7326,19 +7239,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/oro.jar</file-name>
-				<version>2.0.8</version>
-				<project-name>ORO</project-name>
-				<project-url>http://jakarta.apache.org/oro</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 1.1</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-1.1</license-url>
-						<copyright-notice>Copyright (c) 2000-2002 The Apache Software Foundation. All rights reserved.</copyright-notice>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/pdfbox.jar</file-name>
 				<version>2.0.24</version>
 				<project-name>PDFBox</project-name>
@@ -7439,18 +7339,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/rdffilter.jar</file-name>
-				<version>1.0</version>
-				<project-name>RDF Filter</project-name>
-				<project-url>http://rdf-filter.sourceforge.net</project-url>
-				<licenses>
-					<license>
-						<license-name>Public Domain</license-name>
-						<license-url>http://en.wikipedia.org/wiki/Public_domain</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/rhino.jar</file-name>
 				<version>1.7R4</version>
 				<project-name>Mozilla Rhino</project-name>
@@ -7459,18 +7347,6 @@
 					<license>
 						<license-name>MPL 2.0</license-name>
 						<license-url>https://www.mozilla.org/en-US/MPL/2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/ridl.jar</file-name>
-				<version>2.3.1</version>
-				<project-name>OpenOffice.org Java Uno</project-name>
-				<project-url>http://udk.openoffice.org</project-url>
-				<licenses>
-					<license>
-						<license-name>LGPL 2.1</license-name>
-						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -7916,18 +7792,6 @@
 				<licenses>
 					<license>CDDL 1.1</license>
 					<license-url>https://oss.oracle.com/licenses/CDDL-1.1</license-url>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/unoil.jar</file-name>
-				<version>2.3.1</version>
-				<project-name>OpenOffice.org Java Uno</project-name>
-				<project-url>http://udk.openoffice.org</project-url>
-				<licenses>
-					<license>
-						<license-name>LGPL 2.1</license-name>
-						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
-					</license>
 				</licenses>
 			</library>
 			<library>

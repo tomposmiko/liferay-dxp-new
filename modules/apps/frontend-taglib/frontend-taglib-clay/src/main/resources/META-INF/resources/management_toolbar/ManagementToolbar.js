@@ -16,6 +16,7 @@ import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import {ClayDropDownWithItems} from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
 import ClayManagementToolbar from '@clayui/management-toolbar';
+import {LinkOrButton} from '@clayui/shared';
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 
@@ -30,6 +31,8 @@ import SelectionControls from './SelectionControls';
 
 import './ManagementToolbar.scss';
 
+const noop = () => {};
+
 function ManagementToolbar({
 	clearResultsURL,
 	clearSelectionURL,
@@ -43,15 +46,17 @@ function ManagementToolbar({
 	initialCheckboxStatus,
 	initialSelectAllButtonVisible,
 	initialSelectedItems,
-	onActionButtonClick = () => {},
-	onCheckboxChange = () => {},
-	onClearSelectionButtonClick = () => {},
-	onCreateButtonClick = () => {},
-	onCreationMenuItemClick = () => {},
-	onInfoButtonClick = () => {},
-	onFilterDropdownItemClick = () => {},
-	onSelectAllButtonClick = () => {},
+	onActionButtonClick = noop,
+	onCheckboxChange = noop,
+	onClearSelectionButtonClick = noop,
+	onCreateButtonClick = noop,
+	onCreationMenuItemClick = noop,
+	onInfoButtonClick = noop,
+	onFilterDropdownItemClick = noop,
+	onOrderDropdownItemClick = noop,
+	onSelectAllButtonClick = noop,
 	onShowMoreButtonClick,
+	orderDropdownItems,
 	searchActionURL,
 	searchContainerId,
 	searchData,
@@ -124,6 +129,8 @@ function ManagementToolbar({
 							onFilterDropdownItemClick={
 								onFilterDropdownItemClick
 							}
+							onOrderDropdownItemClick={onOrderDropdownItemClick}
+							orderDropdownItems={orderDropdownItems}
 							sortingOrder={sortingOrder}
 							sortingURL={sortingURL}
 						/>
@@ -223,6 +230,16 @@ function ManagementToolbar({
 												onShowMoreButtonClick
 											}
 										/>
+									) : showDesignImprovementsFF ? (
+										<LinkOrButton
+											className="nav-btn"
+											displayType="primary"
+											onClick={onCreateButtonClick}
+											symbol="plus"
+											wide
+										>
+											{Liferay.Language.get('new')}
+										</LinkOrButton>
 									) : (
 										<ClayButtonWithIcon
 											className="nav-btn nav-btn-monospaced"
@@ -282,6 +299,7 @@ ManagementToolbar.propTypes = {
 	onCreateButtonClick: PropTypes.func,
 	onInfoButtonClick: PropTypes.func,
 	onViewTypeSelect: PropTypes.func,
+	orderDropdownItems: PropTypes.array,
 	searchActionURL: PropTypes.string,
 	searchContainerId: PropTypes.string,
 	searchData: PropTypes.object,

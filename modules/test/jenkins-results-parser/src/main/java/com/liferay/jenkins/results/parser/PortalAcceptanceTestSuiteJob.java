@@ -31,9 +31,10 @@ public abstract class PortalAcceptanceTestSuiteJob
 
 	public PortalAcceptanceTestSuiteJob(
 		String jobName, BuildProfile buildProfile, String testSuiteName,
-		String branchName) {
+		String branchName,
+		PortalGitWorkingDirectory portalGitWorkingDirectory) {
 
-		super(jobName, buildProfile, branchName);
+		super(jobName, buildProfile, branchName, portalGitWorkingDirectory);
 
 		if (testSuiteName == null) {
 			testSuiteName = "default";
@@ -85,12 +86,14 @@ public abstract class PortalAcceptanceTestSuiteJob
 		if (!JenkinsResultsParserUtil.isNullOrEmpty(distType)) {
 			for (DistType distTypeValue : DistType.values()) {
 				if (distType.equals(distTypeValue.toString())) {
+					recordJobProperty(jobProperty);
+
 					return distTypeValue;
 				}
 			}
 		}
 
-		return super.getDistType();
+		return DistType.CI;
 	}
 
 	@Override
@@ -118,11 +121,13 @@ public abstract class PortalAcceptanceTestSuiteJob
 	protected Set<String> getRawBatchNames() {
 		Set<String> rawBatchNames = super.getRawBatchNames();
 
-		if (!_testSuiteName.equals("relevant")) {
+		if (!testRelevantChanges()) {
 			return rawBatchNames;
 		}
 
 		JobProperty jobProperty = getJobProperty("test.batch.names[stable]");
+
+		recordJobProperty(jobProperty);
 
 		rawBatchNames.addAll(getSetFromString(jobProperty.getValue()));
 
@@ -130,9 +135,11 @@ public abstract class PortalAcceptanceTestSuiteJob
 	}
 
 	protected Set<String> getRawDependentBatchNames() {
-		JobProperty batchJobProperty = getJobProperty("test.batch.names.smoke");
+		JobProperty jobProperty = getJobProperty("test.batch.names.smoke");
 
-		return getSetFromString(batchJobProperty.getValue());
+		recordJobProperty(jobProperty);
+
+		return getSetFromString(jobProperty.getValue());
 	}
 
 	private final String _testSuiteName;

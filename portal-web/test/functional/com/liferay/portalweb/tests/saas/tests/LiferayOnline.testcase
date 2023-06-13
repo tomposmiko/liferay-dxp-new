@@ -37,12 +37,10 @@ definition {
 		property test.name.skip.portal.instance = "LiferayOnline#AddVirtualInstanceWithDefaultInitializer";
 
 		task ("Add virtual instance able.com with a blank Initializer") {
-			PortalInstances.openVirtualInstancesAdmin();
-
-			LiferayOnline.addVirtualInstanceWithInitializer(
-				mailDomain = "www.baker.com",
-				virtualHost = "www.baker.com",
-				webId = "www.baker.com");
+			HeadlessPortalInstanceAPI.addPortalInstance(
+				domain = "www.baker.com",
+				portalInstanceId = "www.baker.com",
+				virtualHost = "www.baker.com");
 		}
 
 		task ("Go to the new Virtual Instance") {
@@ -64,13 +62,11 @@ definition {
 		property test.name.skip.portal.instance = "LiferayOnline#AddVirtualInstanceWithInitializer";
 
 		task ("Add virtual instance raylife.com with the Raylife Initializer") {
-			PortalInstances.openVirtualInstancesAdmin();
-
-			LiferayOnline.addVirtualInstanceWithInitializer(
-				initializerName = "Raylife",
-				mailDomain = "www.able.com",
-				virtualHost = "www.able.com",
-				webId = "www.able.com");
+			HeadlessPortalInstanceAPI.addPortalInstanceWithVirtualInstanceInitializer(
+				domain = "www.able.com",
+				portalInstanceId = "www.able.com",
+				siteInitializerKey = "com.liferay.site.initializer.raylife",
+				virtualHost = "www.able.com");
 		}
 
 		task ("Go to the new Virtual Instance") {
@@ -91,9 +87,9 @@ definition {
 		task ("Go to Gogo Shell Admin and Stop Raylife Module") {
 			GogoShell.openGogoShellAdmin();
 
-			var moduleID = GogoShell.getModuleID(moduleName = "com.liferay.site.initializer.raylife");
+			var moduleId = GogoShell.getModuleID(moduleName = "com.liferay.site.initializer.raylife");
 
-			GogoShell.stopModule(moduleID = "${moduleID}");
+			GogoShell.stopModule(moduleId = "${moduleId}");
 
 			GogoShell.viewModuleStatus(
 				moduleName = "com.liferay.site.initializer.raylife",
@@ -119,7 +115,7 @@ definition {
 		task ("Go to Gogo Shell Admin and Start Raylife Module") {
 			GogoShell.openGogoShellAdmin();
 
-			GogoShell.startModule(moduleID = "${moduleID}");
+			GogoShell.startModule(moduleId = "${moduleId}");
 
 			GogoShell.viewModuleStatus(
 				moduleName = "com.liferay.site.initializer.raylife",
@@ -159,9 +155,9 @@ definition {
 
 		task ("Go to Add and Create a New Remote App") {
 			RemoteApps.addCustomElement(
-				entryHTMLName = "vanilla-counter",
+				entryHtmlName = "vanilla-counter",
 				entryName = "Vanilla Counter",
-				entryURL = "http://remote-component-test.wincent.com/packages/vanilla-counter/index.js");
+				entryUrl = "http://remote-component-test.wincent.com/packages/vanilla-counter/index.js");
 		}
 
 		task ("On Table Entries, Assert the New Remote App Presence") {
@@ -176,7 +172,7 @@ definition {
 	test RemoteAppsCanBeDeletedInLiferayOnline {
 		task ("Create a New Remote App with JSON") {
 			JSONRemoteApp.addIFrameRemoteAppEntry(
-				iFrameURL = "http://www.liferay.com/my_new_remote_app",
+				iFrameUrl = "http://www.liferay.com/my_new_remote_app",
 				name = "My New Remote App");
 		}
 
@@ -207,9 +203,9 @@ definition {
 			RemoteApps.goToRemoteAppsPortlet();
 
 			RemoteApps.addCustomElement(
-				entryHTMLName = "vanilla-counter",
+				entryHtmlName = "vanilla-counter",
 				entryName = "Vanilla Counter",
-				entryURL = "http://remote-component-test.wincent.com/packages/vanilla-counter/index.js");
+				entryUrl = "http://remote-component-test.wincent.com/packages/vanilla-counter/index.js");
 		}
 
 		task ("Add Vanilla Counter to Test Page") {
@@ -242,7 +238,7 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://www.able.com:8080",
+			specificUrl = "http://www.able.com:8080",
 			userEmailAddress = "test@liferay.com");
 
 		Smoke.viewWelcomeContentPage();

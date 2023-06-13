@@ -17,7 +17,7 @@ definition {
 		}
 
 		task ("Activate local live staging") {
-			Staging.openStagingAdmin(siteURLKey = "test-site-name");
+			Staging.openStagingAdmin(siteUrlKey = "test-site-name");
 
 			Staging.activateStagingCP(siteName = "Test Site Name");
 		}
@@ -79,6 +79,7 @@ definition {
 				siteName = "Test Site Name Staging");
 
 			AssertTextEquals(
+				index = "1",
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "Web Content Content");
 		}
@@ -95,12 +96,13 @@ definition {
 				siteName = "Test Site Name");
 
 			AssertTextEquals(
+				index = "1",
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "Web Content Content");
 		}
 
 		task ("Edit the web content in staging site") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name-staging");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name-staging");
 
 			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
 
@@ -115,6 +117,7 @@ definition {
 				siteName = "Test site Name Staging");
 
 			AssertTextEquals(
+				index = "1",
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "Web Content Content Edit");
 		}
@@ -125,6 +128,7 @@ definition {
 				siteName = "Test site Name");
 
 			AssertTextEquals(
+				index = "1",
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "Web Content Content");
 		}
@@ -145,6 +149,7 @@ definition {
 				siteName = "Test site Name");
 
 			AssertTextEquals(
+				index = "1",
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "Web Content Content Edit");
 		}
@@ -162,7 +167,7 @@ definition {
 		}
 
 		task ("Add a new template for Basic Web Content") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name-staging");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name-staging");
 
 			NavItem.gotoTemplates();
 

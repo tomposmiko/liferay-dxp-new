@@ -95,8 +95,6 @@
 /portal/asm.jar
 /portal/axis.jar
 /portal/c3p0.jar
-/portal/ccpp-ri.jar
-/portal/ccpp.jar
 /portal/cglib-nodep.jar
 /portal/closure-compiler.jar
 /portal/commons-beanutils.jar
@@ -127,7 +125,6 @@
 /portal/httpclient.jar
 /portal/httpcore.jar
 /portal/httpmime.jar
-/portal/im4java.jar
 /portal/isoparser.jar
 /portal/istack-commons-runtime.jar
 /portal/jabsorb.jar
@@ -139,7 +136,6 @@
 /portal/jai-imageio-jpeg2000.jar
 /portal/jai_codec.jar
 /portal/jai_core.jar
-/portal/jakarta-regexp.jar
 /portal/java-libpst.jar
 /portal/javassist.jar
 /portal/jaxb-api.jar
@@ -151,26 +147,21 @@
 /portal/jaxws-rt.jar
 /portal/jazzy.jar
 /portal/jbig2-imageio.jar
-/portal/jcifs.jar
 /portal/jcl-over-slf4j.jar
 /portal/jdom2.jar
 /portal/jempbox.jar
-/portal/jena.jar
 /portal/jericho-html.jar
 /portal/jersey-common.jar
 /portal/jhighlight.jar
 /portal/jhlabs-filters.jar
 /portal/jmatio.jar
 /portal/jna.jar
-/portal/jodconverter.jar
 /portal/jodd-json.jar
 /portal/jodd-proxetta.jar
 /portal/jodd-util.jar
 /portal/json-java.jar
 /portal/jsr107cache.jar
-/portal/juh.jar
 /portal/juniversalchardet.jar
-/portal/jurt.jar
 /portal/jws-api.jar
 /portal/kxml2.jar
 /portal/liferay-icu4j.jar
@@ -182,7 +173,6 @@
 /portal/mime4j-core.jar
 /portal/mime4j-dom.jar
 /portal/mimepull.jar
-/portal/monte-cc.jar
 /portal/mp4parser.jar
 /portal/nekohtml.jar
 /portal/netcdf.jar
@@ -195,7 +185,6 @@
 /portal/netty-resolver.jar
 /portal/netty-transport.jar
 /portal/odmg.jar
-/portal/oro.jar
 /portal/pdfbox.jar
 /portal/persistence.jar
 /portal/poi-ooxml-schemas.jar
@@ -204,9 +193,7 @@
 /portal/poi.jar
 /portal/portlet.jar
 /portal/portletmvc4spring-framework.jar
-/portal/rdffilter.jar
 /portal/rhino.jar
-/portal/ridl.jar
 /portal/rmi-api.jar
 /portal/rometools-utils.jar
 /portal/rometools.jar
@@ -243,7 +230,6 @@
 /portal/tomcat-jdbc.jar
 /portal/tomcat-juli.jar
 /portal/transaction.jar
-/portal/unoil.jar
 /portal/vorbis-java-core.jar
 /portal/vorbis-java-tika.jar
 /portal/wsdl4j.jar

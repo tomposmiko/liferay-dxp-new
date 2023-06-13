@@ -14,7 +14,9 @@
 
 package com.liferay.commerce.account.internal.util;
 
+import com.liferay.account.constants.AccountActionKeys;
 import com.liferay.account.constants.AccountConstants;
+import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountRole;
 import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.commerce.account.constants.CommerceAccountActionKeys;
@@ -134,15 +136,20 @@ public class CommerceAccountRoleHelperImpl
 					CommerceAccountConstants.ROLE_NAME_ACCOUNT_BUYER)) {
 
 			resourceActionIds.put(
+				AccountEntry.class.getName(),
+				new String[] {
+					AccountActionKeys.MANAGE_ADDRESSES,
+					AccountActionKeys.VIEW_ADDRESSES
+				});
+			resourceActionIds.put(
+				"com.liferay.commerce.model.CommerceOrderType",
+				new String[] {ActionKeys.VIEW});
+			resourceActionIds.put(
 				"com.liferay.commerce.order",
 				new String[] {
 					"ADD_COMMERCE_ORDER", "CHECKOUT_OPEN_COMMERCE_ORDERS",
 					"VIEW_COMMERCE_ORDERS", "VIEW_OPEN_COMMERCE_ORDERS"
 				});
-
-			resourceActionIds.put(
-				"com.liferay.commerce.model.CommerceOrderType",
-				new String[] {ActionKeys.VIEW});
 		}
 		else if (name.equals(
 					CommerceAccountConstants.ROLE_NAME_ACCOUNT_ORDER_MANAGER)) {

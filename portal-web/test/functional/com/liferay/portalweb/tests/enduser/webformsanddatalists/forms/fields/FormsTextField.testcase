@@ -2,6 +2,8 @@
 definition {
 
 	property custom.properties = "minifier.enabled=true";
+	property osgi.module.configuration.file.names = "com.liferay.frontend.js.loader.modules.extender.internal.configuration.Details.config";
+	property osgi.module.configurations = "waitTimeout=&quot;15&quot;";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Forms";
@@ -37,7 +39,7 @@ definition {
 		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "FormsTextField#CanBeAutocompletedUsingADataProvider";
 
-		var portalURL = PropsUtil.get("portal.url");
+		var portalUrl = PropsUtil.get("portal.url");
 
 		FormsAdminNavigator.enableLocalNetworkDataProvider();
 
@@ -62,7 +64,7 @@ definition {
 			outputParameterType = "List",
 			outputParameterType2 = "List",
 			password = "test",
-			url = "${portalURL}/api/jsonws/country/get-countries",
+			url = "${portalUrl}/api/jsonws/country/get-countries",
 			username = "test@liferay.com");
 
 		FormsAdmin.saveDataProvider();
@@ -1318,7 +1320,7 @@ definition {
 
 		FormPortlet.submitSuccessfullyAndViewSuccessPage();
 
-		FormsAdmin.openFormsAdmin(siteURLKey = "guest");
+		FormsAdmin.openFormsAdmin(siteUrlKey = "guest");
 
 		FormsAdminNavigator.gotoViewEntries();
 
@@ -1374,7 +1376,7 @@ definition {
 
 		FormPortlet.submitLocalizedSuccessfully(buttonName = "Submeter");
 
-		FormsAdmin.openFormsAdmin(siteURLKey = "guest");
+		FormsAdmin.openFormsAdmin(siteUrlKey = "guest");
 
 		FormsAdminNavigator.gotoViewEntries();
 

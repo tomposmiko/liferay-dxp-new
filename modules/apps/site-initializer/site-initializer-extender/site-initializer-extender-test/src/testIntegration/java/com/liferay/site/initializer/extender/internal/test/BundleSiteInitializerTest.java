@@ -71,6 +71,8 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.Theme;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
@@ -94,6 +96,8 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.remote.app.model.RemoteAppEntry;
+import com.liferay.remote.app.service.RemoteAppEntryLocalService;
 import com.liferay.site.initializer.SiteInitializer;
 import com.liferay.site.initializer.SiteInitializerRegistry;
 import com.liferay.site.navigation.menu.item.layout.constants.SiteNavigationMenuItemTypeConstants;
@@ -176,8 +180,10 @@ public class BundleSiteInitializerTest {
 			_assertListTypeDefinitions(serviceContext);
 			_assertObjectDefinitions(group, serviceContext);
 			_assertPermissions(group);
+			_assertRemoteApp(group);
 			_assertSiteNavigationMenu(group);
 			_assertStyleBookEntry(group);
+			_assertUserRoles(group);
 		}
 		finally {
 			ServiceContextThreadLocal.popServiceContext();
@@ -795,6 +801,20 @@ public class BundleSiteInitializerTest {
 		_assertResourcePermission(group);
 	}
 
+	private void _assertRemoteApp(Group group) throws Exception {
+		RemoteAppEntry remoteAppEntry =
+			_remoteAppEntryLocalService.
+				fetchRemoteAppEntryByExternalReferenceCode(
+					group.getCompanyId(), "ERC001");
+
+		Assert.assertNotNull(remoteAppEntry);
+		Assert.assertEquals(
+			"category.remote-apps", remoteAppEntry.getPortletCategoryName());
+		Assert.assertEquals(
+			"liferay-test-remote-app",
+			remoteAppEntry.getCustomElementHTMLElementName());
+	}
+
 	private void _assertResourcePermission(Group group) throws Exception {
 		Role role = _roleLocalService.fetchRole(
 			group.getCompanyId(), "Test Role 1");
@@ -858,6 +878,7 @@ public class BundleSiteInitializerTest {
 		SiteNavigationMenuItem siteNavigationMenuItem2 =
 			siteNavigationMenuItems.get(1);
 
+		Assert.assertEquals("Test URL", siteNavigationMenuItem2.getName());
 		Assert.assertEquals(
 			SiteNavigationMenuItemTypeConstants.URL,
 			siteNavigationMenuItem2.getType());
@@ -865,6 +886,7 @@ public class BundleSiteInitializerTest {
 		SiteNavigationMenuItem siteNavigationMenuItem3 =
 			siteNavigationMenuItems.get(2);
 
+		Assert.assertEquals("Other Links", siteNavigationMenuItem3.getName());
 		Assert.assertEquals(
 			SiteNavigationMenuItemTypeConstants.NODE,
 			siteNavigationMenuItem3.getType());
@@ -919,6 +941,42 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(page);
 		Assert.assertEquals(totalCount, page.getTotalCount());
+	}
+
+	private void _assertUserRoles(Group group) throws Exception {
+		User user = _userLocalService.fetchUserByEmailAddress(
+			group.getCompanyId(), "test.user1@liferay.com");
+
+		List<Role> roles = user.getRoles();
+
+		Assert.assertEquals(roles.toString(), 3, roles.size());
+
+		Role role = roles.get(0);
+
+		Assert.assertEquals(RoleConstants.USER, role.getName());
+
+		role = roles.get(1);
+
+		Assert.assertEquals("Test Role 1", role.getName());
+
+		role = roles.get(2);
+
+		Assert.assertEquals("Test Role 2", role.getName());
+
+		user = _userLocalService.fetchUserByEmailAddress(
+			group.getCompanyId(), "test.user2@liferay.com");
+
+		roles = user.getRoles();
+
+		Assert.assertEquals(roles.toString(), 2, roles.size());
+
+		role = roles.get(0);
+
+		Assert.assertEquals(RoleConstants.USER, role.getName());
+
+		role = roles.get(1);
+
+		Assert.assertEquals("Test Role 3", role.getName());
 	}
 
 	private Bundle _installBundle(BundleContext bundleContext, String location)
@@ -1010,6 +1068,9 @@ public class BundleSiteInitializerTest {
 
 	@Inject
 	private Portal _portal;
+
+	@Inject
+	private RemoteAppEntryLocalService _remoteAppEntryLocalService;
 
 	@Inject
 	private ResourcePermissionLocalService _resourcePermissionLocalService;

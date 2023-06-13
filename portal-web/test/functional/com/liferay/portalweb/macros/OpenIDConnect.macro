@@ -21,11 +21,11 @@ definition {
 	}
 
 	macro accountSignIn {
-		if (!(isSet(specificURL))) {
+		if (!(isSet(specificUrl))) {
 			Navigator.openURL();
 		}
 		else {
-			Navigator.openSpecificURL(url = "${specificURL}");
+			Navigator.openSpecificURL(url = "${specificUrl}");
 		}
 
 		AssertClick(
@@ -65,11 +65,11 @@ definition {
 
 		FormFields.editTextMultiline(
 			fieldName = "openIdConnectClientId",
-			fieldValue = "${openIDConnectClientID}");
+			fieldValue = "${openIdConnectClientId}");
 
 		FormFields.editTextMultiline(
 			fieldName = "openIdConnectClientSecret",
-			fieldValue = "${openIDConnectClientSecret}");
+			fieldValue = "${openIdConnectClientSecret}");
 
 		FormFields.editTextMultiline(
 			fieldName = "discoveryEndPoint",

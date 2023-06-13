@@ -67,7 +67,7 @@
 </tr>
 <tr>
 	<td>ROLE_EMPTY_MUTED_INFO</td>
-	<td>//div[h3[*[*[contains(text(),'${key_RoleType}')]]]]//div[*[contains(@class,'text-muted')]or contains(@class,'text-muted')]</td>
+	<td>//div[h3[*[*[contains(text(),'${key_roleType}')]]]]//div[*[contains(@class,'text-muted')]or contains(@class,'text-muted')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -406,8 +406,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>SUCCESS_IMPORT_TRANSLATIONS_ITEM_2</td>
-	<td>xpath=(//div[contains(@class,'text-success')]/preceding-sibling::div)[2]</td>
+	<td>SUCCESS_IMPORT_TRANSLATIONS_ITEM_N</td>
+	<td>xpath=(//div[contains(@class,'text-success')]/preceding-sibling::div)[${key_indexNumber}]</td>
 	<td></td>
 </tr>
 <tr>

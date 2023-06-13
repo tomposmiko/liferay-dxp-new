@@ -8,7 +8,7 @@ definition {
 				key_fieldName = "${fieldName}",
 				locator1 = "Button#LOCALIZATION");
 		}
-		else if (isSet(friendlyURLHistory)) {
+		else if (isSet(friendlyUrlHistory)) {
 			Click.clickNoMouseOver(locator1 = "Icon#FRIENDLY_URL_HISTORY_LOCALIZATION");
 		}
 		else if (isSet(modal)) {
@@ -18,7 +18,7 @@ definition {
 			Click.clickNoMouseOver(locator1 = "Button#LOCALIZATION_GENERIC");
 		}
 
-		if (isSet(localizedFriendlyURL)) {
+		if (isSet(localizedFriendlyUrl)) {
 			Click.clickNoMouseOver(locator1 = "Icon#FRIENDLY_URL_HISTORY_SPANISH_LOCALIZATION");
 		}
 		else if (isSet(modal)) {

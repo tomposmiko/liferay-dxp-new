@@ -29,11 +29,11 @@ definition {
 	test AddStructureViaLocaleURL {
 		property test.name.skip.portal.instance = "WebContentStructures#AddStructureViaLocaleURL";
 
-		var portalURL = PropsUtil.get("portal.url");
+		var portalUrl = PropsUtil.get("portal.url");
 
-		Navigator.openSpecificURL(url = "${portalURL}/en/");
+		Navigator.openSpecificURL(url = "${portalUrl}/en/");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 		NavItem.gotoStructures();
 
@@ -57,7 +57,7 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 		NavItem.gotoStructures();
 
@@ -69,7 +69,7 @@ definition {
 	@description = "This is a use case for LPS-82208 and LPS-89641."
 	@priority = "5"
 	test CannotDeleteStructureReferencedByDisplayPage {
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 		NavItem.gotoStructures();
 
@@ -83,14 +83,14 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
 
 		DisplayPageTemplatesAdmin.addDisplayPage(
 			contentType = "Web Content Article",
 			displayPageName = "Display Page Name",
 			subType = "WC Structure Name");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 		WebContentStructures.deleteCP(
 			structureName = "WC Structure Name",
@@ -119,7 +119,7 @@ definition {
 	@priority = "4"
 	test EditFieldReferenceOfFieldOption {
 		task ("Add a web content structure with a Select from List field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			NavItem.gotoStructures();
 
@@ -203,7 +203,7 @@ definition {
 	test EditStructureDefaultValuesForFieldsets {
 		property testray.component.names = "Web Content Administration";
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 		NavItem.gotoStructures();
 
@@ -215,7 +215,7 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure 1");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 		NavItem.gotoStructures();
 
@@ -235,7 +235,7 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure 1");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 		NavItem.gotoStructures();
 
@@ -258,7 +258,7 @@ definition {
 		}
 
 		task ("Add a page based on Blank") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			ContentPages.addPage(pageName = "Test Content Page");
 
@@ -266,7 +266,7 @@ definition {
 		}
 
 		task ("Add a page based on Search") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.addPublicPage(
 				collectionName = "Global Templates",
@@ -275,7 +275,7 @@ definition {
 		}
 
 		task ("Add a page based on Full Page Application") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.addPublicPage(
 				pageName = "Test Full Page Application",
@@ -283,7 +283,7 @@ definition {
 		}
 
 		task ("Add a page based on Page Set") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.addPublicPage(
 				pageName = "Test Page Set",
@@ -296,16 +296,16 @@ definition {
 		}
 
 		task ("Add a page based on Embedded") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.addPublicPage(
 				pageName = "Test Embedded",
-				pageTypeURL = "https://www.liferay.com",
+				pageTypeUrl = "https://www.liferay.com",
 				sitePageType = "Embedded");
 		}
 
 		task ("Add a page based on Link to a Page of This Site") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.addPublicPage(
 				linkPageName = "Test Content Page",
@@ -314,7 +314,7 @@ definition {
 		}
 
 		task ("Add a page based on Panel") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.addPublicPage(
 				componentName = "Collaboration",
@@ -323,16 +323,16 @@ definition {
 		}
 
 		task ("Add a page based on Link to URL") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.addPublicPage(
 				pageName = "Test Link To URL",
-				pageTypeURL = "https://www.liferay.com",
+				pageTypeUrl = "https://www.liferay.com",
 				sitePageType = "Link to URL");
 		}
 
 		task ("Assert cancel edit a Link to URL type page will not redirect to the URL") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.gotoPageEllipsisMenuItem(
 				menuItem = "Configure",
@@ -348,7 +348,7 @@ definition {
 		}
 
 		task ("Add a structure with 9 Link to Page fields") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			NavItem.gotoStructures();
 
@@ -404,42 +404,38 @@ definition {
 
 		task ("Assert access to given pages via Web Content Display") {
 			for (var fieldLabel : list "Widget Page,Content Page,Search,Full Page Application,Embedded,Panel") {
-				Click(
-					key_contentText = "${fieldLabel}",
-					locator1 = "WCD#WEB_CONTENT_TEXT_LINK_URL");
-
-				ControlMenu.viewHeaderTitle(headerTitle = "Test ${fieldLabel}");
+				WebContentDisplayPortlet.viewContent(
+					displayText = "${fieldLabel}",
+					pageName = "Test ${fieldLabel}",
+					webContentTitle = "Web Content Title");
 
 				Navigator.gotoSitePage(
 					pageName = "Test Widget Page",
 					siteName = "Test Site Name");
 			}
 
-			Click(
-				key_contentText = "Link To A Page Of This Site",
-				locator1 = "WCD#WEB_CONTENT_TEXT_LINK_URL");
-
-			ControlMenu.viewHeaderTitle(headerTitle = "Test Content Page");
-
-			Navigator.gotoSitePage(
-				pageName = "Test Widget Page",
-				siteName = "Test Site Name");
-
-			Click(
-				key_contentText = "Page Set",
-				locator1 = "WCD#WEB_CONTENT_TEXT_LINK_URL");
-
-			ControlMenu.viewHeaderTitle(headerTitle = "Test Child Page");
+			WebContentDisplayPortlet.viewContent(
+				displayText = "Link To A Page Of This Site",
+				pageName = "Test Content Page",
+				webContentTitle = "Web Content Title");
 
 			Navigator.gotoSitePage(
 				pageName = "Test Widget Page",
 				siteName = "Test Site Name");
 
-			Click(
-				key_contentText = "Link To URL",
-				locator1 = "WCD#WEB_CONTENT_TEXT_LINK_URL");
+			WebContentDisplayPortlet.viewContent(
+				displayText = "Page Set",
+				pageName = "Test Child Page",
+				webContentTitle = "Web Content Title");
 
-			AssertLocation.assertPartialLocation(value1 = "https://www.liferay.com");
+			Navigator.gotoSitePage(
+				pageName = "Test Widget Page",
+				siteName = "Test Site Name");
+
+			WebContentDisplayPortlet.viewContent(
+				displayText = "Link To URL",
+				url = "https://www.liferay.com",
+				webContentTitle = "Web Content Title");
 		}
 	}
 
@@ -476,7 +472,7 @@ definition {
 		}
 
 		task ("Add a structure with Link to Page field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			NavItem.gotoStructures();
 
@@ -524,18 +520,11 @@ definition {
 			WebContentDisplayPortlet.selectWebContent(webContentTitle = "Web Content Title");
 		}
 
-		task ("Click the link in Web Content Display") {
-			WebContent.viewPGViaWCD(
-				linkName = "Link to Page",
-				linkToPage = "true");
-
-			Click(
-				key_contentText = "Link to Page",
-				locator1 = "WCD#WEB_CONTENT_TEXT_LINK_URL");
-		}
-
 		task ("Assert the page redirects to the great grand child page") {
-			ControlMenu.viewHeaderTitle(headerTitle = "Test Great Grand Child Page");
+			WebContentDisplayPortlet.viewContent(
+				displayText = "Link to Page",
+				pageName = "Test Great Grand Child Page",
+				webContentTitle = "Web Content Title");
 		}
 	}
 
@@ -551,7 +540,7 @@ definition {
 		}
 
 		task ("Add a web content structure with an Image field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			NavItem.gotoStructures();
 
@@ -565,7 +554,7 @@ definition {
 		}
 
 		task ("Add a web content article based on new structure") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -603,9 +592,9 @@ definition {
 		}
 
 		task ("Assert the image is shown in Web Content Display") {
-			WebContent.viewPGViaWCD(
-				image = "true",
-				key_image = "Document_1.jpg");
+			WebContentDisplayPortlet.viewContent(
+				imageFileName = "Document_1.jpg",
+				webContentTitle = "Web Content Title");
 		}
 	}
 
@@ -616,7 +605,7 @@ definition {
 
 		SearchAdministration.executeReindex();
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "global");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "global");
 
 		NavItem.gotoStructures();
 
@@ -659,7 +648,7 @@ definition {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training,Web Content Administration";
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 		NavItem.gotoStructures();
 
@@ -712,7 +701,7 @@ definition {
 	test ViewFavoriteStructure {
 		property testray.component.names = "Web Content Administration";
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 		NavItem.gotoStructures();
 
@@ -732,7 +721,7 @@ definition {
 			var n = ${n} + 1;
 		}
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 		WebContentNavigator.gotoMoreStructuresViaPlusButton(pageMod = "8 of 17");
 
@@ -748,7 +737,7 @@ definition {
 			indexNumber = "1",
 			structureName = "WC Structure Name 9");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 		WebContentStructures.viewFavoriteStructureViaPlusButton(structureName = "WC Structure Name 9");
 	}

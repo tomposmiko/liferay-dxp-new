@@ -25,16 +25,66 @@ export const TOTAL_OF_FIELD = {
 	PROPERTY: 6,
 };
 
+export const SUBSECTION_KEYS = {
+	BUSINESS_EMAIL: 'Business Email',
+	BUSINESS_WEBSITE: 'Business Website',
+	DO_YOU_HAVE_RAYLIFE_POLICY: 'Do you have a Raylife Auto policy?',
+	DO_YOU_SELL_PRODUCTS_UNDER_OWN_BRAND:
+		'Do you sell products under your own brand or label?',
+	DO_YOU_STORE_PERSONALITY_IDENTIFIABLE:
+		'Do you store personally identifiable information about your customers?',
+	LEGAL_ENTITY: 'Legal Entity',
+	PERCENT_OF_SALES_FROM_MERCHANDISE:
+		'Percent of sales from used merchandise?',
+	PHONE: 'Phone',
+	PHYSICAL_ADDRESS: 'Physical Address',
+	WHAT_PERCENTAGE_OF_OVERALL_INVOLVE_DELIVERY:
+		'What percentage of overall sales involve delivery?',
+	YEAR_OF_INDUSTRY_EXPERIENCE: 'Years of industry experience?',
+	YOUR_NAME: 'Your Name',
+};
+
 export const AVAILABLE_STEPS = {
 	BASICS_BUSINESS_INFORMATION: {
 		Component: FormBasicBusinessInformation,
+		active: false,
+		id: 'BASICS_BUSINESS_INFORMATION',
 		index: 2,
+		mobileSubSections: [
+			{
+				active: true,
+				hideInputLabel: false,
+				title: SUBSECTION_KEYS.YOUR_NAME,
+			},
+			{
+				active: false,
+				hideInputLabel: true,
+				title: SUBSECTION_KEYS.BUSINESS_EMAIL,
+			},
+			{
+				active: false,
+				hideInputLabel: true,
+				title: SUBSECTION_KEYS.PHONE,
+			},
+			{
+				active: false,
+				hideInputLabel: true,
+				title: SUBSECTION_KEYS.BUSINESS_WEBSITE,
+			},
+			{
+				active: false,
+				hideInputLabel: false,
+				title: SUBSECTION_KEYS.PHYSICAL_ADDRESS,
+			},
+		],
 		section: 'basics',
 		subsection: 'businessInformation',
 		title: 'Just the business basics!',
 	},
 	BASICS_BUSINESS_TYPE: {
 		Component: FormBasicBusinessType,
+		active: false,
+		id: 'BASICS_BUSINESS_TYPE',
 		index: 1,
 		section: 'basics',
 		subsection: 'business-type',
@@ -42,6 +92,8 @@ export const AVAILABLE_STEPS = {
 	},
 	BASICS_PRODUCT_QUOTE: {
 		Component: FormBasicProductQuote,
+		active: true,
+		id: 'BASICS_PRODUCT_QUOTE',
 		index: 0,
 		section: 'basics',
 		subsection: 'product-quote',
@@ -49,13 +101,61 @@ export const AVAILABLE_STEPS = {
 	},
 	BUSINESS: {
 		Component: FormBusiness,
+		active: true,
+		id: 'BUSINESS',
 		index: 3,
+		mobileSubSections: [
+			{
+				active: true,
+				hideInputLabel: true,
+				title: SUBSECTION_KEYS.YEAR_OF_INDUSTRY_EXPERIENCE,
+			},
+			{
+				active: false,
+				hideContinueButton: true,
+				hideInputLabel: true,
+				title: SUBSECTION_KEYS.DO_YOU_STORE_PERSONALITY_IDENTIFIABLE,
+			},
+			{
+				active: false,
+				hideContinueButton: true,
+				hideInputLabel: true,
+				title: SUBSECTION_KEYS.DO_YOU_HAVE_RAYLIFE_POLICY,
+			},
+			{
+				active: false,
+				hideContinueButton: false,
+				hideInputLabel: true,
+				title: SUBSECTION_KEYS.LEGAL_ENTITY,
+			},
+			{
+				active: false,
+				hideContinueButton: false,
+				hideInputLabel: true,
+				title: SUBSECTION_KEYS.PERCENT_OF_SALES_FROM_MERCHANDISE,
+			},
+			{
+				active: false,
+				hideContinueButton: true,
+				hideInputLabel: true,
+				title: SUBSECTION_KEYS.DO_YOU_SELL_PRODUCTS_UNDER_OWN_BRAND,
+			},
+			{
+				active: false,
+				hideContinueButton: false,
+				hideInputLabel: true,
+				title:
+					SUBSECTION_KEYS.WHAT_PERCENTAGE_OF_OVERALL_INVOLVE_DELIVERY,
+			},
+		],
 		section: 'business',
 		subsection: '',
 		title: "Let's get to know your business!",
 	},
 	EMPLOYEES: {
 		Component: FormEmployees,
+		active: false,
+		id: 'EMPLOYEES',
 		index: 4,
 		section: 'employees',
 		subsection: '',
@@ -63,6 +163,8 @@ export const AVAILABLE_STEPS = {
 	},
 	PROPERTY: {
 		Component: FormProperty,
+		active: false,
+		id: 'PROPERTY',
 		index: 5,
 		section: 'property',
 		subsection: '',

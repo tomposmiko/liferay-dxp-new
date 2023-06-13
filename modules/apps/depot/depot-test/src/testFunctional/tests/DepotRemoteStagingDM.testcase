@@ -82,7 +82,7 @@ definition {
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title",
 			imageFileName = "Document_2.jpg",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		JSONLayout.addWidgetToPublicLayout(
 			groupName = "Site Name",
@@ -101,11 +101,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -150,11 +150,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -180,7 +180,7 @@ definition {
 
 		Staging.publishToLive(remoteStaging = "true");
 
-		BlogsNavigator.openToAddEntry(siteURLKey = "site-name");
+		BlogsNavigator.openToAddEntry(siteUrlKey = "site-name");
 
 		BlogsEntry.addTitle(entryTitle = "Blogs Entry Title");
 
@@ -209,14 +209,14 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		BlogsNavigator.openToBlogEntry(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			entryTitle = "Blogs Entry Title",
 			layoutName = "Test Page",
-			siteURLKey = "remote-site");
+			siteUrlKey = "remote-site");
 
 		BlogsEntry.viewInlineImage(uploadFileName = "Document_2.jpg");
 
@@ -244,7 +244,7 @@ definition {
 		BlogsNavigator.openToBlogEntry(
 			entryTitle = "Blogs Entry Title",
 			layoutName = "Test Page",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		BlogsEntry.viewInlineImage(uploadFileName = "Document_2.jpg");
 
@@ -256,14 +256,14 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		BlogsNavigator.openToBlogEntry(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			entryTitle = "Blogs Entry Title",
 			layoutName = "Test Page",
-			siteURLKey = "remote-site");
+			siteUrlKey = "remote-site");
 
 		BlogsEntry.viewInlineImage(uploadFileName = "Document_2.jpg");
 	}
@@ -287,7 +287,7 @@ definition {
 
 		Staging.publishToLive(remoteStaging = "true");
 
-		BlogsNavigator.openToAddEntry(siteURLKey = "site-name");
+		BlogsNavigator.openToAddEntry(siteUrlKey = "site-name");
 
 		BlogsEntry.addEntryContent(
 			entryContent = "Blogs Entry Content",
@@ -317,11 +317,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -362,11 +362,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -421,11 +421,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -464,11 +464,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -522,11 +522,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -565,11 +565,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -604,7 +604,7 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		ApplicationsMenu.gotoPortlet(
@@ -661,11 +661,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -700,11 +700,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -734,7 +734,7 @@ definition {
 			groupName = "Site Name",
 			layoutName = "Test Page",
 			portlet = "Open Graph",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		OpenGraph.configureOpenGraph(
 			customImage = "true",
@@ -755,26 +755,26 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openToGroupPagesPortlet(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			groupName = "Remote Site",
 			layoutName = "Test Page",
-			portalURL = "http://localhost:9080",
+			portalUrl = "http://localhost:9080",
 			portlet = "Open Graph",
-			siteURLKey = "remote-site");
+			siteUrlKey = "remote-site");
 
 		OpenGraph.viewPreviewImage(imageName = "Document_2.jpg");
 
-		var groupID = Depot.getGroupID(depotName = "Remote Depot");
+		var groupId = Depot.getGroupID(depotName = "Remote Depot");
 
 		User.logoutPG();
 
 		Navigator.openSpecificURL(url = "http://localhost:9080/web/remote-site/test-page");
 
-		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''"og:image" content="http://localhost:9080/documents/${groupID}/0/Document_2.jpg''');
+		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''"og:image" content="http://localhost:9080/documents/${groupId}/0/Document_2.jpg''');
 
 		User.loginPG(
 			nodePort = "8080",
@@ -801,7 +801,7 @@ definition {
 			groupName = "Site Name",
 			layoutName = "Test Page",
 			portlet = "Open Graph",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		OpenGraph.viewNoPreviewImage(imageName = "Document_2.jpg");
 
@@ -817,26 +817,26 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openToGroupPagesPortlet(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			groupName = "Remote Site",
 			layoutName = "Test Page",
-			portalURL = "http://localhost:9080",
+			portalUrl = "http://localhost:9080",
 			portlet = "Open Graph",
-			siteURLKey = "remote-site");
+			siteUrlKey = "remote-site");
 
 		OpenGraph.viewNoPreviewImage(imageName = "Document_2.jpg");
 
-		var groupID = Depot.getGroupID(depotName = "Remote Depot");
+		var groupId = Depot.getGroupID(depotName = "Remote Depot");
 
 		User.logoutPG();
 
 		Navigator.openSpecificURL(url = "http://localhost:9080/web/remote-site/test-page");
 
-		OpenGraph.viewNoOpenGraphProperties(ogPropertyList = '''og:image" content="http://localhost:9080/documents/${groupID}/0/Document_2.jpg"''');
+		OpenGraph.viewNoOpenGraphProperties(ogPropertyList = '''og:image" content="http://localhost:9080/documents/${groupId}/0/Document_2.jpg"''');
 	}
 
 	@description = "This ensures that video shortcut in depot can be deleted and republished in Blogs when enabling remote staging."
@@ -849,7 +849,7 @@ definition {
 
 		VideoShortcut.addCP(
 			videoShortcutTitle = "Test YouTube Video",
-			videoURL = "https://www.youtube.com/watch?v=HOdbzGCI5ME");
+			videoUrl = "https://www.youtube.com/watch?v=HOdbzGCI5ME");
 
 		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
 
@@ -875,7 +875,7 @@ definition {
 		BlogsNavigator.openToBlogEntry(
 			entryTitle = "Blogs Entry Title",
 			layoutName = "Test Page",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		BlogsEntry.viewEntryPG(
 			embedVideo = "true",
@@ -890,14 +890,14 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		BlogsNavigator.openToBlogEntry(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			entryTitle = "Blogs Entry Title",
 			layoutName = "Test Page",
-			siteURLKey = "remote-site");
+			siteUrlKey = "remote-site");
 
 		BlogsEntry.viewEntryPG(
 			embedVideo = "true",
@@ -926,7 +926,7 @@ definition {
 		BlogsNavigator.openToBlogEntry(
 			entryTitle = "Blogs Entry Title",
 			layoutName = "Test Page",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		BlogsEntry.viewEntryPG(
 			embedVideo = "true",
@@ -941,14 +941,14 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		BlogsNavigator.openToBlogEntry(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			entryTitle = "Blogs Entry Title",
 			layoutName = "Test Page",
-			siteURLKey = "remote-site");
+			siteUrlKey = "remote-site");
 
 		BlogsEntry.viewEntryPG(
 			embedVideo = "true",
@@ -975,7 +975,7 @@ definition {
 
 		Staging.publishToLive(remoteStaging = "true");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		NavItem.gotoStructures();
 
@@ -987,7 +987,7 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -1022,17 +1022,17 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
-		WebContent.viewPGViaWCD(
-			image = "true",
-			key_image = "Document_1.jpg");
+		WebContentDisplayPortlet.viewContent(
+			imageFileName = "Document_1.jpg",
+			webContentTitle = "Web Content Title");
 
 		User.loginPG(
 			nodePort = "8080",
@@ -1067,17 +1067,18 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
 		AssertElementNotPresent(
-			key_image = "Document_1.jpg",
-			locator1 = "WCD#WEB_CONTENT_CONTENT_IMAGE");
+			key_imageFileName = "Document_1.jpg",
+			key_webContentTitle = "Web Content Title",
+			locator1 = "WCD#WEB_CONTENT_IMAGE");
 	}
 
 	@description = "This ensures that the blog image from a depot can be edited and republished when enabling remote staging."
@@ -1107,7 +1108,7 @@ definition {
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title",
 			imageFileName = "Document_2.jpg",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		JSONLayout.addWidgetToPublicLayout(
 			groupName = "Site Name",
@@ -1131,11 +1132,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1179,11 +1180,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1220,7 +1221,7 @@ definition {
 			pageName = "Test Page",
 			siteName = "Site Name");
 
-		BlogsNavigator.openToAddEntry(siteURLKey = "site-name");
+		BlogsNavigator.openToAddEntry(siteUrlKey = "site-name");
 
 		BlogsEntry.addTitle(entryTitle = "Blogs Entry Title");
 
@@ -1235,7 +1236,7 @@ definition {
 		BlogsNavigator.openToBlogEntry(
 			entryTitle = "Blogs Entry Title",
 			layoutName = "Test Page",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		BlogsEntry.viewInlineImage(uploadFileName = "Document_2.jpg");
 
@@ -1247,14 +1248,14 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		BlogsNavigator.openToBlogEntry(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			entryTitle = "Blogs Entry Title",
 			layoutName = "Test Page",
-			siteURLKey = "remote-site");
+			siteUrlKey = "remote-site");
 
 		BlogsEntry.viewInlineImage(uploadFileName = "Document_2.jpg");
 
@@ -1285,7 +1286,7 @@ definition {
 		BlogsNavigator.openToBlogEntry(
 			entryTitle = "Blogs Entry Title",
 			layoutName = "Test Page",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		BlogsEntry.viewInlineImage(uploadFileName = "Document_1.jpg");
 
@@ -1297,14 +1298,14 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		BlogsNavigator.openToBlogEntry(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			entryTitle = "Blogs Entry Title",
 			layoutName = "Test Page",
-			siteURLKey = "remote-site");
+			siteUrlKey = "remote-site");
 
 		BlogsEntry.viewInlineImage(uploadFileName = "Document_1.jpg");
 	}
@@ -1330,7 +1331,7 @@ definition {
 
 		Staging.publishToLive(remoteStaging = "true");
 
-		BlogsNavigator.openToAddEntry(siteURLKey = "site-name");
+		BlogsNavigator.openToAddEntry(siteUrlKey = "site-name");
 
 		BlogsEntry.addEntryContent(
 			entryContent = "Blogs Entry Content",
@@ -1360,11 +1361,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1397,11 +1398,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1455,11 +1456,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1495,11 +1496,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1553,11 +1554,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1593,11 +1594,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1632,7 +1633,7 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		ApplicationsMenu.gotoPortlet(
@@ -1689,11 +1690,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1736,11 +1737,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1767,11 +1768,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		DMNavigator.openToConfigInSystemSettings(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			portlet = "FFMPEG Video Converter");
 
 		FormFields.enableCheckbox(fieldName = "enabled");
@@ -1830,11 +1831,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1883,11 +1884,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -1925,7 +1926,7 @@ definition {
 			groupName = "Site Name",
 			layoutName = "Test Page",
 			portlet = "Open Graph",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		OpenGraph.configureOpenGraph(
 			customImage = "true",
@@ -1946,26 +1947,26 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openToGroupPagesPortlet(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			groupName = "Remote Site",
 			layoutName = "Test Page",
-			portalURL = "http://localhost:9080",
+			portalUrl = "http://localhost:9080",
 			portlet = "Open Graph",
-			siteURLKey = "remote-site");
+			siteUrlKey = "remote-site");
 
 		OpenGraph.viewPreviewImage(imageName = "Document_1.jpg");
 
-		var groupID = Depot.getGroupID(depotName = "Remote Depot");
+		var groupId = Depot.getGroupID(depotName = "Remote Depot");
 
 		User.logoutPG();
 
 		Navigator.openSpecificURL(url = "http://localhost:9080/web/remote-site/test-page");
 
-		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''"og:image" content="http://localhost:9080/documents/${groupID}/0/Document_1.jpg''');
+		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''"og:image" content="http://localhost:9080/documents/${groupId}/0/Document_1.jpg''');
 
 		User.loginPG(
 			nodePort = "8080",
@@ -1976,7 +1977,7 @@ definition {
 			groupName = "Site Name",
 			layoutName = "Test Page",
 			portlet = "Open Graph",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		OpenGraph.configureOpenGraph(
 			customImage = "true",
@@ -1998,26 +1999,26 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openToGroupPagesPortlet(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			groupName = "Remote Site",
 			layoutName = "Test Page",
-			portalURL = "http://localhost:9080",
+			portalUrl = "http://localhost:9080",
 			portlet = "Open Graph",
-			siteURLKey = "remote-site");
+			siteUrlKey = "remote-site");
 
 		OpenGraph.viewPreviewImage(imageName = "Document_2.jpg");
 
-		var groupID = Depot.getGroupID(depotName = "Remote Depot");
+		var groupId = Depot.getGroupID(depotName = "Remote Depot");
 
 		User.logoutPG();
 
 		Navigator.openSpecificURL(url = "http://localhost:9080/web/remote-site/test-page");
 
-		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''"og:image" content="http://localhost:9080/documents/${groupID}/0/Document_2.jpg''');
+		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''"og:image" content="http://localhost:9080/documents/${groupId}/0/Document_2.jpg''');
 	}
 
 	@description = "This ensures that the image in depot can be replaced and republished in web content when enabling remote staging."
@@ -2041,7 +2042,7 @@ definition {
 
 		Staging.publishToLive(remoteStaging = "true");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		NavItem.gotoStructures();
 
@@ -2053,7 +2054,7 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -2088,17 +2089,17 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
-		WebContent.viewPGViaWCD(
-			image = "true",
-			key_image = "Document_1.jpg");
+		WebContentDisplayPortlet.viewContent(
+			imageFileName = "Document_1.jpg",
+			webContentTitle = "Web Content Title");
 
 		User.loginPG(
 			nodePort = "8080",
@@ -2111,7 +2112,7 @@ definition {
 
 		WebContentNavigator.openToEditWCInSite(
 			groupName = "Site Name",
-			siteURLKey = "site-name",
+			siteUrlKey = "site-name",
 			webContentTitle = "Web Content Title");
 
 		WebContent.editCP(
@@ -2134,17 +2135,17 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
-		WebContent.viewPGViaWCD(
-			image = "true",
-			key_image = "Document_2.jpg");
+		WebContentDisplayPortlet.viewContent(
+			imageFileName = "Document_2.jpg",
+			webContentTitle = "Web Content Title");
 	}
 
 	@description = "This ensures that a document pending review cannot be searched for in a staged site when enabling remote staging."
@@ -2208,7 +2209,7 @@ definition {
 
 		Staging.publishToLive(remoteStaging = "true");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
+		DMNavigator.openDocumentsAndMediaAdmin(siteUrlKey = "site-name");
 
 		LexiconEntry.gotoAdd();
 
@@ -2254,7 +2255,7 @@ definition {
 			depotName = "Test Depot Name",
 			noConnectedDepot = "true");
 
-		BlogsNavigator.openToAddEntry(siteURLKey = "site-name");
+		BlogsNavigator.openToAddEntry(siteUrlKey = "site-name");
 
 		BlogsNavigator.gotoSelectFile();
 
@@ -2295,7 +2296,7 @@ definition {
 
 		Staging.publishToLive(remoteStaging = "true");
 
-		BlogsNavigator.openToAddEntry(siteURLKey = "site-name");
+		BlogsNavigator.openToAddEntry(siteUrlKey = "site-name");
 
 		BlogsNavigator.gotoSelectFile();
 
@@ -2310,6 +2311,70 @@ definition {
 		AssertElementNotPresent(
 			key_card = "Document_1.jpg",
 			locator1 = "Card#CARD_TITLE");
+	}
+
+	@description = "This ensures that assets stored in a depot can be published from the site DM widget when remote staging is enabled."
+	@priority = "4"
+	test CanPublishAssetFromSiteWidget {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.item.selector.web.internal.configuration.FFFolderItemSelectorGroupSelectorConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
+		property test.name.skip.portal.instance = "DepotRemoteStagingDM#CanPublishAssetFromSiteWidget";
+
+		JSONFolder.addFolder(
+			dmFolderDescription = "DM Folder Description",
+			dmFolderName = "Depot Folder Name",
+			groupName = "Test Depot Name");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Image Description",
+			dmDocumentTitle = "DM Document Title",
+			folderName = "Depot Folder Name",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_2.jpg");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page",
+			widgetName = "Documents and Media");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		DMDocument.setRootFolder(
+			depotName = "Test Depot Name",
+			dmRootFolderName = "Depot Folder Name");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		DMDocument.viewPG(dmDocumentTitle = "DM Document Title");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		User.logoutPG();
+
+		User.firstLoginUI(
+			password = "test",
+			specificUrl = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
+
+		Navigator.openSitePage(
+			baseUrl = "http://localhost:9080",
+			pageName = "Test Page",
+			siteName = "Remote Site");
+
+		DMDocument.viewPG(dmDocumentTitle = "DM Document Title");
 	}
 
 	@description = "This ensures that a document using a custom document type from a depot can be published in the staging site when enabling remote staging."
@@ -2340,7 +2405,7 @@ definition {
 
 		Staging.publishToLive(remoteStaging = "true");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
+		DMNavigator.openDocumentsAndMediaAdmin(siteUrlKey = "site-name");
 
 		DMDocument.addCP(
 			dmDocumentDescription = "DM Document Description",
@@ -2352,7 +2417,7 @@ definition {
 		DMNavigator.openToEntryInAdmin(
 			dmDocumentTitle = "Document_1.jpg",
 			groupName = "Site Name",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		DMDocument.viewCP(dmDocumentTitle = "Document_1.jpg");
 
@@ -2368,12 +2433,12 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		DMNavigator.openDocumentsAndMediaAdmin(
-			baseURL = "http://localhost:9080",
-			siteURLKey = "remote-site");
+			baseUrl = "http://localhost:9080",
+			siteUrlKey = "remote-site");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_1.jpg");
 
@@ -2435,17 +2500,85 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
 		AssetPublisherPortlet.viewAssetDetailsPG(
 			assetContent = "1 Document",
 			assetTitle = "DM Folder Name");
+	}
+
+	@description = "This ensures that an image in a depot can be published in Media Gallery when remote staging is enabled."
+	@priority = "4"
+	test CanPublishImageInMG {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.item.selector.web.internal.configuration.FFFolderItemSelectorGroupSelectorConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
+		property test.name.skip.portal.instance = "DepotRemoteStagingDM#CanPublishImageInMG";
+
+		JSONFolder.addFolder(
+			dmFolderDescription = "DM Folder Description",
+			dmFolderName = "DM Folder Name",
+			groupName = "Test Depot Name");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Image Description",
+			dmDocumentTitle = "Document_2.jpg",
+			folderName = "DM Folder Name",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_2.jpg");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page",
+			widgetName = "Media Gallery");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		MGPortlet.setRootFolder(
+			depotName = "Test Depot Name",
+			dmRootFolderName = "DM Folder Name");
+
+		DMDocument.viewPGViaMG(
+			mgDocumentTitle = "Document_2.jpg",
+			staging = "true");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		User.logoutPG();
+
+		User.firstLoginUI(
+			password = "test",
+			specificUrl = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
+
+		Navigator.openSitePage(
+			baseUrl = "http://localhost:9080",
+			pageName = "Test Page",
+			siteName = "Remote Site");
+
+		DMDocument.viewPGViaMG(
+			mgDocumentTitle = "Document_2.jpg",
+			staging = "true");
 	}
 
 	@description = "This ensures that the shortcut to an image in the depot can be added and published in the staging site when enabling remote staging."
@@ -2467,7 +2600,7 @@ definition {
 
 		Staging.publishToLive(remoteStaging = "true");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
+		DMNavigator.openDocumentsAndMediaAdmin(siteUrlKey = "site-name");
 
 		DMDocument.addDMShortcutCP(
 			depotName = "Test Depot Name",
@@ -2490,12 +2623,12 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		DMNavigator.openDocumentsAndMediaAdmin(
-			baseURL = "http://localhost:9080",
-			siteURLKey = "remote-site");
+			baseUrl = "http://localhost:9080",
+			siteUrlKey = "remote-site");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_1.jpg");
 
@@ -2532,7 +2665,7 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		ApplicationsMenu.gotoPortlet(
@@ -2585,11 +2718,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -2667,11 +2800,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -2720,7 +2853,7 @@ definition {
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title",
 			imageFileName = "Document_2.jpg",
-			siteURLKey = "site-name");
+			siteUrlKey = "site-name");
 
 		JSONLayout.addWidgetToPublicLayout(
 			groupName = "Site Name",
@@ -2739,11 +2872,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -2760,7 +2893,7 @@ definition {
 
 		VideoShortcut.addCP(
 			videoShortcutTitle = "Test YouTube Video Name",
-			videoURL = "https://www.youtube.com/watch?v=2ewB-7_VMGU");
+			videoUrl = "https://www.youtube.com/watch?v=2ewB-7_VMGU");
 
 		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
 
@@ -2798,11 +2931,11 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://localhost:9080",
+			specificUrl = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.openSitePage(
-			baseURL = "http://localhost:9080",
+			baseUrl = "http://localhost:9080",
 			pageName = "Test Page",
 			siteName = "Remote Site");
 
@@ -2912,7 +3045,7 @@ definition {
 
 		Staging.publishToLive(remoteStaging = "true");
 
-		BlogsNavigator.openToAddEntry(siteURLKey = "site-name");
+		BlogsNavigator.openToAddEntry(siteUrlKey = "site-name");
 
 		BlogsNavigator.gotoSelectFile();
 

@@ -98,19 +98,14 @@ definition {
 			ACSegments.viewSegmentCriteriaIndividualAttributes(attributeName = "createDate");
 
 			AssertElementNotPresent(
-				key_CriteriaName = "birthDate",
+				key_criteriaName = "birthDate",
 				locator1 = "ACSegments#CRITERIA_ROW");
 		}
 	}
 
 	@description = "Delete a dynamic segment"
-	@ignore = "true"
 	@priority = "5"
 	test CanDeleteDynamicSegment {
-		property portal.upstream = "quarantine";
-
-		// AC Bug Ticket: LRAC-10060
-
 		ACUtils.createBlogsAndAddToPage();
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");

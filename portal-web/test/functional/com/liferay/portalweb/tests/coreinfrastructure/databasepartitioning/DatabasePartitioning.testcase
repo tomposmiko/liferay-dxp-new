@@ -38,7 +38,7 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://www.able.com:8080",
+			specificUrl = "http://www.able.com:8080",
 			userEmailAddress = "test@www.able.com");
 
 		Navigator.openSpecificURL(url = "http://www.able.com:8080");
@@ -59,7 +59,7 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://www.baker.com:8080",
+			specificUrl = "http://www.baker.com:8080",
 			userEmailAddress = "test@www.baker.com");
 
 		Navigator.openSpecificURL(url = "http://www.baker.com:8080");
@@ -104,7 +104,7 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://www.able.com:8080",
+			specificUrl = "http://www.able.com:8080",
 			userEmailAddress = "test@www.able.com");
 
 		ProductMenu.gotoPortlet(
@@ -169,7 +169,7 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://www.able.com:8080",
+			specificUrl = "http://www.able.com:8080",
 			userEmailAddress = "test@www.able.com");
 
 		Navigator.openSpecificURL(url = "http://www.able.com:8080");
@@ -195,7 +195,7 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://www.able.com:9080",
+			specificUrl = "http://www.able.com:9080",
 			userEmailAddress = "test@www.able.com");
 
 		ProductMenu.gotoPortlet(
@@ -233,7 +233,7 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://www.able.com:8080",
+			specificUrl = "http://www.able.com:8080",
 			userEmailAddress = "test@www.able.com");
 
 		ProductMenu.gotoPortlet(
@@ -274,7 +274,7 @@ definition {
 
 		User.firstLoginUI(
 			password = "test",
-			specificURL = "http://www.able.com:8080",
+			specificUrl = "http://www.able.com:8080",
 			userEmailAddress = "test@www.able.com");
 
 		ProductMenu.gotoPortlet(
@@ -293,7 +293,7 @@ definition {
 
 		Portlet.shutdownServer();
 
-		Portlet.startServer(keepOSGiState = "true");
+		Portlet.startServer(keepOsGiState = "true");
 
 		Navigator.openSpecificURL(url = "http://www.able.com:8080");
 
@@ -321,7 +321,7 @@ definition {
 
 			User.firstLoginUI(
 				password = "test",
-				specificURL = "http://www.able.com:8080",
+				specificUrl = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
@@ -349,7 +349,7 @@ definition {
 			PagesAdmin.addPublicPage(pageName = "Web Content Display Page");
 
 			Navigator.gotoPage(
-				baseURL = "www.able.com:8080",
+				baseUrl = "www.able.com:8080",
 				pageName = "Web Content Display Page");
 
 			Portlet.addPG(portletName = "Web Content Display");
@@ -413,14 +413,16 @@ definition {
 			/*
 			Refresh();
 
-			WebContent.viewPGViaWCD(webContentContent = "WC WebContent Content Default Company");*/
+			WebContentDisplayPortlet.viewContent(
+				webContentContent = "WC WebContent Content Default Company",
+				webContentTitle = "WC WebContent Title Default Company");*/
 		}
 
 		task ("New Company publish it's WebContent Article") {
 			SignOut.signOut();
 
 			Navigator.gotoPage(
-				baseURL = "www.able.com:8080",
+				baseUrl = "www.able.com:8080",
 				pageName = "Web Content Display Page");
 
 			AssertTextEquals.assertPartialText(
@@ -432,7 +434,9 @@ definition {
 
 			Refresh();
 
-			WebContent.viewPGViaWCD(webContentContent = "WC WebContent Content New Company");
+			WebContentDisplayPortlet.viewContent(
+				webContentContent = "WC WebContent Content New Company",
+				webContentTitle = "WC WebContent Title New Company");
 		}
 
 		// Disable Check on Default company until LPS-116111 is resolved
@@ -445,7 +449,9 @@ definition {
 
 			Navigator.gotoPage(pageName = "Web Content Display Page");
 
-			WebContent.viewPGViaWCD(webContentContent = "WC WebContent Content Default Company");
+			WebContentDisplayPortlet.viewContent(
+				webContentContent = "WC WebContent Content Default Company",
+				webContentTitle = "WC WebContent Title Default Company");
 		}*/
 	}
 

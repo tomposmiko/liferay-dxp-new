@@ -30,6 +30,46 @@ definition {
 		}
 	}
 
+	macro addObjectActionViaUI {
+		LexiconEntry.gotoAdd();
+
+		Type(
+			locator1 = "ObjectAdmin#ADD_ACTION_NAME_FIELD",
+			value1 = "${actionName}");
+
+		if (isSet(whenAction)) {
+			Click(locator1 = "ObjectAdmin#ACTION_WHEN_TYPE");
+
+			Click(
+				key_type = "${whenAction}",
+				locator1 = "ObjectAdmin#SELECT_RELATIONSHIPS_TYPE_OPTION");
+		}
+
+		if (isSet(thenAction)) {
+			Click(locator1 = "ObjectAdmin#ACTION_THEN_TYPE");
+
+			Click(
+				key_type = "${thenAction}",
+				locator1 = "ObjectAdmin#SELECT_RELATIONSHIPS_TYPE_OPTION");
+		}
+
+		if (isSet(urlAction)) {
+			Type(
+				locator1 = "ObjectAdmin#ADD_URL_ACTION_FIELD",
+				value1 = "${urlAction}");
+		}
+
+		if (isSet(secretAction)) {
+			Type(
+				locator1 = "ObjectAdmin#ADD_SECRET_ACTION_FIELD",
+				value1 = "${secretAction}");
+		}
+
+		Button.clickSave();
+
+		WaitForSPARefresh();
+	}
+
 	macro addObjectBoleanFieldEntryViaUI {
 		ObjectAdmin.goToCustomObject(objectName = "${objectName}");
 
@@ -348,6 +388,12 @@ definition {
 		AssertElementPresent(locator1 = "ObjectAdmin#FIELD_BLOCK_ADD_FIELD_BUTTON");
 	}
 
+	macro assertEntryOnPageNotPresent {
+		AssertElementNotPresent(
+			key_entryName = "${entryName}",
+			locator1 = "ObjectAdmin#VIEW_ENTRY_NAME_ON_PAGE");
+	}
+
 	macro assertFieldsTableColumnsAreDisplayed {
 		AssertElementPresent(locator1 = "ObjectAdmin#FIELDS_LABEL_COLUMN");
 
@@ -388,6 +434,12 @@ definition {
 		AssertElementPresent(locator1 = "ObjectAdmin#LABEL_FIELD_REQUIRED");
 	}
 
+	macro assertNoItemsWereFound {
+		AssertTextEquals(
+			locator1 = "Message#EMPTY_INFO",
+			value1 = "No items were found.");
+	}
+
 	macro assertNotPossibleAddFieldOnBlockWithoutChooseOptionField {
 		Click(locator1 = "ObjectAdmin#ADD_FIELD_ON_BLOCK");
 
@@ -398,6 +450,20 @@ definition {
 		AssertElementPresent(locator1 = "ObjectAdmin#OBJECT_LAYOUTS_FIELD_INPUT_HAS_REQUIRED_ERROR");
 
 		AssertElementPresent(locator1 = "ObjectAdmin#OBJECT_FIELDS_REQUIRED_ERROR_MESSAGE");
+	}
+
+	macro assertObjectActions {
+		AssertElementPresent(
+			key_actionActive = "${actionActive}",
+			key_actionName = "${actionName}",
+			locator1 = "ObjectAdmin#VIEW_ACTIONS_TAB");
+	}
+
+	macro assertObjectActionsNotPresent {
+		AssertElementNotPresent(
+			key_actionActive = "${actionActive}",
+			key_actionName = "${actionName}",
+			locator1 = "ObjectAdmin#VIEW_ACTIONS_TAB");
 	}
 
 	macro assertObjectColumnsAreDisplayed {
@@ -546,6 +612,20 @@ definition {
 			locator1 = "ObjectAdmin#SELECT_LANGUAGE");
 	}
 
+	macro changePicklistFieldEntry {
+		Click(
+			key_entrySelected = "${entrySelected}",
+			locator1 = "ObjectPortlet#OBJECT_FIELD_SELECTED");
+
+		Click(
+			key_picklistOption = "${newPicklistOption}",
+			locator1 = "ObjectAdmin#ENTRY_PICKLIST_OPTION");
+
+		Button.clickSave();
+
+		WaitForSPARefresh();
+	}
+
 	macro changePluralLabelLanguage {
 		Click(locator1 = "ObjectAdmin#DROPDOWN_LANGUAGEM_PLURAL_LABEL");
 
@@ -568,6 +648,14 @@ definition {
 			value1 = "${name}");
 
 		Click(locator1 = "ObjectAdmin#SAVE_CUSTOM_OBJECT");
+	}
+
+	macro deleteActionViaUI {
+		Click(
+			key_objectLabel = "${actionName}",
+			locator1 = "ObjectAdmin#OBJECT_KEBAB_MENU");
+
+		MenuItem.clickNoError(menuItem = "Delete");
 	}
 
 	macro deleteAllCustomObjectsViaAPI {
@@ -610,7 +698,7 @@ definition {
 		if (isSet(fieldLabelName)) {
 			Type(
 				locator1 = "ObjectAdmin#DETAILS_LABEL_CUSTOM_OBJECT",
-				value1 = "${labelName}");
+				value1 = "${fieldLabelName}");
 		}
 
 		if (isSet(pluralLabelName)) {
@@ -622,13 +710,25 @@ definition {
 		Button.clickSave();
 	}
 
+	macro editEntryName {
+		Type(
+			locator1 = "ObjectAdmin#ENTRY_STRING_VALUE_FIELD",
+			value1 = "${newEntryValue}");
+
+		Button.clickSave();
+	}
+
+	macro goToActionsTab {
+		Click(locator1 = "ObjectAdmin#OBJECT_ACTIONS_TAB");
+	}
+
 	macro goToCustomObject {
-		var objectID = JSONObject.getObjectId(
+		var objectId = JSONObject.getObjectId(
 			objectName = "${objectName}",
 			userEmailAddress = "${userEmailAddress}",
 			userPassword = "${userPassword}");
 
-		Navigator.openSpecificURL(url = "/group/guest/~/control_panel/manage?p_p_id=com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_${objectID}");
+		Navigator.openSpecificURL(url = "/group/guest/~/control_panel/manage?p_p_id=com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_${objectId}");
 	}
 
 	macro goToDetailsTab {

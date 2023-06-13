@@ -32,51 +32,28 @@ definition {
 		}
 	}
 
-	@description = "The user can add a page based in global blog template."
-	@priority = "4"
-	@uitest
-	test AddPageBasedOnGlobalBlogTemplate {
-		task ("Add a page based in global blog template") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
-
-			PagesAdmin.addPublicPage(
-				pageName = "Test Page Name",
-				pageTemplateName = "Blog");
-		}
-
-		task ("View portlets are shown in blog template page") {
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			for (var portletName : list "Blogs,Tag Cloud,Recent Bloggers") {
-				Portlet.viewSpecificPG(portletName = "${portletName}");
-			}
-		}
-	}
-
-	@description = "The user can add a page based in global wiki template."
+	@description = "The user can add a page based in global search template."
 	@priority = "5"
 	@uitest
-	test AddPageBasedOnGlobalWikiTemplate {
+	test AddPageBasedOnGlobalSearchTemplate {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
-		task ("Add a page based in global wiki template") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+		task ("Add a page based in global search template") {
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.addPublicPage(
 				pageName = "Test Page Name",
-				pageTemplateName = "Wiki");
+				pageTemplateName = "Search");
 		}
 
-		task ("View portlets are shown in wiki template page") {
+		task ("View portlets are shown in search template page") {
 			Navigator.gotoSitePage(
 				pageName = "Test Page Name",
 				siteName = "Test Site Name");
 
-			for (var portletName : list "Tag Filter,Category Filter,Wiki") {
-				Portlet.viewSpecificPG(portletName = "${portletName}");
+			for (var portletName : list "Search Bar,Suggestions,Site Facet,Type Facet,Tag Facet,Category Facet,Folder Facet,User Facet,Modified Facet,Search Results,Search Options") {
+				Portlet.viewDefaultTitle(portletName = "${portletName}");
 			}
 		}
 	}
@@ -85,7 +62,7 @@ definition {
 	@priority = "3"
 	test AddPageWithEscapeCharacter {
 		task ("Add a page with escape characters name") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.addPublicPage(pageName = "Test's Page Name");
 		}
@@ -113,7 +90,7 @@ definition {
 		}
 
 		task ("View parent page is shown") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.viewPageItemPresent(
 				pageName = "Test Page Name",
@@ -147,12 +124,41 @@ definition {
 		}
 
 		task ("View child page is shown") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.viewPageItemPresent(
 				depth = "2",
 				pageName = "Test Child Page",
 				privacy = "Private Pages");
+		}
+	}
+
+	@description = "Add a web content via content panel on a widget page."
+	@priority = "4"
+	@uitest
+	test AddWebContentViaContentPanel {
+		task ("Add a widget page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Page Name");
+		}
+
+		task ("Add a web content via content panel") {
+			Navigator.gotoSitePage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
+
+			WidgetPages.addNewContent(assetType = "Basic Web Content");
+
+			WebContent.addCP(
+				webContentContent = "Web Content Content",
+				webContentTitle = "Web Content Title");
+
+			PortletEntry.publish();
+		}
+
+		task ("View web content is shown in content panel") {
+			WidgetPages.viewContentPanel(entryTitleList = "Web Content Title");
 		}
 	}
 
@@ -341,7 +347,7 @@ definition {
 
 		task ("Configure the page with all available portlets then view the portlet is shown") {
 			for (var portletName : list "Blogs,Wiki,Media Gallery,Message Boards,RSS Publisher,Documents and Media,Form,Application Authorization Request") {
-				PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+				PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 				PagesAdmin.configurePage(
 					pageName = "Test Page Name",
@@ -375,7 +381,7 @@ definition {
 		}
 
 		task ("Delete the first widget page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.deletePage(pageName = "Test Page Name 1");
 		}
@@ -402,7 +408,7 @@ definition {
 		}
 
 		task ("Edit the name of the first page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.gotoPageEllipsisMenuItem(
 				menuItem = "Configure",
@@ -453,7 +459,7 @@ definition {
 		}
 
 		task ("View default locale is shown") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.gotoPageEllipsisMenuItem(
 				menuItem = "Configure",

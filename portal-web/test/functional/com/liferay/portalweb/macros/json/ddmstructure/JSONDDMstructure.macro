@@ -4,12 +4,12 @@ definition {
 	macro _getStructureId {
 		Variables.assertDefined(parameterList = "${classNameId},${groupId},${structureName}");
 
-		var portalURL = JSONCompany.getPortalURL();
+		var portalUrl = JSONCompany.getPortalURL();
 
 		var companyId = JSONCompany.getCompanyId();
 
 		var curl = '''
-			${portalURL}/api/jsonws/ddm.ddmstructure/get-structures \
+			${portalUrl}/api/jsonws/ddm.ddmstructure/get-structures \
 			  -u test@liferay.com:test \
 			  -d companyId=${companyId} \
 			  -d groupIds=[${groupId}] \
@@ -31,12 +31,12 @@ definition {
 	macro _getStructureIds {
 		Variables.assertDefined(parameterList = "${classNameId},${groupId}");
 
-		var portalURL = JSONCompany.getPortalURL();
+		var portalUrl = JSONCompany.getPortalURL();
 
 		var companyId = JSONCompany.getCompanyId();
 
 		var curl = '''
-			${portalURL}/api/jsonws/ddm.ddmstructure/get-structures \
+			${portalUrl}/api/jsonws/ddm.ddmstructure/get-structures \
 			  -u test@liferay.com:test \
 			  -d companyId=${companyId} \
 			  -d groupIds=[${groupId}] \

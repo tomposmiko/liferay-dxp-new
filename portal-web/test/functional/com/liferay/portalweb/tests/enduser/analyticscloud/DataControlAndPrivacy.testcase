@@ -15,6 +15,8 @@ definition {
 
 		task ("Set up instance and sign in DXP") {
 			TestCase.setUpPortalInstance();
+
+			ACUtils.launchDXP();
 		}
 	}
 
@@ -39,6 +41,8 @@ definition {
 	@priority = "4"
 	test CanChangeRetentionPeriod {
 		task ("Launch AC and go to Settings") {
+			ACUtils.launchAC();
+
 			ACNavigation.goToSettings();
 		}
 

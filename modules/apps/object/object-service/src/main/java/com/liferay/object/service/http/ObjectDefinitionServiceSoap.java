@@ -228,7 +228,7 @@ public class ObjectDefinitionServiceSoap {
 
 	public static com.liferay.object.model.ObjectDefinitionSoap
 			updateCustomObjectDefinition(
-				Long objectDefinitionId, long descriptionObjectFieldId,
+				long objectDefinitionId, long descriptionObjectFieldId,
 				long titleObjectFieldId, boolean active,
 				String[] labelMapLanguageIds, String[] labelMapValues,
 				String name, String panelAppOrder, String panelCategoryKey,
@@ -248,6 +248,26 @@ public class ObjectDefinitionServiceSoap {
 					objectDefinitionId, descriptionObjectFieldId,
 					titleObjectFieldId, active, labelMap, name, panelAppOrder,
 					panelCategoryKey, portlet, pluralLabelMap, scope);
+
+			return com.liferay.object.model.ObjectDefinitionSoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.object.model.ObjectDefinitionSoap
+			updateTitleObjectFieldId(
+				long objectDefinitionId, long titleObjectFieldId)
+		throws RemoteException {
+
+		try {
+			com.liferay.object.model.ObjectDefinition returnValue =
+				ObjectDefinitionServiceUtil.updateTitleObjectFieldId(
+					objectDefinitionId, titleObjectFieldId);
 
 			return com.liferay.object.model.ObjectDefinitionSoap.toSoapModel(
 				returnValue);

@@ -123,9 +123,27 @@ public class DLFolderItemSelectorView
 			(HttpServletRequest)servletRequest, "folderId",
 			itemSelectorCriterion.getFolderId());
 
-		if (repositoryId != itemSelectorCriterion.getRepositoryId()) {
+		long itemSelectorCriterionRepositoryId =
+			itemSelectorCriterion.getRepositoryId();
+
+		Folder folder = _fetchFolder(folderId);
+
+		if ((folder != null) &&
+			(folder.getRepositoryId() !=
+				itemSelectorCriterion.getRepositoryId())) {
+
+			itemSelectorCriterionRepositoryId = folder.getRepositoryId();
+		}
+
+		if (repositoryId != itemSelectorCriterionRepositoryId) {
 			folderId = ParamUtil.getLong(
 				(HttpServletRequest)servletRequest, "folderId");
+
+			folder = _fetchFolder(folderId);
+
+			if (folder != null) {
+				repositoryId = folder.getRepositoryId();
+			}
 		}
 
 		Group group = _getGroup(repositoryId);
