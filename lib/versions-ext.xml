@@ -1734,7 +1734,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/hibernate-core.jar</file-name>
-				<version>3.6.10.LIFERAY-PATCHED-3</version>
+				<version>3.6.10.LIFERAY-PATCHED-4</version>
 				<project-name>Hibernate</project-name>
 				<project-url>http://www.hibernate.org</project-url>
 				<licenses>

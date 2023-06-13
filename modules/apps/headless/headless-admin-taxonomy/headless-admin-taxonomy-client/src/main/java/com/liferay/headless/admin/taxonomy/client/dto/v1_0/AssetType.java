@@ -15,6 +15,9 @@
 package com.liferay.headless.admin.taxonomy.client.dto.v1_0;
 
 import com.liferay.headless.admin.taxonomy.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.taxonomy.client.serdes.v1_0.AssetTypeSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -85,5 +88,31 @@ public class AssetType {
 	}
 
 	protected String type;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof AssetType)) {
+			return false;
+		}
+
+		AssetType assetType = (AssetType)object;
+
+		return Objects.equals(toString(), assetType.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return AssetTypeSerDes.toJSON(this);
+	}
 
 }

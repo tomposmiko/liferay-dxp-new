@@ -28,8 +28,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -81,9 +87,7 @@ public class MessageBoardThread {
 
 	}
 
-	@Schema(
-		description = "The information of the ratings (average, number) associated to this resource."
-	)
+	@Schema(description = "The thread's average rating.")
 	public AggregateRating getAggregateRating() {
 		return aggregateRating;
 	}
@@ -113,7 +117,7 @@ public class MessageBoardThread {
 	protected AggregateRating aggregateRating;
 
 	@Schema(
-		description = "The main content of the thread, the message written as description of the thread."
+		description = "The thread's main body content (the message written as the thread's description)."
 	)
 	public String getArticleBody() {
 		return articleBody;
@@ -142,7 +146,7 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String articleBody;
 
-	@Schema(description = "The creator of the MessageBoardThread")
+	@Schema(description = "The thread's creator.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -170,7 +174,7 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema(description = "The creation date of the MessageBoardThread.")
+	@Schema(description = "The date the thread was created.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -198,9 +202,7 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(
-		description = "The last time a field of the MessageBoardThread changed."
-	)
+	@Schema(description = "The last time any field of the thread changed.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -228,7 +230,9 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(description = "The media format of the content (html, bbcode...).")
+	@Schema(
+		description = "The media format of the thread's content (e.g., HTML, BBCode, etc.)."
+	)
 	public String getEncodingFormat() {
 		return encodingFormat;
 	}
@@ -256,7 +260,7 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String encodingFormat;
 
-	@Schema(description = "The main title of the thread.")
+	@Schema(description = "The thread's main title.")
 	public String getHeadline() {
 		return headline;
 	}
@@ -285,7 +289,7 @@ public class MessageBoardThread {
 	@NotEmpty
 	protected String headline;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The thread's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -311,9 +315,7 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(
-		description = "A list of keywords describing the MessageBoardThread."
-	)
+	@Schema(description = "A list of keywords describing the thread.")
 	public String[] getKeywords() {
 		return keywords;
 	}
@@ -341,9 +343,7 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] keywords;
 
-	@Schema(
-		description = "The number of child attachments asociated with the MessageBoardThread."
-	)
+	@Schema(description = "The number of the thread's attachments.")
 	public Integer getNumberOfMessageBoardAttachments() {
 		return numberOfMessageBoardAttachments;
 	}
@@ -375,9 +375,7 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfMessageBoardAttachments;
 
-	@Schema(
-		description = "The number of child attachments asociated with the MessageBoardMessages."
-	)
+	@Schema(description = "The number of the thread's messages.")
 	public Integer getNumberOfMessageBoardMessages() {
 		return numberOfMessageBoardMessages;
 	}
@@ -409,8 +407,37 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfMessageBoardMessages;
 
+	@Schema
+	public RelatedContent[] getRelatedContents() {
+		return relatedContents;
+	}
+
+	public void setRelatedContents(RelatedContent[] relatedContents) {
+		this.relatedContents = relatedContents;
+	}
+
+	@JsonIgnore
+	public void setRelatedContents(
+		UnsafeSupplier<RelatedContent[], Exception>
+			relatedContentsUnsafeSupplier) {
+
+		try {
+			relatedContents = relatedContentsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected RelatedContent[] relatedContents;
+
 	@Schema(
-		description = "A flag indicating that this thread is posting a question that can receives aproved answers."
+		description = "A flag that indicates whether this thread was posted as a question that can receive approved answers."
 	)
 	public Boolean getShowAsQuestion() {
 		return showAsQuestion;
@@ -439,9 +466,7 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean showAsQuestion;
 
-	@Schema(
-		description = "The site identificator where this MessageBoardThread is scoped."
-	)
+	@Schema(description = "The ID of the site to which this thread is scoped.")
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -469,7 +494,7 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
-	@Schema(description = "The type of the thread.")
+	@Schema(description = "The thread's type.")
 	public String getThreadType() {
 		return threadType;
 	}
@@ -498,7 +523,7 @@ public class MessageBoardThread {
 	protected String threadType;
 
 	@Schema(
-		description = "Write only property to specify the default permissions."
+		description = "A write-only property that specifies the thread's default permissions."
 	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
@@ -563,115 +588,123 @@ public class MessageBoardThread {
 
 		sb.append("{");
 
-		sb.append("\"aggregateRating\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (aggregateRating == null) {
-			sb.append("null");
+		if (aggregateRating != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"aggregateRating\": ");
+
+			sb.append(String.valueOf(aggregateRating));
 		}
-		else {
-			sb.append(aggregateRating);
-		}
 
-		sb.append(", ");
+		if (articleBody != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"articleBody\": ");
+			sb.append("\"articleBody\": ");
 
-		if (articleBody == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(articleBody);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(articleBody));
 
-		sb.append("\"creator\": ");
-
-		if (creator == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(creator);
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dateCreated\": ");
-
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateCreated);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"creator\": ");
 
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
-			sb.append("\"");
+			sb.append(String.valueOf(creator));
 		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"encodingFormat\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (encodingFormat == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(encodingFormat);
+
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"headline\": ");
+			sb.append("\"dateModified\": ");
 
-		if (headline == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(headline);
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (encodingFormat != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"encodingFormat\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(encodingFormat));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (headline != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"headline\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(headline));
+
+			sb.append("\"");
+		}
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (keywords != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywords\": ");
+			sb.append("\"keywords\": ");
 
-		if (keywords == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < keywords.length; i++) {
 				sb.append("\"");
-				sb.append(keywords[i]);
+
+				sb.append(_escape(keywords[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < keywords.length) {
@@ -682,74 +715,127 @@ public class MessageBoardThread {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (numberOfMessageBoardAttachments != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfMessageBoardAttachments\": ");
+			sb.append("\"numberOfMessageBoardAttachments\": ");
 
-		if (numberOfMessageBoardAttachments == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfMessageBoardAttachments);
 		}
 
-		sb.append(", ");
+		if (numberOfMessageBoardMessages != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfMessageBoardMessages\": ");
+			sb.append("\"numberOfMessageBoardMessages\": ");
 
-		if (numberOfMessageBoardMessages == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfMessageBoardMessages);
 		}
 
-		sb.append(", ");
+		if (relatedContents != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"showAsQuestion\": ");
+			sb.append("\"relatedContents\": ");
 
-		if (showAsQuestion == null) {
-			sb.append("null");
+			sb.append("[");
+
+			for (int i = 0; i < relatedContents.length; i++) {
+				sb.append(String.valueOf(relatedContents[i]));
+
+				if ((i + 1) < relatedContents.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
-		else {
+
+		if (showAsQuestion != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"showAsQuestion\": ");
+
 			sb.append(showAsQuestion);
 		}
 
-		sb.append(", ");
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\": ");
 
-		if (siteId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(siteId);
 		}
 
-		sb.append(", ");
+		if (threadType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"threadType\": ");
+			sb.append("\"threadType\": ");
 
-		if (threadType == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(threadType);
+
+			sb.append(_escape(threadType));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (viewableBy != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"viewableBy\": ");
+			sb.append("\"viewableBy\": ");
 
-		if (viewableBy == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
 			sb.append(viewableBy);
+
 			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

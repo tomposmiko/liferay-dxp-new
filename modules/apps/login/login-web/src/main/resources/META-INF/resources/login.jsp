@@ -71,9 +71,9 @@
 				<liferay-util:dynamic-include key="com.liferay.login.web#/login.jsp#alertPre" />
 
 				<c:choose>
-					<c:when test='<%= SessionMessages.contains(request, "passwordSent") %>'>
+					<c:when test='<%= SessionMessages.contains(request, "forgotPasswordSent") %>'>
 						<div class="alert alert-success">
-							<liferay-ui:message key="an-email-has-been-sent-to-the-provided-email-address" />
+							<liferay-ui:message key="your-request-completed-successfully" />
 						</div>
 					</c:when>
 					<c:when test='<%= SessionMessages.contains(request, "userAdded") %>'>
@@ -158,6 +158,10 @@
 
 					<aui:input autoFocus="<%= windowState.equals(LiferayWindowState.EXCLUSIVE) || windowState.equals(WindowState.MAXIMIZED) %>" cssClass="clearable" label="<%= loginLabel %>" name="login" showRequiredLabel="<%= false %>" type="text" value="<%= login %>">
 						<aui:validator name="required" />
+
+						<c:if test="<%= authType.equals(CompanyConstants.AUTH_TYPE_EA) %>">
+							<aui:validator name="email" />
+						</c:if>
 					</aui:input>
 
 					<aui:input name="password" showRequiredLabel="<%= false %>" type="password" value="<%= password %>">

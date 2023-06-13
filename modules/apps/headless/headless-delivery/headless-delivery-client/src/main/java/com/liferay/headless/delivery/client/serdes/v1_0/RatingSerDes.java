@@ -21,8 +21,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -62,7 +64,7 @@ public class RatingSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"bestRating\":");
+			sb.append("\"bestRating\": ");
 
 			sb.append(rating.getBestRating());
 		}
@@ -72,9 +74,9 @@ public class RatingSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(CreatorSerDes.toJSON(rating.getCreator()));
+			sb.append(String.valueOf(rating.getCreator()));
 		}
 
 		if (rating.getDateCreated() != null) {
@@ -82,7 +84,7 @@ public class RatingSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -96,7 +98,7 @@ public class RatingSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -110,7 +112,7 @@ public class RatingSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(rating.getId());
 		}
@@ -120,7 +122,7 @@ public class RatingSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"ratingValue\":");
+			sb.append("\"ratingValue\": ");
 
 			sb.append(rating.getRatingValue());
 		}
@@ -130,7 +132,7 @@ public class RatingSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"worstRating\":");
+			sb.append("\"worstRating\": ");
 
 			sb.append(rating.getWorstRating());
 		}
@@ -138,6 +140,12 @@ public class RatingSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		RatingJSONParser ratingJSONParser = new RatingJSONParser();
+
+		return ratingJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Rating rating) {
@@ -161,7 +169,7 @@ public class RatingSerDes {
 			map.put("creator", null);
 		}
 		else {
-			map.put("creator", CreatorSerDes.toJSON(rating.getCreator()));
+			map.put("creator", String.valueOf(rating.getCreator()));
 		}
 
 		map.put(
@@ -194,6 +202,41 @@ public class RatingSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class RatingJSONParser extends BaseJSONParser<Rating> {

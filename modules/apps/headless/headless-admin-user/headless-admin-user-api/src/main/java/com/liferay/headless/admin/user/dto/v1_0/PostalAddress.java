@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "PostalAddress")
 public class PostalAddress {
 
-	@Schema(description = "The country. For example, USA.")
+	@Schema(description = "The address's country (e.g., USA).")
 	public String getAddressCountry() {
 		return addressCountry;
 	}
@@ -70,7 +73,7 @@ public class PostalAddress {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String addressCountry;
 
-	@Schema(description = "The locality. For example, Diamond Bar.")
+	@Schema(description = "The address's locality (e.g., city).")
 	public String getAddressLocality() {
 		return addressLocality;
 	}
@@ -98,7 +101,7 @@ public class PostalAddress {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String addressLocality;
 
-	@Schema(description = "The region. For example, CA.")
+	@Schema(description = "The address's region (e.g., state).")
 	public String getAddressRegion() {
 		return addressRegion;
 	}
@@ -126,7 +129,7 @@ public class PostalAddress {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String addressRegion;
 
-	@Schema(description = "The type of address.")
+	@Schema(description = "The address's type.")
 	public String getAddressType() {
 		return addressType;
 	}
@@ -154,7 +157,7 @@ public class PostalAddress {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String addressType;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The address's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -180,7 +183,7 @@ public class PostalAddress {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The postal code. For example, 94043.")
+	@Schema(description = "The address's postal code (e.g., zip code).")
 	public String getPostalCode() {
 		return postalCode;
 	}
@@ -209,7 +212,7 @@ public class PostalAddress {
 	protected String postalCode;
 
 	@Schema(
-		description = "A flag that identifies if the postal address is the main one of the UserAccount/Organization."
+		description = "A flag that identifies whether this is the main address of the user/organization."
 	)
 	public Boolean getPrimary() {
 		return primary;
@@ -239,7 +242,7 @@ public class PostalAddress {
 	protected Boolean primary;
 
 	@Schema(
-		description = "The first componente of a street address. For example, 1600 Amphitheatre Pkwy."
+		description = "The street address's first line (e.g., 1600 Amphitheatre Pkwy.)."
 	)
 	public String getStreetAddressLine1() {
 		return streetAddressLine1;
@@ -268,9 +271,7 @@ public class PostalAddress {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String streetAddressLine1;
 
-	@Schema(
-		description = "The second componente of a street address. For example, 4º B."
-	)
+	@Schema(description = "The street address's second line.")
 	public String getStreetAddressLine2() {
 		return streetAddressLine2;
 	}
@@ -298,7 +299,7 @@ public class PostalAddress {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String streetAddressLine2;
 
-	@Schema(description = "The third componente of a street address.")
+	@Schema(description = "The street address's third line.")
 	public String getStreetAddressLine3() {
 		return streetAddressLine3;
 	}
@@ -353,128 +354,171 @@ public class PostalAddress {
 
 		sb.append("{");
 
-		sb.append("\"addressCountry\": ");
+		if (addressCountry != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (addressCountry == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"addressCountry\": ");
+
 			sb.append("\"");
-			sb.append(addressCountry);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(addressCountry));
 
-		sb.append("\"addressLocality\": ");
-
-		if (addressLocality == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(addressLocality);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (addressLocality != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"addressRegion\": ");
+			sb.append("\"addressLocality\": ");
 
-		if (addressRegion == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(addressRegion);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(addressLocality));
 
-		sb.append("\"addressType\": ");
-
-		if (addressType == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(addressType);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (addressRegion != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"addressRegion\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(addressRegion));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (addressType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"addressType\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(addressType));
+
+			sb.append("\"");
+		}
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (postalCode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"postalCode\": ");
+			sb.append("\"postalCode\": ");
 
-		if (postalCode == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(postalCode);
+
+			sb.append(_escape(postalCode));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (primary != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"primary\": ");
+			sb.append("\"primary\": ");
 
-		if (primary == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(primary);
 		}
 
-		sb.append(", ");
+		if (streetAddressLine1 != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"streetAddressLine1\": ");
+			sb.append("\"streetAddressLine1\": ");
 
-		if (streetAddressLine1 == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(streetAddressLine1);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(streetAddressLine1));
 
-		sb.append("\"streetAddressLine2\": ");
-
-		if (streetAddressLine2 == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(streetAddressLine2);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (streetAddressLine2 != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"streetAddressLine3\": ");
+			sb.append("\"streetAddressLine2\": ");
 
-		if (streetAddressLine3 == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(streetAddressLine2));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (streetAddressLine3 != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"streetAddressLine3\": ");
+
 			sb.append("\"");
-			sb.append(streetAddressLine3);
+
+			sb.append(_escape(streetAddressLine3));
+
 			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

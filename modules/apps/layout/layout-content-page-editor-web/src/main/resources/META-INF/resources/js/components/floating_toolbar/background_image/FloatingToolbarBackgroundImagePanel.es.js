@@ -3,10 +3,11 @@ import {Config} from 'metal-state';
 import Soy from 'metal-soy';
 
 import './FloatingToolbarBackgroundImagePanelDelegateTemplate.soy';
+import {disableSavingChangesStatusAction, enableSavingChangesStatusAction, updateLastSaveDateAction} from '../../../actions/saveChanges.es';
 import {getConnectedComponent} from '../../../store/ConnectedComponent.es';
 import {openImageSelector} from '../../../utils/FragmentsEditorDialogUtils';
 import templates from './FloatingToolbarBackgroundImagePanel.soy';
-import {UPDATE_LAST_SAVE_DATE, UPDATE_ROW_CONFIG, UPDATE_SAVING_CHANGES_STATUS, UPDATE_TRANSLATION_STATUS} from '../../../actions/actions.es';
+import {UPDATE_ROW_CONFIG, UPDATE_TRANSLATION_STATUS} from '../../../actions/actions.es';
 
 /**
  * FloatingToolbarBackgroundImagePanel
@@ -45,36 +46,23 @@ class FloatingToolbarBackgroundImagePanel extends Component {
 	 */
 	_updateRowBackgroundImage(backgroundImage) {
 		this.store
-			.dispatchAction(
-				UPDATE_SAVING_CHANGES_STATUS,
-				{
-					savingChanges: true
-				}
-			)
-			.dispatchAction(
-				UPDATE_ROW_CONFIG,
+			.dispatch(enableSavingChangesStatusAction())
+			.dispatch(
 				{
 					config: {
 						backgroundImage
 					},
-					rowId: this.itemId
+					rowId: this.itemId,
+					type: UPDATE_ROW_CONFIG
 				}
 			)
-			.dispatchAction(
-				UPDATE_TRANSLATION_STATUS
-			)
-			.dispatchAction(
-				UPDATE_LAST_SAVE_DATE,
+			.dispatch(
 				{
-					lastSaveDate: new Date()
+					type: UPDATE_TRANSLATION_STATUS
 				}
 			)
-			.dispatchAction(
-				UPDATE_SAVING_CHANGES_STATUS,
-				{
-					savingChanges: false
-				}
-			);
+			.dispatch(updateLastSaveDateAction())
+			.dispatch(disableSavingChangesStatusAction());
 	}
 
 }

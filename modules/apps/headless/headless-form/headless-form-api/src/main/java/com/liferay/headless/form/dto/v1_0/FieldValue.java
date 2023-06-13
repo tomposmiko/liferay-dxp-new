@@ -24,7 +24,12 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -40,20 +45,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "FieldValue")
 public class FieldValue {
 
-	public FormDocument getDocument() {
-		return document;
+	@Schema
+	public FormDocument getFormDocument() {
+		return formDocument;
 	}
 
-	public void setDocument(FormDocument document) {
-		this.document = document;
+	public void setFormDocument(FormDocument formDocument) {
+		this.formDocument = formDocument;
 	}
 
 	@JsonIgnore
-	public void setDocument(
-		UnsafeSupplier<FormDocument, Exception> documentUnsafeSupplier) {
+	public void setFormDocument(
+		UnsafeSupplier<FormDocument, Exception> formDocumentUnsafeSupplier) {
 
 		try {
-			document = documentUnsafeSupplier.get();
+			formDocument = formDocumentUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -65,22 +71,23 @@ public class FieldValue {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected FormDocument document;
+	protected FormDocument formDocument;
 
-	public Long getDocumentId() {
-		return documentId;
+	@Schema
+	public Long getFormDocumentId() {
+		return formDocumentId;
 	}
 
-	public void setDocumentId(Long documentId) {
-		this.documentId = documentId;
+	public void setFormDocumentId(Long formDocumentId) {
+		this.formDocumentId = formDocumentId;
 	}
 
 	@JsonIgnore
-	public void setDocumentId(
-		UnsafeSupplier<Long, Exception> documentIdUnsafeSupplier) {
+	public void setFormDocumentId(
+		UnsafeSupplier<Long, Exception> formDocumentIdUnsafeSupplier) {
 
 		try {
-			documentId = documentIdUnsafeSupplier.get();
+			formDocumentId = formDocumentIdUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -92,8 +99,9 @@ public class FieldValue {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	protected Long documentId;
+	protected Long formDocumentId;
 
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -116,9 +124,10 @@ public class FieldValue {
 	}
 
 	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -144,6 +153,7 @@ public class FieldValue {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
+	@Schema
 	public String getValue() {
 		return value;
 	}
@@ -198,61 +208,97 @@ public class FieldValue {
 
 		sb.append("{");
 
-		sb.append("\"document\": ");
+		if (formDocument != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (document == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(document);
-		}
+			sb.append("\"formDocument\": ");
 
-		sb.append(", ");
-
-		sb.append("\"documentId\": ");
-
-		if (documentId == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(documentId);
+			sb.append(String.valueOf(formDocument));
 		}
 
-		sb.append(", ");
+		if (formDocumentId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"formDocumentId\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append(formDocumentId);
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(name));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (value != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"value\": ");
+
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(value));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		sb.append("}");
 
-		sb.append("\"value\": ");
+		return sb.toString();
+	}
 
-		if (value == null) {
-			sb.append("null");
-		}
-		else {
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(value);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

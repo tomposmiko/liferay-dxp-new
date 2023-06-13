@@ -26,8 +26,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -43,6 +49,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "FormRecord")
 public class FormRecord {
 
+	@Schema
 	public Creator getCreator() {
 		return creator;
 	}
@@ -70,6 +77,7 @@ public class FormRecord {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Creator creator;
 
+	@Schema
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -94,9 +102,10 @@ public class FormRecord {
 	}
 
 	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
+	@Schema
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -121,9 +130,10 @@ public class FormRecord {
 	}
 
 	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
+	@Schema
 	public Date getDatePublished() {
 		return datePublished;
 	}
@@ -148,9 +158,10 @@ public class FormRecord {
 	}
 
 	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date datePublished;
 
+	@Schema
 	public Boolean getDraft() {
 		return draft;
 	}
@@ -206,6 +217,7 @@ public class FormRecord {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FieldValue[] fieldValues;
 
+	@Schema
 	public Form getForm() {
 		return form;
 	}
@@ -231,6 +243,7 @@ public class FormRecord {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Form form;
 
+	@Schema
 	public Long getFormId() {
 		return formId;
 	}
@@ -258,6 +271,7 @@ public class FormRecord {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long formId;
 
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -280,7 +294,7 @@ public class FormRecord {
 	}
 
 	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
 	@Override
@@ -310,77 +324,82 @@ public class FormRecord {
 
 		sb.append("{");
 
-		sb.append("\"creator\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (creator == null) {
-			sb.append("null");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"creator\": ");
+
+			sb.append(String.valueOf(creator));
 		}
-		else {
-			sb.append(creator);
-		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCreated);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
 
-		sb.append("\"dateModified\": ");
-
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"datePublished\": ");
+			sb.append("\"dateModified\": ");
 
-		if (datePublished == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(datePublished);
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (datePublished != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"draft\": ");
+			sb.append("\"datePublished\": ");
 
-		if (draft == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(datePublished));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (draft != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"draft\": ");
+
 			sb.append(draft);
 		}
 
-		sb.append(", ");
+		if (fieldValues != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"fieldValues\": ");
+			sb.append("\"fieldValues\": ");
 
-		if (fieldValues == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < fieldValues.length; i++) {
-				sb.append(fieldValues[i]);
+				sb.append(String.valueOf(fieldValues[i]));
 
 				if ((i + 1) < fieldValues.length) {
 					sb.append(", ");
@@ -390,37 +409,69 @@ public class FormRecord {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (form != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"form\": ");
+			sb.append("\"form\": ");
 
-		if (form == null) {
-			sb.append("null");
+			sb.append(String.valueOf(form));
 		}
-		else {
-			sb.append(form);
-		}
 
-		sb.append(", ");
+		if (formId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"formId\": ");
+			sb.append("\"formId\": ");
 
-		if (formId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(formId);
 		}
 
-		sb.append(", ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(id);
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

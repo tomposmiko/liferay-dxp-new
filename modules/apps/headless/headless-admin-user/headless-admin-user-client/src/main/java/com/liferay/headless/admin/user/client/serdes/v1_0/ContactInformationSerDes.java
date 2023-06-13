@@ -22,8 +22,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.WebUrl;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -63,7 +65,7 @@ public class ContactInformationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"emailAddresses\":");
+			sb.append("\"emailAddresses\": ");
 
 			sb.append("[");
 
@@ -71,8 +73,7 @@ public class ContactInformationSerDes {
 				 i++) {
 
 				sb.append(
-					EmailAddressSerDes.toJSON(
-						contactInformation.getEmailAddresses()[i]));
+					String.valueOf(contactInformation.getEmailAddresses()[i]));
 
 				if ((i + 1) < contactInformation.getEmailAddresses().length) {
 					sb.append(", ");
@@ -87,11 +88,11 @@ public class ContactInformationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"facebook\":");
+			sb.append("\"facebook\": ");
 
 			sb.append("\"");
 
-			sb.append(contactInformation.getFacebook());
+			sb.append(_escape(contactInformation.getFacebook()));
 
 			sb.append("\"");
 		}
@@ -101,7 +102,7 @@ public class ContactInformationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(contactInformation.getId());
 		}
@@ -111,11 +112,11 @@ public class ContactInformationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"jabber\":");
+			sb.append("\"jabber\": ");
 
 			sb.append("\"");
 
-			sb.append(contactInformation.getJabber());
+			sb.append(_escape(contactInformation.getJabber()));
 
 			sb.append("\"");
 		}
@@ -125,7 +126,7 @@ public class ContactInformationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"postalAddresses\":");
+			sb.append("\"postalAddresses\": ");
 
 			sb.append("[");
 
@@ -133,8 +134,7 @@ public class ContactInformationSerDes {
 				 i++) {
 
 				sb.append(
-					PostalAddressSerDes.toJSON(
-						contactInformation.getPostalAddresses()[i]));
+					String.valueOf(contactInformation.getPostalAddresses()[i]));
 
 				if ((i + 1) < contactInformation.getPostalAddresses().length) {
 					sb.append(", ");
@@ -149,11 +149,11 @@ public class ContactInformationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"skype\":");
+			sb.append("\"skype\": ");
 
 			sb.append("\"");
 
-			sb.append(contactInformation.getSkype());
+			sb.append(_escape(contactInformation.getSkype()));
 
 			sb.append("\"");
 		}
@@ -163,11 +163,11 @@ public class ContactInformationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"sms\":");
+			sb.append("\"sms\": ");
 
 			sb.append("\"");
 
-			sb.append(contactInformation.getSms());
+			sb.append(_escape(contactInformation.getSms()));
 
 			sb.append("\"");
 		}
@@ -177,7 +177,7 @@ public class ContactInformationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"telephones\":");
+			sb.append("\"telephones\": ");
 
 			sb.append("[");
 
@@ -185,7 +185,7 @@ public class ContactInformationSerDes {
 				 i++) {
 
 				sb.append(
-					PhoneSerDes.toJSON(contactInformation.getTelephones()[i]));
+					String.valueOf(contactInformation.getTelephones()[i]));
 
 				if ((i + 1) < contactInformation.getTelephones().length) {
 					sb.append(", ");
@@ -200,11 +200,11 @@ public class ContactInformationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"twitter\":");
+			sb.append("\"twitter\": ");
 
 			sb.append("\"");
 
-			sb.append(contactInformation.getTwitter());
+			sb.append(_escape(contactInformation.getTwitter()));
 
 			sb.append("\"");
 		}
@@ -214,13 +214,12 @@ public class ContactInformationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"webUrls\":");
+			sb.append("\"webUrls\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < contactInformation.getWebUrls().length; i++) {
-				sb.append(
-					WebUrlSerDes.toJSON(contactInformation.getWebUrls()[i]));
+				sb.append(String.valueOf(contactInformation.getWebUrls()[i]));
 
 				if ((i + 1) < contactInformation.getWebUrls().length) {
 					sb.append(", ");
@@ -233,6 +232,13 @@ public class ContactInformationSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		ContactInformationJSONParser contactInformationJSONParser =
+			new ContactInformationJSONParser();
+
+		return contactInformationJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -322,6 +328,41 @@ public class ContactInformationSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class ContactInformationJSONParser

@@ -173,6 +173,23 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 	}
 
 	@Override
+	public SearchRequestBuilder fields(String... fields) {
+		withSearchRequestImpl(
+			searchRequestImpl -> searchRequestImpl.setSelectedFieldNames(
+				fields));
+
+		return this;
+	}
+
+	@Override
+	public SearchRequestBuilder from(Integer from) {
+		withSearchRequestImpl(
+			searchRequestImpl -> searchRequestImpl.setFrom(from));
+
+		return this;
+	}
+
+	@Override
 	public SearchRequestBuilder getFederatedSearchRequestBuilder(
 		String federatedSearchKey) {
 
@@ -189,6 +206,15 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 		withSearchRequestImpl(
 			searchRequestImpl -> searchRequestImpl.setHighlightEnabled(
 				highlightEnabled));
+
+		return this;
+	}
+
+	@Override
+	public SearchRequestBuilder highlightFields(String... highlightFields) {
+		withSearchRequestImpl(
+			searchRequestImpl -> searchRequestImpl.setHighlightFields(
+				highlightFields));
 
 		return this;
 	}
@@ -249,6 +275,14 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 	public SearchRequestBuilder rescoreQuery(Query query) {
 		withSearchRequestImpl(
 			searchRequestImpl -> searchRequestImpl.setRescoreQuery(query));
+
+		return this;
+	}
+
+	@Override
+	public SearchRequestBuilder size(Integer size) {
+		withSearchRequestImpl(
+			searchRequestImpl -> searchRequestImpl.setSize(size));
 
 		return this;
 	}
@@ -333,12 +367,10 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 		Collection<SearchRequestBuilder> searchRequestBuilders =
 			_federatedSearchRequestBuildersMap.values();
 
-		Stream<SearchRequest> map = searchRequestBuilders.stream(
+		return searchRequestBuilders.stream(
 		).map(
 			SearchRequestBuilder::build
 		);
-
-		return map;
 	}
 
 	protected SearchRequestBuilder newFederatedSearchRequestBuilder(

@@ -18,7 +18,6 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
-import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.upload.criterion.UploadItemSelectorCriterion;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
@@ -44,7 +43,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.security.PermissionsURLTag;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -123,16 +121,25 @@ public class LayoutPageTemplateEntryActionDropdownItemsProvider {
 		_getConfigureLayoutPageTemplateEntryActionUnsafeConsumer() {
 
 		return dropdownItem -> {
-			Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
-				PortalUtil.getClassNameId(Layout.class),
-				_layoutPageTemplateEntry.getPlid());
+			Layout layout = null;
+
+			if (_layoutPageTemplateEntry.getType() ==
+					LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE) {
+
+				layout = LayoutLocalServiceUtil.fetchLayout(
+					_layoutPageTemplateEntry.getPlid());
+			}
+			else {
+				layout = LayoutLocalServiceUtil.fetchLayout(
+					PortalUtil.getClassNameId(Layout.class),
+					_layoutPageTemplateEntry.getPlid());
+			}
 
 			dropdownItem.setHref(
 				_renderResponse.createRenderURL(), "mvcRenderCommandName",
 				"/layout/edit_layout", "redirect",
 				_themeDisplay.getURLCurrent(), "backURL",
-				_themeDisplay.getURLCurrent(), "selPlid",
-				draftLayout.getPlid());
+				_themeDisplay.getURLCurrent(), "selPlid", layout.getPlid());
 
 			dropdownItem.setLabel(LanguageUtil.get(_request, "configure"));
 		};
@@ -206,26 +213,20 @@ public class LayoutPageTemplateEntryActionDropdownItemsProvider {
 			String.valueOf(
 				_layoutPageTemplateEntry.getLayoutPageTemplateEntryId()));
 
-		ItemSelectorCriterion uploadItemSelectorCriterion =
+		ItemSelectorCriterion itemSelectorCriterion =
 			new UploadItemSelectorCriterion(
 				LayoutAdminPortletKeys.GROUP_PAGES, uploadURL.toString(),
 				LanguageUtil.get(_themeDisplay.getLocale(), "page-template"),
 				UploadServletRequestConfigurationHelperUtil.getMaxSize(),
 				_layoutAdminWebConfiguration.thumbnailExtensions());
 
-		List<ItemSelectorReturnType> uploadDesiredItemSelectorReturnTypes =
-			new ArrayList<>();
-
-		uploadDesiredItemSelectorReturnTypes.add(
+		itemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			new FileEntryItemSelectorReturnType());
-
-		uploadItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			uploadDesiredItemSelectorReturnTypes);
 
 		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(_request),
 			_renderResponse.getNamespace() + "changePreview",
-			uploadItemSelectorCriterion);
+			itemSelectorCriterion);
 
 		return itemSelectorURL.toString();
 	}

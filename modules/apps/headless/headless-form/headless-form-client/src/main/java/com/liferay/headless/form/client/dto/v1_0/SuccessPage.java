@@ -15,6 +15,9 @@
 package com.liferay.headless.form.client.dto.v1_0;
 
 import com.liferay.headless.form.client.function.UnsafeSupplier;
+import com.liferay.headless.form.client.serdes.v1_0.SuccessPageSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -85,5 +88,31 @@ public class SuccessPage {
 	}
 
 	protected Long id;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof SuccessPage)) {
+			return false;
+		}
+
+		SuccessPage successPage = (SuccessPage)object;
+
+		return Objects.equals(toString(), successPage.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return SuccessPageSerDes.toJSON(this);
+	}
 
 }

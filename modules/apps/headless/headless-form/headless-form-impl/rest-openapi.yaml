@@ -76,16 +76,29 @@ components:
             properties:
                 contentUrl:
                     format: uri
+                    readOnly: true
+                    type: string
+                description:
                     type: string
                 encodingFormat:
+                    readOnly: true
                     type: string
                 fileExtension:
+                    readOnly: true
                     type: string
+                folderId:
+                    format: int64
+                    type: integer
                 id:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                siteId:
                     format: int64
                     type: integer
                 sizeInBytes:
                     format: int64
+                    readOnly: true
                     type: integer
                 title:
                     type: string
@@ -97,12 +110,15 @@ components:
                     $ref: "#/components/schemas/Creator"
                 dateCreated:
                     format: date-time
+                    readOnly: true
                     type: string
                 dateModified:
                     format: date-time
+                    readOnly: true
                     type: string
                 datePublished:
                     format: date-time
+                    readOnly: true
                     type: string
                 draft:
                     type: boolean
@@ -110,16 +126,17 @@ components:
                     description: https://www.schema.org/FormFieldValue
                     items:
                         properties:
-                            document:
+                            formDocument:
                                 allOf:
                                     - $ref: "#/components/schemas/FormDocument"
                                 readOnly: true
-                            documentId:
+                            formDocumentId:
                                 format: int64
                                 type: integer
                                 writeOnly: true
                             id:
                                 format: int64
+                                readOnly: true
                                 type: integer
                             name:
                                 type: string
@@ -137,15 +154,9 @@ components:
                     writeOnly: true
                 id:
                     format: int64
+                    readOnly: true
                     type: integer
             type: object
-        FormRecordForm:
-            description: https://www.schema.org/FormRecordForm
-            properties:
-                draft:
-                    type: boolean
-                fieldValues:
-                    type: string
         FormStructure:
             description: https://www.schema.org/FormStructure
             properties:
@@ -306,18 +317,6 @@ components:
                             type: integer
                     type: object
             type: object
-        MediaForm:
-            description: https://www.schema.org/MediaForm
-            properties:
-                description:
-                    type: string
-                folderId:
-                    format: int64
-                    type: integer
-                name:
-                    type: string
-                title:
-                    type: string
 info:
     description: ""
     title: "Headless Form"
@@ -355,6 +354,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/FormDocument"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/FormDocument"
                     description: ""
             tags: ["FormDocument"]
     "/form-records/{formRecordId}":
@@ -371,6 +373,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/FormRecord"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/FormRecord"
                     description: ""
@@ -392,15 +397,21 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/FormRecordForm"
+                            $ref: "#/components/schemas/FormRecord"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/FormRecord"
             responses:
                 200:
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/FormRecord"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/FormRecord"
                     description: ""
-            tags: ["FormRecordForm"]
+            tags: ["FormRecord"]
     "/form-structures/{formStructureId}":
         get:
             operationId: getFormStructure
@@ -415,6 +426,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/FormStructure"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/FormStructure"
                     description: ""
@@ -433,6 +447,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Form"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Form"
                     description: ""
@@ -456,12 +473,50 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Form"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Form"
             responses:
                 200:
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Form"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Form"
+                    description: ""
+            tags: ["Form"]
+    "/forms/{formId}/form-document":
+        post:
+            operationId: postFormFormDocument
+            parameters:
+                - in: path
+                  name: formId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            properties:
+                                file:
+                                    format: binary
+                                    type: string
+                                formDocument:
+                                    $ref: "#/components/schemas/FormDocument"
+                            type: object
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/FormDocument"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/FormDocument"
                     description: ""
             tags: ["Form"]
     "/forms/{formId}/form-records":
@@ -490,6 +545,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/FormRecord"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/FormRecord"
+                                type: array
                     description: ""
             tags: ["FormRecord"]
         post:
@@ -509,15 +569,21 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/FormRecordForm"
+                            $ref: "#/components/schemas/FormRecord"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/FormRecord"
             responses:
                 200:
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/FormRecord"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/FormRecord"
                     description: ""
-            tags: ["FormRecordForm"]
+            tags: ["FormRecord"]
     "/forms/{formId}/form-records/by-latest-draft":
         get:
             operationId: getFormFormRecordByLatestDraft
@@ -534,37 +600,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/FormRecord"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/FormRecord"
                     description: ""
             tags: ["FormRecord"]
-    "/forms/{formId}/upload-file":
-        post:
-            operationId: postFormUploadFile
-            parameters:
-                - in: path
-                  name: formId
-                  required: true
-                  schema:
-                      format: int64
-                      type: integer
-            requestBody:
-                content:
-                    multipart/form-data:
-                        schema:
-                            properties:
-                                file:
-                                    format: binary
-                                    type: string
-                                mediaForm:
-                                    $ref: "#/components/schemas/MediaForm"
-                            type: object
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/FormDocument"
-                    description: ""
-            tags: ["Form"]
     "/sites/{siteId}/form-structures":
         get:
             operationId: getSiteFormStructuresPage
@@ -587,6 +627,11 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/FormStructure"
+                                type: array
+                        application/xml:
                             schema:
                                 items:
                                     $ref: "#/components/schemas/FormStructure"
@@ -615,6 +660,11 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Form"
+                                type: array
+                        application/xml:
                             schema:
                                 items:
                                     $ref: "#/components/schemas/Form"

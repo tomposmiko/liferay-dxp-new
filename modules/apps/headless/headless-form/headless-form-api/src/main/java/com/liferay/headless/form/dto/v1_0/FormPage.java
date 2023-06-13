@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -70,6 +73,7 @@ public class FormPage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Field[] fields;
 
+	@Schema
 	public String getHeadline() {
 		return headline;
 	}
@@ -97,6 +101,7 @@ public class FormPage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String headline;
 
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -122,6 +127,7 @@ public class FormPage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
+	@Schema
 	public String getText() {
 		return text;
 	}
@@ -174,16 +180,17 @@ public class FormPage {
 
 		sb.append("{");
 
-		sb.append("\"fields\": ");
+		if (fields != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (fields == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"fields\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < fields.length; i++) {
-				sb.append(fields[i]);
+				sb.append(String.valueOf(fields[i]));
 
 				if ((i + 1) < fields.length) {
 					sb.append(", ");
@@ -193,41 +200,77 @@ public class FormPage {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (headline != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"headline\": ");
+			sb.append("\"headline\": ");
 
-		if (headline == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(headline);
+
+			sb.append(_escape(headline));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (text != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"text\": ");
+			sb.append("\"text\": ");
 
-		if (text == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(text));
+
+			sb.append("\"");
 		}
-		else {
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(text);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

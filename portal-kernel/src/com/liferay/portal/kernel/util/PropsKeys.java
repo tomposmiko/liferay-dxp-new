@@ -870,11 +870,23 @@ public interface PropsKeys {
 	public static final String DISCUSSION_COMMENTS_FORMAT =
 		"discussion.comments.format";
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String DISCUSSION_EMAIL_BODY = "discussion.email.body";
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String DISCUSSION_EMAIL_COMMENTS_ADDED_ENABLED =
 		"discussion.email.comments.added.enabled";
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String DISCUSSION_EMAIL_SUBJECT =
 		"discussion.email.subject";
 
@@ -2172,6 +2184,9 @@ public interface PropsKeys {
 
 	public static final String MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL =
 		"module.framework.dynamic.install.start.level";
+
+	public static final String MODULE_FRAMEWORK_EXPORT_PASSWORD_ATTRIBUTES =
+		"module.framework.export.password.attributes";
 
 	/**
 	 * @deprecated As of Judson (7.1.x), with no direct replacement

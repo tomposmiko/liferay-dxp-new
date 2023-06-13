@@ -19,8 +19,10 @@ import com.liferay.headless.form.client.dto.v1_0.Option;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -58,7 +60,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"autocomplete\":");
+			sb.append("\"autocomplete\": ");
 
 			sb.append(field.getAutocomplete());
 		}
@@ -68,11 +70,11 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dataSourceType\":");
+			sb.append("\"dataSourceType\": ");
 
 			sb.append("\"");
 
-			sb.append(field.getDataSourceType());
+			sb.append(_escape(field.getDataSourceType()));
 
 			sb.append("\"");
 		}
@@ -82,11 +84,11 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dataType\":");
+			sb.append("\"dataType\": ");
 
 			sb.append("\"");
 
-			sb.append(field.getDataType());
+			sb.append(_escape(field.getDataType()));
 
 			sb.append("\"");
 		}
@@ -96,11 +98,11 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"displayStyle\":");
+			sb.append("\"displayStyle\": ");
 
 			sb.append("\"");
 
-			sb.append(field.getDisplayStyle());
+			sb.append(_escape(field.getDisplayStyle()));
 
 			sb.append("\"");
 		}
@@ -110,9 +112,9 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"grid\":");
+			sb.append("\"grid\": ");
 
-			sb.append(GridSerDes.toJSON(field.getGrid()));
+			sb.append(String.valueOf(field.getGrid()));
 		}
 
 		if (field.getHasFormRules() != null) {
@@ -120,7 +122,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"hasFormRules\":");
+			sb.append("\"hasFormRules\": ");
 
 			sb.append(field.getHasFormRules());
 		}
@@ -130,7 +132,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(field.getId());
 		}
@@ -140,7 +142,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"immutable\":");
+			sb.append("\"immutable\": ");
 
 			sb.append(field.getImmutable());
 		}
@@ -150,7 +152,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"inline\":");
+			sb.append("\"inline\": ");
 
 			sb.append(field.getInline());
 		}
@@ -160,11 +162,11 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"inputControl\":");
+			sb.append("\"inputControl\": ");
 
 			sb.append("\"");
 
-			sb.append(field.getInputControl());
+			sb.append(_escape(field.getInputControl()));
 
 			sb.append("\"");
 		}
@@ -174,11 +176,11 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"label\":");
+			sb.append("\"label\": ");
 
 			sb.append("\"");
 
-			sb.append(field.getLabel());
+			sb.append(_escape(field.getLabel()));
 
 			sb.append("\"");
 		}
@@ -188,7 +190,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"localizable\":");
+			sb.append("\"localizable\": ");
 
 			sb.append(field.getLocalizable());
 		}
@@ -198,7 +200,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"multiple\":");
+			sb.append("\"multiple\": ");
 
 			sb.append(field.getMultiple());
 		}
@@ -208,11 +210,11 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(field.getName());
+			sb.append(_escape(field.getName()));
 
 			sb.append("\"");
 		}
@@ -222,12 +224,12 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"options\":");
+			sb.append("\"options\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < field.getOptions().length; i++) {
-				sb.append(OptionSerDes.toJSON(field.getOptions()[i]));
+				sb.append(String.valueOf(field.getOptions()[i]));
 
 				if ((i + 1) < field.getOptions().length) {
 					sb.append(", ");
@@ -242,11 +244,11 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"placeholder\":");
+			sb.append("\"placeholder\": ");
 
 			sb.append("\"");
 
-			sb.append(field.getPlaceholder());
+			sb.append(_escape(field.getPlaceholder()));
 
 			sb.append("\"");
 		}
@@ -256,11 +258,11 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"predefinedValue\":");
+			sb.append("\"predefinedValue\": ");
 
 			sb.append("\"");
 
-			sb.append(field.getPredefinedValue());
+			sb.append(_escape(field.getPredefinedValue()));
 
 			sb.append("\"");
 		}
@@ -270,7 +272,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"readOnly\":");
+			sb.append("\"readOnly\": ");
 
 			sb.append(field.getReadOnly());
 		}
@@ -280,7 +282,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"repeatable\":");
+			sb.append("\"repeatable\": ");
 
 			sb.append(field.getRepeatable());
 		}
@@ -290,7 +292,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"required\":");
+			sb.append("\"required\": ");
 
 			sb.append(field.getRequired());
 		}
@@ -300,7 +302,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"showAsSwitcher\":");
+			sb.append("\"showAsSwitcher\": ");
 
 			sb.append(field.getShowAsSwitcher());
 		}
@@ -310,7 +312,7 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"showLabel\":");
+			sb.append("\"showLabel\": ");
 
 			sb.append(field.getShowLabel());
 		}
@@ -320,11 +322,11 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"style\":");
+			sb.append("\"style\": ");
 
 			sb.append("\"");
 
-			sb.append(field.getStyle());
+			sb.append(_escape(field.getStyle()));
 
 			sb.append("\"");
 		}
@@ -334,11 +336,11 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"text\":");
+			sb.append("\"text\": ");
 
 			sb.append("\"");
 
-			sb.append(field.getText());
+			sb.append(_escape(field.getText()));
 
 			sb.append("\"");
 		}
@@ -348,11 +350,11 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"tooltip\":");
+			sb.append("\"tooltip\": ");
 
 			sb.append("\"");
 
-			sb.append(field.getTooltip());
+			sb.append(_escape(field.getTooltip()));
 
 			sb.append("\"");
 		}
@@ -362,14 +364,20 @@ public class FieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"validation\":");
+			sb.append("\"validation\": ");
 
-			sb.append(ValidationSerDes.toJSON(field.getValidation()));
+			sb.append(String.valueOf(field.getValidation()));
 		}
 
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		FieldJSONParser fieldJSONParser = new FieldJSONParser();
+
+		return fieldJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Field field) {
@@ -412,7 +420,7 @@ public class FieldSerDes {
 			map.put("grid", null);
 		}
 		else {
-			map.put("grid", GridSerDes.toJSON(field.getGrid()));
+			map.put("grid", String.valueOf(field.getGrid()));
 		}
 
 		if (field.getHasFormRules() == null) {
@@ -561,11 +569,45 @@ public class FieldSerDes {
 			map.put("validation", null);
 		}
 		else {
-			map.put(
-				"validation", ValidationSerDes.toJSON(field.getValidation()));
+			map.put("validation", String.valueOf(field.getValidation()));
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class FieldJSONParser extends BaseJSONParser<Field> {

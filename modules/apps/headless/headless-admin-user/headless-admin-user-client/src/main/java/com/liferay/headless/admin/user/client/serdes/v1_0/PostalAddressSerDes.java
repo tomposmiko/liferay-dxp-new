@@ -18,8 +18,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.PostalAddress;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,11 +60,11 @@ public class PostalAddressSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"addressCountry\":");
+			sb.append("\"addressCountry\": ");
 
 			sb.append("\"");
 
-			sb.append(postalAddress.getAddressCountry());
+			sb.append(_escape(postalAddress.getAddressCountry()));
 
 			sb.append("\"");
 		}
@@ -72,11 +74,11 @@ public class PostalAddressSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"addressLocality\":");
+			sb.append("\"addressLocality\": ");
 
 			sb.append("\"");
 
-			sb.append(postalAddress.getAddressLocality());
+			sb.append(_escape(postalAddress.getAddressLocality()));
 
 			sb.append("\"");
 		}
@@ -86,11 +88,11 @@ public class PostalAddressSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"addressRegion\":");
+			sb.append("\"addressRegion\": ");
 
 			sb.append("\"");
 
-			sb.append(postalAddress.getAddressRegion());
+			sb.append(_escape(postalAddress.getAddressRegion()));
 
 			sb.append("\"");
 		}
@@ -100,11 +102,11 @@ public class PostalAddressSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"addressType\":");
+			sb.append("\"addressType\": ");
 
 			sb.append("\"");
 
-			sb.append(postalAddress.getAddressType());
+			sb.append(_escape(postalAddress.getAddressType()));
 
 			sb.append("\"");
 		}
@@ -114,7 +116,7 @@ public class PostalAddressSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(postalAddress.getId());
 		}
@@ -124,11 +126,11 @@ public class PostalAddressSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"postalCode\":");
+			sb.append("\"postalCode\": ");
 
 			sb.append("\"");
 
-			sb.append(postalAddress.getPostalCode());
+			sb.append(_escape(postalAddress.getPostalCode()));
 
 			sb.append("\"");
 		}
@@ -138,7 +140,7 @@ public class PostalAddressSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"primary\":");
+			sb.append("\"primary\": ");
 
 			sb.append(postalAddress.getPrimary());
 		}
@@ -148,11 +150,11 @@ public class PostalAddressSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"streetAddressLine1\":");
+			sb.append("\"streetAddressLine1\": ");
 
 			sb.append("\"");
 
-			sb.append(postalAddress.getStreetAddressLine1());
+			sb.append(_escape(postalAddress.getStreetAddressLine1()));
 
 			sb.append("\"");
 		}
@@ -162,11 +164,11 @@ public class PostalAddressSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"streetAddressLine2\":");
+			sb.append("\"streetAddressLine2\": ");
 
 			sb.append("\"");
 
-			sb.append(postalAddress.getStreetAddressLine2());
+			sb.append(_escape(postalAddress.getStreetAddressLine2()));
 
 			sb.append("\"");
 		}
@@ -176,11 +178,11 @@ public class PostalAddressSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"streetAddressLine3\":");
+			sb.append("\"streetAddressLine3\": ");
 
 			sb.append("\"");
 
-			sb.append(postalAddress.getStreetAddressLine3());
+			sb.append(_escape(postalAddress.getStreetAddressLine3()));
 
 			sb.append("\"");
 		}
@@ -188,6 +190,13 @@ public class PostalAddressSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		PostalAddressJSONParser postalAddressJSONParser =
+			new PostalAddressJSONParser();
+
+		return postalAddressJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(PostalAddress postalAddress) {
@@ -282,6 +291,41 @@ public class PostalAddressSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class PostalAddressJSONParser

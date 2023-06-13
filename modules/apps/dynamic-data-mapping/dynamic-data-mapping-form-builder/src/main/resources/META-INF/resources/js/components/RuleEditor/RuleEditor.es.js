@@ -10,6 +10,7 @@ import templates from './RuleEditor.soy.js';
 import {Config} from 'metal-state';
 import {getFieldProperty} from '../LayoutProvider/util/fields.es';
 import {makeFetch} from '../../util/fetch.es';
+import {maxPageIndex, pageOptions} from '../../util/pageSupport.es';
 import {PagesVisitor} from '../../util/visitors.es';
 
 const fieldOptionStructure = Config.shapeOf(
@@ -482,8 +483,12 @@ class RuleEditor extends Component {
 		return list;
 	}
 
+	isValueOperand({type}) {
+		return type !== 'field' && type !== 'user';
+	}
+
 	populateActionTargetValue(id, index) {
-		const {actions} = this;
+		const {actions, pageOptions} = this;
 
 		const previousTarget = actions[index].target;
 
@@ -491,7 +496,13 @@ class RuleEditor extends Component {
 		actions[index].label = id;
 
 		if (actions[index].action == 'jump-to-page') {
-			actions[index].label = id;
+			const selectedOption = pageOptions.find(
+				option => {
+					return option.value == id;
+				}
+			);
+
+			actions[index].label = selectedOption.label;
 		}
 
 		if (id === undefined) {
@@ -540,26 +551,6 @@ class RuleEditor extends Component {
 		);
 	}
 
-	populatePageOptions(pages, maxPageIndex = 0) {
-		let {pageOptions} = this;
-
-		pageOptions = [];
-
-		for (let pageIndex = maxPageIndex + 2; pageIndex <= pages.length; pageIndex++) {
-			pageIndex = pageIndex.toString();
-
-			pageOptions.push(
-				{
-					label: pageIndex,
-					name: pageIndex,
-					value: pageIndex
-				}
-			);
-		}
-
-		return pageOptions;
-	}
-
 	prepareStateForRender(state) {
 		const {pages} = this;
 		const actions = state.loadingDataProviderOptions ? [] : state.actions.map(
@@ -590,9 +581,10 @@ class RuleEditor extends Component {
 					firstOperandOptions,
 					operands: condition.operands.map(
 						(operand, index) => {
-							if (index === 1 && operand.type !== 'field' && operand.type !== 'user') {
+							if (index === 1 && this.isValueOperand(operand)) {
 								operand = {
 									...operand,
+									dataType: getFieldProperty(pages, condition.operands[0].value, 'dataType'),
 									type: getFieldProperty(pages, condition.operands[0].value, 'type')
 								};
 							}
@@ -661,7 +653,7 @@ class RuleEditor extends Component {
 			}
 		);
 
-		const maxPageIndex = this._getMaxPageIndex(conditions);
+		const maxPage = maxPageIndex(conditions, pages);
 
 		this.setState(
 			{
@@ -670,7 +662,7 @@ class RuleEditor extends Component {
 				conditions,
 				deletedFields: this._getDeletedFields(visitor),
 				fieldOptions: this._fieldOptionsValueFn(),
-				pageOptions: this.populatePageOptions(pages, maxPageIndex),
+				pageOptions: pageOptions(pages, maxPage),
 				roles: this._rolesValueFn()
 			}
 		);
@@ -927,30 +919,6 @@ class RuleEditor extends Component {
 		return firstOperand.getAttribute(`${fieldClass.substring(1)}-index`);
 	}
 
-	_getMaxPageIndex(conditions) {
-		const {pages} = this;
-		const pageIndexes = [];
-		const visitor = new PagesVisitor(pages);
-
-		if (conditions.length && conditions[0].operands[0].value) {
-			conditions.forEach(
-				condition => {
-					visitor.mapFields(
-						(field, fieldIndex, columnIndex, rowIndex, pageIndex) => {
-							if (field.fieldName === condition.operands[0].value) {
-								pageIndexes.push(pageIndex);
-							}
-						}
-					);
-				}
-			);
-		}
-
-		const maxPageIndex = Math.max(...pageIndexes);
-
-		return isFinite(maxPageIndex) ? maxPageIndex : 0;
-	}
-
 	_getOperatorsByFieldType(fieldType) {
 		if (fieldType === 'integer' || fieldType === 'double') {
 			fieldType = 'number';
@@ -1195,7 +1163,7 @@ class RuleEditor extends Component {
 			{
 				actions,
 				conditions,
-				pageOptions: this.populatePageOptions(pages, maxPageIndex)
+				pageOptions: pageOptions(pages, maxPageIndex)
 			}
 		);
 	}
@@ -1350,10 +1318,9 @@ class RuleEditor extends Component {
 
 		let secondOperandType = 'field';
 		let valueType = 'field';
-
 		if (value[0] == 'value') {
 			valueType = 'string';
-			secondOperandType = this._getFieldTypeByFieldName(operands[0].value).type;
+			secondOperandType = this._getFieldTypeByFieldName(operands[0].value).dataType;
 		}
 
 		if (secondOperand && ((secondOperand.type === secondOperandType)) && value[0] !== '') {

@@ -61,6 +61,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -156,9 +157,7 @@ public class DDMImpl implements DDM {
 			DDMStructure structure = DDMStructureLocalServiceUtil.getStructure(
 				classPK);
 
-			DDMForm ddmForm = structure.getFullHierarchyDDMForm();
-
-			return ddmForm;
+			return structure.getFullHierarchyDDMForm();
 		}
 		else if (classNameId == ddmTemplateClassNameId) {
 			DDMTemplate template = DDMTemplateLocalServiceUtil.getTemplate(
@@ -685,15 +684,17 @@ public class DDMImpl implements DDM {
 			ddmFormField.getDDMFormFieldOptions();
 
 		for (String optionValue : ddmFormFieldOptions.getOptionsValues()) {
-			JSONObject optionJSONObject = JSONFactoryUtil.createJSONObject();
-
 			String name = fieldName.concat(StringUtil.randomString());
 
-			optionJSONObject.put("id", name);
-			optionJSONObject.put("name", name);
-
-			optionJSONObject.put("type", "option");
-			optionJSONObject.put("value", optionValue);
+			JSONObject optionJSONObject = JSONUtil.put(
+				"id", name
+			).put(
+				"name", name
+			).put(
+				"type", "option"
+			).put(
+				"value", optionValue
+			);
 
 			addDDMFormFieldLocalizedProperty(
 				optionJSONObject, "label",
@@ -809,19 +810,29 @@ public class DDMImpl implements DDM {
 		JSONArray ddmFormFieldsJSONArray = JSONFactoryUtil.createJSONArray();
 
 		for (DDMFormField ddmFormField : ddmFormFields) {
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			jsonObject.put("dataType", ddmFormField.getDataType());
-			jsonObject.put("id", ddmFormField.getName());
-			jsonObject.put("indexType", ddmFormField.getIndexType());
-			jsonObject.put("localizable", ddmFormField.isLocalizable());
-			jsonObject.put("multiple", ddmFormField.isMultiple());
-			jsonObject.put("name", ddmFormField.getName());
-			jsonObject.put("readOnly", ddmFormField.isReadOnly());
-			jsonObject.put("repeatable", ddmFormField.isRepeatable());
-			jsonObject.put("required", ddmFormField.isRequired());
-			jsonObject.put("showLabel", ddmFormField.isShowLabel());
-			jsonObject.put("type", ddmFormField.getType());
+			JSONObject jsonObject = JSONUtil.put(
+				"dataType", ddmFormField.getDataType()
+			).put(
+				"id", ddmFormField.getName()
+			).put(
+				"indexType", ddmFormField.getIndexType()
+			).put(
+				"localizable", ddmFormField.isLocalizable()
+			).put(
+				"multiple", ddmFormField.isMultiple()
+			).put(
+				"name", ddmFormField.getName()
+			).put(
+				"readOnly", ddmFormField.isReadOnly()
+			).put(
+				"repeatable", ddmFormField.isRepeatable()
+			).put(
+				"required", ddmFormField.isRequired()
+			).put(
+				"showLabel", ddmFormField.isShowLabel()
+			).put(
+				"type", ddmFormField.getType()
+			);
 
 			addDDMFormFieldLocalizedProperties(
 				jsonObject, ddmFormField, defaultLocale, defaultLocale);
@@ -842,13 +853,14 @@ public class DDMImpl implements DDM {
 					LocaleUtil.toLanguageId(availableLocale), localeMap);
 			}
 
-			jsonObject.put("localizationMap", localizationMapJSONObject);
-
 			jsonObject.put(
 				"fields",
 				getDDMFormFieldsJSONArray(
 					ddmFormField.getNestedDDMFormFields(), availableLocales,
-					defaultLocale));
+					defaultLocale)
+			).put(
+				"localizationMap", localizationMapJSONObject
+			);
 
 			ddmFormFieldsJSONArray.put(jsonObject);
 		}
@@ -1143,11 +1155,11 @@ public class DDMImpl implements DDM {
 			byte[] bytes = getImageBytes(uploadRequest, fieldNameValue);
 
 			if (ArrayUtil.isNotEmpty(bytes)) {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-				jsonObject.put(
-					"alt", uploadRequest.getParameter(fieldNameValue + "Alt"));
-				jsonObject.put("data", UnicodeFormatter.bytesToHex(bytes));
+				JSONObject jsonObject = JSONUtil.put(
+					"alt", uploadRequest.getParameter(fieldNameValue + "Alt")
+				).put(
+					"data", UnicodeFormatter.bytesToHex(bytes)
+				);
 
 				return jsonObject.toString();
 			}

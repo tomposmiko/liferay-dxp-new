@@ -15,17 +15,15 @@
 package com.liferay.fragment.internal.renderer;
 
 import com.liferay.asset.info.display.contributor.util.ContentAccessorUtil;
-import com.liferay.fragment.model.FragmentCollection;
-import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
-import com.liferay.fragment.service.FragmentCollectionLocalService;
-import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.template.StringTemplateResource;
@@ -33,10 +31,8 @@ import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateManager;
 import com.liferay.portal.kernel.template.TemplateManagerUtil;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
 import java.io.IOException;
@@ -59,42 +55,8 @@ import org.osgi.service.component.annotations.Reference;
 public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 
 	@Override
-	public String getCollectionKey(
-		FragmentRendererContext fragmentRendererContext) {
-
-		try {
-			FragmentEntry fragmentEntry = _getFragmentEntry(
-				fragmentRendererContext);
-
-			FragmentCollection fragmentCollection =
-				_fragmentCollectionLocalService.getFragmentCollection(
-					fragmentEntry.getFragmentCollectionId());
-
-			return fragmentCollection.getFragmentCollectionKey();
-		}
-		catch (PortalException pe) {
-			throw new RuntimeException(pe);
-		}
-	}
-
-	@Override
-	public String getImagePreviewURL(
-		FragmentRendererContext fragmentRendererContext,
-		HttpServletRequest httpServletRequest) {
-
-		try {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			FragmentEntry fragmentEntry = _getFragmentEntry(
-				fragmentRendererContext);
-
-			return fragmentEntry.getImagePreviewURL(themeDisplay);
-		}
-		catch (PortalException pe) {
-			throw new RuntimeException(pe);
-		}
+	public String getCollectionKey() {
+		return StringPool.BLANK;
 	}
 
 	@Override
@@ -103,20 +65,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 	}
 
 	@Override
-	public String getLabel(FragmentRendererContext fragmentRendererContext) {
-		try {
-			FragmentEntry fragmentEntry = _getFragmentEntry(
-				fragmentRendererContext);
-
-			return fragmentEntry.getName();
-		}
-		catch (PortalException pe) {
-			throw new RuntimeException(pe);
-		}
-	}
-
-	@Override
-	public boolean isSelectable() {
+	public boolean isSelectable(HttpServletRequest httpServletRequest) {
 		return false;
 	}
 
@@ -138,17 +87,6 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		catch (PortalException pe) {
 			throw new IOException(pe);
 		}
-	}
-
-	private FragmentEntry _getFragmentEntry(
-			FragmentRendererContext fragmentRendererContext)
-		throws PortalException {
-
-		FragmentEntryLink fragmentEntryLink =
-			fragmentRendererContext.getFragmentEntryLink();
-
-		return _fragmentEntryLocalService.getFragmentEntry(
-			fragmentEntryLink.getFragmentEntryId());
 	}
 
 	private String _processTemplate(
@@ -237,12 +175,16 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			HttpServletResponse httpServletResponse)
 		throws PortalException {
 
+		FragmentEntryLink fragmentEntryLink =
+			fragmentRendererContext.getFragmentEntryLink();
+
 		String css =
 			_fragmentEntryProcessorRegistry.processFragmentEntryLinkCSS(
-				fragmentRendererContext.getFragmentEntryLink(),
-				fragmentRendererContext.getMode(),
+				fragmentEntryLink, fragmentRendererContext.getMode(),
 				fragmentRendererContext.getLocale(),
-				fragmentRendererContext.getSegmentsExperienceIds());
+				fragmentRendererContext.getSegmentsExperienceIds(),
+				fragmentRendererContext.getPreviewClassPK(),
+				fragmentRendererContext.getPreviewType());
 
 		if ((httpServletRequest != null) && (httpServletResponse != null) &&
 			Validator.isNotNull(css)) {
@@ -254,10 +196,11 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 
 		String html =
 			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
-				fragmentRendererContext.getFragmentEntryLink(),
-				fragmentRendererContext.getMode(),
+				fragmentEntryLink, fragmentRendererContext.getMode(),
 				fragmentRendererContext.getLocale(),
-				fragmentRendererContext.getSegmentsExperienceIds());
+				fragmentRendererContext.getSegmentsExperienceIds(),
+				fragmentRendererContext.getPreviewClassPK(),
+				fragmentRendererContext.getPreviewType());
 
 		if ((httpServletRequest != null) && (httpServletResponse != null) &&
 			Validator.isNotNull(html)) {
@@ -268,11 +211,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		}
 
 		html = _writePortletPaths(
-			fragmentRendererContext.getFragmentEntryLink(), html,
-			httpServletRequest, httpServletResponse);
-
-		FragmentEntryLink fragmentEntryLink =
-			fragmentRendererContext.getFragmentEntryLink();
+			fragmentEntryLink, html, httpServletRequest, httpServletResponse);
 
 		return _renderFragmentEntry(
 			fragmentEntryLink.getFragmentEntryId(), css, html,
@@ -297,10 +236,8 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 	}
 
 	@Reference
-	private FragmentCollectionLocalService _fragmentCollectionLocalService;
-
-	@Reference
-	private FragmentEntryLocalService _fragmentEntryLocalService;
+	private FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
 
 	@Reference
 	private FragmentEntryProcessorRegistry _fragmentEntryProcessorRegistry;

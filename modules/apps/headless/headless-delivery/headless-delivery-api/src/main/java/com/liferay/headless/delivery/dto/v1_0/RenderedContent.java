@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "RenderedContent")
 public class RenderedContent {
 
-	@Schema(description = "An absolute URL to the binary image.")
+	@Schema(description = "An absolute URL to the rendered content.")
 	public String getRenderedContentURL() {
 		return renderedContentURL;
 	}
@@ -127,28 +130,67 @@ public class RenderedContent {
 
 		sb.append("{");
 
-		sb.append("\"renderedContentURL\": ");
+		if (renderedContentURL != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (renderedContentURL == null) {
-			sb.append("null");
+			sb.append("\"renderedContentURL\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(renderedContentURL));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (templateName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"templateName\": ");
+
 			sb.append("\"");
-			sb.append(renderedContentURL);
+
+			sb.append(_escape(templateName));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		sb.append("}");
 
-		sb.append("\"templateName\": ");
+		return sb.toString();
+	}
 
-		if (templateName == null) {
-			sb.append("null");
-		}
-		else {
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(templateName);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

@@ -18,8 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.Value;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -56,11 +58,11 @@ public class ValueSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"data\":");
+			sb.append("\"data\": ");
 
 			sb.append("\"");
 
-			sb.append(value.getData());
+			sb.append(_escape(value.getData()));
 
 			sb.append("\"");
 		}
@@ -70,9 +72,9 @@ public class ValueSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"document\":");
+			sb.append("\"document\": ");
 
-			sb.append(ContentDocumentSerDes.toJSON(value.getDocument()));
+			sb.append(String.valueOf(value.getDocument()));
 		}
 
 		if (value.getGeo() != null) {
@@ -80,9 +82,9 @@ public class ValueSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"geo\":");
+			sb.append("\"geo\": ");
 
-			sb.append(GeoSerDes.toJSON(value.getGeo()));
+			sb.append(String.valueOf(value.getGeo()));
 		}
 
 		if (value.getImage() != null) {
@@ -90,9 +92,9 @@ public class ValueSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"image\":");
+			sb.append("\"image\": ");
 
-			sb.append(ContentDocumentSerDes.toJSON(value.getImage()));
+			sb.append(String.valueOf(value.getImage()));
 		}
 
 		if (value.getLink() != null) {
@@ -100,11 +102,11 @@ public class ValueSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"link\":");
+			sb.append("\"link\": ");
 
 			sb.append("\"");
 
-			sb.append(value.getLink());
+			sb.append(_escape(value.getLink()));
 
 			sb.append("\"");
 		}
@@ -114,16 +116,20 @@ public class ValueSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"structuredContentLink\":");
+			sb.append("\"structuredContentLink\": ");
 
-			sb.append(
-				StructuredContentLinkSerDes.toJSON(
-					value.getStructuredContentLink()));
+			sb.append(String.valueOf(value.getStructuredContentLink()));
 		}
 
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		ValueJSONParser valueJSONParser = new ValueJSONParser();
+
+		return valueJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Value value) {
@@ -144,22 +150,21 @@ public class ValueSerDes {
 			map.put("document", null);
 		}
 		else {
-			map.put(
-				"document", ContentDocumentSerDes.toJSON(value.getDocument()));
+			map.put("document", String.valueOf(value.getDocument()));
 		}
 
 		if (value.getGeo() == null) {
 			map.put("geo", null);
 		}
 		else {
-			map.put("geo", GeoSerDes.toJSON(value.getGeo()));
+			map.put("geo", String.valueOf(value.getGeo()));
 		}
 
 		if (value.getImage() == null) {
 			map.put("image", null);
 		}
 		else {
-			map.put("image", ContentDocumentSerDes.toJSON(value.getImage()));
+			map.put("image", String.valueOf(value.getImage()));
 		}
 
 		if (value.getLink() == null) {
@@ -175,11 +180,45 @@ public class ValueSerDes {
 		else {
 			map.put(
 				"structuredContentLink",
-				StructuredContentLinkSerDes.toJSON(
-					value.getStructuredContentLink()));
+				String.valueOf(value.getStructuredContentLink()));
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class ValueJSONParser extends BaseJSONParser<Value> {

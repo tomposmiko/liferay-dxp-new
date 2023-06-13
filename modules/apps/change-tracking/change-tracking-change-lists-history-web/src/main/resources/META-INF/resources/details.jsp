@@ -19,7 +19,7 @@
 <%
 CTCollection ctCollection = (CTCollection)request.getAttribute(CTWebKeys.CT_COLLECTION);
 
-SearchContainer<CTEntry> ctEntrySearchContainer = changeListsHistoryDisplayContext.getCTCollectionDetailsSearchContainer(ctCollection.getCtCollectionId());
+SearchContainer<CTEntry> ctEntrySearchContainer = changeListsHistoryDisplayContext.getCTCollectionDetailsSearchContainer(ctCollection);
 
 if (ctCollection != null) {
 	String title = HtmlUtil.escapeJS(ctCollection.getName());
@@ -28,6 +28,11 @@ if (ctCollection != null) {
 
 	renderResponse.setTitle(title);
 }
+
+String backURL = ParamUtil.getString(request, "backURL");
+
+portletDisplay.setURLBack(backURL);
+portletDisplay.setShowBackIcon(true);
 %>
 
 <clay:management-toolbar
@@ -40,7 +45,6 @@ if (ctCollection != null) {
 	showSearch="<%= true %>"
 	sortingOrder="<%= changeListsHistoryDisplayContext.getOrderByType() %>"
 	sortingURL="<%= changeListsHistoryDisplayContext.getSortingURL() %>"
-	viewTypeItems="<%= changeListsHistoryDisplayContext.getViewTypeItems() %>"
 />
 
 <div class="closed container-fluid-1280">
@@ -86,6 +90,18 @@ if (ctCollection != null) {
 			<liferay-ui:search-container-column-text
 				name="affects"
 			>
+
+				<%
+				int affectsCount = changeListsHistoryDisplayContext.getAffectsCount(curCTEntry);
+
+				if (affectsCount > 0) {
+				%>
+
+					<span class="blue strong"><%= affectsCount %></span>
+
+				<%
+				}
+				%>
 
 			</liferay-ui:search-container-column-text>
 

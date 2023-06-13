@@ -24,7 +24,12 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -40,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "SelectionScope")
 public class SelectionScope {
 
+	@Schema
 	public Long getFolderId() {
 		return folderId;
 	}
@@ -67,6 +73,7 @@ public class SelectionScope {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long folderId;
 
+	@Schema
 	public Long getRepositoryId() {
 		return repositoryId;
 	}
@@ -94,6 +101,7 @@ public class SelectionScope {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long repositoryId;
 
+	@Schema
 	public Boolean getSelectAll() {
 		return selectAll;
 	}
@@ -148,35 +156,69 @@ public class SelectionScope {
 
 		sb.append("{");
 
-		sb.append("\"folderId\": ");
+		if (folderId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (folderId == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"folderId\": ");
+
 			sb.append(folderId);
 		}
 
-		sb.append(", ");
+		if (repositoryId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"repositoryId\": ");
+			sb.append("\"repositoryId\": ");
 
-		if (repositoryId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(repositoryId);
 		}
 
-		sb.append(", ");
+		if (selectAll != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"selectAll\": ");
+			sb.append("\"selectAll\": ");
 
-		if (selectAll == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(selectAll);
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

@@ -63,34 +63,46 @@ public abstract class BaseDocumentFolderResourceImpl
 
 	@Override
 	@DELETE
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "documentFolderId")}
+	)
 	@Path("/document-folders/{documentFolderId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DocumentFolder")})
 	public void deleteDocumentFolder(
-			@NotNull @PathParam("documentFolderId") Long documentFolderId)
+			@NotNull @Parameter(hidden = true) @PathParam("documentFolderId")
+				Long documentFolderId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "documentFolderId")}
+	)
 	@Path("/document-folders/{documentFolderId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "DocumentFolder")})
 	public DocumentFolder getDocumentFolder(
-			@NotNull @PathParam("documentFolderId") Long documentFolderId)
+			@NotNull @Parameter(hidden = true) @PathParam("documentFolderId")
+				Long documentFolderId)
 		throws Exception {
 
 		return new DocumentFolder();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PATCH
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "documentFolderId")}
+	)
 	@Path("/document-folders/{documentFolderId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "DocumentFolder")})
 	public DocumentFolder patchDocumentFolder(
-			@NotNull @PathParam("documentFolderId") Long documentFolderId,
+			@NotNull @Parameter(hidden = true) @PathParam("documentFolderId")
+				Long documentFolderId,
 			DocumentFolder documentFolder)
 		throws Exception {
 
@@ -141,13 +153,17 @@ public abstract class BaseDocumentFolderResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PUT
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "documentFolderId")}
+	)
 	@Path("/document-folders/{documentFolderId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "DocumentFolder")})
 	public DocumentFolder putDocumentFolder(
-			@NotNull @PathParam("documentFolderId") Long documentFolderId,
+			@NotNull @Parameter(hidden = true) @PathParam("documentFolderId")
+				Long documentFolderId,
 			DocumentFolder documentFolder)
 		throws Exception {
 
@@ -158,34 +174,42 @@ public abstract class BaseDocumentFolderResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "parentDocumentFolderId"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path("/document-folders/{parentDocumentFolderId}/document-folders")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "DocumentFolder")})
 	public Page<DocumentFolder> getDocumentFolderDocumentFoldersPage(
-			@NotNull @PathParam("parentDocumentFolderId") Long
-				parentDocumentFolderId,
-			@QueryParam("search") String search, @Context Filter filter,
-			@Context Pagination pagination, @Context Sort[] sorts)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("parentDocumentFolderId") Long parentDocumentFolderId,
+			@Parameter(hidden = true) @QueryParam("search") String search,
+			@Context Filter filter, @Context Pagination pagination,
+			@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "parentDocumentFolderId")
+		}
+	)
 	@Path("/document-folders/{parentDocumentFolderId}/document-folders")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "DocumentFolder")})
 	public DocumentFolder postDocumentFolderDocumentFolder(
-			@NotNull @PathParam("parentDocumentFolderId") Long
-				parentDocumentFolderId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("parentDocumentFolderId") Long parentDocumentFolderId,
 			DocumentFolder documentFolder)
 		throws Exception {
 
@@ -196,33 +220,38 @@ public abstract class BaseDocumentFolderResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "siteId"),
+			@Parameter(in = ParameterIn.QUERY, name = "flatten"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path("/sites/{siteId}/document-folders")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "DocumentFolder")})
 	public Page<DocumentFolder> getSiteDocumentFoldersPage(
-			@NotNull @PathParam("siteId") Long siteId,
-			@QueryParam("flatten") Boolean flatten,
-			@QueryParam("search") String search, @Context Filter filter,
-			@Context Pagination pagination, @Context Sort[] sorts)
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
+			@Parameter(hidden = true) @QueryParam("flatten") Boolean flatten,
+			@Parameter(hidden = true) @QueryParam("search") String search,
+			@Context Filter filter, @Context Pagination pagination,
+			@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "siteId")})
 	@Path("/sites/{siteId}/document-folders")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "DocumentFolder")})
 	public DocumentFolder postSiteDocumentFolder(
-			@NotNull @PathParam("siteId") Long siteId,
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
 			DocumentFolder documentFolder)
 		throws Exception {
 

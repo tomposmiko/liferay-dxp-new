@@ -95,10 +95,17 @@ public class SearchUtil {
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setBooleanClauses(new BooleanClause[] {booleanClause});
-		searchContext.setEnd(pagination.getEndPosition());
+
+		if (pagination != null) {
+			searchContext.setEnd(pagination.getEndPosition());
+		}
+
 		searchContext.setKeywords(keywords);
 		searchContext.setSorts(sorts);
-		searchContext.setStart(pagination.getStartPosition());
+
+		if (pagination != null) {
+			searchContext.setStart(pagination.getStartPosition());
+		}
 
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();

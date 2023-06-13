@@ -15,12 +15,12 @@
 package com.liferay.change.tracking.change.lists.history.web.internal.display.context;
 
 import com.liferay.change.tracking.CTEngineManager;
+import com.liferay.change.tracking.CTManager;
 import com.liferay.change.tracking.constants.CTWebKeys;
+import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -64,6 +64,13 @@ public class ChangeListsHistoryDisplayContext {
 
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		_ctEngineManager = _ctEngineManagerServiceTracker.getService();
+		_ctManager = _ctManagerServiceTracker.getService();
+	}
+
+	public int getAffectsCount(CTEntry ctEntry) {
+		return _ctManager.getRelatedOwnerCTEntriesCount(ctEntry.getCtEntryId());
 	}
 
 	public SoyContext getChangeListsHistoryContext() {
@@ -105,14 +112,12 @@ public class ChangeListsHistoryDisplayContext {
 	}
 
 	public SearchContainer<CTEntry> getCTCollectionDetailsSearchContainer(
-		long ctCollectionId) {
+		CTCollection ctCollection) {
 
 		SearchContainer<CTEntry> searchContainer = new SearchContainer<>(
 			_renderRequest, new DisplayTerms(_renderRequest), null,
 			SearchContainer.DEFAULT_CUR_PARAM, 0, SearchContainer.DEFAULT_DELTA,
 			_getIteratorURL(), null, "there-are-no-change-entries");
-
-		CTEngineManager ctEngineManager = _serviceTracker.getService();
 
 		OrderByComparator<CTEntry> orderByComparator =
 			OrderByComparatorFactoryUtil.create(
@@ -122,14 +127,17 @@ public class ChangeListsHistoryDisplayContext {
 			WorkflowConstants.STATUS_DRAFT, true, searchContainer.getStart(),
 			searchContainer.getEnd(), orderByComparator);
 
+		queryDefinition.setEnd(searchContainer.getEnd());
 		queryDefinition.setOrderByComparator(orderByComparator);
+		queryDefinition.setStart(searchContainer.getStart());
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
-		List<CTEntry> ctEntries = ctEngineManager.getCTEntries(
-			ctCollectionId, queryDefinition);
-
-		searchContainer.setResults(ctEntries);
-		searchContainer.setTotal(ctEntries.size());
+		searchContainer.setResults(
+			_ctEngineManager.getCTEntries(
+				ctCollection.getCtCollectionId(), queryDefinition));
+		searchContainer.setTotal(
+			_ctEngineManager.getCTEntriesCount(
+				ctCollection.getCtCollectionId(), queryDefinition));
 
 		return searchContainer;
 	}
@@ -189,26 +197,6 @@ public class ChangeListsHistoryDisplayContext {
 		PortletURL portletURL = _renderResponse.createRenderURL();
 
 		return portletURL.toString();
-	}
-
-	public List<ViewTypeItem> getViewTypeItems() {
-		return new ViewTypeItemList(_getPortletURL(), _getDisplayStyle()) {
-			{
-				addCardViewTypeItem();
-				addTableViewTypeItem();
-			}
-		};
-	}
-
-	private String _getDisplayStyle() {
-		if (_displayStyle != null) {
-			return _displayStyle;
-		}
-
-		_displayStyle = ParamUtil.getString(
-			_httpServletRequest, "displayStyle", "list");
-
-		return _displayStyle;
 	}
 
 	private String _getFilterByStatus() {
@@ -311,6 +299,7 @@ public class ChangeListsHistoryDisplayContext {
 
 		iteratorURL.setParameter("mvcPath", "/details.jsp");
 		iteratorURL.setParameter("redirect", currentURL.toString());
+		iteratorURL.setParameter("displayStyle", "list");
 		iteratorURL.setParameter(
 			CTWebKeys.CT_PROCESS_ID, String.valueOf(ctProcessId));
 
@@ -357,12 +346,7 @@ public class ChangeListsHistoryDisplayContext {
 	private PortletURL _getPortletURL() {
 		PortletURL portletURL = _renderResponse.createRenderURL();
 
-		String displayStyle = ParamUtil.getString(
-			_httpServletRequest, "displayStyle");
-
-		if (Validator.isNotNull(displayStyle)) {
-			portletURL.setParameter("displayStyle", _getDisplayStyle());
-		}
+		portletURL.setParameter("displayStyle", "list");
 
 		String orderByCol = _getOrderByCol();
 
@@ -380,21 +364,32 @@ public class ChangeListsHistoryDisplayContext {
 	}
 
 	private static ServiceTracker<CTEngineManager, CTEngineManager>
-		_serviceTracker;
+		_ctEngineManagerServiceTracker;
+	private static ServiceTracker<CTManager, CTManager>
+		_ctManagerServiceTracker;
 
 	static {
 		Bundle bundle = FrameworkUtil.getBundle(CTEngineManager.class);
 
-		ServiceTracker<CTEngineManager, CTEngineManager> serviceTracker =
-			new ServiceTracker<>(
+		ServiceTracker<CTEngineManager, CTEngineManager>
+			ctEngineManagerServiceTracker = new ServiceTracker<>(
 				bundle.getBundleContext(), CTEngineManager.class, null);
 
-		serviceTracker.open();
+		ctEngineManagerServiceTracker.open();
 
-		_serviceTracker = serviceTracker;
+		_ctEngineManagerServiceTracker = ctEngineManagerServiceTracker;
+
+		ServiceTracker<CTManager, CTManager> ctManagerServiceTracker =
+			new ServiceTracker<>(
+				bundle.getBundleContext(), CTManager.class, null);
+
+		ctManagerServiceTracker.open();
+
+		_ctManagerServiceTracker = ctManagerServiceTracker;
 	}
 
-	private String _displayStyle;
+	private final CTEngineManager _ctEngineManager;
+	private final CTManager _ctManager;
 	private String _filterByStatus;
 	private String _filterByUser;
 	private final HttpServletRequest _httpServletRequest;

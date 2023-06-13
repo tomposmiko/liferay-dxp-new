@@ -63,32 +63,40 @@ public abstract class BaseCommentResourceImpl implements CommentResource {
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "blogPostingId"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path("/blog-postings/{blogPostingId}/comments")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Comment")})
 	public Page<Comment> getBlogPostingCommentsPage(
-			@NotNull @PathParam("blogPostingId") Long blogPostingId,
-			@QueryParam("search") String search, @Context Filter filter,
-			@Context Pagination pagination, @Context Sort[] sorts)
+			@NotNull @Parameter(hidden = true) @PathParam("blogPostingId") Long
+				blogPostingId,
+			@Parameter(hidden = true) @QueryParam("search") String search,
+			@Context Filter filter, @Context Pagination pagination,
+			@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "blogPostingId")}
+	)
 	@Path("/blog-postings/{blogPostingId}/comments")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Comment")})
 	public Comment postBlogPostingComment(
-			@NotNull @PathParam("blogPostingId") Long blogPostingId,
+			@NotNull @Parameter(hidden = true) @PathParam("blogPostingId") Long
+				blogPostingId,
 			Comment comment)
 		throws Exception {
 
@@ -97,67 +105,40 @@ public abstract class BaseCommentResourceImpl implements CommentResource {
 
 	@Override
 	@DELETE
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "commentId")})
 	@Path("/comments/{commentId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "Comment")})
-	public void deleteComment(@NotNull @PathParam("commentId") Long commentId)
+	public void deleteComment(
+			@NotNull @Parameter(hidden = true) @PathParam("commentId") Long
+				commentId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "commentId")})
 	@Path("/comments/{commentId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Comment")})
-	public Comment getComment(@NotNull @PathParam("commentId") Long commentId)
+	public Comment getComment(
+			@NotNull @Parameter(hidden = true) @PathParam("commentId") Long
+				commentId)
 		throws Exception {
 
 		return new Comment();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PUT
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "commentId")})
 	@Path("/comments/{commentId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Comment")})
 	public Comment putComment(
-			@NotNull @PathParam("commentId") Long commentId, Comment comment)
-		throws Exception {
-
-		return new Comment();
-	}
-
-	@Override
-	@GET
-	@Parameters(
-		value = {
-			@Parameter(in = ParameterIn.QUERY, name = "filter"),
-			@Parameter(in = ParameterIn.QUERY, name = "page"),
-			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
-		}
-	)
-	@Path("/comments/{parentCommentId}/comments")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "Comment")})
-	public Page<Comment> getCommentCommentsPage(
-			@NotNull @PathParam("parentCommentId") Long parentCommentId,
-			@QueryParam("search") String search, @Context Filter filter,
-			@Context Pagination pagination, @Context Sort[] sorts)
-		throws Exception {
-
-		return Page.of(Collections.emptyList());
-	}
-
-	@Override
-	@Consumes("application/json")
-	@POST
-	@Path("/comments/{parentCommentId}/comments")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "Comment")})
-	public Comment postCommentComment(
-			@NotNull @PathParam("parentCommentId") Long parentCommentId,
+			@NotNull @Parameter(hidden = true) @PathParam("commentId") Long
+				commentId,
 			Comment comment)
 		throws Exception {
 
@@ -168,32 +149,41 @@ public abstract class BaseCommentResourceImpl implements CommentResource {
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "parentCommentId"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
-	@Path("/documents/{documentId}/comments")
-	@Produces("application/json")
+	@Path("/comments/{parentCommentId}/comments")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Comment")})
-	public Page<Comment> getDocumentCommentsPage(
-			@NotNull @PathParam("documentId") Long documentId,
-			@QueryParam("search") String search, @Context Filter filter,
-			@Context Pagination pagination, @Context Sort[] sorts)
+	public Page<Comment> getCommentCommentsPage(
+			@NotNull @Parameter(hidden = true) @PathParam("parentCommentId")
+				Long parentCommentId,
+			@Parameter(hidden = true) @QueryParam("search") String search,
+			@Context Filter filter, @Context Pagination pagination,
+			@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
-	@Path("/documents/{documentId}/comments")
-	@Produces("application/json")
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "parentCommentId")}
+	)
+	@Path("/comments/{parentCommentId}/comments")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Comment")})
-	public Comment postDocumentComment(
-			@NotNull @PathParam("documentId") Long documentId, Comment comment)
+	public Comment postCommentComment(
+			@NotNull @Parameter(hidden = true) @PathParam("parentCommentId")
+				Long parentCommentId,
+			Comment comment)
 		throws Exception {
 
 		return new Comment();
@@ -203,32 +193,86 @@ public abstract class BaseCommentResourceImpl implements CommentResource {
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "documentId"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
-	@Path("/structured-contents/{structuredContentId}/comments")
-	@Produces("application/json")
+	@Path("/documents/{documentId}/comments")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Comment")})
-	public Page<Comment> getStructuredContentCommentsPage(
-			@NotNull @PathParam("structuredContentId") Long structuredContentId,
-			@QueryParam("search") String search, @Context Filter filter,
-			@Context Pagination pagination, @Context Sort[] sorts)
+	public Page<Comment> getDocumentCommentsPage(
+			@NotNull @Parameter(hidden = true) @PathParam("documentId") Long
+				documentId,
+			@Parameter(hidden = true) @QueryParam("search") String search,
+			@Context Filter filter, @Context Pagination pagination,
+			@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "documentId")}
+	)
+	@Path("/documents/{documentId}/comments")
+	@Produces({"application/json", "application/xml"})
+	@Tags(value = {@Tag(name = "Comment")})
+	public Comment postDocumentComment(
+			@NotNull @Parameter(hidden = true) @PathParam("documentId") Long
+				documentId,
+			Comment comment)
+		throws Exception {
+
+		return new Comment();
+	}
+
+	@Override
+	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "structuredContentId"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
+			@Parameter(in = ParameterIn.QUERY, name = "filter"),
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
+		}
+	)
 	@Path("/structured-contents/{structuredContentId}/comments")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
+	@Tags(value = {@Tag(name = "Comment")})
+	public Page<Comment> getStructuredContentCommentsPage(
+			@NotNull @Parameter(hidden = true) @PathParam("structuredContentId")
+				Long structuredContentId,
+			@Parameter(hidden = true) @QueryParam("search") String search,
+			@Context Filter filter, @Context Pagination pagination,
+			@Context Sort[] sorts)
+		throws Exception {
+
+		return Page.of(Collections.emptyList());
+	}
+
+	@Override
+	@Consumes({"application/json", "application/xml"})
+	@POST
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "structuredContentId")
+		}
+	)
+	@Path("/structured-contents/{structuredContentId}/comments")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Comment")})
 	public Comment postStructuredContentComment(
-			@NotNull @PathParam("structuredContentId") Long structuredContentId,
+			@NotNull @Parameter(hidden = true) @PathParam("structuredContentId")
+				Long structuredContentId,
 			Comment comment)
 		throws Exception {
 

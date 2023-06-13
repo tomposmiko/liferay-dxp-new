@@ -254,11 +254,22 @@ public class DDMFormDisplayContext {
 	}
 
 	public String getDefaultLanguageId() throws PortalException {
+		String languageId = ParamUtil.getString(_renderRequest, "languageId");
+
+		Locale locale = LocaleUtil.fromLanguageId(languageId, true, false);
+
 		DDMForm ddmForm = getDDMForm();
 
-		return ParamUtil.getString(
-			_renderRequest, "languageId",
-			LanguageUtil.getLanguageId(ddmForm.getDefaultLocale()));
+		Set<Locale> availableLocales = ddmForm.getAvailableLocales();
+
+		if (!availableLocales.contains(locale)) {
+			HttpServletRequest request = PortalUtil.getHttpServletRequest(
+				_renderRequest);
+
+			locale = getLocale(request, ddmForm);
+		}
+
+		return LanguageUtil.getLanguageId(locale);
 	}
 
 	public DDMFormInstance getFormInstance() {
@@ -665,10 +676,7 @@ public class DDMFormDisplayContext {
 	}
 
 	protected ThemeDisplay getThemeDisplay() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		return themeDisplay;
+		return (ThemeDisplay)_renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 	}
 
 	protected User getUser() {

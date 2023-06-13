@@ -26,8 +26,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -46,7 +52,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Segment")
 public class Segment {
 
-	@Schema(description = "The active of the segment")
+	@Schema(
+		description = "A flag that indicates whether the segment is active."
+	)
 	public Boolean getActive() {
 		return active;
 	}
@@ -74,7 +82,7 @@ public class Segment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean active;
 
-	@Schema(description = "The criteria of the segment")
+	@Schema(description = "The segment's criteria.")
 	public String getCriteria() {
 		return criteria;
 	}
@@ -103,7 +111,7 @@ public class Segment {
 	@NotEmpty
 	protected String criteria;
 
-	@Schema(description = "The create date of the segment")
+	@Schema(description = "The segment's creation date.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -131,7 +139,7 @@ public class Segment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(description = "The modified date of the segment")
+	@Schema(description = "The segment's most recent modification date.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -159,7 +167,7 @@ public class Segment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(description = "The internal ID of the segment")
+	@Schema(description = "The segment's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -185,7 +193,7 @@ public class Segment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The name of the segment")
+	@Schema(description = "The segment's name.")
 	public String getName() {
 		return name;
 	}
@@ -212,7 +220,7 @@ public class Segment {
 	@NotEmpty
 	protected String name;
 
-	@Schema(description = "The site of the segment")
+	@Schema(description = "The ID of the segment's site.")
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -240,7 +248,7 @@ public class Segment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
-	@Schema(description = "The source of the segment")
+	@Schema(description = "The segment's source.")
 	public String getSource() {
 		return source;
 	}
@@ -295,100 +303,142 @@ public class Segment {
 
 		sb.append("{");
 
-		sb.append("\"active\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (active == null) {
-			sb.append("null");
-		}
-		else {
+		if (active != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"active\": ");
+
 			sb.append(active);
 		}
 
-		sb.append(", ");
+		if (criteria != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"criteria\": ");
+			sb.append("\"criteria\": ");
 
-		if (criteria == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(criteria);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(criteria));
 
-		sb.append("\"dateCreated\": ");
-
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateCreated);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateModified);
+
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"dateModified\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\": ");
 
-		if (siteId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(siteId);
 		}
 
-		sb.append(", ");
+		if (source != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"source\": ");
+			sb.append("\"source\": ");
 
-		if (source == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(source));
+
+			sb.append("\"");
 		}
-		else {
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(source);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

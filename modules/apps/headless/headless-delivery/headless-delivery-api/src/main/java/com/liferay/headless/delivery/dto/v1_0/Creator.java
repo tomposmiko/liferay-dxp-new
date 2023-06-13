@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Creator")
 public class Creator {
 
-	@Schema(description = "An additional name, can be used for a middle name.")
+	@Schema(description = "The author's additional name (e.g., middle name).")
 	public String getAdditionalName() {
 		return additionalName;
 	}
@@ -70,7 +73,7 @@ public class Creator {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String additionalName;
 
-	@Schema(description = "In the US, the surname of the UserAccount.")
+	@Schema(description = "The author's surname.")
 	public String getFamilyName() {
 		return familyName;
 	}
@@ -98,7 +101,7 @@ public class Creator {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String familyName;
 
-	@Schema(description = "In the US, the first name of the UserAccount.")
+	@Schema(description = "The author's first name.")
 	public String getGivenName() {
 		return givenName;
 	}
@@ -126,7 +129,7 @@ public class Creator {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String givenName;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The author's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -152,9 +155,7 @@ public class Creator {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(
-		description = "A relative URL to the image profile of the UserAccount."
-	)
+	@Schema(description = "A relative URL to the author's profile image.")
 	public String getImage() {
 		return image;
 	}
@@ -182,7 +183,7 @@ public class Creator {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String image;
 
-	@Schema(description = "The full name of the UserAccount.")
+	@Schema(description = "The author's full name.")
 	public String getName() {
 		return name;
 	}
@@ -208,7 +209,7 @@ public class Creator {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String name;
 
-	@Schema(description = "A relative URL to the profile of the UserAccount.")
+	@Schema(description = "A relative URL to the author's user profile.")
 	public String getProfileURL() {
 		return profileURL;
 	}
@@ -263,91 +264,133 @@ public class Creator {
 
 		sb.append("{");
 
-		sb.append("\"additionalName\": ");
+		if (additionalName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (additionalName == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"additionalName\": ");
+
 			sb.append("\"");
-			sb.append(additionalName);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(additionalName));
 
-		sb.append("\"familyName\": ");
-
-		if (familyName == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(familyName);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (familyName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"givenName\": ");
+			sb.append("\"familyName\": ");
 
-		if (givenName == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(givenName);
+
+			sb.append(_escape(familyName));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (givenName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"givenName\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(givenName));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (image != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"image\": ");
+			sb.append("\"image\": ");
 
-		if (image == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(image);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(image));
 
-		sb.append("\"name\": ");
-
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(name);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"profileURL\": ");
+			sb.append("\"name\": ");
 
-		if (profileURL == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(name));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (profileURL != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"profileURL\": ");
+
 			sb.append("\"");
-			sb.append(profileURL);
+
+			sb.append(_escape(profileURL));
+
 			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

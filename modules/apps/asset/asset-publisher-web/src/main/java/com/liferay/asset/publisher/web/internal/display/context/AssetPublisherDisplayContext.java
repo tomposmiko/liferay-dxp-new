@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -479,13 +480,12 @@ public class AssetPublisherDisplayContext {
 		JSONArray rulesJSONArray = JSONFactoryUtil.createJSONArray();
 
 		for (int queryLogicIndex : queryLogicIndexes) {
-			JSONObject ruleJSONObject = JSONFactoryUtil.createJSONObject();
-
 			boolean queryAndOperator = PrefsParamUtil.getBoolean(
 				_portletPreferences, _request,
 				"queryAndOperator" + queryLogicIndex);
 
-			ruleJSONObject.put("queryAndOperator", queryAndOperator);
+			JSONObject ruleJSONObject = JSONUtil.put(
+				"queryAndOperator", queryAndOperator);
 
 			boolean queryContains = PrefsParamUtil.getBoolean(
 				_portletPreferences, _request,
@@ -508,10 +508,14 @@ public class AssetPublisherDisplayContext {
 				queryValues = _assetPublisherWebUtil.filterAssetTagNames(
 					_themeDisplay.getScopeGroupId(), queryValues);
 
-				List<Map<String, String>> selectedItems = new ArrayList<>();
-
 				String[] tagNames = StringUtil.split(
 					queryValues, StringPool.COMMA);
+
+				if (ArrayUtil.isEmpty(tagNames)) {
+					continue;
+				}
+
+				List<Map<String, String>> selectedItems = new ArrayList<>();
 
 				for (String tagName : tagNames) {
 					Map<String, String> item = new HashMap<>();
@@ -529,10 +533,14 @@ public class AssetPublisherDisplayContext {
 					_request, "queryCategoryIds" + queryLogicIndex,
 					queryValues);
 
-				List<HashMap<String, Object>> selectedItems = new ArrayList<>();
-
 				List<AssetCategory> categories = _filterAssetCategories(
 					GetterUtil.getLongValues(queryValues.split(",")));
+
+				if (ListUtil.isEmpty(categories)) {
+					continue;
+				}
+
+				List<HashMap<String, Object>> selectedItems = new ArrayList<>();
 
 				for (AssetCategory category : categories) {
 					HashMap<String, Object> selectedCategory = new HashMap<>();
@@ -551,8 +559,11 @@ public class AssetPublisherDisplayContext {
 				continue;
 			}
 
-			ruleJSONObject.put("queryValues", queryValues);
-			ruleJSONObject.put("type", queryName);
+			ruleJSONObject.put(
+				"queryValues", queryValues
+			).put(
+				"type", queryName
+			);
 
 			rulesJSONArray.put(ruleJSONObject);
 		}
@@ -1337,16 +1348,7 @@ public class AssetPublisherDisplayContext {
 		return false;
 	}
 
-	public boolean isSelectionStyleDynamic() throws PortalException {
-		AssetListEntry assetListEntry = fetchAssetListEntry();
-
-		if (isSelectionStyleAssetList() && (assetListEntry != null) &&
-			(assetListEntry.getType() ==
-				AssetListEntryTypeConstants.TYPE_DYNAMIC)) {
-
-			return true;
-		}
-
+	public boolean isSelectionStyleDynamic() {
 		if (Objects.equals(getSelectionStyle(), "dynamic")) {
 			return true;
 		}
@@ -1710,15 +1712,18 @@ public class AssetPublisherDisplayContext {
 		}
 	}
 
-	public void setPageKeywords() throws PortalException {
+	public void setPageKeywords() {
 		if (getAssetCategoryId() > 0) {
 			AssetCategory assetCategory =
-				AssetCategoryLocalServiceUtil.getCategory(getAssetCategoryId());
+				AssetCategoryLocalServiceUtil.fetchAssetCategory(
+					getAssetCategoryId());
 
-			PortalUtil.setPageKeywords(
-				HtmlUtil.escape(
-					assetCategory.getTitle(_themeDisplay.getLocale())),
-				_request);
+			if (assetCategory != null) {
+				PortalUtil.setPageKeywords(
+					HtmlUtil.escape(
+						assetCategory.getTitle(_themeDisplay.getLocale())),
+					_request);
+			}
 		}
 
 		if (Validator.isNotNull(getAssetTagName())) {

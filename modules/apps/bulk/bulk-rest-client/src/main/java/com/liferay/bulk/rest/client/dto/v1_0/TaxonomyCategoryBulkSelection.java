@@ -15,6 +15,9 @@
 package com.liferay.bulk.rest.client.dto.v1_0;
 
 import com.liferay.bulk.rest.client.function.UnsafeSupplier;
+import com.liferay.bulk.rest.client.serdes.v1_0.TaxonomyCategoryBulkSelectionSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -96,5 +99,33 @@ public class TaxonomyCategoryBulkSelection {
 	}
 
 	protected Long[] taxonomyCategoryIdsToRemove;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof TaxonomyCategoryBulkSelection)) {
+			return false;
+		}
+
+		TaxonomyCategoryBulkSelection taxonomyCategoryBulkSelection =
+			(TaxonomyCategoryBulkSelection)object;
+
+		return Objects.equals(
+			toString(), taxonomyCategoryBulkSelection.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return TaxonomyCategoryBulkSelectionSerDes.toJSON(this);
+	}
 
 }

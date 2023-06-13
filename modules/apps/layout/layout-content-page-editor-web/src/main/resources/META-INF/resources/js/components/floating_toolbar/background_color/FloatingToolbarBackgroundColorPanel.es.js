@@ -5,9 +5,10 @@ import Soy from 'metal-soy';
 import '../common/FloatingToolbarColorPicker.es';
 import './FloatingToolbarBackgroundColorPanelDelegateTemplate.soy';
 import {CONFIG_KEYS} from '../../../utils/rowConstants';
+import {disableSavingChangesStatusAction, enableSavingChangesStatusAction, updateLastSaveDateAction} from '../../../actions/saveChanges.es';
 import getConnectedComponent from '../../../store/ConnectedComponent.es';
 import templates from './FloatingToolbarBackgroundColorPanel.soy';
-import {UPDATE_LAST_SAVE_DATE, UPDATE_ROW_CONFIG, UPDATE_SAVING_CHANGES_STATUS, UPDATE_TRANSLATION_STATUS} from '../../../actions/actions.es';
+import {UPDATE_ROW_CONFIG, UPDATE_TRANSLATION_STATUS} from '../../../actions/actions.es';
 
 /**
  * FloatingToolbarBackgroundColorPanel
@@ -49,34 +50,21 @@ class FloatingToolbarBackgroundColorPanel extends Component {
 	 */
 	_updateRowConfig(config) {
 		this.store
-			.dispatchAction(
-				UPDATE_SAVING_CHANGES_STATUS,
-				{
-					savingChanges: true
-				}
-			)
-			.dispatchAction(
-				UPDATE_ROW_CONFIG,
+			.dispatch(enableSavingChangesStatusAction())
+			.dispatch(
 				{
 					config,
-					rowId: this.itemId
+					rowId: this.itemId,
+					type: UPDATE_ROW_CONFIG
 				}
 			)
-			.dispatchAction(
-				UPDATE_TRANSLATION_STATUS
-			)
-			.dispatchAction(
-				UPDATE_LAST_SAVE_DATE,
+			.dispatch(
 				{
-					lastSaveDate: new Date()
+					type: UPDATE_TRANSLATION_STATUS
 				}
 			)
-			.dispatchAction(
-				UPDATE_SAVING_CHANGES_STATUS,
-				{
-					savingChanges: false
-				}
-			);
+			.dispatch(updateLastSaveDateAction())
+			.dispatch(disableSavingChangesStatusAction());
 	}
 }
 

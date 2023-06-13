@@ -64,37 +64,52 @@ public abstract class BaseMessageBoardMessageResourceImpl
 
 	@Override
 	@DELETE
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "messageBoardMessageId")
+		}
+	)
 	@Path("/message-board-messages/{messageBoardMessageId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public void deleteMessageBoardMessage(
-			@NotNull @PathParam("messageBoardMessageId") Long
-				messageBoardMessageId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("messageBoardMessageId") Long messageBoardMessageId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "messageBoardMessageId")
+		}
+	)
 	@Path("/message-board-messages/{messageBoardMessageId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public MessageBoardMessage getMessageBoardMessage(
-			@NotNull @PathParam("messageBoardMessageId") Long
-				messageBoardMessageId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("messageBoardMessageId") Long messageBoardMessageId)
 		throws Exception {
 
 		return new MessageBoardMessage();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PATCH
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "messageBoardMessageId")
+		}
+	)
 	@Path("/message-board-messages/{messageBoardMessageId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public MessageBoardMessage patchMessageBoardMessage(
-			@NotNull @PathParam("messageBoardMessageId") Long
-				messageBoardMessageId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("messageBoardMessageId") Long messageBoardMessageId,
 			MessageBoardMessage messageBoardMessage)
 		throws Exception {
 
@@ -168,14 +183,19 @@ public abstract class BaseMessageBoardMessageResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PUT
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "messageBoardMessageId")
+		}
+	)
 	@Path("/message-board-messages/{messageBoardMessageId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public MessageBoardMessage putMessageBoardMessage(
-			@NotNull @PathParam("messageBoardMessageId") Long
-				messageBoardMessageId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("messageBoardMessageId") Long messageBoardMessageId,
 			MessageBoardMessage messageBoardMessage)
 		throws Exception {
 
@@ -184,37 +204,52 @@ public abstract class BaseMessageBoardMessageResourceImpl
 
 	@Override
 	@DELETE
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "messageBoardMessageId")
+		}
+	)
 	@Path("/message-board-messages/{messageBoardMessageId}/my-rating")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public void deleteMessageBoardMessageMyRating(
-			@NotNull @PathParam("messageBoardMessageId") Long
-				messageBoardMessageId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("messageBoardMessageId") Long messageBoardMessageId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "messageBoardMessageId")
+		}
+	)
 	@Path("/message-board-messages/{messageBoardMessageId}/my-rating")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public Rating getMessageBoardMessageMyRating(
-			@NotNull @PathParam("messageBoardMessageId") Long
-				messageBoardMessageId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("messageBoardMessageId") Long messageBoardMessageId)
 		throws Exception {
 
 		return new Rating();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "messageBoardMessageId")
+		}
+	)
 	@Path("/message-board-messages/{messageBoardMessageId}/my-rating")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public Rating postMessageBoardMessageMyRating(
-			@NotNull @PathParam("messageBoardMessageId") Long
-				messageBoardMessageId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("messageBoardMessageId") Long messageBoardMessageId,
 			Rating rating)
 		throws Exception {
 
@@ -222,14 +257,19 @@ public abstract class BaseMessageBoardMessageResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PUT
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "messageBoardMessageId")
+		}
+	)
 	@Path("/message-board-messages/{messageBoardMessageId}/my-rating")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public Rating putMessageBoardMessageMyRating(
-			@NotNull @PathParam("messageBoardMessageId") Long
-				messageBoardMessageId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("messageBoardMessageId") Long messageBoardMessageId,
 			Rating rating)
 		throws Exception {
 
@@ -240,38 +280,52 @@ public abstract class BaseMessageBoardMessageResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(
+				in = ParameterIn.PATH, name = "parentMessageBoardMessageId"
+			),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path(
 		"/message-board-messages/{parentMessageBoardMessageId}/message-board-messages"
 	)
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public Page<MessageBoardMessage>
 			getMessageBoardMessageMessageBoardMessagesPage(
-				@NotNull @PathParam("parentMessageBoardMessageId") Long
+				@NotNull @Parameter(hidden = true)
+				@PathParam("parentMessageBoardMessageId") Long
 					parentMessageBoardMessageId,
-				@QueryParam("search") String search, @Context Filter filter,
-				@Context Pagination pagination, @Context Sort[] sorts)
+				@Parameter(hidden = true) @QueryParam("search") String search,
+				@Context Filter filter, @Context Pagination pagination,
+				@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {
+			@Parameter(
+				in = ParameterIn.PATH, name = "parentMessageBoardMessageId"
+			)
+		}
+	)
 	@Path(
 		"/message-board-messages/{parentMessageBoardMessageId}/message-board-messages"
 	)
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public MessageBoardMessage postMessageBoardMessageMessageBoardMessage(
-			@NotNull @PathParam("parentMessageBoardMessageId") Long
+			@NotNull @Parameter(hidden = true)
+			@PathParam("parentMessageBoardMessageId") Long
 				parentMessageBoardMessageId,
 			MessageBoardMessage messageBoardMessage)
 		throws Exception {
@@ -283,39 +337,47 @@ public abstract class BaseMessageBoardMessageResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "messageBoardThreadId"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path(
 		"/message-board-threads/{messageBoardThreadId}/message-board-messages"
 	)
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public Page<MessageBoardMessage>
 			getMessageBoardThreadMessageBoardMessagesPage(
-				@NotNull @PathParam("messageBoardThreadId") Long
-					messageBoardThreadId,
-				@QueryParam("search") String search, @Context Filter filter,
-				@Context Pagination pagination, @Context Sort[] sorts)
+				@NotNull @Parameter(hidden = true)
+				@PathParam("messageBoardThreadId") Long messageBoardThreadId,
+				@Parameter(hidden = true) @QueryParam("search") String search,
+				@Context Filter filter, @Context Pagination pagination,
+				@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "messageBoardThreadId")
+		}
+	)
 	@Path(
 		"/message-board-threads/{messageBoardThreadId}/message-board-messages"
 	)
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "MessageBoardMessage")})
 	public MessageBoardMessage postMessageBoardThreadMessageBoardMessage(
-			@NotNull @PathParam("messageBoardThreadId") Long
-				messageBoardThreadId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("messageBoardThreadId") Long messageBoardThreadId,
 			MessageBoardMessage messageBoardMessage)
 		throws Exception {
 

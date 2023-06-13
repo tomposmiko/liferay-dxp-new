@@ -20,8 +20,10 @@ class FragmentsEditorToolbar extends Component {
 		this.once(
 			'storeChanged',
 			() => {
-				this.store.dispatchAction(
-					UPDATE_TRANSLATION_STATUS
+				this.store.dispatch(
+					{
+						type: UPDATE_TRANSLATION_STATUS
+					}
 				);
 			}
 		);
@@ -43,7 +45,11 @@ class FragmentsEditorToolbar extends Component {
 	 * @review
 	 */
 	_handleToggleContextualSidebarButtonClick() {
-		this.store.dispatchAction(TOGGLE_SIDEBAR);
+		this.store.dispatch(
+			{
+				type: TOGGLE_SIDEBAR
+			}
+		);
 	}
 
 }

@@ -1,11 +1,12 @@
 import Component from 'metal-component';
+import debounce from 'metal-debounce';
 import Soy, {Config} from 'metal-soy';
 
 import './FloatingToolbarLinkPanelDelegateTemplate.soy';
 import {BUTTON_TYPES, TARGET_TYPES} from '../../../utils/constants';
+import {disableSavingChangesStatusAction, enableSavingChangesStatusAction, updateLastSaveDateAction} from '../../../actions/saveChanges.es';
 import templates from './FloatingToolbarLinkPanel.soy';
-import {UPDATE_CONFIG_ATTRIBUTES, UPDATE_LAST_SAVE_DATE, UPDATE_SAVING_CHANGES_STATUS} from '../../../actions/actions.es';
-import debounce from 'metal-debounce';
+import {UPDATE_CONFIG_ATTRIBUTES} from '../../../actions/actions.es';
 
 /**
  * FloatingToolbarLinkPanel
@@ -58,32 +59,17 @@ class FloatingToolbarLinkPanel extends Component {
 	 */
 	_updateRowConfig(config) {
 		this.store
-			.dispatchAction(
-				UPDATE_SAVING_CHANGES_STATUS,
-				{
-					savingChanges: true
-				}
-			)
-			.dispatchAction(
-				UPDATE_CONFIG_ATTRIBUTES,
+			.dispatch(enableSavingChangesStatusAction())
+			.dispatch(
 				{
 					config,
 					editableId: this.item.editableId,
-					fragmentEntryLinkId: this.item.fragmentEntryLinkId
+					fragmentEntryLinkId: this.item.fragmentEntryLinkId,
+					type: UPDATE_CONFIG_ATTRIBUTES
 				}
 			)
-			.dispatchAction(
-				UPDATE_LAST_SAVE_DATE,
-				{
-					lastSaveDate: new Date()
-				}
-			)
-			.dispatchAction(
-				UPDATE_SAVING_CHANGES_STATUS,
-				{
-					savingChanges: false
-				}
-			);
+			.dispatch(updateLastSaveDateAction())
+			.dispatch(disableSavingChangesStatusAction());
 	}
 
 	/**

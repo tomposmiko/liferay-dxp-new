@@ -60,37 +60,52 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 
 	@Override
 	@DELETE
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseFolderId")
+		}
+	)
 	@Path("/knowledge-base-folders/{knowledgeBaseFolderId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "KnowledgeBaseFolder")})
 	public void deleteKnowledgeBaseFolder(
-			@NotNull @PathParam("knowledgeBaseFolderId") Long
-				knowledgeBaseFolderId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseFolderId") Long knowledgeBaseFolderId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseFolderId")
+		}
+	)
 	@Path("/knowledge-base-folders/{knowledgeBaseFolderId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseFolder")})
 	public KnowledgeBaseFolder getKnowledgeBaseFolder(
-			@NotNull @PathParam("knowledgeBaseFolderId") Long
-				knowledgeBaseFolderId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseFolderId") Long knowledgeBaseFolderId)
 		throws Exception {
 
 		return new KnowledgeBaseFolder();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PATCH
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseFolderId")
+		}
+	)
 	@Path("/knowledge-base-folders/{knowledgeBaseFolderId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseFolder")})
 	public KnowledgeBaseFolder patchKnowledgeBaseFolder(
-			@NotNull @PathParam("knowledgeBaseFolderId") Long
-				knowledgeBaseFolderId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseFolderId") Long knowledgeBaseFolderId,
 			KnowledgeBaseFolder knowledgeBaseFolder)
 		throws Exception {
 
@@ -148,14 +163,19 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PUT
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseFolderId")
+		}
+	)
 	@Path("/knowledge-base-folders/{knowledgeBaseFolderId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseFolder")})
 	public KnowledgeBaseFolder putKnowledgeBaseFolder(
-			@NotNull @PathParam("knowledgeBaseFolderId") Long
-				knowledgeBaseFolderId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseFolderId") Long knowledgeBaseFolderId,
 			KnowledgeBaseFolder knowledgeBaseFolder)
 		throws Exception {
 
@@ -166,6 +186,9 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(
+				in = ParameterIn.PATH, name = "parentKnowledgeBaseFolderId"
+			),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
 		}
@@ -173,11 +196,12 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 	@Path(
 		"/knowledge-base-folders/{parentKnowledgeBaseFolderId}/knowledge-base-folders"
 	)
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseFolder")})
 	public Page<KnowledgeBaseFolder>
 			getKnowledgeBaseFolderKnowledgeBaseFoldersPage(
-				@NotNull @PathParam("parentKnowledgeBaseFolderId") Long
+				@NotNull @Parameter(hidden = true)
+				@PathParam("parentKnowledgeBaseFolderId") Long
 					parentKnowledgeBaseFolderId,
 				@Context Pagination pagination)
 		throws Exception {
@@ -186,15 +210,23 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {
+			@Parameter(
+				in = ParameterIn.PATH, name = "parentKnowledgeBaseFolderId"
+			)
+		}
+	)
 	@Path(
 		"/knowledge-base-folders/{parentKnowledgeBaseFolderId}/knowledge-base-folders"
 	)
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseFolder")})
 	public KnowledgeBaseFolder postKnowledgeBaseFolderKnowledgeBaseFolder(
-			@NotNull @PathParam("parentKnowledgeBaseFolderId") Long
+			@NotNull @Parameter(hidden = true)
+			@PathParam("parentKnowledgeBaseFolderId") Long
 				parentKnowledgeBaseFolderId,
 			KnowledgeBaseFolder knowledgeBaseFolder)
 		throws Exception {
@@ -206,15 +238,16 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "siteId"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
 		}
 	)
 	@Path("/sites/{siteId}/knowledge-base-folders")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseFolder")})
 	public Page<KnowledgeBaseFolder> getSiteKnowledgeBaseFoldersPage(
-			@NotNull @PathParam("siteId") Long siteId,
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
 			@Context Pagination pagination)
 		throws Exception {
 
@@ -222,13 +255,14 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "siteId")})
 	@Path("/sites/{siteId}/knowledge-base-folders")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseFolder")})
 	public KnowledgeBaseFolder postSiteKnowledgeBaseFolder(
-			@NotNull @PathParam("siteId") Long siteId,
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
 			KnowledgeBaseFolder knowledgeBaseFolder)
 		throws Exception {
 

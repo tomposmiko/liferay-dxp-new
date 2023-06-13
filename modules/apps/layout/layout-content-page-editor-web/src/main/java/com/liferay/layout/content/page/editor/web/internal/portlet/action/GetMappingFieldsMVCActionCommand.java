@@ -21,6 +21,7 @@ import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortlet
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -73,11 +74,13 @@ public class GetMappingFieldsMVCActionCommand extends BaseMVCActionCommand {
 					classTypeId, themeDisplay.getLocale());
 
 			for (InfoDisplayField infoDisplayField : infoDisplayFields) {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-				jsonObject.put("key", infoDisplayField.getKey());
-				jsonObject.put("label", infoDisplayField.getLabel());
-				jsonObject.put("type", infoDisplayField.getType());
+				JSONObject jsonObject = JSONUtil.put(
+					"key", infoDisplayField.getKey()
+				).put(
+					"label", infoDisplayField.getLabel()
+				).put(
+					"type", infoDisplayField.getType()
+				);
 
 				jsonArray.put(jsonObject);
 			}

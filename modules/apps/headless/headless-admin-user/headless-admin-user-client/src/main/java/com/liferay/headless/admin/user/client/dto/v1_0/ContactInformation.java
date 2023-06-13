@@ -15,6 +15,9 @@
 package com.liferay.headless.admin.user.client.dto.v1_0;
 
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.user.client.serdes.v1_0.ContactInformationSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -232,5 +235,31 @@ public class ContactInformation {
 	}
 
 	protected WebUrl[] webUrls;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof ContactInformation)) {
+			return false;
+		}
+
+		ContactInformation contactInformation = (ContactInformation)object;
+
+		return Objects.equals(toString(), contactInformation.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return ContactInformationSerDes.toJSON(this);
+	}
 
 }

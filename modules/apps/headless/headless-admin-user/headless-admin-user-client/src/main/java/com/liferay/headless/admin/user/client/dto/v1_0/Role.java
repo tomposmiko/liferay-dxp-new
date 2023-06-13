@@ -15,8 +15,10 @@
 package com.liferay.headless.admin.user.client.dto.v1_0;
 
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.user.client.serdes.v1_0.RoleSerDes;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -190,5 +192,31 @@ public class Role {
 	}
 
 	protected String roleType;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Role)) {
+			return false;
+		}
+
+		Role role = (Role)object;
+
+		return Objects.equals(toString(), role.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return RoleSerDes.toJSON(this);
+	}
 
 }

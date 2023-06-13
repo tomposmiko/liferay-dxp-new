@@ -19,8 +19,10 @@ import com.liferay.data.engine.rest.client.dto.v1_0.LocalizedValue;
 import com.liferay.data.engine.rest.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -57,20 +59,20 @@ public class DataRecordCollectionSerDes {
 
 		if (dataRecordCollection.getDataDefinitionId() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dataDefinitionId\":");
+			sb.append("\"dataDefinitionId\": ");
 
 			sb.append(dataRecordCollection.getDataDefinitionId());
 		}
 
 		if (dataRecordCollection.getDescription() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("[");
 
@@ -78,8 +80,7 @@ public class DataRecordCollectionSerDes {
 				 i++) {
 
 				sb.append(
-					LocalizedValueSerDes.toJSON(
-						dataRecordCollection.getDescription()[i]));
+					String.valueOf(dataRecordCollection.getDescription()[i]));
 
 				if ((i + 1) < dataRecordCollection.getDescription().length) {
 					sb.append(", ");
@@ -91,27 +92,25 @@ public class DataRecordCollectionSerDes {
 
 		if (dataRecordCollection.getId() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(dataRecordCollection.getId());
 		}
 
 		if (dataRecordCollection.getName() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < dataRecordCollection.getName().length; i++) {
-				sb.append(
-					LocalizedValueSerDes.toJSON(
-						dataRecordCollection.getName()[i]));
+				sb.append(String.valueOf(dataRecordCollection.getName()[i]));
 
 				if ((i + 1) < dataRecordCollection.getName().length) {
 					sb.append(", ");
@@ -124,6 +123,13 @@ public class DataRecordCollectionSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		DataRecordCollectionJSONParser dataRecordCollectionJSONParser =
+			new DataRecordCollectionJSONParser();
+
+		return dataRecordCollectionJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -168,6 +174,41 @@ public class DataRecordCollectionSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class DataRecordCollectionJSONParser

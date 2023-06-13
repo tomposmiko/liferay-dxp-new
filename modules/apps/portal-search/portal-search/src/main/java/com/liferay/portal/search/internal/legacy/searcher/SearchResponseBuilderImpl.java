@@ -68,6 +68,14 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 	}
 
 	@Override
+	public SearchResponseBuilder count(long count) {
+		withSearchResponseImpl(
+			searchResponseImpl -> searchResponseImpl.setCount(count));
+
+		return this;
+	}
+
+	@Override
 	public SearchResponseBuilder federatedSearchKey(String key) {
 		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setFederatedSearchKey(

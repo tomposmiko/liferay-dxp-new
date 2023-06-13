@@ -18,6 +18,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.admin.user.client.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.client.pagination.Page;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserConstants;
@@ -31,6 +32,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -103,6 +105,21 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 	@Override
 	@Test
 	public void testGetUserAccountsPage() throws Exception {
+
+		// See LPS-94496 for why we have to delete all users except for the
+		// test user
+
+		List<User> users = UserLocalServiceUtil.getUsers(
+			PortalUtil.getDefaultCompanyId(), false,
+			WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+
+		for (User user : users) {
+			if (user.getUserId() != _testUser.getUserId()) {
+				UserLocalServiceUtil.deleteUser(user);
+			}
+		}
+
 		UserAccount userAccount1 = testGetUserAccountsPage_addUserAccount(
 			randomUserAccount());
 		UserAccount userAccount2 = testGetUserAccountsPage_addUserAccount(

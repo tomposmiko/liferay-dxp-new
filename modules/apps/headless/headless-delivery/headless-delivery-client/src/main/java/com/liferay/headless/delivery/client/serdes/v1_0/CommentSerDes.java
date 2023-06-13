@@ -21,8 +21,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -62,9 +64,9 @@ public class CommentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(CreatorSerDes.toJSON(comment.getCreator()));
+			sb.append(String.valueOf(comment.getCreator()));
 		}
 
 		if (comment.getDateCreated() != null) {
@@ -72,7 +74,7 @@ public class CommentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -86,7 +88,7 @@ public class CommentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -101,7 +103,7 @@ public class CommentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(comment.getId());
 		}
@@ -111,7 +113,7 @@ public class CommentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"numberOfComments\":");
+			sb.append("\"numberOfComments\": ");
 
 			sb.append(comment.getNumberOfComments());
 		}
@@ -121,11 +123,11 @@ public class CommentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"text\":");
+			sb.append("\"text\": ");
 
 			sb.append("\"");
 
-			sb.append(comment.getText());
+			sb.append(_escape(comment.getText()));
 
 			sb.append("\"");
 		}
@@ -133,6 +135,12 @@ public class CommentSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		CommentJSONParser commentJSONParser = new CommentJSONParser();
+
+		return commentJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Comment comment) {
@@ -149,7 +157,7 @@ public class CommentSerDes {
 			map.put("creator", null);
 		}
 		else {
-			map.put("creator", CreatorSerDes.toJSON(comment.getCreator()));
+			map.put("creator", String.valueOf(comment.getCreator()));
 		}
 
 		map.put(
@@ -184,6 +192,41 @@ public class CommentSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class CommentJSONParser extends BaseJSONParser<Comment> {

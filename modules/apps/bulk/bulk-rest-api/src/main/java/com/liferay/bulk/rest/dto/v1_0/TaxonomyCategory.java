@@ -24,7 +24,12 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -40,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "TaxonomyCategory")
 public class TaxonomyCategory {
 
+	@Schema
 	public Long getTaxonomyCategoryId() {
 		return taxonomyCategoryId;
 	}
@@ -67,6 +73,7 @@ public class TaxonomyCategory {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long taxonomyCategoryId;
 
+	@Schema
 	public String getTaxonomyCategoryName() {
 		return taxonomyCategoryName;
 	}
@@ -121,26 +128,63 @@ public class TaxonomyCategory {
 
 		sb.append("{");
 
-		sb.append("\"taxonomyCategoryId\": ");
+		if (taxonomyCategoryId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (taxonomyCategoryId == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"taxonomyCategoryId\": ");
+
 			sb.append(taxonomyCategoryId);
 		}
 
-		sb.append(", ");
+		if (taxonomyCategoryName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategoryName\": ");
+			sb.append("\"taxonomyCategoryName\": ");
 
-		if (taxonomyCategoryName == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(taxonomyCategoryName));
+
+			sb.append("\"");
 		}
-		else {
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(taxonomyCategoryName);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

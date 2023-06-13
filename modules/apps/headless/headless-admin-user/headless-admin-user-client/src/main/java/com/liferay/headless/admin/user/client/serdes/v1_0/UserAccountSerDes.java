@@ -24,8 +24,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -68,11 +70,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"additionalName\":");
+			sb.append("\"additionalName\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getAdditionalName());
+			sb.append(_escape(userAccount.getAdditionalName()));
 
 			sb.append("\"");
 		}
@@ -82,11 +84,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"alternateName\":");
+			sb.append("\"alternateName\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getAlternateName());
+			sb.append(_escape(userAccount.getAlternateName()));
 
 			sb.append("\"");
 		}
@@ -96,7 +98,7 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"birthDate\":");
+			sb.append("\"birthDate\": ");
 
 			sb.append("\"");
 
@@ -111,11 +113,9 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"contactInformation\":");
+			sb.append("\"contactInformation\": ");
 
-			sb.append(
-				ContactInformationSerDes.toJSON(
-					userAccount.getContactInformation()));
+			sb.append(String.valueOf(userAccount.getContactInformation()));
 		}
 
 		if (userAccount.getDashboardURL() != null) {
@@ -123,11 +123,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dashboardURL\":");
+			sb.append("\"dashboardURL\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getDashboardURL());
+			sb.append(_escape(userAccount.getDashboardURL()));
 
 			sb.append("\"");
 		}
@@ -137,7 +137,7 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -152,7 +152,7 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -167,11 +167,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"emailAddress\":");
+			sb.append("\"emailAddress\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getEmailAddress());
+			sb.append(_escape(userAccount.getEmailAddress()));
 
 			sb.append("\"");
 		}
@@ -181,11 +181,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"familyName\":");
+			sb.append("\"familyName\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getFamilyName());
+			sb.append(_escape(userAccount.getFamilyName()));
 
 			sb.append("\"");
 		}
@@ -195,11 +195,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"givenName\":");
+			sb.append("\"givenName\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getGivenName());
+			sb.append(_escape(userAccount.getGivenName()));
 
 			sb.append("\"");
 		}
@@ -209,11 +209,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"honorificPrefix\":");
+			sb.append("\"honorificPrefix\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getHonorificPrefix());
+			sb.append(_escape(userAccount.getHonorificPrefix()));
 
 			sb.append("\"");
 		}
@@ -223,11 +223,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"honorificSuffix\":");
+			sb.append("\"honorificSuffix\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getHonorificSuffix());
+			sb.append(_escape(userAccount.getHonorificSuffix()));
 
 			sb.append("\"");
 		}
@@ -237,7 +237,7 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(userAccount.getId());
 		}
@@ -247,11 +247,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"image\":");
+			sb.append("\"image\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getImage());
+			sb.append(_escape(userAccount.getImage()));
 
 			sb.append("\"");
 		}
@@ -261,11 +261,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"jobTitle\":");
+			sb.append("\"jobTitle\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getJobTitle());
+			sb.append(_escape(userAccount.getJobTitle()));
 
 			sb.append("\"");
 		}
@@ -275,14 +275,14 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"keywords\":");
+			sb.append("\"keywords\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < userAccount.getKeywords().length; i++) {
 				sb.append("\"");
 
-				sb.append(userAccount.getKeywords()[i]);
+				sb.append(_escape(userAccount.getKeywords()[i]));
 
 				sb.append("\"");
 
@@ -299,11 +299,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getName());
+			sb.append(_escape(userAccount.getName()));
 
 			sb.append("\"");
 		}
@@ -313,7 +313,7 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"organizationBriefs\":");
+			sb.append("\"organizationBriefs\": ");
 
 			sb.append("[");
 
@@ -321,8 +321,7 @@ public class UserAccountSerDes {
 				 i++) {
 
 				sb.append(
-					OrganizationBriefSerDes.toJSON(
-						userAccount.getOrganizationBriefs()[i]));
+					String.valueOf(userAccount.getOrganizationBriefs()[i]));
 
 				if ((i + 1) < userAccount.getOrganizationBriefs().length) {
 					sb.append(", ");
@@ -337,11 +336,11 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"profileURL\":");
+			sb.append("\"profileURL\": ");
 
 			sb.append("\"");
 
-			sb.append(userAccount.getProfileURL());
+			sb.append(_escape(userAccount.getProfileURL()));
 
 			sb.append("\"");
 		}
@@ -351,13 +350,12 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"roleBriefs\":");
+			sb.append("\"roleBriefs\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < userAccount.getRoleBriefs().length; i++) {
-				sb.append(
-					RoleBriefSerDes.toJSON(userAccount.getRoleBriefs()[i]));
+				sb.append(String.valueOf(userAccount.getRoleBriefs()[i]));
 
 				if ((i + 1) < userAccount.getRoleBriefs().length) {
 					sb.append(", ");
@@ -372,13 +370,12 @@ public class UserAccountSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"siteBriefs\":");
+			sb.append("\"siteBriefs\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < userAccount.getSiteBriefs().length; i++) {
-				sb.append(
-					SiteBriefSerDes.toJSON(userAccount.getSiteBriefs()[i]));
+				sb.append(String.valueOf(userAccount.getSiteBriefs()[i]));
 
 				if ((i + 1) < userAccount.getSiteBriefs().length) {
 					sb.append(", ");
@@ -391,6 +388,13 @@ public class UserAccountSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		UserAccountJSONParser userAccountJSONParser =
+			new UserAccountJSONParser();
+
+		return userAccountJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(UserAccount userAccount) {
@@ -431,8 +435,7 @@ public class UserAccountSerDes {
 		else {
 			map.put(
 				"contactInformation",
-				ContactInformationSerDes.toJSON(
-					userAccount.getContactInformation()));
+				String.valueOf(userAccount.getContactInformation()));
 		}
 
 		if (userAccount.getDashboardURL() == null) {
@@ -557,6 +560,41 @@ public class UserAccountSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class UserAccountJSONParser

@@ -20,8 +20,10 @@ import com.liferay.data.engine.rest.client.dto.v1_0.LocalizedValue;
 import com.liferay.data.engine.rest.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -58,10 +60,10 @@ public class DataLayoutPageSerDes {
 
 		if (dataLayoutPage.getDataLayoutRows() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dataLayoutRows\":");
+			sb.append("\"dataLayoutRows\": ");
 
 			sb.append("[");
 
@@ -69,8 +71,7 @@ public class DataLayoutPageSerDes {
 				 i++) {
 
 				sb.append(
-					DataLayoutRowSerDes.toJSON(
-						dataLayoutPage.getDataLayoutRows()[i]));
+					String.valueOf(dataLayoutPage.getDataLayoutRows()[i]));
 
 				if ((i + 1) < dataLayoutPage.getDataLayoutRows().length) {
 					sb.append(", ");
@@ -82,17 +83,15 @@ public class DataLayoutPageSerDes {
 
 		if (dataLayoutPage.getDescription() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < dataLayoutPage.getDescription().length; i++) {
-				sb.append(
-					LocalizedValueSerDes.toJSON(
-						dataLayoutPage.getDescription()[i]));
+				sb.append(String.valueOf(dataLayoutPage.getDescription()[i]));
 
 				if ((i + 1) < dataLayoutPage.getDescription().length) {
 					sb.append(", ");
@@ -104,16 +103,15 @@ public class DataLayoutPageSerDes {
 
 		if (dataLayoutPage.getTitle() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"title\":");
+			sb.append("\"title\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < dataLayoutPage.getTitle().length; i++) {
-				sb.append(
-					LocalizedValueSerDes.toJSON(dataLayoutPage.getTitle()[i]));
+				sb.append(String.valueOf(dataLayoutPage.getTitle()[i]));
 
 				if ((i + 1) < dataLayoutPage.getTitle().length) {
 					sb.append(", ");
@@ -126,6 +124,13 @@ public class DataLayoutPageSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		DataLayoutPageJSONParser dataLayoutPageJSONParser =
+			new DataLayoutPageJSONParser();
+
+		return dataLayoutPageJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(DataLayoutPage dataLayoutPage) {
@@ -160,6 +165,41 @@ public class DataLayoutPageSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class DataLayoutPageJSONParser

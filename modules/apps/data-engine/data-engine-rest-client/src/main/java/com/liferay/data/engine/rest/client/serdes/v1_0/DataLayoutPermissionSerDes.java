@@ -18,8 +18,10 @@ import com.liferay.data.engine.rest.client.dto.v1_0.DataLayoutPermission;
 import com.liferay.data.engine.rest.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -55,40 +57,40 @@ public class DataLayoutPermissionSerDes {
 
 		if (dataLayoutPermission.getAddDataLayout() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"addDataLayout\":");
+			sb.append("\"addDataLayout\": ");
 
 			sb.append(dataLayoutPermission.getAddDataLayout());
 		}
 
 		if (dataLayoutPermission.getDefinePermissions() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"definePermissions\":");
+			sb.append("\"definePermissions\": ");
 
 			sb.append(dataLayoutPermission.getDefinePermissions());
 		}
 
 		if (dataLayoutPermission.getDelete() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"delete\":");
+			sb.append("\"delete\": ");
 
 			sb.append(dataLayoutPermission.getDelete());
 		}
 
 		if (dataLayoutPermission.getRoleNames() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"roleNames\":");
+			sb.append("\"roleNames\": ");
 
 			sb.append("[");
 
@@ -97,7 +99,7 @@ public class DataLayoutPermissionSerDes {
 
 				sb.append("\"");
 
-				sb.append(dataLayoutPermission.getRoleNames()[i]);
+				sb.append(_escape(dataLayoutPermission.getRoleNames()[i]));
 
 				sb.append("\"");
 
@@ -111,20 +113,20 @@ public class DataLayoutPermissionSerDes {
 
 		if (dataLayoutPermission.getUpdate() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"update\":");
+			sb.append("\"update\": ");
 
 			sb.append(dataLayoutPermission.getUpdate());
 		}
 
 		if (dataLayoutPermission.getView() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"view\":");
+			sb.append("\"view\": ");
 
 			sb.append(dataLayoutPermission.getView());
 		}
@@ -132,6 +134,13 @@ public class DataLayoutPermissionSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		DataLayoutPermissionJSONParser dataLayoutPermissionJSONParser =
+			new DataLayoutPermissionJSONParser();
+
+		return dataLayoutPermissionJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -192,6 +201,41 @@ public class DataLayoutPermissionSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class DataLayoutPermissionJSONParser

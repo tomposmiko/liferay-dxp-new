@@ -25,11 +25,13 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.segments.criteria.Criteria;
+import com.liferay.segments.criteria.CriteriaSerializer;
 import com.liferay.segments.exception.RequiredSegmentsEntryException;
 import com.liferay.segments.exception.SegmentsEntryKeyException;
 import com.liferay.segments.model.SegmentsEntry;
@@ -77,7 +79,7 @@ public class SegmentsEntryLocalServiceTest {
 		String segmentsEntryKey = RandomTestUtil.randomString();
 		String name = RandomTestUtil.randomString();
 		String description = RandomTestUtil.randomString();
-		String criteria = RandomTestUtil.randomString();
+		String criteria = CriteriaSerializer.serialize(new Criteria());
 		String type = RandomTestUtil.randomString();
 
 		SegmentsEntry segmentsEntry = SegmentsTestUtil.addSegmentsEntry(
@@ -85,7 +87,7 @@ public class SegmentsEntryLocalServiceTest {
 			type);
 
 		Assert.assertEquals(
-			FriendlyURLNormalizerUtil.normalize(segmentsEntryKey),
+			StringUtil.toUpperCase(segmentsEntryKey.trim()),
 			segmentsEntry.getSegmentsEntryKey());
 		Assert.assertEquals(
 			name, segmentsEntry.getName(LocaleUtil.getDefault()));
@@ -288,7 +290,7 @@ public class SegmentsEntryLocalServiceTest {
 				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		Assert.assertEquals(
-			FriendlyURLNormalizerUtil.normalize(segmentsEntryKey),
+			StringUtil.toUpperCase(segmentsEntryKey.trim()),
 			updatedSegmentsEntry.getSegmentsEntryKey());
 		Assert.assertEquals(
 			nameMap.get(LocaleUtil.getDefault()),

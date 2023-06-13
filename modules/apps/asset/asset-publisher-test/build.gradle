@@ -3,6 +3,7 @@ copyLibs {
 }
 
 dependencies {
+	testIntegrationCompile group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.16"
 	testIntegrationCompile group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
 	testIntegrationCompile project(":apps:asset:asset-publisher-api")
 	testIntegrationCompile project(":apps:asset:asset-test-util")
@@ -16,5 +17,4 @@ dependencies {
 	testIntegrationCompile project(":core:petra:petra-lang")
 	testIntegrationCompile project(":core:petra:petra-string")
 	testIntegrationCompile project(":core:registry-api")
-	testIntegrationCompile project(":test:arquillian-extension-junit-bridge")
 }

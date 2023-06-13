@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -70,7 +73,7 @@ public class EmailAddress {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String emailAddress;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The email address's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -97,7 +100,7 @@ public class EmailAddress {
 	protected Long id;
 
 	@Schema(
-		description = "A flag that identifies if the email address is the main one of the UserAccount/Organization."
+		description = "A flag that indicates whether this is the main email address of the user/organization."
 	)
 	public Boolean getPrimary() {
 		return primary;
@@ -126,7 +129,7 @@ public class EmailAddress {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean primary;
 
-	@Schema(description = "The type of the email address.")
+	@Schema(description = "The email address's type.")
 	public String getType() {
 		return type;
 	}
@@ -179,50 +182,87 @@ public class EmailAddress {
 
 		sb.append("{");
 
-		sb.append("\"emailAddress\": ");
+		if (emailAddress != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (emailAddress == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"emailAddress\": ");
+
 			sb.append("\"");
-			sb.append(emailAddress);
+
+			sb.append(_escape(emailAddress));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (primary != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"primary\": ");
+			sb.append("\"primary\": ");
 
-		if (primary == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(primary);
 		}
 
-		sb.append(", ");
+		if (type != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"type\": ");
+			sb.append("\"type\": ");
 
-		if (type == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(type));
+
+			sb.append("\"");
 		}
-		else {
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(type);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

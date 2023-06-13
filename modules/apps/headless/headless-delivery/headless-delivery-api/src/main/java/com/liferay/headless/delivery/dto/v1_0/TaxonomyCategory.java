@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -43,7 +46,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class TaxonomyCategory {
 
 	@Schema(
-		description = "The id of the category, can be used to retrieve more information in the TaxonomyCategory API."
+		description = "The category's ID, which can be used to retrieve more information via the `TaxonomyCategory` API."
 	)
 	public Long getTaxonomyCategoryId() {
 		return taxonomyCategoryId;
@@ -72,7 +75,7 @@ public class TaxonomyCategory {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long taxonomyCategoryId;
 
-	@Schema(description = "The name of the TaxonomyCategory.")
+	@Schema(description = "The category's name.")
 	public String getTaxonomyCategoryName() {
 		return taxonomyCategoryName;
 	}
@@ -127,26 +130,63 @@ public class TaxonomyCategory {
 
 		sb.append("{");
 
-		sb.append("\"taxonomyCategoryId\": ");
+		if (taxonomyCategoryId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (taxonomyCategoryId == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"taxonomyCategoryId\": ");
+
 			sb.append(taxonomyCategoryId);
 		}
 
-		sb.append(", ");
+		if (taxonomyCategoryName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategoryName\": ");
+			sb.append("\"taxonomyCategoryName\": ");
 
-		if (taxonomyCategoryName == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(taxonomyCategoryName));
+
+			sb.append("\"");
 		}
-		else {
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(taxonomyCategoryName);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

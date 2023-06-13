@@ -7,10 +7,10 @@
 	{@param selectCategoriesUrl: string}
 	{@param showModal: bool}
 	{@param spritemap: string}
-	{@param? _handleCategoriesChange: any}
 	{@param? _handleFormSubmit: any}
 	{@param? _handleInputFocus: any}
 	{@param? _handleRadioChange: any}
+	{@param? _handleSelectedItemsChange: any}
 	{@param? description: string}
 	{@param? multiple: bool}
 	{@param? namespace: string}
@@ -34,9 +34,9 @@
 							{param selectCategoriesUrl: $selectCategoriesUrl /}
 							{param spritemap: $spritemap /}
 							{param vocabularies: $vocabularies /}
-							{param _handleCategoriesChange: $_handleCategoriesChange /}
 							{param _handleInputFocus: $_handleInputFocus /}
 							{param _handleRadioChange: $_handleRadioChange /}
+							{param _handleSelectedItemsChange: $_handleSelectedItemsChange /}
 						{/call}
 					{/if}
 				{/param}
@@ -79,9 +79,9 @@
 	{@param hiddenInput: string}
 	{@param selectCategoriesUrl: string}
 	{@param spritemap: string}
-	{@param? _handleCategoriesChange: any}
 	{@param? _handleInputFocus: any}
 	{@param? _handleRadioChange: any}
+	{@param? _handleSelectedItemsChange: any}
 	{@param? description: string}
 	{@param? multiple: bool}
 	{@param? namespace: string}
@@ -132,7 +132,7 @@
 			{param elementClasses: 'clay-multi-select' /}
 			{param eventName: $namespace + 'selectCategories' /}
 			{param events: [
-				'categoryIdsChange': $_handleCategoriesChange,
+				'selectedItemsChange': $_handleSelectedItemsChange,
 				'inputFocus': $_handleInputFocus
 			] /}
 			{param groupIds: $groupIds /}

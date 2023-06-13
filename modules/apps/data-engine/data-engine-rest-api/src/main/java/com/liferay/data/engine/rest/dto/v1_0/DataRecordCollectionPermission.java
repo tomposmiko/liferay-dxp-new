@@ -24,7 +24,12 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -40,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "DataRecordCollectionPermission")
 public class DataRecordCollectionPermission {
 
+	@Schema
 	public Boolean getAddDataRecord() {
 		return addDataRecord;
 	}
@@ -67,6 +73,7 @@ public class DataRecordCollectionPermission {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean addDataRecord;
 
+	@Schema
 	public Boolean getAddDataRecordCollection() {
 		return addDataRecordCollection;
 	}
@@ -96,6 +103,7 @@ public class DataRecordCollectionPermission {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean addDataRecordCollection;
 
+	@Schema
 	public Boolean getDefinePermissions() {
 		return definePermissions;
 	}
@@ -123,6 +131,7 @@ public class DataRecordCollectionPermission {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean definePermissions;
 
+	@Schema
 	public Boolean getDelete() {
 		return delete;
 	}
@@ -150,6 +159,7 @@ public class DataRecordCollectionPermission {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean delete;
 
+	@Schema
 	public Boolean getDeleteDataRecord() {
 		return deleteDataRecord;
 	}
@@ -177,6 +187,7 @@ public class DataRecordCollectionPermission {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean deleteDataRecord;
 
+	@Schema
 	public Boolean getExportDataRecord() {
 		return exportDataRecord;
 	}
@@ -204,6 +215,7 @@ public class DataRecordCollectionPermission {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean exportDataRecord;
 
+	@Schema
 	public String[] getRoleNames() {
 		return roleNames;
 	}
@@ -231,6 +243,7 @@ public class DataRecordCollectionPermission {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] roleNames;
 
+	@Schema
 	public Boolean getUpdate() {
 		return update;
 	}
@@ -258,6 +271,7 @@ public class DataRecordCollectionPermission {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean update;
 
+	@Schema
 	public Boolean getUpdateDataRecord() {
 		return updateDataRecord;
 	}
@@ -285,6 +299,7 @@ public class DataRecordCollectionPermission {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean updateDataRecord;
 
+	@Schema
 	public Boolean getView() {
 		return view;
 	}
@@ -310,6 +325,7 @@ public class DataRecordCollectionPermission {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean view;
 
+	@Schema
 	public Boolean getViewDataRecord() {
 		return viewDataRecord;
 	}
@@ -366,83 +382,80 @@ public class DataRecordCollectionPermission {
 
 		sb.append("{");
 
-		sb.append("\"addDataRecord\": ");
+		if (addDataRecord != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (addDataRecord == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"addDataRecord\": ");
+
 			sb.append(addDataRecord);
 		}
 
-		sb.append(", ");
+		if (addDataRecordCollection != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"addDataRecordCollection\": ");
+			sb.append("\"addDataRecordCollection\": ");
 
-		if (addDataRecordCollection == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(addDataRecordCollection);
 		}
 
-		sb.append(", ");
+		if (definePermissions != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"definePermissions\": ");
+			sb.append("\"definePermissions\": ");
 
-		if (definePermissions == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(definePermissions);
 		}
 
-		sb.append(", ");
+		if (delete != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"delete\": ");
+			sb.append("\"delete\": ");
 
-		if (delete == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(delete);
 		}
 
-		sb.append(", ");
+		if (deleteDataRecord != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"deleteDataRecord\": ");
+			sb.append("\"deleteDataRecord\": ");
 
-		if (deleteDataRecord == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(deleteDataRecord);
 		}
 
-		sb.append(", ");
+		if (exportDataRecord != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"exportDataRecord\": ");
+			sb.append("\"exportDataRecord\": ");
 
-		if (exportDataRecord == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(exportDataRecord);
 		}
 
-		sb.append(", ");
+		if (roleNames != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"roleNames\": ");
+			sb.append("\"roleNames\": ");
 
-		if (roleNames == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < roleNames.length; i++) {
 				sb.append("\"");
-				sb.append(roleNames[i]);
+
+				sb.append(_escape(roleNames[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < roleNames.length) {
@@ -453,48 +466,79 @@ public class DataRecordCollectionPermission {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (update != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"update\": ");
+			sb.append("\"update\": ");
 
-		if (update == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(update);
 		}
 
-		sb.append(", ");
+		if (updateDataRecord != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"updateDataRecord\": ");
+			sb.append("\"updateDataRecord\": ");
 
-		if (updateDataRecord == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(updateDataRecord);
 		}
 
-		sb.append(", ");
+		if (view != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"view\": ");
+			sb.append("\"view\": ");
 
-		if (view == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(view);
 		}
 
-		sb.append(", ");
+		if (viewDataRecord != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"viewDataRecord\": ");
+			sb.append("\"viewDataRecord\": ");
 
-		if (viewDataRecord == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(viewDataRecord);
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

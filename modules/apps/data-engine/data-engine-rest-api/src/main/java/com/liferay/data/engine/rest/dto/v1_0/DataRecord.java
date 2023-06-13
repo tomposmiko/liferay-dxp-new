@@ -24,7 +24,12 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -40,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "DataRecord")
 public class DataRecord {
 
+	@Schema
 	public Long getDataRecordCollectionId() {
 		return dataRecordCollectionId;
 	}
@@ -67,17 +73,18 @@ public class DataRecord {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long dataRecordCollectionId;
 
-	public DataRecordValue[] getDataRecordValues() {
+	@Schema
+	public Map<String, ?> getDataRecordValues() {
 		return dataRecordValues;
 	}
 
-	public void setDataRecordValues(DataRecordValue[] dataRecordValues) {
+	public void setDataRecordValues(Map<String, ?> dataRecordValues) {
 		this.dataRecordValues = dataRecordValues;
 	}
 
 	@JsonIgnore
 	public void setDataRecordValues(
-		UnsafeSupplier<DataRecordValue[], Exception>
+		UnsafeSupplier<Map<String, ?>, Exception>
 			dataRecordValuesUnsafeSupplier) {
 
 		try {
@@ -93,8 +100,9 @@ public class DataRecord {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected DataRecordValue[] dataRecordValues;
+	protected Map<String, ?> dataRecordValues;
 
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -147,45 +155,69 @@ public class DataRecord {
 
 		sb.append("{");
 
-		sb.append("\"dataRecordCollectionId\": ");
+		if (dataRecordCollectionId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (dataRecordCollectionId == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"dataRecordCollectionId\": ");
+
 			sb.append(dataRecordCollectionId);
 		}
 
-		sb.append(", ");
-
-		sb.append("\"dataRecordValues\": ");
-
-		if (dataRecordValues == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("[");
-
-			for (int i = 0; i < dataRecordValues.length; i++) {
-				sb.append(dataRecordValues[i]);
-
-				if ((i + 1) < dataRecordValues.length) {
-					sb.append(", ");
-				}
+		if (dataRecordValues != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
 			}
 
-			sb.append("]");
+			sb.append("\"dataRecordValues\": ");
+
+			sb.append(_toJSON(dataRecordValues));
 		}
 
-		sb.append(", ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(id);
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

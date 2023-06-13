@@ -22,8 +22,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -66,7 +68,7 @@ public class TaxonomyVocabularySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"assetTypes\":");
+			sb.append("\"assetTypes\": ");
 
 			sb.append("[");
 
@@ -74,8 +76,7 @@ public class TaxonomyVocabularySerDes {
 				 i++) {
 
 				sb.append(
-					AssetTypeSerDes.toJSON(
-						taxonomyVocabulary.getAssetTypes()[i]));
+					String.valueOf(taxonomyVocabulary.getAssetTypes()[i]));
 
 				if ((i + 1) < taxonomyVocabulary.getAssetTypes().length) {
 					sb.append(", ");
@@ -90,7 +91,7 @@ public class TaxonomyVocabularySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"availableLanguages\":");
+			sb.append("\"availableLanguages\": ");
 
 			sb.append("[");
 
@@ -99,7 +100,8 @@ public class TaxonomyVocabularySerDes {
 
 				sb.append("\"");
 
-				sb.append(taxonomyVocabulary.getAvailableLanguages()[i]);
+				sb.append(
+					_escape(taxonomyVocabulary.getAvailableLanguages()[i]));
 
 				sb.append("\"");
 
@@ -118,9 +120,9 @@ public class TaxonomyVocabularySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(CreatorSerDes.toJSON(taxonomyVocabulary.getCreator()));
+			sb.append(String.valueOf(taxonomyVocabulary.getCreator()));
 		}
 
 		if (taxonomyVocabulary.getDateCreated() != null) {
@@ -128,7 +130,7 @@ public class TaxonomyVocabularySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -144,7 +146,7 @@ public class TaxonomyVocabularySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -160,11 +162,11 @@ public class TaxonomyVocabularySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(taxonomyVocabulary.getDescription());
+			sb.append(_escape(taxonomyVocabulary.getDescription()));
 
 			sb.append("\"");
 		}
@@ -174,7 +176,7 @@ public class TaxonomyVocabularySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(taxonomyVocabulary.getId());
 		}
@@ -184,11 +186,11 @@ public class TaxonomyVocabularySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(taxonomyVocabulary.getName());
+			sb.append(_escape(taxonomyVocabulary.getName()));
 
 			sb.append("\"");
 		}
@@ -198,7 +200,7 @@ public class TaxonomyVocabularySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"numberOfTaxonomyCategories\":");
+			sb.append("\"numberOfTaxonomyCategories\": ");
 
 			sb.append(taxonomyVocabulary.getNumberOfTaxonomyCategories());
 		}
@@ -208,7 +210,7 @@ public class TaxonomyVocabularySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"siteId\":");
+			sb.append("\"siteId\": ");
 
 			sb.append(taxonomyVocabulary.getSiteId());
 		}
@@ -218,7 +220,7 @@ public class TaxonomyVocabularySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"viewableBy\":");
+			sb.append("\"viewableBy\": ");
 
 			sb.append("\"");
 
@@ -230,6 +232,13 @@ public class TaxonomyVocabularySerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		TaxonomyVocabularyJSONParser taxonomyVocabularyJSONParser =
+			new TaxonomyVocabularyJSONParser();
+
+		return taxonomyVocabularyJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -266,9 +275,7 @@ public class TaxonomyVocabularySerDes {
 			map.put("creator", null);
 		}
 		else {
-			map.put(
-				"creator",
-				CreatorSerDes.toJSON(taxonomyVocabulary.getCreator()));
+			map.put("creator", String.valueOf(taxonomyVocabulary.getCreator()));
 		}
 
 		map.put(
@@ -331,6 +338,41 @@ public class TaxonomyVocabularySerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class TaxonomyVocabularyJSONParser

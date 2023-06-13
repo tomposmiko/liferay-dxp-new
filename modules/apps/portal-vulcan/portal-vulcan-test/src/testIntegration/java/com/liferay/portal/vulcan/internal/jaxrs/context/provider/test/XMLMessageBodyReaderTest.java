@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.vulcan.internal.test.util.URLConnectionUtil;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
@@ -27,7 +28,6 @@ import com.liferay.registry.ServiceRegistration;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 
-import java.net.URL;
 import java.net.URLConnection;
 
 import java.util.Collections;
@@ -59,7 +59,7 @@ public class XMLMessageBodyReaderTest {
 
 		Map<String, Object> properties = new HashMap<>();
 
-		properties.put("liferay.auth.verifier", false);
+		properties.put("liferay.auth.verifier", true);
 		properties.put("liferay.oauth2", false);
 		properties.put("osgi.jaxrs.application.base", "/test-vulcan");
 		properties.put(
@@ -76,9 +76,8 @@ public class XMLMessageBodyReaderTest {
 
 	@Test
 	public void testIsReadFromXML() throws Exception {
-		URL url = new URL("http://localhost:8080/o/test-vulcan/test-class");
-
-		URLConnection urlConnection = url.openConnection();
+		URLConnection urlConnection = URLConnectionUtil.createURLConnection(
+			"http://localhost:8080/o/test-vulcan/test-class");
 
 		urlConnection.setDoOutput(true);
 		urlConnection.setRequestProperty(

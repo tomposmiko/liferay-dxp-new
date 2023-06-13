@@ -15,6 +15,9 @@
 package com.liferay.headless.admin.user.client.dto.v1_0;
 
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.user.client.serdes.v1_0.PhoneSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -127,5 +130,31 @@ public class Phone {
 	}
 
 	protected Boolean primary;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Phone)) {
+			return false;
+		}
+
+		Phone phone = (Phone)object;
+
+		return Objects.equals(toString(), phone.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return PhoneSerDes.toJSON(this);
+	}
 
 }

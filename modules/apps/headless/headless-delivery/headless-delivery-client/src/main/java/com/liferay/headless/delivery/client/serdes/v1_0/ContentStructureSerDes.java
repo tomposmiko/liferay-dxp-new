@@ -22,8 +22,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -66,7 +68,7 @@ public class ContentStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"availableLanguages\":");
+			sb.append("\"availableLanguages\": ");
 
 			sb.append("[");
 
@@ -75,7 +77,7 @@ public class ContentStructureSerDes {
 
 				sb.append("\"");
 
-				sb.append(contentStructure.getAvailableLanguages()[i]);
+				sb.append(_escape(contentStructure.getAvailableLanguages()[i]));
 
 				sb.append("\"");
 
@@ -92,7 +94,7 @@ public class ContentStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"contentStructureFields\":");
+			sb.append("\"contentStructureFields\": ");
 
 			sb.append("[");
 
@@ -100,7 +102,7 @@ public class ContentStructureSerDes {
 				 i < contentStructure.getContentStructureFields().length; i++) {
 
 				sb.append(
-					ContentStructureFieldSerDes.toJSON(
+					String.valueOf(
 						contentStructure.getContentStructureFields()[i]));
 
 				if ((i + 1) <
@@ -118,9 +120,9 @@ public class ContentStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(CreatorSerDes.toJSON(contentStructure.getCreator()));
+			sb.append(String.valueOf(contentStructure.getCreator()));
 		}
 
 		if (contentStructure.getDateCreated() != null) {
@@ -128,7 +130,7 @@ public class ContentStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -144,7 +146,7 @@ public class ContentStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -160,11 +162,11 @@ public class ContentStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(contentStructure.getDescription());
+			sb.append(_escape(contentStructure.getDescription()));
 
 			sb.append("\"");
 		}
@@ -174,7 +176,7 @@ public class ContentStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(contentStructure.getId());
 		}
@@ -184,11 +186,11 @@ public class ContentStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(contentStructure.getName());
+			sb.append(_escape(contentStructure.getName()));
 
 			sb.append("\"");
 		}
@@ -198,7 +200,7 @@ public class ContentStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"siteId\":");
+			sb.append("\"siteId\": ");
 
 			sb.append(contentStructure.getSiteId());
 		}
@@ -206,6 +208,13 @@ public class ContentStructureSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		ContentStructureJSONParser contentStructureJSONParser =
+			new ContentStructureJSONParser();
+
+		return contentStructureJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(ContentStructure contentStructure) {
@@ -240,8 +249,7 @@ public class ContentStructureSerDes {
 			map.put("creator", null);
 		}
 		else {
-			map.put(
-				"creator", CreatorSerDes.toJSON(contentStructure.getCreator()));
+			map.put("creator", String.valueOf(contentStructure.getCreator()));
 		}
 
 		map.put(
@@ -283,6 +291,41 @@ public class ContentStructureSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class ContentStructureJSONParser

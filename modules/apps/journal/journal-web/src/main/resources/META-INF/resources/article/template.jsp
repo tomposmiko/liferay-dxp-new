@@ -67,15 +67,13 @@ DDMTemplate ddmTemplate = journalEditArticleDisplayContext.getDDMTemplate();
 </c:choose>
 
 <aui:script>
-	<c:if test="<%= (article != null) && (ddmTemplate != null) %>">
+	<c:if test="<%= article != null %>">
 		<portlet:renderURL var="previewArticleContentTemplateURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 			<portlet:param name="mvcPath" value="/preview_article_content_template.jsp" />
 			<portlet:param name="groupId" value="<%= String.valueOf(article.getGroupId()) %>" />
 			<portlet:param name="articleId" value="<%= String.valueOf(article.getArticleId()) %>" />
 			<portlet:param name="version" value="<%= String.valueOf(article.getVersion()) %>" />
 		</portlet:renderURL>
-
-		var ddmTemplateKey = document.getElementById('<portlet:namespace />ddmTemplateKey');
 
 		var previewWithTemplate = document.getElementById('<portlet:namespace />previewWithTemplate');
 
@@ -85,15 +83,39 @@ DDMTemplate ddmTemplate = journalEditArticleDisplayContext.getDDMTemplate();
 				function(event) {
 					var uri = '<%= previewArticleContentTemplateURL %>';
 
-					uri = Liferay.Util.addParams('<portlet:namespace />ddmTemplateKey=' + ddmTemplateKey.value, uri)
+					<%
+					long ddmTemplateId = 0;
 
-					Liferay.Util.openWindow(
+					if (ddmTemplate != null) {
+						if (ddmTemplate.getTemplateId() == 0) {
+							ddmTemplateId = -1;
+						}
+						else {
+							ddmTemplateId = ddmTemplate.getTemplateId();
+						}
+					}
+					%>
+
+					var ddmTemplateId = '<%= ddmTemplateId %>';
+
+					if (document.<portlet:namespace />fm1.<portlet:namespace />ddmTemplateId.value != '') {
+						ddmTemplateId = document.<portlet:namespace />fm1.<portlet:namespace />ddmTemplateId.value;
+					}
+
+					uri = Liferay.Util.addParams('<portlet:namespace />ddmTemplateId=' + ddmTemplateId, uri);
+
+					Liferay.Util.selectEntity(
 						{
 							dialog: {
 								destroyOnHide: true
 							},
+							eventName: '<portlet:namespace />preview',
+							id: '<portlet:namespace />preview',
 							title: '<liferay-ui:message key="preview" />',
 							uri: uri
+						},
+						function(event) {
+							changeDDMTemplate(event.ddmtemplateid);
 						}
 					);
 				}
@@ -138,6 +160,7 @@ DDMTemplate ddmTemplate = journalEditArticleDisplayContext.getDDMTemplate();
 					{
 						dialog: {
 							constrain: true,
+							destroyOnHide: true,
 							modal: true
 						},
 						eventName: '<portlet:namespace />selectDDMTemplate',

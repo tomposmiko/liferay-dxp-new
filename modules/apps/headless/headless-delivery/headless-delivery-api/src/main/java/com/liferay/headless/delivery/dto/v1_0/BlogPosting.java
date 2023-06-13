@@ -28,8 +28,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -81,9 +87,7 @@ public class BlogPosting {
 
 	}
 
-	@Schema(
-		description = "The information of the ratings (average, number) associated to this resource."
-	)
+	@Schema(description = "The blog post's average rating.")
 	public AggregateRating getAggregateRating() {
 		return aggregateRating;
 	}
@@ -112,7 +116,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected AggregateRating aggregateRating;
 
-	@Schema(description = "The subtitle of this BlogPosting.")
+	@Schema(description = "The blog post's subtitle.")
 	public String getAlternativeHeadline() {
 		return alternativeHeadline;
 	}
@@ -140,7 +144,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String alternativeHeadline;
 
-	@Schema(description = "The article content of this BlogPosting.")
+	@Schema(description = "The blog post's body (content).")
 	public String getArticleBody() {
 		return articleBody;
 	}
@@ -169,7 +173,7 @@ public class BlogPosting {
 	@NotEmpty
 	protected String articleBody;
 
-	@Schema(description = "The creator of the BlogPosting")
+	@Schema(description = "The blog post's author.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -197,7 +201,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema(description = "The creation date of the BlogPosting.")
+	@Schema(description = "The blog post's creation date.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -225,7 +229,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(description = "The last time a field of the BlogPosting changed.")
+	@Schema(description = "The blog post's most recent modification date.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -253,7 +257,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(description = "The last date when the BlogPosting was published.")
+	@Schema(description = "The blog post's publication date.")
 	public Date getDatePublished() {
 		return datePublished;
 	}
@@ -281,7 +285,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date datePublished;
 
-	@Schema(description = "A description explaining this BlogPosting.")
+	@Schema(description = "The blog post's description.")
 	public String getDescription() {
 		return description;
 	}
@@ -309,7 +313,9 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
-	@Schema(description = "The media format of the content (html, bbcode...).")
+	@Schema(
+		description = "The blog post's media format (e.g., HTML, BBCode, etc.)."
+	)
 	public String getEncodingFormat() {
 		return encodingFormat;
 	}
@@ -337,9 +343,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String encodingFormat;
 
-	@Schema(
-		description = "A relative URL where this content will be accesible."
-	)
+	@Schema(description = "The blog post's relative URL.")
 	public String getFriendlyUrlPath() {
 		return friendlyUrlPath;
 	}
@@ -367,7 +371,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String friendlyUrlPath;
 
-	@Schema(description = "The main title of this BlogPosting.")
+	@Schema(description = "The blog post's main title.")
 	public String getHeadline() {
 		return headline;
 	}
@@ -396,7 +400,7 @@ public class BlogPosting {
 	@NotEmpty
 	protected String headline;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The blog post's identifier.")
 	public Long getId() {
 		return id;
 	}
@@ -422,7 +426,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The cover image of the BlogPosting.")
+	@Schema(description = "The blog post's cover image.")
 	public Image getImage() {
 		return image;
 	}
@@ -448,7 +452,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Image image;
 
-	@Schema(description = "A list of keywords describing the BlogPosting.")
+	@Schema(description = "A list of keywords describing the blog post.")
 	public String[] getKeywords() {
 		return keywords;
 	}
@@ -476,9 +480,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] keywords;
 
-	@Schema(
-		description = "The number of comments this BlogPosting has received."
-	)
+	@Schema(description = "The number of comments this blog post has received.")
 	public Integer getNumberOfComments() {
 		return numberOfComments;
 	}
@@ -506,8 +508,37 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfComments;
 
+	@Schema
+	public RelatedContent[] getRelatedContents() {
+		return relatedContents;
+	}
+
+	public void setRelatedContents(RelatedContent[] relatedContents) {
+		this.relatedContents = relatedContents;
+	}
+
+	@JsonIgnore
+	public void setRelatedContents(
+		UnsafeSupplier<RelatedContent[], Exception>
+			relatedContentsUnsafeSupplier) {
+
+		try {
+			relatedContents = relatedContentsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected RelatedContent[] relatedContents;
+
 	@Schema(
-		description = "The site identificator where this BlogPosting is scoped."
+		description = "The ID of the site to which this blog post is scoped."
 	)
 	public Long getSiteId() {
 		return siteId;
@@ -536,7 +567,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
-	@Schema(description = "The categories asociated with this BlogPosting.")
+	@Schema(description = "The categories associated with this blog post.")
 	public TaxonomyCategory[] getTaxonomyCategories() {
 		return taxonomyCategories;
 	}
@@ -566,7 +597,7 @@ public class BlogPosting {
 	protected TaxonomyCategory[] taxonomyCategories;
 
 	@Schema(
-		description = "A write only field to add TaxonomyCategory to this resource."
+		description = "A write-only field that adds a `TaxonomyCategory` to this resource."
 	)
 	public Long[] getTaxonomyCategoryIds() {
 		return taxonomyCategoryIds;
@@ -596,7 +627,7 @@ public class BlogPosting {
 	protected Long[] taxonomyCategoryIds;
 
 	@Schema(
-		description = "Write only property to specify the default permissions."
+		description = "A write-only property that specifies the default permissions."
 	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
@@ -661,178 +692,189 @@ public class BlogPosting {
 
 		sb.append("{");
 
-		sb.append("\"aggregateRating\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (aggregateRating == null) {
-			sb.append("null");
+		if (aggregateRating != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"aggregateRating\": ");
+
+			sb.append(String.valueOf(aggregateRating));
 		}
-		else {
-			sb.append(aggregateRating);
-		}
 
-		sb.append(", ");
+		if (alternativeHeadline != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"alternativeHeadline\": ");
+			sb.append("\"alternativeHeadline\": ");
 
-		if (alternativeHeadline == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(alternativeHeadline);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(alternativeHeadline));
 
-		sb.append("\"articleBody\": ");
-
-		if (articleBody == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(articleBody);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (articleBody != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"articleBody\": ");
 
-		if (creator == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(creator);
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dateCreated\": ");
-
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCreated);
+
+			sb.append(_escape(articleBody));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"creator\": ");
 
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
-			sb.append("\"");
+			sb.append(String.valueOf(creator));
 		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"datePublished\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (datePublished == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(datePublished);
+
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"dateModified\": ");
 
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(description);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateModified));
 
-		sb.append("\"encodingFormat\": ");
-
-		if (encodingFormat == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(encodingFormat);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (datePublished != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"friendlyUrlPath\": ");
+			sb.append("\"datePublished\": ");
 
-		if (friendlyUrlPath == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(friendlyUrlPath);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(datePublished));
 
-		sb.append("\"headline\": ");
-
-		if (headline == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(headline);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"description\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (encodingFormat != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"encodingFormat\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(encodingFormat));
+
+			sb.append("\"");
+		}
+
+		if (friendlyUrlPath != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"friendlyUrlPath\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(friendlyUrlPath));
+
+			sb.append("\"");
+		}
+
+		if (headline != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"headline\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(headline));
+
+			sb.append("\"");
+		}
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (image != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"image\": ");
+			sb.append("\"image\": ");
 
-		if (image == null) {
-			sb.append("null");
+			sb.append(String.valueOf(image));
 		}
-		else {
-			sb.append(image);
-		}
 
-		sb.append(", ");
+		if (keywords != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywords\": ");
+			sb.append("\"keywords\": ");
 
-		if (keywords == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < keywords.length; i++) {
 				sb.append("\"");
-				sb.append(keywords[i]);
+
+				sb.append(_escape(keywords[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < keywords.length) {
@@ -843,40 +885,57 @@ public class BlogPosting {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (numberOfComments != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfComments\": ");
+			sb.append("\"numberOfComments\": ");
 
-		if (numberOfComments == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfComments);
 		}
 
-		sb.append(", ");
+		if (relatedContents != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"relatedContents\": ");
 
-		if (siteId == null) {
-			sb.append("null");
+			sb.append("[");
+
+			for (int i = 0; i < relatedContents.length; i++) {
+				sb.append(String.valueOf(relatedContents[i]));
+
+				if ((i + 1) < relatedContents.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
-		else {
+
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"siteId\": ");
+
 			sb.append(siteId);
 		}
 
-		sb.append(", ");
+		if (taxonomyCategories != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategories\": ");
+			sb.append("\"taxonomyCategories\": ");
 
-		if (taxonomyCategories == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < taxonomyCategories.length; i++) {
-				sb.append(taxonomyCategories[i]);
+				sb.append(String.valueOf(taxonomyCategories[i]));
 
 				if ((i + 1) < taxonomyCategories.length) {
 					sb.append(", ");
@@ -886,14 +945,13 @@ public class BlogPosting {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (taxonomyCategoryIds != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategoryIds\": ");
+			sb.append("\"taxonomyCategoryIds\": ");
 
-		if (taxonomyCategoryIds == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < taxonomyCategoryIds.length; i++) {
@@ -907,17 +965,53 @@ public class BlogPosting {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (viewableBy != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"viewableBy\": ");
+			sb.append("\"viewableBy\": ");
 
-		if (viewableBy == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
 			sb.append(viewableBy);
+
 			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

@@ -23,9 +23,7 @@ import com.liferay.document.library.kernel.document.conversion.DocumentConversio
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
-import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
 import com.liferay.document.library.util.DLURLHelper;
-import com.liferay.document.library.web.internal.asset.DLFileEntryAssetRendererFactory;
 import com.liferay.document.library.web.internal.security.permission.resource.DLFileEntryPermission;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
@@ -38,12 +36,14 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletLayoutFinder;
 import com.liferay.portal.kernel.portlet.PortletLayoutFinderRegistryUtil;
+import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.capabilities.CommentCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -55,7 +55,6 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.asset.DLFileEntryDDMFormValuesReader;
 import com.liferay.trash.TrashHelper;
 
-import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.ActionRequest;
@@ -75,27 +74,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class DLFileEntryAssetRenderer
 	extends BaseJSPAssetRenderer<FileEntry> implements TrashRenderer {
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	public DLFileEntryAssetRenderer(
-		FileEntry fileEntry, FileVersion fileVersion) {
-
-		this(fileEntry, fileVersion, DLFileEntryLocalServiceUtil.getService());
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	public DLFileEntryAssetRenderer(
-		FileEntry fileEntry, FileVersion fileVersion,
-		DLFileEntryLocalService dlFileEntryLocalService) {
-
-		this(fileEntry, fileVersion, dlFileEntryLocalService, null, null);
-	}
 
 	public DLFileEntryAssetRenderer(
 		FileEntry fileEntry, FileVersion fileVersion,
@@ -145,15 +123,6 @@ public class DLFileEntryAssetRenderer
 		}
 
 		return null;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public Date getDisplayDate() {
-		return _fileEntry.getModifiedDate();
 	}
 
 	@Override
@@ -276,19 +245,7 @@ public class DLFileEntryAssetRenderer
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
 
-		Group group = GroupLocalServiceUtil.fetchGroup(_fileEntry.getGroupId());
-
-		if (group.isCompany()) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)liferayPortletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			group = themeDisplay.getScopeGroup();
-		}
-
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			liferayPortletRequest, group, DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
-			0, 0, PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = _getPortletURL(liferayPortletRequest);
 
 		portletURL.setParameter(
 			"mvcRenderCommandName", "/document_library/edit_file_entry");
@@ -304,9 +261,7 @@ public class DLFileEntryAssetRenderer
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			liferayPortletRequest, DLPortletKeys.DOCUMENT_LIBRARY,
-			PortletRequest.ACTION_PHASE);
+		PortletURL portletURL = _getPortletURL(liferayPortletRequest);
 
 		portletURL.setParameter(
 			ActionRequest.ACTION_NAME, "/document_library/get_file");
@@ -403,13 +358,6 @@ public class DLFileEntryAssetRenderer
 		return _fileEntry.getUuid();
 	}
 
-	public boolean hasDeletePermission(PermissionChecker permissionChecker)
-		throws PortalException {
-
-		return DLFileEntryPermission.contains(
-			permissionChecker, _fileEntry.getFileEntryId(), ActionKeys.DELETE);
-	}
-
 	@Override
 	public boolean hasEditPermission(PermissionChecker permissionChecker)
 		throws PortalException {
@@ -499,6 +447,35 @@ public class DLFileEntryAssetRenderer
 			assetDisplayPageFriendlyURLProvider;
 	}
 
+	private PortletURL _getPortletURL(
+			LiferayPortletRequest liferayPortletRequest)
+		throws PortalException {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)liferayPortletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		Group group = GroupLocalServiceUtil.fetchGroup(_fileEntry.getGroupId());
+
+		if (group.isCompany()) {
+			group = themeDisplay.getScopeGroup();
+		}
+
+		if (PortletPermissionUtil.hasControlPanelAccessPermission(
+				themeDisplay.getPermissionChecker(), group.getGroupId(),
+				DLPortletKeys.DOCUMENT_LIBRARY_ADMIN)) {
+
+			return PortalUtil.getControlPanelPortletURL(
+				liferayPortletRequest, group,
+				DLPortletKeys.DOCUMENT_LIBRARY_ADMIN, 0, 0,
+				PortletRequest.RENDER_PHASE);
+		}
+
+		return PortletURLFactoryUtil.create(
+			liferayPortletRequest, DLPortletKeys.DOCUMENT_LIBRARY,
+			PortletRequest.RENDER_PHASE);
+	}
+
 	private boolean _hasViewInContextGroupLayout(
 		ThemeDisplay themeDisplay, long groupId) {
 
@@ -531,7 +508,7 @@ public class DLFileEntryAssetRenderer
 	private AssetDisplayPageFriendlyURLProvider
 		_assetDisplayPageFriendlyURLProvider;
 	private final DLFileEntryLocalService _dlFileEntryLocalService;
-	private DLURLHelper _dlURLHelper;
+	private final DLURLHelper _dlURLHelper;
 	private final FileEntry _fileEntry;
 	private FileVersion _fileVersion;
 	private final TrashHelper _trashHelper;

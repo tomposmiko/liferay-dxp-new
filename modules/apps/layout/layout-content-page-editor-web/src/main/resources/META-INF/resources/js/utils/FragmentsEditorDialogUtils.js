@@ -1,3 +1,12 @@
+import {UPDATE_LAST_SAVE_DATE} from '../actions/actions.es';
+
+/**
+ * @private
+ * @review
+ * @type {null|{detach: Function}}
+ */
+let _widgetConfigurationChangeHandler = null;
+
 /**
  * Possible types that can be returned by the image selector
  */
@@ -113,4 +122,53 @@ function openImageSelector(
 	);
 }
 
-export {openAssetBrowser, openImageSelector};
+/**
+ * @param {{dispatch: Function}} store
+ * @review
+ */
+function startListeningWidgetConfigurationChange(store) {
+	stopListeningWidgetConfigurationChange();
+
+	let submitFormHandler = null;
+
+	_widgetConfigurationChangeHandler = Liferay.after(
+		'popupReady',
+		event => {
+			if (submitFormHandler) {
+				submitFormHandler.detach();
+
+				submitFormHandler = null;
+			}
+
+			submitFormHandler = event.win.Liferay.on(
+				'submitForm',
+				() => {
+					store.dispatch(
+						{
+							lastSaveDate: new Date(),
+							type: UPDATE_LAST_SAVE_DATE
+						}
+					);
+				}
+			);
+		}
+	);
+}
+
+/**
+ * @review
+ */
+function stopListeningWidgetConfigurationChange() {
+	if (_widgetConfigurationChangeHandler) {
+		_widgetConfigurationChangeHandler.detach();
+
+		_widgetConfigurationChangeHandler = null;
+	}
+}
+
+export {
+	openAssetBrowser,
+	openImageSelector,
+	startListeningWidgetConfigurationChange,
+	stopListeningWidgetConfigurationChange
+};

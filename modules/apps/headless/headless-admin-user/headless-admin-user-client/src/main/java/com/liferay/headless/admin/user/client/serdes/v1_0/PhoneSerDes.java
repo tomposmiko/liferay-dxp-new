@@ -18,8 +18,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.Phone;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -56,11 +58,11 @@ public class PhoneSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"extension\":");
+			sb.append("\"extension\": ");
 
 			sb.append("\"");
 
-			sb.append(phone.getExtension());
+			sb.append(_escape(phone.getExtension()));
 
 			sb.append("\"");
 		}
@@ -70,7 +72,7 @@ public class PhoneSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(phone.getId());
 		}
@@ -80,11 +82,11 @@ public class PhoneSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"phoneNumber\":");
+			sb.append("\"phoneNumber\": ");
 
 			sb.append("\"");
 
-			sb.append(phone.getPhoneNumber());
+			sb.append(_escape(phone.getPhoneNumber()));
 
 			sb.append("\"");
 		}
@@ -94,11 +96,11 @@ public class PhoneSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"phoneType\":");
+			sb.append("\"phoneType\": ");
 
 			sb.append("\"");
 
-			sb.append(phone.getPhoneType());
+			sb.append(_escape(phone.getPhoneType()));
 
 			sb.append("\"");
 		}
@@ -108,7 +110,7 @@ public class PhoneSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"primary\":");
+			sb.append("\"primary\": ");
 
 			sb.append(phone.getPrimary());
 		}
@@ -116,6 +118,12 @@ public class PhoneSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		PhoneJSONParser phoneJSONParser = new PhoneJSONParser();
+
+		return phoneJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Phone phone) {
@@ -161,6 +169,41 @@ public class PhoneSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class PhoneJSONParser extends BaseJSONParser<Phone> {

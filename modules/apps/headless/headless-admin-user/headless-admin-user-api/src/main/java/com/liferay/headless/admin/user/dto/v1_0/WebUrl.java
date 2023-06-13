@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "WebUrl")
 public class WebUrl {
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The URL's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -68,7 +71,7 @@ public class WebUrl {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "An absolute URL.")
+	@Schema(description = "The absolute URL.")
 	public String getUrl() {
 		return url;
 	}
@@ -94,7 +97,7 @@ public class WebUrl {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String url;
 
-	@Schema(description = "The type of the URL.")
+	@Schema(description = "The URL's type.")
 	public String getUrlType() {
 		return urlType;
 	}
@@ -149,39 +152,77 @@ public class WebUrl {
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (url != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"url\": ");
+			sb.append("\"url\": ");
 
-		if (url == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(url));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (urlType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"urlType\": ");
+
 			sb.append("\"");
-			sb.append(url);
+
+			sb.append(_escape(urlType));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		sb.append("}");
 
-		sb.append("\"urlType\": ");
+		return sb.toString();
+	}
 
-		if (urlType == null) {
-			sb.append("null");
-		}
-		else {
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(urlType);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

@@ -25,15 +25,16 @@ String label = (String)request.getAttribute("liferay-product-navigation:personal
 
 <style type="text/css">
 	#clay_dropdown_portal .dropdown-menu-personal-menu {
-		max-height: fit-content;
+		max-height: none;
 	}
 
 	#clay_dropdown_portal .dropdown-menu-personal-menu .dropdown-item-indicator {
 		padding-right: 0.5rem;
 	}
 
-	div.personal-menu-dropdown .btn:focus {
-		box-shadow: none;
+	div.personal-menu-dropdown .btn {
+		border-radius: 5000px;
+		border-width: medium;
 	}
 
 	div.personal-menu-dropdown .dropdown-item {
@@ -42,9 +43,9 @@ String label = (String)request.getAttribute("liferay-product-navigation:personal
 </style>
 
 <div class="personal-menu-dropdown" id="<%= namespace + "personal_menu_dropdown" %>">
-	<div id="<%= namespace + "personal_menu_dropdown_toggle" %>" style="cursor: pointer;">
+	<button aria-expanded="true" aria-haspopup="true" class="btn btn-unstyled dropdown-toggle" id="<%= namespace + "personal_menu_dropdown_toggle" %>" ref="triggerButton" type="button">
 		<%= label %>
-	</div>
+	</button>
 </div>
 
 <%
@@ -55,7 +56,7 @@ resourceURL.setParameter("portletId", themeDisplay.getPpid());
 resourceURL.setResourceID("/get_personal_menu_items");
 %>
 
-<aui:script require="clay-dropdown/src/ClayDropdown as ClayDropdown,metal-dom/src/dom as dom">
+<aui:script require="clay-dropdown/src/ClayDropdown as ClayDropdown,metal-dom/src/dom as dom, metal-position/src/Position">
 	var toggle = document.getElementById('<%= namespace + "personal_menu_dropdown_toggle" %>');
 
 	if (toggle) {
@@ -84,7 +85,28 @@ resourceURL.setResourceID("/get_personal_menu_items");
 											this.expanded = true;
 										}
 
+										var toggleButton = this.element.querySelector('button');
+
+										toggleButton.focus();
+
 										var dropdown = this;
+
+										this.refs.dropdown.refs.portal.on(
+											'menuExpanded',
+											function(event) {
+												var Position = metalPositionSrcPosition.default;
+
+												var menu = this.element;
+												var menuRegion = Position.getRegion(menu);
+
+												if (menuRegion.top < 0) {
+													var body = document.querySelector('body');
+													var bodyRegion = Position.getRegion(body);
+
+													menu.style.top = bodyRegion.top + 'px';
+												}
+											}
+										);
 
 										this.refs.dropdown.refs.portal.on(
 											'rendered',
@@ -92,6 +114,8 @@ resourceURL.setResourceID("/get_personal_menu_items");
 												if (dropdown.expanded) {
 													this.element.classList.add('dropdown-menu-personal-menu');
 													this.element.classList.remove('dropdown-menu-indicator-start');
+
+													this.emit('menuExpanded', event);
 												}
 											}
 										);

@@ -141,16 +141,10 @@ public class JournalContentDisplayContext {
 			return _article;
 		}
 
-		long previewArticleId = ParamUtil.getLong(
-			_portletRequest, "previewArticleId");
-
-		if (previewArticleId > 0) {
-			_article = JournalArticleLocalServiceUtil.fetchArticle(
-				previewArticleId);
-		}
-
 		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		_article = _getArticleByPreviewAssetEntryId();
 
 		if ((_article != null) &&
 			JournalArticlePermission.contains(
@@ -800,17 +794,7 @@ public class JournalContentDisplayContext {
 			return _preview;
 		}
 
-		long previewArticleId = ParamUtil.getLong(
-			_portletRequest, "previewArticleId");
-
-		if (previewArticleId <= 0) {
-			_preview = false;
-
-			return _preview;
-		}
-
-		JournalArticle article = JournalArticleLocalServiceUtil.fetchArticle(
-			previewArticleId);
+		JournalArticle article = _getArticleByPreviewAssetEntryId();
 
 		if (article == null) {
 			_preview = false;
@@ -989,6 +973,44 @@ public class JournalContentDisplayContext {
 			portletRequest.setAttribute(
 				WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
 		}
+	}
+
+	private JournalArticle _getArticleByPreviewAssetEntryId() {
+		long previewAssetEntryId = ParamUtil.getLong(
+			_portletRequest, "previewAssetEntryId");
+
+		if (previewAssetEntryId <= 0) {
+			return null;
+		}
+
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+			previewAssetEntryId);
+
+		if (assetEntry == null) {
+			return null;
+		}
+
+		AssetRendererFactory<?> assetRendererFactory =
+			assetEntry.getAssetRendererFactory();
+
+		if (assetRendererFactory == null) {
+			return null;
+		}
+
+		int previewAssetEntryType = ParamUtil.getInteger(
+			_portletRequest, "previewAssetEntryType",
+			AssetRendererFactory.TYPE_LATEST_APPROVED);
+
+		try {
+			AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(
+				assetEntry.getClassPK(), previewAssetEntryType);
+
+			return (JournalArticle)assetRenderer.getAssetObject();
+		}
+		catch (Exception e) {
+		}
+
+		return null;
 	}
 
 	private DDMTemplate _getDDMTemplate(String ddmTemplateKey)

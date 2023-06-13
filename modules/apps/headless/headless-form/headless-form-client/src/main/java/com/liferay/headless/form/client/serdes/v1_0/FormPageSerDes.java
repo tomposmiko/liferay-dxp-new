@@ -19,8 +19,10 @@ import com.liferay.headless.form.client.dto.v1_0.FormPage;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -58,12 +60,12 @@ public class FormPageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"fields\":");
+			sb.append("\"fields\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < formPage.getFields().length; i++) {
-				sb.append(FieldSerDes.toJSON(formPage.getFields()[i]));
+				sb.append(String.valueOf(formPage.getFields()[i]));
 
 				if ((i + 1) < formPage.getFields().length) {
 					sb.append(", ");
@@ -78,11 +80,11 @@ public class FormPageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"headline\":");
+			sb.append("\"headline\": ");
 
 			sb.append("\"");
 
-			sb.append(formPage.getHeadline());
+			sb.append(_escape(formPage.getHeadline()));
 
 			sb.append("\"");
 		}
@@ -92,7 +94,7 @@ public class FormPageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(formPage.getId());
 		}
@@ -102,11 +104,11 @@ public class FormPageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"text\":");
+			sb.append("\"text\": ");
 
 			sb.append("\"");
 
-			sb.append(formPage.getText());
+			sb.append(_escape(formPage.getText()));
 
 			sb.append("\"");
 		}
@@ -114,6 +116,12 @@ public class FormPageSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		FormPageJSONParser formPageJSONParser = new FormPageJSONParser();
+
+		return formPageJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(FormPage formPage) {
@@ -152,6 +160,41 @@ public class FormPageSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class FormPageJSONParser extends BaseJSONParser<FormPage> {

@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -43,7 +46,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class HoursAvailable {
 
 	@Schema(
-		description = "An hour in HH:MM format that marks when the Organization closes."
+		description = "The organization's closing time (in `HH:MM` format)."
 	)
 	public String getCloses() {
 		return closes;
@@ -100,34 +103,8 @@ public class HoursAvailable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String dayOfWeek;
 
-	@Schema(description = "The identifier of the resource.")
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	@JsonIgnore
-	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
-		try {
-			id = idUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Long id;
-
 	@Schema(
-		description = "An hour in HH:MM format that marks when the Organization opens."
+		description = "The organization's opening time (in `HH:MM` format)."
 	)
 	public String getOpens() {
 		return opens;
@@ -183,52 +160,81 @@ public class HoursAvailable {
 
 		sb.append("{");
 
-		sb.append("\"closes\": ");
+		if (closes != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (closes == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"closes\": ");
+
 			sb.append("\"");
-			sb.append(closes);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(closes));
 
-		sb.append("\"dayOfWeek\": ");
-
-		if (dayOfWeek == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dayOfWeek);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dayOfWeek != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"dayOfWeek\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(id);
-		}
-
-		sb.append(", ");
-
-		sb.append("\"opens\": ");
-
-		if (opens == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(opens);
+
+			sb.append(_escape(dayOfWeek));
+
 			sb.append("\"");
+		}
+
+		if (opens != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"opens\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(opens));
+
+			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

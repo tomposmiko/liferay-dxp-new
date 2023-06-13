@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -43,7 +46,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Service {
 
 	@Schema(
-		description = "A list of hours when the organization is open. Follows https://www.schema.org/OpeningHoursSpecification specification."
+		description = "A list of hours when the organization is open. This follows the [`OpeningHoursSpecification`](https://www.schema.org/OpeningHoursSpecification) specification."
 	)
 	public HoursAvailable[] getHoursAvailable() {
 		return hoursAvailable;
@@ -73,33 +76,7 @@ public class Service {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected HoursAvailable[] hoursAvailable;
 
-	@Schema(description = "The identifier of the resource.")
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	@JsonIgnore
-	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
-		try {
-			id = idUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Long id;
-
-	@Schema(description = "The type of the service provided.")
+	@Schema(description = "The type of service the organization provides.")
 	public String getServiceType() {
 		return serviceType;
 	}
@@ -154,16 +131,17 @@ public class Service {
 
 		sb.append("{");
 
-		sb.append("\"hoursAvailable\": ");
+		if (hoursAvailable != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (hoursAvailable == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"hoursAvailable\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < hoursAvailable.length; i++) {
-				sb.append(hoursAvailable[i]);
+				sb.append(String.valueOf(hoursAvailable[i]));
 
 				if ((i + 1) < hoursAvailable.length) {
 					sb.append(", ");
@@ -173,28 +151,53 @@ public class Service {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (serviceType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"serviceType\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(id);
-		}
-
-		sb.append(", ");
-
-		sb.append("\"serviceType\": ");
-
-		if (serviceType == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(serviceType);
+
+			sb.append(_escape(serviceType));
+
 			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

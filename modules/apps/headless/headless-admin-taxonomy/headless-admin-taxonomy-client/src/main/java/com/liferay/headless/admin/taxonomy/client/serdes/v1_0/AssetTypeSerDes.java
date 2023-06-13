@@ -18,8 +18,10 @@ import com.liferay.headless.admin.taxonomy.client.dto.v1_0.AssetType;
 import com.liferay.headless.admin.taxonomy.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -56,7 +58,7 @@ public class AssetTypeSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"required\":");
+			sb.append("\"required\": ");
 
 			sb.append(assetType.getRequired());
 		}
@@ -66,11 +68,11 @@ public class AssetTypeSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"subtype\":");
+			sb.append("\"subtype\": ");
 
 			sb.append("\"");
 
-			sb.append(assetType.getSubtype());
+			sb.append(_escape(assetType.getSubtype()));
 
 			sb.append("\"");
 		}
@@ -80,11 +82,11 @@ public class AssetTypeSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"type\":");
+			sb.append("\"type\": ");
 
 			sb.append("\"");
 
-			sb.append(assetType.getType());
+			sb.append(_escape(assetType.getType()));
 
 			sb.append("\"");
 		}
@@ -92,6 +94,12 @@ public class AssetTypeSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		AssetTypeJSONParser assetTypeJSONParser = new AssetTypeJSONParser();
+
+		return assetTypeJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(AssetType assetType) {
@@ -123,6 +131,41 @@ public class AssetTypeSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class AssetTypeJSONParser extends BaseJSONParser<AssetType> {

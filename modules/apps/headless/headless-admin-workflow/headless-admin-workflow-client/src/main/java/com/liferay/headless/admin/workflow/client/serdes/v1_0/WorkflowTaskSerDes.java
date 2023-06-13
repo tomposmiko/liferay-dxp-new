@@ -21,8 +21,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -64,7 +66,7 @@ public class WorkflowTaskSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"completed\":");
+			sb.append("\"completed\": ");
 
 			sb.append(workflowTask.getCompleted());
 		}
@@ -74,7 +76,7 @@ public class WorkflowTaskSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCompleted\":");
+			sb.append("\"dateCompleted\": ");
 
 			sb.append("\"");
 
@@ -90,7 +92,7 @@ public class WorkflowTaskSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -105,11 +107,11 @@ public class WorkflowTaskSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"definitionName\":");
+			sb.append("\"definitionName\": ");
 
 			sb.append("\"");
 
-			sb.append(workflowTask.getDefinitionName());
+			sb.append(_escape(workflowTask.getDefinitionName()));
 
 			sb.append("\"");
 		}
@@ -119,11 +121,11 @@ public class WorkflowTaskSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(workflowTask.getDescription());
+			sb.append(_escape(workflowTask.getDescription()));
 
 			sb.append("\"");
 		}
@@ -133,7 +135,7 @@ public class WorkflowTaskSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dueDate\":");
+			sb.append("\"dueDate\": ");
 
 			sb.append("\"");
 
@@ -148,7 +150,7 @@ public class WorkflowTaskSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(workflowTask.getId());
 		}
@@ -158,11 +160,11 @@ public class WorkflowTaskSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(workflowTask.getName());
+			sb.append(_escape(workflowTask.getName()));
 
 			sb.append("\"");
 		}
@@ -172,10 +174,9 @@ public class WorkflowTaskSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"objectReviewed\":");
+			sb.append("\"objectReviewed\": ");
 
-			sb.append(
-				ObjectReviewedSerDes.toJSON(workflowTask.getObjectReviewed()));
+			sb.append(String.valueOf(workflowTask.getObjectReviewed()));
 		}
 
 		if (workflowTask.getTransitions() != null) {
@@ -183,14 +184,14 @@ public class WorkflowTaskSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"transitions\":");
+			sb.append("\"transitions\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < workflowTask.getTransitions().length; i++) {
 				sb.append("\"");
 
-				sb.append(workflowTask.getTransitions()[i]);
+				sb.append(_escape(workflowTask.getTransitions()[i]));
 
 				sb.append("\"");
 
@@ -205,6 +206,13 @@ public class WorkflowTaskSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		WorkflowTaskJSONParser workflowTaskJSONParser =
+			new WorkflowTaskJSONParser();
+
+		return workflowTaskJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(WorkflowTask workflowTask) {
@@ -273,7 +281,7 @@ public class WorkflowTaskSerDes {
 		else {
 			map.put(
 				"objectReviewed",
-				ObjectReviewedSerDes.toJSON(workflowTask.getObjectReviewed()));
+				String.valueOf(workflowTask.getObjectReviewed()));
 		}
 
 		if (workflowTask.getTransitions() == null) {
@@ -285,6 +293,41 @@ public class WorkflowTaskSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class WorkflowTaskJSONParser

@@ -24,7 +24,12 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -40,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "KeywordBulkSelection")
 public class KeywordBulkSelection {
 
+	@Schema
 	public DocumentBulkSelection getDocumentBulkSelection() {
 		return documentBulkSelection;
 	}
@@ -70,6 +76,7 @@ public class KeywordBulkSelection {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected DocumentBulkSelection documentBulkSelection;
 
+	@Schema
 	public String[] getKeywordsToAdd() {
 		return keywordsToAdd;
 	}
@@ -97,6 +104,7 @@ public class KeywordBulkSelection {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] keywordsToAdd;
 
+	@Schema
 	public String[] getKeywordsToRemove() {
 		return keywordsToRemove;
 	}
@@ -152,28 +160,30 @@ public class KeywordBulkSelection {
 
 		sb.append("{");
 
-		sb.append("\"documentBulkSelection\": ");
+		if (documentBulkSelection != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (documentBulkSelection == null) {
-			sb.append("null");
+			sb.append("\"documentBulkSelection\": ");
+
+			sb.append(String.valueOf(documentBulkSelection));
 		}
-		else {
-			sb.append(documentBulkSelection);
-		}
 
-		sb.append(", ");
+		if (keywordsToAdd != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywordsToAdd\": ");
+			sb.append("\"keywordsToAdd\": ");
 
-		if (keywordsToAdd == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < keywordsToAdd.length; i++) {
 				sb.append("\"");
-				sb.append(keywordsToAdd[i]);
+
+				sb.append(_escape(keywordsToAdd[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < keywordsToAdd.length) {
@@ -184,19 +194,20 @@ public class KeywordBulkSelection {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (keywordsToRemove != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywordsToRemove\": ");
+			sb.append("\"keywordsToRemove\": ");
 
-		if (keywordsToRemove == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < keywordsToRemove.length; i++) {
 				sb.append("\"");
-				sb.append(keywordsToRemove[i]);
+
+				sb.append(_escape(keywordsToRemove[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < keywordsToRemove.length) {
@@ -205,6 +216,41 @@ public class KeywordBulkSelection {
 			}
 
 			sb.append("]");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

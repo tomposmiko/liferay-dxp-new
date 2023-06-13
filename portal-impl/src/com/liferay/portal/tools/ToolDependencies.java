@@ -278,6 +278,14 @@ public class ToolDependencies {
 			return _portalCacheName;
 		}
 
+		public boolean isBlocking() {
+			return false;
+		}
+
+		public boolean isMVCC() {
+			return false;
+		}
+
 		@Override
 		public void put(K key, V value) {
 			put(key, value, DEFAULT_TIME_TO_LIVE);
@@ -379,6 +387,10 @@ public class ToolDependencies {
 		@Override
 		public void destroy() {
 			_portalCaches.clear();
+		}
+
+		public PortalCache<K, V> fetchPortalCache(String portalCacheName) {
+			return _portalCaches.get(portalCacheName);
 		}
 
 		@Override

@@ -1401,6 +1401,12 @@ war.path=${app.server.portal.dir}/</echo>
 							value="liferay.home=${test.app.server.parent.dir}"
 						/>
 
+						<replace
+							file="${test.app.server.classes.portal.dir}/portal-ext.properties"
+							token="web.server.http.port=8080"
+							value="web.server.http.port=${test.app.server.leading.port.number}080"
+						/>
+
 						<math
 							datatype="int"
 							operand1="${app.server.bundle.index}"
@@ -1691,7 +1697,7 @@ server.detector.server.id=tomcat</echo>
 					<equals arg1="${app.server.type}" arg2="weblogic" />
 					<then>
 						<echo file="${liferay.home}/tools/portal-tools-db-upgrade-client/app-server.properties">dir=${app.server.dir}
-extra.lib.dirs=domains/liferay/bin,wlserver/server/lib,domains/liferay/autodeploy/ROOT/WEB-INF/lib
+extra.lib.dirs=wlserver/modules
 global.lib.dir=domains/liferay/lib
 portal.dir=domains/liferay/autodeploy/ROOT
 server.detector.server.id=weblogic</echo>
@@ -3931,6 +3937,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 						app.server.bin.dir="${app.server.tcat.admin.bin.dir}"
 						app.server.bundle.index="@{app.server.bundle.index}"
 						delete.liferay.home="@{delete.liferay.home}"
+						test.docker.environment="${test.docker.environment}"
 						testable.portal.started.marker.file="@{testable.portal.started.marker.file}"
 					/>
 
@@ -3938,6 +3945,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 						app.server.bin.dir="${app.server.tcat.agent.bin.dir}"
 						app.server.bundle.index="@{app.server.bundle.index}"
 						delete.liferay.home="@{delete.liferay.home}"
+						test.docker.environment="${test.docker.environment}"
 						testable.portal.started.marker.file="@{testable.portal.started.marker.file}"
 					/>
 				</then>
@@ -3945,6 +3953,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					<start-app-server-cmd
 						app.server.bundle.index="@{app.server.bundle.index}"
 						delete.liferay.home="@{delete.liferay.home}"
+						test.docker.environment="${test.docker.environment}"
 						testable.portal.started.marker.file="@{testable.portal.started.marker.file}"
 					/>
 				</else>
@@ -3956,6 +3965,8 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 		<attribute default="${app.server.bin.dir}" name="app.server.bin.dir" />
 		<attribute default="0" name="app.server.bundle.index" />
 		<attribute default="true" name="delete.liferay.home" />
+		<attribute default="host" name="docker.network.name" />
+		<attribute default="false" name="test.docker.environment" />
 		<attribute default="" name="testable.portal.started.marker.file" />
 
 		<sequential>
@@ -4042,10 +4053,30 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					<if>
 						<equals arg1="${test.ant.launched.by.selenium}" arg2="true" />
 						<then>
-							<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
-								<arg line="${app.server.start.executable.arg.line}" />
-								<env key="JAVA_HOME" path="${java.jdk.home}" />
-							</exec>
+							<if>
+								<istrue value="${test.docker.environment}" />
+								<then>
+									<echo>docker run -d -p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080 -v ${app.server.parent.dir}:${app.server.parent.dir} --cidfile=docker.process.pid --network=@{docker.network.name} openjdk:8-alpine ${app.server.bin.dir}/${app.server.start.executable} ${app.server.start.executable.arg.line}</echo>
+
+									<exec executable="docker">
+										<arg line="run -d" />
+										<arg line="-p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080" />
+										<arg value="-v" />
+										<arg value="${app.server.parent.dir}:${app.server.parent.dir}" />
+										<arg value="--cidfile=docker.process.pid" />
+										<arg value="--network=@{docker.network.name}" />
+										<arg value="openjdk:8u191-jdk-alpine3.8" />
+										<arg value="${app.server.bin.dir}/${app.server.start.executable}" />
+										<arg value="${app.server.start.executable.arg.line}" />
+									</exec>
+								</then>
+								<else>
+									<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
+										<arg line="${app.server.start.executable.arg.line}" />
+										<env key="JAVA_HOME" path="${java.jdk.home}" />
+									</exec>
+								</else>
+							</if>
 
 							<wait-for-app-server app.server.bin.dir="@{app.server.bin.dir}" app.server.bundle.index="@{app.server.bundle.index}" />
 						</then>
@@ -4065,10 +4096,30 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 								</if>
 
 								<daemons>
-									<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" failonerror="true" resolveexecutable="true">
-										<arg line="${app.server.start.executable.arg.line}" />
-										<env key="JAVA_HOME" path="${java.jdk.home}" />
-									</exec>
+									<if>
+										<istrue value="${test.docker.environment}" />
+										<then>
+											<echo>docker run -d -p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080 -v ${app.server.parent.dir}:${app.server.parent.dir} --cidfile=docker.process.pid --network=@{docker.network.name} openjdk:8-alpine ${app.server.bin.dir}/${app.server.start.executable} ${app.server.start.executable.arg.line}</echo>
+
+											<exec executable="docker">
+												<arg line="run -d" />
+												<arg line="-p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080" />
+												<arg value="-v" />
+												<arg value="${app.server.parent.dir}:${app.server.parent.dir}" />
+												<arg value="--cidfile=docker.process.pid" />
+												<arg value="--network=@{docker.network.name}" />
+												<arg value="openjdk:8u191-jdk-alpine3.8" />
+												<arg value="${app.server.bin.dir}/${app.server.start.executable}" />
+												<arg value="${app.server.start.executable.arg.line}" />
+											</exec>
+										</then>
+										<else>
+											<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" failonerror="true" resolveexecutable="true">
+												<arg line="${app.server.start.executable.arg.line}" />
+												<env key="JAVA_HOME" path="${java.jdk.home}" />
+											</exec>
+										</else>
+									</if>
 								</daemons>
 							</parallel>
 						</else>
@@ -4202,6 +4253,15 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 						app.server.explicit.stop.count="@{app.server.explicit.stop.count}"
 					/>
 				</then>
+				<elseif>
+					<istrue value="${test.docker.environment}" />
+					<then>
+						<stop-app-server-docker-cmd
+							app.server.bundle.index="@{app.server.bundle.index}"
+							app.server.explicit.stop.count="@{app.server.explicit.stop.count}"
+						/>
+					</then>
+				</elseif>
 				<else>
 					<stop-app-server-cmd
 						app.server.bundle.index="@{app.server.bundle.index}"
@@ -4384,6 +4444,34 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					</if>
 				</sequential>
 			</parallel>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="stop-app-server-docker-cmd">
+		<attribute default="${app.server.bin.dir}" name="app.server.bin.dir" />
+		<attribute default="0" name="app.server.bundle.index" />
+		<attribute default="0" name="app.server.explicit.stop.count" />
+
+		<sequential>
+			<set-app-server-properties
+				app.server.bin.dir="@{app.server.bin.dir}"
+				app.server.bundle.index="@{app.server.bundle.index}"
+			/>
+
+			<loadfile
+				property="docker.process.pid"
+				srcfile="docker.process.pid"
+			/>
+
+			<exec executable="docker">
+				<arg line="container stop ${docker.process.pid}" />
+			</exec>
+
+			<exec executable="docker">
+				<arg line="container rm ${docker.process.pid}" />
+			</exec>
+
+			<delete file="docker.process.pid" />
 		</sequential>
 	</macrodef>
 
@@ -7319,7 +7407,9 @@ memory.scheduler.org.quartz.threadPool.threadCount=1
 
 persisted.scheduler.org.quartz.threadPool.threadCount=1
 
-virtual.hosts.default.site.name=</echo>
+virtual.hosts.default.site.name=
+
+web.server.http.port=8080</echo>
 
 		<if>
 			<equals arg1="${database.type}" arg2="oracle" />
@@ -9750,35 +9840,24 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 							<equals arg1="${database.type}" arg2="mysql" />
 						</or>
 						<then>
-							<var name="arg.line" unset="true" />
+							<var name="arg.line" value="" />
 
+							<get-database-property property.name="database.host" />
 							<get-database-property property.name="database.password" />
 							<get-database-property property.name="database.username" />
 
-							<if>
+							<local name="mysql.host" />
+
+							<condition else="" property="mysql.host" value="127.0.0.1">
 								<and>
-									<equals arg1="${database.password}" arg2="" />
-									<equals arg1="${database.username}" arg2="" />
+									<equals arg1="${database.host}" arg2="localhost" />
+									<istrue value="${test.docker.environment}" />
 								</and>
-								<then>
-									<var name="arg.line" value="" />
-								</then>
-								<elseif>
-									<equals arg1="${database.password}" arg2="" />
-									<then>
-										<var name="arg.line" value="-u ${database.username}" />
-									</then>
-								</elseif>
-								<elseif>
-									<equals arg1="${database.username}" arg2="" />
-									<then>
-										<var name="arg.line" value="-p${database.password}" />
-									</then>
-								</elseif>
-								<else>
-									<var name="arg.line" value="-p${database.password} -u ${database.username}" />
-								</else>
-							</if>
+							</condition>
+
+							<var name="arg.line" unless:blank="${mysql.host}" value="${arg.line} -h ${mysql.host}" />
+							<var name="arg.line" unless:blank="${database.username}" value="${arg.line} -u ${database.username}" />
+							<var name="arg.line" unless:blank="${database.password}" value="${arg.line} -p${database.password}" />
 
 							<propertycopy from="${database.type}.executable" name="database.executable" override="true" />
 

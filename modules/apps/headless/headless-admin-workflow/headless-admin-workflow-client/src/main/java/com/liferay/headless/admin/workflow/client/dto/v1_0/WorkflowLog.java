@@ -15,8 +15,10 @@
 package com.liferay.headless.admin.workflow.client.dto.v1_0;
 
 import com.liferay.headless.admin.workflow.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.workflow.client.serdes.v1_0.WorkflowLogSerDes;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -232,5 +234,31 @@ public class WorkflowLog {
 	}
 
 	protected String type;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof WorkflowLog)) {
+			return false;
+		}
+
+		WorkflowLog workflowLog = (WorkflowLog)object;
+
+		return Objects.equals(toString(), workflowLog.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return WorkflowLogSerDes.toJSON(this);
+	}
 
 }

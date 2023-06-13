@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "ContentField")
 public class ContentField {
 
-	@Schema(description = "The type of field (image, text).")
+	@Schema(description = "The field type (e.g., image, text, etc.).")
 	public String getDataType() {
 		return dataType;
 	}
@@ -71,7 +74,7 @@ public class ContentField {
 	protected String dataType;
 
 	@Schema(
-		description = "The type of control that has be used to render the content (text, textarea...)."
+		description = "The field's control type (e.g., text, text area, etc.)."
 	)
 	public String getInputControl() {
 		return inputControl;
@@ -100,7 +103,7 @@ public class ContentField {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String inputControl;
 
-	@Schema(description = "The label of the field.")
+	@Schema(description = "The field's label.")
 	public String getLabel() {
 		return label;
 	}
@@ -129,7 +132,7 @@ public class ContentField {
 	protected String label;
 
 	@Schema(
-		description = "The internal name of the field, valid for comparisons and unique in the StructuredContent."
+		description = "The field's internal name. This is valid for comparisons and unique in the structured content."
 	)
 	public String getName() {
 		return name;
@@ -157,7 +160,7 @@ public class ContentField {
 	protected String name;
 
 	@Schema(
-		description = "A list of child ContentFields that depend on this resource."
+		description = "A list of child content fields that depend on this resource."
 	)
 	public ContentField[] getNestedFields() {
 		return nestedFields;
@@ -187,7 +190,7 @@ public class ContentField {
 	protected ContentField[] nestedFields;
 
 	@Schema(
-		description = "A flag indicating if this field can be rendered multiple times."
+		description = "A flag that indicates whether this field can be rendered multiple times."
 	)
 	public Boolean getRepeatable() {
 		return repeatable;
@@ -216,6 +219,7 @@ public class ContentField {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean repeatable;
 
+	@Schema
 	public Value getValue() {
 		return value;
 	}
@@ -268,68 +272,73 @@ public class ContentField {
 
 		sb.append("{");
 
-		sb.append("\"dataType\": ");
+		if (dataType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (dataType == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"dataType\": ");
+
 			sb.append("\"");
-			sb.append(dataType);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(dataType));
 
-		sb.append("\"inputControl\": ");
-
-		if (inputControl == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(inputControl);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (inputControl != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"label\": ");
+			sb.append("\"inputControl\": ");
 
-		if (label == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(label);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(inputControl));
 
-		sb.append("\"name\": ");
-
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(name);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (label != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"nestedFields\": ");
+			sb.append("\"label\": ");
 
-		if (nestedFields == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(label));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"name\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(name));
+
+			sb.append("\"");
+		}
+
+		if (nestedFields != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"nestedFields\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < nestedFields.length; i++) {
-				sb.append(nestedFields[i]);
+				sb.append(String.valueOf(nestedFields[i]));
 
 				if ((i + 1) < nestedFields.length) {
 					sb.append(", ");
@@ -339,26 +348,59 @@ public class ContentField {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (repeatable != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"repeatable\": ");
+			sb.append("\"repeatable\": ");
 
-		if (repeatable == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(repeatable);
 		}
 
-		sb.append(", ");
+		if (value != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"value\": ");
+			sb.append("\"value\": ");
 
-		if (value == null) {
-			sb.append("null");
+			sb.append(String.valueOf(value));
 		}
-		else {
-			sb.append(value);
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

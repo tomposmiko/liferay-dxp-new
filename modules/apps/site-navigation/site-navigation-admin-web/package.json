@@ -12,10 +12,10 @@
 		}
 	},
 	"dependencies": {
-		"metal-dom": "^2.0.0",
-		"metal-drag-drop": "3.3.0",
-		"metal-position": "^2.1.0",
-		"metal-state": "^2.13.2"
+		"metal-dom": "2.16.8",
+		"metal-drag-drop": "3.3.1",
+		"metal-position": "2.1.2",
+		"metal-state": "2.16.8"
 	},
 	"name": "site-navigation-admin-web",
 	"scripts": {
@@ -23,5 +23,5 @@
 		"checkFormat": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format"
 	},
-	"version": "2.0.0"
+	"version": "2.0.5"
 }

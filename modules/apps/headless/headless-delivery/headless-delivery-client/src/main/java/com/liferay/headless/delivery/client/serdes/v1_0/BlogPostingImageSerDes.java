@@ -18,8 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.BlogPostingImage;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,11 +60,11 @@ public class BlogPostingImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"contentUrl\":");
+			sb.append("\"contentUrl\": ");
 
 			sb.append("\"");
 
-			sb.append(blogPostingImage.getContentUrl());
+			sb.append(_escape(blogPostingImage.getContentUrl()));
 
 			sb.append("\"");
 		}
@@ -72,11 +74,11 @@ public class BlogPostingImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"encodingFormat\":");
+			sb.append("\"encodingFormat\": ");
 
 			sb.append("\"");
 
-			sb.append(blogPostingImage.getEncodingFormat());
+			sb.append(_escape(blogPostingImage.getEncodingFormat()));
 
 			sb.append("\"");
 		}
@@ -86,11 +88,11 @@ public class BlogPostingImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"fileExtension\":");
+			sb.append("\"fileExtension\": ");
 
 			sb.append("\"");
 
-			sb.append(blogPostingImage.getFileExtension());
+			sb.append(_escape(blogPostingImage.getFileExtension()));
 
 			sb.append("\"");
 		}
@@ -100,7 +102,7 @@ public class BlogPostingImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(blogPostingImage.getId());
 		}
@@ -110,7 +112,7 @@ public class BlogPostingImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"sizeInBytes\":");
+			sb.append("\"sizeInBytes\": ");
 
 			sb.append(blogPostingImage.getSizeInBytes());
 		}
@@ -120,11 +122,11 @@ public class BlogPostingImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"title\":");
+			sb.append("\"title\": ");
 
 			sb.append("\"");
 
-			sb.append(blogPostingImage.getTitle());
+			sb.append(_escape(blogPostingImage.getTitle()));
 
 			sb.append("\"");
 		}
@@ -134,7 +136,7 @@ public class BlogPostingImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"viewableBy\":");
+			sb.append("\"viewableBy\": ");
 
 			sb.append("\"");
 
@@ -146,6 +148,13 @@ public class BlogPostingImageSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		BlogPostingImageJSONParser blogPostingImageJSONParser =
+			new BlogPostingImageJSONParser();
+
+		return blogPostingImageJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(BlogPostingImage blogPostingImage) {
@@ -213,6 +222,41 @@ public class BlogPostingImageSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class BlogPostingImageJSONParser

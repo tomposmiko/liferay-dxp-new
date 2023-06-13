@@ -22,8 +22,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -64,9 +66,9 @@ public class FormRecordSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(CreatorSerDes.toJSON(formRecord.getCreator()));
+			sb.append(String.valueOf(formRecord.getCreator()));
 		}
 
 		if (formRecord.getDateCreated() != null) {
@@ -74,7 +76,7 @@ public class FormRecordSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -89,7 +91,7 @@ public class FormRecordSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -104,7 +106,7 @@ public class FormRecordSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"datePublished\":");
+			sb.append("\"datePublished\": ");
 
 			sb.append("\"");
 
@@ -119,7 +121,7 @@ public class FormRecordSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"draft\":");
+			sb.append("\"draft\": ");
 
 			sb.append(formRecord.getDraft());
 		}
@@ -129,13 +131,12 @@ public class FormRecordSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"fieldValues\":");
+			sb.append("\"fieldValues\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < formRecord.getFieldValues().length; i++) {
-				sb.append(
-					FieldValueSerDes.toJSON(formRecord.getFieldValues()[i]));
+				sb.append(String.valueOf(formRecord.getFieldValues()[i]));
 
 				if ((i + 1) < formRecord.getFieldValues().length) {
 					sb.append(", ");
@@ -150,9 +151,9 @@ public class FormRecordSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"form\":");
+			sb.append("\"form\": ");
 
-			sb.append(FormSerDes.toJSON(formRecord.getForm()));
+			sb.append(String.valueOf(formRecord.getForm()));
 		}
 
 		if (formRecord.getFormId() != null) {
@@ -160,7 +161,7 @@ public class FormRecordSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"formId\":");
+			sb.append("\"formId\": ");
 
 			sb.append(formRecord.getFormId());
 		}
@@ -170,7 +171,7 @@ public class FormRecordSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(formRecord.getId());
 		}
@@ -178,6 +179,12 @@ public class FormRecordSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		FormRecordJSONParser formRecordJSONParser = new FormRecordJSONParser();
+
+		return formRecordJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(FormRecord formRecord) {
@@ -194,7 +201,7 @@ public class FormRecordSerDes {
 			map.put("creator", null);
 		}
 		else {
-			map.put("creator", CreatorSerDes.toJSON(formRecord.getCreator()));
+			map.put("creator", String.valueOf(formRecord.getCreator()));
 		}
 
 		map.put(
@@ -227,7 +234,7 @@ public class FormRecordSerDes {
 			map.put("form", null);
 		}
 		else {
-			map.put("form", FormSerDes.toJSON(formRecord.getForm()));
+			map.put("form", String.valueOf(formRecord.getForm()));
 		}
 
 		if (formRecord.getFormId() == null) {
@@ -245,6 +252,41 @@ public class FormRecordSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class FormRecordJSONParser

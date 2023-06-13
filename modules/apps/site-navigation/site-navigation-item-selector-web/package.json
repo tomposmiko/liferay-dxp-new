@@ -1,9 +1,9 @@
 {
 	"dependencies": {
-		"metal": "^2.5.18",
-		"metal-dom": "^2.5.18",
-		"metal-soy": "^2.4.5",
-		"metal-state": "^2.6.4"
+		"metal": "2.16.8",
+		"metal-dom": "2.16.8",
+		"metal-soy": "2.16.8",
+		"metal-state": "2.16.8"
 	},
 	"name": "site-navigation-item-selector-web",
 	"scripts": {
@@ -11,5 +11,5 @@
 		"checkFormat": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format"
 	},
-	"version": "2.0.0"
+	"version": "2.0.3"
 }

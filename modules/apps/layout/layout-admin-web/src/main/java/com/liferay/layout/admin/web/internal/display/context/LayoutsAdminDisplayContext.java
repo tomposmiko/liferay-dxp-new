@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
@@ -119,9 +120,6 @@ public class LayoutsAdminDisplayContext {
 		_layoutCopyHelper =
 			(LayoutCopyHelper)_liferayPortletRequest.getAttribute(
 				LayoutAdminWebKeys.LAYOUT_COPY_HELPER);
-
-		_liferayPortletRequest.setAttribute(
-			WebKeys.LAYOUT_DESCRIPTIONS, getLayoutDescriptions());
 	}
 
 	public List<DropdownItem> getAddLayoutDropdownItems() {
@@ -207,9 +205,6 @@ public class LayoutsAdminDisplayContext {
 	}
 
 	public JSONArray getBreadcrumbEntriesJSONArray() throws PortalException {
-		JSONArray breadcrumbEntriesJSONArray =
-			JSONFactoryUtil.createJSONArray();
-
 		boolean privatePages = isPrivateLayout();
 
 		Layout selLayout = getSelLayout();
@@ -218,10 +213,7 @@ public class LayoutsAdminDisplayContext {
 			privatePages = selLayout.isPrivateLayout();
 		}
 
-		JSONObject breadcrumbEntryJSONObject =
-			JSONFactoryUtil.createJSONObject();
-
-		breadcrumbEntryJSONObject.put(
+		JSONObject breadcrumbEntryJSONObject = JSONUtil.put(
 			"title", LanguageUtil.get(_request, "pages"));
 
 		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
@@ -240,7 +232,8 @@ public class LayoutsAdminDisplayContext {
 
 		breadcrumbEntryJSONObject.put("url", portletURL.toString());
 
-		breadcrumbEntriesJSONArray.put(breadcrumbEntryJSONObject);
+		JSONArray breadcrumbEntriesJSONArray = JSONUtil.put(
+			breadcrumbEntryJSONObject);
 
 		if (isFirstColumn()) {
 			return breadcrumbEntriesJSONArray;
@@ -404,7 +397,8 @@ public class LayoutsAdminDisplayContext {
 	public String getFirstColumnConfigureLayoutURL(boolean privatePages) {
 		PortletURL editLayoutSetURL = _liferayPortletResponse.createRenderURL();
 
-		editLayoutSetURL.setParameter("mvcPath", "/edit_layout_set.jsp");
+		editLayoutSetURL.setParameter(
+			"mvcRenderCommandName", "/layout/edit_layout_set");
 		editLayoutSetURL.setParameter(
 			"redirect", _themeDisplay.getURLCurrent());
 		editLayoutSetURL.setParameter("backURL", _themeDisplay.getURLCurrent());
@@ -564,11 +558,13 @@ public class LayoutsAdminDisplayContext {
 				}
 			}
 
-			JSONObject layoutJSONObject = JSONFactoryUtil.createJSONObject();
-
-			layoutJSONObject.put(
-				"actionURLs", _getActionURLsJSONObject(layout));
-			layoutJSONObject.put("active", _isActive(layout.getPlid()));
+			JSONObject layoutJSONObject = JSONUtil.put(
+				"actions", _getAvailableActions(layout)
+			).put(
+				"actionURLs", _getActionURLsJSONObject(layout)
+			).put(
+				"active", _isActive(layout.getPlid())
+			);
 
 			LayoutTypeController layoutTypeController =
 				LayoutTypeControllerTracker.getLayoutTypeController(
@@ -599,29 +595,25 @@ public class LayoutsAdminDisplayContext {
 					publishDate = modifiedDate;
 				}
 
-				layoutJSONObject.put("draft", modifiedDate.after(publishDate));
+				layoutJSONObject.put(
+					"draft", modifiedDate.getTime() > publishDate.getTime());
 			}
 			else {
 				layoutJSONObject.put("draft", false);
 			}
-
-			layoutJSONObject.put(
-				"homePage",
-				_getHomePagePlid(privateLayout) == layout.getPlid());
 
 			int childLayoutsCount = LayoutLocalServiceUtil.getLayoutsCount(
 				getSelGroup(), layout.isPrivateLayout(), layout.getLayoutId());
 
 			layoutJSONObject.put("hasChild", childLayoutsCount > 0);
 
-			layoutJSONObject.put(
-				"homePageTitle", _getHomePageTitle(privateLayout));
-
 			LayoutType layoutType = layout.getLayoutType();
 
-			layoutJSONObject.put("parentable", layoutType.isParentable());
-
-			layoutJSONObject.put("plid", layout.getPlid());
+			layoutJSONObject.put(
+				"parentable", layoutType.isParentable()
+			).put(
+				"plid", layout.getPlid()
+			);
 
 			PortletURL portletURL = getPortletURL();
 
@@ -633,10 +625,11 @@ public class LayoutsAdminDisplayContext {
 			portletURL.setParameter(
 				"privateLayout", String.valueOf(layout.isPrivateLayout()));
 
-			layoutJSONObject.put("url", portletURL.toString());
-
 			layoutJSONObject.put(
-				"title", layout.getName(_themeDisplay.getLocale()));
+				"title", layout.getName(_themeDisplay.getLocale())
+			).put(
+				"url", portletURL.toString()
+			);
 
 			layoutsJSONArray.put(layoutJSONObject);
 		}
@@ -719,20 +712,6 @@ public class LayoutsAdminDisplayContext {
 
 	public Long getLiveGroupId() {
 		return _groupDisplayContextHelper.getLiveGroupId();
-	}
-
-	public String getMarkAsHomePageLayoutURL(Layout layout) {
-		PortletURL markAsHomePageLayoutURL =
-			_liferayPortletResponse.createActionURL();
-
-		markAsHomePageLayoutURL.setParameter(
-			ActionRequest.ACTION_NAME, "/layout/mark_as_home_page_layout");
-		markAsHomePageLayoutURL.setParameter(
-			"redirect", _themeDisplay.getURLCurrent());
-		markAsHomePageLayoutURL.setParameter(
-			"selPlid", String.valueOf(layout.getPlid()));
-
-		return markAsHomePageLayoutURL.toString();
 	}
 
 	public String getMoveLayoutColumnItemURL() {
@@ -1319,23 +1298,6 @@ public class LayoutsAdminDisplayContext {
 		return true;
 	}
 
-	public boolean isShowMarkAsHomePageLayout(Layout layout)
-		throws PortalException {
-
-		if (!isShowConfigureAction(layout)) {
-			return false;
-		}
-
-		if ((layout.getParentLayoutId() !=
-				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) ||
-			(_getHomePagePlid(isPrivateLayout()) == layout.getPlid())) {
-
-			return false;
-		}
-
-		return true;
-	}
-
 	public boolean isShowOrphanPortletsAction(Layout layout)
 		throws PortalException {
 
@@ -1421,11 +1383,6 @@ public class LayoutsAdminDisplayContext {
 			jsonObject.put("editLayoutURL", getEditLayoutURL(layout));
 		}
 
-		if (isShowMarkAsHomePageLayout(layout)) {
-			jsonObject.put(
-				"markAsHomePageLayoutURL", getMarkAsHomePageLayoutURL(layout));
-		}
-
 		if (isShowOrphanPortletsAction(layout)) {
 			jsonObject.put("orphanPortletsURL", getOrphanPortletsURL(layout));
 		}
@@ -1484,6 +1441,20 @@ public class LayoutsAdminDisplayContext {
 		return _activeLayoutSetBranchId;
 	}
 
+	private String _getAvailableActions(Layout layout) throws PortalException {
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		if (LayoutPermissionUtil.contains(
+				themeDisplay.getPermissionChecker(), layout,
+				ActionKeys.DELETE)) {
+
+			return "deleteSelectedPages";
+		}
+
+		return StringPool.BLANK;
+	}
+
 	private String _getBackURL() {
 		if (_backURL != null) {
 			return _backURL;
@@ -1497,10 +1468,7 @@ public class LayoutsAdminDisplayContext {
 	private JSONObject _getBreadcrumbEntryJSONObject(
 		long plid, boolean privateLayout, String title) {
 
-		JSONObject breadcrumbEntryJSONObject =
-			JSONFactoryUtil.createJSONObject();
-
-		breadcrumbEntryJSONObject.put("title", title);
+		JSONObject breadcrumbEntryJSONObject = JSONUtil.put("title", title);
 
 		PortletURL portletURL = getPortletURL();
 
@@ -1515,14 +1483,17 @@ public class LayoutsAdminDisplayContext {
 	private JSONObject _getFirstColumn(boolean privatePages, boolean active)
 		throws PortalException {
 
-		JSONObject pagesJSONObject = JSONFactoryUtil.createJSONObject();
-
-		pagesJSONObject.put(
-			"actionURLs", _getFirstColumnActionURLsJSONObject(privatePages));
-		pagesJSONObject.put("active", active);
-		pagesJSONObject.put("hasChild", true);
-		pagesJSONObject.put("plid", LayoutConstants.DEFAULT_PLID);
-		pagesJSONObject.put("title", getTitle(privatePages));
+		JSONObject pagesJSONObject = JSONUtil.put(
+			"actionURLs", _getFirstColumnActionURLsJSONObject(privatePages)
+		).put(
+			"active", active
+		).put(
+			"hasChild", true
+		).put(
+			"plid", LayoutConstants.DEFAULT_PLID
+		).put(
+			"title", getTitle(privatePages)
+		);
 
 		PortletURL pagesURL = getPortletURL();
 
@@ -1553,33 +1524,7 @@ public class LayoutsAdminDisplayContext {
 		return jsonObject;
 	}
 
-	private long _getHomePagePlid(boolean privateLayout) {
-		if (_homePagePlid != null) {
-			return _homePagePlid;
-		}
-
-		_homePagePlid = LayoutLocalServiceUtil.getDefaultPlid(
-			getSelGroupId(), privateLayout);
-
-		return _homePagePlid;
-	}
-
-	private String _getHomePageTitle(boolean privateLayout) {
-		if (_homePageTitle != null) {
-			return _homePageTitle;
-		}
-
-		Layout defaultLayout = LayoutLocalServiceUtil.fetchDefaultLayout(
-			getSelGroupId(), privateLayout);
-
-		_homePageTitle = defaultLayout.getName(_themeDisplay.getLocale());
-
-		return _homePageTitle;
-	}
-
 	private JSONArray _getLayoutColumnsJSONArray() throws Exception {
-		JSONArray layoutColumnsJSONArray = JSONFactoryUtil.createJSONArray();
-
 		JSONArray firstColumnJSONArray = JSONFactoryUtil.createJSONArray();
 
 		Layout selLayout = getSelLayout();
@@ -1614,7 +1559,7 @@ public class LayoutsAdminDisplayContext {
 			firstColumnJSONArray.put(_getFirstColumn(true, active));
 		}
 
-		layoutColumnsJSONArray.put(firstColumnJSONArray);
+		JSONArray layoutColumnsJSONArray = JSONUtil.put(firstColumnJSONArray);
 
 		if (isFirstColumn()) {
 			return layoutColumnsJSONArray;
@@ -1660,16 +1605,17 @@ public class LayoutsAdminDisplayContext {
 				_themeDisplay.getScopeGroupId(), isPrivateLayout());
 
 		for (LayoutSetBranch layoutSetBranch : layoutSetBranches) {
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			jsonObject.put(
+			JSONObject jsonObject = JSONUtil.put(
 				"active",
 				layoutSetBranch.getLayoutSetBranchId() ==
-					_getActiveLayoutSetBranchId());
-			jsonObject.put("hasChild", true);
-			jsonObject.put("plid", LayoutConstants.DEFAULT_PLID);
-			jsonObject.put(
-				"title", LanguageUtil.get(_request, layoutSetBranch.getName()));
+					_getActiveLayoutSetBranchId()
+			).put(
+				"hasChild", true
+			).put(
+				"plid", LayoutConstants.DEFAULT_PLID
+			).put(
+				"title", LanguageUtil.get(_request, layoutSetBranch.getName())
+			);
 
 			PortletURL portletURL = getPortletURL();
 
@@ -1739,8 +1685,6 @@ public class LayoutsAdminDisplayContext {
 	private String _displayStyle;
 	private Boolean _firstColumn;
 	private final GroupDisplayContextHelper _groupDisplayContextHelper;
-	private Long _homePagePlid;
-	private String _homePageTitle;
 	private String _keywords;
 	private final LayoutCopyHelper _layoutCopyHelper;
 	private List<LayoutDescription> _layoutDescriptions;

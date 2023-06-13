@@ -5,17 +5,17 @@ buildService {
 
 dependencies {
 	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
-	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
+	compileOnly group: "com.liferay", name: "com.liferay.asset.api", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.asset.auto.tagger.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.configuration.admin.api", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.osgi.service.tracker.collections", version: "4.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.petra.function", version: "3.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.petra.lang", version: "3.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "3.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.aop.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype.api", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.persistence.api", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.spring.extender.api", version: "4.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.0.0"
 	compileOnly group: "org.osgi", name: "org.osgi.core", version: "5.0.0"
-	compileOnly project(":apps:asset:asset-api")
-	compileOnly project(":apps:asset:asset-auto-tagger-api")
-	compileOnly project(":apps:configuration-admin:configuration-admin-api")
-	compileOnly project(":apps:portal:portal-aop-api")
-	compileOnly project(":apps:portal:portal-spring-extender-api")
-	compileOnly project(":apps:static:portal-configuration:portal-configuration-metatype-api")
-	compileOnly project(":apps:static:portal-configuration:portal-configuration-persistence-api")
-	compileOnly project(":core:osgi-service-tracker-collections")
-	compileOnly project(":core:petra:petra-function")
-	compileOnly project(":core:petra:petra-lang")
-	compileOnly project(":core:petra:petra-string")
 }

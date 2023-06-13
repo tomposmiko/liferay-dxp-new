@@ -24,7 +24,12 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -40,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "DataDefinitionRule")
 public class DataDefinitionRule {
 
+	@Schema
 	public String[] getDataDefinitionFieldNames() {
 		return dataDefinitionFieldNames;
 	}
@@ -69,6 +75,7 @@ public class DataDefinitionRule {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] dataDefinitionFieldNames;
 
+	@Schema
 	public DataDefinitionRuleParameter[] getDataDefinitionRuleParameters() {
 		return dataDefinitionRuleParameters;
 	}
@@ -100,6 +107,7 @@ public class DataDefinitionRule {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected DataDefinitionRuleParameter[] dataDefinitionRuleParameters;
 
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -125,6 +133,7 @@ public class DataDefinitionRule {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
+	@Schema
 	public String getRuleType() {
 		return ruleType;
 	}
@@ -179,17 +188,20 @@ public class DataDefinitionRule {
 
 		sb.append("{");
 
-		sb.append("\"dataDefinitionFieldNames\": ");
+		if (dataDefinitionFieldNames != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (dataDefinitionFieldNames == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"dataDefinitionFieldNames\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < dataDefinitionFieldNames.length; i++) {
 				sb.append("\"");
-				sb.append(dataDefinitionFieldNames[i]);
+
+				sb.append(_escape(dataDefinitionFieldNames[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < dataDefinitionFieldNames.length) {
@@ -200,18 +212,17 @@ public class DataDefinitionRule {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (dataDefinitionRuleParameters != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dataDefinitionRuleParameters\": ");
+			sb.append("\"dataDefinitionRuleParameters\": ");
 
-		if (dataDefinitionRuleParameters == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < dataDefinitionRuleParameters.length; i++) {
-				sb.append(dataDefinitionRuleParameters[i]);
+				sb.append(String.valueOf(dataDefinitionRuleParameters[i]));
 
 				if ((i + 1) < dataDefinitionRuleParameters.length) {
 					sb.append(", ");
@@ -221,30 +232,67 @@ public class DataDefinitionRule {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(name));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (ruleType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"ruleType\": ");
+
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(ruleType));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		sb.append("}");
 
-		sb.append("\"ruleType\": ");
+		return sb.toString();
+	}
 
-		if (ruleType == null) {
-			sb.append("null");
-		}
-		else {
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(ruleType);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

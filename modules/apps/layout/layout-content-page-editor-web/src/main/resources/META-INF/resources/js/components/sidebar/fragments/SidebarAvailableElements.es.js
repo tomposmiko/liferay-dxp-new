@@ -5,10 +5,12 @@ import position from 'metal-position';
 import Soy from 'metal-soy';
 
 import './FragmentsEditorSidebarCard.es';
-import {ADD_FRAGMENT_ENTRY_LINK, CLEAR_DROP_TARGET, UPDATE_DROP_TARGET, UPDATE_LAST_SAVE_DATE, UPDATE_SAVING_CHANGES_STATUS} from '../../../actions/actions.es';
-import {FRAGMENTS_EDITOR_ITEM_BORDERS, FRAGMENTS_EDITOR_ITEM_TYPES} from '../../../utils/constants';
+import {ADD_FRAGMENT_ENTRY_LINK, CLEAR_DROP_TARGET, UPDATE_DROP_TARGET} from '../../../actions/actions.es';
+import {disableSavingChangesStatusAction, enableSavingChangesStatusAction, updateLastSaveDateAction} from '../../../actions/saveChanges.es';
+import {FRAGMENTS_EDITOR_DRAGGING_CLASS, FRAGMENTS_EDITOR_ITEM_BORDERS, FRAGMENTS_EDITOR_ITEM_TYPES} from '../../../utils/constants';
 import {getConnectedComponent} from '../../../store/ConnectedComponent.es';
 import {initializeDragDrop} from '../../../utils/FragmentsEditorDragDrop.es';
+import {setDraggingItemPosition} from '../../../utils/FragmentsEditorUpdateUtils.es';
 import templates from './SidebarAvailableElements.soy';
 
 /**
@@ -46,7 +48,7 @@ class SidebarAvailableElements extends Component {
 	/**
 	 * Callback that is executed when an item is being dragged.
 	 * @param {object} eventData
-	 * @param {MouseEvent} data.originalEvent
+	 * @param {MouseEvent} eventData.originalEvent
 	 * @private
 	 * @review
 	 */
@@ -57,6 +59,8 @@ class SidebarAvailableElements extends Component {
 		const targetIsColumn = targetItem && ('columnId' in data);
 		const targetIsFragment = targetItem && ('fragmentEntryLinkId' in data);
 		const targetIsRow = targetItem && ('layoutRowId' in data);
+
+		setDraggingItemPosition(eventData.originalEvent);
 
 		if (targetIsColumn || targetIsFragment || targetIsRow) {
 			const mouseY = eventData.originalEvent.clientY;
@@ -87,12 +91,12 @@ class SidebarAvailableElements extends Component {
 				dropTargetItemType = FRAGMENTS_EDITOR_ITEM_TYPES.row;
 			}
 
-			this.store.dispatchAction(
-				UPDATE_DROP_TARGET,
+			this.store.dispatch(
 				{
 					dropTargetBorder: nearestBorder,
 					dropTargetItemId,
-					dropTargetItemType
+					dropTargetItemType,
+					type: UPDATE_DROP_TARGET
 				}
 			);
 		}
@@ -104,8 +108,10 @@ class SidebarAvailableElements extends Component {
 	 * @review
 	 */
 	_handleDragEnd() {
-		this.store.dispatchAction(
-			CLEAR_DROP_TARGET
+		this.store.dispatch(
+			{
+				type: CLEAR_DROP_TARGET
+			}
 		);
 	}
 
@@ -129,33 +135,20 @@ class SidebarAvailableElements extends Component {
 			);
 
 			this.store
-				.dispatchAction(
-					UPDATE_SAVING_CHANGES_STATUS,
-					{
-						savingChanges: true
-					}
-				)
-				.dispatchAction(
-					ADD_FRAGMENT_ENTRY_LINK,
+				.dispatch(enableSavingChangesStatusAction())
+				.dispatch(
 					{
 						fragmentEntryKey: itemId,
-						fragmentName: itemName
+						fragmentName: itemName,
+						type: ADD_FRAGMENT_ENTRY_LINK
 					}
 				)
-				.dispatchAction(
-					UPDATE_LAST_SAVE_DATE,
+				.dispatch(updateLastSaveDateAction())
+				.dispatch(disableSavingChangesStatusAction())
+				.dispatch(
 					{
-						lastSaveDate: new Date()
+						type: CLEAR_DROP_TARGET
 					}
-				)
-				.dispatchAction(
-					UPDATE_SAVING_CHANGES_STATUS,
-					{
-						savingChanges: false
-					}
-				)
-				.dispatchAction(
-					CLEAR_DROP_TARGET
 				);
 		}
 	}
@@ -170,31 +163,16 @@ class SidebarAvailableElements extends Component {
 	 */
 	_handleEntryClick(event) {
 		this.store
-			.dispatchAction(
-				UPDATE_SAVING_CHANGES_STATUS,
-				{
-					savingChanges: true
-				}
-			)
-			.dispatchAction(
-				ADD_FRAGMENT_ENTRY_LINK,
+			.dispatch(enableSavingChangesStatusAction())
+			.dispatch(
 				{
 					fragmentEntryKey: event.itemId,
-					fragmentName: event.itemName
+					fragmentName: event.itemName,
+					type: ADD_FRAGMENT_ENTRY_LINK
 				}
 			)
-			.dispatchAction(
-				UPDATE_LAST_SAVE_DATE,
-				{
-					lastSaveDate: new Date()
-				}
-			)
-			.dispatchAction(
-				UPDATE_SAVING_CHANGES_STATUS,
-				{
-					savingChanges: false
-				}
-			);
+			.dispatch(updateLastSaveDateAction())
+			.dispatch(disableSavingChangesStatusAction());
 	}
 
 	/**
@@ -209,6 +187,7 @@ class SidebarAvailableElements extends Component {
 		this._dragDrop = initializeDragDrop(
 			{
 				autoScroll: true,
+				draggingClass: FRAGMENTS_EDITOR_DRAGGING_CLASS,
 				dragPlaceholder: Drag.Placeholder.CLONE,
 				handles: '.fragments-editor__drag-handler',
 				sources: '.fragments-editor__drag-source--sidebar-fragment',

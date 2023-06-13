@@ -15,6 +15,9 @@
 package com.liferay.headless.admin.user.client.dto.v1_0;
 
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.user.client.serdes.v1_0.HoursAvailableSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -67,25 +70,6 @@ public class HoursAvailable {
 
 	protected String dayOfWeek;
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
-		try {
-			id = idUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Long id;
-
 	public String getOpens() {
 		return opens;
 	}
@@ -106,5 +90,31 @@ public class HoursAvailable {
 	}
 
 	protected String opens;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof HoursAvailable)) {
+			return false;
+		}
+
+		HoursAvailable hoursAvailable = (HoursAvailable)object;
+
+		return Objects.equals(toString(), hoursAvailable.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return HoursAvailableSerDes.toJSON(this);
+	}
 
 }

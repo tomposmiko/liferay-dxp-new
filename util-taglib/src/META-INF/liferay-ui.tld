@@ -2075,6 +2075,12 @@
 			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
+		<attribute>
+			<name>reverse</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>boolean</type>
+		</attribute>
 	</tag>
 	<tag>
 		<name>input-permissions-params</name>
@@ -4381,6 +4387,11 @@
 		</attribute>
 		<attribute>
 			<name>imageCssClass</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>size</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>

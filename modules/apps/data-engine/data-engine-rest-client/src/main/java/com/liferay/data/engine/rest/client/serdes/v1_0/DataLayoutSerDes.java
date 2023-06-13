@@ -23,8 +23,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -62,27 +64,25 @@ public class DataLayoutSerDes {
 
 		if (dataLayout.getDataDefinitionId() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dataDefinitionId\":");
+			sb.append("\"dataDefinitionId\": ");
 
 			sb.append(dataLayout.getDataDefinitionId());
 		}
 
 		if (dataLayout.getDataLayoutPages() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dataLayoutPages\":");
+			sb.append("\"dataLayoutPages\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < dataLayout.getDataLayoutPages().length; i++) {
-				sb.append(
-					DataLayoutPageSerDes.toJSON(
-						dataLayout.getDataLayoutPages()[i]));
+				sb.append(String.valueOf(dataLayout.getDataLayoutPages()[i]));
 
 				if ((i + 1) < dataLayout.getDataLayoutPages().length) {
 					sb.append(", ");
@@ -94,10 +94,10 @@ public class DataLayoutSerDes {
 
 		if (dataLayout.getDateCreated() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -109,10 +109,10 @@ public class DataLayoutSerDes {
 
 		if (dataLayout.getDateModified() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -124,31 +124,29 @@ public class DataLayoutSerDes {
 
 		if (dataLayout.getDefaultLanguageId() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"defaultLanguageId\":");
+			sb.append("\"defaultLanguageId\": ");
 
 			sb.append("\"");
 
-			sb.append(dataLayout.getDefaultLanguageId());
+			sb.append(_escape(dataLayout.getDefaultLanguageId()));
 
 			sb.append("\"");
 		}
 
 		if (dataLayout.getDescription() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < dataLayout.getDescription().length; i++) {
-				sb.append(
-					LocalizedValueSerDes.toJSON(
-						dataLayout.getDescription()[i]));
+				sb.append(String.valueOf(dataLayout.getDescription()[i]));
 
 				if ((i + 1) < dataLayout.getDescription().length) {
 					sb.append(", ");
@@ -160,25 +158,25 @@ public class DataLayoutSerDes {
 
 		if (dataLayout.getId() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(dataLayout.getId());
 		}
 
 		if (dataLayout.getName() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < dataLayout.getName().length; i++) {
-				sb.append(LocalizedValueSerDes.toJSON(dataLayout.getName()[i]));
+				sb.append(String.valueOf(dataLayout.getName()[i]));
 
 				if ((i + 1) < dataLayout.getName().length) {
 					sb.append(", ");
@@ -190,24 +188,24 @@ public class DataLayoutSerDes {
 
 		if (dataLayout.getPaginationMode() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"paginationMode\":");
+			sb.append("\"paginationMode\": ");
 
 			sb.append("\"");
 
-			sb.append(dataLayout.getPaginationMode());
+			sb.append(_escape(dataLayout.getPaginationMode()));
 
 			sb.append("\"");
 		}
 
 		if (dataLayout.getUserId() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"userId\":");
+			sb.append("\"userId\": ");
 
 			sb.append(dataLayout.getUserId());
 		}
@@ -215,6 +213,12 @@ public class DataLayoutSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		DataLayoutJSONParser dataLayoutJSONParser = new DataLayoutJSONParser();
+
+		return dataLayoutJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(DataLayout dataLayout) {
@@ -300,6 +304,41 @@ public class DataLayoutSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class DataLayoutJSONParser

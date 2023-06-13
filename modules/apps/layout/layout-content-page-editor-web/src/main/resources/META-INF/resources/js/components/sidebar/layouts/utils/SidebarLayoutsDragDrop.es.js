@@ -2,8 +2,9 @@ import position from 'metal-position';
 import {Drag, DragDrop} from 'metal-drag-drop';
 import State from 'metal-state';
 
-import {FRAGMENTS_EDITOR_ITEM_BORDERS} from '../../../../utils/constants';
+import {FRAGMENTS_EDITOR_DRAGGING_CLASS, FRAGMENTS_EDITOR_ITEM_BORDERS} from '../../../../utils/constants';
 import {initializeDragDrop} from '../../../../utils/FragmentsEditorDragDrop.es';
+import {setDraggingItemPosition} from '../../../../utils/FragmentsEditorUpdateUtils.es';
 
 /**
  * SidebarLayoutsDragDrop
@@ -24,8 +25,10 @@ class SidebarLayoutsDragDrop extends State {
 	 * @inheritDoc
 	 * @review
 	 */
-	disposed() {
+	dispose() {
 		this._dragDrop.dispose();
+
+		super.dispose();
 	}
 
 	/**
@@ -37,6 +40,8 @@ class SidebarLayoutsDragDrop extends State {
 	 */
 	_handleDrag(data) {
 		const targetItem = data.target;
+
+		setDraggingItemPosition(data.originalEvent);
 
 		if (targetItem && 'layoutRowId' in targetItem.dataset) {
 			const mouseY = data.originalEvent.clientY;
@@ -99,6 +104,7 @@ class SidebarLayoutsDragDrop extends State {
 		this._dragDrop = initializeDragDrop(
 			{
 				autoScroll: true,
+				draggingClass: FRAGMENTS_EDITOR_DRAGGING_CLASS,
 				dragPlaceholder: Drag.Placeholder.CLONE,
 				sources: '.fragments-editor__drag-source--sidebar-layout',
 				targets: '.fragments-editor__drop-target--sidebar-layout'

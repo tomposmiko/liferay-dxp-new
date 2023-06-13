@@ -1,6 +1,6 @@
 import {Config} from 'metal-state';
 
-import {FRAGMENTS_EDITOR_ITEM_BORDERS} from '../utils/constants';
+import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR, FRAGMENTS_EDITOR_ITEM_BORDERS, FRAGMENTS_EDITOR_ROW_TYPES} from '../utils/constants';
 import {setIn} from '../utils/FragmentsEditorUpdateUtils.es';
 
 const LayoutDataShape = Config.shapeOf(
@@ -21,7 +21,10 @@ const LayoutDataShape = Config.shapeOf(
 							}
 						)
 					),
-					rowId: Config.string()
+					rowId: Config.string(),
+					type: Config
+						.oneOf(Object.values(FRAGMENTS_EDITOR_ROW_TYPES))
+						.value(FRAGMENTS_EDITOR_ROW_TYPES.componentRow)
 				}
 			)
 		)
@@ -138,6 +141,7 @@ const INITIAL_STATE = {
 		.objectOf(
 			Config.shapeOf(
 				{
+					active: Config.bool(),
 					name: Config.string(),
 					priority: Config.number(),
 					segmentsEntryId: Config.string(),
@@ -368,7 +372,7 @@ const INITIAL_STATE = {
 					content: Config.any().value(''),
 					editableValues: Config.shapeOf(
 						{
-							['com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor']: Config.objectOf(
+							[EDITABLE_FRAGMENT_ENTRY_PROCESSOR]: Config.objectOf(
 								Config.shapeOf(
 									{
 										classNameId: Config.string().value(''),

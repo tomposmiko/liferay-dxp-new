@@ -65,32 +65,36 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "siteId"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path("/sites/{siteId}/taxonomy-vocabularies")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "TaxonomyVocabulary")})
 	public Page<TaxonomyVocabulary> getSiteTaxonomyVocabulariesPage(
-			@NotNull @PathParam("siteId") Long siteId,
-			@QueryParam("search") String search, @Context Filter filter,
-			@Context Pagination pagination, @Context Sort[] sorts)
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
+			@Parameter(hidden = true) @QueryParam("search") String search,
+			@Context Filter filter, @Context Pagination pagination,
+			@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "siteId")})
 	@Path("/sites/{siteId}/taxonomy-vocabularies")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "TaxonomyVocabulary")})
 	public TaxonomyVocabulary postSiteTaxonomyVocabulary(
-			@NotNull @PathParam("siteId") Long siteId,
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
 			TaxonomyVocabulary taxonomyVocabulary)
 		throws Exception {
 
@@ -99,37 +103,52 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 
 	@Override
 	@DELETE
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "taxonomyVocabularyId")
+		}
+	)
 	@Path("/taxonomy-vocabularies/{taxonomyVocabularyId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "TaxonomyVocabulary")})
 	public void deleteTaxonomyVocabulary(
-			@NotNull @PathParam("taxonomyVocabularyId") Long
-				taxonomyVocabularyId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("taxonomyVocabularyId") Long taxonomyVocabularyId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "taxonomyVocabularyId")
+		}
+	)
 	@Path("/taxonomy-vocabularies/{taxonomyVocabularyId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "TaxonomyVocabulary")})
 	public TaxonomyVocabulary getTaxonomyVocabulary(
-			@NotNull @PathParam("taxonomyVocabularyId") Long
-				taxonomyVocabularyId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("taxonomyVocabularyId") Long taxonomyVocabularyId)
 		throws Exception {
 
 		return new TaxonomyVocabulary();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PATCH
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "taxonomyVocabularyId")
+		}
+	)
 	@Path("/taxonomy-vocabularies/{taxonomyVocabularyId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "TaxonomyVocabulary")})
 	public TaxonomyVocabulary patchTaxonomyVocabulary(
-			@NotNull @PathParam("taxonomyVocabularyId") Long
-				taxonomyVocabularyId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("taxonomyVocabularyId") Long taxonomyVocabularyId,
 			TaxonomyVocabulary taxonomyVocabulary)
 		throws Exception {
 
@@ -182,14 +201,19 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PUT
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "taxonomyVocabularyId")
+		}
+	)
 	@Path("/taxonomy-vocabularies/{taxonomyVocabularyId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "TaxonomyVocabulary")})
 	public TaxonomyVocabulary putTaxonomyVocabulary(
-			@NotNull @PathParam("taxonomyVocabularyId") Long
-				taxonomyVocabularyId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("taxonomyVocabularyId") Long taxonomyVocabularyId,
 			TaxonomyVocabulary taxonomyVocabulary)
 		throws Exception {
 

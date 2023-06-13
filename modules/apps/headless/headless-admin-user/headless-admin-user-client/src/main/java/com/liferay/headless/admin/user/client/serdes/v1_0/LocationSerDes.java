@@ -18,8 +18,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.Location;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -56,11 +58,11 @@ public class LocationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"addressCountry\":");
+			sb.append("\"addressCountry\": ");
 
 			sb.append("\"");
 
-			sb.append(location.getAddressCountry());
+			sb.append(_escape(location.getAddressCountry()));
 
 			sb.append("\"");
 		}
@@ -70,11 +72,11 @@ public class LocationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"addressRegion\":");
+			sb.append("\"addressRegion\": ");
 
 			sb.append("\"");
 
-			sb.append(location.getAddressRegion());
+			sb.append(_escape(location.getAddressRegion()));
 
 			sb.append("\"");
 		}
@@ -84,7 +86,7 @@ public class LocationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(location.getId());
 		}
@@ -92,6 +94,12 @@ public class LocationSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		LocationJSONParser locationJSONParser = new LocationJSONParser();
+
+		return locationJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Location location) {
@@ -125,6 +133,41 @@ public class LocationSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class LocationJSONParser extends BaseJSONParser<Location> {

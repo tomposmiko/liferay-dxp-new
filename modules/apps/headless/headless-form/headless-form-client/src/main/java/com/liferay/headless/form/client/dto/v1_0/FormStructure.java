@@ -15,8 +15,10 @@
 package com.liferay.headless.form.client.dto.v1_0;
 
 import com.liferay.headless.form.client.function.UnsafeSupplier;
+import com.liferay.headless.form.client.serdes.v1_0.FormStructureSerDes;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -232,5 +234,31 @@ public class FormStructure {
 	}
 
 	protected SuccessPage successPage;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof FormStructure)) {
+			return false;
+		}
+
+		FormStructure formStructure = (FormStructure)object;
+
+		return Objects.equals(toString(), formStructure.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return FormStructureSerDes.toJSON(this);
+	}
 
 }

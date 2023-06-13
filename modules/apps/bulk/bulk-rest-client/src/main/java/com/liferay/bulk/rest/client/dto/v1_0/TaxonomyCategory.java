@@ -15,6 +15,9 @@
 package com.liferay.bulk.rest.client.dto.v1_0;
 
 import com.liferay.bulk.rest.client.function.UnsafeSupplier;
+import com.liferay.bulk.rest.client.serdes.v1_0.TaxonomyCategorySerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -66,5 +69,31 @@ public class TaxonomyCategory {
 	}
 
 	protected String taxonomyCategoryName;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof TaxonomyCategory)) {
+			return false;
+		}
+
+		TaxonomyCategory taxonomyCategory = (TaxonomyCategory)object;
+
+		return Objects.equals(toString(), taxonomyCategory.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return TaxonomyCategorySerDes.toJSON(this);
+	}
 
 }

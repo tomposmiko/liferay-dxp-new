@@ -16,6 +16,8 @@ package com.liferay.headless.delivery.internal.dto.v1_0.converter;
 
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.kernel.service.AssetLinkLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.util.DLURLHelper;
@@ -39,6 +41,7 @@ import com.liferay.headless.delivery.internal.dto.v1_0.util.AggregateRatingUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.ContentDocumentUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.ContentStructureUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.CreatorUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.RelatedContentUtil;
 import com.liferay.headless.delivery.internal.resource.v1_0.BaseStructuredContentResourceImpl;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
@@ -130,6 +133,11 @@ public class StructuredContentDTOConverter implements DTOConverter {
 				numberOfComments = _commentManager.getCommentsCount(
 					JournalArticle.class.getName(),
 					journalArticle.getResourcePrimKey());
+				relatedContents = RelatedContentUtil.toRelatedContents(
+					_assetEntryLocalService, _assetLinkLocalService,
+					JournalArticle.class.getName(),
+					journalArticle.getResourcePrimKey(),
+					dtoConverterContext.getLocale());
 				renderedContents = _toRenderedContents(
 					ddmStructure, journalArticle,
 					dtoConverterContext.getLocale(),
@@ -397,6 +405,12 @@ public class StructuredContentDTOConverter implements DTOConverter {
 
 	@Reference
 	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
+	private AssetLinkLocalService _assetLinkLocalService;
 
 	@Reference
 	private AssetTagLocalService _assetTagLocalService;

@@ -4,16 +4,15 @@ import {Config} from 'metal-state';
 import {isFunction, isObject} from 'metal';
 import Soy from 'metal-soy';
 
-import FragmentEditableField from './FragmentEditableField.es';
-import FragmentStyleEditor from './FragmentStyleEditor.es';
-import MetalStore from '../../store/store.es';
+import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../../utils/constants';
+import {getConnectedComponent} from '../../store/ConnectedComponent.es';
+import {prefixSegmentsExperienceId} from '../../utils/prefixSegmentsExperienceId.es';
 import {setIn} from '../../utils/FragmentsEditorUpdateUtils.es';
 import {shouldUpdateOnChangeProperties} from '../../utils/FragmentsEditorComponentUtils.es';
-import {prefixSegmentsExperienceId} from '../../utils/prefixSegmentsExperienceId.es';
+import {updateEditableValueAction} from '../../actions/updateEditableValue.es';
+import FragmentEditableField from './FragmentEditableField.es';
+import FragmentStyleEditor from './FragmentStyleEditor.es';
 import templates from './FragmentEntryLinkContent.soy';
-import {UPDATE_EDITABLE_VALUE} from '../../actions/actions.es';
-
-const EDITABLE_FRAGMENT_ENTRY_PROCESSOR = 'com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor';
 
 /**
  * Creates a Fragment Entry Link Content component.
@@ -40,11 +39,23 @@ class FragmentEntryLinkContent extends Component {
 	 * @inheritDoc
 	 */
 	prepareStateForRender(state) {
-		return setIn(
-			state,
+		let nextState = state;
+
+		if (state.languageId && Liferay.Language.direction) {
+			nextState = setIn(
+				nextState,
+				['_languageDirection'],
+				Liferay.Language.direction[state.languageId] || 'ltr'
+			);
+		}
+
+		nextState = setIn(
+			nextState,
 			['content'],
 			this.content ? Soy.toIncDom(this.content) : null
 		);
+
+		return nextState;
 	}
 
 	/**
@@ -305,15 +316,14 @@ class FragmentEntryLinkContent extends Component {
 		const editableValueSegmentsExperienceId = prefixSegmentsExperienceId(this.segmentsExperienceId) ||
 			prefixSegmentsExperienceId(this.defaultSegmentsExperienceId);
 
-		this.store.dispatchAction(
-			UPDATE_EDITABLE_VALUE,
-			{
-				editableId: event.name,
-				editableValue: event.value,
-				editableValueId: this.languageId,
-				editableValueSegmentsExperienceId,
-				fragmentEntryLinkId: this.fragmentEntryLinkId
-			}
+		this.store.dispatch(
+			updateEditableValueAction(
+				this.fragmentEntryLinkId,
+				event.name,
+				this.languageId,
+				event.value,
+				editableValueSegmentsExperienceId
+			)
 		);
 	}
 
@@ -421,33 +431,6 @@ FragmentEntryLinkContent.STATE = {
 		.value(''),
 
 	/**
-	 * Default configurations for AlloyEditor instances.
-	 * @default {}
-	 * @instance
-	 * @memberOf FragmentEntryLink
-	 * @type {object}
-	 */
-	defaultEditorConfigurations: Config.object().value({}),
-
-	/**
-	 * Default language ID for the editor.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentsEditor
-	 * @type {!string}
-	 */
-	defaultLanguageId: Config.string().required(),
-
-	/**
-	 * Default segment ID for the editor.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentsEditor
-	 * @type {!string}
-	 */
-	defaultSegmentsExperienceId: Config.string(),
-
-	/**
 	 * Editable values that should be used instead of the default ones inside
 	 * editable fields.
 	 * @default undefined
@@ -467,97 +450,31 @@ FragmentEntryLinkContent.STATE = {
 	fragmentEntryLinkId: Config.string().required(),
 
 	/**
-	 * URL for the image selector.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentEntryLink
-	 * @type {!string}
-	 */
-	imageSelectorURL: Config.string().required(),
-
-	/**
-	 * Currently selected language ID.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentsEditor
-	 * @type {!string}
-	 */
-	languageId: Config.string().required(),
-
-	/**
-	 * Currently selected segment ID.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentsEditor
-	 * @type {!string}
-	 */
-	segmentsExperienceId: Config.string(),
-
-	/**
-	 * Currently selected mapping type label.
-	 * @default {}
-	 * @instance
-	 * @memberOf FragmentEntryLink
-	 * @review
-	 * @type {{
-	 *   subtype: {
-	 *   	id: !string,
-	 *   	label: !string
-	 *   },
-	 *   type: {
-	 *   	id: !string,
-	 *   	label: !string
-	 *   }
-	 * }}
-	 */
-	selectedMappingTypes: Config
-		.shapeOf(
-			{
-				subtype: Config.shapeOf(
-					{
-						id: Config.string().required(),
-						label: Config.string().required()
-					}
-				),
-				type: Config.shapeOf(
-					{
-						id: Config.string().required(),
-						label: Config.string().required()
-					}
-				)
-			}
-		)
-		.value({}),
-
-	/**
 	 * If <code>true</code>, the asset mapping is enabled.
 	 * @default false
 	 * @instance
 	 * @memberOf FragmentEntryLink
-	 * @type {bool}
+	 * @type {boolean}
 	 */
-	showMapping: Config.bool().value(false),
-
-	/**
-	 * Store instance.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentEntryLink
-	 * @type {MetalStore}
-	 */
-	store: Config.instanceOf(MetalStore),
-
-	/**
-	 * Portlet namespace required for prefixing AlloyEditor instances.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentEntryLink
-	 * @type {!string}
-	 */
-	portletNamespace: Config.string().required()
+	showMapping: Config.bool().value(false)
 };
 
-Soy.register(FragmentEntryLinkContent, templates);
+const ConnectedFragmentEntryLinkContent = getConnectedComponent(
+	FragmentEntryLinkContent,
+	[
+		'defaultEditorConfigurations',
+		'defaultLanguageId',
+		'defaultSegmentsExperienceId',
+		'imageSelectorURL',
+		'languageId',
+		'portletNamespace',
+		'selectedMappingTypes',
+		'segmentsExperienceId',
+		'spritemap'
+	]
+);
 
-export {EDITABLE_FRAGMENT_ENTRY_PROCESSOR};
-export default FragmentEntryLinkContent;
+Soy.register(ConnectedFragmentEntryLinkContent, templates);
+
+export {ConnectedFragmentEntryLinkContent, FragmentEntryLinkContent};
+export default ConnectedFragmentEntryLinkContent;

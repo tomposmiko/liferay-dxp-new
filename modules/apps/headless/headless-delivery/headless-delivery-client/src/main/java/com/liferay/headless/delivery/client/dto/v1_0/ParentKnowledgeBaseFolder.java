@@ -15,6 +15,9 @@
 package com.liferay.headless.delivery.client.dto.v1_0;
 
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
+import com.liferay.headless.delivery.client.serdes.v1_0.ParentKnowledgeBaseFolderSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -66,5 +69,32 @@ public class ParentKnowledgeBaseFolder {
 	}
 
 	protected String folderName;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof ParentKnowledgeBaseFolder)) {
+			return false;
+		}
+
+		ParentKnowledgeBaseFolder parentKnowledgeBaseFolder =
+			(ParentKnowledgeBaseFolder)object;
+
+		return Objects.equals(toString(), parentKnowledgeBaseFolder.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return ParentKnowledgeBaseFolderSerDes.toJSON(this);
+	}
 
 }

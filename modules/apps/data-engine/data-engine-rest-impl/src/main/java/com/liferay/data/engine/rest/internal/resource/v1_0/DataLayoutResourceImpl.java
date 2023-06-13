@@ -69,6 +69,25 @@ public class DataLayoutResourceImpl extends BaseDataLayoutResourceImpl {
 	}
 
 	@Override
+	public Page<DataLayout> getDataDefinitionDataLayoutsPage(
+			Long dataDefinitionId, Pagination pagination)
+		throws Exception {
+
+		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
+			dataDefinitionId);
+
+		return Page.of(
+			transform(
+				_ddmStructureLayoutLocalService.getStructureLayouts(
+					ddmStructure.getGroupId(), pagination.getStartPosition(),
+					pagination.getEndPosition()),
+				this::_toDataLayout),
+			pagination,
+			_ddmStructureLayoutLocalService.getStructureLayoutsCount(
+				ddmStructure.getGroupId()));
+	}
+
+	@Override
 	public DataLayout getDataLayout(Long dataLayoutId) throws Exception {
 		_modelResourcePermission.check(
 			PermissionThreadLocal.getPermissionChecker(), dataLayoutId,

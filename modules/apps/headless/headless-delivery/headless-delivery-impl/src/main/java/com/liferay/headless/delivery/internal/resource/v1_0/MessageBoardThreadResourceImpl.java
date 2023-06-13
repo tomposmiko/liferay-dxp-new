@@ -15,6 +15,8 @@
 package com.liferay.headless.delivery.internal.resource.v1_0;
 
 import com.liferay.asset.kernel.model.AssetTag;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.kernel.service.AssetLinkLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.headless.common.spi.resource.SPIRatingResource;
 import com.liferay.headless.common.spi.service.context.ServiceContextUtil;
@@ -23,6 +25,7 @@ import com.liferay.headless.delivery.dto.v1_0.Rating;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.AggregateRatingUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.CreatorUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.RatingUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.RelatedContentUtil;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.MessageBoardMessageEntityModel;
 import com.liferay.headless.delivery.resource.v1_0.MessageBoardThreadResource;
 import com.liferay.message.boards.constants.MBMessageConstants;
@@ -340,6 +343,10 @@ public class MessageBoardThreadResourceImpl
 					_mbMessageLocalService.getChildMessagesCount(
 						mbMessage.getMessageId(),
 						WorkflowConstants.STATUS_APPROVED);
+				relatedContents = RelatedContentUtil.toRelatedContents(
+					_assetEntryLocalService, _assetLinkLocalService,
+					mbMessage.getModelClassName(), mbMessage.getMessageId(),
+					contextAcceptLanguage.getPreferredLocale());
 				showAsQuestion = mbThread.isQuestion();
 				siteId = mbThread.getGroupId();
 				threadType = _toThreadType(
@@ -422,6 +429,12 @@ public class MessageBoardThreadResourceImpl
 
 	private static final EntityModel _entityModel =
 		new MessageBoardMessageEntityModel();
+
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
+	private AssetLinkLocalService _assetLinkLocalService;
 
 	@Reference
 	private AssetTagLocalService _assetTagLocalService;

@@ -11,12 +11,12 @@
 		}
 	},
 	"dependencies": {
-		"clay-dropdown": "2.14.0",
-		"clay-label": "2.14.0",
-		"metal": "^2.5.18",
-		"metal-dom": "^2.5.18",
-		"metal-soy": "^2.4.5",
-		"metal-state": "^2.6.4"
+		"clay-dropdown": "2.14.2",
+		"clay-label": "2.14.2",
+		"metal": "2.16.8",
+		"metal-dom": "2.16.8",
+		"metal-soy": "2.16.8",
+		"metal-state": "2.16.8"
 	},
 	"name": "journal-web",
 	"scripts": {
@@ -24,5 +24,5 @@
 		"checkFormat": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format"
 	},
-	"version": "3.0.0"
+	"version": "3.0.10"
 }

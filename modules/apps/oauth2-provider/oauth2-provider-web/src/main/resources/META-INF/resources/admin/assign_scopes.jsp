@@ -76,28 +76,14 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 	AUI().use(
 		'node',
 		'aui-modal',
-		'event-outside',
 		function(A) {
 			if (A.all('#<portlet:namespace />navGlobalScopes .panel').size() > 0) {
 				A.one('#<portlet:namespace />navScopeTypes').toggleClass('hidden', false);
 			}
 
-			var modal = new A.Modal(
-				{
-					centered: true,
-					cssClass: 'assign-scopes-modal',
-					visible: false,
-					zIndex: Liferay.zIndex.OVERLAY,
-					modal: true,
-					width: 1000,
-					bodyContent: '<div id="<portlet:namespace />modalBody"/>',
-					headerContent: '<%= UnicodeLanguageUtil.get(request, "choose-one-of-the-following-global-scopes-that-include-this-resource-scope") %>'
-				}
-			).render();
-
 			var handle;
 
-			var appsAccordion = A.one('#appsAccordion');
+			var appsAccordion = A.one('#<portlet:namespace />appsAccordion');
 
 			appsAccordion.delegate(
 				'click',
@@ -114,6 +100,54 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 					if (currentTarget.attr("name")) {
 						return true;
 					}
+
+					var modal = new A.Modal(
+						{
+							centered: true,
+							cssClass: 'assign-scopes-modal modal-full-screen',
+							destroyOnHide: true,
+							visible: true,
+							zIndex: Liferay.zIndex.OVERLAY,
+							modal: true,
+							bodyContent: '<div id="<portlet:namespace />modalBody"/>',
+							headerContent: '<%= UnicodeLanguageUtil.get(request, "choose-one-of-the-following-global-scopes-that-include-this-resource-scope") %>'
+						}
+					).render();
+
+					modal.on(
+						'visibleChange',
+						function(event) {
+							if (event.newVal) {
+								return;
+							}
+
+							document.querySelectorAll('#<portlet:namespace />globalAccordion .panel').forEach(
+								function(globalAccordionPanel) {
+									globalAccordionPanel.classList.remove('hide');
+								}
+							);
+
+							var globalAccordion = document.getElementById('<portlet:namespace />globalAccordion');
+							var navGlobalScopes = document.getElementById('<portlet:namespace />navGlobalScopes');
+
+							if (navGlobalScopes && globalAccordion) {
+								dom.append(navGlobalScopes, globalAccordion);
+							}
+						}
+					);
+
+					modal.addToolbar(
+						[
+							{
+								cssClass: 'btn-primary',
+								label: '<liferay-ui:message key="close" />',
+								on: {
+									click: function() {
+										modal.hide();
+									}
+								}
+							}
+						]);
 
 					var scopeAliases = currentTarget.attr("data-slave").split(" ");
 
@@ -142,31 +176,6 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 					if (globalAccordion && modalBody) {
 						dom.append(modalBody, globalAccordion);
 					}
-
-					var boundingBox = modal.get('boundingBox');
-
-					handle = boundingBox.once(
-						'clickoutside',
-						function() {
-							modal.hide();
-
-							document.querySelectorAll('#<portlet:namespace />globalAccordion .panel').forEach(
-								function(globalAccordionPanel) {
-									globalAccordionPanel.classList.remove('hide');
-								}
-							);
-
-							var globalAccordion = document.getElementById('<portlet:namespace />globalAccordion');
-							var navGlobalScopes = document.getElementById('<portlet:namespace />navGlobalScopes');
-
-							if (navGlobalScopes && globalAccordion) {
-								dom.append(navGlobalScopes, globalAccordion);
-							}
-						},
-						modal
-					);
-
-					modal.show();
 
 					event.preventDefault();
 
@@ -209,7 +218,11 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 								continue;
 							}
 
-							A.all('input[data-master]:checked').each(
+							A.all('#<portlet:namespace />globalAccordion .panel[data-master]').filter(
+								function() {
+									return this.one('input:checked');
+								}
+							).each(
 								function() {
 									var array = this.attr("data-master").split(" ");
 

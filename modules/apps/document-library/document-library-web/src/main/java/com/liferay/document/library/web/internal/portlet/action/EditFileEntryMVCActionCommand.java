@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -163,11 +164,13 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			String fileName = validFileNameKVP.getKey();
 			String originalFileName = validFileNameKVP.getValue();
 
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			jsonObject.put("added", Boolean.TRUE);
-			jsonObject.put("fileName", fileName);
-			jsonObject.put("originalFileName", originalFileName);
+			JSONObject jsonObject = JSONUtil.put(
+				"added", Boolean.TRUE
+			).put(
+				"fileName", fileName
+			).put(
+				"originalFileName", originalFileName
+			);
 
 			jsonArray.put(jsonObject);
 		}
@@ -176,12 +179,15 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			String fileName = invalidFileNameKVP.getKey();
 			String errorMessage = invalidFileNameKVP.getValue();
 
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			jsonObject.put("added", Boolean.FALSE);
-			jsonObject.put("errorMessage", errorMessage);
-			jsonObject.put("fileName", fileName);
-			jsonObject.put("originalFileName", fileName);
+			JSONObject jsonObject = JSONUtil.put(
+				"added", Boolean.FALSE
+			).put(
+				"errorMessage", errorMessage
+			).put(
+				"fileName", fileName
+			).put(
+				"originalFileName", fileName
+			);
 
 			jsonArray.put(jsonObject);
 		}
@@ -427,8 +433,11 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			String errorMessage = themeDisplay.translate(
 				"an-unexpected-error-occurred-while-deleting-the-file");
 
-			jsonObject.put("deleted", Boolean.FALSE);
-			jsonObject.put("errorMessage", errorMessage);
+			jsonObject.put(
+				"deleted", Boolean.FALSE
+			).put(
+				"errorMessage", errorMessage
+			);
 		}
 
 		JSONPortletResponseUtil.writeJSON(
@@ -952,9 +961,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 					description, changeLog, inputStream, size, serviceContext);
 
 				if (cmd.equals(Constants.ADD_DYNAMIC)) {
-					JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-					jsonObject.put("fileEntryId", fileEntry.getFileEntryId());
+					JSONObject jsonObject = JSONUtil.put(
+						"fileEntryId", fileEntry.getFileEntryId());
 
 					JSONPortletResponseUtil.writeJSON(
 						actionRequest, actionResponse, jsonObject);

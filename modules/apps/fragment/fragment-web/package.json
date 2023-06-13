@@ -1,12 +1,12 @@
 {
 	"dependencies": {
-		"metal": "^2.16.7",
-		"metal-component": "^2.16.7",
-		"metal-debounce": "^2.0.1",
-		"metal-dom": "^2.16.7",
-		"metal-soy": "^2.16.7",
-		"metal-state": "^2.16.7",
-		"metal-uri": "^3.1.2"
+		"metal": "2.16.8",
+		"metal-component": "2.16.8",
+		"metal-debounce": "2.0.1",
+		"metal-dom": "2.16.8",
+		"metal-soy": "2.16.8",
+		"metal-state": "2.16.8",
+		"metal-uri": "2.4.0"
 	},
 	"name": "fragment-web",
 	"scripts": {
@@ -14,5 +14,5 @@
 		"checkFormat": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format"
 	},
-	"version": "2.0.0"
+	"version": "2.0.4"
 }

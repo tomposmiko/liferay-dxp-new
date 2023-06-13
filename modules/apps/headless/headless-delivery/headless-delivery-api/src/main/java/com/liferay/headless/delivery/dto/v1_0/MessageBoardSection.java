@@ -28,8 +28,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -81,7 +87,7 @@ public class MessageBoardSection {
 
 	}
 
-	@Schema(description = "The creator of the MessageBoardSection")
+	@Schema(description = "The section's creator.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -109,7 +115,7 @@ public class MessageBoardSection {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema(description = "The creation date of the MessageBoardSection.")
+	@Schema(description = "The date the section was created.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -137,9 +143,7 @@ public class MessageBoardSection {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(
-		description = "The last time a field of the MessageBoardSection changed."
-	)
+	@Schema(description = "The last time the section was changed.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -167,7 +171,7 @@ public class MessageBoardSection {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(description = "The description of the MessageBoardSection")
+	@Schema(description = "The section's description.")
 	public String getDescription() {
 		return description;
 	}
@@ -195,7 +199,7 @@ public class MessageBoardSection {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The section's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -221,9 +225,7 @@ public class MessageBoardSection {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(
-		description = "The number of child MessageBoardSections that belong to this MessageBoardSection."
-	)
+	@Schema(description = "The number of this section's child sections.")
 	public Integer getNumberOfMessageBoardSections() {
 		return numberOfMessageBoardSections;
 	}
@@ -256,7 +258,7 @@ public class MessageBoardSection {
 	protected Integer numberOfMessageBoardSections;
 
 	@Schema(
-		description = "The number of child MessageBoardThreads that belong to this MessageBoardSection."
+		description = "The number of message board threads in this section."
 	)
 	public Integer getNumberOfMessageBoardThreads() {
 		return numberOfMessageBoardThreads;
@@ -289,9 +291,7 @@ public class MessageBoardSection {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfMessageBoardThreads;
 
-	@Schema(
-		description = "The site identificator where this MessageBoardSection is scoped."
-	)
+	@Schema(description = "The ID of the site to which this section is scoped.")
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -319,7 +319,7 @@ public class MessageBoardSection {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
-	@Schema(description = "The main title of the resource.")
+	@Schema(description = "The section's main title.")
 	public String getTitle() {
 		return title;
 	}
@@ -349,7 +349,7 @@ public class MessageBoardSection {
 	protected String title;
 
 	@Schema(
-		description = "Write only property to specify the default permissions."
+		description = "A write-only property that specifies the default permissions."
 	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
@@ -414,122 +414,162 @@ public class MessageBoardSection {
 
 		sb.append("{");
 
-		sb.append("\"creator\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (creator == null) {
-			sb.append("null");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"creator\": ");
+
+			sb.append(String.valueOf(creator));
 		}
-		else {
-			sb.append(creator);
-		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCreated);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
 
-		sb.append("\"dateModified\": ");
-
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"dateModified\": ");
 
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(description);
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"description\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (numberOfMessageBoardSections != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfMessageBoardSections\": ");
+			sb.append("\"numberOfMessageBoardSections\": ");
 
-		if (numberOfMessageBoardSections == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfMessageBoardSections);
 		}
 
-		sb.append(", ");
+		if (numberOfMessageBoardThreads != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfMessageBoardThreads\": ");
+			sb.append("\"numberOfMessageBoardThreads\": ");
 
-		if (numberOfMessageBoardThreads == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfMessageBoardThreads);
 		}
 
-		sb.append(", ");
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\": ");
 
-		if (siteId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(siteId);
 		}
 
-		sb.append(", ");
+		if (title != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\": ");
 
-		if (title == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(title);
+
+			sb.append(_escape(title));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (viewableBy != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"viewableBy\": ");
+			sb.append("\"viewableBy\": ");
 
-		if (viewableBy == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
 			sb.append(viewableBy);
+
 			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

@@ -26,8 +26,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -43,6 +49,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "FormStructure")
 public class FormStructure {
 
+	@Schema
 	public String[] getAvailableLanguages() {
 		return availableLanguages;
 	}
@@ -70,6 +77,7 @@ public class FormStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] availableLanguages;
 
+	@Schema
 	public Creator getCreator() {
 		return creator;
 	}
@@ -97,6 +105,7 @@ public class FormStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Creator creator;
 
+	@Schema
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -124,6 +133,7 @@ public class FormStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date dateCreated;
 
+	@Schema
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -151,6 +161,7 @@ public class FormStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date dateModified;
 
+	@Schema
 	public String getDescription() {
 		return description;
 	}
@@ -206,6 +217,7 @@ public class FormStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FormPage[] formPages;
 
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -231,6 +243,7 @@ public class FormStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -256,6 +269,7 @@ public class FormStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
+	@Schema
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -338,17 +352,23 @@ public class FormStructure {
 
 		sb.append("{");
 
-		sb.append("\"availableLanguages\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (availableLanguages == null) {
-			sb.append("null");
-		}
-		else {
+		if (availableLanguages != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"availableLanguages\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < availableLanguages.length; i++) {
 				sb.append("\"");
-				sb.append(availableLanguages[i]);
+
+				sb.append(_escape(availableLanguages[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < availableLanguages.length) {
@@ -359,68 +379,69 @@ public class FormStructure {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"creator\": ");
 
-		if (creator == null) {
-			sb.append("null");
+			sb.append(String.valueOf(creator));
 		}
-		else {
-			sb.append(creator);
-		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCreated);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
 
-		sb.append("\"dateModified\": ");
-
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"dateModified\": ");
 
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(description);
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"formPages\": ");
+			sb.append("\"description\": ");
 
-		if (formPages == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (formPages != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"formPages\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < formPages.length; i++) {
-				sb.append(formPages[i]);
+				sb.append(String.valueOf(formPages[i]));
 
 				if ((i + 1) < formPages.length) {
 					sb.append(", ");
@@ -430,50 +451,83 @@ public class FormStructure {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\": ");
 
-		if (siteId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(siteId);
 		}
 
-		sb.append(", ");
+		if (successPage != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"successPage\": ");
+			sb.append("\"successPage\": ");
 
-		if (successPage == null) {
-			sb.append("null");
+			sb.append(String.valueOf(successPage));
 		}
-		else {
-			sb.append(successPage);
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

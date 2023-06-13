@@ -15,6 +15,9 @@
 package com.liferay.headless.delivery.client.dto.v1_0;
 
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
+import com.liferay.headless.delivery.client.serdes.v1_0.ValueSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -147,5 +150,31 @@ public class Value {
 	}
 
 	protected StructuredContentLink structuredContentLink;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Value)) {
+			return false;
+		}
+
+		Value value = (Value)object;
+
+		return Objects.equals(toString(), value.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return ValueSerDes.toJSON(this);
+	}
 
 }

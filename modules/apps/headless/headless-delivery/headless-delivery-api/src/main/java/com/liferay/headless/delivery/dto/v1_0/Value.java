@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Value")
 public class Value {
 
-	@Schema(description = "The content of this field for simple types.")
+	@Schema(description = "The field's content for simple types.")
 	public String getData() {
 		return data;
 	}
@@ -68,7 +71,7 @@ public class Value {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String data;
 
-	@Schema(description = "A ContentDocument element.")
+	@Schema(description = "A content document element.")
 	public ContentDocument getDocument() {
 		return document;
 	}
@@ -122,7 +125,9 @@ public class Value {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Geo geo;
 
-	@Schema(description = "A ContentDocument element storing an image file.")
+	@Schema(
+		description = "A content document element that stores an image file."
+	)
 	public ContentDocument getImage() {
 		return image;
 	}
@@ -150,7 +155,7 @@ public class Value {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ContentDocument image;
 
-	@Schema(description = "A link to a page inside the server.")
+	@Schema(description = "A link to a page on the server.")
 	public String getLink() {
 		return link;
 	}
@@ -176,7 +181,7 @@ public class Value {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String link;
 
-	@Schema(description = "A link to a JournalArticle stored in the server.")
+	@Schema(description = "A link to structured content on the server.")
 	public StructuredContentLink getStructuredContentLink() {
 		return structuredContentLink;
 	}
@@ -234,72 +239,107 @@ public class Value {
 
 		sb.append("{");
 
-		sb.append("\"data\": ");
+		if (data != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (data == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"data\": ");
+
 			sb.append("\"");
-			sb.append(data);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(data));
 
-		sb.append("\"document\": ");
-
-		if (document == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(document);
-		}
-
-		sb.append(", ");
-
-		sb.append("\"geo\": ");
-
-		if (geo == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(geo);
-		}
-
-		sb.append(", ");
-
-		sb.append("\"image\": ");
-
-		if (image == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(image);
-		}
-
-		sb.append(", ");
-
-		sb.append("\"link\": ");
-
-		if (link == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(link);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (document != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"structuredContentLink\": ");
+			sb.append("\"document\": ");
 
-		if (structuredContentLink == null) {
-			sb.append("null");
+			sb.append(String.valueOf(document));
 		}
-		else {
-			sb.append(structuredContentLink);
+
+		if (geo != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"geo\": ");
+
+			sb.append(String.valueOf(geo));
+		}
+
+		if (image != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"image\": ");
+
+			sb.append(String.valueOf(image));
+		}
+
+		if (link != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"link\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(link));
+
+			sb.append("\"");
+		}
+
+		if (structuredContentLink != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"structuredContentLink\": ");
+
+			sb.append(String.valueOf(structuredContentLink));
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

@@ -18,8 +18,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.SegmentUser;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,11 +60,11 @@ public class SegmentUserSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"emailAddress\":");
+			sb.append("\"emailAddress\": ");
 
 			sb.append("\"");
 
-			sb.append(segmentUser.getEmailAddress());
+			sb.append(_escape(segmentUser.getEmailAddress()));
 
 			sb.append("\"");
 		}
@@ -72,7 +74,7 @@ public class SegmentUserSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(segmentUser.getId());
 		}
@@ -82,11 +84,11 @@ public class SegmentUserSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(segmentUser.getName());
+			sb.append(_escape(segmentUser.getName()));
 
 			sb.append("\"");
 		}
@@ -94,6 +96,13 @@ public class SegmentUserSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		SegmentUserJSONParser segmentUserJSONParser =
+			new SegmentUserJSONParser();
+
+		return segmentUserJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(SegmentUser segmentUser) {
@@ -126,6 +135,41 @@ public class SegmentUserSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class SegmentUserJSONParser

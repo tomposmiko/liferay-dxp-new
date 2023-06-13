@@ -1,12 +1,12 @@
 {
 	"dependencies": {
-		"clay-button": "2.14.0",
-		"clay-icon": "2.14.0",
-		"clay-label": "2.14.0",
-		"metal-component": "^2.16.7",
-		"metal-dom": "^2.16.7",
-		"metal-soy": "^2.16.7",
-		"metal-state": "^2.16.7"
+		"clay-button": "2.14.2",
+		"clay-icon": "2.14.2",
+		"clay-label": "2.14.2",
+		"metal-component": "2.16.8",
+		"metal-dom": "2.16.8",
+		"metal-soy": "2.16.8",
+		"metal-state": "2.16.8"
 	},
 	"name": "portal-search-admin-web",
 	"scripts": {
@@ -14,5 +14,5 @@
 		"checkFormat": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format"
 	},
-	"version": "2.0.0"
+	"version": "2.0.2"
 }

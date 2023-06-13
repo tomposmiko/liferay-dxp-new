@@ -285,6 +285,9 @@ public class DataFactory {
 
 		models.add(UserPersonalSite.class.getName());
 
+		models.add(_getMBDiscussionCombinedClassName(BlogsEntry.class));
+		models.add(_getMBDiscussionCombinedClassName(WikiPage.class));
+
 		for (String model : models) {
 			ClassNameModel classNameModel = new ClassNameModelImpl();
 
@@ -2259,6 +2262,32 @@ public class DataFactory {
 		return mbCategoryModels;
 	}
 
+	public AssetEntryModel newMBDiscussionAssetEntryModel(
+		BlogsEntryModel blogsEntryModel) {
+
+		ClassNameModel classNameModel = _classNameModels.get(
+			_getMBDiscussionCombinedClassName(BlogsEntry.class));
+
+		return newAssetEntryModel(
+			blogsEntryModel.getGroupId(), blogsEntryModel.getCreateDate(),
+			blogsEntryModel.getModifiedDate(), classNameModel.getClassNameId(),
+			blogsEntryModel.getEntryId(), "", 0, true, false, "",
+			String.valueOf(blogsEntryModel.getGroupId()));
+	}
+
+	public AssetEntryModel newMBDiscussionAssetEntryModel(
+		WikiPageModel wikiPageModel) {
+
+		ClassNameModel classNameModel = _classNameModels.get(
+			_getMBDiscussionCombinedClassName(WikiPage.class));
+
+		return newAssetEntryModel(
+			wikiPageModel.getGroupId(), wikiPageModel.getCreateDate(),
+			wikiPageModel.getModifiedDate(), classNameModel.getClassNameId(),
+			wikiPageModel.getResourcePrimKey(), "", 0, true, false, "",
+			String.valueOf(wikiPageModel.getGroupId()));
+	}
+
 	public MBDiscussionModel newMBDiscussionModel(
 		long groupId, long classNameId, long classPK, long threadId) {
 
@@ -3885,6 +3914,12 @@ public class DataFactory {
 		catch (ReflectiveOperationException roe) {
 			ReflectionUtil.throwException(roe);
 		}
+	}
+
+	private String _getMBDiscussionCombinedClassName(Class<?> clazz) {
+		return StringBundler.concat(
+			MBDiscussion.class.getName(), StringPool.UNDERLINE,
+			clazz.getName());
 	}
 
 	private String _getResourcePermissionModelName(String... classNames) {

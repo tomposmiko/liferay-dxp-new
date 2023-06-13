@@ -19,8 +19,10 @@ import com.liferay.data.engine.rest.client.dto.v1_0.DataDefinitionRuleParameter;
 import com.liferay.data.engine.rest.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -57,10 +59,10 @@ public class DataDefinitionRuleSerDes {
 
 		if (dataDefinitionRule.getDataDefinitionFieldNames() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dataDefinitionFieldNames\":");
+			sb.append("\"dataDefinitionFieldNames\": ");
 
 			sb.append("[");
 
@@ -70,7 +72,9 @@ public class DataDefinitionRuleSerDes {
 
 				sb.append("\"");
 
-				sb.append(dataDefinitionRule.getDataDefinitionFieldNames()[i]);
+				sb.append(
+					_escape(
+						dataDefinitionRule.getDataDefinitionFieldNames()[i]));
 
 				sb.append("\"");
 
@@ -87,10 +91,10 @@ public class DataDefinitionRuleSerDes {
 
 		if (dataDefinitionRule.getDataDefinitionRuleParameters() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dataDefinitionRuleParameters\":");
+			sb.append("\"dataDefinitionRuleParameters\": ");
 
 			sb.append("[");
 
@@ -101,7 +105,7 @@ public class DataDefinitionRuleSerDes {
 				 i++) {
 
 				sb.append(
-					DataDefinitionRuleParameterSerDes.toJSON(
+					String.valueOf(
 						dataDefinitionRule.getDataDefinitionRuleParameters()
 							[i]));
 
@@ -117,28 +121,28 @@ public class DataDefinitionRuleSerDes {
 
 		if (dataDefinitionRule.getName() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(dataDefinitionRule.getName());
+			sb.append(_escape(dataDefinitionRule.getName()));
 
 			sb.append("\"");
 		}
 
 		if (dataDefinitionRule.getRuleType() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"ruleType\":");
+			sb.append("\"ruleType\": ");
 
 			sb.append("\"");
 
-			sb.append(dataDefinitionRule.getRuleType());
+			sb.append(_escape(dataDefinitionRule.getRuleType()));
 
 			sb.append("\"");
 		}
@@ -146,6 +150,13 @@ public class DataDefinitionRuleSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		DataDefinitionRuleJSONParser dataDefinitionRuleJSONParser =
+			new DataDefinitionRuleJSONParser();
+
+		return dataDefinitionRuleJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -193,6 +204,41 @@ public class DataDefinitionRuleSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class DataDefinitionRuleJSONParser

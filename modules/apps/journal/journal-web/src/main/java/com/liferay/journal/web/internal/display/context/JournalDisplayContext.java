@@ -57,6 +57,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
@@ -75,6 +76,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -501,19 +503,17 @@ public class JournalDisplayContext {
 			_themeDisplay.getScopeGroupId(),
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+		JSONObject jsonObject = JSONUtil.put(
+			"children", jsonArray
+		).put(
+			"icon", "folder"
+		).put(
+			"id", JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID
+		).put(
+			"name", LanguageUtil.get(_themeDisplay.getLocale(), "home")
+		);
 
-		jsonObject.put("children", jsonArray);
-		jsonObject.put("icon", "folder");
-		jsonObject.put("id", JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-		jsonObject.put(
-			"name", LanguageUtil.get(_themeDisplay.getLocale(), "home"));
-
-		JSONArray rootJSONArray = JSONFactoryUtil.createJSONArray();
-
-		rootJSONArray.put(jsonObject);
-
-		return rootJSONArray;
+		return JSONUtil.put(jsonObject);
 	}
 
 	public String getFolderTitle() {
@@ -548,6 +548,19 @@ public class JournalDisplayContext {
 		_keywords = ParamUtil.getString(_request, "keywords");
 
 		return _keywords;
+	}
+
+	public JournalArticle getLatestArticle(JournalArticle journalArticle) {
+		JournalArticle latestArticle =
+			JournalArticleLocalServiceUtil.fetchLatestArticle(
+				journalArticle.getGroupId(), journalArticle.getArticleId(),
+				WorkflowConstants.STATUS_ANY);
+
+		if (latestArticle != null) {
+			return latestArticle;
+		}
+
+		return journalArticle;
 	}
 
 	public String getNavigation() {
@@ -814,10 +827,13 @@ public class JournalDisplayContext {
 
 			articleSearchContainer.setRowChecker(entriesChecker);
 
-			EntriesMover entriesMover = new EntriesMover(
-				_trashHelper.isTrashEnabled(_themeDisplay.getScopeGroupId()));
+			if (!BrowserSnifferUtil.isMobile(_request)) {
+				EntriesMover entriesMover = new EntriesMover(
+					_trashHelper.isTrashEnabled(
+						_themeDisplay.getScopeGroupId()));
 
-			articleSearchContainer.setRowMover(entriesMover);
+				articleSearchContainer.setRowMover(entriesMover);
+			}
 		}
 
 		if (isNavigationMine() || isNavigationRecent()) {
@@ -925,6 +941,7 @@ public class JournalDisplayContext {
 
 				if (className.equals(JournalArticle.class.getName())) {
 					JournalArticle article = null;
+					boolean visible = true;
 
 					if (!showVersions) {
 						article =
@@ -940,9 +957,16 @@ public class JournalDisplayContext {
 
 						article = JournalArticleLocalServiceUtil.fetchArticle(
 							groupId, articleId, version);
+
+						visible =
+							_journalChangeTrackingHelper.
+								isJournalArticleInChangeList(
+									_themeDisplay.getUserId(), article.getId());
 					}
 
-					results.add(article);
+					if (visible) {
+						results.add(article);
+					}
 				}
 				else if (className.equals(JournalFolder.class.getName())) {
 					JournalFolder folder =
@@ -1216,9 +1240,13 @@ public class JournalDisplayContext {
 				jsonObject.put("children", childrenJSONArray);
 			}
 
-			jsonObject.put("icon", "folder");
-			jsonObject.put("id", folder.getFolderId());
-			jsonObject.put("name", folder.getName());
+			jsonObject.put(
+				"icon", "folder"
+			).put(
+				"id", folder.getFolderId()
+			).put(
+				"name", folder.getName()
+			);
 
 			if (folder.getFolderId() == getParentFolderId()) {
 				jsonObject.put("selected", true);

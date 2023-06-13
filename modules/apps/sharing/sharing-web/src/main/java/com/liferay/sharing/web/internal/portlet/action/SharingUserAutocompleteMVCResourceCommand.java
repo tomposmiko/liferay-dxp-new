@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -35,6 +37,7 @@ import com.liferay.portal.kernel.util.comparator.UserScreenNameComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.sharing.constants.SharingPortletKeys;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -105,6 +108,10 @@ public class SharingUserAutocompleteMVCResourceCommand
 
 		User user = themeDisplay.getUser();
 
+		if (ArrayUtil.isEmpty(user.getGroupIds())) {
+			return Collections.emptyList();
+		}
+
 		return _userLocalService.searchSocial(
 			themeDisplay.getCompanyId(), user.getGroupIds(), query, 0, 20,
 			new UserScreenNameComparator());
@@ -125,10 +132,11 @@ public class SharingUserAutocompleteMVCResourceCommand
 				continue;
 			}
 
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			jsonObject.put("emailAddress", user.getEmailAddress());
-			jsonObject.put("fullName", user.getFullName());
+			JSONObject jsonObject = JSONUtil.put(
+				"emailAddress", user.getEmailAddress()
+			).put(
+				"fullName", user.getFullName()
+			);
 
 			String portraitURL = StringPool.BLANK;
 
@@ -136,9 +144,11 @@ public class SharingUserAutocompleteMVCResourceCommand
 				portraitURL = user.getPortraitURL(themeDisplay);
 			}
 
-			jsonObject.put("portraitURL", portraitURL);
-
-			jsonObject.put("userId", Long.valueOf(user.getUserId()));
+			jsonObject.put(
+				"portraitURL", portraitURL
+			).put(
+				"userId", Long.valueOf(user.getUserId())
+			);
 
 			jsonArray.put(jsonObject);
 		}

@@ -15,12 +15,16 @@
 package com.liferay.portal.vulcan.internal.jaxrs.message.body;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import com.liferay.portal.vulcan.fields.FieldsQueryParam;
 import com.liferay.portal.vulcan.internal.jackson.databind.ser.VulcanPropertyFilter;
+import com.liferay.portal.vulcan.internal.jaxrs.serializer.PageJsonSerializer;
+import com.liferay.portal.vulcan.pagination.Page;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -73,7 +77,18 @@ public abstract class BaseMessageBodyWriter
 
 		ObjectMapper objectMapper = _getObjectMapper(clazz);
 
-		objectMapper.writeValue(outputStream, object);
+		if (mediaType.equals(MediaType.APPLICATION_XML_TYPE)) {
+			SimpleModule simpleModule = new SimpleModule();
+
+			simpleModule.addSerializer(Page.class, new PageJsonSerializer());
+
+			objectMapper.registerModule(simpleModule);
+		}
+
+		ObjectWriter objectWriter = objectMapper.writerFor(
+			objectMapper.constructType(genericType));
+
+		objectWriter.writeValue(outputStream, object);
 
 		outputStream.flush();
 	}

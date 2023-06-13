@@ -17,7 +17,10 @@ package com.liferay.blogs.web.internal.info.display.contributor;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.info.display.contributor.BaseInfoDisplayContributorField;
 import com.liferay.info.display.contributor.InfoDisplayContributorField;
+import com.liferay.info.display.contributor.InfoDisplayContributorFieldType;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -53,27 +56,30 @@ public class BlogsEntryCoverImageInfoDisplayContributorField
 	}
 
 	@Override
-	public String getType() {
-		return "image";
+	public InfoDisplayContributorFieldType getType() {
+		return InfoDisplayContributorFieldType.IMAGE;
 	}
 
 	@Override
-	public String getValue(BlogsEntry blogsEntry, Locale locale) {
+	public Object getValue(BlogsEntry blogsEntry, Locale locale) {
 		ThemeDisplay themeDisplay = getThemeDisplay();
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		if (themeDisplay != null) {
 			try {
-				return blogsEntry.getCoverImageURL(themeDisplay);
+				jsonObject.put(
+					"url", blogsEntry.getCoverImageURL(themeDisplay));
 			}
 			catch (PortalException pe) {
 				_log.error(pe, pe);
-
-				return null;
 			}
 		}
 		else {
-			return blogsEntry.getCoverImageURL();
+			jsonObject.put("url", blogsEntry.getCoverImageURL());
 		}
+
+		return jsonObject;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

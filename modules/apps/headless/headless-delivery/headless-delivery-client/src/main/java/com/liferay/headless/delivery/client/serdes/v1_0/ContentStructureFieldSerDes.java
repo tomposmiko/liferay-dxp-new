@@ -19,8 +19,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.Option;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -60,11 +62,11 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dataType\":");
+			sb.append("\"dataType\": ");
 
 			sb.append("\"");
 
-			sb.append(contentStructureField.getDataType());
+			sb.append(_escape(contentStructureField.getDataType()));
 
 			sb.append("\"");
 		}
@@ -74,11 +76,11 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"inputControl\":");
+			sb.append("\"inputControl\": ");
 
 			sb.append("\"");
 
-			sb.append(contentStructureField.getInputControl());
+			sb.append(_escape(contentStructureField.getInputControl()));
 
 			sb.append("\"");
 		}
@@ -88,11 +90,11 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"label\":");
+			sb.append("\"label\": ");
 
 			sb.append("\"");
 
-			sb.append(contentStructureField.getLabel());
+			sb.append(_escape(contentStructureField.getLabel()));
 
 			sb.append("\"");
 		}
@@ -102,7 +104,7 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"localizable\":");
+			sb.append("\"localizable\": ");
 
 			sb.append(contentStructureField.getLocalizable());
 		}
@@ -112,7 +114,7 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"multiple\":");
+			sb.append("\"multiple\": ");
 
 			sb.append(contentStructureField.getMultiple());
 		}
@@ -122,11 +124,11 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(contentStructureField.getName());
+			sb.append(_escape(contentStructureField.getName()));
 
 			sb.append("\"");
 		}
@@ -136,7 +138,7 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"nestedContentStructureFields\":");
+			sb.append("\"nestedContentStructureFields\": ");
 
 			sb.append("[");
 
@@ -146,7 +148,7 @@ public class ContentStructureFieldSerDes {
 				 i++) {
 
 				sb.append(
-					ContentStructureFieldSerDes.toJSON(
+					String.valueOf(
 						contentStructureField.getNestedContentStructureFields()
 							[i]));
 
@@ -165,7 +167,7 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"options\":");
+			sb.append("\"options\": ");
 
 			sb.append("[");
 
@@ -173,7 +175,7 @@ public class ContentStructureFieldSerDes {
 				 i++) {
 
 				sb.append(
-					OptionSerDes.toJSON(contentStructureField.getOptions()[i]));
+					String.valueOf(contentStructureField.getOptions()[i]));
 
 				if ((i + 1) < contentStructureField.getOptions().length) {
 					sb.append(", ");
@@ -188,11 +190,11 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"predefinedValue\":");
+			sb.append("\"predefinedValue\": ");
 
 			sb.append("\"");
 
-			sb.append(contentStructureField.getPredefinedValue());
+			sb.append(_escape(contentStructureField.getPredefinedValue()));
 
 			sb.append("\"");
 		}
@@ -202,7 +204,7 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"repeatable\":");
+			sb.append("\"repeatable\": ");
 
 			sb.append(contentStructureField.getRepeatable());
 		}
@@ -212,7 +214,7 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"required\":");
+			sb.append("\"required\": ");
 
 			sb.append(contentStructureField.getRequired());
 		}
@@ -222,7 +224,7 @@ public class ContentStructureFieldSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"showLabel\":");
+			sb.append("\"showLabel\": ");
 
 			sb.append(contentStructureField.getShowLabel());
 		}
@@ -230,6 +232,13 @@ public class ContentStructureFieldSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		ContentStructureFieldJSONParser contentStructureFieldJSONParser =
+			new ContentStructureFieldJSONParser();
+
+		return contentStructureFieldJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -346,6 +355,41 @@ public class ContentStructureFieldSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class ContentStructureFieldJSONParser

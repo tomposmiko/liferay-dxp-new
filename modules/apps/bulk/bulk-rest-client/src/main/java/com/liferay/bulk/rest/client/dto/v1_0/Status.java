@@ -15,6 +15,9 @@
 package com.liferay.bulk.rest.client.dto.v1_0;
 
 import com.liferay.bulk.rest.client.function.UnsafeSupplier;
+import com.liferay.bulk.rest.client.serdes.v1_0.StatusSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -45,5 +48,31 @@ public class Status {
 	}
 
 	protected Boolean actionInProgress;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Status)) {
+			return false;
+		}
+
+		Status status = (Status)object;
+
+		return Objects.equals(toString(), status.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return StatusSerDes.toJSON(this);
+	}
 
 }

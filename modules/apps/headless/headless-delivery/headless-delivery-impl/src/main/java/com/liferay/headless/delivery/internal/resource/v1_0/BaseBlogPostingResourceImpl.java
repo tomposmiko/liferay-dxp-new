@@ -64,34 +64,46 @@ public abstract class BaseBlogPostingResourceImpl
 
 	@Override
 	@DELETE
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "blogPostingId")}
+	)
 	@Path("/blog-postings/{blogPostingId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "BlogPosting")})
 	public void deleteBlogPosting(
-			@NotNull @PathParam("blogPostingId") Long blogPostingId)
+			@NotNull @Parameter(hidden = true) @PathParam("blogPostingId") Long
+				blogPostingId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "blogPostingId")}
+	)
 	@Path("/blog-postings/{blogPostingId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "BlogPosting")})
 	public BlogPosting getBlogPosting(
-			@NotNull @PathParam("blogPostingId") Long blogPostingId)
+			@NotNull @Parameter(hidden = true) @PathParam("blogPostingId") Long
+				blogPostingId)
 		throws Exception {
 
 		return new BlogPosting();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PATCH
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "blogPostingId")}
+	)
 	@Path("/blog-postings/{blogPostingId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "BlogPosting")})
 	public BlogPosting patchBlogPosting(
-			@NotNull @PathParam("blogPostingId") Long blogPostingId,
+			@NotNull @Parameter(hidden = true) @PathParam("blogPostingId") Long
+				blogPostingId,
 			BlogPosting blogPosting)
 		throws Exception {
 
@@ -165,13 +177,17 @@ public abstract class BaseBlogPostingResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PUT
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "blogPostingId")}
+	)
 	@Path("/blog-postings/{blogPostingId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "BlogPosting")})
 	public BlogPosting putBlogPosting(
-			@NotNull @PathParam("blogPostingId") Long blogPostingId,
+			@NotNull @Parameter(hidden = true) @PathParam("blogPostingId") Long
+				blogPostingId,
 			BlogPosting blogPosting)
 		throws Exception {
 
@@ -180,34 +196,46 @@ public abstract class BaseBlogPostingResourceImpl
 
 	@Override
 	@DELETE
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "blogPostingId")}
+	)
 	@Path("/blog-postings/{blogPostingId}/my-rating")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "BlogPosting")})
 	public void deleteBlogPostingMyRating(
-			@NotNull @PathParam("blogPostingId") Long blogPostingId)
+			@NotNull @Parameter(hidden = true) @PathParam("blogPostingId") Long
+				blogPostingId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "blogPostingId")}
+	)
 	@Path("/blog-postings/{blogPostingId}/my-rating")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "BlogPosting")})
 	public Rating getBlogPostingMyRating(
-			@NotNull @PathParam("blogPostingId") Long blogPostingId)
+			@NotNull @Parameter(hidden = true) @PathParam("blogPostingId") Long
+				blogPostingId)
 		throws Exception {
 
 		return new Rating();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "blogPostingId")}
+	)
 	@Path("/blog-postings/{blogPostingId}/my-rating")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "BlogPosting")})
 	public Rating postBlogPostingMyRating(
-			@NotNull @PathParam("blogPostingId") Long blogPostingId,
+			@NotNull @Parameter(hidden = true) @PathParam("blogPostingId") Long
+				blogPostingId,
 			Rating rating)
 		throws Exception {
 
@@ -215,13 +243,17 @@ public abstract class BaseBlogPostingResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PUT
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "blogPostingId")}
+	)
 	@Path("/blog-postings/{blogPostingId}/my-rating")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "BlogPosting")})
 	public Rating putBlogPostingMyRating(
-			@NotNull @PathParam("blogPostingId") Long blogPostingId,
+			@NotNull @Parameter(hidden = true) @PathParam("blogPostingId") Long
+				blogPostingId,
 			Rating rating)
 		throws Exception {
 
@@ -232,32 +264,37 @@ public abstract class BaseBlogPostingResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "siteId"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path("/sites/{siteId}/blog-postings")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "BlogPosting")})
 	public Page<BlogPosting> getSiteBlogPostingsPage(
-			@NotNull @PathParam("siteId") Long siteId,
-			@QueryParam("search") String search, @Context Filter filter,
-			@Context Pagination pagination, @Context Sort[] sorts)
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
+			@Parameter(hidden = true) @QueryParam("search") String search,
+			@Context Filter filter, @Context Pagination pagination,
+			@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "siteId")})
 	@Path("/sites/{siteId}/blog-postings")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "BlogPosting")})
 	public BlogPosting postSiteBlogPosting(
-			@NotNull @PathParam("siteId") Long siteId, BlogPosting blogPosting)
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
+			BlogPosting blogPosting)
 		throws Exception {
 
 		return new BlogPosting();

@@ -19,8 +19,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.Service;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -58,14 +60,12 @@ public class ServiceSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"hoursAvailable\":");
+			sb.append("\"hoursAvailable\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < service.getHoursAvailable().length; i++) {
-				sb.append(
-					HoursAvailableSerDes.toJSON(
-						service.getHoursAvailable()[i]));
+				sb.append(String.valueOf(service.getHoursAvailable()[i]));
 
 				if ((i + 1) < service.getHoursAvailable().length) {
 					sb.append(", ");
@@ -75,26 +75,16 @@ public class ServiceSerDes {
 			sb.append("]");
 		}
 
-		if (service.getId() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"id\":");
-
-			sb.append(service.getId());
-		}
-
 		if (service.getServiceType() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"serviceType\":");
+			sb.append("\"serviceType\": ");
 
 			sb.append("\"");
 
-			sb.append(service.getServiceType());
+			sb.append(_escape(service.getServiceType()));
 
 			sb.append("\"");
 		}
@@ -102,6 +92,12 @@ public class ServiceSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		ServiceJSONParser serviceJSONParser = new ServiceJSONParser();
+
+		return serviceJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Service service) {
@@ -119,13 +115,6 @@ public class ServiceSerDes {
 				"hoursAvailable", String.valueOf(service.getHoursAvailable()));
 		}
 
-		if (service.getId() == null) {
-			map.put("id", null);
-		}
-		else {
-			map.put("id", String.valueOf(service.getId()));
-		}
-
 		if (service.getServiceType() == null) {
 			map.put("serviceType", null);
 		}
@@ -134,6 +123,41 @@ public class ServiceSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class ServiceJSONParser extends BaseJSONParser<Service> {
@@ -163,11 +187,6 @@ public class ServiceSerDes {
 						).toArray(
 							size -> new HoursAvailable[size]
 						));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "id")) {
-				if (jsonParserFieldValue != null) {
-					service.setId(Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "serviceType")) {

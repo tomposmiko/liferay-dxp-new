@@ -115,6 +115,11 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 	}
 
 	@Override
+	public Integer getFrom() {
+		return _from;
+	}
+
+	@Override
 	public List<String> getIndexes() {
 		QueryConfig queryConfig = _searchContext.getQueryConfig();
 
@@ -150,6 +155,11 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 	@Override
 	public Query getRescoreQuery() {
 		return _rescoreQuery;
+	}
+
+	@Override
+	public Integer getSize() {
+		return _size;
 	}
 
 	@Override
@@ -206,10 +216,20 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 		_federatedSearchKey = federatedSearchKey;
 	}
 
+	public void setFrom(Integer from) {
+		_from = from;
+	}
+
 	public void setHighlightEnabled(boolean highlightEnabled) {
 		QueryConfig queryConfig = _searchContext.getQueryConfig();
 
 		queryConfig.setHighlightEnabled(highlightEnabled);
+	}
+
+	public void setHighlightFields(String... highlightFields) {
+		QueryConfig queryConfig = _searchContext.getQueryConfig();
+
+		queryConfig.setHighlightFieldNames(highlightFields);
 	}
 
 	public void setIncludeResponseString(boolean includeResponseString) {
@@ -244,6 +264,16 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 		_rescoreQuery = query;
 	}
 
+	public void setSelectedFieldNames(String... selectedFieldNames) {
+		QueryConfig queryConfig = _searchContext.getQueryConfig();
+
+		queryConfig.setSelectedFieldNames(selectedFieldNames);
+	}
+
+	public void setSize(Integer size) {
+		_size = size;
+	}
+
 	public void setSorts(Sort... sorts) {
 		_sorts.clear();
 
@@ -269,6 +299,7 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 	private String _federatedSearchKey;
 	private final Map<String, SearchRequest> _federatedSearchRequestsMap =
 		new LinkedHashMap<>();
+	private Integer _from;
 	private boolean _includeResponseString;
 	private final List<Class<?>> _modelIndexerClasses = new ArrayList<>();
 	private final Map<String, PipelineAggregation> _pipelineAggregationsMap =
@@ -277,6 +308,7 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 	private Query _query;
 	private Query _rescoreQuery;
 	private final SearchContext _searchContext;
+	private Integer _size;
 	private final List<Sort> _sorts = new ArrayList<>();
 	private final List<StatsRequest> _statsRequests = new ArrayList<>();
 

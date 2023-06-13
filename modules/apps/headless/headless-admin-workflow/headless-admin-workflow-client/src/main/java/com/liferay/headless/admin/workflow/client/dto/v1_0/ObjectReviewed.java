@@ -15,6 +15,9 @@
 package com.liferay.headless.admin.workflow.client.dto.v1_0;
 
 import com.liferay.headless.admin.workflow.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.workflow.client.serdes.v1_0.ObjectReviewedSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -64,5 +67,31 @@ public class ObjectReviewed {
 	}
 
 	protected String resourceType;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof ObjectReviewed)) {
+			return false;
+		}
+
+		ObjectReviewed objectReviewed = (ObjectReviewed)object;
+
+		return Objects.equals(toString(), objectReviewed.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return ObjectReviewedSerDes.toJSON(this);
+	}
 
 }

@@ -18,8 +18,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.Creator;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -56,11 +58,11 @@ public class CreatorSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"additionalName\":");
+			sb.append("\"additionalName\": ");
 
 			sb.append("\"");
 
-			sb.append(creator.getAdditionalName());
+			sb.append(_escape(creator.getAdditionalName()));
 
 			sb.append("\"");
 		}
@@ -70,11 +72,11 @@ public class CreatorSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"familyName\":");
+			sb.append("\"familyName\": ");
 
 			sb.append("\"");
 
-			sb.append(creator.getFamilyName());
+			sb.append(_escape(creator.getFamilyName()));
 
 			sb.append("\"");
 		}
@@ -84,11 +86,11 @@ public class CreatorSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"givenName\":");
+			sb.append("\"givenName\": ");
 
 			sb.append("\"");
 
-			sb.append(creator.getGivenName());
+			sb.append(_escape(creator.getGivenName()));
 
 			sb.append("\"");
 		}
@@ -98,7 +100,7 @@ public class CreatorSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(creator.getId());
 		}
@@ -108,11 +110,11 @@ public class CreatorSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"image\":");
+			sb.append("\"image\": ");
 
 			sb.append("\"");
 
-			sb.append(creator.getImage());
+			sb.append(_escape(creator.getImage()));
 
 			sb.append("\"");
 		}
@@ -122,11 +124,11 @@ public class CreatorSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(creator.getName());
+			sb.append(_escape(creator.getName()));
 
 			sb.append("\"");
 		}
@@ -136,11 +138,11 @@ public class CreatorSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"profileURL\":");
+			sb.append("\"profileURL\": ");
 
 			sb.append("\"");
 
-			sb.append(creator.getProfileURL());
+			sb.append(_escape(creator.getProfileURL()));
 
 			sb.append("\"");
 		}
@@ -148,6 +150,12 @@ public class CreatorSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		CreatorJSONParser creatorJSONParser = new CreatorJSONParser();
+
+		return creatorJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Creator creator) {
@@ -208,6 +216,41 @@ public class CreatorSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class CreatorJSONParser extends BaseJSONParser<Creator> {

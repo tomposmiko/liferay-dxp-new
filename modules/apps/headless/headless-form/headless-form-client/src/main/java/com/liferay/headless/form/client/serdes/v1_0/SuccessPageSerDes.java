@@ -18,8 +18,10 @@ import com.liferay.headless.form.client.dto.v1_0.SuccessPage;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,11 +60,11 @@ public class SuccessPageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(successPage.getDescription());
+			sb.append(_escape(successPage.getDescription()));
 
 			sb.append("\"");
 		}
@@ -72,11 +74,11 @@ public class SuccessPageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"headline\":");
+			sb.append("\"headline\": ");
 
 			sb.append("\"");
 
-			sb.append(successPage.getHeadline());
+			sb.append(_escape(successPage.getHeadline()));
 
 			sb.append("\"");
 		}
@@ -86,7 +88,7 @@ public class SuccessPageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(successPage.getId());
 		}
@@ -94,6 +96,13 @@ public class SuccessPageSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		SuccessPageJSONParser successPageJSONParser =
+			new SuccessPageJSONParser();
+
+		return successPageJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(SuccessPage successPage) {
@@ -126,6 +135,41 @@ public class SuccessPageSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class SuccessPageJSONParser

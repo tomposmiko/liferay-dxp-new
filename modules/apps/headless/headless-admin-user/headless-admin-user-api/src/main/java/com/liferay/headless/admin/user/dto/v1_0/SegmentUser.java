@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "SegmentUser")
 public class SegmentUser {
 
-	@Schema(description = "The email address of the segment user")
+	@Schema(description = "The user's email address.")
 	public String getEmailAddress() {
 		return emailAddress;
 	}
@@ -70,7 +73,7 @@ public class SegmentUser {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String emailAddress;
 
-	@Schema(description = "The internal ID of the segment user")
+	@Schema(description = "The user's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -96,7 +99,7 @@ public class SegmentUser {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The full name of the segment user")
+	@Schema(description = "The user's full name.")
 	public String getName() {
 		return name;
 	}
@@ -149,39 +152,77 @@ public class SegmentUser {
 
 		sb.append("{");
 
-		sb.append("\"emailAddress\": ");
+		if (emailAddress != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (emailAddress == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"emailAddress\": ");
+
 			sb.append("\"");
-			sb.append(emailAddress);
+
+			sb.append(_escape(emailAddress));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(name));
+
+			sb.append("\"");
 		}
-		else {
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(name);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

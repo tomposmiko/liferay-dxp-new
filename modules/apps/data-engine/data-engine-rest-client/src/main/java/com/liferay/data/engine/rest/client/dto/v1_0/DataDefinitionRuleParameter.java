@@ -15,6 +15,9 @@
 package com.liferay.data.engine.rest.client.dto.v1_0;
 
 import com.liferay.data.engine.rest.client.function.UnsafeSupplier;
+import com.liferay.data.engine.rest.client.serdes.v1_0.DataDefinitionRuleParameterSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -64,5 +67,33 @@ public class DataDefinitionRuleParameter {
 	}
 
 	protected Object value;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof DataDefinitionRuleParameter)) {
+			return false;
+		}
+
+		DataDefinitionRuleParameter dataDefinitionRuleParameter =
+			(DataDefinitionRuleParameter)object;
+
+		return Objects.equals(
+			toString(), dataDefinitionRuleParameter.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return DataDefinitionRuleParameterSerDes.toJSON(this);
+	}
 
 }

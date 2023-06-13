@@ -63,6 +63,7 @@
 		<suppress checks="SubnameCheck" files="portal-kernel/src/com/liferay/portal/kernel/util/ListUtil\.java" />
 		<suppress checks="SubnameCheck" files="portal-kernel/src/com/liferay/portal/kernel/util/PackagingUtil\.java" />
 		<suppress checks="SubnameCheck" files="portal-kernel/test/unit/com/liferay/portal/kernel/util/ListUtilTest\.java" />
+		<suppress checks="UnusedMethodCheck" files="portal-test-integration/src/com/liferay/portal/test/rule/SyntheticBundleClassTestRule\.java" />
 		<suppress checks="ValidatorIsNullCheck" files="portal-impl/src/com/liferay/portal/service/persistence/impl/UserFinderImpl\.java" />
 		<suppress checks="VariableDeclarationAsUsedCheck" files="portal-impl/src/com/liferay/portal/action/UpdateLayoutAction\.java" />
 
@@ -185,11 +186,9 @@
 
 		<suppress checks="JSONPackageJSONCheck" files="modules/apps/analytics/analytics-client-js/package\.json" />
 		<suppress checks="JSONPackageJSONCheck" files="modules/apps/dynamic-data-mapping/dynamic-data-mapping-form-builder/package\.json" />
-		<suppress checks="JSONPackageJSONCheck" files="modules/apps/dynamic-data-mapping/dynamic-data-mapping-form-field-type/package\.json" />
 		<suppress checks="JSONPackageJSONCheck" files="modules/apps/dynamic-data-mapping/dynamic-data-mapping-form-web/package\.json" />
 		<suppress checks="JSONPackageJSONCheck" files="modules/apps/frontend-js/frontend-js-node-shims/package\.json" />
 		<suppress checks="JSONPackageJSONCheck" files="modules/apps/frontend-js/frontend-js-web/package\.json" />
-		<suppress checks="JSONPackageJSONCheck" files="modules/apps/portal-search/portal-search-web/package\.json" />
 		<suppress checks="JSONPackageJSONCheck" files="modules/apps/segments/segments-web/package\.json" />
 	</source-check>
 </suppressions>

@@ -15,6 +15,9 @@
 package com.liferay.data.engine.rest.client.dto.v1_0;
 
 import com.liferay.data.engine.rest.client.function.UnsafeSupplier;
+import com.liferay.data.engine.rest.client.serdes.v1_0.CustomPropertySerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -64,5 +67,31 @@ public class CustomProperty {
 	}
 
 	protected Object value;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof CustomProperty)) {
+			return false;
+		}
+
+		CustomProperty customProperty = (CustomProperty)object;
+
+		return Objects.equals(toString(), customProperty.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return CustomPropertySerDes.toJSON(this);
+	}
 
 }

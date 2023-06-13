@@ -24,7 +24,12 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -40,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "DataRecordCollection")
 public class DataRecordCollection {
 
+	@Schema
 	public Long getDataDefinitionId() {
 		return dataDefinitionId;
 	}
@@ -67,6 +73,7 @@ public class DataRecordCollection {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long dataDefinitionId;
 
+	@Schema
 	public LocalizedValue[] getDescription() {
 		return description;
 	}
@@ -94,6 +101,7 @@ public class DataRecordCollection {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected LocalizedValue[] description;
 
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -119,6 +127,7 @@ public class DataRecordCollection {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
+	@Schema
 	public LocalizedValue[] getName() {
 		return name;
 	}
@@ -174,27 +183,27 @@ public class DataRecordCollection {
 
 		sb.append("{");
 
-		sb.append("\"dataDefinitionId\": ");
+		if (dataDefinitionId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (dataDefinitionId == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"dataDefinitionId\": ");
+
 			sb.append(dataDefinitionId);
 		}
 
-		sb.append(", ");
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"description\": ");
 
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < description.length; i++) {
-				sb.append(description[i]);
+				sb.append(String.valueOf(description[i]));
 
 				if ((i + 1) < description.length) {
 					sb.append(", ");
@@ -204,29 +213,27 @@ public class DataRecordCollection {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < name.length; i++) {
-				sb.append(name[i]);
+				sb.append(String.valueOf(name[i]));
 
 				if ((i + 1) < name.length) {
 					sb.append(", ");
@@ -234,6 +241,41 @@ public class DataRecordCollection {
 			}
 
 			sb.append("]");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

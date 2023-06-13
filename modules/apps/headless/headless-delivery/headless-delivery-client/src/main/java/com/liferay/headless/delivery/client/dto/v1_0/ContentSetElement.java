@@ -15,6 +15,9 @@
 package com.liferay.headless.delivery.client.dto.v1_0;
 
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
+import com.liferay.headless.delivery.client.serdes.v1_0.ContentSetElementSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -106,5 +109,31 @@ public class ContentSetElement {
 	}
 
 	protected String title;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof ContentSetElement)) {
+			return false;
+		}
+
+		ContentSetElement contentSetElement = (ContentSetElement)object;
+
+		return Objects.equals(toString(), contentSetElement.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return ContentSetElementSerDes.toJSON(this);
+	}
 
 }

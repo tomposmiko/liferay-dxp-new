@@ -21,8 +21,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -64,11 +66,11 @@ public class WorkflowTaskAssignToMeSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"comment\":");
+			sb.append("\"comment\": ");
 
 			sb.append("\"");
 
-			sb.append(workflowTaskAssignToMe.getComment());
+			sb.append(_escape(workflowTaskAssignToMe.getComment()));
 
 			sb.append("\"");
 		}
@@ -78,7 +80,7 @@ public class WorkflowTaskAssignToMeSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dueDate\":");
+			sb.append("\"dueDate\": ");
 
 			sb.append("\"");
 
@@ -92,6 +94,13 @@ public class WorkflowTaskAssignToMeSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		WorkflowTaskAssignToMeJSONParser workflowTaskAssignToMeJSONParser =
+			new WorkflowTaskAssignToMeJSONParser();
+
+		return workflowTaskAssignToMeJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -120,6 +129,41 @@ public class WorkflowTaskAssignToMeSerDes {
 				workflowTaskAssignToMe.getDueDate()));
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class WorkflowTaskAssignToMeJSONParser

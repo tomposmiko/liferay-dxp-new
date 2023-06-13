@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portlet.util.test.PortletKeys;
 
@@ -75,20 +76,24 @@ public class LayoutCopyHelperTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
+
+		_serviceContext = ServiceContextTestUtil.getServiceContext(
+			_group.getGroupId());
+
+		ServiceContextThreadLocal.pushServiceContext(_serviceContext);
 	}
 
 	@Test
 	public void testCopyContentLayoutStructure() throws Exception {
 		Layout sourceLayout = LayoutTestUtil.addLayout(
 			_group.getGroupId(), StringPool.BLANK);
-
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		List<FragmentEntryLink> fragmentEntryLinks = new ArrayList<>();
 
@@ -97,7 +102,7 @@ public class LayoutCopyHelperTest {
 				sourceLayout.getUserId(), sourceLayout.getGroupId(), 0,
 				_portal.getClassNameId(Layout.class), sourceLayout.getPlid(),
 				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
-				StringPool.BLANK, 0, serviceContext);
+				StringPool.BLANK, 0, _serviceContext);
 
 		fragmentEntryLinks.add(fragmentEntryLink1);
 
@@ -106,7 +111,7 @@ public class LayoutCopyHelperTest {
 				sourceLayout.getUserId(), sourceLayout.getGroupId(), 0,
 				_portal.getClassNameId(Layout.class), sourceLayout.getPlid(),
 				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
-				StringPool.BLANK, 0, serviceContext);
+				StringPool.BLANK, 0, _serviceContext);
 
 		fragmentEntryLinks.add(fragmentEntryLink2);
 
@@ -117,7 +122,7 @@ public class LayoutCopyHelperTest {
 		_layoutPageTemplateStructureLocalService.addLayoutPageTemplateStructure(
 			sourceLayout.getUserId(), sourceLayout.getGroupId(),
 			_portal.getClassNameId(Layout.class), sourceLayout.getPlid(),
-			jsonObject.toString(), serviceContext);
+			jsonObject.toString(), _serviceContext);
 
 		Layout targetLayout = LayoutTestUtil.addLayout(
 			_group.getGroupId(), StringPool.BLANK);
@@ -286,10 +291,7 @@ public class LayoutCopyHelperTest {
 			PortletPreferencesFactoryUtil.toXML(targetPortletPreferences),
 			PortletPreferencesFactoryUtil.toXML(sourcePortletPreferences));
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
-
-		ServiceContextThreadLocal.pushServiceContext(serviceContext);
+		ServiceContextThreadLocal.pushServiceContext(_serviceContext);
 
 		_layoutCopyHelper.copyLayout(sourceLayout, targetLayout);
 
@@ -414,5 +416,7 @@ public class LayoutCopyHelperTest {
 
 	@Inject(filter = "javax.portlet.name=" + PortletKeys.TEST)
 	private final Portlet _portlet = null;
+
+	private ServiceContext _serviceContext;
 
 }

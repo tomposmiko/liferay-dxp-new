@@ -108,6 +108,12 @@ public class SearcherImpl implements Searcher {
 
 		SearchContext searchContext = searchRequestImpl.getSearchContext();
 
+		if (isCount(searchRequestImpl)) {
+			indexSearcherHelper.searchCount(searchContext, null);
+
+			return;
+		}
+
 		Hits hits = indexSearcherHelper.search(searchContext, null);
 
 		searchResponseBuilder.hits(hits);
@@ -124,6 +130,12 @@ public class SearcherImpl implements Searcher {
 
 		Hits hits = search(facetedSearcher, searchContext);
 
+		if (isCount(searchRequestImpl)) {
+			searchResponseBuilder.count(hits.getLength());
+
+			return;
+		}
+
 		searchResponseBuilder.hits(hits);
 	}
 
@@ -135,6 +147,12 @@ public class SearcherImpl implements Searcher {
 
 		SearchContext searchContext = searchRequestImpl.getSearchContext();
 
+		if (isCount(searchRequestImpl)) {
+			searchResponseBuilder.count(searchCount(indexer, searchContext));
+
+			return;
+		}
+
 		Hits hits = search(indexer, searchContext);
 
 		searchResponseBuilder.hits(hits);
@@ -144,13 +162,9 @@ public class SearcherImpl implements Searcher {
 		SearchRequestImpl searchRequestImpl,
 		SearchResponseBuilder searchResponseBuilder) {
 
-		boolean indexerSearch = false;
+		List<String> indexes = searchRequestImpl.getIndexes();
 
-		if (getCompanyId(searchRequestImpl) != 0) {
-			indexerSearch = true;
-		}
-
-		if (indexerSearch) {
+		if (indexes.isEmpty()) {
 			doIndexerSearch(searchRequestImpl, searchResponseBuilder);
 		}
 		else {
@@ -177,6 +191,16 @@ public class SearcherImpl implements Searcher {
 		return null;
 	}
 
+	protected boolean isCount(SearchRequestImpl searchRequestImpl) {
+		if ((searchRequestImpl.getSize() != null) &&
+			(searchRequestImpl.getSize() == 0)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	protected Hits search(
 		FacetedSearcher facetedSearcher, SearchContext searchContext) {
 
@@ -191,6 +215,15 @@ public class SearcherImpl implements Searcher {
 	protected Hits search(Indexer indexer, SearchContext searchContext) {
 		try {
 			return indexer.search(searchContext);
+		}
+		catch (SearchException se) {
+			throw uncheck(se);
+		}
+	}
+
+	protected long searchCount(Indexer indexer, SearchContext searchContext) {
+		try {
+			return indexer.searchCount(searchContext);
 		}
 		catch (SearchException se) {
 			throw uncheck(se);

@@ -105,12 +105,11 @@ LayoutColumn.STATE = {
 	layoutColumn: Config.arrayOf(
 		Config.shapeOf(
 			{
+				actions: Config.string().required(),
 				actionURLs: Config.object().required(),
 				active: Config.bool().required(),
 				description: Config.string().required(),
 				hasChild: Config.bool().required(),
-				homePage: Config.bool().required(),
-				homePageTitle: Config.string().required(),
 				plid: Config.string().required(),
 				title: Config.string().required(),
 				url: Config.string().required()

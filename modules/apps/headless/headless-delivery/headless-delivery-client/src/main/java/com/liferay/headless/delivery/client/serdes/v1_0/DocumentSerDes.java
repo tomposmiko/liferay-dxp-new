@@ -16,6 +16,7 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 
 import com.liferay.headless.delivery.client.dto.v1_0.AdaptedImage;
 import com.liferay.headless.delivery.client.dto.v1_0.Document;
+import com.liferay.headless.delivery.client.dto.v1_0.RelatedContent;
 import com.liferay.headless.delivery.client.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
@@ -23,8 +24,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -65,13 +68,12 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"adaptedImages\":");
+			sb.append("\"adaptedImages\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < document.getAdaptedImages().length; i++) {
-				sb.append(
-					AdaptedImageSerDes.toJSON(document.getAdaptedImages()[i]));
+				sb.append(String.valueOf(document.getAdaptedImages()[i]));
 
 				if ((i + 1) < document.getAdaptedImages().length) {
 					sb.append(", ");
@@ -86,10 +88,9 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"aggregateRating\":");
+			sb.append("\"aggregateRating\": ");
 
-			sb.append(
-				AggregateRatingSerDes.toJSON(document.getAggregateRating()));
+			sb.append(String.valueOf(document.getAggregateRating()));
 		}
 
 		if (document.getContentUrl() != null) {
@@ -97,11 +98,11 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"contentUrl\":");
+			sb.append("\"contentUrl\": ");
 
 			sb.append("\"");
 
-			sb.append(document.getContentUrl());
+			sb.append(_escape(document.getContentUrl()));
 
 			sb.append("\"");
 		}
@@ -111,9 +112,9 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(CreatorSerDes.toJSON(document.getCreator()));
+			sb.append(String.valueOf(document.getCreator()));
 		}
 
 		if (document.getDateCreated() != null) {
@@ -121,7 +122,7 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -136,7 +137,7 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -151,11 +152,11 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(document.getDescription());
+			sb.append(_escape(document.getDescription()));
 
 			sb.append("\"");
 		}
@@ -165,7 +166,7 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"documentFolderId\":");
+			sb.append("\"documentFolderId\": ");
 
 			sb.append(document.getDocumentFolderId());
 		}
@@ -175,11 +176,11 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"encodingFormat\":");
+			sb.append("\"encodingFormat\": ");
 
 			sb.append("\"");
 
-			sb.append(document.getEncodingFormat());
+			sb.append(_escape(document.getEncodingFormat()));
 
 			sb.append("\"");
 		}
@@ -189,11 +190,11 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"fileExtension\":");
+			sb.append("\"fileExtension\": ");
 
 			sb.append("\"");
 
-			sb.append(document.getFileExtension());
+			sb.append(_escape(document.getFileExtension()));
 
 			sb.append("\"");
 		}
@@ -203,7 +204,7 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(document.getId());
 		}
@@ -213,14 +214,14 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"keywords\":");
+			sb.append("\"keywords\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < document.getKeywords().length; i++) {
 				sb.append("\"");
 
-				sb.append(document.getKeywords()[i]);
+				sb.append(_escape(document.getKeywords()[i]));
 
 				sb.append("\"");
 
@@ -237,9 +238,29 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"numberOfComments\":");
+			sb.append("\"numberOfComments\": ");
 
 			sb.append(document.getNumberOfComments());
+		}
+
+		if (document.getRelatedContents() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"relatedContents\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < document.getRelatedContents().length; i++) {
+				sb.append(String.valueOf(document.getRelatedContents()[i]));
+
+				if ((i + 1) < document.getRelatedContents().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		if (document.getSizeInBytes() != null) {
@@ -247,7 +268,7 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"sizeInBytes\":");
+			sb.append("\"sizeInBytes\": ");
 
 			sb.append(document.getSizeInBytes());
 		}
@@ -257,14 +278,12 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"taxonomyCategories\":");
+			sb.append("\"taxonomyCategories\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < document.getTaxonomyCategories().length; i++) {
-				sb.append(
-					TaxonomyCategorySerDes.toJSON(
-						document.getTaxonomyCategories()[i]));
+				sb.append(String.valueOf(document.getTaxonomyCategories()[i]));
 
 				if ((i + 1) < document.getTaxonomyCategories().length) {
 					sb.append(", ");
@@ -279,7 +298,7 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"taxonomyCategoryIds\":");
+			sb.append("\"taxonomyCategoryIds\": ");
 
 			sb.append("[");
 
@@ -299,11 +318,11 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"title\":");
+			sb.append("\"title\": ");
 
 			sb.append("\"");
 
-			sb.append(document.getTitle());
+			sb.append(_escape(document.getTitle()));
 
 			sb.append("\"");
 		}
@@ -313,7 +332,7 @@ public class DocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"viewableBy\":");
+			sb.append("\"viewableBy\": ");
 
 			sb.append("\"");
 
@@ -325,6 +344,12 @@ public class DocumentSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		DocumentJSONParser documentJSONParser = new DocumentJSONParser();
+
+		return documentJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Document document) {
@@ -351,7 +376,7 @@ public class DocumentSerDes {
 		else {
 			map.put(
 				"aggregateRating",
-				AggregateRatingSerDes.toJSON(document.getAggregateRating()));
+				String.valueOf(document.getAggregateRating()));
 		}
 
 		if (document.getContentUrl() == null) {
@@ -365,7 +390,7 @@ public class DocumentSerDes {
 			map.put("creator", null);
 		}
 		else {
-			map.put("creator", CreatorSerDes.toJSON(document.getCreator()));
+			map.put("creator", String.valueOf(document.getCreator()));
 		}
 
 		map.put(
@@ -431,6 +456,15 @@ public class DocumentSerDes {
 				String.valueOf(document.getNumberOfComments()));
 		}
 
+		if (document.getRelatedContents() == null) {
+			map.put("relatedContents", null);
+		}
+		else {
+			map.put(
+				"relatedContents",
+				String.valueOf(document.getRelatedContents()));
+		}
+
 		if (document.getSizeInBytes() == null) {
 			map.put("sizeInBytes", null);
 		}
@@ -471,6 +505,41 @@ public class DocumentSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class DocumentJSONParser extends BaseJSONParser<Document> {
@@ -568,6 +637,18 @@ public class DocumentSerDes {
 				if (jsonParserFieldValue != null) {
 					document.setNumberOfComments(
 						Integer.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "relatedContents")) {
+				if (jsonParserFieldValue != null) {
+					document.setRelatedContents(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> RelatedContentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new RelatedContent[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "sizeInBytes")) {

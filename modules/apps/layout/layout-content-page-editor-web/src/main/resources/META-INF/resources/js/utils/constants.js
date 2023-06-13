@@ -32,7 +32,8 @@ export const COMPATIBLE_TYPES = {
 		'ddm-number',
 		'ddm-text-html',
 		'text',
-		'textarea'
+		'textarea',
+		'url'
 	],
 
 	'image': [
@@ -47,7 +48,8 @@ export const COMPATIBLE_TYPES = {
 		'ddm-number',
 		'ddm-text-html',
 		'text',
-		'textarea'
+		'textarea',
+		'url'
 	],
 
 	'text': [
@@ -56,7 +58,8 @@ export const COMPATIBLE_TYPES = {
 		'ddm-integer',
 		'ddm-number',
 		'text',
-		'textarea'
+		'textarea',
+		'url'
 	]
 };
 
@@ -149,14 +152,16 @@ export const FLOATING_TOOLBAR_BUTTONS = {
 };
 
 /**
- * Fragment Entry Link types
- * @review
- * @type {!object}
+ * @type {string}
  */
-export const FRAGMENT_ENTRY_LINK_TYPES = {
-	component: 'fragment-entry-link-component',
-	section: 'fragment-entry-link-section'
-};
+export const EDITABLE_FRAGMENT_ENTRY_PROCESSOR = 'com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor';
+
+/**
+ * Fragments Editor dragging class
+ * @review
+ * @type {string}
+ */
+export const FRAGMENTS_EDITOR_DRAGGING_CLASS = 'dragging';
 
 /**
  * Fragments Editor item borders
@@ -187,8 +192,8 @@ export const FRAGMENTS_EDITOR_ITEM_TYPES = {
  * @type {!object}
  */
 export const FRAGMENTS_EDITOR_ROW_TYPES = {
-	componentRow: 'fragments-editor-component-row',
-	sectionRow: 'fragments-editor-section-row'
+	componentRow: '1',
+	sectionRow: '0'
 };
 
 /**

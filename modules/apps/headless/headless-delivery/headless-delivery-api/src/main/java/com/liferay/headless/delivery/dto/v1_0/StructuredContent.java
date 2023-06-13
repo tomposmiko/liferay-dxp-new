@@ -28,11 +28,18 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -44,7 +51,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Generated("")
 @GraphQLName("StructuredContent")
 @JsonFilter("Liferay.Vulcan")
-@Schema(requiredProperties = {"contentStructureId"})
+@Schema(requiredProperties = {"contentStructureId", "title"})
 @XmlRootElement(name = "StructuredContent")
 public class StructuredContent {
 
@@ -81,9 +88,7 @@ public class StructuredContent {
 
 	}
 
-	@Schema(
-		description = "The information of the ratings (average, number) associated to this resource."
-	)
+	@Schema(description = "The structured content's average rating.")
 	public AggregateRating getAggregateRating() {
 		return aggregateRating;
 	}
@@ -113,7 +118,7 @@ public class StructuredContent {
 	protected AggregateRating aggregateRating;
 
 	@Schema(
-		description = "A list of languages the content has a translation for."
+		description = "The list of languages the structured content has a translation for."
 	)
 	public String[] getAvailableLanguages() {
 		return availableLanguages;
@@ -143,7 +148,7 @@ public class StructuredContent {
 	protected String[] availableLanguages;
 
 	@Schema(
-		description = "A list of fields that store the information of the StructuredContent."
+		description = "The list of fields that store the structured content's information."
 	)
 	public ContentField[] getContentFields() {
 		return contentFields;
@@ -172,7 +177,7 @@ public class StructuredContent {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ContentField[] contentFields;
 
-	@Schema(description = "The identifier of the ContentStructure.")
+	@Schema(description = "The ID of the `ContentStructure`.")
 	public Long getContentStructureId() {
 		return contentStructureId;
 	}
@@ -201,7 +206,7 @@ public class StructuredContent {
 	@NotNull
 	protected Long contentStructureId;
 
-	@Schema(description = "The creator of the StructuredContent")
+	@Schema(description = "The structured content's creator.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -229,7 +234,7 @@ public class StructuredContent {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema(description = "The creation date of the StructuredContent.")
+	@Schema(description = "The structured content's creation date.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -258,7 +263,7 @@ public class StructuredContent {
 	protected Date dateCreated;
 
 	@Schema(
-		description = "The last time a field of the StructuredContent changed."
+		description = "The last time any field of the structured content was changed."
 	)
 	public Date getDateModified() {
 		return dateModified;
@@ -288,7 +293,7 @@ public class StructuredContent {
 	protected Date dateModified;
 
 	@Schema(
-		description = "The last date when the StructuredContent was published."
+		description = "The structured content's most recent publication date."
 	)
 	public Date getDatePublished() {
 		return datePublished;
@@ -317,7 +322,7 @@ public class StructuredContent {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date datePublished;
 
-	@Schema(description = "The description of the StructuredContent")
+	@Schema(description = "The structured content's description.")
 	public String getDescription() {
 		return description;
 	}
@@ -346,7 +351,7 @@ public class StructuredContent {
 	protected String description;
 
 	@Schema(
-		description = "A relative URL to the rendered content of the StructuredContent."
+		description = "A relative URL to the structured content's rendered content."
 	)
 	public String getFriendlyUrlPath() {
 		return friendlyUrlPath;
@@ -375,7 +380,7 @@ public class StructuredContent {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String friendlyUrlPath;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The structured content's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -402,7 +407,7 @@ public class StructuredContent {
 	protected Long id;
 
 	@Schema(
-		description = "An identifier, indepedent of the database, that can be used to reference the resource."
+		description = "An identifier, independent of the database, that can be used to reference the structured content."
 	)
 	public String getKey() {
 		return key;
@@ -430,7 +435,7 @@ public class StructuredContent {
 	protected String key;
 
 	@Schema(
-		description = "A list of keywords describing the StructuredContent."
+		description = "A list of keywords describing the structured content."
 	)
 	public String[] getKeywords() {
 		return keywords;
@@ -460,7 +465,7 @@ public class StructuredContent {
 	protected String[] keywords;
 
 	@Schema(
-		description = "The number of child comments this StructuredContent has received."
+		description = "The number of comments the structured content has received."
 	)
 	public Integer getNumberOfComments() {
 		return numberOfComments;
@@ -489,8 +494,37 @@ public class StructuredContent {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfComments;
 
+	@Schema
+	public RelatedContent[] getRelatedContents() {
+		return relatedContents;
+	}
+
+	public void setRelatedContents(RelatedContent[] relatedContents) {
+		this.relatedContents = relatedContents;
+	}
+
+	@JsonIgnore
+	public void setRelatedContents(
+		UnsafeSupplier<RelatedContent[], Exception>
+			relatedContentsUnsafeSupplier) {
+
+		try {
+			relatedContents = relatedContentsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected RelatedContent[] relatedContents;
+
 	@Schema(
-		description = "A list of rendered StructuredContents, the result of using a template to process the content, returning html."
+		description = "A list of rendered structured content, which results from using a template to process the content and return HTML."
 	)
 	public RenderedContent[] getRenderedContents() {
 		return renderedContents;
@@ -521,7 +555,7 @@ public class StructuredContent {
 	protected RenderedContent[] renderedContents;
 
 	@Schema(
-		description = "The site identificator where this StructuredContent is scoped."
+		description = "The ID of the site to which this structured content is scoped."
 	)
 	public Long getSiteId() {
 		return siteId;
@@ -551,7 +585,7 @@ public class StructuredContent {
 	protected Long siteId;
 
 	@Schema(
-		description = "The categories asociated with this StructuredContent."
+		description = "The categories associated with this structured content."
 	)
 	public TaxonomyCategory[] getTaxonomyCategories() {
 		return taxonomyCategories;
@@ -582,7 +616,7 @@ public class StructuredContent {
 	protected TaxonomyCategory[] taxonomyCategories;
 
 	@Schema(
-		description = "A write only field to add TaxonomyCategory to this resource."
+		description = "A write-only field to add a category to this structured content."
 	)
 	public Long[] getTaxonomyCategoryIds() {
 		return taxonomyCategoryIds;
@@ -611,7 +645,7 @@ public class StructuredContent {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long[] taxonomyCategoryIds;
 
-	@Schema(description = "The main title of the StructuredContent.")
+	@Schema(description = "The structured content's main title.")
 	public String getTitle() {
 		return title;
 	}
@@ -637,10 +671,11 @@ public class StructuredContent {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@NotEmpty
 	protected String title;
 
 	@Schema(
-		description = "A valid external identifier to reference this content."
+		description = "A valid external identifier to reference this structured content."
 	)
 	public String getUuid() {
 		return uuid;
@@ -668,7 +703,7 @@ public class StructuredContent {
 	protected String uuid;
 
 	@Schema(
-		description = "Write only property to specify the default permissions."
+		description = "A write-only property that specifies the structured content's default permissions."
 	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
@@ -733,28 +768,33 @@ public class StructuredContent {
 
 		sb.append("{");
 
-		sb.append("\"aggregateRating\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (aggregateRating == null) {
-			sb.append("null");
+		if (aggregateRating != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"aggregateRating\": ");
+
+			sb.append(String.valueOf(aggregateRating));
 		}
-		else {
-			sb.append(aggregateRating);
-		}
 
-		sb.append(", ");
+		if (availableLanguages != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"availableLanguages\": ");
+			sb.append("\"availableLanguages\": ");
 
-		if (availableLanguages == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < availableLanguages.length; i++) {
 				sb.append("\"");
-				sb.append(availableLanguages[i]);
+
+				sb.append(_escape(availableLanguages[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < availableLanguages.length) {
@@ -765,18 +805,17 @@ public class StructuredContent {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (contentFields != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"contentFields\": ");
+			sb.append("\"contentFields\": ");
 
-		if (contentFields == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < contentFields.length; i++) {
-				sb.append(contentFields[i]);
+				sb.append(String.valueOf(contentFields[i]));
 
 				if ((i + 1) < contentFields.length) {
 					sb.append(", ");
@@ -786,130 +825,134 @@ public class StructuredContent {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (contentStructureId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"contentStructureId\": ");
+			sb.append("\"contentStructureId\": ");
 
-		if (contentStructureId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentStructureId);
 		}
 
-		sb.append(", ");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"creator\": ");
 
-		if (creator == null) {
-			sb.append("null");
+			sb.append(String.valueOf(creator));
 		}
-		else {
-			sb.append(creator);
-		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCreated);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
 
-		sb.append("\"dateModified\": ");
-
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"datePublished\": ");
+			sb.append("\"dateModified\": ");
 
-		if (datePublished == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(datePublished);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateModified));
 
-		sb.append("\"description\": ");
-
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(description);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (datePublished != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"friendlyUrlPath\": ");
+			sb.append("\"datePublished\": ");
 
-		if (friendlyUrlPath == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(friendlyUrlPath);
+
+			sb.append(liferayToJSONDateFormat.format(datePublished));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"description\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (friendlyUrlPath != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"friendlyUrlPath\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(friendlyUrlPath));
+
+			sb.append("\"");
+		}
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (key != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"key\": ");
+			sb.append("\"key\": ");
 
-		if (key == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(key);
+
+			sb.append(_escape(key));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (keywords != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywords\": ");
+			sb.append("\"keywords\": ");
 
-		if (keywords == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < keywords.length; i++) {
 				sb.append("\"");
-				sb.append(keywords[i]);
+
+				sb.append(_escape(keywords[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < keywords.length) {
@@ -920,29 +963,47 @@ public class StructuredContent {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (numberOfComments != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfComments\": ");
+			sb.append("\"numberOfComments\": ");
 
-		if (numberOfComments == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfComments);
 		}
 
-		sb.append(", ");
+		if (relatedContents != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"renderedContents\": ");
+			sb.append("\"relatedContents\": ");
 
-		if (renderedContents == null) {
-			sb.append("null");
+			sb.append("[");
+
+			for (int i = 0; i < relatedContents.length; i++) {
+				sb.append(String.valueOf(relatedContents[i]));
+
+				if ((i + 1) < relatedContents.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
-		else {
+
+		if (renderedContents != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"renderedContents\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < renderedContents.length; i++) {
-				sb.append(renderedContents[i]);
+				sb.append(String.valueOf(renderedContents[i]));
 
 				if ((i + 1) < renderedContents.length) {
 					sb.append(", ");
@@ -952,29 +1013,27 @@ public class StructuredContent {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\": ");
 
-		if (siteId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(siteId);
 		}
 
-		sb.append(", ");
+		if (taxonomyCategories != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategories\": ");
+			sb.append("\"taxonomyCategories\": ");
 
-		if (taxonomyCategories == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < taxonomyCategories.length; i++) {
-				sb.append(taxonomyCategories[i]);
+				sb.append(String.valueOf(taxonomyCategories[i]));
 
 				if ((i + 1) < taxonomyCategories.length) {
 					sb.append(", ");
@@ -984,14 +1043,13 @@ public class StructuredContent {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (taxonomyCategoryIds != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategoryIds\": ");
+			sb.append("\"taxonomyCategoryIds\": ");
 
-		if (taxonomyCategoryIds == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < taxonomyCategoryIds.length; i++) {
@@ -1005,43 +1063,81 @@ public class StructuredContent {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (title != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\": ");
 
-		if (title == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(title);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(title));
 
-		sb.append("\"uuid\": ");
-
-		if (uuid == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(uuid);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (uuid != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"viewableBy\": ");
+			sb.append("\"uuid\": ");
 
-		if (viewableBy == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
+			sb.append(_escape(uuid));
+
+			sb.append("\"");
+		}
+
+		if (viewableBy != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"viewableBy\": ");
+
+			sb.append("\"");
+
 			sb.append(viewableBy);
+
 			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

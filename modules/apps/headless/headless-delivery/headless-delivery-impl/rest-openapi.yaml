@@ -1,11 +1,10 @@
 components:
     schemas:
         AggregateRating:
-            #@review
-            description: https://www.schema.org/AggregateRating
+            description: Represents the average rating. See [AggregateRating](https://www.schema.org/AggregateRating) for more information.
             properties:
                 bestRating:
-                    description: The best rating possible (by default normalized to 1.0).
+                    description: The highest possible rating (by default normalized to 1.0).
                     format: double
                     readOnly: true
                     type: number
@@ -19,116 +18,120 @@ components:
                     readOnly: true
                     type: number
                 worstRating:
-                    description: The worst rating possible (by default normalized to 0.0).
+                    description: The lowest possible rating (by default normalized to 0.0).
                     format: double
                     readOnly: true
                     type: number
             type: object
         BlogPosting:
-            #@review
-            description: https://www.schema.org/BlogPosting
+            description: Represents a blog post. See [BlogPosting](https://www.schema.org/BlogPosting) for more information.
             properties:
                 aggregateRating:
                     allOf:
                         - $ref: "#/components/schemas/AggregateRating"
-                    description: The information of the ratings (average, number) associated to this resource.
+                    description: The blog post's average rating.
                     readOnly: true
                 alternativeHeadline:
-                    description: The subtitle of this BlogPosting.
+                    description: The blog post's subtitle.
                     type: string
                 articleBody:
-                    description: The article content of this BlogPosting.
+                    description: The blog post's body (content).
                     type: string
                 creator:
                     allOf:
                         - $ref: "#/components/schemas/Creator"
-                    description: The creator of the BlogPosting
+                    description: The blog post's author.
                     readOnly: true
                 dateCreated:
-                    description: The creation date of the BlogPosting.
+                    description: The blog post's creation date.
                     format: date-time
                     readOnly: true
                     type: string
                 dateModified:
-                    description: The last time a field of the BlogPosting changed.
+                    description: The blog post's most recent modification date.
                     format: date-time
                     readOnly: true
                     type: string
                 datePublished:
-                    description: The last date when the BlogPosting was published.
+                    description: The blog post's publication date.
                     format: date-time
                     type: string
                 description:
-                    description: A description explaining this BlogPosting.
+                    description: The blog post's description.
                     type: string
                 encodingFormat:
-                    description: The media format of the content (html, bbcode...).
+                    description: The blog post's media format (e.g., HTML, BBCode, etc.).
                     readOnly: true
                     type: string
                 friendlyUrlPath:
-                    description: A relative URL where this content will be accesible.
+                    description: The blog post's relative URL.
                     type: string
                 headline:
-                    description: The main title of this BlogPosting.
+                    description: The blog post's main title.
                     type: string
                 id:
-                    description: The identifier of the resource.
+                    description: The blog post's identifier.
                     format: int64
                     readOnly: true
                     type: integer
                 image:
-                    description: The cover image of the BlogPosting.
+                    description: The blog post's cover image.
                     properties:
                         caption:
-                            description: A text describing the BlogPosting image.
+                            description: The text describing the image.
                             type: string
                         contentUrl:
-                            description: An absolute URL to the image.
+                            description: The image's relative URL.
                             format: uri
                             readOnly: true
                             type: string
                         imageId:
-                            description: An identifier of the image, can be used to retrieve more information in a Document API.
+                            description: The image's ID. This can be used to retrieve more information in the `Document` API.
                             format: int64
                             type: integer
                     type: object
                 keywords:
-                    description: A list of keywords describing the BlogPosting.
+                    description: A list of keywords describing the blog post.
                     items:
                         type: string
                     type: array
                 numberOfComments:
-                    description: The number of comments this BlogPosting has received.
+                    description: The number of comments this blog post has received.
                     readOnly: true
                     type: integer
+                relatedContents:
+                    items:
+                        $ref: "#/components/schemas/RelatedContent"
+                    readOnly: true
+                    type: array
                 siteId:
-                    description: The site identificator where this BlogPosting is scoped.
+                    description: The ID of the site to which this blog post is scoped.
                     format: int64
                     readOnly: true
                     type: integer
                 taxonomyCategories:
-                    description: The categories asociated with this BlogPosting.
+                    description: The categories associated with this blog post.
                     items:
                         properties:
                             taxonomyCategoryId:
-                                description: The id of the category, can be used to retrieve more information in the TaxonomyCategory API.
+                                description: The category's ID. This can be used to retrieve more information in the `TaxonomyCategory` API.
                                 format: int64
                                 type: integer
                             taxonomyCategoryName:
-                                description: The name of the TaxonomyCategory.
+                                description: The category's name.
                                 type: string
                         type: object
                     readOnly: true
                     type: array
                 taxonomyCategoryIds:
-                    description: A write only field to add TaxonomyCategory to this resource.
+                    description: A write-only field that adds a `TaxonomyCategory` to this resource.
                     items:
                         format: int64
                         type: integer
                     type: array
                     writeOnly: true
                 viewableBy:
-                    description: Write only property to specify the default permissions.
+                    description: A write-only property that specifies the default permissions.
                     enum: [Anyone, Members, Owner]
                     type: string
                     writeOnly: true
@@ -137,142 +140,138 @@ components:
                 - headline
             type: object
         BlogPostingImage:
-            #@review
-            description: https://www.schema.org/BlogPostingImage
+            description: Represents a blog post's image. Properties follow the [image](https://schema.org/image) specification.
             properties:
                 contentUrl:
-                    description: An absolute URL to the binary image.
+                    description: The image's relative URL.
                     readOnly: true
                     type: string
                 encodingFormat:
-                    description: The content type of this image (application/png...).
+                    description: The image's content type (e.g., `application/png`, etc.).
                     readOnly: true
                     type: string
                 fileExtension:
-                    description: The extension of the image.
+                    description: The image's file extension.
                     readOnly: true
                     type: string
                 id:
-                    description: The identifier of the resource.
+                    description: The image's ID.
                     format: int64
                     readOnly: true
                     type: integer
                 sizeInBytes:
-                    description: The size in bytes of the image.
+                    description: The image's size in bytes.
                     format: int64
                     readOnly: true
                     type: integer
                 title:
-                    description: The text describing the image.
+                    description: The image's title text.
                     type: string
                 viewableBy:
-                    description: Write only property to specify the default permissions.
+                    description: A write-only property that specifies the default permissions.
                     enum: [Anyone, Members, Owner]
                     type: string
                     writeOnly: true
             type: object
         Comment:
-            #@review
-            description: https://www.schema.org/Comment
+            description: Represents a comment. See [Comment](https://www.schema.org/Comment) for more details.
             properties:
                 creator:
                     allOf:
                         - $ref: "#/components/schemas/Creator"
-                    description: The creator of the Comment
+                    description: The comment's author.
                     readOnly: true
                 dateCreated:
-                    description: The creation date of the Comment.
+                    description: The comment's creation date.
                     format: date-time
                     readOnly: true
                     type: string
                 dateModified:
-                    description: The last time a field of the Comment changed.
+                    description: The comment's latest modification date.
                     format: date-time
                     readOnly: true
                     type: string
                 id:
-                    description: The identifier of the resource.
+                    description: The comment's ID.
                     format: int64
                     readOnly: true
                     type: integer
                 numberOfComments:
-                    description: The number of child comments associated with this Comment.
+                    description: The number of child comments on this comment.
                     readOnly: true
                     type: integer
                 text:
-                    description: The content of the Comment.
+                    description: The comment's text content.
                     type: string
             type: object
         ContentDocument:
-            #@review
-            description: https://www.schema.org/ContentDocument
+            description: Represents a document (binary data and metadata) associated with structured content. Properties follow the [Media Object](https://schema.org/MediaObject) specification.
             properties:
                 contentUrl:
-                    description: An absolute URL to the binary file.
+                    description: The document's relative URL.
                     format: uri
                     readOnly: true
                     type: string
                 description:
-                    description: The description of the file.
+                    description: The document's description.
                     type: string
                 encodingFormat:
-                    description: The content type (application/pdf) of the binary file.
+                    description: The document's content type (e.g., `application/pdf`, etc.).
                     readOnly: true
                     type: string
                 fileExtension:
-                    description: The file extension.
+                    description: The document's file extension.
                     readOnly: true
                     type: string
                 id:
-                    description: The identifier of the resource.
+                    description: The document's ID.
                     format: int64
                     type: integer
                 sizeInBytes:
-                    description: The size in bytes of the ContentDocument.
+                    description: The document's file size in bytes.
                     format: int64
                     readOnly: true
                     type: integer
                 title:
-                    description: The text describing the ContentDocument.
+                    description: The document's title.
                     type: string
             type: object
         ContentField:
-            #@review
-            description: https://www.schema.org/ContentField
+            description: Represents the value of each field in structured content. Fields can contain different information types (e.g., geolocation, documents, etc.).
             properties:
                 dataType:
-                    description: The type of field (image, text).
+                    description: The field type (e.g., image, text, etc.).
                     readOnly: true
                     type: string
                 inputControl:
-                    description: The type of control that has be used to render the content (text, textarea...).
+                    description: The field's control type (e.g., text, text area, etc.).
                     readOnly: true
                     type: string
                 label:
-                    description: The label of the field.
+                    description: The field's label.
                     readOnly: true
                     type: string
                 name:
-                    description: The internal name of the field, valid for comparisons and unique in the StructuredContent.
+                    description: The field's internal name. This is valid for comparisons and unique in the structured content.
                     type: string
                 nestedFields:
-                    description: A list of child ContentFields that depend on this resource.
+                    description: A list of child content fields that depend on this resource.
                     items:
                         $ref: "#/components/schemas/ContentField"
                     type: array
                 repeatable:
-                    description: A flag indicating if this field can be rendered multiple times.
+                    description: A flag that indicates whether this field can be rendered multiple times.
                     readOnly: true
                     type: boolean
                 value:
                     properties:
                         data:
-                            description: The content of this field for simple types.
+                            description: The field's content for simple types.
                             type: string
                         document:
                             allOf:
                                 - $ref: "#/components/schemas/ContentDocument"
-                            description: A ContentDocument element.
+                            description: A content document element.
                         geo:
                             description: A point determined by latitude and longitude.
                             properties:
@@ -288,31 +287,841 @@ components:
                         image:
                             allOf:
                                 - $ref: "#/components/schemas/ContentDocument"
-                            description: A ContentDocument element storing an image file.
+                            description: A content document element that stores an image file.
                         link:
-                            description: A link to a page inside the server.
+                            description: A link to a page on the server.
                             format: uri
                             type: string
                         structuredContentLink:
-                            description: A link to a JournalArticle stored in the server.
+                            description: A link to structured content on the server.
                             properties:
                                 id:
-                                    description: The identifier of the resource.
+                                    description: The resource's ID.
                                     format: int64
                                     type: integer
                                 title:
-                                    description: The title of the resouce.
+                                    description: The resource's title.
                                     type: string
                             type: object
                     type: object
         ContentSetElement:
-            #@review
-            description: https://www.schema.org/ContentSetElement
+            description: Represents each member of a content set and can contain different types of assets.
             properties:
                 content:
-                    description: The main content.
+                    description: The content's fields.
                     readOnly: true
                     type: object
+                contentType:
+                    description: The content set element's type.
+                    readOnly: true
+                    type: string
+                id:
+                    description: The content set element's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                title:
+                    description: The content's title.
+                    readOnly: true
+                    type: string
+        ContentStructure:
+            description: Represents the content structure that backs structured content. This defines which form fields are available and the possible types and values.
+            properties:
+                availableLanguages:
+                    description: The list of languages the structure has a translation for.
+                    items:
+                        type: string
+                    readOnly: true
+                    type: array
+                contentStructureFields:
+                    description: The list of the content structure's fields.
+                    items:
+                        $ref: "#/components/schemas/ContentStructureField"
+                    readOnly: true
+                    type: array
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    description: The content structure's creator.
+                    readOnly: true
+                dateCreated:
+                    description: The content structure's creation date.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description: The last time a field of the content structure changed.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                description:
+                    description: The content structure's description.
+                    readOnly: true
+                    type: string
+                id:
+                    description: The content structure's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                name:
+                    description: The content structure's name.
+                    readOnly: true
+                    type: string
+                siteId:
+                    description: The ID of the site to which the content structure is scoped.
+                    format: int64
+                    readOnly: true
+                    type: integer
+            type: object
+        ContentStructureField:
+            description: Represents each field in a content structure, backed by a content field.
+            properties:
+                dataType:
+                    description: The form field's type (e.g., date, geolocation, text, etc.).
+                    readOnly: true
+                    type: string
+                inputControl:
+                    description: The form field's input control type (e.g., text, textarea, select field, etc.).
+                    readOnly: true
+                    type: string
+                label:
+                    description: The form field's label.
+                    readOnly: true
+                    type: string
+                localizable:
+                    description: A flag that indicates whether the content is accessible in different languages.
+                    readOnly: true
+                    type: boolean
+                multiple:
+                    description: A flag that indicates whether the form field can have several values.
+                    readOnly: true
+                    type: boolean
+                name:
+                    description: The form field's name.
+                    readOnly: true
+                    type: string
+                nestedContentStructureFields:
+                    description: The child content structure fields that depend on this form field.
+                    items:
+                        $ref: "#/components/schemas/ContentStructureField"
+                    readOnly: true
+                    type: array
+                options:
+                    description: The list of different possible values.
+                    items:
+                        properties:
+                            label:
+                                description: The option's label.
+                                type: string
+                            value:
+                                description: The internal value of the field option.
+                                type: string
+                        type: object
+                    readOnly: true
+                    type: array
+                predefinedValue:
+                    description: The form field's default value.
+                    readOnly: true
+                    type: string
+                repeatable:
+                    description: A flag that indicates whether this content can be rendered (and answered) several times.
+                    readOnly: true
+                    type: boolean
+                required:
+                    description: A flag that indicates whether this form field is required.
+                    readOnly: true
+                    type: boolean
+                showLabel:
+                    description: A flag that indicates whether the structure's end target should render the field label.
+                    readOnly: true
+                    type: boolean
+            type: object
+        Creator:
+            description: Represents the user account of the content's creator/author. Properties follow the [creator](https://schema.org/creator) specification.
+            properties:
+                additionalName:
+                    description: The author's additional name (e.g., middle name).
+                    readOnly: true
+                    type: string
+                familyName:
+                    description: The author's surname.
+                    readOnly: true
+                    type: string
+                givenName:
+                    description: The author's first name.
+                    readOnly: true
+                    type: string
+                id:
+                    description: The author's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                image:
+                    description: A relative URL to the author's profile image.
+                    format: uri
+                    readOnly: true
+                    type: string
+                name:
+                    description: The author's full name.
+                    readOnly: true
+                    type: string
+                profileURL:
+                    description: A relative URL to the author's user profile.
+                    format: uri
+                    readOnly: true
+                    type: string
+            type: object
+        Document:
+            description: Represents a Document Library file, storing binary and metadata information. Properties follow the [MediaObject](https://schema.org/MediaObject) specification.
+            properties:
+                adaptedImages:
+                    description: An array of images in several resolutions and sizes, created by the Adaptive Media framework.
+                    items:
+                        properties:
+                            contentUrl:
+                                description: The image's relative URL.
+                                format: uri
+                                type: string
+                            height:
+                                description: The image's height in pixels.
+                                type: integer
+                            resolutionName:
+                                description: The name of the image's Adaptive Media image resolution.
+                                type: string
+                            sizeInBytes:
+                                description: The image's size in bytes.
+                                format: int64
+                                type: integer
+                            width:
+                                description: The image's width in pixels.
+                                type: integer
+                        type: object
+                    readOnly: true
+                    type: array
+                aggregateRating:
+                    allOf:
+                        - $ref: "#/components/schemas/AggregateRating"
+                    description: The document's average rating.
+                    readOnly: true
+                contentUrl:
+                    description: The document's relative URL.
+                    format: binary
+                    readOnly: true
+                    type: string
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    description: The document's creator.
+                    readOnly: true
+                dateCreated:
+                    description: The document's creation date.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description: The last time a field of the document changed.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                description:
+                    description: The document's description.
+                    type: string
+                documentFolderId:
+                    description: The ID of the `DocumentFolder` where this document is stored.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                encodingFormat:
+                    description: The document's content type (e.g., `application/pdf`, etc.).
+                    readOnly: true
+                    type: string
+                fileExtension:
+                    description: The document's file extension.
+                    readOnly: true
+                    type: string
+                id:
+                    description: The document's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                keywords:
+                    description: A list of keywords describing the document.
+                    items:
+                        type: string
+                    type: array
+                numberOfComments:
+                    description: The number of comments on the document.
+                    readOnly: true
+                    type: integer
+                relatedContents:
+                    items:
+                        $ref: "#/components/schemas/RelatedContent"
+                    readOnly: true
+                    type: array
+                sizeInBytes:
+                    description: The document's size in bytes.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                taxonomyCategories:
+                    description: The categories associated with this document.
+                    items:
+                        properties:
+                            taxonomyCategoryId:
+                                description: The category's ID. This can be used to retrieve more information via the `TaxonomyCategory` API.
+                                format: int64
+                                type: integer
+                            taxonomyCategoryName:
+                                description: The category's name.
+                                type: string
+                        type: object
+                    readOnly: true
+                    type: array
+                taxonomyCategoryIds:
+                    description: A write-only field that adds `TaxonomyCategory` instances to the document.
+                    items:
+                        format: int64
+                        type: integer
+                    type: array
+                    writeOnly: true
+                title:
+                    description: The document's main title/name.
+                    type: string
+                viewableBy:
+                    description: A write-only property that specifies the document's default permissions.
+                    enum: [Anyone, Members, Owner]
+                    type: string
+                    writeOnly: true
+            type: object
+        DocumentFolder:
+            description: Represents a document folder that can contain documents and other folders.
+            properties:
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    description: The folder's creator.
+                    readOnly: true
+                dateCreated:
+                    description: The folder's creation date.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description: The last time a field of the folder changed.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                description:
+                    description: The folder's description.
+                    type: string
+                id:
+                    description: The folder's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                name:
+                    description: The folder's main title/name.
+                    type: string
+                numberOfDocumentFolders:
+                    description: The number of this folder's child folders.
+                    readOnly: true
+                    type: integer
+                numberOfDocuments:
+                    description: The number of documents in this folder.
+                    readOnly: true
+                    type: integer
+                siteId:
+                    description: The ID of the site to which this folder is scoped.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                viewableBy:
+                    description: A write-only property that specifies the folder's default permissions.
+                    enum: [Anyone, Members, Owner]
+                    type: string
+                    writeOnly: true
+            required:
+                - name
+            type: object
+        KnowledgeBaseArticle:
+            description: Represents a Knowledge Base article (`KBArticle`), the main entity in the Knowledge Base API.
+            properties:
+                aggregateRating:
+                    allOf:
+                        - $ref: "#/components/schemas/AggregateRating"
+                    description: The article's average rating.
+                    readOnly: true
+                articleBody:
+                    description: The article's main content.
+                    type: string
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    description: The article's author.
+                    readOnly: true
+                dateCreated:
+                    description: The date the article was created.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description: The last time the article's content or metadata changed.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                description:
+                    description: The article's description.
+                    type: string
+                encodingFormat:
+                    description: The article's media type (e.g., HTML, BBCode, etc.).
+                    readOnly: true
+                    type: string
+                friendlyUrlPath:
+                    description: The article's relative URL.
+                    type: string
+                id:
+                    description: The article's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                keywords:
+                    description: A list of keywords describing the article.
+                    items:
+                        type: string
+                    type: array
+                numberOfAttachments:
+                    description: The article's number attachments.
+                    readOnly: true
+                    type: integer
+                numberOfKnowledgeBaseArticles:
+                    description: The number of this article's child articles.
+                    readOnly: true
+                    type: integer
+                parentKnowledgeBaseFolder:
+                    description: The article's parent folder, if it exists.
+                    properties:
+                        folderId:
+                            description: The parent folder's ID.
+                            format: int64
+                            type: integer
+                        folderName:
+                            description: The parent folder's name.
+                            type: string
+                    readOnly: true
+                    type: object
+                parentKnowledgeBaseFolderId:
+                    description: The ID of the article's parent folder, if that folder exists.
+                    format: int64
+                    type: integer
+                    writeOnly: true
+                relatedContents:
+                    items:
+                        $ref: "#/components/schemas/RelatedContent"
+                    readOnly: true
+                    type: array
+                siteId:
+                    description: The ID of the site to which this article is scoped.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                taxonomyCategories:
+                    description: The categories associated with this article.
+                    items:
+                        properties:
+                            taxonomyCategoryId:
+                                description: The category's ID, which can be used to retrieve more information in the `TaxonomyCategory` API.
+                                format: int64
+                                type: integer
+                            taxonomyCategoryName:
+                                description: The category's name.
+                                type: string
+                        type: object
+                    readOnly: true
+                    type: array
+                taxonomyCategoryIds:
+                    description: A write-only field that adds taxonomy categories to this article.
+                    items:
+                        format: int64
+                        type: integer
+                    type: array
+                    writeOnly: true
+                title:
+                    description: The article's main title.
+                    type: string
+                viewableBy:
+                    description: A write-only property that specifies the article's default permissions.
+                    enum: [Anyone, Members, Owner]
+                    type: string
+                    writeOnly: true
+            required:
+                - articleBody
+                - title
+            type: object
+        KnowledgeBaseAttachment:
+            description: Represents a binary file attached to a Knowledge Base article.
+            properties:
+                contentUrl:
+                    description: The file's relative URL.
+                    readOnly: true
+                    type: string
+                encodingFormat:
+                    description: The file's media type (e.g., application/pdf, etc.).
+                    readOnly: true
+                    type: string
+                fileExtension:
+                    description: The file's extension.
+                    readOnly: true
+                    type: string
+                id:
+                    description: The file's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                sizeInBytes:
+                    description: The file's size in bytes.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                title:
+                    description: The file's main title.
+                    type: string
+            type: object
+        KnowledgeBaseFolder:
+            description: Represents a folder for organizing Knowledge Base articles.
+            properties:
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    description: The folder's creator.
+                    readOnly: true
+                dateCreated:
+                    description: The date the folder was created.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description: The last time the folder was modified.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                description:
+                    description: The folder's description.
+                    type: string
+                id:
+                    description: The folder's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                name:
+                    description: The folder's main title/name.
+                    type: string
+                numberOfKnowledgeBaseArticles:
+                    description: The number of Knowledge Base articles in this folder.
+                    readOnly: true
+                    type: integer
+                numberOfKnowledgeBaseFolders:
+                    description: The number of Knowledge Base folders in this folder.
+                    readOnly: true
+                    type: integer
+                parentKnowledgeBaseFolder:
+                    description: The folder's parent Knowledge Base folder, if it exists.
+                    properties:
+                        folderId:
+                            description: The parent folder's ID.
+                            format: int64
+                            type: integer
+                        folderName:
+                            description: The parent folder's name.
+                            type: string
+                    readOnly: true
+                    type: object
+                parentKnowledgeBaseFolderId:
+                    description: The ID of the folder's parent Knowledge Base folder, if such a parent folder exists.
+                    format: int64
+                    type: integer
+                    writeOnly: true
+                siteId:
+                    description: The ID of the site to which this folder is scoped.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                viewableBy:
+                    description: A write-only property that specifies the folder's default permissions.
+                    enum: [Anyone, Members, Owner]
+                    type: string
+                    writeOnly: true
+            required:
+                - name
+            type: object
+        MessageBoardAttachment:
+            description: A binary file attached to a message on a message board (`MessageBoardMessage`).
+            properties:
+                contentUrl:
+                    description: The file's relative URL.
+                    readOnly: true
+                    type: string
+                encodingFormat:
+                    description: The file's media format (e.g., application/pdf, etc.).
+                    readOnly: true
+                    type: string
+                fileExtension:
+                    description: The file's extension.
+                    readOnly: true
+                    type: string
+                id:
+                    description: The file's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                sizeInBytes:
+                    description: The file's size in bytes.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                title:
+                    description: The file's title.
+                    type: string
+            type: object
+        MessageBoardMessage:
+            description: Represents a message on a message board. Properties follow the [Discussion Forum Posting](https://schema.org/DiscussionForumPosting) specification.
+            properties:
+                aggregateRating:
+                    allOf:
+                        - $ref: "#/components/schemas/AggregateRating"
+                    description: The message's average rating.
+                    readOnly: true
+                anonymous:
+                    description: A flag that indicates whether the message's author is anonymous.
+                    type: boolean
+                articleBody:
+                    description: The message's main content.
+                    type: string
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    description: The message's author.
+                    readOnly: true
+                dateCreated:
+                    description: The date the message was created.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description: The last time the content or metadata of the message was changed.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                encodingFormat:
+                    description: The message's media format (e.g., HTML, BBCode, etc.).
+                    readOnly: true
+                    type: string
+                headline:
+                    description: The message's main title.
+                    type: string
+                id:
+                    description: The message's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                keywords:
+                    description: A list of keywords describing the message.
+                    items:
+                        type: string
+                    type: array
+                numberOfMessageBoardAttachments:
+                    description: The number of the message's attachments.
+                    readOnly: true
+                    type: integer
+                numberOfMessageBoardMessages:
+                    description: The number of the message's child messages.
+                    readOnly: true
+                    type: integer
+                relatedContents:
+                    items:
+                        $ref: "#/components/schemas/RelatedContent"
+                    readOnly: true
+                    type: array
+                showAsAnswer:
+                    description: A flag that indicates whether the message is answering a question.
+                    type: boolean
+                siteId:
+                    description: The ID of the site to which this message is scoped.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                viewableBy:
+                    description: A write-only property that specifies the default permissions.
+                    enum: [Anyone, Members, Owner]
+                    type: string
+                    writeOnly: true
+            type: object
+        MessageBoardSection:
+            description: Represents a section/folder on a message board, used to organize messages.
+            properties:
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    description: The section's creator.
+                    readOnly: true
+                dateCreated:
+                    description: The date the section was created.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description: The last time the section was changed.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                description:
+                    description: The section's description.
+                    type: string
+                id:
+                    description: The section's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                numberOfMessageBoardSections:
+                    description: The number of this section's child sections.
+                    readOnly: true
+                    type: integer
+                numberOfMessageBoardThreads:
+                    description: The number of message board threads in this section.
+                    readOnly: true
+                    type: integer
+                siteId:
+                    description: The ID of the site to which this section is scoped.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                title:
+                    description: The section's main title.
+                    type: string
+                viewableBy:
+                    description: A write-only property that specifies the default permissions.
+                    enum: [Anyone, Members, Owner]
+                    type: string
+                    writeOnly: true
+            required:
+                - title
+            type: object
+        MessageBoardThread:
+            description: Represents a discussion thread in a message board.
+            properties:
+                aggregateRating:
+                    allOf:
+                        - $ref: "#/components/schemas/AggregateRating"
+                    description: The thread's average rating.
+                    readOnly: true
+                articleBody:
+                    description: The thread's main body content (the message written as the thread's description).
+                    type: string
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    description: The thread's creator.
+                    readOnly: true
+                dateCreated:
+                    description: The date the thread was created.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description: The last time any field of the thread changed.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                encodingFormat:
+                    description: The media format of the thread's content (e.g., HTML, BBCode, etc.).
+                    readOnly: true
+                    type: string
+                headline:
+                    description: The thread's main title.
+                    type: string
+                id:
+                    description: The thread's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                keywords:
+                    description: A list of keywords describing the thread.
+                    items:
+                        type: string
+                    type: array
+                numberOfMessageBoardAttachments:
+                    description: The number of the thread's attachments.
+                    readOnly: true
+                    type: integer
+                numberOfMessageBoardMessages:
+                    description: The number of the thread's messages.
+                    readOnly: true
+                    type: integer
+                relatedContents:
+                    items:
+                        $ref: "#/components/schemas/RelatedContent"
+                    readOnly: true
+                    type: array
+                showAsQuestion:
+                    description: A flag that indicates whether this thread was posted as a question that can receive approved answers.
+                    type: boolean
+                siteId:
+                    description: The ID of the site to which this thread is scoped.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                threadType:
+                    description: The thread's type.
+                    type: string
+                viewableBy:
+                    description: A write-only property that specifies the thread's default permissions.
+                    enum: [Anyone, Members, Owner]
+                    type: string
+                    writeOnly: true
+            required:
+                - headline
+            type: object
+        Rating:
+            description: Represents a rating/score received by any kind of asset. Properties follow the [Rating](https://schema.org/Rating) specification.
+            properties:
+                bestRating:
+                    description: The best possible rating an asset can receive (normalized to 1.0 by default).
+                    format: double
+                    readOnly: true
+                    type: number
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    description: The rating's creator.
+                    readOnly: true
+                dateCreated:
+                    description: The rating's creation date.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description: The last time a field of the rating changed.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                id:
+                    description: The rating's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                ratingValue:
+                    description: The rating's value.
+                    format: double
+                    type: number
+                worstRating:
+                    description: The worst possible rating an asset can receive (normalized to 0.0 by default).
+                    format: double
+                    readOnly: true
+                    type: number
+            type: object
+        RelatedContent:
+            # @review
+            description: Represents a relationship between two resources, internally modeled as AssetLink.
+            properties:
                 contentType:
                     description: The type of the content.
                     readOnly: true
@@ -323,869 +1132,86 @@ components:
                     readOnly: true
                     type: integer
                 title:
-                    description: The title of the ContentSetElement.
+                    description: The title of the content.
                     readOnly: true
                     type: string
-        ContentStructure:
-            #@review
-            description: The ContentStructure backing a StructuredContent. Defines which form fields are available and the possible types and values.
-            properties:
-                availableLanguages:
-                    description: A list of languages the content has a translation for.
-                    items:
-                        type: string
-                    readOnly: true
-                    type: array
-                contentStructureFields:
-                    description: A list of fields that belong to this ContentStructure.
-                    items:
-                        $ref: "#/components/schemas/ContentStructureField"
-                    readOnly: true
-                    type: array
-                creator:
-                    allOf:
-                        - $ref: "#/components/schemas/Creator"
-                    description: The creator of the ContentStructure
-                    readOnly: true
-                dateCreated:
-                    description: The creation date of the ContentStructure.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                dateModified:
-                    description: The last time a field of the ContentStructure changed.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                description:
-                    description: The description of the ContentStructure
-                    readOnly: true
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                name:
-                    description: The name.
-                    readOnly: true
-                    type: string
-                siteId:
-                    description: The site identificator where this ContentStructure is scoped.
-                    format: int64
-                    readOnly: true
-                    type: integer
-            type: object
-        ContentStructureField:
-            #@review
-            description: https://www.schema.org/ContentStructureField
-            properties:
-                dataType:
-                    description: The type of the form field (date, geo, text...).
-                    readOnly: true
-                    type: string
-                inputControl:
-                    description: The type of the input used to render the content (text, textarea, select...).
-                    readOnly: true
-                    type: string
-                label:
-                    description: The label of the form field.
-                    readOnly: true
-                    type: string
-                localizable:
-                    description: A flag indicating if the content can be accesible in different languages.
-                    readOnly: true
-                    type: boolean
-                multiple:
-                    description: A flag indicating that this form field can have several answers.
-                    readOnly: true
-                    type: boolean
-                name:
-                    description: The name.
-                    readOnly: true
-                    type: string
-                nestedContentStructureFields:
-                    description: The child ContentStructureFields that depends in this resource.
-                    items:
-                        $ref: "#/components/schemas/ContentStructureField"
-                    readOnly: true
-                    type: array
-                options:
-                    description: A list of several predefined answers.
-                    items:
-                        properties:
-                            label:
-                                description: The label.
-                                type: string
-                            value:
-                                description: The internal value of the Option.
-                                type: string
-                        type: object
-                    readOnly: true
-                    type: array
-                predefinedValue:
-                    description: The default value of the form field.
-                    readOnly: true
-                    type: string
-                repeatable:
-                    description: A flag indicating in this content can be rendered (and answered) several times.
-                    readOnly: true
-                    type: boolean
-                required:
-                    description: A flag to indicate that this form field is required, form can't be filled without it.
-                    readOnly: true
-                    type: boolean
-                showLabel:
-                    description: A flag indicating if the end target of this structure should render the label of the field.
-                    readOnly: true
-                    type: boolean
-            type: object
-        Creator:
-            #@review
-            description: https://www.schema.org/Creator
-            properties:
-                additionalName:
-                    description: An additional name, can be used for a middle name.
-                    readOnly: true
-                    type: string
-                familyName:
-                    description: In the US, the surname of the UserAccount.
-                    readOnly: true
-                    type: string
-                givenName:
-                    description: In the US, the first name of the UserAccount.
-                    readOnly: true
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                image:
-                    description: A relative URL to the image profile of the UserAccount.
-                    format: uri
-                    readOnly: true
-                    type: string
-                name:
-                    description: The full name of the UserAccount.
-                    readOnly: true
-                    type: string
-                profileURL:
-                    description: A relative URL to the profile of the UserAccount.
-                    format: uri
-                    readOnly: true
-                    type: string
-            type: object
-        Document:
-            #@review
-            description: A DLFile, storing binary and metadata information. Properties follow https://schema.org/MediaObject specification.
-            properties:
-                adaptedImages:
-                    description: An array of images in several resolutions and sizes, created by the adaptive media framework.
-                    items:
-                        properties:
-                            contentUrl:
-                                description: An absolute URL to the image.
-                                format: uri
-                                type: string
-                            height:
-                                description: The height of the image.
-                                type: integer
-                            resolutionName:
-                                description: A descriptive name of this version.
-                                type: string
-                            sizeInBytes:
-                                description: The size in bytes of the image.
-                                format: int64
-                                type: integer
-                            width:
-                                description: The width of the image.
-                                type: integer
-                        type: object
-                    readOnly: true
-                    type: array
-                aggregateRating:
-                    allOf:
-                        - $ref: "#/components/schemas/AggregateRating"
-                    description: The information of the ratings (average, number) associated to this resource.
-                    readOnly: true
-                contentUrl:
-                    description: An absolute URL to the binary Document.
-                    format: binary
-                    readOnly: true
-                    type: string
-                creator:
-                    allOf:
-                        - $ref: "#/components/schemas/Creator"
-                    description: The creator of the Document
-                    readOnly: true
-                dateCreated:
-                    description: The creation date of the Document.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                dateModified:
-                    description: The last time a field of the Document changed.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                description:
-                    description: The description of the Document
-                    type: string
-                documentFolderId:
-                    description: The id of the DocumentFolder where this Document is stored.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                encodingFormat:
-                    description: The content type (application/pdf) of the Document.
-                    readOnly: true
-                    type: string
-                fileExtension:
-                    description: The file extension of the binary file.
-                    readOnly: true
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                keywords:
-                    description: A list of keywords describing the Document.
-                    items:
-                        type: string
-                    type: array
-                numberOfComments:
-                    description: A list of child comments of this content.
-                    readOnly: true
-                    type: integer
-                sizeInBytes:
-                    description: The size in bytes of the binary files.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                taxonomyCategories:
-                    description: The categories asociated with this Document.
-                    items:
-                        properties:
-                            taxonomyCategoryId:
-                                description: The id of the category, can be used to retrieve more information in the TaxonomyCategory API.
-                                format: int64
-                                type: integer
-                            taxonomyCategoryName:
-                                description: The name of the TaxonomyCategory.
-                                type: string
-                        type: object
-                    readOnly: true
-                    type: array
-                taxonomyCategoryIds:
-                    description: A write only field to add TaxonomyCategory to this resource.
-                    items:
-                        format: int64
-                        type: integer
-                    type: array
-                    writeOnly: true
-                title:
-                    description: The main title/name of the Document.
-                    type: string
-                viewableBy:
-                    description: Write only property to specify the default permissions.
-                    enum: [Anyone, Members, Owner]
-                    type: string
-                    writeOnly: true
-            type: object
-        DocumentFolder:
-            #@review
-            description: A DocumentFolder containing other DocumentFolder or several Documents.
-            properties:
-                creator:
-                    allOf:
-                        - $ref: "#/components/schemas/Creator"
-                    description: The creator of the DocumentFolder
-                    readOnly: true
-                dateCreated:
-                    description: The creation date of the DocumentFolder.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                dateModified:
-                    description: The last time a field of the DocumentFolder changed.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                description:
-                    description: The description of the DocumentFolder
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                name:
-                    description: The main title/name of the DocumentFolder
-                    type: string
-                numberOfDocumentFolders:
-                    description: The number of child DocumentFolders that depend on this resources.
-                    readOnly: true
-                    type: integer
-                numberOfDocuments:
-                    description: The number of child Documents that depend on this resources.
-                    readOnly: true
-                    type: integer
-                siteId:
-                    description: The site identificator where this DocumentFolder is scoped.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                viewableBy:
-                    description: Write only property to specify the default permissions.
-                    enum: [Anyone, Members, Owner]
-                    type: string
-                    writeOnly: true
-            required:
-                - name
-            type: object
-        KnowledgeBaseArticle:
-            #@review
-            description: A KBArticle, the main entity in the knowledge base API, modeling an article in a FAQ section.
-            properties:
-                aggregateRating:
-                    allOf:
-                        - $ref: "#/components/schemas/AggregateRating"
-                    description: The information of the ratings (average, number) associated to this resource.
-                    readOnly: true
-                articleBody:
-                    description: The main content of this resouce.
-                    type: string
-                creator:
-                    allOf:
-                        - $ref: "#/components/schemas/Creator"
-                    description: The creator of the KnowledgeBaseArticle
-                    readOnly: true
-                dateCreated:
-                    description: The creation date of the KnowledgeBaseArticle.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                dateModified:
-                    description: The last time a field of the KnowledgeBaseArticle changed.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                description:
-                    description: The description of the KnowledgeBaseArticle.
-                    type: string
-                encodingFormat:
-                    description: The media type (html, bbcode) of the content.
-                    readOnly: true
-                    type: string
-                friendlyUrlPath:
-                    description: A relative URL to access this resource.
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                keywords:
-                    description: A list of keywords describing the KnowledgeBaseArticle.
-                    items:
-                        type: string
-                    type: array
-                numberOfAttachments:
-                    description: The number of KnowledgeBaseAttachments that are stored in this article.
-                    readOnly: true
-                    type: integer
-                numberOfKnowledgeBaseArticles:
-                    description: The number of child KBArticle that are asociated with this resouce.
-                    readOnly: true
-                    type: integer
-                parentKnowledgeBaseFolder:
-                    description: The parent KnowledgeBaseFolder of this article, if any.
-                    properties:
-                        folderId:
-                            description: The identifier of the folder.
-                            format: int64
-                            type: integer
-                        folderName:
-                            description: The name of the folder.
-                            type: string
-                    readOnly: true
-                    type: object
-                parentKnowledgeBaseFolderId:
-                    description: The parent KnowledgeBaseFolder identifier of this article, if any.
-                    format: int64
-                    type: integer
-                    writeOnly: true
-                siteId:
-                    description: The site identificator where this TaxonomyVocabulary is scoped.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                taxonomyCategories:
-                    description: The categories asociated with this KnowledgeBaseArticle.
-                    items:
-                        properties:
-                            taxonomyCategoryId:
-                                description: The id of the category, can be used to retrieve more information in the TaxonomyCategory API.
-                                format: int64
-                                type: integer
-                            taxonomyCategoryName:
-                                description: The name of the TaxonomyCategory.
-                                type: string
-                        type: object
-                    readOnly: true
-                    type: array
-                taxonomyCategoryIds:
-                    description: A write only field to add TaxonomyCategory to this resource.
-                    items:
-                        format: int64
-                        type: integer
-                    type: array
-                    writeOnly: true
-                title:
-                    description: The main title of the KnowledgeBaseArticle.
-                    type: string
-                viewableBy:
-                    description: Write only property to specify the default permissions.
-                    enum: [Anyone, Members, Owner]
-                    type: string
-                    writeOnly: true
-            required:
-                - articleBody
-                - title
-            type: object
-        KnowledgeBaseAttachment:
-            #@review
-            description: A binary file asociated with a KnowledgeBaseArticle.
-            properties:
-                contentUrl:
-                    description: An absolute URL to the binary file.
-                    readOnly: true
-                    type: string
-                encodingFormat:
-                    description: The media type (application/pdf...) of the binary file.
-                    readOnly: true
-                    type: string
-                fileExtension:
-                    description: The file extension.
-                    readOnly: true
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                sizeInBytes:
-                    description: The size in bytes of the binary file.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                title:
-                    description: The main title of the binary file.
-                    type: string
-            type: object
-        KnowledgeBaseFolder:
-            #@review
-            description: A folder to clasify KnowledgeBaseArticles.
-            properties:
-                creator:
-                    allOf:
-                        - $ref: "#/components/schemas/Creator"
-                    description: The creator of the KnowledgeBaseFolder.
-                    readOnly: true
-                dateCreated:
-                    description: The creation date of the KnowledgeBaseFolder.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                dateModified:
-                    description: The last time a field of the KnowledgeBaseFolder changed.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                description:
-                    description: The description of the KnowledgeBaseFolder.
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                name:
-                    description: The main title/name of this resource.
-                    type: string
-                numberOfKnowledgeBaseArticles:
-                    description: The number of child KnowledgeBaseArticles asociated with this resource.
-                    readOnly: true
-                    type: integer
-                numberOfKnowledgeBaseFolders:
-                    description: The number of child KnowledgeBaseFolders asociated with this resource.
-                    readOnly: true
-                    type: integer
-                parentKnowledgeBaseFolder:
-                    description: The parent KnowledgeBaseFolder of this article, if any.
-                    properties:
-                        folderId:
-                            description: The identifier of the folder.
-                            format: int64
-                            type: integer
-                        folderName:
-                            description: The name of the folder.
-                            type: string
-                    readOnly: true
-                    type: object
-                parentKnowledgeBaseFolderId:
-                    description: The parent KnowledgeBaseFolder identifier of this article, if any.
-                    format: int64
-                    type: integer
-                    writeOnly: true
-                siteId:
-                    description: The site identificator where this KnowledgeBaseFolder is scoped.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                viewableBy:
-                    description: Write only property to specify the default permissions.
-                    enum: [Anyone, Members, Owner]
-                    type: string
-                    writeOnly: true
-            required:
-                - name
-            type: object
-        MessageBoardAttachment:
-            #@review
-            description: A binary file linked to a MessageBoardMessage.
-            properties:
-                contentUrl:
-                    description: An absolute URL to the binary image.
-                    readOnly: true
-                    type: string
-                encodingFormat:
-                    description: The media format of the binary file (application/pdf...).
-                    readOnly: true
-                    type: string
-                fileExtension:
-                    description: The extension of the binary file.
-                    readOnly: true
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                sizeInBytes:
-                    description: The size in bytes of the binary file.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                title:
-                    description: The title of the binary file.
-                    type: string
-            type: object
-        MessageBoardMessage:
-            #@review
-            description: A MBMessage, a message inside a forum. Properties follow https://schema.org/DiscussionForumPosting specification.
-            properties:
-                aggregateRating:
-                    allOf:
-                        - $ref: "#/components/schemas/AggregateRating"
-                    description: The information of the ratings (average, number) associated to this resource.
-                    readOnly: true
-                anonymous:
-                    description: A flag to indicate that this message is not going to return the creator information.
-                    type: boolean
-                articleBody:
-                    description: The main content of the MessageBoardMessage.
-                    type: string
-                creator:
-                    allOf:
-                        - $ref: "#/components/schemas/Creator"
-                    description: The creator of the MessageBoardMessage
-                    readOnly: true
-                dateCreated:
-                    description: The creation date of the MessageBoardMessage.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                dateModified:
-                    description: The last time a field of the MessageBoardMessage changed.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                encodingFormat:
-                    description: The media format of the content (html, bbcode...).
-                    readOnly: true
-                    type: string
-                headline:
-                    description: The main title of the MessageBoardMessage.
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                keywords:
-                    description: A list of keywords describing the MessageBoardMessage.
-                    items:
-                        type: string
-                    type: array
-                numberOfMessageBoardAttachments:
-                    description: The number of child attachments associated with this resource.
-                    readOnly: true
-                    type: integer
-                numberOfMessageBoardMessages:
-                    description: The number of child MessageBoardMessages that are associated with this resource.
-                    readOnly: true
-                    type: integer
-                showAsAnswer:
-                    description: A flag to indicate if this MessageBoardMessage is answering a question.
-                    type: boolean
-                siteId:
-                    description: The site identificator where this MessageBoardMessage is scoped.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                viewableBy:
-                    description: Write only property to specify the default permissions.
-                    enum: [Anyone, Members, Owner]
-                    type: string
-                    writeOnly: true
-            type: object
-        MessageBoardSection:
-            #@review
-            description: Represents a folder inside a forum, clasifying several MessageBoardMessages.
-            properties:
-                creator:
-                    allOf:
-                        - $ref: "#/components/schemas/Creator"
-                    description: The creator of the MessageBoardSection
-                    readOnly: true
-                dateCreated:
-                    description: The creation date of the MessageBoardSection.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                dateModified:
-                    description: The last time a field of the MessageBoardSection changed.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                description:
-                    description: The description of the MessageBoardSection
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                numberOfMessageBoardSections:
-                    description: The number of child MessageBoardSections that belong to this MessageBoardSection.
-                    readOnly: true
-                    type: integer
-                numberOfMessageBoardThreads:
-                    description: The number of child MessageBoardThreads that belong to this MessageBoardSection.
-                    readOnly: true
-                    type: integer
-                siteId:
-                    description: The site identificator where this MessageBoardSection is scoped.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                title:
-                    description: The main title of the resource.
-                    type: string
-                viewableBy:
-                    description: Write only property to specify the default permissions.
-                    enum: [Anyone, Members, Owner]
-                    type: string
-                    writeOnly: true
-            required:
-                - title
-            type: object
-        MessageBoardThread:
-            #@review
-            description: A thread inside a forum, internally modelled with the MBThread class.
-            properties:
-                aggregateRating:
-                    allOf:
-                        - $ref: "#/components/schemas/AggregateRating"
-                    description: The information of the ratings (average, number) associated to this resource.
-                    readOnly: true
-                articleBody:
-                    description: The main content of the thread, the message written as description of the thread.
-                    type: string
-                creator:
-                    allOf:
-                        - $ref: "#/components/schemas/Creator"
-                    description: The creator of the MessageBoardThread
-                    readOnly: true
-                dateCreated:
-                    description: The creation date of the MessageBoardThread.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                dateModified:
-                    description: The last time a field of the MessageBoardThread changed.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                encodingFormat:
-                    description: The media format of the content (html, bbcode...).
-                    readOnly: true
-                    type: string
-                headline:
-                    description: The main title of the thread.
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                keywords:
-                    description: A list of keywords describing the MessageBoardThread.
-                    items:
-                        type: string
-                    type: array
-                numberOfMessageBoardAttachments:
-                    description: The number of child attachments asociated with the MessageBoardThread.
-                    readOnly: true
-                    type: integer
-                numberOfMessageBoardMessages:
-                    description: The number of child attachments asociated with the MessageBoardMessages.
-                    readOnly: true
-                    type: integer
-                showAsQuestion:
-                    description: A flag indicating that this thread is posting a question that can receives aproved answers.
-                    type: boolean
-                siteId:
-                    description: The site identificator where this MessageBoardThread is scoped.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                threadType:
-                    description: The type of the thread.
-                    type: string
-                viewableBy:
-                    description: Write only property to specify the default permissions.
-                    enum: [Anyone, Members, Owner]
-                    type: string
-                    writeOnly: true
-            required:
-                - headline
-            type: object
-        Rating:
-            #@review
-            description: Represents a score received by any kind of asset. Properties follow https://schema.org/Rating specification.
-            properties:
-                bestRating:
-                    description: The best possible rating a content can receive, by default normalized to 1.0.
-                    format: double
-                    readOnly: true
-                    type: number
-                creator:
-                    allOf:
-                        - $ref: "#/components/schemas/Creator"
-                    description: The creator of the Rating
-                    readOnly: true
-                dateCreated:
-                    description: The creation date of the Rating.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                dateModified:
-                    description: The last time a field of the Rating changed.
-                    format: date-time
-                    readOnly: true
-                    type: string
-                id:
-                    description: The identifier of the resource.
-                    format: int64
-                    readOnly: true
-                    type: integer
-                ratingValue:
-                    description: The value of the Rating.
-                    format: double
-                    type: number
-                worstRating:
-                    description: The worst possible rating a content can receive, by default normalized to 0.0.
-                    format: double
-                    readOnly: true
-                    type: number
-            type: object
         StructuredContent:
-            #@review
-            description: A content with fields and rendered by a template backed by a ContentStructure. Internally modeled as a JournalArticle.
+            description: Represents content that has fields and is rendered by a template backed by a `ContentStructure`. This is modeled internally as a `JournalArticle`.
             properties:
                 aggregateRating:
                     allOf:
                         - $ref: "#/components/schemas/AggregateRating"
-                    description: The information of the ratings (average, number) associated to this resource.
+                    description: The structured content's average rating.
                     readOnly: true
                 availableLanguages:
-                    description: A list of languages the content has a translation for.
+                    description: The list of languages the structured content has a translation for.
                     items:
                         type: string
                     readOnly: true
                     type: array
                 contentFields:
-                    description: A list of fields that store the information of the StructuredContent.
+                    description: The list of fields that store the structured content's information.
                     items:
                         $ref: "#/components/schemas/ContentField"
                     type: array
                 contentStructureId:
-                    description: The identifier of the ContentStructure.
+                    description: The ID of the `ContentStructure`.
                     format: int64
                     type: integer
                 creator:
                     allOf:
                         - $ref: "#/components/schemas/Creator"
-                    description: The creator of the StructuredContent
+                    description: The structured content's creator.
                     readOnly: true
                 dateCreated:
-                    description: The creation date of the StructuredContent.
+                    description: The structured content's creation date.
                     format: date-time
                     readOnly: true
                     type: string
                 dateModified:
-                    description: The last time a field of the StructuredContent changed.
+                    description: The last time any field of the structured content was changed.
                     format: date-time
                     readOnly: true
                     type: string
                 datePublished:
-                    description: The last date when the StructuredContent was published.
+                    description: The structured content's most recent publication date.
                     format: date-time
                     type: string
                 description:
-                    description: The description of the StructuredContent
+                    description: The structured content's description.
                     type: string
                 friendlyUrlPath:
-                    description: A relative URL to the rendered content of the StructuredContent.
+                    description: A relative URL to the structured content's rendered content.
                     type: string
                 id:
-                    description: The identifier of the resource.
+                    description: The structured content's ID.
                     format: int64
                     readOnly: true
                     type: integer
                 key:
-                    description: An identifier, indepedent of the database, that can be used to reference the resource.
+                    description: An identifier, independent of the database, that can be used to reference the structured content.
                     readOnly: true
                     type: string
                 keywords:
-                    description: A list of keywords describing the StructuredContent.
+                    description: A list of keywords describing the structured content.
                     items:
                         type: string
                     type: array
                 numberOfComments:
-                    description: The number of child comments this StructuredContent has received.
+                    description: The number of comments the structured content has received.
                     readOnly: true
                     type: integer
+                relatedContents:
+                    items:
+                        $ref: "#/components/schemas/RelatedContent"
+                    readOnly: true
+                    type: array
                 renderedContents:
-                    description: A list of rendered StructuredContents, the result of using a template to process the content, returning html.
+                    description: A list of rendered structured content, which results from using a template to process the content and return HTML.
                     items:
                         properties:
                             renderedContentURL:
-                                description: An absolute URL to the binary image.
+                                description: An absolute URL to the rendered content.
                                 format: uri
                                 type: string
                             templateName:
@@ -1195,90 +1221,90 @@ components:
                     readOnly: true
                     type: array
                 siteId:
-                    description: The site identificator where this StructuredContent is scoped.
+                    description: The ID of the site to which this structured content is scoped.
                     format: int64
                     readOnly: true
                     type: integer
                 taxonomyCategories:
-                    description: The categories asociated with this StructuredContent.
+                    description: The categories associated with this structured content.
                     items:
                         properties:
                             taxonomyCategoryId:
-                                description: The id of the category, can be used to retrieve more information in the TaxonomyCategory API.
+                                description: The category's ID, which can be used to retrieve more information via the `TaxonomyCategory` API.
                                 format: int64
                                 type: integer
                             taxonomyCategoryName:
-                                description: The name of the TaxonomyCategory.
+                                description: The category's name.
                                 type: string
                         type: object
                     readOnly: true
                     type: array
                 taxonomyCategoryIds:
-                    description: A write only field to add TaxonomyCategory to this resource.
+                    description: A write-only field to add a category to this structured content.
                     items:
                         format: int64
                         type: integer
                     type: array
                     writeOnly: true
                 title:
-                    description: The main title of the StructuredContent.
+                    description: The structured content's main title.
                     type: string
                 uuid:
-                    description: A valid external identifier to reference this content.
+                    description: A valid external identifier to reference this structured content.
                     readOnly: true
                     type: string
                 viewableBy:
-                    description: Write only property to specify the default permissions.
+                    description: A write-only property that specifies the structured content's default permissions.
                     enum: [Anyone, Members, Owner]
                     type: string
                     writeOnly: true
             required:
                 - contentStructureId
+                - title
         StructuredContentFolder:
-            #@review
-            description: https://www.schema.org/StructuredContentFolder
+            description: Represents a folder that can be used to organize structured content.
             properties:
                 creator:
                     allOf:
                         - $ref: "#/components/schemas/Creator"
-                    description: The creator of the StructuredContentFolder
+                    description: The folder's creator.
                     readOnly: true
                 dateCreated:
-                    description: The creation date of the StructuredContentFolder.
+                    description: The date the folder was created.
                     format: date-time
                     readOnly: true
                     type: string
                 dateModified:
-                    description: The last time a field of the StructuredContentFolder changed.
+                    description: The last time any of the folder's fields changed.
                     format: date-time
                     readOnly: true
                     type: string
                 description:
-                    description: The description of the StructuredContentFolder
+                    description: The folder's description.
                     type: string
                 id:
-                    description: The identifier of the resource.
+                    description: The folder's ID.
                     format: int64
                     readOnly: true
                     type: integer
                 name:
-                    description: The name of the StructuredContentFolder.
+                    description: The folder's name.
                     type: string
                 numberOfStructuredContentFolders:
-                    description: The number of child StructuredContentFolders that belong to this resource.
+                    description: The number of structured content folders inside this folder.
                     readOnly: true
                     type: integer
                 numberOfStructuredContents:
-                    description: The number of child StructuredContents that belong to this resource.
+                    description: The number of structured content objects inside this folder.
                     readOnly: true
                     type: integer
                 siteId:
-                    description: The site identificator where this StructuredContentFolder is scoped.
+                    description: The ID of the site to which this folder is scoped.
                     format: int64
                     readOnly: true
                     type: integer
                 viewableBy:
-                    description: Write only property to specify the default permissions.
+                    description: A write-only property that specifies the folder's default permissions.
                     enum: [Anyone, Members, Owner]
                     type: string
                     writeOnly: true
@@ -1322,6 +1348,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/BlogPostingImage"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/BlogPostingImage"
                     description: ""
             tags: ["BlogPostingImage"]
     "/blog-postings/{blogPostingId}":
@@ -1355,6 +1384,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/BlogPosting"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/BlogPosting"
                     description: ""
             tags: ["BlogPosting"]
         patch:
@@ -1371,10 +1403,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/BlogPosting"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/BlogPosting"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/BlogPosting"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/BlogPosting"
                     description: ""
@@ -1393,10 +1431,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/BlogPosting"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/BlogPosting"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/BlogPosting"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/BlogPosting"
                     description: ""
@@ -1439,6 +1483,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Comment"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Comment"
+                                type: array
                     description: ""
             tags: ["Comment"]
         post:
@@ -1455,10 +1504,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Comment"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Comment"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Comment"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Comment"
                     description: ""
@@ -1494,6 +1549,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Rating"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
                     description: ""
             tags: ["BlogPosting"]
         post:
@@ -1510,10 +1568,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""
@@ -1532,10 +1596,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""
@@ -1571,6 +1641,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Comment"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Comment"
                     description: ""
             tags: ["Comment"]
         put:
@@ -1587,10 +1660,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Comment"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Comment"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Comment"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Comment"
                     description: ""
@@ -1633,6 +1712,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Comment"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Comment"
+                                type: array
                     description: ""
             tags: ["Comment"]
         post:
@@ -1649,10 +1733,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Comment"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Comment"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Comment"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Comment"
                     description: ""
@@ -1683,6 +1773,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/ContentSetElement"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentSetElement"
+                                type: array
                     description: ""
             tags: ["ContentSetElement"]
     "/content-structures/{contentStructureId}":
@@ -1699,6 +1794,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/ContentStructure"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/ContentStructure"
                     description: ""
@@ -1745,6 +1843,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/StructuredContent"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/StructuredContent"
+                                type: array
                     description: ""
             tags: ["StructuredContent"]
     "/document-folders/{documentFolderId}":
@@ -1778,6 +1881,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/DocumentFolder"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/DocumentFolder"
                     description: ""
             tags: ["DocumentFolder"]
         patch:
@@ -1794,10 +1900,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/DocumentFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/DocumentFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/DocumentFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/DocumentFolder"
                     description: ""
@@ -1816,10 +1928,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/DocumentFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/DocumentFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/DocumentFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/DocumentFolder"
                     description: ""
@@ -1862,6 +1980,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Document"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Document"
+                                type: array
                     description: ""
             tags: ["Document"]
         post:
@@ -1888,6 +2011,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Document"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Document"
                     description: ""
@@ -1930,6 +2056,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/DocumentFolder"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/DocumentFolder"
+                                type: array
                     description: ""
             tags: ["DocumentFolder"]
         post:
@@ -1946,10 +2077,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/DocumentFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/DocumentFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/DocumentFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/DocumentFolder"
                     description: ""
@@ -1985,6 +2122,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Document"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Document"
                     description: ""
             tags: ["Document"]
         patch:
@@ -2013,6 +2153,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Document"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Document"
                     description: ""
             tags: ["Document"]
         put:
@@ -2039,6 +2182,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Document"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Document"
                     description: ""
@@ -2081,6 +2227,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Comment"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Comment"
+                                type: array
                     description: ""
             tags: ["Comment"]
         post:
@@ -2097,10 +2248,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Comment"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Comment"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Comment"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Comment"
                     description: ""
@@ -2136,6 +2293,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Rating"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
                     description: ""
             tags: ["Document"]
         post:
@@ -2152,10 +2312,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""
@@ -2174,10 +2340,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""
@@ -2213,6 +2385,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseArticle"
                     description: ""
             tags: ["KnowledgeBaseArticle"]
         patch:
@@ -2229,10 +2404,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/KnowledgeBaseArticle"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/KnowledgeBaseArticle"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseArticle"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
                     description: ""
@@ -2251,10 +2432,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/KnowledgeBaseArticle"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/KnowledgeBaseArticle"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseArticle"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
                     description: ""
@@ -2273,6 +2460,11 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/KnowledgeBaseAttachment"
+                                type: array
+                        application/xml:
                             schema:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseAttachment"
@@ -2303,6 +2495,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseAttachment"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseAttachment"
                     description: ""
@@ -2338,6 +2533,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Rating"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
                     description: ""
             tags: ["KnowledgeBaseArticle"]
         post:
@@ -2354,10 +2552,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""
@@ -2376,10 +2580,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""
@@ -2422,6 +2632,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseArticle"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/KnowledgeBaseArticle"
+                                type: array
                     description: ""
             tags: ["KnowledgeBaseArticle"]
         post:
@@ -2438,10 +2653,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/KnowledgeBaseArticle"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/KnowledgeBaseArticle"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseArticle"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
                     description: ""
@@ -2477,6 +2698,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseAttachment"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseAttachment"
                     description: ""
             tags: ["KnowledgeBaseAttachment"]
     "/knowledge-base-folders/{knowledgeBaseFolderId}":
@@ -2510,6 +2734,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseFolder"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseFolder"
                     description: ""
             tags: ["KnowledgeBaseFolder"]
         patch:
@@ -2526,10 +2753,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/KnowledgeBaseFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/KnowledgeBaseFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseFolder"
                     description: ""
@@ -2548,10 +2781,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/KnowledgeBaseFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/KnowledgeBaseFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseFolder"
                     description: ""
@@ -2598,6 +2837,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseArticle"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/KnowledgeBaseArticle"
+                                type: array
                     description: ""
             tags: ["KnowledgeBaseArticle"]
         post:
@@ -2614,10 +2858,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/KnowledgeBaseArticle"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/KnowledgeBaseArticle"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseArticle"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
                     description: ""
@@ -2648,6 +2898,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseFolder"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/KnowledgeBaseFolder"
+                                type: array
                     description: ""
             tags: ["KnowledgeBaseFolder"]
         post:
@@ -2664,10 +2919,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/KnowledgeBaseFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/KnowledgeBaseFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseFolder"
                     description: ""
@@ -2703,6 +2964,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardAttachment"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardAttachment"
                     description: ""
             tags: ["MessageBoardAttachment"]
     "/message-board-messages/{messageBoardMessageId}":
@@ -2736,6 +3000,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardMessage"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardMessage"
                     description: ""
             tags: ["MessageBoardMessage"]
         patch:
@@ -2752,10 +3019,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardMessage"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardMessage"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardMessage"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardMessage"
                     description: ""
@@ -2774,10 +3047,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardMessage"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardMessage"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardMessage"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardMessage"
                     description: ""
@@ -2796,6 +3075,11 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/MessageBoardAttachment"
+                                type: array
+                        application/xml:
                             schema:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardAttachment"
@@ -2826,6 +3110,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardAttachment"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardAttachment"
                     description: ""
@@ -2861,6 +3148,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Rating"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
                     description: ""
             tags: ["MessageBoardMessage"]
         post:
@@ -2877,10 +3167,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""
@@ -2899,10 +3195,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""
@@ -2945,6 +3247,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardMessage"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/MessageBoardMessage"
+                                type: array
                     description: ""
             tags: ["MessageBoardMessage"]
         post:
@@ -2961,10 +3268,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardMessage"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardMessage"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardMessage"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardMessage"
                     description: ""
@@ -3000,6 +3313,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardSection"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardSection"
                     description: ""
             tags: ["MessageBoardSection"]
         patch:
@@ -3016,10 +3332,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardSection"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardSection"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardSection"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardSection"
                     description: ""
@@ -3038,10 +3360,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardSection"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardSection"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardSection"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardSection"
                     description: ""
@@ -3084,6 +3412,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardThread"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/MessageBoardThread"
+                                type: array
                     description: ""
             tags: ["MessageBoardThread"]
         post:
@@ -3100,10 +3433,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardThread"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardThread"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardThread"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardThread"
                     description: ""
@@ -3146,6 +3485,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardSection"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/MessageBoardSection"
+                                type: array
                     description: ""
             tags: ["MessageBoardSection"]
         post:
@@ -3162,10 +3506,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardSection"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardSection"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardSection"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardSection"
                     description: ""
@@ -3201,6 +3551,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardThread"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardThread"
                     description: ""
             tags: ["MessageBoardThread"]
         patch:
@@ -3217,10 +3570,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardThread"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardThread"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardThread"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardThread"
                     description: ""
@@ -3239,10 +3598,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardThread"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardThread"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardThread"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardThread"
                     description: ""
@@ -3261,6 +3626,11 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/MessageBoardAttachment"
+                                type: array
+                        application/xml:
                             schema:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardAttachment"
@@ -3291,6 +3661,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardAttachment"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardAttachment"
                     description: ""
@@ -3333,6 +3706,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardMessage"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/MessageBoardMessage"
+                                type: array
                     description: ""
             tags: ["MessageBoardMessage"]
         post:
@@ -3349,10 +3727,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardMessage"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardMessage"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardMessage"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardMessage"
                     description: ""
@@ -3388,6 +3772,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Rating"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
                     description: ""
             tags: ["MessageBoardThread"]
         post:
@@ -3404,10 +3791,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""
@@ -3426,10 +3819,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""
@@ -3472,6 +3871,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/BlogPostingImage"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/BlogPostingImage"
+                                type: array
                     description: ""
             tags: ["BlogPostingImage"]
         post:
@@ -3498,6 +3902,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/BlogPostingImage"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/BlogPostingImage"
                     description: ""
@@ -3540,6 +3947,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/BlogPosting"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/BlogPosting"
+                                type: array
                     description: ""
             tags: ["BlogPosting"]
         post:
@@ -3556,10 +3968,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/BlogPosting"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/BlogPosting"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/BlogPosting"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/BlogPosting"
                     description: ""
@@ -3595,6 +4013,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/ContentSetElement"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentSetElement"
+                                type: array
                     description: ""
             tags: ["ContentSetElement"]
     "/sites/{siteId}/content-sets/by-uuid/{uuid}/content-set-elements":
@@ -3624,6 +4047,11 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentSetElement"
+                                type: array
+                        application/xml:
                             schema:
                                 items:
                                     $ref: "#/components/schemas/ContentSetElement"
@@ -3664,6 +4092,11 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentStructure"
+                                type: array
+                        application/xml:
                             schema:
                                 items:
                                     $ref: "#/components/schemas/ContentStructure"
@@ -3712,6 +4145,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/DocumentFolder"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/DocumentFolder"
+                                type: array
                     description: ""
             tags: ["DocumentFolder"]
         post:
@@ -3728,10 +4166,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/DocumentFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/DocumentFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/DocumentFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/DocumentFolder"
                     description: ""
@@ -3778,6 +4222,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Document"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Document"
+                                type: array
                     description: ""
             tags: ["Document"]
         post:
@@ -3804,6 +4253,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Document"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Document"
                     description: ""
@@ -3850,6 +4302,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseArticle"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/KnowledgeBaseArticle"
+                                type: array
                     description: ""
             tags: ["KnowledgeBaseArticle"]
         post:
@@ -3866,10 +4323,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/KnowledgeBaseArticle"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/KnowledgeBaseArticle"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseArticle"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
                     description: ""
@@ -3900,6 +4363,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseFolder"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/KnowledgeBaseFolder"
+                                type: array
                     description: ""
             tags: ["KnowledgeBaseFolder"]
         post:
@@ -3916,10 +4384,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/KnowledgeBaseFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/KnowledgeBaseFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/KnowledgeBaseFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseFolder"
                     description: ""
@@ -3966,6 +4440,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardSection"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/MessageBoardSection"
+                                type: array
                     description: ""
             tags: ["MessageBoardSection"]
         post:
@@ -3982,10 +4461,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardSection"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardSection"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardSection"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardSection"
                     description: ""
@@ -4032,6 +4517,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardThread"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/MessageBoardThread"
+                                type: array
                     description: ""
             tags: ["MessageBoardThread"]
         post:
@@ -4048,10 +4538,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/MessageBoardThread"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/MessageBoardThread"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardThread"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardThread"
                     description: ""
@@ -4098,6 +4594,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/StructuredContentFolder"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/StructuredContentFolder"
+                                type: array
                     description: ""
             tags: ["StructuredContentFolder"]
         post:
@@ -4114,10 +4615,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/StructuredContentFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContentFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContentFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContentFolder"
                     description: ""
@@ -4168,6 +4675,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/StructuredContent"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/StructuredContent"
+                                type: array
                     description: ""
             tags: ["StructuredContent"]
         post:
@@ -4188,10 +4700,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/StructuredContent"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContent"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContent"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
                     description: ""
@@ -4221,6 +4739,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContent"
                     description: ""
             tags: ["StructuredContent"]
     "/sites/{siteId}/structured-contents/by-uuid/{uuid}":
@@ -4246,6 +4767,9 @@ paths:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContent"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
                     description: ""
@@ -4288,6 +4812,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/StructuredContentFolder"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/StructuredContentFolder"
+                                type: array
                     description: ""
             tags: ["StructuredContentFolder"]
         post:
@@ -4304,10 +4833,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/StructuredContentFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContentFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContentFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContentFolder"
                     description: ""
@@ -4343,7 +4878,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/StructuredContentFolder"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContentFolder"
                     description: ""
+            tags: ["StructuredContentFolder"]
         patch:
             operationId: patchStructuredContentFolder
             parameters:
@@ -4358,10 +4897,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/StructuredContentFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContentFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContentFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContentFolder"
                     description: ""
@@ -4380,10 +4925,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/StructuredContentFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContentFolder"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContentFolder"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContentFolder"
                     description: ""
@@ -4430,6 +4981,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/StructuredContent"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/StructuredContent"
+                                type: array
                     description: ""
             tags: ["StructuredContent"]
         post:
@@ -4450,10 +5006,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/StructuredContent"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContent"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContent"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
                     description: ""
@@ -4493,6 +5055,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContent"
                     description: ""
             tags: ["StructuredContent"]
         patch:
@@ -4513,10 +5078,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/StructuredContent"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContent"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContent"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
                     description: ""
@@ -4539,10 +5110,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/StructuredContent"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContent"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContent"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
                     description: ""
@@ -4585,6 +5162,11 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Comment"
                                 type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Comment"
+                                type: array
                     description: ""
             tags: ["Comment"]
         post:
@@ -4601,10 +5183,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Comment"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Comment"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Comment"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Comment"
                     description: ""
@@ -4640,6 +5228,9 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Rating"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
                     description: ""
             tags: ["StructuredContent"]
         post:
@@ -4656,10 +5247,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""
@@ -4678,10 +5275,16 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
             responses:
                 200:
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
                     description: ""

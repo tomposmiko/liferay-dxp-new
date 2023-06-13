@@ -14,10 +14,15 @@
 
 package com.liferay.fragment.renderer;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.io.IOException;
+
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,13 +30,12 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Jorge Ferrer
  */
+@ProviderType
 public interface FragmentRenderer {
 
-	public String getCollectionKey(
-		FragmentRendererContext fragmentRendererContext);
+	public String getCollectionKey();
 
 	public default String getImagePreviewURL(
-		FragmentRendererContext fragmentRendererContext,
 		HttpServletRequest httpServletRequest) {
 
 		return StringPool.BLANK;
@@ -43,17 +47,16 @@ public interface FragmentRenderer {
 		return clazz.getName();
 	}
 
-	public String getLabel(FragmentRendererContext fragmentRendererContext);
+	public default String getLabel(Locale locale) {
+		return LanguageUtil.get(
+			locale, FragmentConstants.getTypeLabel(getType()));
+	}
 
 	public default int getType() {
 		return FragmentConstants.TYPE_COMPONENT;
 	}
 
-	public default boolean isAvailable(HttpServletRequest httpServletRequest) {
-		return true;
-	}
-
-	public default boolean isSelectable() {
+	public default boolean isSelectable(HttpServletRequest httpServletRequest) {
 		return true;
 	}
 

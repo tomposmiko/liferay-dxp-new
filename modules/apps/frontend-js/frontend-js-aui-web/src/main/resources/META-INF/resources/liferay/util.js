@@ -1159,16 +1159,27 @@
 					Util._submitLocked = true;
 				}
 
-				var actionURL = new A.Url(action);
+				var searchParamsIndex = action.indexOf('?');
 
-				var authToken = actionURL.getParameter('p_auth') || '';
+				if (searchParamsIndex === -1) {
+					var baseURL = action;
+					var queryString = '';
+				}
+				else {
+					var baseURL = action.slice(0, searchParamsIndex);
+					var queryString = action.slice(searchParamsIndex + 1);
+				}
+
+				var searchParams = new URLSearchParams(queryString);
+
+				var authToken = searchParams.get('p_auth') || '';
 
 				form.append('<input name="p_auth" type="hidden" value="' + authToken + '" />');
 
 				if (authToken) {
-					actionURL.removeParameter('p_auth');
+					searchParams.delete('p_auth');
 
-					action = actionURL.toString();
+					action = baseURL + '?' + searchParams.toString();
 				}
 
 				form.attr('action', action);

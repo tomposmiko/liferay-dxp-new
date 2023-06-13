@@ -82,16 +82,6 @@ exports[`SegmentEdit should render 1`] = `
             class="btn-group"
           >
             <div
-              class="btn-group-item"
-            >
-              <button
-                class="btn btn-secondary btn-sm"
-                type="button"
-              >
-                x-members
-              </button>
-            </div>
-            <div
               class="btn-group-item mr-2"
             >
               <label
@@ -115,11 +105,11 @@ exports[`SegmentEdit should render 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="lexicon-icon lexicon-icon-view"
+                        class="lexicon-icon lexicon-icon-pencil"
                         viewBox="0 0 512 512"
                       >
                         <use
-                          xlink:href="#view"
+                          xlink:href="#pencil"
                         />
                       </svg>
                     </span>
@@ -148,7 +138,7 @@ exports[`SegmentEdit should render 1`] = `
               class="btn-group-item"
             >
               <a
-                class="btn btn-secondary btn-sm disabled"
+                class="btn btn-secondary btn-sm"
                 href="/test-url"
               >
                 cancel

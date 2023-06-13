@@ -175,6 +175,29 @@ renderResponse.setTitle(categoryDisplayName);
 										url="<%= exportURL %>"
 									/>
 								</c:if>
+
+								<%
+								List<ConfigurationMenuItem> configurationMenuItems = (List<ConfigurationMenuItem>)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_MENU_ITEMS);
+								%>
+
+								<c:if test="<%= ListUtil.isNotEmpty(configurationMenuItems) %>">
+
+									<%
+									for (ConfigurationMenuItem configurationMenuItem : configurationMenuItems) {
+										Configuration configuration = configurationModel.getConfiguration();
+									%>
+
+										<liferay-ui:icon
+											message="<%= configurationMenuItem.getLabel(locale) %>"
+											url="<%= configurationMenuItem.getURL(renderRequest, renderResponse, configurationModel.getID(), configurationModel.getFactoryPid(), configuration.getProperties()) %>"
+											useDialog="<%= true %>"
+										/>
+
+									<%
+									}
+									%>
+
+								</c:if>
 							</liferay-ui:icon-menu>
 						</c:if>
 					</h2>

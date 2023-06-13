@@ -15,8 +15,10 @@
 package com.liferay.headless.admin.workflow.client.dto.v1_0;
 
 import com.liferay.headless.admin.workflow.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.workflow.client.serdes.v1_0.WorkflowTaskAssignToUserSerDes;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -89,5 +91,32 @@ public class WorkflowTaskAssignToUser {
 	}
 
 	protected Date dueDate;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof WorkflowTaskAssignToUser)) {
+			return false;
+		}
+
+		WorkflowTaskAssignToUser workflowTaskAssignToUser =
+			(WorkflowTaskAssignToUser)object;
+
+		return Objects.equals(toString(), workflowTaskAssignToUser.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return WorkflowTaskAssignToUserSerDes.toJSON(this);
+	}
 
 }

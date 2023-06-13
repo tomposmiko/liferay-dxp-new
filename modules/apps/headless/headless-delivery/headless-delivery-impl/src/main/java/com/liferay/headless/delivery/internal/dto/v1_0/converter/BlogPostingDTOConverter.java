@@ -16,6 +16,8 @@ package com.liferay.headless.delivery.internal.dto.v1_0.converter;
 
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.kernel.service.AssetLinkLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryService;
@@ -28,6 +30,7 @@ import com.liferay.headless.delivery.dto.v1_0.converter.DTOConverter;
 import com.liferay.headless.delivery.dto.v1_0.converter.DTOConverterContext;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.AggregateRatingUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.CreatorUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.RelatedContentUtil;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -87,6 +90,10 @@ public class BlogPostingDTOConverter implements DTOConverter {
 					AssetTag.NAME_ACCESSOR);
 				numberOfComments = _commentManager.getCommentsCount(
 					BlogsEntry.class.getName(), blogsEntry.getEntryId());
+				relatedContents = RelatedContentUtil.toRelatedContents(
+					_assetEntryLocalService, _assetLinkLocalService,
+					blogsEntry.getModelClassName(), blogsEntry.getEntryId(),
+					dtoConverterContext.getLocale());
 				siteId = blogsEntry.getGroupId();
 				taxonomyCategories = TransformUtil.transformToArray(
 					_assetCategoryLocalService.getCategories(
@@ -124,6 +131,12 @@ public class BlogPostingDTOConverter implements DTOConverter {
 
 	@Reference
 	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
+	private AssetLinkLocalService _assetLinkLocalService;
 
 	@Reference
 	private AssetTagLocalService _assetTagLocalService;

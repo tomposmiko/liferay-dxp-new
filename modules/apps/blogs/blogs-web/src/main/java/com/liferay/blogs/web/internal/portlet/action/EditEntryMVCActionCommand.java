@@ -36,8 +36,8 @@ import com.liferay.friendly.url.exception.DuplicateFriendlyURLEntryException;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.editor.EditorConstants;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.TrashedModel;
@@ -207,15 +207,16 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 			boolean ajax = ParamUtil.getBoolean(actionRequest, "ajax");
 
 			if (ajax) {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-				jsonObject.put(
+				JSONObject jsonObject = JSONUtil.put(
 					"attributeDataImageId",
-					EditorConstants.ATTRIBUTE_DATA_IMAGE_ID);
-				jsonObject.put("content", entry.getContent());
-				jsonObject.put(
-					"coverImageFileEntryId", entry.getCoverImageFileEntryId());
-				jsonObject.put("entryId", entry.getEntryId());
+					EditorConstants.ATTRIBUTE_DATA_IMAGE_ID
+				).put(
+					"content", entry.getContent()
+				).put(
+					"coverImageFileEntryId", entry.getCoverImageFileEntryId()
+				).put(
+					"entryId", entry.getEntryId()
+				);
 
 				JSONPortletResponseUtil.writeJSON(
 					actionRequest, actionResponse, jsonObject);

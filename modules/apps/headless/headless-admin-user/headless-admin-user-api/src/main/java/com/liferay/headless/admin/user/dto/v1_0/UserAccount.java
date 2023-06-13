@@ -26,8 +26,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -43,7 +49,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "UserAccount")
 public class UserAccount {
 
-	@Schema(description = "An additional name, can be used for a middle name.")
+	@Schema(description = "The user's additional name (e.g., middle name).")
 	public String getAdditionalName() {
 		return additionalName;
 	}
@@ -71,7 +77,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String additionalName;
 
-	@Schema(description = "An alias or screen name for the UserAcount.")
+	@Schema(description = "The user's alias or screen name.")
 	public String getAlternateName() {
 		return alternateName;
 	}
@@ -99,7 +105,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String alternateName;
 
-	@Schema(description = "The date of birth, in ISO 8601 format.")
+	@Schema(description = "The user's date of birth, in ISO 8601 format.")
 	public Date getBirthDate() {
 		return birthDate;
 	}
@@ -127,7 +133,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date birthDate;
 
-	@Schema(description = "https://www.schema.org/ContactInformation")
+	@Schema(description = "The user's contact information.")
 	public ContactInformation getContactInformation() {
 		return contactInformation;
 	}
@@ -156,7 +162,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ContactInformation contactInformation;
 
-	@Schema(description = "A relative URL to the dashboard of the UserAccount.")
+	@Schema(description = "A relative URL to the user's dashboard.")
 	public String getDashboardURL() {
 		return dashboardURL;
 	}
@@ -184,7 +190,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String dashboardURL;
 
-	@Schema(description = "The creation date of the UserAccount.")
+	@Schema(description = "The creation date of the user's account.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -212,7 +218,9 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(description = "The last time a field of the UserAccount changed.")
+	@Schema(
+		description = "The last time any field of the user's account was changed."
+	)
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -240,7 +248,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(description = "The main email address of the UserAccount.")
+	@Schema(description = "The user's main email address.")
 	public String getEmailAddress() {
 		return emailAddress;
 	}
@@ -268,7 +276,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String emailAddress;
 
-	@Schema(description = "In the US, the surname of the UserAccount.")
+	@Schema(description = "The user's surname (last name).")
 	public String getFamilyName() {
 		return familyName;
 	}
@@ -296,7 +304,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String familyName;
 
-	@Schema(description = "In the US, the first name of the UserAccount.")
+	@Schema(description = "The user's first name.")
 	public String getGivenName() {
 		return givenName;
 	}
@@ -324,7 +332,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String givenName;
 
-	@Schema(description = "The UserAccount title (dr, mr, mrs, ms...)")
+	@Schema(description = "The user's title (e.g., Dr., Mr., Mrs, Ms., etc.).")
 	public String getHonorificPrefix() {
 		return honorificPrefix;
 	}
@@ -352,7 +360,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String honorificPrefix;
 
-	@Schema(description = "The UserAccount honorific suffix (ii, jr, phd...)")
+	@Schema(description = "The user's suffix (e.g., II, Jr., PhD, etc.).")
 	public String getHonorificSuffix() {
 		return honorificSuffix;
 	}
@@ -380,7 +388,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String honorificSuffix;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The user's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -406,7 +414,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "A relative URL to profile image.")
+	@Schema(description = "A relative URL to the user's profile image.")
 	public String getImage() {
 		return image;
 	}
@@ -434,7 +442,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String image;
 
-	@Schema(description = "The UserAccount job title.")
+	@Schema(description = "The user's job title.")
 	public String getJobTitle() {
 		return jobTitle;
 	}
@@ -462,7 +470,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String jobTitle;
 
-	@Schema(description = "A list of keywords describing the UserAccount.")
+	@Schema(description = "A list of keywords describing the user.")
 	public String[] getKeywords() {
 		return keywords;
 	}
@@ -490,7 +498,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String[] keywords;
 
-	@Schema(description = "The full name of the UserAccount.")
+	@Schema(description = "The user's full name.")
 	public String getName() {
 		return name;
 	}
@@ -516,7 +524,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String name;
 
-	@Schema(description = "A list of Organizations the UserAccount belongs to.")
+	@Schema(description = "A list of the user's organizations.")
 	public OrganizationBrief[] getOrganizationBriefs() {
 		return organizationBriefs;
 	}
@@ -545,7 +553,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected OrganizationBrief[] organizationBriefs;
 
-	@Schema(description = "A relative URL to the profile of the UserAccount.")
+	@Schema(description = "A relative URL to the user's profile.")
 	public String getProfileURL() {
 		return profileURL;
 	}
@@ -573,7 +581,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String profileURL;
 
-	@Schema(description = "A list of Roles the UserAccount has.")
+	@Schema(description = "A list of the user's roles.")
 	public RoleBrief[] getRoleBriefs() {
 		return roleBriefs;
 	}
@@ -601,7 +609,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected RoleBrief[] roleBriefs;
 
-	@Schema(description = "A list of sites the UserAccount belongs to.")
+	@Schema(description = "A list of the user's sites.")
 	public SiteBrief[] getSiteBriefs() {
 		return siteBriefs;
 	}
@@ -656,208 +664,225 @@ public class UserAccount {
 
 		sb.append("{");
 
-		sb.append("\"additionalName\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (additionalName == null) {
-			sb.append("null");
-		}
-		else {
+		if (additionalName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"additionalName\": ");
+
 			sb.append("\"");
-			sb.append(additionalName);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(additionalName));
 
-		sb.append("\"alternateName\": ");
-
-		if (alternateName == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(alternateName);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (alternateName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"birthDate\": ");
+			sb.append("\"alternateName\": ");
 
-		if (birthDate == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(birthDate);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(alternateName));
 
-		sb.append("\"contactInformation\": ");
-
-		if (contactInformation == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(contactInformation);
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dashboardURL\": ");
-
-		if (dashboardURL == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dashboardURL);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (birthDate != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"birthDate\": ");
 
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCreated);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(birthDate));
 
-		sb.append("\"dateModified\": ");
-
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contactInformation != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"emailAddress\": ");
+			sb.append("\"contactInformation\": ");
 
-		if (emailAddress == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(emailAddress);
-			sb.append("\"");
+			sb.append(String.valueOf(contactInformation));
 		}
 
-		sb.append(", ");
+		if (dashboardURL != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"familyName\": ");
+			sb.append("\"dashboardURL\": ");
 
-		if (familyName == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(familyName);
+
+			sb.append(_escape(dashboardURL));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"givenName\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (givenName == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(givenName);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
 
-		sb.append("\"honorificPrefix\": ");
-
-		if (honorificPrefix == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(honorificPrefix);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"honorificSuffix\": ");
+			sb.append("\"dateModified\": ");
 
-		if (honorificSuffix == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(honorificSuffix);
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (emailAddress != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"emailAddress\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(emailAddress));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (familyName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"familyName\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(familyName));
+
+			sb.append("\"");
+		}
+
+		if (givenName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"givenName\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(givenName));
+
+			sb.append("\"");
+		}
+
+		if (honorificPrefix != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"honorificPrefix\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(honorificPrefix));
+
+			sb.append("\"");
+		}
+
+		if (honorificSuffix != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"honorificSuffix\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(honorificSuffix));
+
+			sb.append("\"");
+		}
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (image != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"image\": ");
+			sb.append("\"image\": ");
 
-		if (image == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(image);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(image));
 
-		sb.append("\"jobTitle\": ");
-
-		if (jobTitle == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(jobTitle);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (jobTitle != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywords\": ");
+			sb.append("\"jobTitle\": ");
 
-		if (keywords == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(jobTitle));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (keywords != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"keywords\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < keywords.length; i++) {
 				sb.append("\"");
-				sb.append(keywords[i]);
+
+				sb.append(_escape(keywords[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < keywords.length) {
@@ -868,31 +893,31 @@ public class UserAccount {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (organizationBriefs != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"organizationBriefs\": ");
+			sb.append("\"organizationBriefs\": ");
 
-		if (organizationBriefs == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < organizationBriefs.length; i++) {
-				sb.append(organizationBriefs[i]);
+				sb.append(String.valueOf(organizationBriefs[i]));
 
 				if ((i + 1) < organizationBriefs.length) {
 					sb.append(", ");
@@ -902,31 +927,31 @@ public class UserAccount {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (profileURL != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"profileURL\": ");
+			sb.append("\"profileURL\": ");
 
-		if (profileURL == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(profileURL);
+
+			sb.append(_escape(profileURL));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (roleBriefs != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"roleBriefs\": ");
+			sb.append("\"roleBriefs\": ");
 
-		if (roleBriefs == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < roleBriefs.length; i++) {
-				sb.append(roleBriefs[i]);
+				sb.append(String.valueOf(roleBriefs[i]));
 
 				if ((i + 1) < roleBriefs.length) {
 					sb.append(", ");
@@ -936,18 +961,17 @@ public class UserAccount {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (siteBriefs != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteBriefs\": ");
+			sb.append("\"siteBriefs\": ");
 
-		if (siteBriefs == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < siteBriefs.length; i++) {
-				sb.append(siteBriefs[i]);
+				sb.append(String.valueOf(siteBriefs[i]));
 
 				if ((i + 1) < siteBriefs.length) {
 					sb.append(", ");
@@ -955,6 +979,41 @@ public class UserAccount {
 			}
 
 			sb.append("]");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

@@ -15,6 +15,9 @@
 package com.liferay.headless.form.client.dto.v1_0;
 
 import com.liferay.headless.form.client.function.UnsafeSupplier;
+import com.liferay.headless.form.client.serdes.v1_0.GridSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -83,5 +86,31 @@ public class Grid {
 	}
 
 	protected Row[] rows;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Grid)) {
+			return false;
+		}
+
+		Grid grid = (Grid)object;
+
+		return Objects.equals(toString(), grid.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return GridSerDes.toJSON(this);
+	}
 
 }

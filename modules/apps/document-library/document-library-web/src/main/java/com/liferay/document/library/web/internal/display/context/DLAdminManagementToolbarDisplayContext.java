@@ -24,6 +24,7 @@ import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
+import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.web.internal.constants.DLWebKeys;
 import com.liferay.document.library.web.internal.display.context.logic.DLPortletInstanceSettingsHelper;
 import com.liferay.document.library.web.internal.display.context.util.DLRequestHelper;
@@ -112,7 +113,7 @@ public class DLAdminManagementToolbarDisplayContext {
 			_themeDisplay.getScopeGroupId());
 	}
 
-	public List<DropdownItem> getActionDropdownItems() {
+	public List<DropdownItem> getActionDropdownItems() throws PortalException {
 		if (!_dlPortletInstanceSettingsHelper.isShowActions()) {
 			return null;
 		}
@@ -154,11 +155,18 @@ public class DLAdminManagementToolbarDisplayContext {
 								LanguageUtil.get(_request, "move"));
 							dropdownItem.setQuickAction(true);
 						});
+
+					boolean enableOnBulk = _isEnableOnBulk();
+
 					add(
 						dropdownItem -> {
 							dropdownItem.putData("action", "editTags");
-							dropdownItem.putData(
-								"enableOnBulk", Boolean.TRUE.toString());
+
+							if (enableOnBulk) {
+								dropdownItem.putData(
+									"enableOnBulk", Boolean.TRUE.toString());
+							}
+
 							dropdownItem.setIcon("tag");
 							dropdownItem.setLabel(
 								LanguageUtil.get(_request, "edit-tags"));
@@ -170,8 +178,13 @@ public class DLAdminManagementToolbarDisplayContext {
 							dropdownItem -> {
 								dropdownItem.putData(
 									"action", "editCategories");
-								dropdownItem.putData(
-									"enableOnBulk", Boolean.TRUE.toString());
+
+								if (enableOnBulk) {
+									dropdownItem.putData(
+										"enableOnBulk",
+										Boolean.TRUE.toString());
+								}
+
 								dropdownItem.setIcon("categories");
 								dropdownItem.setLabel(
 									LanguageUtil.get(
@@ -256,7 +269,8 @@ public class DLAdminManagementToolbarDisplayContext {
 			}
 
 			if (!RepositoryUtil.isExternalRepository(
-					fileEntry.getRepositoryId())) {
+					fileEntry.getRepositoryId()) &&
+				!_hasWorkflowDefinitionLink(fileEntry)) {
 
 				if (_hasValidAssetVocabularies) {
 					availableActionDropdownItems.add("editCategories");
@@ -834,6 +848,53 @@ public class DLAdminManagementToolbarDisplayContext {
 
 				return false;
 			});
+	}
+
+	private boolean _hasWorkflowDefinitionLink(FileEntry fileEntry)
+		throws PortalException {
+
+		if (!(fileEntry.getModel() instanceof DLFileEntry)) {
+			return false;
+		}
+
+		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
+
+		if (_hasWorkflowDefinitionLink(
+				dlFileEntry.getFolderId(), dlFileEntry.getFileEntryTypeId())) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _hasWorkflowDefinitionLink(
+			long folderId, long fileEntryTypeId)
+		throws PortalException {
+
+		try {
+			return DLUtil.hasWorkflowDefinitionLink(
+				_themeDisplay.getCompanyId(), _themeDisplay.getScopeGroupId(),
+				folderId, fileEntryTypeId);
+		}
+		catch (PortalException | RuntimeException e) {
+			throw e;
+		}
+		catch (Exception e) {
+			throw new PortalException(e);
+		}
+	}
+
+	private boolean _isEnableOnBulk() throws PortalException {
+		long folderId = ParamUtil.getLong(_request, "folderId");
+
+		if (_hasWorkflowDefinitionLink(
+				folderId, DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_ALL)) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	private boolean _isSearch() {

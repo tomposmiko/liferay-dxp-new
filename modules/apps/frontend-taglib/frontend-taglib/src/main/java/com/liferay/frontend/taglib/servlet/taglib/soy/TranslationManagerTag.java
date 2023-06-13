@@ -18,6 +18,7 @@ import com.liferay.frontend.taglib.soy.servlet.taglib.ComponentRendererTag;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -47,16 +48,17 @@ public class TranslationManagerTag extends ComponentRendererTag {
 		for (Locale locale : locales) {
 			String languageId = LocaleUtil.toLanguageId(locale);
 
-			JSONObject localeJSONObject = JSONFactoryUtil.createJSONObject();
-
 			String w3cLanguageId = LocaleUtil.toW3cLanguageId(locale);
 
-			localeJSONObject.put("code", w3cLanguageId);
-			localeJSONObject.put("icon", StringUtil.toLowerCase(w3cLanguageId));
-
-			localeJSONObject.put("id", languageId);
-			localeJSONObject.put(
-				"label", locale.getDisplayName(themeDisplay.getLocale()));
+			JSONObject localeJSONObject = JSONUtil.put(
+				"code", w3cLanguageId
+			).put(
+				"icon", StringUtil.toLowerCase(w3cLanguageId)
+			).put(
+				"id", languageId
+			).put(
+				"label", locale.getDisplayName(themeDisplay.getLocale())
+			);
 
 			if (ArrayUtil.contains(_availableLocales, locale)) {
 				availableLocalesJSONArray.put(localeJSONObject);

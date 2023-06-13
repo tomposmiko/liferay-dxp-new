@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Image")
 public class Image {
 
-	@Schema(description = "A text describing the BlogPosting image.")
+	@Schema(description = "The text describing the image.")
 	public String getCaption() {
 		return caption;
 	}
@@ -70,7 +73,7 @@ public class Image {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String caption;
 
-	@Schema(description = "An absolute URL to the image.")
+	@Schema(description = "The image's relative URL.")
 	public String getContentUrl() {
 		return contentUrl;
 	}
@@ -99,7 +102,7 @@ public class Image {
 	protected String contentUrl;
 
 	@Schema(
-		description = "An identifier of the image, can be used to retrieve more information in a Document API."
+		description = "The image's ID. This can be used to retrieve more information in the `Document` API."
 	)
 	public Long getImageId() {
 		return imageId;
@@ -155,39 +158,77 @@ public class Image {
 
 		sb.append("{");
 
-		sb.append("\"caption\": ");
+		if (caption != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (caption == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"caption\": ");
+
 			sb.append("\"");
-			sb.append(caption);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(caption));
 
-		sb.append("\"contentUrl\": ");
-
-		if (contentUrl == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(contentUrl);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentUrl != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"imageId\": ");
+			sb.append("\"contentUrl\": ");
 
-		if (imageId == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(contentUrl));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (imageId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"imageId\": ");
+
 			sb.append(imageId);
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

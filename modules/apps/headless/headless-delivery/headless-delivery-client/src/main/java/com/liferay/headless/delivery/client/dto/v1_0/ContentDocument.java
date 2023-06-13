@@ -15,6 +15,9 @@
 package com.liferay.headless.delivery.client.dto.v1_0;
 
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
+import com.liferay.headless.delivery.client.serdes.v1_0.ContentDocumentSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -169,5 +172,31 @@ public class ContentDocument {
 	}
 
 	protected String title;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof ContentDocument)) {
+			return false;
+		}
+
+		ContentDocument contentDocument = (ContentDocument)object;
+
+		return Objects.equals(toString(), contentDocument.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return ContentDocumentSerDes.toJSON(this);
+	}
 
 }

@@ -3,9 +3,10 @@ import Soy, {Config} from 'metal-soy';
 
 import './FloatingToolbarImagePropertiesPanelDelegateTemplate.soy';
 import {EDITABLE_FIELD_CONFIG_KEYS, TARGET_TYPES} from '../../../utils/constants';
+import {disableSavingChangesStatusAction, enableSavingChangesStatusAction, updateLastSaveDateAction} from '../../../actions/saveChanges.es';
 import getConnectedComponent from '../../../store/ConnectedComponent.es';
 import templates from './FloatingToolbarImagePropertiesPanel.soy';
-import {CLEAR_FRAGMENT_EDITOR, ENABLE_FRAGMENT_EDITOR, UPDATE_CONFIG_ATTRIBUTES, UPDATE_LAST_SAVE_DATE, UPDATE_SAVING_CHANGES_STATUS, UPDATE_TRANSLATION_STATUS} from '../../../actions/actions.es';
+import {CLEAR_FRAGMENT_EDITOR, ENABLE_FRAGMENT_EDITOR, UPDATE_CONFIG_ATTRIBUTES, UPDATE_TRANSLATION_STATUS} from '../../../actions/actions.es';
 
 /**
  * FloatingToolbarImagePropertiesPanel
@@ -20,35 +21,22 @@ class FloatingToolbarImagePropertiesPanel extends Component {
 	 */
 	_updateFragmentConfig(config) {
 		this.store
-			.dispatchAction(
-				UPDATE_SAVING_CHANGES_STATUS,
-				{
-					savingChanges: true
-				}
-			)
-			.dispatchAction(
-				UPDATE_CONFIG_ATTRIBUTES,
+			.dispatch(enableSavingChangesStatusAction())
+			.dispatch(
 				{
 					config,
 					editableId: this.item.editableId,
-					fragmentEntryLinkId: this.item.fragmentEntryLinkId
+					fragmentEntryLinkId: this.item.fragmentEntryLinkId,
+					type: UPDATE_CONFIG_ATTRIBUTES
 				}
 			)
-			.dispatchAction(
-				UPDATE_TRANSLATION_STATUS
-			)
-			.dispatchAction(
-				UPDATE_LAST_SAVE_DATE,
+			.dispatch(
 				{
-					lastSaveDate: new Date()
+					type: UPDATE_TRANSLATION_STATUS
 				}
 			)
-			.dispatchAction(
-				UPDATE_SAVING_CHANGES_STATUS,
-				{
-					savingChanges: false
-				}
-			);
+			.dispatch(updateLastSaveDateAction())
+			.dispatch(disableSavingChangesStatusAction());
 	}
 
 	/**
@@ -57,10 +45,10 @@ class FloatingToolbarImagePropertiesPanel extends Component {
 	 * @review
 	 */
 	_handleClearImageButtonClick() {
-		this.store.dispatchAction(
-			CLEAR_FRAGMENT_EDITOR,
+		this.store.dispatch(
 			{
-				itemId: this.itemId
+				itemId: this.itemId,
+				type: CLEAR_FRAGMENT_EDITOR
 			}
 		);
 	}
@@ -99,10 +87,10 @@ class FloatingToolbarImagePropertiesPanel extends Component {
 	 * @review
 	 */
 	_handleSelectImageButtonClick() {
-		this.store.dispatchAction(
-			ENABLE_FRAGMENT_EDITOR,
+		this.store.dispatch(
 			{
-				itemId: this.itemId
+				itemId: this.itemId,
+				type: ENABLE_FRAGMENT_EDITOR
 			}
 		);
 	}

@@ -66,9 +66,6 @@ import org.osgi.util.tracker.ServiceTracker;
 @ProviderType
 public class AssetListEntryImpl extends AssetListEntryBaseImpl {
 
-	public AssetListEntryImpl() {
-	}
-
 	@Override
 	public List<AssetEntry> getAssetEntries(long segmentsEntryId) {
 		return getAssetEntries(
@@ -89,16 +86,13 @@ public class AssetListEntryImpl extends AssetListEntryBaseImpl {
 	}
 
 	@Override
-	public List<AssetEntry> getAssetEntries(long[] segmentsEntryIds)
-		throws PortalException {
-
+	public List<AssetEntry> getAssetEntries(long[] segmentsEntryIds) {
 		return getAssetEntries(_getFirstSegmentsEntryId(segmentsEntryIds));
 	}
 
 	@Override
 	public List<AssetEntry> getAssetEntries(
-			long[] segmentsEntryIds, int start, int end)
-		throws PortalException {
+		long[] segmentsEntryIds, int start, int end) {
 
 		return getAssetEntries(
 			_getFirstSegmentsEntryId(segmentsEntryIds), start, end);
@@ -119,9 +113,7 @@ public class AssetListEntryImpl extends AssetListEntryBaseImpl {
 	}
 
 	@Override
-	public int getAssetEntriesCount(long[] segmentsEntryIds)
-		throws PortalException {
-
+	public int getAssetEntriesCount(long[] segmentsEntryIds) {
 		return getAssetEntriesCount(_getFirstSegmentsEntryId(segmentsEntryIds));
 	}
 
@@ -198,9 +190,7 @@ public class AssetListEntryImpl extends AssetListEntryBaseImpl {
 	}
 
 	@Override
-	public AssetEntryQuery getAssetEntryQuery(long[] segmentsEntryIds)
-		throws PortalException {
-
+	public AssetEntryQuery getAssetEntryQuery(long[] segmentsEntryIds) {
 		return getAssetEntryQuery(_getFirstSegmentsEntryId(segmentsEntryIds));
 	}
 
@@ -343,14 +333,24 @@ public class AssetListEntryImpl extends AssetListEntryBaseImpl {
 			ClassTypeReader classTypeReader =
 				assetRendererFactory.getClassTypeReader();
 
-			List<ClassType> classTypes = classTypeReader.getAvailableClassTypes(
-				new long[] {getGroupId()}, LocaleUtil.getDefault());
+			try {
+				List<ClassType> classTypes =
+					classTypeReader.getAvailableClassTypes(
+						PortalUtil.getSharedContentSiteGroupIds(
+							getCompanyId(), getGroupId(), getUserId()),
+						LocaleUtil.getDefault());
 
-			Stream<ClassType> stream = classTypes.stream();
+				Stream<ClassType> stream = classTypes.stream();
 
-			availableClassTypeIds = stream.mapToLong(
-				classType -> classType.getClassTypeId()
-			).toArray();
+				availableClassTypeIds = stream.mapToLong(
+					classType -> classType.getClassTypeId()
+				).toArray();
+			}
+			catch (PortalException pe) {
+				_log.error(
+					"Unable to get class types for class name " + className,
+					pe);
+			}
 		}
 
 		boolean anyAssetType = GetterUtil.getBoolean(

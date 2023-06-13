@@ -18,8 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.ContentSetElement;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,9 +60,13 @@ public class ContentSetElementSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"content\":");
+			sb.append("\"content\": ");
 
-			sb.append(contentSetElement.getContent());
+			sb.append("\"");
+
+			sb.append(_escape(contentSetElement.getContent()));
+
+			sb.append("\"");
 		}
 
 		if (contentSetElement.getContentType() != null) {
@@ -68,11 +74,11 @@ public class ContentSetElementSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"contentType\":");
+			sb.append("\"contentType\": ");
 
 			sb.append("\"");
 
-			sb.append(contentSetElement.getContentType());
+			sb.append(_escape(contentSetElement.getContentType()));
 
 			sb.append("\"");
 		}
@@ -82,7 +88,7 @@ public class ContentSetElementSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(contentSetElement.getId());
 		}
@@ -92,11 +98,11 @@ public class ContentSetElementSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"title\":");
+			sb.append("\"title\": ");
 
 			sb.append("\"");
 
-			sb.append(contentSetElement.getTitle());
+			sb.append(_escape(contentSetElement.getTitle()));
 
 			sb.append("\"");
 		}
@@ -104,6 +110,13 @@ public class ContentSetElementSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		ContentSetElementJSONParser contentSetElementJSONParser =
+			new ContentSetElementJSONParser();
+
+		return contentSetElementJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -146,6 +159,41 @@ public class ContentSetElementSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class ContentSetElementJSONParser

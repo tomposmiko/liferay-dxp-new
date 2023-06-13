@@ -5,6 +5,7 @@
  */
 {template .render}
 	{@param layoutColumn: list<[
+		actions: string,
 		actionURLs: map<string, string>,
 		active: bool,
 		checked: bool,
@@ -24,18 +25,6 @@
 	{@param pathThemeImages: string}
 	{@param portletNamespace: string}
 	{@param? _handleLayoutColumnItemDropdownItemClick: any}
-	{@param? draggingItem: [
-		actionURLs: map<string, string>,
-		active: bool,
-		checked: bool,
-		description: string,
-		hasChild: bool,
-		plid: string,
-		title: string,
-		url: string
-	]}
-	{@param? draggingItemPosition: string}
-	{@param? hoveredLayoutColumnItemPlid: string}
 
 	{let $layoutColumnClasses kind="text"}
 		col-11
@@ -60,16 +49,6 @@
 		ref="layoutItemsWrapper"
 	>
 		{foreach $layoutColumnItem in $layoutColumn}
-			{let $styleModifier kind="text"}
-				{if $hoveredLayoutColumnItemPlid == $layoutColumnItem.plid}
-					{$draggingItemPosition}
-				{/if}
-
-				{if $draggingItem and $draggingItem.plid == $layoutColumnItem.plid}
-					{sp}layout-column-item-dragged
-				{/if}
-			{/let}
-
 			{call .layoutColumnItem}
 				{param _handleLayoutColumnItemDropdownItemClick: $_handleLayoutColumnItemDropdownItemClick /}
 				{param key: $layoutColumnItem.plid /}
@@ -80,7 +59,6 @@
 				{param handleLayoutColumnItemClick: $handleLayoutColumnItemClick /}
 				{param pathThemeImages: $pathThemeImages /}
 				{param portletNamespace: $portletNamespace /}
-				{param styleModifier: $styleModifier /}
 			{/call}
 		{/foreach}
 	</ul>
@@ -104,6 +82,7 @@
 {template .layoutColumnItem}
 	{@param layoutColumnIndex: number}
 	{@param layoutColumnItem: [
+		actions: string,
 		actionURLs: map<string, string>,
 		active: bool,
 		checked: bool,
@@ -122,7 +101,6 @@
 	{@param pathThemeImages: string}
 	{@param portletNamespace: string}
 	{@param? _handleLayoutColumnItemDropdownItemClick: any}
-	{@param? styleModifier: string}
 
 	{let $listGroupItemClasses kind="text"}
 		layout-item
@@ -141,14 +119,11 @@
 			{sp}active-item
 			{sp}focus
 		{/if}
-
-		{if $styleModifier}
-			{sp}{$styleModifier}
-		{/if}
 	{/let}
 
 	{let $listGroupItemAttributes kind="attributes"}
 		class="{$listGroupItemClasses}"
+		data-actions="{$layoutColumnItem.actions ?: ''}"
 		data-layout-column-item-plid="{$layoutColumnItem.plid}"
 
 		{if $layoutColumnItem.active}

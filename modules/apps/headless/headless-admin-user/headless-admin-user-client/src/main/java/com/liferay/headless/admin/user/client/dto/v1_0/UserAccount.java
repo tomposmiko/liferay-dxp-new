@@ -15,8 +15,10 @@
 package com.liferay.headless.admin.user.client.dto.v1_0;
 
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.user.client.serdes.v1_0.UserAccountSerDes;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -465,5 +467,31 @@ public class UserAccount {
 	}
 
 	protected SiteBrief[] siteBriefs;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof UserAccount)) {
+			return false;
+		}
+
+		UserAccount userAccount = (UserAccount)object;
+
+		return Objects.equals(toString(), userAccount.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return UserAccountSerDes.toJSON(this);
+	}
 
 }

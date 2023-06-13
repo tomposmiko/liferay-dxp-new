@@ -13,13 +13,11 @@ definition {
 
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
-			layoutName = "Asset Publisher Page"
-		);
+			layoutName = "Asset Publisher Page");
 
 		Navigator.gotoSitePage(
 			pageName = "Asset Publisher Page",
-			siteName = "Test Site Name"
-		);
+			siteName = "Test Site Name");
 
 		Portlet.addPG(portletName = "Asset Publisher");
 	}
@@ -33,23 +31,6 @@ definition {
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
 		}
-	}
-
-	@description = "This is a test for LPS-86192. The default asset link behavior should be 'View in Context'."
-	@priority = "4"
-	test ViewDefaultAssetLinkBehavior {
-		echo("## Navigate to Asset Publisher widget display settings.");
-
-		AssetPublisherPortlet.gotoConfigurationPG();
-
-		Navigator.gotoNavTab(navTab = "Display Settings");
-
-		echo("## Assert the default asset link behavior is 'View in Context'.");
-
-		AssertSelectedLabel(
-			locator1 = "APConfigurationDisplaysettings#ASSET_LINK_BEHAVIOR_SELECT",
-			value1 = "View in Context"
-		);
 	}
 
 	@description = "This is a test for LPS-93357. The subscribe button can be enabled/disabled."
@@ -66,10 +47,25 @@ definition {
 		task ("Assert the subscribe button displays") {
 			Navigator.gotoSitePage(
 				pageName = "Asset Publisher Page",
-				siteName = "Test Site Name"
-			);
+				siteName = "Test Site Name");
 
 			AssertElementPresent(locator1 = "Button#SUBSCRIBE");
 		}
+	}
+
+	@description = "This is a test for LPS-86192. The default asset link behavior should be 'View in Context'."
+	@priority = "4"
+	test ViewDefaultAssetLinkBehavior {
+		echo("## Navigate to Asset Publisher widget display settings.");
+
+		AssetPublisherPortlet.gotoConfigurationPG();
+
+		Navigator.gotoNavTab(navTab = "Display Settings");
+
+		echo("## Assert the default asset link behavior is 'View in Context'.");
+
+		AssertSelectedLabel(
+			locator1 = "APConfigurationDisplaysettings#ASSET_LINK_BEHAVIOR_SELECT",
+			value1 = "View in Context");
 	}
 }

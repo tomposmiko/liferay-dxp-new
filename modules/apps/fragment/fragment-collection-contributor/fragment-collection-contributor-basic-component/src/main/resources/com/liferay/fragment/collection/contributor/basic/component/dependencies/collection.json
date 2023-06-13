@@ -1,20 +1,3 @@
 {
-	"fragments": [
-		"card",
-		"card-basic",
-		"heading",
-		"image",
-		"line",
-		"link",
-		"link-center",
-		"paragraph",
-		"primary-button",
-		"secondary-button",
-		"slider",
-		"social",
-		"spacer-2x",
-		"spacer-4x",
-		"spacer-8x"
-	],
 	"name": "Basic Components"
 }

@@ -26,8 +26,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -46,7 +52,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Keyword")
 public class Keyword {
 
-	@Schema(description = "The creator of this Keyword.")
+	@Schema(description = "The keyword's creator.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -74,7 +80,7 @@ public class Keyword {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema(description = "The creation date of the Keyword.")
+	@Schema(description = "The keyword's creation date.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -102,7 +108,7 @@ public class Keyword {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(description = "The creation date of the Keyword.")
+	@Schema(description = "The keyword's most recent modification date.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -130,7 +136,7 @@ public class Keyword {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The keyword's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -157,7 +163,7 @@ public class Keyword {
 	protected Long id;
 
 	@Schema(
-		description = "The number of times this Keyword has been used in other Assets."
+		description = "The number of times this keyword has been used with other assets."
 	)
 	public Integer getKeywordUsageCount() {
 		return keywordUsageCount;
@@ -186,7 +192,7 @@ public class Keyword {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer keywordUsageCount;
 
-	@Schema(description = "The name of the Keyword.")
+	@Schema(description = "The keyword's name.")
 	public String getName() {
 		return name;
 	}
@@ -213,9 +219,7 @@ public class Keyword {
 	@NotEmpty
 	protected String name;
 
-	@Schema(
-		description = "The site identificator where this Keyword is scoped."
-	)
+	@Schema(description = "The ID of the site to which this keyword is scoped.")
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -270,85 +274,124 @@ public class Keyword {
 
 		sb.append("{");
 
-		sb.append("\"creator\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (creator == null) {
-			sb.append("null");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"creator\": ");
+
+			sb.append(String.valueOf(creator));
 		}
-		else {
-			sb.append(creator);
-		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCreated);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
 
-		sb.append("\"dateModified\": ");
-
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"dateModified\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (keywordUsageCount != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywordUsageCount\": ");
+			sb.append("\"keywordUsageCount\": ");
 
-		if (keywordUsageCount == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(keywordUsageCount);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\": ");
 
-		if (siteId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(siteId);
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

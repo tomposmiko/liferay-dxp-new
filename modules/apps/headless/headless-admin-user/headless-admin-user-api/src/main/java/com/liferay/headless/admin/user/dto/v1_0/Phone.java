@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Phone")
 public class Phone {
 
-	@Schema(description = "the phone extension.")
+	@Schema(description = "The phone number's extension.")
 	public String getExtension() {
 		return extension;
 	}
@@ -70,7 +73,7 @@ public class Phone {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String extension;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The phone number's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -96,7 +99,7 @@ public class Phone {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "the phone number, without extension.")
+	@Schema(description = "The phone number without its extension.")
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
@@ -124,7 +127,7 @@ public class Phone {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String phoneNumber;
 
-	@Schema(description = "the type of phone number.")
+	@Schema(description = "The phone number's type.")
 	public String getPhoneType() {
 		return phoneType;
 	}
@@ -153,7 +156,7 @@ public class Phone {
 	protected String phoneType;
 
 	@Schema(
-		description = "A flag that identifies if the phone is the main one of the UserAccount/Organization."
+		description = "A flag that identifies whether this is the main phone number of the user/organization."
 	)
 	public Boolean getPrimary() {
 		return primary;
@@ -209,63 +212,101 @@ public class Phone {
 
 		sb.append("{");
 
-		sb.append("\"extension\": ");
+		if (extension != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (extension == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"extension\": ");
+
 			sb.append("\"");
-			sb.append(extension);
+
+			sb.append(_escape(extension));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (phoneNumber != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"phoneNumber\": ");
+			sb.append("\"phoneNumber\": ");
 
-		if (phoneNumber == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(phoneNumber);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(phoneNumber));
 
-		sb.append("\"phoneType\": ");
-
-		if (phoneType == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(phoneType);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (phoneType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"primary\": ");
+			sb.append("\"phoneType\": ");
 
-		if (primary == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(phoneType));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (primary != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"primary\": ");
+
 			sb.append(primary);
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

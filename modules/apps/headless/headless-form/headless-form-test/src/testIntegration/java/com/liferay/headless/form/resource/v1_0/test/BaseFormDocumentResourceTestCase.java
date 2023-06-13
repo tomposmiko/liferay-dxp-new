@@ -342,11 +342,23 @@ public abstract class BaseFormDocumentResourceTestCase {
 			valid = false;
 		}
 
+		if (!Objects.equals(formDocument.getSiteId(), testGroup.getGroupId())) {
+			valid = false;
+		}
+
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
 			if (Objects.equals("contentUrl", additionalAssertFieldName)) {
 				if (formDocument.getContentUrl() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("description", additionalAssertFieldName)) {
+				if (formDocument.getDescription() == null) {
 					valid = false;
 				}
 
@@ -363,6 +375,14 @@ public abstract class BaseFormDocumentResourceTestCase {
 
 			if (Objects.equals("fileExtension", additionalAssertFieldName)) {
 				if (formDocument.getFileExtension() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("folderId", additionalAssertFieldName)) {
+				if (formDocument.getFolderId() == null) {
 					valid = false;
 				}
 
@@ -421,6 +441,12 @@ public abstract class BaseFormDocumentResourceTestCase {
 			return true;
 		}
 
+		if (!Objects.equals(
+				formDocument1.getSiteId(), formDocument2.getSiteId())) {
+
+			return false;
+		}
+
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
@@ -428,6 +454,17 @@ public abstract class BaseFormDocumentResourceTestCase {
 				if (!Objects.deepEquals(
 						formDocument1.getContentUrl(),
 						formDocument2.getContentUrl())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("description", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formDocument1.getDescription(),
+						formDocument2.getDescription())) {
 
 					return false;
 				}
@@ -450,6 +487,17 @@ public abstract class BaseFormDocumentResourceTestCase {
 				if (!Objects.deepEquals(
 						formDocument1.getFileExtension(),
 						formDocument2.getFileExtension())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("folderId", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formDocument1.getFolderId(),
+						formDocument2.getFolderId())) {
 
 					return false;
 				}
@@ -549,6 +597,14 @@ public abstract class BaseFormDocumentResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("description")) {
+			sb.append("'");
+			sb.append(String.valueOf(formDocument.getDescription()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("encodingFormat")) {
 			sb.append("'");
 			sb.append(String.valueOf(formDocument.getEncodingFormat()));
@@ -565,7 +621,17 @@ public abstract class BaseFormDocumentResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("folderId")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("id")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("siteId")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
@@ -591,9 +657,12 @@ public abstract class BaseFormDocumentResourceTestCase {
 		return new FormDocument() {
 			{
 				contentUrl = RandomTestUtil.randomString();
+				description = RandomTestUtil.randomString();
 				encodingFormat = RandomTestUtil.randomString();
 				fileExtension = RandomTestUtil.randomString();
+				folderId = RandomTestUtil.randomLong();
 				id = RandomTestUtil.randomLong();
+				siteId = testGroup.getGroupId();
 				sizeInBytes = RandomTestUtil.randomLong();
 				title = RandomTestUtil.randomString();
 			}
@@ -602,6 +671,8 @@ public abstract class BaseFormDocumentResourceTestCase {
 
 	protected FormDocument randomIrrelevantFormDocument() {
 		FormDocument randomIrrelevantFormDocument = randomFormDocument();
+
+		randomIrrelevantFormDocument.setSiteId(irrelevantGroup.getGroupId());
 
 		return randomIrrelevantFormDocument;
 	}

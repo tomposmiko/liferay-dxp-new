@@ -34,6 +34,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -109,7 +110,7 @@ public class DDMFormValuesExportImportContentProcessor
 				portletDataContext, stagedModel));
 		ddmFormValuesTransformer.addTransformer(
 			new JournalArticleImportDDMFormFieldValueTransformer(
-				portletDataContext));
+				portletDataContext, stagedModel));
 		ddmFormValuesTransformer.addTransformer(
 			new LayoutImportDDMFormFieldValueTransformer(portletDataContext));
 
@@ -303,16 +304,17 @@ public class DDMFormValuesExportImportContentProcessor
 			long newClassPK = MapUtil.getLong(classPKs, classPK);
 
 			if (newClassPK > 0) {
-				Element disposableElement =
-					portletDataContext.getReferenceElement(
-						_stagedModel, DLFileEntry.class, (Serializable)classPK);
-
 				try {
 					return _dlAppLocalService.getFileEntry(newClassPK);
 				}
 				catch (NoSuchFileEntryException nsfee) {
+					Element referenceElement =
+						portletDataContext.getReferenceElement(
+							_stagedModel, DLFileEntry.class,
+							(Serializable)classPK);
+
 					if (PortletDataContext.REFERENCE_TYPE_DEPENDENCY_DISPOSABLE.
-							equals(disposableElement.attribute("type"))) {
+							equals(referenceElement.attributeValue("type"))) {
 
 						if (_log.isWarnEnabled()) {
 							_log.warn(
@@ -366,13 +368,17 @@ public class DDMFormValuesExportImportContentProcessor
 		}
 
 		protected String toJSON(FileEntry fileEntry, String type) {
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			jsonObject.put("classPK", fileEntry.getFileEntryId());
-			jsonObject.put("groupId", fileEntry.getGroupId());
-			jsonObject.put("title", fileEntry.getTitle());
-			jsonObject.put("type", type);
-			jsonObject.put("uuid", fileEntry.getUuid());
+			JSONObject jsonObject = JSONUtil.put(
+				"classPK", fileEntry.getFileEntryId()
+			).put(
+				"groupId", fileEntry.getGroupId()
+			).put(
+				"title", fileEntry.getTitle()
+			).put(
+				"type", type
+			).put(
+				"uuid", fileEntry.getUuid()
+			);
 
 			return jsonObject.toString();
 		}
@@ -424,23 +430,38 @@ public class DDMFormValuesExportImportContentProcessor
 				JournalArticle journalArticle =
 					_journalArticleLocalService.fetchLatestArticle(classPK);
 
-				jsonObject.put("groupId", journalArticle.getGroupId());
-				jsonObject.put("uuid", journalArticle.getUuid());
+				jsonObject.put(
+					"groupId", journalArticle.getGroupId()
+				).put(
+					"uuid", journalArticle.getUuid()
+				);
 
 				value.addString(locale, jsonObject.toString());
 
-				if (_exportReferencedContent) {
+				boolean disposableDependency = _hasNotExportableStatus(
+					journalArticle, journalArticle.getStatus());
+
+				if (_exportReferencedContent && !disposableDependency) {
 					StagedModelDataHandlerUtil.exportReferenceStagedModel(
 						_portletDataContext, _stagedModel, journalArticle,
-						_portletDataContext.REFERENCE_TYPE_DEPENDENCY);
+						PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 				}
 				else {
+					String referenceType =
+						PortletDataContext.REFERENCE_TYPE_DEPENDENCY;
+
+					if (disposableDependency) {
+						referenceType =
+							PortletDataContext.
+								REFERENCE_TYPE_DEPENDENCY_DISPOSABLE;
+					}
+
 					Element entityElement =
 						_portletDataContext.getExportDataElement(_stagedModel);
 
 					_portletDataContext.addReferenceElement(
 						_stagedModel, entityElement, journalArticle,
-						PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+						referenceType, true);
 				}
 			}
 		}
@@ -455,9 +476,10 @@ public class DDMFormValuesExportImportContentProcessor
 		implements DDMFormFieldValueTransformer {
 
 		public JournalArticleImportDDMFormFieldValueTransformer(
-			PortletDataContext portletDataContext) {
+			PortletDataContext portletDataContext, StagedModel stagedModel) {
 
 			_portletDataContext = portletDataContext;
+			_stagedModel = stagedModel;
 		}
 
 		@Override
@@ -477,18 +499,7 @@ public class DDMFormValuesExportImportContentProcessor
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 					valueString);
 
-				String uuid = jsonObject.getString("uuid");
-				long groupId = jsonObject.getLong("groupId");
-
-				Map<Long, Long> groupIds =
-					(Map<Long, Long>)_portletDataContext.getNewPrimaryKeysMap(
-						Group.class);
-
-				groupId = MapUtil.getLong(groupIds, groupId);
-
-				JournalArticle journalArticle =
-					_journalArticleLocalService.
-						fetchJournalArticleByUuidAndGroupId(uuid, groupId);
+				JournalArticle journalArticle = fetchJournalArticle(jsonObject);
 
 				if (journalArticle == null) {
 					continue;
@@ -500,7 +511,61 @@ public class DDMFormValuesExportImportContentProcessor
 			}
 		}
 
+		protected JournalArticle fetchJournalArticle(JSONObject jsonObject)
+			throws PortalException {
+
+			long classPK = GetterUtil.getLong(jsonObject.get("classPK"));
+
+			Map<Long, Long> classPKs =
+				(Map<Long, Long>)_portletDataContext.getNewPrimaryKeysMap(
+					JournalArticle.class);
+
+			long newClassPK = MapUtil.getLong(classPKs, classPK);
+
+			if (newClassPK > 0) {
+				try {
+					return _journalArticleLocalService.getLatestArticle(
+						newClassPK);
+				}
+				catch (NoSuchFileEntryException nsfee) {
+					Element referenceElement =
+						_portletDataContext.getReferenceElement(
+							_stagedModel, JournalArticle.class,
+							(Serializable)classPK);
+
+					if (PortletDataContext.REFERENCE_TYPE_DEPENDENCY_DISPOSABLE.
+							equals(referenceElement.attributeValue("type"))) {
+
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"Unable to find journal article with " +
+									"primaryKey " + newClassPK,
+								nsfee);
+						}
+					}
+					else {
+						throw nsfee;
+					}
+				}
+			}
+
+			// Legacy import
+
+			String uuid = jsonObject.getString("uuid");
+			long groupId = jsonObject.getLong("groupId");
+
+			Map<Long, Long> groupIds =
+				(Map<Long, Long>)_portletDataContext.getNewPrimaryKeysMap(
+					Group.class);
+
+			groupId = MapUtil.getLong(groupIds, groupId);
+
+			return _journalArticleLocalService.
+				fetchJournalArticleByUuidAndGroupId(uuid, groupId);
+		}
+
 		private final PortletDataContext _portletDataContext;
+		private final StagedModel _stagedModel;
 
 	}
 
@@ -643,11 +708,13 @@ public class DDMFormValuesExportImportContentProcessor
 		}
 
 		protected String toJSON(Layout layout) {
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			jsonObject.put("groupId", layout.getGroupId());
-			jsonObject.put("layoutId", layout.getLayoutId());
-			jsonObject.put("privateLayout", layout.isPrivateLayout());
+			JSONObject jsonObject = JSONUtil.put(
+				"groupId", layout.getGroupId()
+			).put(
+				"layoutId", layout.getLayoutId()
+			).put(
+				"privateLayout", layout.isPrivateLayout()
+			);
 
 			return jsonObject.toString();
 		}

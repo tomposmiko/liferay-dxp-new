@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "AdaptedImage")
 public class AdaptedImage {
 
-	@Schema(description = "An absolute URL to the image.")
+	@Schema(description = "The image's relative URL.")
 	public String getContentUrl() {
 		return contentUrl;
 	}
@@ -70,7 +73,7 @@ public class AdaptedImage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String contentUrl;
 
-	@Schema(description = "The height of the image.")
+	@Schema(description = "The image's height in pixels.")
 	public Integer getHeight() {
 		return height;
 	}
@@ -98,7 +101,9 @@ public class AdaptedImage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer height;
 
-	@Schema(description = "A descriptive name of this version.")
+	@Schema(
+		description = "The name of the image's Adaptive Media image resolution."
+	)
 	public String getResolutionName() {
 		return resolutionName;
 	}
@@ -126,7 +131,7 @@ public class AdaptedImage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String resolutionName;
 
-	@Schema(description = "The size in bytes of the image.")
+	@Schema(description = "The image's size in bytes.")
 	public Long getSizeInBytes() {
 		return sizeInBytes;
 	}
@@ -154,7 +159,7 @@ public class AdaptedImage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long sizeInBytes;
 
-	@Schema(description = "The width of the image.")
+	@Schema(description = "The image's width in pixels.")
 	public Integer getWidth() {
 		return width;
 	}
@@ -209,61 +214,97 @@ public class AdaptedImage {
 
 		sb.append("{");
 
-		sb.append("\"contentUrl\": ");
+		if (contentUrl != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (contentUrl == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"contentUrl\": ");
+
 			sb.append("\"");
-			sb.append(contentUrl);
+
+			sb.append(_escape(contentUrl));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (height != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"height\": ");
+			sb.append("\"height\": ");
 
-		if (height == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(height);
 		}
 
-		sb.append(", ");
+		if (resolutionName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"resolutionName\": ");
+			sb.append("\"resolutionName\": ");
 
-		if (resolutionName == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(resolutionName);
+
+			sb.append(_escape(resolutionName));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (sizeInBytes != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"sizeInBytes\": ");
+			sb.append("\"sizeInBytes\": ");
 
-		if (sizeInBytes == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(sizeInBytes);
 		}
 
-		sb.append(", ");
+		if (width != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"width\": ");
+			sb.append("\"width\": ");
 
-		if (width == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(width);
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

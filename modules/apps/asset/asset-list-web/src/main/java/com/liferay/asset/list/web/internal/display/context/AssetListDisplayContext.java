@@ -15,6 +15,7 @@
 package com.liferay.asset.list.web.internal.display.context;
 
 import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.list.constants.AssetListActionKeys;
 import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
 import com.liferay.asset.list.constants.AssetListPortletKeys;
@@ -33,7 +34,6 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -201,7 +201,7 @@ public class AssetListDisplayContext {
 		AssetListEntry assetListEntry = getAssetListEntry();
 
 		if (assetListEntry != null) {
-			return HtmlUtil.escape(assetListEntry.getTitle());
+			return assetListEntry.getTitle();
 		}
 
 		String title = StringPool.BLANK;
@@ -237,6 +237,16 @@ public class AssetListDisplayContext {
 		_assetListEntryType = assetListEntryType;
 
 		return _assetListEntryType;
+	}
+
+	public String getClassName(AssetRendererFactory<?> assetRendererFactory) {
+		Class<?> clazz = assetRendererFactory.getClass();
+
+		String className = clazz.getName();
+
+		int pos = className.lastIndexOf(StringPool.PERIOD);
+
+		return className.substring(pos + 1);
 	}
 
 	public String getEmptyResultMessageDescription() {

@@ -15,6 +15,9 @@
 package com.liferay.headless.admin.user.client.dto.v1_0;
 
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.user.client.serdes.v1_0.LocationSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -85,5 +88,31 @@ public class Location {
 	}
 
 	protected Long id;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Location)) {
+			return false;
+		}
+
+		Location location = (Location)object;
+
+		return Objects.equals(toString(), location.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return LocationSerDes.toJSON(this);
+	}
 
 }

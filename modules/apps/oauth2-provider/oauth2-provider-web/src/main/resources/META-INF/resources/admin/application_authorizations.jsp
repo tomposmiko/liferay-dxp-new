@@ -32,6 +32,7 @@ OAuth2AuthorizationsManagementToolbarDisplayContext oAuth2AuthorizationsManageme
 	actionDropdownItems="<%= oAuth2AuthorizationsManagementToolbarDisplayContext.getActionDropdownItems() %>"
 	disabled="<%= oAuth2AuthorizationsCount == 0 %>"
 	filterDropdownItems="<%= oAuth2AuthorizationsManagementToolbarDisplayContext.getFilterDropdownItems() %>"
+	itemsTotal="<%= oAuth2AuthorizationsCount %>"
 	namespace="<%= renderResponse.getNamespace() %>"
 	searchContainerId="oAuth2AuthorizationsSearchContainer"
 	selectable="<%= true %>"
@@ -101,7 +102,8 @@ OAuth2AuthorizationsManagementToolbarDisplayContext oAuth2AuthorizationsManageme
 				/>
 
 				<liferay-ui:search-container-column-text
-					property="remoteIPInfo"
+					name="remoteIPInfo"
+					value='<%= oAuth2Authorization.getRemoteIPInfo() + ", " + oAuth2Authorization.getRemoteHostInfo() %>'
 				/>
 
 				<liferay-ui:search-container-column-jsp

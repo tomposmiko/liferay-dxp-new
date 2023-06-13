@@ -147,10 +147,11 @@ public class AddFragmentEntryLinkMVCActionCommand extends BaseMVCActionCommand {
 				_transactionConfig, callable);
 
 			jsonObject.put(
-				"editableValues", fragmentEntryLink.getEditableValues());
-			jsonObject.put(
+				"editableValues", fragmentEntryLink.getEditableValues()
+			).put(
 				"fragmentEntryLinkId",
-				fragmentEntryLink.getFragmentEntryLinkId());
+				fragmentEntryLink.getFragmentEntryLinkId()
+			);
 
 			SessionMessages.add(actionRequest, "fragmentEntryLinkAdded");
 		}
@@ -180,8 +181,7 @@ public class AddFragmentEntryLinkMVCActionCommand extends BaseMVCActionCommand {
 		String fragmentEntryKey) {
 
 		Map<String, FragmentEntry> fragmentEntries =
-			_fragmentCollectionContributorTracker.
-				getFragmentCollectionContributorEntries();
+			_fragmentCollectionContributorTracker.getFragmentEntries();
 
 		return fragmentEntries.get(fragmentEntryKey);
 	}

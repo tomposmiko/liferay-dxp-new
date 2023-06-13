@@ -26,8 +26,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -43,7 +49,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "WorkflowTask")
 public class WorkflowTask {
 
-	@Schema(description = "Represents a task to be executed in a Workflow.")
+	@Schema(description = "A flag that indicates whether the task is complete.")
 	public Boolean getCompleted() {
 		return completed;
 	}
@@ -71,7 +77,7 @@ public class WorkflowTask {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean completed;
 
-	@Schema(description = "The creation date of the Organization.")
+	@Schema(description = "The task's completion date.")
 	public Date getDateCompleted() {
 		return dateCompleted;
 	}
@@ -99,7 +105,7 @@ public class WorkflowTask {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCompleted;
 
-	@Schema(description = "The creation date of the Organization.")
+	@Schema(description = "The task's creation date.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -127,7 +133,7 @@ public class WorkflowTask {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(description = "The name of the definition of the Workflow.")
+	@Schema(description = "The name of the task's workflow definition.")
 	public String getDefinitionName() {
 		return definitionName;
 	}
@@ -155,7 +161,7 @@ public class WorkflowTask {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String definitionName;
 
-	@Schema(description = "A description of the WorkflowTask.")
+	@Schema(description = "The task's description.")
 	public String getDescription() {
 		return description;
 	}
@@ -183,7 +189,7 @@ public class WorkflowTask {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String description;
 
-	@Schema(description = "A date where the WorkflowTask should be executed.")
+	@Schema(description = "The date the task should be completed by.")
 	public Date getDueDate() {
 		return dueDate;
 	}
@@ -211,7 +217,7 @@ public class WorkflowTask {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dueDate;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The task's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -237,7 +243,7 @@ public class WorkflowTask {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The name of the WorkflowTask.")
+	@Schema(description = "The task's name.")
 	public String getName() {
 		return name;
 	}
@@ -264,7 +270,7 @@ public class WorkflowTask {
 	protected String name;
 
 	@Schema(
-		description = "The object/asset that is being managed by a Workflow."
+		description = "The object/asset that the task's workflow is managing."
 	)
 	public ObjectReviewed getObjectReviewed() {
 		return objectReviewed;
@@ -295,7 +301,7 @@ public class WorkflowTask {
 	protected ObjectReviewed objectReviewed;
 
 	@Schema(
-		description = "A list of transitions to be launched by the Workflow."
+		description = "A list of transitions to be launched by the task's workflow."
 	)
 	public String[] getTransitions() {
 		return transitions;
@@ -351,128 +357,137 @@ public class WorkflowTask {
 
 		sb.append("{");
 
-		sb.append("\"completed\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (completed == null) {
-			sb.append("null");
-		}
-		else {
+		if (completed != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"completed\": ");
+
 			sb.append(completed);
 		}
 
-		sb.append(", ");
+		if (dateCompleted != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCompleted\": ");
+			sb.append("\"dateCompleted\": ");
 
-		if (dateCompleted == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCompleted);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCompleted));
 
-		sb.append("\"dateCreated\": ");
-
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateCreated);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"definitionName\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (definitionName == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(definitionName);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
 
-		sb.append("\"description\": ");
-
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(description);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (definitionName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dueDate\": ");
+			sb.append("\"definitionName\": ");
 
-		if (dueDate == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dueDate);
+
+			sb.append(_escape(definitionName));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"description\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (dueDate != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dueDate\": ");
+
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(dueDate));
+
+			sb.append("\"");
+		}
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (objectReviewed != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"objectReviewed\": ");
+			sb.append("\"objectReviewed\": ");
 
-		if (objectReviewed == null) {
-			sb.append("null");
+			sb.append(String.valueOf(objectReviewed));
 		}
-		else {
-			sb.append(objectReviewed);
-		}
 
-		sb.append(", ");
+		if (transitions != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"transitions\": ");
+			sb.append("\"transitions\": ");
 
-		if (transitions == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < transitions.length; i++) {
 				sb.append("\"");
-				sb.append(transitions[i]);
+
+				sb.append(_escape(transitions[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < transitions.length) {
@@ -481,6 +496,41 @@ public class WorkflowTask {
 			}
 
 			sb.append("]");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

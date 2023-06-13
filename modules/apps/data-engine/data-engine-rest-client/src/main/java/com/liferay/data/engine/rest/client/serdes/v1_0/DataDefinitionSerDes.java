@@ -24,8 +24,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -65,10 +67,10 @@ public class DataDefinitionSerDes {
 
 		if (dataDefinition.getDataDefinitionFields() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dataDefinitionFields\":");
+			sb.append("\"dataDefinitionFields\": ");
 
 			sb.append("[");
 
@@ -76,7 +78,7 @@ public class DataDefinitionSerDes {
 				 i++) {
 
 				sb.append(
-					DataDefinitionFieldSerDes.toJSON(
+					String.valueOf(
 						dataDefinition.getDataDefinitionFields()[i]));
 
 				if ((i + 1) < dataDefinition.getDataDefinitionFields().length) {
@@ -89,10 +91,10 @@ public class DataDefinitionSerDes {
 
 		if (dataDefinition.getDataDefinitionRules() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dataDefinitionRules\":");
+			sb.append("\"dataDefinitionRules\": ");
 
 			sb.append("[");
 
@@ -100,8 +102,7 @@ public class DataDefinitionSerDes {
 				 i++) {
 
 				sb.append(
-					DataDefinitionRuleSerDes.toJSON(
-						dataDefinition.getDataDefinitionRules()[i]));
+					String.valueOf(dataDefinition.getDataDefinitionRules()[i]));
 
 				if ((i + 1) < dataDefinition.getDataDefinitionRules().length) {
 					sb.append(", ");
@@ -113,10 +114,10 @@ public class DataDefinitionSerDes {
 
 		if (dataDefinition.getDateCreated() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -129,10 +130,10 @@ public class DataDefinitionSerDes {
 
 		if (dataDefinition.getDateModified() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -145,17 +146,15 @@ public class DataDefinitionSerDes {
 
 		if (dataDefinition.getDescription() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < dataDefinition.getDescription().length; i++) {
-				sb.append(
-					LocalizedValueSerDes.toJSON(
-						dataDefinition.getDescription()[i]));
+				sb.append(String.valueOf(dataDefinition.getDescription()[i]));
 
 				if ((i + 1) < dataDefinition.getDescription().length) {
 					sb.append(", ");
@@ -167,26 +166,25 @@ public class DataDefinitionSerDes {
 
 		if (dataDefinition.getId() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(dataDefinition.getId());
 		}
 
 		if (dataDefinition.getName() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < dataDefinition.getName().length; i++) {
-				sb.append(
-					LocalizedValueSerDes.toJSON(dataDefinition.getName()[i]));
+				sb.append(String.valueOf(dataDefinition.getName()[i]));
 
 				if ((i + 1) < dataDefinition.getName().length) {
 					sb.append(", ");
@@ -198,34 +196,34 @@ public class DataDefinitionSerDes {
 
 		if (dataDefinition.getSiteId() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"siteId\":");
+			sb.append("\"siteId\": ");
 
 			sb.append(dataDefinition.getSiteId());
 		}
 
 		if (dataDefinition.getStorageType() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"storageType\":");
+			sb.append("\"storageType\": ");
 
 			sb.append("\"");
 
-			sb.append(dataDefinition.getStorageType());
+			sb.append(_escape(dataDefinition.getStorageType()));
 
 			sb.append("\"");
 		}
 
 		if (dataDefinition.getUserId() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"userId\":");
+			sb.append("\"userId\": ");
 
 			sb.append(dataDefinition.getUserId());
 		}
@@ -233,6 +231,13 @@ public class DataDefinitionSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		DataDefinitionJSONParser dataDefinitionJSONParser =
+			new DataDefinitionJSONParser();
+
+		return dataDefinitionJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(DataDefinition dataDefinition) {
@@ -316,6 +321,41 @@ public class DataDefinitionSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class DataDefinitionJSONParser

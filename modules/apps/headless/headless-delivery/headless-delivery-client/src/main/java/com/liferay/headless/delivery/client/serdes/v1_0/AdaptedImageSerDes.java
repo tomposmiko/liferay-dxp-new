@@ -18,8 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.AdaptedImage;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,11 +60,11 @@ public class AdaptedImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"contentUrl\":");
+			sb.append("\"contentUrl\": ");
 
 			sb.append("\"");
 
-			sb.append(adaptedImage.getContentUrl());
+			sb.append(_escape(adaptedImage.getContentUrl()));
 
 			sb.append("\"");
 		}
@@ -72,7 +74,7 @@ public class AdaptedImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"height\":");
+			sb.append("\"height\": ");
 
 			sb.append(adaptedImage.getHeight());
 		}
@@ -82,11 +84,11 @@ public class AdaptedImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"resolutionName\":");
+			sb.append("\"resolutionName\": ");
 
 			sb.append("\"");
 
-			sb.append(adaptedImage.getResolutionName());
+			sb.append(_escape(adaptedImage.getResolutionName()));
 
 			sb.append("\"");
 		}
@@ -96,7 +98,7 @@ public class AdaptedImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"sizeInBytes\":");
+			sb.append("\"sizeInBytes\": ");
 
 			sb.append(adaptedImage.getSizeInBytes());
 		}
@@ -106,7 +108,7 @@ public class AdaptedImageSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"width\":");
+			sb.append("\"width\": ");
 
 			sb.append(adaptedImage.getWidth());
 		}
@@ -114,6 +116,13 @@ public class AdaptedImageSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		AdaptedImageJSONParser adaptedImageJSONParser =
+			new AdaptedImageJSONParser();
+
+		return adaptedImageJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(AdaptedImage adaptedImage) {
@@ -162,6 +171,41 @@ public class AdaptedImageSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class AdaptedImageJSONParser

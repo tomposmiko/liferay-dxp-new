@@ -21,8 +21,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -64,9 +66,9 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(CreatorSerDes.toJSON(knowledgeBaseFolder.getCreator()));
+			sb.append(String.valueOf(knowledgeBaseFolder.getCreator()));
 		}
 
 		if (knowledgeBaseFolder.getDateCreated() != null) {
@@ -74,7 +76,7 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -90,7 +92,7 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -106,11 +108,11 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(knowledgeBaseFolder.getDescription());
+			sb.append(_escape(knowledgeBaseFolder.getDescription()));
 
 			sb.append("\"");
 		}
@@ -120,7 +122,7 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(knowledgeBaseFolder.getId());
 		}
@@ -130,11 +132,11 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(knowledgeBaseFolder.getName());
+			sb.append(_escape(knowledgeBaseFolder.getName()));
 
 			sb.append("\"");
 		}
@@ -144,7 +146,7 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"numberOfKnowledgeBaseArticles\":");
+			sb.append("\"numberOfKnowledgeBaseArticles\": ");
 
 			sb.append(knowledgeBaseFolder.getNumberOfKnowledgeBaseArticles());
 		}
@@ -154,7 +156,7 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"numberOfKnowledgeBaseFolders\":");
+			sb.append("\"numberOfKnowledgeBaseFolders\": ");
 
 			sb.append(knowledgeBaseFolder.getNumberOfKnowledgeBaseFolders());
 		}
@@ -164,10 +166,10 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"parentKnowledgeBaseFolder\":");
+			sb.append("\"parentKnowledgeBaseFolder\": ");
 
 			sb.append(
-				ParentKnowledgeBaseFolderSerDes.toJSON(
+				String.valueOf(
 					knowledgeBaseFolder.getParentKnowledgeBaseFolder()));
 		}
 
@@ -176,7 +178,7 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"parentKnowledgeBaseFolderId\":");
+			sb.append("\"parentKnowledgeBaseFolderId\": ");
 
 			sb.append(knowledgeBaseFolder.getParentKnowledgeBaseFolderId());
 		}
@@ -186,7 +188,7 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"siteId\":");
+			sb.append("\"siteId\": ");
 
 			sb.append(knowledgeBaseFolder.getSiteId());
 		}
@@ -196,7 +198,7 @@ public class KnowledgeBaseFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"viewableBy\":");
+			sb.append("\"viewableBy\": ");
 
 			sb.append("\"");
 
@@ -208,6 +210,13 @@ public class KnowledgeBaseFolderSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		KnowledgeBaseFolderJSONParser knowledgeBaseFolderJSONParser =
+			new KnowledgeBaseFolderJSONParser();
+
+		return knowledgeBaseFolderJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -227,8 +236,7 @@ public class KnowledgeBaseFolderSerDes {
 		}
 		else {
 			map.put(
-				"creator",
-				CreatorSerDes.toJSON(knowledgeBaseFolder.getCreator()));
+				"creator", String.valueOf(knowledgeBaseFolder.getCreator()));
 		}
 
 		map.put(
@@ -290,7 +298,7 @@ public class KnowledgeBaseFolderSerDes {
 		else {
 			map.put(
 				"parentKnowledgeBaseFolder",
-				ParentKnowledgeBaseFolderSerDes.toJSON(
+				String.valueOf(
 					knowledgeBaseFolder.getParentKnowledgeBaseFolder()));
 		}
 
@@ -321,6 +329,41 @@ public class KnowledgeBaseFolderSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class KnowledgeBaseFolderJSONParser

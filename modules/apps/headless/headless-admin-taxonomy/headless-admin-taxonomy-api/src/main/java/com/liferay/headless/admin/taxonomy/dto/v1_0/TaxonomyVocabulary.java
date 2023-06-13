@@ -28,8 +28,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -82,7 +88,7 @@ public class TaxonomyVocabulary {
 	}
 
 	@Schema(
-		description = "A list of assets that can be asociated with this TaxonomyVocabulary."
+		description = "A list of asset types that can be associated with this vocabulary."
 	)
 	public AssetType[] getAssetTypes() {
 		return assetTypes;
@@ -112,7 +118,7 @@ public class TaxonomyVocabulary {
 	protected AssetType[] assetTypes;
 
 	@Schema(
-		description = "A list of languages the content has a translation for."
+		description = "A list of languages the vocabulary has a translation for."
 	)
 	public String[] getAvailableLanguages() {
 		return availableLanguages;
@@ -141,7 +147,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String[] availableLanguages;
 
-	@Schema(description = "The creator of this TaxonomyVocabulary.")
+	@Schema(description = "The vocabulary's creator.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -169,7 +175,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema(description = "The creation date of the Organization.")
+	@Schema(description = "The vocabulary's creation date.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -197,7 +203,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(description = "The creation date of the Organization.")
+	@Schema(description = "The vocabulary's most recent modification date.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -225,9 +231,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(
-		description = "A text description describing the TaxonomyVocabulary."
-	)
+	@Schema(description = "The vocabulary's text description.")
 	public String getDescription() {
 		return description;
 	}
@@ -255,7 +259,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The vocabulary's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -281,7 +285,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The name of the TaxonomyVocabulary.")
+	@Schema(description = "The vocabulary's name.")
 	public String getName() {
 		return name;
 	}
@@ -309,7 +313,7 @@ public class TaxonomyVocabulary {
 	protected String name;
 
 	@Schema(
-		description = "The number of TaxonomyCategories that directly depend on this resource."
+		description = "The number of categories that directly depend on this vocabulary."
 	)
 	public Integer getNumberOfTaxonomyCategories() {
 		return numberOfTaxonomyCategories;
@@ -343,7 +347,7 @@ public class TaxonomyVocabulary {
 	protected Integer numberOfTaxonomyCategories;
 
 	@Schema(
-		description = "The site identificator where this TaxonomyVocabulary is scoped."
+		description = "The ID of the site to which this vocabulary is scoped."
 	)
 	public Long getSiteId() {
 		return siteId;
@@ -373,7 +377,7 @@ public class TaxonomyVocabulary {
 	protected Long siteId;
 
 	@Schema(
-		description = "Write only property to specify the default permissions."
+		description = "A write-only property that specifies the vocabulary's default permissions."
 	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
@@ -438,16 +442,20 @@ public class TaxonomyVocabulary {
 
 		sb.append("{");
 
-		sb.append("\"assetTypes\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (assetTypes == null) {
-			sb.append("null");
-		}
-		else {
+		if (assetTypes != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"assetTypes\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < assetTypes.length; i++) {
-				sb.append(assetTypes[i]);
+				sb.append(String.valueOf(assetTypes[i]));
 
 				if ((i + 1) < assetTypes.length) {
 					sb.append(", ");
@@ -457,19 +465,20 @@ public class TaxonomyVocabulary {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (availableLanguages != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"availableLanguages\": ");
+			sb.append("\"availableLanguages\": ");
 
-		if (availableLanguages == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < availableLanguages.length; i++) {
 				sb.append("\"");
-				sb.append(availableLanguages[i]);
+
+				sb.append(_escape(availableLanguages[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < availableLanguages.length) {
@@ -480,113 +489,149 @@ public class TaxonomyVocabulary {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"creator\": ");
 
-		if (creator == null) {
-			sb.append("null");
+			sb.append(String.valueOf(creator));
 		}
-		else {
-			sb.append(creator);
-		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCreated);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
 
-		sb.append("\"dateModified\": ");
-
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"dateModified\": ");
 
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(description);
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"description\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (numberOfTaxonomyCategories != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfTaxonomyCategories\": ");
+			sb.append("\"numberOfTaxonomyCategories\": ");
 
-		if (numberOfTaxonomyCategories == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfTaxonomyCategories);
 		}
 
-		sb.append(", ");
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\": ");
 
-		if (siteId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(siteId);
 		}
 
-		sb.append(", ");
+		if (viewableBy != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"viewableBy\": ");
+			sb.append("\"viewableBy\": ");
 
-		if (viewableBy == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
 			sb.append(viewableBy);
+
 			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

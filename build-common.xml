@@ -445,8 +445,13 @@ information.
 						/>
 					</copy>
 
+					<path id="test.compile.classpath">
+						<pathelement path="${project.dir}/lib/development/biz.aQute.bnd.jar" />
+						<path refid="test.classpath" />
+					</path>
+
 					<javac
-						classpathref="test.classpath"
+						classpathref="test.compile.classpath"
 						compiler="${javac.compiler}"
 						debug="${javac.debug}"
 						deprecation="${javac.deprecation}"
@@ -1696,7 +1701,7 @@ artifact.url=${remote.repository.url}/com/liferay/portal/com.liferay.${processed
 				<path refid="lib.pre.classpath" />
 				<fileset
 					dir="${project.dir}/lib/development"
-					excludes="jalopy.jar,jetty*.jar,tomcat*.jar"
+					excludes="biz.aQute.bnd.jar,jalopy.jar,jetty*.jar,tomcat*.jar"
 					includes="*.jar"
 				/>
 				<fileset
@@ -1719,9 +1724,19 @@ artifact.url=${remote.repository.url}/com/liferay/portal/com.liferay.${processed
 
 	<macrodef name="setup-yarn">
 		<sequential>
-			<gradle-execute dir="${project.dir}/modules" task="setUpYarn">
-				<arg value="--build-file=${project.dir}/modules/util.gradle" />
-			</gradle-execute>
+			<if>
+				<not>
+					<and>
+						<equals arg1="${os.name}" arg2="SunOS" />
+						<isset property="env.JENKINS_HOME" />
+					</and>
+				</not>
+				<then>
+					<gradle-execute dir="${project.dir}/modules" task="setUpYarn">
+						<arg value="--build-file=${project.dir}/modules/util.gradle" />
+					</gradle-execute>
+				</then>
+			</if>
 		</sequential>
 	</macrodef>
 
@@ -1892,6 +1907,7 @@ rerun your task.
 					<propertyref name="aspectj.configuration" />
 					<propertyref name="baseline.jar.report.level" />
 					<propertyref name="baseline.jar.report.only.dirty.packages" />
+					<propertyref name="build.binaries.cache.dir" />
 					<propertyref name="git.working.branch.name" />
 					<propertyref name="jacoco.agent.configuration" />
 					<propertyref name="jacoco.agent.jar" />

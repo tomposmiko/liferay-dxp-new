@@ -18,8 +18,10 @@ import com.liferay.bulk.rest.client.dto.v1_0.Status;
 import com.liferay.bulk.rest.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -53,10 +55,10 @@ public class StatusSerDes {
 
 		if (status.getActionInProgress() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"actionInProgress\":");
+			sb.append("\"actionInProgress\": ");
 
 			sb.append(status.getActionInProgress());
 		}
@@ -64,6 +66,12 @@ public class StatusSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		StatusJSONParser statusJSONParser = new StatusJSONParser();
+
+		return statusJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Status status) {
@@ -83,6 +91,41 @@ public class StatusSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class StatusJSONParser extends BaseJSONParser<Status> {

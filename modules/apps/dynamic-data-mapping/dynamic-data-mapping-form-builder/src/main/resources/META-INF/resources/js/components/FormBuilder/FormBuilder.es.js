@@ -107,6 +107,7 @@ class FormBuilder extends Component {
 
 	attached() {
 		const {activePage, pages} = this.props;
+		const {store} = this.context;
 		const formBasicInfo = document.querySelector('.ddm-form-basic-info');
 		const translationManager = document.querySelector('.ddm-translation-manager');
 
@@ -118,6 +119,10 @@ class FormBuilder extends Component {
 		if (!this._pageHasFields(pages, activePage)) {
 			this.openSidebar();
 		}
+
+		this._eventHandler.add(
+			store.on('fieldDuplicated', () => this.openSidebar())
+		);
 	}
 
 	created() {

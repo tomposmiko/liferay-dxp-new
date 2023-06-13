@@ -62,15 +62,16 @@ public abstract class BaseWorkflowTaskResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "roleId"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
 		}
 	)
 	@Path("/roles/{roleId}/workflow-tasks")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public Page<WorkflowTask> getRoleWorkflowTasksPage(
-			@NotNull @PathParam("roleId") Long roleId,
+			@NotNull @Parameter(hidden = true) @PathParam("roleId") Long roleId,
 			@Context Pagination pagination)
 		throws Exception {
 
@@ -86,7 +87,7 @@ public abstract class BaseWorkflowTaskResourceImpl
 		}
 	)
 	@Path("/workflow-tasks/assigned-to-me")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public Page<WorkflowTask> getWorkflowTasksAssignedToMePage(
 			@Context Pagination pagination)
@@ -104,7 +105,7 @@ public abstract class BaseWorkflowTaskResourceImpl
 		}
 	)
 	@Path("/workflow-tasks/assigned-to-my-roles")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public Page<WorkflowTask> getWorkflowTasksAssignedToMyRolesPage(
 			@Context Pagination pagination)
@@ -115,24 +116,32 @@ public abstract class BaseWorkflowTaskResourceImpl
 
 	@Override
 	@GET
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "workflowTaskId")}
+	)
 	@Path("/workflow-tasks/{workflowTaskId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public WorkflowTask getWorkflowTask(
-			@NotNull @PathParam("workflowTaskId") Long workflowTaskId)
+			@NotNull @Parameter(hidden = true) @PathParam("workflowTaskId") Long
+				workflowTaskId)
 		throws Exception {
 
 		return new WorkflowTask();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "workflowTaskId")}
+	)
 	@Path("/workflow-tasks/{workflowTaskId}/assign-to-me")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public WorkflowTask postWorkflowTaskAssignToMe(
-			@NotNull @PathParam("workflowTaskId") Long workflowTaskId,
+			@NotNull @Parameter(hidden = true) @PathParam("workflowTaskId") Long
+				workflowTaskId,
 			WorkflowTaskAssignToMe workflowTaskAssignToMe)
 		throws Exception {
 
@@ -140,13 +149,17 @@ public abstract class BaseWorkflowTaskResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "workflowTaskId")}
+	)
 	@Path("/workflow-tasks/{workflowTaskId}/assign-to-user")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public WorkflowTask postWorkflowTaskAssignToUser(
-			@NotNull @PathParam("workflowTaskId") Long workflowTaskId,
+			@NotNull @Parameter(hidden = true) @PathParam("workflowTaskId") Long
+				workflowTaskId,
 			WorkflowTaskAssignToUser workflowTaskAssignToUser)
 		throws Exception {
 
@@ -154,13 +167,17 @@ public abstract class BaseWorkflowTaskResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "workflowTaskId")}
+	)
 	@Path("/workflow-tasks/{workflowTaskId}/change-transition")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public WorkflowTask postWorkflowTaskChangeTransition(
-			@NotNull @PathParam("workflowTaskId") Long workflowTaskId,
+			@NotNull @Parameter(hidden = true) @PathParam("workflowTaskId") Long
+				workflowTaskId,
 			ChangeTransition changeTransition)
 		throws Exception {
 
@@ -168,13 +185,17 @@ public abstract class BaseWorkflowTaskResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "workflowTaskId")}
+	)
 	@Path("/workflow-tasks/{workflowTaskId}/update-due-date")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public WorkflowTask postWorkflowTaskUpdateDueDate(
-			@NotNull @PathParam("workflowTaskId") Long workflowTaskId,
+			@NotNull @Parameter(hidden = true) @PathParam("workflowTaskId") Long
+				workflowTaskId,
 			WorkflowTaskAssignToMe workflowTaskAssignToMe)
 		throws Exception {
 

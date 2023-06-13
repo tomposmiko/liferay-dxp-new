@@ -15,6 +15,7 @@
 package com.liferay.headless.admin.taxonomy.client.dto.v1_0;
 
 import com.liferay.headless.admin.taxonomy.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.taxonomy.client.serdes.v1_0.TaxonomyVocabularySerDes;
 
 import java.util.Date;
 import java.util.Objects;
@@ -297,5 +298,31 @@ public class TaxonomyVocabulary {
 	}
 
 	protected ViewableBy viewableBy;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof TaxonomyVocabulary)) {
+			return false;
+		}
+
+		TaxonomyVocabulary taxonomyVocabulary = (TaxonomyVocabulary)object;
+
+		return Objects.equals(toString(), taxonomyVocabulary.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return TaxonomyVocabularySerDes.toJSON(this);
+	}
 
 }

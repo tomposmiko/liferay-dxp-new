@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -43,7 +46,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Location {
 
 	@Schema(
-		description = "The country where the Organization is located. Follows https://schema.org/addressCountry specification."
+		description = "The organization's country. This follows the [`addressCountry`](https://schema.org/addressCountry) specification."
 	)
 	public String getAddressCountry() {
 		return addressCountry;
@@ -73,7 +76,7 @@ public class Location {
 	protected String addressCountry;
 
 	@Schema(
-		description = "The region where the Organization is located. Follows https://schema.org/addressRegion specification."
+		description = "The organization's region. This follows the [`addressRegion`](https://schema.org/addressRegion) specification."
 	)
 	public String getAddressRegion() {
 		return addressRegion;
@@ -102,7 +105,7 @@ public class Location {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String addressRegion;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The location's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -155,39 +158,77 @@ public class Location {
 
 		sb.append("{");
 
-		sb.append("\"addressCountry\": ");
+		if (addressCountry != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (addressCountry == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"addressCountry\": ");
+
 			sb.append("\"");
-			sb.append(addressCountry);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(addressCountry));
 
-		sb.append("\"addressRegion\": ");
-
-		if (addressRegion == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(addressRegion);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (addressRegion != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"addressRegion\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(addressRegion));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

@@ -37,7 +37,7 @@ import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.item.selector.ItemSelector;
-import com.liferay.item.selector.ItemSelectorReturnType;
+import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -223,12 +224,11 @@ public class EditAssetListDisplayContext {
 		JSONArray rulesJSONArray = JSONFactoryUtil.createJSONArray();
 
 		for (int queryLogicIndex : queryLogicIndexes) {
-			JSONObject ruleJSONObject = JSONFactoryUtil.createJSONObject();
-
 			boolean queryAndOperator = PropertiesParamUtil.getBoolean(
 				_properties, _request, "queryAndOperator" + queryLogicIndex);
 
-			ruleJSONObject.put("queryAndOperator", queryAndOperator);
+			JSONObject ruleJSONObject = JSONUtil.put(
+				"queryAndOperator", queryAndOperator);
 
 			boolean queryContains = PropertiesParamUtil.getBoolean(
 				_properties, _request, "queryContains" + queryLogicIndex, true);
@@ -249,10 +249,14 @@ public class EditAssetListDisplayContext {
 				queryValues = _filterAssetTagNames(
 					_themeDisplay.getScopeGroupId(), queryValues);
 
-				List<Map<String, String>> selectedItems = new ArrayList<>();
-
 				String[] tagNames = StringUtil.split(
 					queryValues, StringPool.COMMA);
+
+				if (ArrayUtil.isEmpty(tagNames)) {
+					continue;
+				}
+
+				List<Map<String, String>> selectedItems = new ArrayList<>();
 
 				for (String tagName : tagNames) {
 					Map<String, String> item = new HashMap<>();
@@ -270,10 +274,14 @@ public class EditAssetListDisplayContext {
 					_request, "queryCategoryIds" + queryLogicIndex,
 					queryValues);
 
-				List<HashMap<String, Object>> selectedItems = new ArrayList<>();
-
 				List<AssetCategory> categories = _filterAssetCategories(
 					GetterUtil.getLongValues(queryValues.split(",")));
+
+				if (ListUtil.isEmpty(categories)) {
+					continue;
+				}
+
+				List<HashMap<String, Object>> selectedItems = new ArrayList<>();
 
 				for (AssetCategory category : categories) {
 					HashMap<String, Object> selectedCategory = new HashMap<>();
@@ -292,17 +300,21 @@ public class EditAssetListDisplayContext {
 				continue;
 			}
 
-			ruleJSONObject.put("queryValues", queryValues);
-			ruleJSONObject.put("type", queryName);
+			ruleJSONObject.put(
+				"queryValues", queryValues
+			).put(
+				"type", queryName
+			);
 
 			rulesJSONArray.put(ruleJSONObject);
 		}
 
 		if (rulesJSONArray.length() == 0) {
-			JSONObject defaultRule = JSONFactoryUtil.createJSONObject();
-
-			defaultRule.put("queryContains", true);
-			defaultRule.put("type", "assetTags");
+			JSONObject defaultRule = JSONUtil.put(
+				"queryContains", true
+			).put(
+				"type", "assetTags"
+			);
 
 			rulesJSONArray.put(defaultRule);
 		}
@@ -514,20 +526,15 @@ public class EditAssetListDisplayContext {
 		ItemSelector itemSelector = (ItemSelector)_request.getAttribute(
 			AssetListWebKeys.ITEM_SELECTOR);
 
-		SiteItemSelectorCriterion siteItemSelectorCriterion =
+		ItemSelectorCriterion itemSelectorCriterion =
 			new SiteItemSelectorCriterion();
 
-		List<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
-			new ArrayList<>();
-
-		desiredItemSelectorReturnTypes.add(new SiteItemSelectorReturnType());
-
-		siteItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			desiredItemSelectorReturnTypes);
+		itemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			new SiteItemSelectorReturnType());
 
 		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(_request),
-			getSelectGroupEventName(), siteItemSelectorCriterion);
+			getSelectGroupEventName(), itemSelectorCriterion);
 
 		itemSelectorURL.setParameter(
 			"portletResource", AssetListPortletKeys.ASSET_LIST);

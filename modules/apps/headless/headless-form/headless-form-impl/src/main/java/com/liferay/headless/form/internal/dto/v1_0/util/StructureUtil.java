@@ -176,14 +176,16 @@ public class StructureUtil {
 
 				setDataType(
 					() -> {
+						if (Objects.equals("date", type)) {
+							return type;
+						}
+
 						if (Objects.equals("document_library", type)) {
 							return "document";
 						}
 
-						if (Objects.equals("date", type) ||
-							Objects.equals("paragraph", type)) {
-
-							return type;
+						if (Objects.equals("paragraph", type)) {
+							return "string";
 						}
 
 						return ddmFormField.getDataType();

@@ -21,8 +21,8 @@ import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.util.FragmentEntryRenderUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
@@ -80,12 +80,15 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 		path = path + StringPool.SLASH + getFragmentEntryKey();
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-		jsonObject.put("cssPath", "index.css");
-		jsonObject.put("htmlPath", "index.html");
-		jsonObject.put("jsPath", "index.js");
-		jsonObject.put("name", getName());
+		JSONObject jsonObject = JSONUtil.put(
+			"cssPath", "index.css"
+		).put(
+			"htmlPath", "index.html"
+		).put(
+			"jsPath", "index.js"
+		).put(
+			"name", getName()
+		);
 
 		FileEntry previewFileEntry = _getPreviewFileEntry();
 

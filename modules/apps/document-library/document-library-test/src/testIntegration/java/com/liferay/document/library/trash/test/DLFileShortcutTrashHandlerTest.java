@@ -267,7 +267,7 @@ public class DLFileShortcutTrashHandlerTest
 	}
 
 	protected void trashFileEntry() throws Exception {
-		Group group = GroupTestUtil.addGroup();
+		group = GroupTestUtil.addGroup();
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(group.getGroupId());

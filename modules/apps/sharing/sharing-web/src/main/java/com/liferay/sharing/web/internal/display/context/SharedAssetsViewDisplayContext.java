@@ -50,6 +50,7 @@ import com.liferay.sharing.util.comparator.SharingEntryModifiedDateComparator;
 import com.liferay.sharing.web.internal.servlet.taglib.ui.SharingEntryMenuItemContributorRegistry;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -188,9 +189,15 @@ public class SharedAssetsViewDisplayContext {
 		menu.setMarkupView("lexicon");
 		menu.setTriggerCssClass("component-action");
 
-		List<MenuItem> menuItems = new ArrayList<>(2);
+		if (!isVisible(sharingEntry)) {
+			menu.setMenuItems(Collections.emptyList());
 
-		if (hasEditPermission(
+			return menu;
+		}
+
+		List<MenuItem> menuItems = new ArrayList<>();
+
+		if (_hasEditPermission(
 				sharingEntry.getClassNameId(), sharingEntry.getClassPK())) {
 
 			menuItems.add(_createEditMenuItem(sharingEntry));
@@ -257,19 +264,6 @@ public class SharedAssetsViewDisplayContext {
 		}
 
 		return sharingEntryInterpreter.getTitle(sharingEntry);
-	}
-
-	public boolean hasEditPermission(long classNameId, long classPK) {
-		SharingEntry sharingEntry = _sharingEntryLocalService.fetchSharingEntry(
-			_themeDisplay.getUserId(), classNameId, classPK);
-
-		if ((sharingEntry != null) &&
-			sharingEntry.hasSharingPermission(SharingEntryAction.UPDATE)) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	public boolean isVisible(SharingEntry sharingEntry) throws PortalException {
@@ -383,10 +377,7 @@ public class SharedAssetsViewDisplayContext {
 	}
 
 	private PortletURL _getCurrentSortingURL() throws PortletException {
-		PortletURL sortingURL = PortletURLUtil.clone(
-			_currentURLObj, _liferayPortletResponse);
-
-		return sortingURL;
+		return PortletURLUtil.clone(_currentURLObj, _liferayPortletResponse);
 	}
 
 	private List<DropdownItem> _getFilterNavigationDropdownItems() {
@@ -481,6 +472,19 @@ public class SharedAssetsViewDisplayContext {
 
 		return sharingEntryEditRenderer.getURLEdit(
 			sharingEntry, liferayPortletRequest, liferayPortletResponse);
+	}
+
+	private boolean _hasEditPermission(long classNameId, long classPK) {
+		SharingEntry sharingEntry = _sharingEntryLocalService.fetchSharingEntry(
+			_themeDisplay.getUserId(), classNameId, classPK);
+
+		if ((sharingEntry != null) &&
+			sharingEntry.hasSharingPermission(SharingEntryAction.UPDATE)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean _isIncoming() {

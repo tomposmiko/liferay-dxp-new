@@ -15,6 +15,7 @@
 package com.liferay.headless.delivery.client.dto.v1_0;
 
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
+import com.liferay.headless.delivery.client.serdes.v1_0.BlogPostingImageSerDes;
 
 import java.util.Objects;
 
@@ -210,5 +211,31 @@ public class BlogPostingImage {
 	}
 
 	protected ViewableBy viewableBy;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof BlogPostingImage)) {
+			return false;
+		}
+
+		BlogPostingImage blogPostingImage = (BlogPostingImage)object;
+
+		return Objects.equals(toString(), blogPostingImage.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return BlogPostingImageSerDes.toJSON(this);
+	}
 
 }

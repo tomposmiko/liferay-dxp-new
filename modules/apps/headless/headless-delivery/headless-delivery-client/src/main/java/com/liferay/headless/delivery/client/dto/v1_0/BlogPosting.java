@@ -15,6 +15,7 @@
 package com.liferay.headless.delivery.client.dto.v1_0;
 
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
+import com.liferay.headless.delivery.client.serdes.v1_0.BlogPostingSerDes;
 
 import java.util.Date;
 import java.util.Objects;
@@ -371,6 +372,28 @@ public class BlogPosting {
 
 	protected Integer numberOfComments;
 
+	public RelatedContent[] getRelatedContents() {
+		return relatedContents;
+	}
+
+	public void setRelatedContents(RelatedContent[] relatedContents) {
+		this.relatedContents = relatedContents;
+	}
+
+	public void setRelatedContents(
+		UnsafeSupplier<RelatedContent[], Exception>
+			relatedContentsUnsafeSupplier) {
+
+		try {
+			relatedContents = relatedContentsUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected RelatedContent[] relatedContents;
+
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -463,5 +486,31 @@ public class BlogPosting {
 	}
 
 	protected ViewableBy viewableBy;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof BlogPosting)) {
+			return false;
+		}
+
+		BlogPosting blogPosting = (BlogPosting)object;
+
+		return Objects.equals(toString(), blogPosting.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return BlogPostingSerDes.toJSON(this);
+	}
 
 }

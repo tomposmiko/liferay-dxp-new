@@ -15,6 +15,9 @@
 package com.liferay.data.engine.rest.client.dto.v1_0;
 
 import com.liferay.data.engine.rest.client.function.UnsafeSupplier;
+import com.liferay.data.engine.rest.client.serdes.v1_0.DataDefinitionPermissionSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -148,5 +151,32 @@ public class DataDefinitionPermission {
 	}
 
 	protected Boolean view;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof DataDefinitionPermission)) {
+			return false;
+		}
+
+		DataDefinitionPermission dataDefinitionPermission =
+			(DataDefinitionPermission)object;
+
+		return Objects.equals(toString(), dataDefinitionPermission.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return DataDefinitionPermissionSerDes.toJSON(this);
+	}
 
 }

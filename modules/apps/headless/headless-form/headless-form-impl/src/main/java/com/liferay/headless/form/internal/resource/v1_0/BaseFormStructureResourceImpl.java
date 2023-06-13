@@ -55,11 +55,15 @@ public abstract class BaseFormStructureResourceImpl
 
 	@Override
 	@GET
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "formStructureId")}
+	)
 	@Path("/form-structures/{formStructureId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "FormStructure")})
 	public FormStructure getFormStructure(
-			@NotNull @PathParam("formStructureId") Long formStructureId)
+			@NotNull @Parameter(hidden = true) @PathParam("formStructureId")
+				Long formStructureId)
 		throws Exception {
 
 		return new FormStructure();
@@ -69,15 +73,16 @@ public abstract class BaseFormStructureResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "siteId"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
 		}
 	)
 	@Path("/sites/{siteId}/form-structures")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "FormStructure")})
 	public Page<FormStructure> getSiteFormStructuresPage(
-			@NotNull @PathParam("siteId") Long siteId,
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
 			@Context Pagination pagination)
 		throws Exception {
 

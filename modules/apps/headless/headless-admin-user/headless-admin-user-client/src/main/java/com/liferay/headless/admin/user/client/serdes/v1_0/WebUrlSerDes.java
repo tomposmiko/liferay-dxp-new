@@ -18,8 +18,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.WebUrl;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -56,7 +58,7 @@ public class WebUrlSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(webUrl.getId());
 		}
@@ -66,11 +68,11 @@ public class WebUrlSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"url\":");
+			sb.append("\"url\": ");
 
 			sb.append("\"");
 
-			sb.append(webUrl.getUrl());
+			sb.append(_escape(webUrl.getUrl()));
 
 			sb.append("\"");
 		}
@@ -80,11 +82,11 @@ public class WebUrlSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"urlType\":");
+			sb.append("\"urlType\": ");
 
 			sb.append("\"");
 
-			sb.append(webUrl.getUrlType());
+			sb.append(_escape(webUrl.getUrlType()));
 
 			sb.append("\"");
 		}
@@ -92,6 +94,12 @@ public class WebUrlSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		WebUrlJSONParser webUrlJSONParser = new WebUrlJSONParser();
+
+		return webUrlJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(WebUrl webUrl) {
@@ -123,6 +131,41 @@ public class WebUrlSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class WebUrlJSONParser extends BaseJSONParser<WebUrl> {

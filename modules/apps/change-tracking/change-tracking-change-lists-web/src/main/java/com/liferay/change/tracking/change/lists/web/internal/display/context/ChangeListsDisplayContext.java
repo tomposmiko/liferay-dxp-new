@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -42,6 +41,7 @@ import com.liferay.portal.template.soy.util.SoyContextFactoryUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -148,6 +148,12 @@ public class ChangeListsDisplayContext {
 		return creationMenu;
 	}
 
+	public Map<Integer, Long> getCTCollectionChangeTypeCounts(
+		long ctCollectionId) {
+
+		return _ctEngineManager.getCTCollectionChangeTypeCounts(ctCollectionId);
+	}
+
 	public String getDisplayStyle() {
 		if (_displayStyle != null) {
 			return _displayStyle;
@@ -224,12 +230,8 @@ public class ChangeListsDisplayContext {
 
 		queryDefinition.setAttribute("keywords", keywords);
 
-		OrderByComparator<CTCollection> orderByComparator =
-			OrderByComparatorFactoryUtil.create(
-				"CTCollection", _getOrderByCol(),
-				getOrderByType().equals("asc"));
-
-		queryDefinition.setOrderByComparator(orderByComparator);
+		int count = (int)_ctEngineManager.countByKeywords(
+			_themeDisplay.getCompanyId(), queryDefinition);
 
 		List<CTCollection> ctCollections = new ArrayList<>();
 
@@ -238,7 +240,30 @@ public class ChangeListsDisplayContext {
 				_themeDisplay.getCompanyId());
 
 		if (productionCTCollection.isPresent() && Validator.isNull(keywords)) {
-			ctCollections.add(productionCTCollection.get());
+			if (searchContainer.getCur() == 1) {
+				ctCollections.add(productionCTCollection.get());
+			}
+
+			count += 1;
+		}
+
+		if (searchContainer.getEnd() < count) {
+			queryDefinition.setEnd(searchContainer.getEnd() - 1);
+		}
+		else {
+			queryDefinition.setEnd(searchContainer.getEnd());
+		}
+
+		queryDefinition.setOrderByComparator(
+			OrderByComparatorFactoryUtil.create(
+				"CTCollection", _getOrderByCol(),
+				getOrderByType().equals("asc")));
+
+		if (searchContainer.getStart() > 0) {
+			queryDefinition.setStart(searchContainer.getStart() - 1);
+		}
+		else {
+			queryDefinition.setStart(searchContainer.getStart());
 		}
 
 		ctCollections.addAll(
@@ -247,7 +272,7 @@ public class ChangeListsDisplayContext {
 
 		searchContainer.setResults(ctCollections);
 
-		searchContainer.setTotal(ctCollections.size());
+		searchContainer.setTotal(count);
 
 		return searchContainer;
 	}
@@ -267,6 +292,7 @@ public class ChangeListsDisplayContext {
 
 		portletURL.setParameter("mvcRenderCommandName", "/change_lists/view");
 		portletURL.setParameter("select", "true");
+		portletURL.setParameter("displayStyle", getDisplayStyle());
 
 		return portletURL.toString();
 	}
@@ -345,8 +371,10 @@ public class ChangeListsDisplayContext {
 
 		PortletURL iteratorURL = _renderResponse.createRenderURL();
 
-		iteratorURL.setParameter("mvcPath", "/view_categories.jsp");
+		iteratorURL.setParameter("mvcPath", "/view.jsp");
 		iteratorURL.setParameter("redirect", currentURL.toString());
+		iteratorURL.setParameter("displayStyle", getDisplayStyle());
+		iteratorURL.setParameter("select", "true");
 
 		return iteratorURL;
 	}

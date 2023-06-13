@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.vulcan.internal.test.util.URLConnectionUtil;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
@@ -30,7 +31,6 @@ import com.liferay.registry.ServiceRegistration;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.net.URL;
 import java.net.URLConnection;
 
 import java.util.Arrays;
@@ -64,7 +64,7 @@ public class XMLMessageBodyWriterTest {
 
 		Map<String, Object> properties = new HashMap<>();
 
-		properties.put("liferay.auth.verifier", false);
+		properties.put("liferay.auth.verifier", true);
 		properties.put("liferay.oauth2", false);
 		properties.put("osgi.jaxrs.application.base", "/test-vulcan");
 		properties.put(
@@ -190,9 +190,8 @@ public class XMLMessageBodyWriterTest {
 	private Document _getDocument(String urlString)
 		throws DocumentException, IOException {
 
-		URL url = new URL(urlString);
-
-		URLConnection urlConnection = url.openConnection();
+		URLConnection urlConnection = URLConnectionUtil.createURLConnection(
+			urlString);
 
 		urlConnection.setRequestProperty("Accept", MediaType.APPLICATION_XML);
 

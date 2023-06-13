@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "AssetType")
 public class AssetType {
 
-	@Schema(description = "Flag that marks if this type is required.")
+	@Schema(description = "A flag that marks if this type is required.")
 	public Boolean getRequired() {
 		return required;
 	}
@@ -70,7 +73,7 @@ public class AssetType {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean required;
 
-	@Schema(description = "Subtype of the asset.")
+	@Schema(description = "The asset's subtype.")
 	public String getSubtype() {
 		return subtype;
 	}
@@ -99,7 +102,7 @@ public class AssetType {
 	protected String subtype;
 
 	@Schema(
-		description = "Represents the type of the asset (BlogPosting, Document...)."
+		description = "The asset's type (e.g., `BlogPosting`, `Document`, etc.)."
 	)
 	public String getType() {
 		return type;
@@ -153,39 +156,77 @@ public class AssetType {
 
 		sb.append("{");
 
-		sb.append("\"required\": ");
+		if (required != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (required == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"required\": ");
+
 			sb.append(required);
 		}
 
-		sb.append(", ");
+		if (subtype != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"subtype\": ");
+			sb.append("\"subtype\": ");
 
-		if (subtype == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(subtype));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (type != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"type\": ");
+
 			sb.append("\"");
-			sb.append(subtype);
+
+			sb.append(_escape(type));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		sb.append("}");
 
-		sb.append("\"type\": ");
+		return sb.toString();
+	}
 
-		if (type == null) {
-			sb.append("null");
-		}
-		else {
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(type);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

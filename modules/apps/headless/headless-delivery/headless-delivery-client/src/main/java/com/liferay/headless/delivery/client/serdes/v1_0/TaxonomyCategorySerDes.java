@@ -18,8 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,7 +60,7 @@ public class TaxonomyCategorySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"taxonomyCategoryId\":");
+			sb.append("\"taxonomyCategoryId\": ");
 
 			sb.append(taxonomyCategory.getTaxonomyCategoryId());
 		}
@@ -68,11 +70,11 @@ public class TaxonomyCategorySerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"taxonomyCategoryName\":");
+			sb.append("\"taxonomyCategoryName\": ");
 
 			sb.append("\"");
 
-			sb.append(taxonomyCategory.getTaxonomyCategoryName());
+			sb.append(_escape(taxonomyCategory.getTaxonomyCategoryName()));
 
 			sb.append("\"");
 		}
@@ -80,6 +82,13 @@ public class TaxonomyCategorySerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		TaxonomyCategoryJSONParser taxonomyCategoryJSONParser =
+			new TaxonomyCategoryJSONParser();
+
+		return taxonomyCategoryJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(TaxonomyCategory taxonomyCategory) {
@@ -108,6 +117,41 @@ public class TaxonomyCategorySerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class TaxonomyCategoryJSONParser

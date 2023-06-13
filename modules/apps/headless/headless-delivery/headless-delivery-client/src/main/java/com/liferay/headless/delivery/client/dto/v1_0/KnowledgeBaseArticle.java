@@ -15,6 +15,7 @@
 package com.liferay.headless.delivery.client.dto.v1_0;
 
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
+import com.liferay.headless.delivery.client.serdes.v1_0.KnowledgeBaseArticleSerDes;
 
 import java.util.Date;
 import java.util.Objects;
@@ -364,6 +365,28 @@ public class KnowledgeBaseArticle {
 
 	protected Long parentKnowledgeBaseFolderId;
 
+	public RelatedContent[] getRelatedContents() {
+		return relatedContents;
+	}
+
+	public void setRelatedContents(RelatedContent[] relatedContents) {
+		this.relatedContents = relatedContents;
+	}
+
+	public void setRelatedContents(
+		UnsafeSupplier<RelatedContent[], Exception>
+			relatedContentsUnsafeSupplier) {
+
+		try {
+			relatedContents = relatedContentsUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected RelatedContent[] relatedContents;
+
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -477,5 +500,32 @@ public class KnowledgeBaseArticle {
 	}
 
 	protected ViewableBy viewableBy;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof KnowledgeBaseArticle)) {
+			return false;
+		}
+
+		KnowledgeBaseArticle knowledgeBaseArticle =
+			(KnowledgeBaseArticle)object;
+
+		return Objects.equals(toString(), knowledgeBaseArticle.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return KnowledgeBaseArticleSerDes.toJSON(this);
+	}
 
 }

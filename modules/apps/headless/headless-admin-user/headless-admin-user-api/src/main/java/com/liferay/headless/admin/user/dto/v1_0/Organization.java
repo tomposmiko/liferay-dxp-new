@@ -26,8 +26,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -44,7 +50,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Organization {
 
 	@Schema(
-		description = "The text of a comment associated with the Organization."
+		description = "The text of a comment associated with the organization."
 	)
 	public String getComment() {
 		return comment;
@@ -74,7 +80,7 @@ public class Organization {
 	protected String comment;
 
 	@Schema(
-		description = "The contact information for an Organization, with the list of email addresses, postal addresses, telephones and web urls linked to that Organization."
+		description = "The organization's contact information, which includes email addresses, postal addresses, phone numbers, and web URLs. This is modeled internally as a `Contact`."
 	)
 	public ContactInformation getContactInformation() {
 		return contactInformation;
@@ -104,7 +110,7 @@ public class Organization {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected ContactInformation contactInformation;
 
-	@Schema(description = "The creation date of the Organization.")
+	@Schema(description = "The organization's creation date.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -132,7 +138,9 @@ public class Organization {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(description = "The last time a field of the Organization changed.")
+	@Schema(
+		description = "The most recent time any of the organization's fields changed."
+	)
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -160,7 +168,7 @@ public class Organization {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The organization's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -186,9 +194,7 @@ public class Organization {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(
-		description = "A relative URL to the image associated with the Organization."
-	)
+	@Schema(description = "A relative URL to the organization's image.")
 	public String getImage() {
 		return image;
 	}
@@ -216,7 +222,7 @@ public class Organization {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String image;
 
-	@Schema(description = "A list of keywords describing the Organization.")
+	@Schema(description = "A list of keywords describing the organization.")
 	public String[] getKeywords() {
 		return keywords;
 	}
@@ -245,7 +251,7 @@ public class Organization {
 	protected String[] keywords;
 
 	@Schema(
-		description = "Postal information (country and region) where the Organization is located."
+		description = "The organization's postal information (country and region)."
 	)
 	public Location getLocation() {
 		return location;
@@ -274,7 +280,7 @@ public class Organization {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Location location;
 
-	@Schema(description = "The name of the Organization.")
+	@Schema(description = "The organization's name.")
 	public String getName() {
 		return name;
 	}
@@ -301,7 +307,7 @@ public class Organization {
 	protected String name;
 
 	@Schema(
-		description = "The number of child Organizations that belong to this Organization."
+		description = "The number of this organization's child organizations."
 	)
 	public Integer getNumberOfOrganizations() {
 		return numberOfOrganizations;
@@ -331,7 +337,7 @@ public class Organization {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfOrganizations;
 
-	@Schema(description = "The parent Organization of this resource, if any.")
+	@Schema(description = "The organization's parent organization.")
 	public Organization getParentOrganization() {
 		return parentOrganization;
 	}
@@ -361,7 +367,7 @@ public class Organization {
 	protected Organization parentOrganization;
 
 	@Schema(
-		description = "A list of services provided by an Organization. Follows https://www.schema.org/Service specification."
+		description = "A list of services the organization provides. This follows the [`Service`](https://www.schema.org/Service) specification."
 	)
 	public Service[] getServices() {
 		return services;
@@ -417,91 +423,99 @@ public class Organization {
 
 		sb.append("{");
 
-		sb.append("\"comment\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (comment == null) {
-			sb.append("null");
-		}
-		else {
+		if (comment != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"comment\": ");
+
 			sb.append("\"");
-			sb.append(comment);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(comment));
 
-		sb.append("\"contactInformation\": ");
-
-		if (contactInformation == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(contactInformation);
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dateCreated\": ");
-
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateCreated);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contactInformation != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"contactInformation\": ");
 
-		if (dateModified == null) {
-			sb.append("null");
+			sb.append(String.valueOf(contactInformation));
 		}
-		else {
+
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateCreated\": ");
+
 			sb.append("\"");
-			sb.append(dateModified);
+
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"dateModified\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (image != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"image\": ");
+			sb.append("\"image\": ");
 
-		if (image == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(image);
+
+			sb.append(_escape(image));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (keywords != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywords\": ");
+			sb.append("\"keywords\": ");
 
-		if (keywords == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < keywords.length; i++) {
 				sb.append("\"");
-				sb.append(keywords[i]);
+
+				sb.append(_escape(keywords[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < keywords.length) {
@@ -512,64 +526,61 @@ public class Organization {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (location != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"location\": ");
+			sb.append("\"location\": ");
 
-		if (location == null) {
-			sb.append("null");
+			sb.append(String.valueOf(location));
 		}
-		else {
-			sb.append(location);
-		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (numberOfOrganizations != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfOrganizations\": ");
+			sb.append("\"numberOfOrganizations\": ");
 
-		if (numberOfOrganizations == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfOrganizations);
 		}
 
-		sb.append(", ");
+		if (parentOrganization != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"parentOrganization\": ");
+			sb.append("\"parentOrganization\": ");
 
-		if (parentOrganization == null) {
-			sb.append("null");
+			sb.append(String.valueOf(parentOrganization));
 		}
-		else {
-			sb.append(parentOrganization);
-		}
 
-		sb.append(", ");
+		if (services != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"services\": ");
+			sb.append("\"services\": ");
 
-		if (services == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < services.length; i++) {
-				sb.append(services[i]);
+				sb.append(String.valueOf(services[i]));
 
 				if ((i + 1) < services.length) {
 					sb.append(", ");
@@ -577,6 +588,41 @@ public class Organization {
 			}
 
 			sb.append("]");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

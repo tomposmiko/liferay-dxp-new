@@ -22,8 +22,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -66,7 +68,7 @@ public class FormStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"availableLanguages\":");
+			sb.append("\"availableLanguages\": ");
 
 			sb.append("[");
 
@@ -75,7 +77,7 @@ public class FormStructureSerDes {
 
 				sb.append("\"");
 
-				sb.append(formStructure.getAvailableLanguages()[i]);
+				sb.append(_escape(formStructure.getAvailableLanguages()[i]));
 
 				sb.append("\"");
 
@@ -92,9 +94,9 @@ public class FormStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(CreatorSerDes.toJSON(formStructure.getCreator()));
+			sb.append(String.valueOf(formStructure.getCreator()));
 		}
 
 		if (formStructure.getDateCreated() != null) {
@@ -102,7 +104,7 @@ public class FormStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -117,7 +119,7 @@ public class FormStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -133,11 +135,11 @@ public class FormStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(formStructure.getDescription());
+			sb.append(_escape(formStructure.getDescription()));
 
 			sb.append("\"");
 		}
@@ -147,13 +149,12 @@ public class FormStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"formPages\":");
+			sb.append("\"formPages\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < formStructure.getFormPages().length; i++) {
-				sb.append(
-					FormPageSerDes.toJSON(formStructure.getFormPages()[i]));
+				sb.append(String.valueOf(formStructure.getFormPages()[i]));
 
 				if ((i + 1) < formStructure.getFormPages().length) {
 					sb.append(", ");
@@ -168,7 +169,7 @@ public class FormStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(formStructure.getId());
 		}
@@ -178,11 +179,11 @@ public class FormStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(formStructure.getName());
+			sb.append(_escape(formStructure.getName()));
 
 			sb.append("\"");
 		}
@@ -192,7 +193,7 @@ public class FormStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"siteId\":");
+			sb.append("\"siteId\": ");
 
 			sb.append(formStructure.getSiteId());
 		}
@@ -202,14 +203,21 @@ public class FormStructureSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"successPage\":");
+			sb.append("\"successPage\": ");
 
-			sb.append(SuccessPageSerDes.toJSON(formStructure.getSuccessPage()));
+			sb.append(String.valueOf(formStructure.getSuccessPage()));
 		}
 
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		FormStructureJSONParser formStructureJSONParser =
+			new FormStructureJSONParser();
+
+		return formStructureJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(FormStructure formStructure) {
@@ -235,8 +243,7 @@ public class FormStructureSerDes {
 			map.put("creator", null);
 		}
 		else {
-			map.put(
-				"creator", CreatorSerDes.toJSON(formStructure.getCreator()));
+			map.put("creator", String.valueOf(formStructure.getCreator()));
 		}
 
 		map.put(
@@ -288,11 +295,45 @@ public class FormStructureSerDes {
 		}
 		else {
 			map.put(
-				"successPage",
-				SuccessPageSerDes.toJSON(formStructure.getSuccessPage()));
+				"successPage", String.valueOf(formStructure.getSuccessPage()));
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class FormStructureJSONParser

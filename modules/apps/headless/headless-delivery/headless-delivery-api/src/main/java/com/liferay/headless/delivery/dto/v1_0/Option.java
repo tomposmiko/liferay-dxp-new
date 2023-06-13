@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Option")
 public class Option {
 
-	@Schema(description = "The label.")
+	@Schema(description = "The option's label.")
 	public String getLabel() {
 		return label;
 	}
@@ -70,7 +73,7 @@ public class Option {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String label;
 
-	@Schema(description = "The internal value of the Option.")
+	@Schema(description = "The internal value of the field option.")
 	public String getValue() {
 		return value;
 	}
@@ -125,28 +128,67 @@ public class Option {
 
 		sb.append("{");
 
-		sb.append("\"label\": ");
+		if (label != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (label == null) {
-			sb.append("null");
+			sb.append("\"label\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(label));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (value != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"value\": ");
+
 			sb.append("\"");
-			sb.append(label);
+
+			sb.append(_escape(value));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		sb.append("}");
 
-		sb.append("\"value\": ");
+		return sb.toString();
+	}
 
-		if (value == null) {
-			sb.append("null");
-		}
-		else {
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(value);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

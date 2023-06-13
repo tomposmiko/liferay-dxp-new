@@ -14,7 +14,11 @@
 
 package com.liferay.user.associated.data.web.internal.util;
 
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
+import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.log.Log;
@@ -28,6 +32,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.user.associated.data.display.UADDisplay;
@@ -107,7 +112,8 @@ public class UADSearchContainerBuilder {
 
 		searchContainer.setResults(results);
 
-		searchContainer.setRowChecker(new RowChecker(liferayPortletResponse));
+		searchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(liferayPortletResponse));
 		searchContainer.setTotal(uadEntities.size());
 
 		return searchContainer;
@@ -187,8 +193,8 @@ public class UADSearchContainerBuilder {
 				uadHierarchyDisplay.search(
 					parentContainerClass, parentContainerId,
 					selectedUser.getUserId(), groupIds,
-					displayTerms.getKeywords(), null, null,
-					searchContainer.getStart(), searchContainer.getEnd()));
+					displayTerms.getKeywords(), null, null, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS));
 
 			String parentContainerIdString = String.valueOf(parentContainerId);
 
@@ -197,7 +203,7 @@ public class UADSearchContainerBuilder {
 					uadHierarchyDisplay.search(
 						parentContainerClass, -1L, selectedUser.getUserId(),
 						groupIds, displayTerms.getKeywords(), null, null,
-						searchContainer.getStart(), searchContainer.getEnd()));
+						QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 			}
 
 			LiferayPortletRequest liferayPortletRequest =
@@ -228,7 +234,8 @@ public class UADSearchContainerBuilder {
 			);
 
 			searchContainer.setResults(results);
-			searchContainer.setTotal(results.size());
+
+			searchContainer.setTotal(entities.size());
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
@@ -263,7 +270,9 @@ public class UADSearchContainerBuilder {
 			SearchContainer.DEFAULT_DELTA, currentURL, null,
 			"no-entities-remain-of-this-type", null);
 
-		searchContainer.setId("UADEntities");
+		searchContainer.setId(
+			StringBundler.concat(
+				"UADEntities", StringPool.UNDERLINE, StringUtil.randomId()));
 
 		String orderByCol = ParamUtil.getString(
 			renderRequest, SearchContainer.DEFAULT_ORDER_BY_COL_PARAM);

@@ -66,6 +66,11 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 	}
 
 	@Override
+	public long getCount() {
+		return _count;
+	}
+
+	@Override
 	public List<com.liferay.portal.kernel.search.Document> getDocuments71() {
 		return Arrays.asList(_hits.getDocs());
 	}
@@ -138,6 +143,10 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 		_aggregationResultsMap.putAll(aggregationResultsMap);
 	}
 
+	public void setCount(long count) {
+		_count = count;
+	}
+
 	public void setFederatedSearchKey(String federatedSearchKey) {
 		_federatedSearchKey = federatedSearchKey;
 	}
@@ -204,6 +213,7 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 
 	private final Map<String, AggregationResult> _aggregationResultsMap =
 		new LinkedHashMap<>();
+	private long _count;
 	private final FacetContextImpl _facetContext;
 	private String _federatedSearchKey;
 	private final Map<String, SearchResponse> _federatedSearchResponsesMap =

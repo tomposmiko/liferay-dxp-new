@@ -16,9 +16,11 @@ package com.liferay.journal.web.internal.info.display.contributor;
 
 import com.liferay.info.display.contributor.BaseInfoDisplayContributorField;
 import com.liferay.info.display.contributor.InfoDisplayContributorField;
+import com.liferay.info.display.contributor.InfoDisplayContributorFieldType;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -57,12 +59,12 @@ public class JournalArticleLastEditorProfileImageInfoDisplayContributorField
 	}
 
 	@Override
-	public String getType() {
-		return "image";
+	public InfoDisplayContributorFieldType getType() {
+		return InfoDisplayContributorFieldType.IMAGE;
 	}
 
 	@Override
-	public String getValue(JournalArticle article, Locale locale) {
+	public Object getValue(JournalArticle article, Locale locale) {
 		User user = _userLocalService.fetchUser(article.getUserId());
 
 		if (user == null) {
@@ -77,7 +79,8 @@ public class JournalArticleLastEditorProfileImageInfoDisplayContributorField
 
 		if (themeDisplay != null) {
 			try {
-				return user.getPortraitURL(getThemeDisplay());
+				return JSONUtil.put(
+					"url", user.getPortraitURL(getThemeDisplay()));
 			}
 			catch (PortalException pe) {
 				if (_log.isDebugEnabled()) {

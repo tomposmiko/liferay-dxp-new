@@ -1,8 +1,7 @@
-import {ADD_FRAGMENT_ENTRY_LINK, CLEAR_FRAGMENT_EDITOR, DISABLE_FRAGMENT_EDITOR, ENABLE_FRAGMENT_EDITOR, MOVE_FRAGMENT_ENTRY_LINK, REMOVE_FRAGMENT_ENTRY_LINK, UPDATE_CONFIG_ATTRIBUTES, UPDATE_EDITABLE_VALUE} from '../actions/actions.es';
+import {ADD_FRAGMENT_ENTRY_LINK, CLEAR_FRAGMENT_EDITOR, DISABLE_FRAGMENT_EDITOR, ENABLE_FRAGMENT_EDITOR, MOVE_FRAGMENT_ENTRY_LINK, REMOVE_FRAGMENT_ENTRY_LINK, UPDATE_CONFIG_ATTRIBUTES, UPDATE_EDITABLE_VALUE_ERROR, UPDATE_EDITABLE_VALUE_LOADING, UPDATE_EDITABLE_VALUE_SUCCESS} from '../actions/actions.es';
 import {add, addRow, remove, setIn, updateIn, updateWidgets} from '../utils/FragmentsEditorUpdateUtils.es';
 import {containsFragmentEntryLinkId} from '../utils/LayoutDataList.es';
-import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../components/fragment_entry_link/FragmentEntryLinkContent.es';
-import {FRAGMENT_ENTRY_LINK_TYPES, FRAGMENTS_EDITOR_ITEM_BORDERS, FRAGMENTS_EDITOR_ITEM_TYPES, FRAGMENTS_EDITOR_ROW_TYPES} from '../utils/constants';
+import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR, FRAGMENTS_EDITOR_ITEM_BORDERS, FRAGMENTS_EDITOR_ITEM_TYPES, FRAGMENTS_EDITOR_ROW_TYPES} from '../utils/constants';
 import {getColumn, getDropRowPosition, getFragmentColumn, getFragmentRowIndex} from '../utils/FragmentsEditorGetUtils.es';
 import {removeFragmentEntryLinks, updatePageEditorLayoutData} from '../utils/FragmentsEditorFetchUtils.es';
 
@@ -13,7 +12,7 @@ import {removeFragmentEntryLinks, updatePageEditorLayoutData} from '../utils/Fra
  * @param {string} dropTargetItemId
  * @param {string} dropTargetItemType
  * @param {object} layoutData
- * @param {string} fragmentEntryLinkType
+ * @param {string} fragmentEntryLinkRowType
  * @private
  * @return {object}
  * @review
@@ -24,7 +23,7 @@ function addFragment(
 	dropTargetItemId,
 	dropTargetItemType,
 	layoutData,
-	fragmentEntryLinkType = FRAGMENT_ENTRY_LINK_TYPES.component
+	fragmentEntryLinkRowType = FRAGMENTS_EDITOR_ROW_TYPES.componentRow
 ) {
 	let nextData = layoutData;
 
@@ -70,7 +69,7 @@ function addFragment(
 		nextData = _addSingleFragmentRow(
 			layoutData,
 			fragmentEntryLinkId,
-			fragmentEntryLinkType,
+			fragmentEntryLinkRowType,
 			position
 		);
 	}
@@ -78,7 +77,7 @@ function addFragment(
 		nextData = _addSingleFragmentRow(
 			layoutData,
 			fragmentEntryLinkId,
-			fragmentEntryLinkType,
+			fragmentEntryLinkRowType,
 			layoutData.structure.length
 		);
 	}
@@ -87,27 +86,28 @@ function addFragment(
 }
 
 /**
- * @param {!object} state
- * @param {!string} actionType
- * @param {!object} payload
- * @param {!string} payload.fragmentEntryKey
- * @param {!string} payload.fragmentName
+ * @param {object} state
+ * @param {object} action
+ * @param {string} action.type
+ * @param {string} action.fragmentEntryKey
+ * @param {string} action.fragmentEntryLinkType
+ * @param {string} action.fragmentName
  * @return {object}
  * @review
  */
-function addFragmentEntryLinkReducer(state, actionType, payload) {
+function addFragmentEntryLinkReducer(state, action) {
 	return new Promise(
 		resolve => {
 			let nextState = state;
 
-			if (actionType === ADD_FRAGMENT_ENTRY_LINK) {
+			if (action.type === ADD_FRAGMENT_ENTRY_LINK) {
 				let fragmentEntryLink = null;
 				let nextData = null;
 
 				_addFragmentEntryLink(
 					nextState.addFragmentEntryLinkURL,
-					payload.fragmentEntryKey,
-					payload.fragmentName,
+					action.fragmentEntryKey,
+					action.fragmentName,
 					nextState.classNameId,
 					nextState.classPK,
 					nextState.portletNamespace,
@@ -123,7 +123,7 @@ function addFragmentEntryLinkReducer(state, actionType, payload) {
 								nextState.dropTargetItemId,
 								nextState.dropTargetItemType,
 								nextState.layoutData,
-								payload.fragmentEntryLinkType
+								action.fragmentEntryLinkRowType
 							);
 
 							return updatePageEditorLayoutData(
@@ -176,17 +176,17 @@ function addFragmentEntryLinkReducer(state, actionType, payload) {
 
 /**
  * @param {object} state
- * @param {string} actionType
- * @param {object} payload
- * @param {string} payload.itemId
+ * @param {object} action
+ * @param {string} action.itemId
+ * @param {string} action.type
  * @return {object}
  * @review
  */
-function clearFragmentEditorReducer(state, actionType, payload) {
+function clearFragmentEditorReducer(state, action) {
 	let nextState = state;
 
-	if (actionType === CLEAR_FRAGMENT_EDITOR) {
-		nextState = setIn(nextState, ['fragmentEditorClear'], payload.itemId);
+	if (action.type === CLEAR_FRAGMENT_EDITOR) {
+		nextState = setIn(nextState, ['fragmentEditorClear'], action.itemId);
 	}
 
 	return nextState;
@@ -194,14 +194,15 @@ function clearFragmentEditorReducer(state, actionType, payload) {
 
 /**
  * @param {object} state
- * @param {string} actionType
+ * @param {object} action
+ * @param {string} action.type
  * @return {object}
  * @review
  */
-function disableFragmentEditorReducer(state, actionType) {
+function disableFragmentEditorReducer(state, action) {
 	let nextState = state;
 
-	if (actionType === DISABLE_FRAGMENT_EDITOR) {
+	if (action.type === DISABLE_FRAGMENT_EDITOR) {
 		nextState = setIn(nextState, ['fragmentEditorEnabled'], null);
 	}
 
@@ -210,17 +211,17 @@ function disableFragmentEditorReducer(state, actionType) {
 
 /**
  * @param {object} state
- * @param {string} actionType
- * @param {object} payload
- * @param {string} payload.itemId
+ * @param {object} action
+ * @param {string} action.type
+ * @param {string} action.itemId
  * @return {object}
  * @review
  */
-function enableFragmentEditorReducer(state, actionType, payload) {
+function enableFragmentEditorReducer(state, action) {
 	let nextState = state;
 
-	if (actionType === ENABLE_FRAGMENT_EDITOR) {
-		nextState = setIn(nextState, ['fragmentEditorEnabled'], payload.itemId);
+	if (action.type === ENABLE_FRAGMENT_EDITOR) {
+		nextState = setIn(nextState, ['fragmentEditorEnabled'], action.itemId);
 	}
 
 	return nextState;
@@ -278,37 +279,38 @@ function getFragmentEntryLinkContent(
 }
 
 /**
- * @param {!object} state
- * @param {!string} actionType
- * @param {!object} payload
- * @param {!string} payload.fragmentEntryLinkId
- * @param {!string} payload.targetBorder
- * @param {!string} payload.targetItemId
- * @param {!string} payload.targetItemType
+ * @param {object} state
+ * @param {object} action
+ * @param {string} action.fragmentEntryLinkId
+ * @param {string} action.fragmentEntryLinkType
+ * @param {string} action.targetBorder
+ * @param {string} action.targetItemId
+ * @param {string} action.targetItemType
+ * @param {string} action.type
  * @return {object}
  * @review
  */
-function moveFragmentEntryLinkReducer(state, actionType, payload) {
+function moveFragmentEntryLinkReducer(state, action) {
 	return new Promise(
 		resolve => {
 			let nextState = state;
 
-			if (actionType === MOVE_FRAGMENT_ENTRY_LINK) {
+			if (action.type === MOVE_FRAGMENT_ENTRY_LINK) {
 				let nextData = null;
 
 				nextData = _removeFragment(
 					nextState.layoutData,
-					payload.fragmentEntryLinkId,
-					payload.fragmentEntryLinkType
+					action.fragmentEntryLinkId,
+					action.fragmentEntryLinkRowType
 				);
 
 				nextData = addFragment(
-					payload.fragmentEntryLinkId,
-					payload.targetBorder,
-					payload.targetItemId,
-					payload.targetItemType,
+					action.fragmentEntryLinkId,
+					action.targetBorder,
+					action.targetItemId,
+					action.targetItemType,
 					nextData,
-					payload.fragmentEntryLinkType
+					action.fragmentEntryLinkRowType
 				);
 
 				updatePageEditorLayoutData(nextData, nextState.segmentsExperienceId).then(
@@ -340,20 +342,20 @@ function moveFragmentEntryLinkReducer(state, actionType, payload) {
 
 /**
  * @param {object} state
- * @param {string} actionType
- * @param {object} payload
- * @param {string} payload.fragmentEntryLinkId
- * @param {string} payload.fragmentEntryLinkType
+ * @param {object} action
+ * @param {string} action.fragmentEntryLinkId
+ * @param {string} action.fragmentEntryLinkRowType
+ * @param {string} action.type
  * @return {Promise<object>}
  * @review
  */
-function removeFragmentEntryLinkReducer(state, actionType, payload) {
+function removeFragmentEntryLinkReducer(state, action) {
 	return new Promise(
 		resolve => {
 			let nextState = state;
 
-			if (actionType === REMOVE_FRAGMENT_ENTRY_LINK) {
-				const {fragmentEntryLinkId} = payload;
+			if (action.type === REMOVE_FRAGMENT_ENTRY_LINK) {
+				const {fragmentEntryLinkId} = action;
 
 				const fragmentEntryLinkRow = nextState.layoutData.structure[
 					getFragmentRowIndex(
@@ -362,23 +364,19 @@ function removeFragmentEntryLinkReducer(state, actionType, payload) {
 					)
 				];
 
-				const fragmentEntryLinkType = fragmentEntryLinkRow.type === FRAGMENTS_EDITOR_ROW_TYPES.sectionRow ?
-					FRAGMENT_ENTRY_LINK_TYPES.section :
-					FRAGMENT_ENTRY_LINK_TYPES.component;
-
 				nextState = setIn(
 					nextState,
 					['layoutData'],
 					_removeFragment(
 						nextState.layoutData,
 						fragmentEntryLinkId,
-						fragmentEntryLinkType
+						fragmentEntryLinkRow.type || FRAGMENTS_EDITOR_ROW_TYPES.componentRow
 					)
 				);
 
 				nextState = updateWidgets(
 					nextState,
-					payload.fragmentEntryLinkId
+					action.fragmentEntryLinkId
 				);
 
 				const _shouldRemoveFragmentEntryLink = !containsFragmentEntryLinkId(
@@ -436,122 +434,75 @@ function removeFragmentEntryLinkReducer(state, actionType, payload) {
 }
 
 /**
- * @param {!object} state
- * @param {!string} actionType
- * @param {object} payload
- * @param {string} payload.fragmentEntryLinkId
- * @param {string} payload.editableId
- * @param {string} payload.editableValue
- * @param {string} payload.editableValueId
+ * @param {object} state
+ * @param {object} action
+ * @param {string} action.type
+ * @param {string} action.fragmentEntryLinkId
+ * @param {string} action.editableValues
+ * @param {Date} action.date
  * @return {object}
  * @review
  */
-function updateEditableValueReducer(state, actionType, payload) {
+function updateEditableValueReducer(state, action) {
 	let nextState = state;
 
-	return new Promise(
-		resolve => {
-			if (actionType === UPDATE_EDITABLE_VALUE) {
-				const {
-					editableId,
-					editableValue,
-					editableValueId,
-					editableValueSegmentsExperienceId
-				} = payload;
+	if (action.type === UPDATE_EDITABLE_VALUE_ERROR ||
+		action.type === UPDATE_EDITABLE_VALUE_LOADING ||
+		action.type === UPDATE_EDITABLE_VALUE_SUCCESS) {
 
-				const {editableValues} = nextState.fragmentEntryLinks[payload.fragmentEntryLinkId];
+		const editablesPath = [
+			'fragmentEntryLinks',
+			action.fragmentEntryLinkId,
+			'editableValues'
+		];
 
-				const keysTreeArray = editableValueSegmentsExperienceId ? [
-					EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
-					editableId,
-					editableValueSegmentsExperienceId
-				] : [
-					EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
-					editableId
-				];
+		if (action.type === UPDATE_EDITABLE_VALUE_SUCCESS) {
+			nextState = setIn(nextState, ['savingChanges'], false);
 
-				let nextEditableValues = setIn(
-					editableValues,
-					[...keysTreeArray, editableValueId],
-					editableValue
-				);
+			nextState = setIn(
+				nextState,
+				['lastSaveDate'],
+				action.date.toLocaleTimeString(
+					Liferay.ThemeDisplay.getBCP47LanguageId()
+				)
+			);
 
-				if (editableValueId === 'mappedField') {
-					nextEditableValues = updateIn(
-						nextEditableValues,
-						keysTreeArray,
-						editableValue => {
-							const nextEditableValue = Object.assign({}, editableValue);
-
-							[
-								'config',
-								state.defaultSegmentsEntryId,
-								...Object.keys(state.availableLanguages),
-								...Object.keys(state.availableSegmentsEntries)
-							].forEach(
-								key => {
-									delete nextEditableValue[key];
-								}
-							);
-
-							return nextEditableValue;
-						}
-					);
-				}
-
-				const formData = new FormData();
-
-				formData.append(
-					`${nextState.portletNamespace}fragmentEntryLinkId`,
-					payload.fragmentEntryLinkId
-				);
-
-				formData.append(
-					`${nextState.portletNamespace}editableValues`,
-					JSON.stringify(nextEditableValues)
-				);
-
-				fetch(
-					nextState.editFragmentEntryLinkURL,
-					{
-						body: formData,
-						credentials: 'include',
-						method: 'POST'
-					}
-				).then(
-					() => {
-						nextState = setIn(
-							nextState,
-							[
-								'fragmentEntryLinks',
-								payload.fragmentEntryLinkId,
-								'editableValues'
-							],
-							nextEditableValues
-						);
-
-						resolve(nextState);
-					}
-				);
-			}
-			else {
-				resolve(nextState);
-			}
+			nextState = setIn(nextState, editablesPath, action.editableValues);
 		}
-	);
+		else if (action.type === UPDATE_EDITABLE_VALUE_ERROR) {
+			nextState = setIn(nextState, ['savingChanges'], false);
+			nextState = setIn(nextState, editablesPath, action.editableValues);
+		}
+		else if (action.type === UPDATE_EDITABLE_VALUE_LOADING) {
+			nextState = setIn(nextState, ['savingChanges'], true);
+			nextState = setIn(nextState, editablesPath, action.editableValues);
+		}
+	}
+
+	return nextState;
 }
 
-function updateFragmentEntryLinkConfigReducer(state, actionType, payload) {
+/**
+ * @param {object} state
+ * @param {object} action
+ * @param {object} action.config
+ * @param {string} action.editableId
+ * @param {string} action.fragmentEntryLinkId
+ * @param {string} action.type
+ * @return {object}
+ * @review
+ */
+function updateFragmentEntryLinkConfigReducer(state, action) {
 	let nextState = state;
 
 	return new Promise(
 		resolve => {
-			if (actionType === UPDATE_CONFIG_ATTRIBUTES) {
+			if (action.type === UPDATE_CONFIG_ATTRIBUTES) {
 				const {
 					config,
 					editableId,
 					fragmentEntryLinkId
-				} = payload;
+				} = action;
 
 				let {editableValues} = nextState.fragmentEntryLinks[fragmentEntryLinkId];
 
@@ -722,26 +673,22 @@ function _addFragmentToColumn(
  *
  * @param {object} layoutData
  * @param {string} fragmentEntryLinkId
- * @param {string} fragmentEntryLinkType
+ * @param {string} fragmentEntryLinkRowType
  * @param {number} position
  * @return {object}
  */
 function _addSingleFragmentRow(
 	layoutData,
 	fragmentEntryLinkId,
-	fragmentEntryLinkType,
+	fragmentEntryLinkRowType,
 	position
 ) {
-	const rowType = fragmentEntryLinkType === FRAGMENT_ENTRY_LINK_TYPES.section ?
-		FRAGMENTS_EDITOR_ROW_TYPES.sectionRow :
-		FRAGMENTS_EDITOR_ROW_TYPES.componentRow;
-
 	return addRow(
 		['12'],
 		layoutData,
 		position,
 		[fragmentEntryLinkId],
-		rowType
+		fragmentEntryLinkRowType
 	);
 }
 
@@ -779,19 +726,19 @@ function _getDropFragmentPosition(
  * Removes a given fragmentEntryLinkId from a given layoutData.
  * It does not remove it from fragmentEntryLinks array.
  *
- * If the fragmentEntryLinkType is "section", it will remove the whole
+ * If the fragmentEntryLinkRowType is "section", it will remove the whole
  * row (and columns) too.
  *
  * @param {object} layoutData
  * @param {string} fragmentEntryLinkId
- * @param {string} [fragmentEntryLinkType=FRAGMENTS_EDITOR_ROW_TYPES.componentRow]
+ * @param {string} [fragmentEntryLinkRowType=FRAGMENTS_EDITOR_ROW_TYPES.componentRow]
  * @return {object} Next layout data
  * @review
  */
 function _removeFragment(
 	layoutData,
 	fragmentEntryLinkId,
-	fragmentEntryLinkType = FRAGMENTS_EDITOR_ROW_TYPES.componentRow
+	fragmentEntryLinkRowType = FRAGMENTS_EDITOR_ROW_TYPES.componentRow
 ) {
 	const {structure} = layoutData;
 
@@ -810,7 +757,7 @@ function _removeFragment(
 
 	let nextData = null;
 
-	if (fragmentEntryLinkType === FRAGMENT_ENTRY_LINK_TYPES.section) {
+	if (fragmentEntryLinkRowType === FRAGMENTS_EDITOR_ROW_TYPES.sectionRow) {
 		nextData = updateIn(
 			layoutData,
 			['structure'],

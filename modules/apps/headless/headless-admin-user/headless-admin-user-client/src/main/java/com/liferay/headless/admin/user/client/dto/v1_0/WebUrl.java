@@ -15,6 +15,9 @@
 package com.liferay.headless.admin.user.client.dto.v1_0;
 
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.user.client.serdes.v1_0.WebUrlSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -83,5 +86,31 @@ public class WebUrl {
 	}
 
 	protected String urlType;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof WebUrl)) {
+			return false;
+		}
+
+		WebUrl webUrl = (WebUrl)object;
+
+		return Objects.equals(toString(), webUrl.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return WebUrlSerDes.toJSON(this);
+	}
 
 }

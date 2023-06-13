@@ -66,6 +66,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -235,9 +236,11 @@ public class CalendarPortlet extends MVCPortlet {
 				String message = themeDisplay.translate(
 					"an-unexpected-error-occurred-while-importing-your-file");
 
-				jsonObject.put("error", message);
-
-				jsonObject.put("success", false);
+				jsonObject.put(
+					"error", message
+				).put(
+					"success", false
+				);
 			}
 		}
 		else {
@@ -247,9 +250,11 @@ public class CalendarPortlet extends MVCPortlet {
 			String message = ResourceBundleUtil.getString(
 				resourceBundle, "failed-to-import-empty-file");
 
-			jsonObject.put("error", message);
-
-			jsonObject.put("success", false);
+			jsonObject.put(
+				"error", message
+			).put(
+				"success", false
+			);
 		}
 
 		writeJSON(actionRequest, actionResponse, jsonObject);
@@ -643,8 +648,6 @@ public class CalendarPortlet extends MVCPortlet {
 				themeDisplay, calendarBooking, timeZone);
 		}
 		catch (PortalException pe) {
-			jsonObject = JSONFactoryUtil.createJSONObject();
-
 			String errorMessage = "";
 
 			if (pe instanceof AssetCategoryException) {
@@ -653,7 +656,7 @@ public class CalendarPortlet extends MVCPortlet {
 				errorMessage = getErrorMessageForException(ace, themeDisplay);
 			}
 
-			jsonObject.put("exception", errorMessage);
+			jsonObject = JSONUtil.put("exception", errorMessage);
 		}
 
 		hideDefaultSuccessMessage(actionRequest);
@@ -1545,13 +1548,17 @@ public class CalendarPortlet extends MVCPortlet {
 		java.util.Calendar nowCalendar = CalendarFactoryUtil.getCalendar(
 			timeZone);
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-		jsonObject.put("day", nowCalendar.get(java.util.Calendar.DAY_OF_MONTH));
-		jsonObject.put("hour", nowCalendar.get(java.util.Calendar.HOUR_OF_DAY));
-		jsonObject.put("minute", nowCalendar.get(java.util.Calendar.MINUTE));
-		jsonObject.put("month", nowCalendar.get(java.util.Calendar.MONTH));
-		jsonObject.put("year", nowCalendar.get(java.util.Calendar.YEAR));
+		JSONObject jsonObject = JSONUtil.put(
+			"day", nowCalendar.get(java.util.Calendar.DAY_OF_MONTH)
+		).put(
+			"hour", nowCalendar.get(java.util.Calendar.HOUR_OF_DAY)
+		).put(
+			"minute", nowCalendar.get(java.util.Calendar.MINUTE)
+		).put(
+			"month", nowCalendar.get(java.util.Calendar.MONTH)
+		).put(
+			"year", nowCalendar.get(java.util.Calendar.YEAR)
+		);
 
 		writeJSON(resourceRequest, resourceResponse, jsonObject);
 	}
@@ -1598,14 +1605,13 @@ public class CalendarPortlet extends MVCPortlet {
 		java.util.Calendar startTimeJCalendar = getJCalendar(
 			resourceRequest, "startTime");
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
 		boolean result =
 			_calendarBookingLocalService.hasExclusiveCalendarBooking(
 				calendar, startTimeJCalendar.getTimeInMillis(),
 				endTimeJCalendar.getTimeInMillis());
 
-		jsonObject.put("hasExclusiveCalendarBooking", result);
+		JSONObject jsonObject = JSONUtil.put(
+			"hasExclusiveCalendarBooking", result);
 
 		writeJSON(resourceRequest, resourceResponse, jsonObject);
 	}
@@ -1645,10 +1651,11 @@ public class CalendarPortlet extends MVCPortlet {
 			_log.warn(message);
 		}
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-		jsonObject.put("error", message);
-		jsonObject.put("success", false);
+		JSONObject jsonObject = JSONUtil.put(
+			"error", message
+		).put(
+			"success", false
+		);
 
 		writeJSON(resourceRequest, resourceResponse, jsonObject);
 	}

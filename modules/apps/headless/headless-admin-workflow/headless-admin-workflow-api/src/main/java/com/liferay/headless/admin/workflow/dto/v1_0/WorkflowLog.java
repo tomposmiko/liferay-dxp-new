@@ -26,8 +26,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -43,7 +49,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "WorkflowLog")
 public class WorkflowLog {
 
-	@Schema(description = "The UserAccount auditing the Workflow.")
+	@Schema(
+		description = "The user account of the person auditing the workflow."
+	)
 	public Creator getAuditPerson() {
 		return auditPerson;
 	}
@@ -71,7 +79,7 @@ public class WorkflowLog {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator auditPerson;
 
-	@Schema(description = "The log of comments.")
+	@Schema(description = "The log's comments.")
 	public String getCommentLog() {
 		return commentLog;
 	}
@@ -99,7 +107,7 @@ public class WorkflowLog {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String commentLog;
 
-	@Schema(description = "The creation date of the Organization.")
+	@Schema(description = "The log's creation date.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -127,7 +135,7 @@ public class WorkflowLog {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The log's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -153,7 +161,7 @@ public class WorkflowLog {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The person being assigned with the Workflow.")
+	@Schema(description = "The person assigned to the workflow.")
 	public Creator getPerson() {
 		return person;
 	}
@@ -181,9 +189,7 @@ public class WorkflowLog {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator person;
 
-	@Schema(
-		description = "The previous person being assigned with the Workflow."
-	)
+	@Schema(description = "The previous person assigned to the workflow.")
 	public Creator getPreviousPerson() {
 		return previousPerson;
 	}
@@ -211,7 +217,7 @@ public class WorkflowLog {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator previousPerson;
 
-	@Schema(description = "The previous state of the Workflow.")
+	@Schema(description = "The workflow's previous state.")
 	public String getPreviousState() {
 		return previousState;
 	}
@@ -239,7 +245,7 @@ public class WorkflowLog {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String previousState;
 
-	@Schema(description = "The current state of the Workflow.")
+	@Schema(description = "The workflow's current state.")
 	public String getState() {
 		return state;
 	}
@@ -267,7 +273,7 @@ public class WorkflowLog {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String state;
 
-	@Schema(description = "The task asociated with this WorkflowLog.")
+	@Schema(description = "The task asociated with this workflow log.")
 	public Long getTaskId() {
 		return taskId;
 	}
@@ -295,7 +301,7 @@ public class WorkflowLog {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long taskId;
 
-	@Schema(description = "The type of WorkflowLog.")
+	@Schema(description = "The workflow log's type.")
 	public String getType() {
 		return type;
 	}
@@ -348,122 +354,162 @@ public class WorkflowLog {
 
 		sb.append("{");
 
-		sb.append("\"auditPerson\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (auditPerson == null) {
-			sb.append("null");
+		if (auditPerson != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"auditPerson\": ");
+
+			sb.append(String.valueOf(auditPerson));
 		}
-		else {
-			sb.append(auditPerson);
-		}
 
-		sb.append(", ");
+		if (commentLog != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"commentLog\": ");
+			sb.append("\"commentLog\": ");
 
-		if (commentLog == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(commentLog);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(commentLog));
 
-		sb.append("\"dateCreated\": ");
-
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateCreated);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (person != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"person\": ");
+			sb.append("\"person\": ");
 
-		if (person == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(person);
-		}
-
-		sb.append(", ");
-
-		sb.append("\"previousPerson\": ");
-
-		if (previousPerson == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(previousPerson);
+			sb.append(String.valueOf(person));
 		}
 
-		sb.append(", ");
+		if (previousPerson != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"previousState\": ");
+			sb.append("\"previousPerson\": ");
 
-		if (previousState == null) {
-			sb.append("null");
+			sb.append(String.valueOf(previousPerson));
 		}
-		else {
+
+		if (previousState != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"previousState\": ");
+
 			sb.append("\"");
-			sb.append(previousState);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(previousState));
 
-		sb.append("\"state\": ");
-
-		if (state == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(state);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (state != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taskId\": ");
+			sb.append("\"state\": ");
 
-		if (taskId == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(state));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (taskId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"taskId\": ");
+
 			sb.append(taskId);
 		}
 
-		sb.append(", ");
+		if (type != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"type\": ");
+			sb.append("\"type\": ");
 
-		if (type == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(type));
+
+			sb.append("\"");
 		}
-		else {
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(type);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

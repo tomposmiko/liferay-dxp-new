@@ -26,8 +26,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -44,7 +50,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ContentStructure {
 
 	@Schema(
-		description = "A list of languages the content has a translation for."
+		description = "The list of languages the structure has a translation for."
 	)
 	public String[] getAvailableLanguages() {
 		return availableLanguages;
@@ -73,9 +79,7 @@ public class ContentStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String[] availableLanguages;
 
-	@Schema(
-		description = "A list of fields that belong to this ContentStructure."
-	)
+	@Schema(description = "The list of the content structure's fields.")
 	public ContentStructureField[] getContentStructureFields() {
 		return contentStructureFields;
 	}
@@ -106,7 +110,7 @@ public class ContentStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected ContentStructureField[] contentStructureFields;
 
-	@Schema(description = "The creator of the ContentStructure")
+	@Schema(description = "The content structure's creator.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -134,7 +138,7 @@ public class ContentStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema(description = "The creation date of the ContentStructure.")
+	@Schema(description = "The content structure's creation date.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -163,7 +167,7 @@ public class ContentStructure {
 	protected Date dateCreated;
 
 	@Schema(
-		description = "The last time a field of the ContentStructure changed."
+		description = "The last time a field of the content structure changed."
 	)
 	public Date getDateModified() {
 		return dateModified;
@@ -192,7 +196,7 @@ public class ContentStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(description = "The description of the ContentStructure")
+	@Schema(description = "The content structure's description.")
 	public String getDescription() {
 		return description;
 	}
@@ -220,7 +224,7 @@ public class ContentStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String description;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The content structure's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -246,7 +250,7 @@ public class ContentStructure {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The name.")
+	@Schema(description = "The content structure's name.")
 	public String getName() {
 		return name;
 	}
@@ -273,7 +277,7 @@ public class ContentStructure {
 	protected String name;
 
 	@Schema(
-		description = "The site identificator where this ContentStructure is scoped."
+		description = "The ID of the site to which the content structure is scoped."
 	)
 	public Long getSiteId() {
 		return siteId;
@@ -329,17 +333,23 @@ public class ContentStructure {
 
 		sb.append("{");
 
-		sb.append("\"availableLanguages\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (availableLanguages == null) {
-			sb.append("null");
-		}
-		else {
+		if (availableLanguages != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"availableLanguages\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < availableLanguages.length; i++) {
 				sb.append("\"");
-				sb.append(availableLanguages[i]);
+
+				sb.append(_escape(availableLanguages[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < availableLanguages.length) {
@@ -350,18 +360,17 @@ public class ContentStructure {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (contentStructureFields != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"contentStructureFields\": ");
+			sb.append("\"contentStructureFields\": ");
 
-		if (contentStructureFields == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < contentStructureFields.length; i++) {
-				sb.append(contentStructureFields[i]);
+				sb.append(String.valueOf(contentStructureFields[i]));
 
 				if ((i + 1) < contentStructureFields.length) {
 					sb.append(", ");
@@ -371,89 +380,125 @@ public class ContentStructure {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"creator\": ");
 
-		if (creator == null) {
-			sb.append("null");
+			sb.append(String.valueOf(creator));
 		}
-		else {
-			sb.append(creator);
-		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCreated);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
 
-		sb.append("\"dateModified\": ");
-
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"dateModified\": ");
 
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(description);
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"description\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\": ");
 
-		if (siteId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(siteId);
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

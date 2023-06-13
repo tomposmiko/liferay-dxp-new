@@ -42,12 +42,12 @@ class SidebarLayoutsPanel extends Component {
 	_handleDragLayout(eventData) {
 		const {hoveredRowBorder, hoveredRowId} = eventData;
 
-		this.store.dispatchAction(
-			UPDATE_DROP_TARGET,
+		this.store.dispatch(
 			{
 				dropTargetBorder: hoveredRowBorder,
 				dropTargetItemId: hoveredRowId,
-				dropTargetItemType: FRAGMENTS_EDITOR_ITEM_TYPES.row
+				dropTargetItemType: FRAGMENTS_EDITOR_ITEM_TYPES.row,
+				type: UPDATE_DROP_TARGET
 			}
 		);
 	}
@@ -62,13 +62,15 @@ class SidebarLayoutsPanel extends Component {
 	_handleDropLayout(eventData) {
 		const layoutColumns = this._layouts[eventData.layoutIndex].columns;
 
-		this.store.dispatchAction(
-			ADD_ROW,
+		this.store.dispatch(
 			{
-				layoutColumns
+				layoutColumns,
+				type: ADD_ROW
 			}
-		).dispatchAction(
-			CLEAR_DROP_TARGET
+		).dispatch(
+			{
+				type: CLEAR_DROP_TARGET
+			}
 		);
 
 		requestAnimationFrame(
@@ -85,8 +87,10 @@ class SidebarLayoutsPanel extends Component {
 	 * @review
 	 */
 	_handleLeaveLayoutTarget() {
-		this.store.dispatchAction(
-			CLEAR_DROP_TARGET
+		this.store.dispatch(
+			{
+				type: CLEAR_DROP_TARGET
+			}
 		);
 	}
 

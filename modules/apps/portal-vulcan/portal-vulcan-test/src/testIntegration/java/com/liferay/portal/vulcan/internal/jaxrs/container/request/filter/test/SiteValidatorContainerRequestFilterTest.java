@@ -18,22 +18,19 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.vulcan.internal.test.util.URLConnectionUtil;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
 
 import java.io.FileNotFoundException;
-
-import java.net.URL;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -70,7 +67,7 @@ public class SiteValidatorContainerRequestFilterTest {
 
 		Map<String, Object> properties = new HashMap<>();
 
-		properties.put("liferay.auth.verifier", false);
+		properties.put("liferay.auth.verifier", true);
 		properties.put("liferay.oauth2", false);
 		properties.put("osgi.jaxrs.application.base", "/test-vulcan");
 		properties.put(
@@ -89,9 +86,7 @@ public class SiteValidatorContainerRequestFilterTest {
 
 	@Test(expected = FileNotFoundException.class)
 	public void testInValidGroup() throws Exception {
-		URL url = new URL("http://localhost:8080/o/test-vulcan/0/name");
-
-		StringUtil.read(url.openStream());
+		URLConnectionUtil.read("http://localhost:8080/o/test-vulcan/0/name");
 	}
 
 	@Test
@@ -104,11 +99,9 @@ public class SiteValidatorContainerRequestFilterTest {
 			defaultCompanyId, user.getUserId(),
 			GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
-		URL url = new URL(
+		String groupName = URLConnectionUtil.read(
 			"http://localhost:8080/o/test-vulcan/" + group.getGroupId() +
 				"/name");
-
-		String groupName = StringUtil.read(url.openStream());
 
 		Assert.assertEquals(group.getName(LocaleUtil.getDefault()), groupName);
 	}
@@ -131,9 +124,6 @@ public class SiteValidatorContainerRequestFilterTest {
 		}
 
 	}
-
-	@Inject
-	private GroupLocalService _groupLocalService;
 
 	@Inject
 	private Portal _portal;

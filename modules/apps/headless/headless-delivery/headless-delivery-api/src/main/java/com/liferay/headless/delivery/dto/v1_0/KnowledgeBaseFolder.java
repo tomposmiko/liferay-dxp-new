@@ -28,8 +28,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -81,7 +87,7 @@ public class KnowledgeBaseFolder {
 
 	}
 
-	@Schema(description = "The creator of the KnowledgeBaseFolder.")
+	@Schema(description = "The folder's creator.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -109,7 +115,7 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema(description = "The creation date of the KnowledgeBaseFolder.")
+	@Schema(description = "The date the folder was created.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -137,9 +143,7 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(
-		description = "The last time a field of the KnowledgeBaseFolder changed."
-	)
+	@Schema(description = "The last time the folder was modified.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -167,7 +171,7 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(description = "The description of the KnowledgeBaseFolder.")
+	@Schema(description = "The folder's description.")
 	public String getDescription() {
 		return description;
 	}
@@ -195,7 +199,7 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The folder's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -221,7 +225,7 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The main title/name of this resource.")
+	@Schema(description = "The folder's main title/name.")
 	public String getName() {
 		return name;
 	}
@@ -249,7 +253,7 @@ public class KnowledgeBaseFolder {
 	protected String name;
 
 	@Schema(
-		description = "The number of child KnowledgeBaseArticles asociated with this resource."
+		description = "The number of Knowledge Base articles in this folder."
 	)
 	public Integer getNumberOfKnowledgeBaseArticles() {
 		return numberOfKnowledgeBaseArticles;
@@ -283,7 +287,7 @@ public class KnowledgeBaseFolder {
 	protected Integer numberOfKnowledgeBaseArticles;
 
 	@Schema(
-		description = "The number of child KnowledgeBaseFolders asociated with this resource."
+		description = "The number of Knowledge Base folders in this folder."
 	)
 	public Integer getNumberOfKnowledgeBaseFolders() {
 		return numberOfKnowledgeBaseFolders;
@@ -317,7 +321,7 @@ public class KnowledgeBaseFolder {
 	protected Integer numberOfKnowledgeBaseFolders;
 
 	@Schema(
-		description = "The parent KnowledgeBaseFolder of this article, if any."
+		description = "The folder's parent Knowledge Base folder, if it exists."
 	)
 	public ParentKnowledgeBaseFolder getParentKnowledgeBaseFolder() {
 		return parentKnowledgeBaseFolder;
@@ -351,7 +355,7 @@ public class KnowledgeBaseFolder {
 	protected ParentKnowledgeBaseFolder parentKnowledgeBaseFolder;
 
 	@Schema(
-		description = "The parent KnowledgeBaseFolder identifier of this article, if any."
+		description = "The ID of the folder's parent Knowledge Base folder, if such a parent folder exists."
 	)
 	public Long getParentKnowledgeBaseFolderId() {
 		return parentKnowledgeBaseFolderId;
@@ -384,9 +388,7 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long parentKnowledgeBaseFolderId;
 
-	@Schema(
-		description = "The site identificator where this KnowledgeBaseFolder is scoped."
-	)
+	@Schema(description = "The ID of the site to which this folder is scoped.")
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -415,7 +417,7 @@ public class KnowledgeBaseFolder {
 	protected Long siteId;
 
 	@Schema(
-		description = "Write only property to specify the default permissions."
+		description = "A write-only property that specifies the folder's default permissions."
 	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
@@ -480,144 +482,182 @@ public class KnowledgeBaseFolder {
 
 		sb.append("{");
 
-		sb.append("\"creator\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (creator == null) {
-			sb.append("null");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"creator\": ");
+
+			sb.append(String.valueOf(creator));
 		}
-		else {
-			sb.append(creator);
-		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCreated);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
 
-		sb.append("\"dateModified\": ");
-
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"dateModified\": ");
 
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(description);
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"description\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (numberOfKnowledgeBaseArticles != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfKnowledgeBaseArticles\": ");
+			sb.append("\"numberOfKnowledgeBaseArticles\": ");
 
-		if (numberOfKnowledgeBaseArticles == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfKnowledgeBaseArticles);
 		}
 
-		sb.append(", ");
+		if (numberOfKnowledgeBaseFolders != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfKnowledgeBaseFolders\": ");
+			sb.append("\"numberOfKnowledgeBaseFolders\": ");
 
-		if (numberOfKnowledgeBaseFolders == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfKnowledgeBaseFolders);
 		}
 
-		sb.append(", ");
+		if (parentKnowledgeBaseFolder != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"parentKnowledgeBaseFolder\": ");
+			sb.append("\"parentKnowledgeBaseFolder\": ");
 
-		if (parentKnowledgeBaseFolder == null) {
-			sb.append("null");
+			sb.append(String.valueOf(parentKnowledgeBaseFolder));
 		}
-		else {
-			sb.append(parentKnowledgeBaseFolder);
-		}
 
-		sb.append(", ");
+		if (parentKnowledgeBaseFolderId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"parentKnowledgeBaseFolderId\": ");
+			sb.append("\"parentKnowledgeBaseFolderId\": ");
 
-		if (parentKnowledgeBaseFolderId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(parentKnowledgeBaseFolderId);
 		}
 
-		sb.append(", ");
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\": ");
 
-		if (siteId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(siteId);
 		}
 
-		sb.append(", ");
+		if (viewableBy != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"viewableBy\": ");
+			sb.append("\"viewableBy\": ");
 
-		if (viewableBy == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
 			sb.append(viewableBy);
+
 			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

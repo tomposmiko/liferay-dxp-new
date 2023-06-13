@@ -15,6 +15,7 @@
 package com.liferay.headless.delivery.client.dto.v1_0;
 
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
+import com.liferay.headless.delivery.client.serdes.v1_0.MessageBoardMessageSerDes;
 
 import java.util.Date;
 import java.util.Objects;
@@ -318,6 +319,28 @@ public class MessageBoardMessage {
 
 	protected Integer numberOfMessageBoardMessages;
 
+	public RelatedContent[] getRelatedContents() {
+		return relatedContents;
+	}
+
+	public void setRelatedContents(RelatedContent[] relatedContents) {
+		this.relatedContents = relatedContents;
+	}
+
+	public void setRelatedContents(
+		UnsafeSupplier<RelatedContent[], Exception>
+			relatedContentsUnsafeSupplier) {
+
+		try {
+			relatedContents = relatedContentsUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected RelatedContent[] relatedContents;
+
 	public Boolean getShowAsAnswer() {
 		return showAsAnswer;
 	}
@@ -388,5 +411,31 @@ public class MessageBoardMessage {
 	}
 
 	protected ViewableBy viewableBy;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof MessageBoardMessage)) {
+			return false;
+		}
+
+		MessageBoardMessage messageBoardMessage = (MessageBoardMessage)object;
+
+		return Objects.equals(toString(), messageBoardMessage.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return MessageBoardMessageSerDes.toJSON(this);
+	}
 
 }

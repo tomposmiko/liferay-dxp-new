@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Field")
 public class Field {
 
+	@Schema
 	public Boolean getAutocomplete() {
 		return autocomplete;
 	}
@@ -69,6 +73,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean autocomplete;
 
+	@Schema
 	public String getDataSourceType() {
 		return dataSourceType;
 	}
@@ -96,6 +101,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String dataSourceType;
 
+	@Schema
 	public String getDataType() {
 		return dataType;
 	}
@@ -123,6 +129,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String dataType;
 
+	@Schema
 	public String getDisplayStyle() {
 		return displayStyle;
 	}
@@ -176,6 +183,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Grid grid;
 
+	@Schema
 	public Boolean getHasFormRules() {
 		return hasFormRules;
 	}
@@ -203,6 +211,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean hasFormRules;
 
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -228,6 +237,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
+	@Schema
 	public Boolean getImmutable() {
 		return immutable;
 	}
@@ -255,6 +265,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean immutable;
 
+	@Schema
 	public Boolean getInline() {
 		return inline;
 	}
@@ -282,6 +293,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean inline;
 
+	@Schema
 	public String getInputControl() {
 		return inputControl;
 	}
@@ -309,6 +321,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String inputControl;
 
+	@Schema
 	public String getLabel() {
 		return label;
 	}
@@ -336,6 +349,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String label;
 
+	@Schema
 	public Boolean getLocalizable() {
 		return localizable;
 	}
@@ -363,6 +377,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean localizable;
 
+	@Schema
 	public Boolean getMultiple() {
 		return multiple;
 	}
@@ -390,6 +405,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean multiple;
 
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -443,6 +459,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Option[] options;
 
+	@Schema
 	public String getPlaceholder() {
 		return placeholder;
 	}
@@ -470,6 +487,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String placeholder;
 
+	@Schema
 	public String getPredefinedValue() {
 		return predefinedValue;
 	}
@@ -497,6 +515,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String predefinedValue;
 
+	@Schema
 	public Boolean getReadOnly() {
 		return readOnly;
 	}
@@ -524,6 +543,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean readOnly;
 
+	@Schema
 	public Boolean getRepeatable() {
 		return repeatable;
 	}
@@ -551,6 +571,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean repeatable;
 
+	@Schema
 	public Boolean getRequired() {
 		return required;
 	}
@@ -578,6 +599,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean required;
 
+	@Schema
 	public Boolean getShowAsSwitcher() {
 		return showAsSwitcher;
 	}
@@ -605,6 +627,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean showAsSwitcher;
 
+	@Schema
 	public Boolean getShowLabel() {
 		return showLabel;
 	}
@@ -632,6 +655,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean showLabel;
 
+	@Schema
 	public String getStyle() {
 		return style;
 	}
@@ -659,6 +683,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String style;
 
+	@Schema
 	public String getText() {
 		return text;
 	}
@@ -684,6 +709,7 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String text;
 
+	@Schema
 	public String getTooltip() {
 		return tooltip;
 	}
@@ -766,182 +792,181 @@ public class Field {
 
 		sb.append("{");
 
-		sb.append("\"autocomplete\": ");
+		if (autocomplete != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (autocomplete == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"autocomplete\": ");
+
 			sb.append(autocomplete);
 		}
 
-		sb.append(", ");
+		if (dataSourceType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dataSourceType\": ");
+			sb.append("\"dataSourceType\": ");
 
-		if (dataSourceType == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dataSourceType);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(dataSourceType));
 
-		sb.append("\"dataType\": ");
-
-		if (dataType == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dataType);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dataType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"displayStyle\": ");
+			sb.append("\"dataType\": ");
 
-		if (displayStyle == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(displayStyle);
+
+			sb.append(_escape(dataType));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (displayStyle != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"grid\": ");
+			sb.append("\"displayStyle\": ");
 
-		if (grid == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(displayStyle));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(grid);
+
+		if (grid != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"grid\": ");
+
+			sb.append(String.valueOf(grid));
 		}
 
-		sb.append(", ");
+		if (hasFormRules != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"hasFormRules\": ");
+			sb.append("\"hasFormRules\": ");
 
-		if (hasFormRules == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(hasFormRules);
 		}
 
-		sb.append(", ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (immutable != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"immutable\": ");
+			sb.append("\"immutable\": ");
 
-		if (immutable == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(immutable);
 		}
 
-		sb.append(", ");
+		if (inline != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"inline\": ");
+			sb.append("\"inline\": ");
 
-		if (inline == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(inline);
 		}
 
-		sb.append(", ");
+		if (inputControl != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"inputControl\": ");
+			sb.append("\"inputControl\": ");
 
-		if (inputControl == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(inputControl);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(inputControl));
 
-		sb.append("\"label\": ");
-
-		if (label == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(label);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (label != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"localizable\": ");
+			sb.append("\"label\": ");
 
-		if (localizable == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(label));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (localizable != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"localizable\": ");
+
 			sb.append(localizable);
 		}
 
-		sb.append(", ");
+		if (multiple != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"multiple\": ");
+			sb.append("\"multiple\": ");
 
-		if (multiple == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(multiple);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (options != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"options\": ");
+			sb.append("\"options\": ");
 
-		if (options == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < options.length; i++) {
-				sb.append(options[i]);
+				sb.append(String.valueOf(options[i]));
 
 				if ((i + 1) < options.length) {
 					sb.append(", ");
@@ -951,135 +976,169 @@ public class Field {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (placeholder != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"placeholder\": ");
+			sb.append("\"placeholder\": ");
 
-		if (placeholder == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(placeholder);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(placeholder));
 
-		sb.append("\"predefinedValue\": ");
-
-		if (predefinedValue == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(predefinedValue);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (predefinedValue != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"readOnly\": ");
+			sb.append("\"predefinedValue\": ");
 
-		if (readOnly == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(predefinedValue));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (readOnly != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"readOnly\": ");
+
 			sb.append(readOnly);
 		}
 
-		sb.append(", ");
+		if (repeatable != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"repeatable\": ");
+			sb.append("\"repeatable\": ");
 
-		if (repeatable == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(repeatable);
 		}
 
-		sb.append(", ");
+		if (required != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"required\": ");
+			sb.append("\"required\": ");
 
-		if (required == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(required);
 		}
 
-		sb.append(", ");
+		if (showAsSwitcher != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"showAsSwitcher\": ");
+			sb.append("\"showAsSwitcher\": ");
 
-		if (showAsSwitcher == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(showAsSwitcher);
 		}
 
-		sb.append(", ");
+		if (showLabel != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"showLabel\": ");
+			sb.append("\"showLabel\": ");
 
-		if (showLabel == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(showLabel);
 		}
 
-		sb.append(", ");
+		if (style != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"style\": ");
+			sb.append("\"style\": ");
 
-		if (style == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(style);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(style));
 
-		sb.append("\"text\": ");
-
-		if (text == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(text);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (text != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"tooltip\": ");
+			sb.append("\"text\": ");
 
-		if (tooltip == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(tooltip);
+
+			sb.append(_escape(text));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (tooltip != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"validation\": ");
+			sb.append("\"tooltip\": ");
 
-		if (validation == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(tooltip));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(validation);
+
+		if (validation != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"validation\": ");
+
+			sb.append(String.valueOf(validation));
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

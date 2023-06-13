@@ -15,6 +15,9 @@
 package com.liferay.headless.form.client.dto.v1_0;
 
 import com.liferay.headless.form.client.function.UnsafeSupplier;
+import com.liferay.headless.form.client.serdes.v1_0.FieldValueSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -25,47 +28,47 @@ import javax.annotation.Generated;
 @Generated("")
 public class FieldValue {
 
-	public FormDocument getDocument() {
-		return document;
+	public FormDocument getFormDocument() {
+		return formDocument;
 	}
 
-	public void setDocument(FormDocument document) {
-		this.document = document;
+	public void setFormDocument(FormDocument formDocument) {
+		this.formDocument = formDocument;
 	}
 
-	public void setDocument(
-		UnsafeSupplier<FormDocument, Exception> documentUnsafeSupplier) {
+	public void setFormDocument(
+		UnsafeSupplier<FormDocument, Exception> formDocumentUnsafeSupplier) {
 
 		try {
-			document = documentUnsafeSupplier.get();
+			formDocument = formDocumentUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected FormDocument document;
+	protected FormDocument formDocument;
 
-	public Long getDocumentId() {
-		return documentId;
+	public Long getFormDocumentId() {
+		return formDocumentId;
 	}
 
-	public void setDocumentId(Long documentId) {
-		this.documentId = documentId;
+	public void setFormDocumentId(Long formDocumentId) {
+		this.formDocumentId = formDocumentId;
 	}
 
-	public void setDocumentId(
-		UnsafeSupplier<Long, Exception> documentIdUnsafeSupplier) {
+	public void setFormDocumentId(
+		UnsafeSupplier<Long, Exception> formDocumentIdUnsafeSupplier) {
 
 		try {
-			documentId = documentIdUnsafeSupplier.get();
+			formDocumentId = formDocumentIdUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected Long documentId;
+	protected Long formDocumentId;
 
 	public Long getId() {
 		return id;
@@ -125,5 +128,31 @@ public class FieldValue {
 	}
 
 	protected String value;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof FieldValue)) {
+			return false;
+		}
+
+		FieldValue fieldValue = (FieldValue)object;
+
+		return Objects.equals(toString(), fieldValue.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return FieldValueSerDes.toJSON(this);
+	}
 
 }

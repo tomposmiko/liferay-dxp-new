@@ -15,8 +15,10 @@
 package com.liferay.headless.admin.user.client.dto.v1_0;
 
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.user.client.serdes.v1_0.SegmentSerDes;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -190,5 +192,31 @@ public class Segment {
 	}
 
 	protected String source;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Segment)) {
+			return false;
+		}
+
+		Segment segment = (Segment)object;
+
+		return Objects.equals(toString(), segment.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return SegmentSerDes.toJSON(this);
+	}
 
 }

@@ -21,8 +21,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -66,10 +68,9 @@ public class StructuredContentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(
-				CreatorSerDes.toJSON(structuredContentFolder.getCreator()));
+			sb.append(String.valueOf(structuredContentFolder.getCreator()));
 		}
 
 		if (structuredContentFolder.getDateCreated() != null) {
@@ -77,7 +78,7 @@ public class StructuredContentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -93,7 +94,7 @@ public class StructuredContentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -109,11 +110,11 @@ public class StructuredContentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(structuredContentFolder.getDescription());
+			sb.append(_escape(structuredContentFolder.getDescription()));
 
 			sb.append("\"");
 		}
@@ -123,7 +124,7 @@ public class StructuredContentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(structuredContentFolder.getId());
 		}
@@ -133,11 +134,11 @@ public class StructuredContentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(structuredContentFolder.getName());
+			sb.append(_escape(structuredContentFolder.getName()));
 
 			sb.append("\"");
 		}
@@ -149,7 +150,7 @@ public class StructuredContentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"numberOfStructuredContentFolders\":");
+			sb.append("\"numberOfStructuredContentFolders\": ");
 
 			sb.append(
 				structuredContentFolder.getNumberOfStructuredContentFolders());
@@ -160,7 +161,7 @@ public class StructuredContentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"numberOfStructuredContents\":");
+			sb.append("\"numberOfStructuredContents\": ");
 
 			sb.append(structuredContentFolder.getNumberOfStructuredContents());
 		}
@@ -170,7 +171,7 @@ public class StructuredContentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"siteId\":");
+			sb.append("\"siteId\": ");
 
 			sb.append(structuredContentFolder.getSiteId());
 		}
@@ -180,7 +181,7 @@ public class StructuredContentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"viewableBy\":");
+			sb.append("\"viewableBy\": ");
 
 			sb.append("\"");
 
@@ -192,6 +193,13 @@ public class StructuredContentFolderSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		StructuredContentFolderJSONParser structuredContentFolderJSONParser =
+			new StructuredContentFolderJSONParser();
+
+		return structuredContentFolderJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -212,7 +220,7 @@ public class StructuredContentFolderSerDes {
 		else {
 			map.put(
 				"creator",
-				CreatorSerDes.toJSON(structuredContentFolder.getCreator()));
+				String.valueOf(structuredContentFolder.getCreator()));
 		}
 
 		map.put(
@@ -289,6 +297,41 @@ public class StructuredContentFolderSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class StructuredContentFolderJSONParser

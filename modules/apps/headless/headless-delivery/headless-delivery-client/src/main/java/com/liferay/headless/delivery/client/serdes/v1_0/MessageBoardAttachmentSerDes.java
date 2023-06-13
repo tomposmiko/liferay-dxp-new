@@ -18,8 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardAttachment;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,11 +60,11 @@ public class MessageBoardAttachmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"contentUrl\":");
+			sb.append("\"contentUrl\": ");
 
 			sb.append("\"");
 
-			sb.append(messageBoardAttachment.getContentUrl());
+			sb.append(_escape(messageBoardAttachment.getContentUrl()));
 
 			sb.append("\"");
 		}
@@ -72,11 +74,11 @@ public class MessageBoardAttachmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"encodingFormat\":");
+			sb.append("\"encodingFormat\": ");
 
 			sb.append("\"");
 
-			sb.append(messageBoardAttachment.getEncodingFormat());
+			sb.append(_escape(messageBoardAttachment.getEncodingFormat()));
 
 			sb.append("\"");
 		}
@@ -86,11 +88,11 @@ public class MessageBoardAttachmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"fileExtension\":");
+			sb.append("\"fileExtension\": ");
 
 			sb.append("\"");
 
-			sb.append(messageBoardAttachment.getFileExtension());
+			sb.append(_escape(messageBoardAttachment.getFileExtension()));
 
 			sb.append("\"");
 		}
@@ -100,7 +102,7 @@ public class MessageBoardAttachmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(messageBoardAttachment.getId());
 		}
@@ -110,7 +112,7 @@ public class MessageBoardAttachmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"sizeInBytes\":");
+			sb.append("\"sizeInBytes\": ");
 
 			sb.append(messageBoardAttachment.getSizeInBytes());
 		}
@@ -120,11 +122,11 @@ public class MessageBoardAttachmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"title\":");
+			sb.append("\"title\": ");
 
 			sb.append("\"");
 
-			sb.append(messageBoardAttachment.getTitle());
+			sb.append(_escape(messageBoardAttachment.getTitle()));
 
 			sb.append("\"");
 		}
@@ -132,6 +134,13 @@ public class MessageBoardAttachmentSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		MessageBoardAttachmentJSONParser messageBoardAttachmentJSONParser =
+			new MessageBoardAttachmentJSONParser();
+
+		return messageBoardAttachmentJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -194,6 +203,41 @@ public class MessageBoardAttachmentSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class MessageBoardAttachmentJSONParser

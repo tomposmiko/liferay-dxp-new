@@ -61,32 +61,41 @@ public abstract class BaseKeywordResourceImpl implements KeywordResource {
 
 	@Override
 	@DELETE
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "keywordId")})
 	@Path("/keywords/{keywordId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "Keyword")})
-	public void deleteKeyword(@NotNull @PathParam("keywordId") Long keywordId)
+	public void deleteKeyword(
+			@NotNull @Parameter(hidden = true) @PathParam("keywordId") Long
+				keywordId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "keywordId")})
 	@Path("/keywords/{keywordId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Keyword")})
-	public Keyword getKeyword(@NotNull @PathParam("keywordId") Long keywordId)
+	public Keyword getKeyword(
+			@NotNull @Parameter(hidden = true) @PathParam("keywordId") Long
+				keywordId)
 		throws Exception {
 
 		return new Keyword();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PUT
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "keywordId")})
 	@Path("/keywords/{keywordId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Keyword")})
 	public Keyword putKeyword(
-			@NotNull @PathParam("keywordId") Long keywordId, Keyword keyword)
+			@NotNull @Parameter(hidden = true) @PathParam("keywordId") Long
+				keywordId,
+			Keyword keyword)
 		throws Exception {
 
 		return new Keyword();
@@ -96,32 +105,37 @@ public abstract class BaseKeywordResourceImpl implements KeywordResource {
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "siteId"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path("/sites/{siteId}/keywords")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Keyword")})
 	public Page<Keyword> getSiteKeywordsPage(
-			@NotNull @PathParam("siteId") Long siteId,
-			@QueryParam("search") String search, @Context Filter filter,
-			@Context Pagination pagination, @Context Sort[] sorts)
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
+			@Parameter(hidden = true) @QueryParam("search") String search,
+			@Context Filter filter, @Context Pagination pagination,
+			@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "siteId")})
 	@Path("/sites/{siteId}/keywords")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Keyword")})
 	public Keyword postSiteKeyword(
-			@NotNull @PathParam("siteId") Long siteId, Keyword keyword)
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
+			Keyword keyword)
 		throws Exception {
 
 		return new Keyword();

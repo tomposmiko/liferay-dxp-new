@@ -15,6 +15,7 @@
 package com.liferay.headless.delivery.client.dto.v1_0;
 
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
+import com.liferay.headless.delivery.client.serdes.v1_0.StructuredContentFolderSerDes;
 
 import java.util.Date;
 import java.util.Objects;
@@ -281,5 +282,32 @@ public class StructuredContentFolder {
 	}
 
 	protected ViewableBy viewableBy;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof StructuredContentFolder)) {
+			return false;
+		}
+
+		StructuredContentFolder structuredContentFolder =
+			(StructuredContentFolder)object;
+
+		return Objects.equals(toString(), structuredContentFolder.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return StructuredContentFolderSerDes.toJSON(this);
+	}
 
 }

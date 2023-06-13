@@ -21,12 +21,15 @@ import com.liferay.asset.kernel.exception.NoSuchEntryException;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.model.VersionedAssetEntry;
 import com.liferay.info.display.contributor.InfoDisplayContributorField;
+import com.liferay.info.display.contributor.InfoDisplayContributorFieldType;
 import com.liferay.info.display.contributor.InfoDisplayField;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
+import com.liferay.portal.kernel.sanitizer.SanitizerException;
 import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -37,6 +40,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -76,8 +80,19 @@ public abstract class BaseAssetInfoDisplayContributor<T>
 				getAssetRendererFactoryByClassNameId(
 					assetEntry.getClassNameId());
 
-		AssetRenderer<T> assetRenderer = assetRendererFactory.getAssetRenderer(
-			assetEntry.getClassPK());
+		AssetRenderer<T> assetRenderer = null;
+
+		if (assetEntry instanceof VersionedAssetEntry) {
+			VersionedAssetEntry versionedAssetEntry =
+				(VersionedAssetEntry)assetEntry;
+
+			assetRenderer = assetRendererFactory.getAssetRenderer(
+				assetEntry.getClassPK(), versionedAssetEntry.getVersionType());
+		}
+		else {
+			assetRenderer = assetRendererFactory.getAssetRenderer(
+				assetEntry.getClassPK());
+		}
 
 		T assetObject = assetRenderer.getAssetObject();
 
@@ -92,16 +107,8 @@ public abstract class BaseAssetInfoDisplayContributor<T>
 		Map<String, Object> infoDisplayFieldsValues =
 			getInfoDisplayFieldsValues(assetEntry, locale);
 
-		Object fieldValue = infoDisplayFieldsValues.getOrDefault(
+		return infoDisplayFieldsValues.getOrDefault(
 			fieldName, StringPool.BLANK);
-
-		if (fieldValue instanceof ContentAccessor) {
-			ContentAccessor contentAccessor = (ContentAccessor)fieldValue;
-
-			fieldValue = contentAccessor.getContent();
-		}
-
-		return fieldValue;
 	}
 
 	@Override
@@ -191,19 +198,11 @@ public abstract class BaseAssetInfoDisplayContributor<T>
 		for (InfoDisplayContributorField infoDisplayContributorField :
 				_getInfoDisplayContributorFields(AssetEntry.class.getName())) {
 
-			Object infoDisplayFieldValue = infoDisplayContributorField.getValue(
-				assetEntry, locale);
-
-			if (infoDisplayFieldValue instanceof String) {
-				infoDisplayFieldValue = SanitizerUtil.sanitize(
-					assetEntry.getCompanyId(), assetEntry.getGroupId(),
-					assetEntry.getUserId(), AssetEntry.class.getName(),
-					assetEntry.getEntryId(), ContentTypes.TEXT_HTML,
-					Sanitizer.MODE_ALL, (String)infoDisplayFieldValue, null);
-			}
-
 			infoDisplayFieldsValues.putIfAbsent(
-				infoDisplayContributorField.getKey(), infoDisplayFieldValue);
+				infoDisplayContributorField.getKey(),
+				_getInfoDisplayFieldValue(
+					assetEntry, assetEntry, infoDisplayContributorField,
+					locale));
 		}
 
 		return infoDisplayFieldsValues;
@@ -224,14 +223,42 @@ public abstract class BaseAssetInfoDisplayContributor<T>
 		for (InfoDisplayContributorField infoDisplayContributorField :
 				_getInfoDisplayContributorFields(className)) {
 
+			InfoDisplayContributorFieldType infoDisplayContributorFieldType =
+				infoDisplayContributorField.getType();
+
 			infoDisplayFields.add(
 				new InfoDisplayField(
 					infoDisplayContributorField.getKey(),
 					infoDisplayContributorField.getLabel(locale),
-					infoDisplayContributorField.getType()));
+					infoDisplayContributorFieldType.getValue()));
 		}
 
 		return infoDisplayFields;
+	}
+
+	private <T> Object _getInfoDisplayFieldValue(
+			T model, AssetEntry assetEntry,
+			InfoDisplayContributorField infoDisplayContributorField,
+			Locale locale)
+		throws SanitizerException {
+
+		InfoDisplayContributorFieldType infoDisplayContributorFieldType =
+			infoDisplayContributorField.getType();
+		Object value = infoDisplayContributorField.getValue(model, locale);
+
+		if (!Objects.equals(
+				InfoDisplayContributorFieldType.URL,
+				infoDisplayContributorFieldType) &&
+			(value instanceof String)) {
+
+			return SanitizerUtil.sanitize(
+				assetEntry.getCompanyId(), assetEntry.getGroupId(),
+				assetEntry.getUserId(), AssetEntry.class.getName(),
+				assetEntry.getEntryId(), ContentTypes.TEXT_HTML,
+				Sanitizer.MODE_ALL, (String)value, null);
+		}
+
+		return value;
 	}
 
 	private Map<String, Object> _getParameterMap(
@@ -248,19 +275,17 @@ public abstract class BaseAssetInfoDisplayContributor<T>
 		for (InfoDisplayContributorField infoDisplayContributorField :
 				infoDisplayContributorFields) {
 
-			Object infoDisplayFieldValue = infoDisplayContributorField.getValue(
-				assetObject, locale);
+			Object fieldValue = _getInfoDisplayFieldValue(
+				assetObject, assetEntry, infoDisplayContributorField, locale);
 
-			if (infoDisplayFieldValue instanceof String) {
-				infoDisplayFieldValue = SanitizerUtil.sanitize(
-					assetEntry.getCompanyId(), assetEntry.getGroupId(),
-					assetEntry.getUserId(), AssetEntry.class.getName(),
-					assetEntry.getEntryId(), ContentTypes.TEXT_HTML,
-					Sanitizer.MODE_ALL, (String)infoDisplayFieldValue, null);
+			if (fieldValue instanceof ContentAccessor) {
+				ContentAccessor contentAccessor = (ContentAccessor)fieldValue;
+
+				fieldValue = contentAccessor.getContent();
 			}
 
 			parameterMap.putIfAbsent(
-				infoDisplayContributorField.getKey(), infoDisplayFieldValue);
+				infoDisplayContributorField.getKey(), fieldValue);
 		}
 
 		Map<String, Object> classTypeValues = getClassTypeValues(

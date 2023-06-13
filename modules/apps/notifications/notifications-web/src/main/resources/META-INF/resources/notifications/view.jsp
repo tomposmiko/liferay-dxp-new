@@ -45,6 +45,7 @@ navigationURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
 %>
 
 <clay:navigation-bar
+	inverted="<%= layout.isTypeControlPanel() %>"
 	navigationItems="<%=
 		new JSPNavigationItemList(pageContext) {
 			{

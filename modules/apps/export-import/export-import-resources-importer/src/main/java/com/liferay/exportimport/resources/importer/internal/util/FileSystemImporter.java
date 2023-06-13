@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -1501,17 +1502,16 @@ public class FileSystemImporter extends BaseImporter {
 	}
 
 	protected JSONObject getDefaultPortletJSONObject(String journalArticleId) {
-		JSONObject portletJSONObject = JSONFactoryUtil.createJSONObject();
+		JSONObject portletJSONObject = JSONUtil.put(
+			"portletId", _JOURNAL_CONTENT_PORTLET_ID);
 
-		portletJSONObject.put("portletId", _JOURNAL_CONTENT_PORTLET_ID);
-
-		JSONObject portletPreferencesJSONObject =
-			JSONFactoryUtil.createJSONObject();
-
-		portletPreferencesJSONObject.put("articleId", journalArticleId);
-		portletPreferencesJSONObject.put("groupId", groupId);
-		portletPreferencesJSONObject.put(
-			"portletSetupPortletDecoratorId", "borderless");
+		JSONObject portletPreferencesJSONObject = JSONUtil.put(
+			"articleId", journalArticleId
+		).put(
+			"groupId", groupId
+		).put(
+			"portletSetupPortletDecoratorId", "borderless"
+		);
 
 		portletJSONObject.put(
 			"portletPreferences", portletPreferencesJSONObject);

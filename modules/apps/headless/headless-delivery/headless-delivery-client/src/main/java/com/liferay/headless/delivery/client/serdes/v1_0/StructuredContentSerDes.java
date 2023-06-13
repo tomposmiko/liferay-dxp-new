@@ -15,6 +15,7 @@
 package com.liferay.headless.delivery.client.serdes.v1_0;
 
 import com.liferay.headless.delivery.client.dto.v1_0.ContentField;
+import com.liferay.headless.delivery.client.dto.v1_0.RelatedContent;
 import com.liferay.headless.delivery.client.dto.v1_0.RenderedContent;
 import com.liferay.headless.delivery.client.dto.v1_0.StructuredContent;
 import com.liferay.headless.delivery.client.dto.v1_0.TaxonomyCategory;
@@ -24,8 +25,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -68,11 +71,9 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"aggregateRating\":");
+			sb.append("\"aggregateRating\": ");
 
-			sb.append(
-				AggregateRatingSerDes.toJSON(
-					structuredContent.getAggregateRating()));
+			sb.append(String.valueOf(structuredContent.getAggregateRating()));
 		}
 
 		if (structuredContent.getAvailableLanguages() != null) {
@@ -80,7 +81,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"availableLanguages\":");
+			sb.append("\"availableLanguages\": ");
 
 			sb.append("[");
 
@@ -89,7 +90,8 @@ public class StructuredContentSerDes {
 
 				sb.append("\"");
 
-				sb.append(structuredContent.getAvailableLanguages()[i]);
+				sb.append(
+					_escape(structuredContent.getAvailableLanguages()[i]));
 
 				sb.append("\"");
 
@@ -108,7 +110,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"contentFields\":");
+			sb.append("\"contentFields\": ");
 
 			sb.append("[");
 
@@ -116,8 +118,7 @@ public class StructuredContentSerDes {
 				 i++) {
 
 				sb.append(
-					ContentFieldSerDes.toJSON(
-						structuredContent.getContentFields()[i]));
+					String.valueOf(structuredContent.getContentFields()[i]));
 
 				if ((i + 1) < structuredContent.getContentFields().length) {
 					sb.append(", ");
@@ -132,7 +133,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"contentStructureId\":");
+			sb.append("\"contentStructureId\": ");
 
 			sb.append(structuredContent.getContentStructureId());
 		}
@@ -142,9 +143,9 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(CreatorSerDes.toJSON(structuredContent.getCreator()));
+			sb.append(String.valueOf(structuredContent.getCreator()));
 		}
 
 		if (structuredContent.getDateCreated() != null) {
@@ -152,7 +153,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -168,7 +169,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -184,7 +185,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"datePublished\":");
+			sb.append("\"datePublished\": ");
 
 			sb.append("\"");
 
@@ -200,11 +201,11 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(structuredContent.getDescription());
+			sb.append(_escape(structuredContent.getDescription()));
 
 			sb.append("\"");
 		}
@@ -214,11 +215,11 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"friendlyUrlPath\":");
+			sb.append("\"friendlyUrlPath\": ");
 
 			sb.append("\"");
 
-			sb.append(structuredContent.getFriendlyUrlPath());
+			sb.append(_escape(structuredContent.getFriendlyUrlPath()));
 
 			sb.append("\"");
 		}
@@ -228,7 +229,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(structuredContent.getId());
 		}
@@ -238,11 +239,11 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"key\":");
+			sb.append("\"key\": ");
 
 			sb.append("\"");
 
-			sb.append(structuredContent.getKey());
+			sb.append(_escape(structuredContent.getKey()));
 
 			sb.append("\"");
 		}
@@ -252,14 +253,14 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"keywords\":");
+			sb.append("\"keywords\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < structuredContent.getKeywords().length; i++) {
 				sb.append("\"");
 
-				sb.append(structuredContent.getKeywords()[i]);
+				sb.append(_escape(structuredContent.getKeywords()[i]));
 
 				sb.append("\"");
 
@@ -276,9 +277,32 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"numberOfComments\":");
+			sb.append("\"numberOfComments\": ");
 
 			sb.append(structuredContent.getNumberOfComments());
+		}
+
+		if (structuredContent.getRelatedContents() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"relatedContents\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < structuredContent.getRelatedContents().length;
+				 i++) {
+
+				sb.append(
+					String.valueOf(structuredContent.getRelatedContents()[i]));
+
+				if ((i + 1) < structuredContent.getRelatedContents().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		if (structuredContent.getRenderedContents() != null) {
@@ -286,7 +310,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"renderedContents\":");
+			sb.append("\"renderedContents\": ");
 
 			sb.append("[");
 
@@ -294,8 +318,7 @@ public class StructuredContentSerDes {
 				 i++) {
 
 				sb.append(
-					RenderedContentSerDes.toJSON(
-						structuredContent.getRenderedContents()[i]));
+					String.valueOf(structuredContent.getRenderedContents()[i]));
 
 				if ((i + 1) < structuredContent.getRenderedContents().length) {
 					sb.append(", ");
@@ -310,7 +333,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"siteId\":");
+			sb.append("\"siteId\": ");
 
 			sb.append(structuredContent.getSiteId());
 		}
@@ -320,7 +343,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"taxonomyCategories\":");
+			sb.append("\"taxonomyCategories\": ");
 
 			sb.append("[");
 
@@ -328,7 +351,7 @@ public class StructuredContentSerDes {
 				 i < structuredContent.getTaxonomyCategories().length; i++) {
 
 				sb.append(
-					TaxonomyCategorySerDes.toJSON(
+					String.valueOf(
 						structuredContent.getTaxonomyCategories()[i]));
 
 				if ((i + 1) <
@@ -346,7 +369,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"taxonomyCategoryIds\":");
+			sb.append("\"taxonomyCategoryIds\": ");
 
 			sb.append("[");
 
@@ -370,11 +393,11 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"title\":");
+			sb.append("\"title\": ");
 
 			sb.append("\"");
 
-			sb.append(structuredContent.getTitle());
+			sb.append(_escape(structuredContent.getTitle()));
 
 			sb.append("\"");
 		}
@@ -384,11 +407,11 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"uuid\":");
+			sb.append("\"uuid\": ");
 
 			sb.append("\"");
 
-			sb.append(structuredContent.getUuid());
+			sb.append(_escape(structuredContent.getUuid()));
 
 			sb.append("\"");
 		}
@@ -398,7 +421,7 @@ public class StructuredContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"viewableBy\":");
+			sb.append("\"viewableBy\": ");
 
 			sb.append("\"");
 
@@ -410,6 +433,13 @@ public class StructuredContentSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		StructuredContentJSONParser structuredContentJSONParser =
+			new StructuredContentJSONParser();
+
+		return structuredContentJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
@@ -430,8 +460,7 @@ public class StructuredContentSerDes {
 		else {
 			map.put(
 				"aggregateRating",
-				AggregateRatingSerDes.toJSON(
-					structuredContent.getAggregateRating()));
+				String.valueOf(structuredContent.getAggregateRating()));
 		}
 
 		if (structuredContent.getAvailableLanguages() == null) {
@@ -465,9 +494,7 @@ public class StructuredContentSerDes {
 			map.put("creator", null);
 		}
 		else {
-			map.put(
-				"creator",
-				CreatorSerDes.toJSON(structuredContent.getCreator()));
+			map.put("creator", String.valueOf(structuredContent.getCreator()));
 		}
 
 		map.put(
@@ -533,6 +560,15 @@ public class StructuredContentSerDes {
 				String.valueOf(structuredContent.getNumberOfComments()));
 		}
 
+		if (structuredContent.getRelatedContents() == null) {
+			map.put("relatedContents", null);
+		}
+		else {
+			map.put(
+				"relatedContents",
+				String.valueOf(structuredContent.getRelatedContents()));
+		}
+
 		if (structuredContent.getRenderedContents() == null) {
 			map.put("renderedContents", null);
 		}
@@ -591,6 +627,41 @@ public class StructuredContentSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class StructuredContentJSONParser
@@ -703,6 +774,18 @@ public class StructuredContentSerDes {
 				if (jsonParserFieldValue != null) {
 					structuredContent.setNumberOfComments(
 						Integer.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "relatedContents")) {
+				if (jsonParserFieldValue != null) {
+					structuredContent.setRelatedContents(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> RelatedContentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new RelatedContent[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "renderedContents")) {

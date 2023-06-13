@@ -18,8 +18,10 @@ import com.liferay.headless.form.client.dto.v1_0.Validation;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -56,11 +58,11 @@ public class ValidationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"errorMessage\":");
+			sb.append("\"errorMessage\": ");
 
 			sb.append("\"");
 
-			sb.append(validation.getErrorMessage());
+			sb.append(_escape(validation.getErrorMessage()));
 
 			sb.append("\"");
 		}
@@ -70,11 +72,11 @@ public class ValidationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"expression\":");
+			sb.append("\"expression\": ");
 
 			sb.append("\"");
 
-			sb.append(validation.getExpression());
+			sb.append(_escape(validation.getExpression()));
 
 			sb.append("\"");
 		}
@@ -84,7 +86,7 @@ public class ValidationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(validation.getId());
 		}
@@ -92,6 +94,12 @@ public class ValidationSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		ValidationJSONParser validationJSONParser = new ValidationJSONParser();
+
+		return validationJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Validation validation) {
@@ -124,6 +132,41 @@ public class ValidationSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class ValidationJSONParser

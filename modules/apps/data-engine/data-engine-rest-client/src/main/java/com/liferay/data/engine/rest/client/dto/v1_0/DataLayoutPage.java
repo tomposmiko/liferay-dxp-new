@@ -15,6 +15,9 @@
 package com.liferay.data.engine.rest.client.dto.v1_0;
 
 import com.liferay.data.engine.rest.client.function.UnsafeSupplier;
+import com.liferay.data.engine.rest.client.serdes.v1_0.DataLayoutPageSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -88,5 +91,31 @@ public class DataLayoutPage {
 	}
 
 	protected LocalizedValue[] title;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof DataLayoutPage)) {
+			return false;
+		}
+
+		DataLayoutPage dataLayoutPage = (DataLayoutPage)object;
+
+		return Objects.equals(toString(), dataLayoutPage.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return DataLayoutPageSerDes.toJSON(this);
+	}
 
 }

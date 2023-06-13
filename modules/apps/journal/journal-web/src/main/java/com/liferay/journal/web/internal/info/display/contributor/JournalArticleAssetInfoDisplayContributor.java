@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
-import com.liferay.portal.kernel.sanitizer.SanitizerException;
 import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -48,6 +47,7 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portlet.display.template.PortletDisplayTemplate;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -249,13 +249,14 @@ public class JournalArticleAssetInfoDisplayContributor
 	private String _getTemplateKey(DDMTemplate ddmTemplate) {
 		String templateKey = ddmTemplate.getTemplateKey();
 
-		return _DDM_TEMPLATE + templateKey.replaceAll("\\W", "_");
+		return PortletDisplayTemplate.DISPLAY_STYLE_PREFIX +
+			templateKey.replaceAll("\\W", "_");
 	}
 
 	private Object _sanitizeFieldValue(
 			JournalArticle article, DDMFormFieldValue ddmFormFieldValue,
 			Locale locale)
-		throws SanitizerException {
+		throws PortalException {
 
 		Value value = ddmFormFieldValue.getValue();
 
@@ -281,7 +282,12 @@ public class JournalArticleAssetInfoDisplayContributor
 			return numberFormat.format(GetterUtil.getDouble(valueString));
 		}
 		else if (Objects.equals(ddmFormFieldValue.getType(), "ddm-image")) {
-			return _transformFileEntryURL(valueString);
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				valueString);
+
+			jsonObject.put("url", _transformFileEntryURL(valueString));
+
+			return jsonObject;
 		}
 
 		return SanitizerUtil.sanitize(
@@ -315,8 +321,6 @@ public class JournalArticleAssetInfoDisplayContributor
 
 		return StringPool.BLANK;
 	}
-
-	private static final String _DDM_TEMPLATE = "ddmTemplate_";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalArticleAssetInfoDisplayContributor.class);

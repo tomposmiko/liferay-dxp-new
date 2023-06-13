@@ -114,7 +114,11 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 					targetLayout.getGroupId(), classNameId,
 					targetLayout.getPlid());
 
-			return;
+			layoutPageTemplateStructure =
+				_layoutPageTemplateStructureLocalService.
+					rebuildLayoutPageTemplateStructure(
+						sourceLayout.getGroupId(), classNameId,
+						sourceLayout.getPlid());
 		}
 
 		ServiceContext serviceContext = Optional.ofNullable(

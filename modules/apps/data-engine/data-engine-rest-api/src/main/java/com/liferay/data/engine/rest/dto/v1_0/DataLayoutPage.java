@@ -24,7 +24,12 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -40,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "DataLayoutPage")
 public class DataLayoutPage {
 
+	@Schema
 	public DataLayoutRow[] getDataLayoutRows() {
 		return dataLayoutRows;
 	}
@@ -68,6 +74,7 @@ public class DataLayoutPage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected DataLayoutRow[] dataLayoutRows;
 
+	@Schema
 	public LocalizedValue[] getDescription() {
 		return description;
 	}
@@ -95,6 +102,7 @@ public class DataLayoutPage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected LocalizedValue[] description;
 
+	@Schema
 	public LocalizedValue[] getTitle() {
 		return title;
 	}
@@ -149,16 +157,17 @@ public class DataLayoutPage {
 
 		sb.append("{");
 
-		sb.append("\"dataLayoutRows\": ");
+		if (dataLayoutRows != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (dataLayoutRows == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"dataLayoutRows\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < dataLayoutRows.length; i++) {
-				sb.append(dataLayoutRows[i]);
+				sb.append(String.valueOf(dataLayoutRows[i]));
 
 				if ((i + 1) < dataLayoutRows.length) {
 					sb.append(", ");
@@ -168,18 +177,17 @@ public class DataLayoutPage {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"description\": ");
 
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < description.length; i++) {
-				sb.append(description[i]);
+				sb.append(String.valueOf(description[i]));
 
 				if ((i + 1) < description.length) {
 					sb.append(", ");
@@ -189,18 +197,17 @@ public class DataLayoutPage {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (title != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\": ");
 
-		if (title == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < title.length; i++) {
-				sb.append(title[i]);
+				sb.append(String.valueOf(title[i]));
 
 				if ((i + 1) < title.length) {
 					sb.append(", ");
@@ -208,6 +215,41 @@ public class DataLayoutPage {
 			}
 
 			sb.append("]");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

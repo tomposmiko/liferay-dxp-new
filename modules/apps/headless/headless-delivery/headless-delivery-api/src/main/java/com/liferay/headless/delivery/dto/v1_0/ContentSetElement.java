@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "ContentSetElement")
 public class ContentSetElement {
 
-	@Schema(description = "The main content.")
+	@Schema(description = "The content's fields.")
 	public Object getContent() {
 		return content;
 	}
@@ -70,7 +73,7 @@ public class ContentSetElement {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Object content;
 
-	@Schema(description = "The type of the content.")
+	@Schema(description = "The content set element's type.")
 	public String getContentType() {
 		return contentType;
 	}
@@ -98,7 +101,7 @@ public class ContentSetElement {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String contentType;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The content set element's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -124,7 +127,7 @@ public class ContentSetElement {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The title of the ContentSetElement.")
+	@Schema(description = "The content's title.")
 	public String getTitle() {
 		return title;
 	}
@@ -179,50 +182,91 @@ public class ContentSetElement {
 
 		sb.append("{");
 
-		sb.append("\"content\": ");
+		if (content != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (content == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(content);
-		}
+			sb.append("\"content\": ");
 
-		sb.append(", ");
-
-		sb.append("\"contentType\": ");
-
-		if (contentType == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(contentType);
+
+			sb.append(_escape(content));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"contentType\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(contentType));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (title != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\": ");
 
-		if (title == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(title));
+
+			sb.append("\"");
 		}
-		else {
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(title);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

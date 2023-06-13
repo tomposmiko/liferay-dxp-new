@@ -64,37 +64,52 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 
 	@Override
 	@DELETE
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseArticleId")
+		}
+	)
 	@Path("/knowledge-base-articles/{knowledgeBaseArticleId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public void deleteKnowledgeBaseArticle(
-			@NotNull @PathParam("knowledgeBaseArticleId") Long
-				knowledgeBaseArticleId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseArticleId") Long knowledgeBaseArticleId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseArticleId")
+		}
+	)
 	@Path("/knowledge-base-articles/{knowledgeBaseArticleId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public KnowledgeBaseArticle getKnowledgeBaseArticle(
-			@NotNull @PathParam("knowledgeBaseArticleId") Long
-				knowledgeBaseArticleId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseArticleId") Long knowledgeBaseArticleId)
 		throws Exception {
 
 		return new KnowledgeBaseArticle();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PATCH
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseArticleId")
+		}
+	)
 	@Path("/knowledge-base-articles/{knowledgeBaseArticleId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public KnowledgeBaseArticle patchKnowledgeBaseArticle(
-			@NotNull @PathParam("knowledgeBaseArticleId") Long
-				knowledgeBaseArticleId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseArticleId") Long knowledgeBaseArticleId,
 			KnowledgeBaseArticle knowledgeBaseArticle)
 		throws Exception {
 
@@ -178,14 +193,19 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PUT
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseArticleId")
+		}
+	)
 	@Path("/knowledge-base-articles/{knowledgeBaseArticleId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public KnowledgeBaseArticle putKnowledgeBaseArticle(
-			@NotNull @PathParam("knowledgeBaseArticleId") Long
-				knowledgeBaseArticleId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseArticleId") Long knowledgeBaseArticleId,
 			KnowledgeBaseArticle knowledgeBaseArticle)
 		throws Exception {
 
@@ -194,37 +214,52 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 
 	@Override
 	@DELETE
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseArticleId")
+		}
+	)
 	@Path("/knowledge-base-articles/{knowledgeBaseArticleId}/my-rating")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public void deleteKnowledgeBaseArticleMyRating(
-			@NotNull @PathParam("knowledgeBaseArticleId") Long
-				knowledgeBaseArticleId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseArticleId") Long knowledgeBaseArticleId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseArticleId")
+		}
+	)
 	@Path("/knowledge-base-articles/{knowledgeBaseArticleId}/my-rating")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public Rating getKnowledgeBaseArticleMyRating(
-			@NotNull @PathParam("knowledgeBaseArticleId") Long
-				knowledgeBaseArticleId)
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseArticleId") Long knowledgeBaseArticleId)
 		throws Exception {
 
 		return new Rating();
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseArticleId")
+		}
+	)
 	@Path("/knowledge-base-articles/{knowledgeBaseArticleId}/my-rating")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public Rating postKnowledgeBaseArticleMyRating(
-			@NotNull @PathParam("knowledgeBaseArticleId") Long
-				knowledgeBaseArticleId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseArticleId") Long knowledgeBaseArticleId,
 			Rating rating)
 		throws Exception {
 
@@ -232,14 +267,19 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@PUT
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseArticleId")
+		}
+	)
 	@Path("/knowledge-base-articles/{knowledgeBaseArticleId}/my-rating")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public Rating putKnowledgeBaseArticleMyRating(
-			@NotNull @PathParam("knowledgeBaseArticleId") Long
-				knowledgeBaseArticleId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseArticleId") Long knowledgeBaseArticleId,
 			Rating rating)
 		throws Exception {
 
@@ -250,38 +290,52 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(
+				in = ParameterIn.PATH, name = "parentKnowledgeBaseArticleId"
+			),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path(
 		"/knowledge-base-articles/{parentKnowledgeBaseArticleId}/knowledge-base-articles"
 	)
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public Page<KnowledgeBaseArticle>
 			getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
-				@NotNull @PathParam("parentKnowledgeBaseArticleId") Long
+				@NotNull @Parameter(hidden = true)
+				@PathParam("parentKnowledgeBaseArticleId") Long
 					parentKnowledgeBaseArticleId,
-				@QueryParam("search") String search, @Context Filter filter,
-				@Context Pagination pagination, @Context Sort[] sorts)
+				@Parameter(hidden = true) @QueryParam("search") String search,
+				@Context Filter filter, @Context Pagination pagination,
+				@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {
+			@Parameter(
+				in = ParameterIn.PATH, name = "parentKnowledgeBaseArticleId"
+			)
+		}
+	)
 	@Path(
 		"/knowledge-base-articles/{parentKnowledgeBaseArticleId}/knowledge-base-articles"
 	)
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public KnowledgeBaseArticle postKnowledgeBaseArticleKnowledgeBaseArticle(
-			@NotNull @PathParam("parentKnowledgeBaseArticleId") Long
+			@NotNull @Parameter(hidden = true)
+			@PathParam("parentKnowledgeBaseArticleId") Long
 				parentKnowledgeBaseArticleId,
 			KnowledgeBaseArticle knowledgeBaseArticle)
 		throws Exception {
@@ -293,40 +347,50 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseFolderId"),
+			@Parameter(in = ParameterIn.QUERY, name = "flatten"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path(
 		"/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles"
 	)
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public Page<KnowledgeBaseArticle>
 			getKnowledgeBaseFolderKnowledgeBaseArticlesPage(
-				@NotNull @PathParam("knowledgeBaseFolderId") Long
-					knowledgeBaseFolderId,
-				@QueryParam("flatten") Boolean flatten,
-				@QueryParam("search") String search, @Context Filter filter,
-				@Context Pagination pagination, @Context Sort[] sorts)
+				@NotNull @Parameter(hidden = true)
+				@PathParam("knowledgeBaseFolderId") Long knowledgeBaseFolderId,
+				@Parameter(hidden = true) @QueryParam("flatten") Boolean
+					flatten,
+				@Parameter(hidden = true) @QueryParam("search") String search,
+				@Context Filter filter, @Context Pagination pagination,
+				@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "knowledgeBaseFolderId")
+		}
+	)
 	@Path(
 		"/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles"
 	)
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public KnowledgeBaseArticle postKnowledgeBaseFolderKnowledgeBaseArticle(
-			@NotNull @PathParam("knowledgeBaseFolderId") Long
-				knowledgeBaseFolderId,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("knowledgeBaseFolderId") Long knowledgeBaseFolderId,
 			KnowledgeBaseArticle knowledgeBaseArticle)
 		throws Exception {
 
@@ -337,33 +401,38 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 	@GET
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "siteId"),
+			@Parameter(in = ParameterIn.QUERY, name = "flatten"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
 			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path("/sites/{siteId}/knowledge-base-articles")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public Page<KnowledgeBaseArticle> getSiteKnowledgeBaseArticlesPage(
-			@NotNull @PathParam("siteId") Long siteId,
-			@QueryParam("flatten") Boolean flatten,
-			@QueryParam("search") String search, @Context Filter filter,
-			@Context Pagination pagination, @Context Sort[] sorts)
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
+			@Parameter(hidden = true) @QueryParam("flatten") Boolean flatten,
+			@Parameter(hidden = true) @QueryParam("search") String search,
+			@Context Filter filter, @Context Pagination pagination,
+			@Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
-	@Consumes("application/json")
+	@Consumes({"application/json", "application/xml"})
 	@POST
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "siteId")})
 	@Path("/sites/{siteId}/knowledge-base-articles")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "KnowledgeBaseArticle")})
 	public KnowledgeBaseArticle postSiteKnowledgeBaseArticle(
-			@NotNull @PathParam("siteId") Long siteId,
+			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
 			KnowledgeBaseArticle knowledgeBaseArticle)
 		throws Exception {
 

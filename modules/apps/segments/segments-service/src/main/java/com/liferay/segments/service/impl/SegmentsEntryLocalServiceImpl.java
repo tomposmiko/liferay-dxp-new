@@ -33,11 +33,11 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.segments.constants.SegmentsConstants;
 import com.liferay.segments.exception.RequiredSegmentsEntryException;
@@ -74,8 +74,12 @@ public class SegmentsEntryLocalServiceImpl
 		User user = userLocalService.getUser(serviceContext.getUserId());
 		long groupId = serviceContext.getScopeGroupId();
 
-		segmentsEntryKey = FriendlyURLNormalizerUtil.normalize(
-			segmentsEntryKey);
+		if (Validator.isNull(segmentsEntryKey)) {
+			segmentsEntryKey = String.valueOf(counterLocalService.increment());
+		}
+		else {
+			segmentsEntryKey = StringUtil.toUpperCase(segmentsEntryKey.trim());
+		}
 
 		validate(0, groupId, segmentsEntryKey);
 
@@ -308,8 +312,7 @@ public class SegmentsEntryLocalServiceImpl
 		SegmentsEntry segmentsEntry = segmentsEntryPersistence.findByPrimaryKey(
 			segmentsEntryId);
 
-		segmentsEntryKey = FriendlyURLNormalizerUtil.normalize(
-			segmentsEntryKey);
+		segmentsEntryKey = StringUtil.toUpperCase(segmentsEntryKey.trim());
 
 		validate(segmentsEntryId, segmentsEntry.getGroupId(), segmentsEntryKey);
 

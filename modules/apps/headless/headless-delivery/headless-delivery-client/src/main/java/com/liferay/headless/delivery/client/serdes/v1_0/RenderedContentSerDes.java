@@ -18,8 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.RenderedContent;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,11 +60,11 @@ public class RenderedContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"renderedContentURL\":");
+			sb.append("\"renderedContentURL\": ");
 
 			sb.append("\"");
 
-			sb.append(renderedContent.getRenderedContentURL());
+			sb.append(_escape(renderedContent.getRenderedContentURL()));
 
 			sb.append("\"");
 		}
@@ -72,11 +74,11 @@ public class RenderedContentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"templateName\":");
+			sb.append("\"templateName\": ");
 
 			sb.append("\"");
 
-			sb.append(renderedContent.getTemplateName());
+			sb.append(_escape(renderedContent.getTemplateName()));
 
 			sb.append("\"");
 		}
@@ -84,6 +86,13 @@ public class RenderedContentSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		RenderedContentJSONParser renderedContentJSONParser =
+			new RenderedContentJSONParser();
+
+		return renderedContentJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(RenderedContent renderedContent) {
@@ -112,6 +121,41 @@ public class RenderedContentSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class RenderedContentJSONParser

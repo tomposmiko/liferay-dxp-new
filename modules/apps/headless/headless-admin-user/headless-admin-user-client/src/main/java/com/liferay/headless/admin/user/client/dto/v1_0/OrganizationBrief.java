@@ -15,6 +15,9 @@
 package com.liferay.headless.admin.user.client.dto.v1_0;
 
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
+import com.liferay.headless.admin.user.client.serdes.v1_0.OrganizationBriefSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -62,5 +65,31 @@ public class OrganizationBrief {
 	}
 
 	protected String name;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof OrganizationBrief)) {
+			return false;
+		}
+
+		OrganizationBrief organizationBrief = (OrganizationBrief)object;
+
+		return Objects.equals(toString(), organizationBrief.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return OrganizationBriefSerDes.toJSON(this);
+	}
 
 }

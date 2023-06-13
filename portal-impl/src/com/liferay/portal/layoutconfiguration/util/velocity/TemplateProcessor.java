@@ -218,9 +218,8 @@ public class TemplateProcessor implements ColumnProcessor {
 
 				PortletPreferencesFactoryUtil.getLayoutPortletSetup(
 					layout.getCompanyId(), layout.getGroupId(),
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-					PortletKeys.PREFS_PLID_SHARED, portletId,
-					defaultPreferences);
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, layout.getPlid(),
+					portletId, defaultPreferences);
 			}
 		}
 

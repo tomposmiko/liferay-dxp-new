@@ -21,8 +21,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -64,9 +66,9 @@ public class WorkflowLogSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"auditPerson\":");
+			sb.append("\"auditPerson\": ");
 
-			sb.append(CreatorSerDes.toJSON(workflowLog.getAuditPerson()));
+			sb.append(String.valueOf(workflowLog.getAuditPerson()));
 		}
 
 		if (workflowLog.getCommentLog() != null) {
@@ -74,11 +76,11 @@ public class WorkflowLogSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"commentLog\":");
+			sb.append("\"commentLog\": ");
 
 			sb.append("\"");
 
-			sb.append(workflowLog.getCommentLog());
+			sb.append(_escape(workflowLog.getCommentLog()));
 
 			sb.append("\"");
 		}
@@ -88,7 +90,7 @@ public class WorkflowLogSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -103,7 +105,7 @@ public class WorkflowLogSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(workflowLog.getId());
 		}
@@ -113,9 +115,9 @@ public class WorkflowLogSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"person\":");
+			sb.append("\"person\": ");
 
-			sb.append(CreatorSerDes.toJSON(workflowLog.getPerson()));
+			sb.append(String.valueOf(workflowLog.getPerson()));
 		}
 
 		if (workflowLog.getPreviousPerson() != null) {
@@ -123,9 +125,9 @@ public class WorkflowLogSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"previousPerson\":");
+			sb.append("\"previousPerson\": ");
 
-			sb.append(CreatorSerDes.toJSON(workflowLog.getPreviousPerson()));
+			sb.append(String.valueOf(workflowLog.getPreviousPerson()));
 		}
 
 		if (workflowLog.getPreviousState() != null) {
@@ -133,11 +135,11 @@ public class WorkflowLogSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"previousState\":");
+			sb.append("\"previousState\": ");
 
 			sb.append("\"");
 
-			sb.append(workflowLog.getPreviousState());
+			sb.append(_escape(workflowLog.getPreviousState()));
 
 			sb.append("\"");
 		}
@@ -147,11 +149,11 @@ public class WorkflowLogSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"state\":");
+			sb.append("\"state\": ");
 
 			sb.append("\"");
 
-			sb.append(workflowLog.getState());
+			sb.append(_escape(workflowLog.getState()));
 
 			sb.append("\"");
 		}
@@ -161,7 +163,7 @@ public class WorkflowLogSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"taskId\":");
+			sb.append("\"taskId\": ");
 
 			sb.append(workflowLog.getTaskId());
 		}
@@ -171,11 +173,11 @@ public class WorkflowLogSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"type\":");
+			sb.append("\"type\": ");
 
 			sb.append("\"");
 
-			sb.append(workflowLog.getType());
+			sb.append(_escape(workflowLog.getType()));
 
 			sb.append("\"");
 		}
@@ -183,6 +185,13 @@ public class WorkflowLogSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		WorkflowLogJSONParser workflowLogJSONParser =
+			new WorkflowLogJSONParser();
+
+		return workflowLogJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(WorkflowLog workflowLog) {
@@ -200,8 +209,7 @@ public class WorkflowLogSerDes {
 		}
 		else {
 			map.put(
-				"auditPerson",
-				CreatorSerDes.toJSON(workflowLog.getAuditPerson()));
+				"auditPerson", String.valueOf(workflowLog.getAuditPerson()));
 		}
 
 		if (workflowLog.getCommentLog() == null) {
@@ -226,7 +234,7 @@ public class WorkflowLogSerDes {
 			map.put("person", null);
 		}
 		else {
-			map.put("person", CreatorSerDes.toJSON(workflowLog.getPerson()));
+			map.put("person", String.valueOf(workflowLog.getPerson()));
 		}
 
 		if (workflowLog.getPreviousPerson() == null) {
@@ -235,7 +243,7 @@ public class WorkflowLogSerDes {
 		else {
 			map.put(
 				"previousPerson",
-				CreatorSerDes.toJSON(workflowLog.getPreviousPerson()));
+				String.valueOf(workflowLog.getPreviousPerson()));
 		}
 
 		if (workflowLog.getPreviousState() == null) {
@@ -269,6 +277,41 @@ public class WorkflowLogSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class WorkflowLogJSONParser

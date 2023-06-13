@@ -81,10 +81,16 @@ public interface SearchRequestBuilder {
 
 	public SearchRequestBuilder federatedSearchKey(String federatedSearchKey);
 
+	public SearchRequestBuilder fields(String... fields);
+
+	public SearchRequestBuilder from(Integer from);
+
 	public SearchRequestBuilder getFederatedSearchRequestBuilder(
 		String federatedSearchKey);
 
 	public SearchRequestBuilder highlightEnabled(boolean highlightEnabled);
+
+	public SearchRequestBuilder highlightFields(String... highlightFields);
 
 	/**
 	 * Enables inclusion of the search engine's response string with the
@@ -113,6 +119,8 @@ public interface SearchRequestBuilder {
 	 * @return the search request builder
 	 */
 	public SearchRequestBuilder rescoreQuery(Query rescoreQuery);
+
+	public SearchRequestBuilder size(Integer size);
 
 	public SearchRequestBuilder sorts(Sort... sorts);
 

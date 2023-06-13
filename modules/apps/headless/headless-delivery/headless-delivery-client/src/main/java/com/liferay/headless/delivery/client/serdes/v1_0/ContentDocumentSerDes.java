@@ -18,8 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.ContentDocument;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,11 +60,11 @@ public class ContentDocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"contentUrl\":");
+			sb.append("\"contentUrl\": ");
 
 			sb.append("\"");
 
-			sb.append(contentDocument.getContentUrl());
+			sb.append(_escape(contentDocument.getContentUrl()));
 
 			sb.append("\"");
 		}
@@ -72,11 +74,11 @@ public class ContentDocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(contentDocument.getDescription());
+			sb.append(_escape(contentDocument.getDescription()));
 
 			sb.append("\"");
 		}
@@ -86,11 +88,11 @@ public class ContentDocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"encodingFormat\":");
+			sb.append("\"encodingFormat\": ");
 
 			sb.append("\"");
 
-			sb.append(contentDocument.getEncodingFormat());
+			sb.append(_escape(contentDocument.getEncodingFormat()));
 
 			sb.append("\"");
 		}
@@ -100,11 +102,11 @@ public class ContentDocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"fileExtension\":");
+			sb.append("\"fileExtension\": ");
 
 			sb.append("\"");
 
-			sb.append(contentDocument.getFileExtension());
+			sb.append(_escape(contentDocument.getFileExtension()));
 
 			sb.append("\"");
 		}
@@ -114,7 +116,7 @@ public class ContentDocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(contentDocument.getId());
 		}
@@ -124,7 +126,7 @@ public class ContentDocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"sizeInBytes\":");
+			sb.append("\"sizeInBytes\": ");
 
 			sb.append(contentDocument.getSizeInBytes());
 		}
@@ -134,11 +136,11 @@ public class ContentDocumentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"title\":");
+			sb.append("\"title\": ");
 
 			sb.append("\"");
 
-			sb.append(contentDocument.getTitle());
+			sb.append(_escape(contentDocument.getTitle()));
 
 			sb.append("\"");
 		}
@@ -146,6 +148,13 @@ public class ContentDocumentSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		ContentDocumentJSONParser contentDocumentJSONParser =
+			new ContentDocumentJSONParser();
+
+		return contentDocumentJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(ContentDocument contentDocument) {
@@ -214,6 +223,41 @@ public class ContentDocumentSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class ContentDocumentJSONParser

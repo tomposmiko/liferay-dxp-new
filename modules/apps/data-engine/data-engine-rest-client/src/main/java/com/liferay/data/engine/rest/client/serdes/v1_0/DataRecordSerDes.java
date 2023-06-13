@@ -15,13 +15,13 @@
 package com.liferay.data.engine.rest.client.serdes.v1_0;
 
 import com.liferay.data.engine.rest.client.dto.v1_0.DataRecord;
-import com.liferay.data.engine.rest.client.dto.v1_0.DataRecordValue;
 import com.liferay.data.engine.rest.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -55,42 +55,30 @@ public class DataRecordSerDes {
 
 		if (dataRecord.getDataRecordCollectionId() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dataRecordCollectionId\":");
+			sb.append("\"dataRecordCollectionId\": ");
 
 			sb.append(dataRecord.getDataRecordCollectionId());
 		}
 
 		if (dataRecord.getDataRecordValues() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"dataRecordValues\":");
+			sb.append("\"dataRecordValues\": ");
 
-			sb.append("[");
-
-			for (int i = 0; i < dataRecord.getDataRecordValues().length; i++) {
-				sb.append(
-					DataRecordValueSerDes.toJSON(
-						dataRecord.getDataRecordValues()[i]));
-
-				if ((i + 1) < dataRecord.getDataRecordValues().length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
+			sb.append(_toJSON(dataRecord.getDataRecordValues()));
 		}
 
 		if (dataRecord.getId() != null) {
 			if (sb.length() > 1) {
-				sb.append(",");
+				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(dataRecord.getId());
 		}
@@ -98,6 +86,12 @@ public class DataRecordSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		DataRecordJSONParser dataRecordJSONParser = new DataRecordJSONParser();
+
+		return dataRecordJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(DataRecord dataRecord) {
@@ -135,6 +129,41 @@ public class DataRecordSerDes {
 		return map;
 	}
 
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
 	private static class DataRecordJSONParser
 		extends BaseJSONParser<DataRecord> {
 
@@ -162,14 +191,7 @@ public class DataRecordSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dataRecordValues")) {
 				if (jsonParserFieldValue != null) {
 					dataRecord.setDataRecordValues(
-						Stream.of(
-							toStrings((Object[])jsonParserFieldValue)
-						).map(
-							object -> DataRecordValueSerDes.toDTO(
-								(String)object)
-						).toArray(
-							size -> new DataRecordValue[size]
-						));
+						DataRecordSerDes.toMap((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {

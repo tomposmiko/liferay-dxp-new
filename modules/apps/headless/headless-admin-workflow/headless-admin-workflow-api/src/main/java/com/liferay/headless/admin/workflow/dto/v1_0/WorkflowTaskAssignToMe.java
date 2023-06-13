@@ -26,8 +26,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -44,7 +50,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class WorkflowTaskAssignToMe {
 
 	@Schema(
-		description = "An optional comment to be added while accepting the WorkflowTask."
+		description = "An optional comment to add when accepting the workflow task."
 	)
 	public String getComment() {
 		return comment;
@@ -73,7 +79,9 @@ public class WorkflowTaskAssignToMe {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected String comment;
 
-	@Schema(description = "A date where the WorkflowTask should be executed.")
+	@Schema(
+		description = "The date on which the workflow task should be executed."
+	)
 	public Date getDueDate() {
 		return dueDate;
 	}
@@ -129,28 +137,70 @@ public class WorkflowTaskAssignToMe {
 
 		sb.append("{");
 
-		sb.append("\"comment\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (comment == null) {
-			sb.append("null");
+		if (comment != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"comment\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(comment));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (dueDate != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dueDate\": ");
+
 			sb.append("\"");
-			sb.append(comment);
+
+			sb.append(liferayToJSONDateFormat.format(dueDate));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		sb.append("}");
 
-		sb.append("\"dueDate\": ");
+		return sb.toString();
+	}
 
-		if (dueDate == null) {
-			sb.append("null");
-		}
-		else {
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(dueDate);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

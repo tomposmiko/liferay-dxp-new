@@ -18,6 +18,7 @@ import com.liferay.petra.encryptor.Encryptor;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
@@ -264,13 +265,11 @@ public class PollerRequestHandlerImpl
 			}
 		}
 
-		JSONObject pollerResponseHeaderJSONObject =
-			JSONFactoryUtil.createJSONObject();
-
-		pollerResponseHeaderJSONObject.put("suspendPolling", suspendPolling);
-		pollerResponseHeaderJSONObject.put("userId", pollerHeader.getUserId());
-
-		return pollerResponseHeaderJSONObject;
+		return JSONUtil.put(
+			"suspendPolling", suspendPolling
+		).put(
+			"userId", pollerHeader.getUserId()
+		);
 	}
 
 	protected void executePollerRequests(

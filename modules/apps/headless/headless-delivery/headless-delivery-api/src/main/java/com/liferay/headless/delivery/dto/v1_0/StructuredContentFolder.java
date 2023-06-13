@@ -28,8 +28,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -81,7 +87,7 @@ public class StructuredContentFolder {
 
 	}
 
-	@Schema(description = "The creator of the StructuredContentFolder")
+	@Schema(description = "The folder's creator.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -109,7 +115,7 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema(description = "The creation date of the StructuredContentFolder.")
+	@Schema(description = "The date the folder was created.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -137,9 +143,7 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(
-		description = "The last time a field of the StructuredContentFolder changed."
-	)
+	@Schema(description = "The last time any of the folder's fields changed.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -167,7 +171,7 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(description = "The description of the StructuredContentFolder")
+	@Schema(description = "The folder's description.")
 	public String getDescription() {
 		return description;
 	}
@@ -195,7 +199,7 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The folder's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -221,7 +225,7 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The name of the StructuredContentFolder.")
+	@Schema(description = "The folder's name.")
 	public String getName() {
 		return name;
 	}
@@ -249,7 +253,7 @@ public class StructuredContentFolder {
 	protected String name;
 
 	@Schema(
-		description = "The number of child StructuredContentFolders that belong to this resource."
+		description = "The number of structured content folders inside this folder."
 	)
 	public Integer getNumberOfStructuredContentFolders() {
 		return numberOfStructuredContentFolders;
@@ -284,7 +288,7 @@ public class StructuredContentFolder {
 	protected Integer numberOfStructuredContentFolders;
 
 	@Schema(
-		description = "The number of child StructuredContents that belong to this resource."
+		description = "The number of structured content objects inside this folder."
 	)
 	public Integer getNumberOfStructuredContents() {
 		return numberOfStructuredContents;
@@ -317,9 +321,7 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfStructuredContents;
 
-	@Schema(
-		description = "The site identificator where this StructuredContentFolder is scoped."
-	)
+	@Schema(description = "The ID of the site to which this folder is scoped.")
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -348,7 +350,7 @@ public class StructuredContentFolder {
 	protected Long siteId;
 
 	@Schema(
-		description = "Write only property to specify the default permissions."
+		description = "A write-only property that specifies the folder's default permissions."
 	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
@@ -414,122 +416,162 @@ public class StructuredContentFolder {
 
 		sb.append("{");
 
-		sb.append("\"creator\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (creator == null) {
-			sb.append("null");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"creator\": ");
+
+			sb.append(String.valueOf(creator));
 		}
-		else {
-			sb.append(creator);
-		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(dateCreated);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
 
-		sb.append("\"dateModified\": ");
-
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"dateModified\": ");
 
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(description);
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"description\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (numberOfStructuredContentFolders != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfStructuredContentFolders\": ");
+			sb.append("\"numberOfStructuredContentFolders\": ");
 
-		if (numberOfStructuredContentFolders == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfStructuredContentFolders);
 		}
 
-		sb.append(", ");
+		if (numberOfStructuredContents != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfStructuredContents\": ");
+			sb.append("\"numberOfStructuredContents\": ");
 
-		if (numberOfStructuredContents == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfStructuredContents);
 		}
 
-		sb.append(", ");
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\": ");
 
-		if (siteId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(siteId);
 		}
 
-		sb.append(", ");
+		if (viewableBy != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"viewableBy\": ");
+			sb.append("\"viewableBy\": ");
 
-		if (viewableBy == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
 			sb.append(viewableBy);
+
 			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

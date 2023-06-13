@@ -51,6 +51,16 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 	}
 
 	@Override
+	public long getPreviewClassPK() {
+		return _previewClassPK;
+	}
+
+	@Override
+	public int getPreviewType() {
+		return _previewType;
+	}
+
+	@Override
 	public long[] getSegmentsExperienceIds() {
 		return _segmentsExperienceIds;
 	}
@@ -67,6 +77,14 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 		_mode = mode;
 	}
 
+	public void setPreviewClassPK(long previewClassPK) {
+		_previewClassPK = previewClassPK;
+	}
+
+	public void setPreviewType(int previewType) {
+		_previewType = previewType;
+	}
+
 	public void setSegmentsExperienceIds(long[] segmentsExperienceIds) {
 		_segmentsExperienceIds = segmentsExperienceIds;
 	}
@@ -75,6 +93,8 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 	private final FragmentEntryLink _fragmentEntryLink;
 	private Locale _locale = LocaleUtil.getMostRelevantLocale();
 	private String _mode = FragmentEntryLinkConstants.VIEW;
+	private long _previewClassPK;
+	private int _previewType;
 	private long[] _segmentsExperienceIds = new long[0];
 
 }

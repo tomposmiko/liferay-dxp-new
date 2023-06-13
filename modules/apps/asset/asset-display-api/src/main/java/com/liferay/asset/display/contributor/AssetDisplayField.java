@@ -15,8 +15,8 @@
 package com.liferay.asset.display.contributor;
 
 import com.liferay.petra.lang.HashUtil;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 
 import java.util.Objects;
 
@@ -82,13 +82,13 @@ public class AssetDisplayField {
 	}
 
 	public JSONObject toJSONObject() {
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-		jsonObject.put("key", getKey());
-		jsonObject.put("label", getLabel());
-		jsonObject.put("type", getType());
-
-		return jsonObject;
+		return JSONUtil.put(
+			"key", getKey()
+		).put(
+			"label", getLabel()
+		).put(
+			"type", getType()
+		);
 	}
 
 	private static final String _TYPE = "text";

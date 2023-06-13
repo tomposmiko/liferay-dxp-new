@@ -17,14 +17,18 @@ package com.liferay.fragment.entry.processor.editable.parser.impl;
 import com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor;
 import com.liferay.fragment.entry.processor.editable.parser.EditableElementParser;
 import com.liferay.fragment.exception.FragmentEntryContentException;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.jsoup.nodes.Element;
@@ -47,12 +51,42 @@ public class ImageEditableElementParser implements EditableElementParser {
 	}
 
 	@Override
+	public JSONObject getFieldTemplateConfigJSONObject(
+		String fieldName, Locale locale, Object fieldValue) {
+
+		String alt = StringPool.BLANK;
+
+		if (fieldValue == null) {
+			alt = StringUtil.replace(
+				_TMPL_IMAGE_FIELD_ALT_TEMPLATE, "field_name", fieldName);
+		}
+		else if (fieldValue instanceof JSONObject) {
+			JSONObject fieldValueJSONObject = (JSONObject)fieldValue;
+
+			alt = fieldValueJSONObject.getString("alt");
+		}
+
+		return JSONUtil.put("alt", alt);
+	}
+
+	@Override
 	public String getValue(Element element) {
 		List<Element> elements = element.getElementsByTag("img");
 
 		Element replaceableElement = elements.get(0);
 
 		return replaceableElement.attr("src");
+	}
+
+	@Override
+	public String parseFieldValue(Object fieldValue) {
+		if (!(fieldValue instanceof JSONObject)) {
+			return StringPool.BLANK;
+		}
+
+		JSONObject jsonObject = (JSONObject)fieldValue;
+
+		return GetterUtil.getString(jsonObject.getString("url"));
 	}
 
 	@Override
@@ -72,6 +106,13 @@ public class ImageEditableElementParser implements EditableElementParser {
 
 		if (configJSONObject == null) {
 			return;
+		}
+
+		String alt = configJSONObject.getString("alt");
+
+		if (Validator.isNotNull(alt)) {
+			replaceableElement.attr(
+				"alt", StringUtil.trim(_html.unescape(alt)));
 		}
 
 		String imageLink = configJSONObject.getString("imageLink");
@@ -110,6 +151,12 @@ public class ImageEditableElementParser implements EditableElementParser {
 					new Object[] {"<em>", "</em>"}, false));
 		}
 	}
+
+	private static final String _TMPL_IMAGE_FIELD_ALT_TEMPLATE =
+		StringUtil.read(
+			EditableFragmentEntryProcessor.class,
+			"/META-INF/resources/fragment/entry/processor/editable" +
+				"/image_field_alt_template.tmpl");
 
 	private static final String _TMPL_IMAGE_FIELD_TEMPLATE = StringUtil.read(
 		EditableFragmentEntryProcessor.class,

@@ -30,6 +30,7 @@ class FragmentEditableFieldTooltip extends Component {
 	 */
 	created() {
 		this._handleDocumentClick = this._handleDocumentClick.bind(this);
+		this._handleFragmentEntryLinkListWrapperScroll = this._handleFragmentEntryLinkListWrapperScroll.bind(this);
 
 		this._handleWindowResize = debounce(
 			this._handleWindowResize.bind(this),
@@ -47,20 +48,35 @@ class FragmentEditableFieldTooltip extends Component {
 			'click',
 			this._handleDocumentClick
 		);
+
+		const fragmentEntryLinkListWrapper = document.querySelector(
+			'.fragment-entry-link-list-wrapper'
+		);
+
+		if (fragmentEntryLinkListWrapper) {
+			fragmentEntryLinkListWrapper.addEventListener(
+				'scroll',
+				this._handleFragmentEntryLinkListWrapperScroll
+			);
+		}
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	disposed() {
-		if (this._documentClickHandler) {
-			this._documentClickHandler.removeListener();
-			this._documentClickHandler = null;
-		}
+		this._documentClickHandler.removeListener();
+		this._windowResizeHandler.removeListener();
 
-		if (this._windowResizeHandler) {
-			this._windowResizeHandler.removeListener();
-			this._windowResizeHandler = null;
+		const fragmentEntryLinkListWrapper = document.querySelector(
+			'.fragment-entry-link-list-wrapper'
+		);
+
+		if (fragmentEntryLinkListWrapper) {
+			fragmentEntryLinkListWrapper.removeEventListener(
+				'scroll',
+				this._handleFragmentEntryLinkListWrapperScroll
+			);
 		}
 	}
 
@@ -73,6 +89,7 @@ class FragmentEditableFieldTooltip extends Component {
 
 	/**
 	 * Aligns the tooltip position for editable fields.
+	 *
 	 * @private
 	 */
 	_alignTooltip() {
@@ -80,13 +97,15 @@ class FragmentEditableFieldTooltip extends Component {
 			Align.align(
 				this.refs.tooltip,
 				this.alignElement,
-				Align.Top
+				Align.Top,
+				false
 			);
 		}
 	}
 
 	/**
 	 * Handles a button click.
+	 *
 	 * @param {MouseEvent} event
 	 */
 	_handleButtonClick(event) {
@@ -103,6 +122,7 @@ class FragmentEditableFieldTooltip extends Component {
 
 	/**
 	 * Hides the tooltip when a document click occurs outside the tooltip.
+	 *
 	 * @param {MouseEvent} event The document click.
 	 */
 	_handleDocumentClick(event) {
@@ -117,9 +137,17 @@ class FragmentEditableFieldTooltip extends Component {
 
 	/**
 	 * Callback executed to align the tooltip when the window is resized.
+	 *
 	 * @private
 	 */
 	_handleWindowResize() {
+		this._alignTooltip();
+	}
+
+	/**
+	 * @private
+	 */
+	_handleFragmentEntryLinkListWrapperScroll() {
 		this._alignTooltip();
 	}
 
@@ -127,6 +155,7 @@ class FragmentEditableFieldTooltip extends Component {
 
 /**
  * State definition.
+ *
  * @static
  * @type {!Object}
  */
@@ -134,6 +163,7 @@ FragmentEditableFieldTooltip.STATE = {
 
 	/**
 	 * Reference element the tooltip alignment is based on.
+	 *
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentEditableFieldTooltip
@@ -143,6 +173,7 @@ FragmentEditableFieldTooltip.STATE = {
 
 	/**
 	 * List of buttons rendered inside the tooltip.
+	 *
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentEditableFieldTooltip

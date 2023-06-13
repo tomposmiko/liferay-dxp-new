@@ -159,8 +159,13 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CLOSE_MESSAGE_FLOAT</td>
+	<td>//div[contains(@class,'alert-dismissible')][contains(@class,'show')]//button[@aria-label='Close']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>COLOR_EFFECT</td>
-	<td>//a[contains(@class, 'btn')][*[name()='svg'][@data-icon='effects']]</td>
+	<td>//button[*[name()='svg'][contains(@class,'lexicon-icon-effects')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -225,7 +230,7 @@
 </tr>
 <tr>
 	<td>DOWNLOAD</td>
-	<td>//a[contains(@class,'btn') and contains(.,'Download')] | //button[contains(.,'Download')]</td>
+	<td>//a[2][contains(@class,'btn') and contains(.,'Download')] | //button[contains(.,'Download')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -600,7 +605,7 @@
 </tr>
 <tr>
 	<td>TRANSFORM</td>
-	<td>//div[a/*[name()='svg'][@data-icon='transform']]</td>
+	<td>//button[*[name()='svg'][contains(@class,'lexicon-icon-transform')]]</td>
 	<td></td>
 </tr>
 <tr>

@@ -24,7 +24,12 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -40,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "TaxonomyVocabulary")
 public class TaxonomyVocabulary {
 
+	@Schema
 	public Boolean getMultiValued() {
 		return multiValued;
 	}
@@ -67,6 +73,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean multiValued;
 
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -92,6 +99,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
+	@Schema
 	public Boolean getRequired() {
 		return required;
 	}
@@ -119,6 +127,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean required;
 
+	@Schema
 	public TaxonomyCategory[] getTaxonomyCategories() {
 		return taxonomyCategories;
 	}
@@ -147,6 +156,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected TaxonomyCategory[] taxonomyCategories;
 
+	@Schema
 	public Long getTaxonomyVocabularyId() {
 		return taxonomyVocabularyId;
 	}
@@ -201,51 +211,51 @@ public class TaxonomyVocabulary {
 
 		sb.append("{");
 
-		sb.append("\"multiValued\": ");
+		if (multiValued != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (multiValued == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"multiValued\": ");
+
 			sb.append(multiValued);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (required != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"required\": ");
+			sb.append("\"required\": ");
 
-		if (required == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(required);
 		}
 
-		sb.append(", ");
+		if (taxonomyCategories != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategories\": ");
+			sb.append("\"taxonomyCategories\": ");
 
-		if (taxonomyCategories == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < taxonomyCategories.length; i++) {
-				sb.append(taxonomyCategories[i]);
+				sb.append(String.valueOf(taxonomyCategories[i]));
 
 				if ((i + 1) < taxonomyCategories.length) {
 					sb.append(", ");
@@ -255,15 +265,49 @@ public class TaxonomyVocabulary {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (taxonomyVocabularyId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyVocabularyId\": ");
+			sb.append("\"taxonomyVocabularyId\": ");
 
-		if (taxonomyVocabularyId == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(taxonomyVocabularyId);
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

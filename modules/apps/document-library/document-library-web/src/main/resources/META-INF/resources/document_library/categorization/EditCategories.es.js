@@ -17,6 +17,8 @@ class EditCategories extends Component {
 	 * @inheritDoc
 	 */
 	attached() {
+		this._assetVocabularyCategories = new Map();
+
 		this._bulkStatusComponent =	Liferay.component(this.namespace + 'BulkStatus');
 	}
 
@@ -63,10 +65,10 @@ class EditCategories extends Component {
 		let valid = true;
 
 		if (inputNode.value) {
-			inputNode.parentElement.classList.remove('has-error');
+			inputNode.parentElement.parentElement.classList.remove('has-error');
 		}
 		else {
-			inputNode.parentElement.classList.add('has-error');
+			inputNode.parentElement.parentElement.classList.add('has-error');
 
 			let feedbackErrorNode = inputNode.parentElement.querySelector('.' + this._feedbackErrorClass);
 
@@ -81,6 +83,17 @@ class EditCategories extends Component {
 		}
 
 		return valid;
+	}
+
+	/**
+	 * Checks if the vocabulary have errors
+	 *
+	 * @private
+	 * @review
+	 * @return {Boolean} true if it has a error, false if has not error.
+	 */
+	_checkErrors() {
+		return !!this.element.querySelector('.has-error');
 	}
 
 	/**
@@ -162,16 +175,11 @@ class EditCategories extends Component {
 	 */
 	_getFinalCategories() {
 		let finalCategories = [];
-		let inputElementName = this.namespace + this.hiddenInput;
 
-		this.vocabularies.forEach(
-			vocabulary => {
-				let inputNode = document.getElementById(inputElementName + vocabulary.id);
-
-				if (inputNode.value) {
-					let categoryIds = inputNode.value.split(',').map(Number);
-					finalCategories = finalCategories.concat(categoryIds);
-				}
+		this._assetVocabularyCategories.forEach(
+			category => {
+				const categoryIds = category.map(item => item.value);
+				finalCategories = finalCategories.concat(categoryIds);
 			}
 		);
 
@@ -199,19 +207,6 @@ class EditCategories extends Component {
 		return document.getElementById(this.namespace + this.hiddenInput + vocabularyId);
 	}
 
-	/**
-	 * Checks if a required vocabulary has categories or not.
-	 *
-	 * @param  {Event} event
-	 */
-	_handleCategoriesChange(event) {
-		let vocabularyId = event.vocabularyId[0];
-
-		if (this._requiredVocabularies.includes(parseInt(vocabularyId, 10))) {
-			this._checkRequiredVocabulary(vocabularyId);
-		}
-	}
-
 	_handleInputFocus(event) {
 		const dataProvider = event.target.refs.autocomplete.refs.dataProvider;
 		const modal = this.element.querySelector('.modal');
@@ -231,6 +226,21 @@ class EditCategories extends Component {
 		this.append = event.target.value === 'add';
 	}
 
+	_handleSelectedItemsChange(event) {
+		const vocabularyId = event.vocabularyId;
+
+		this._assetVocabularyCategories.set(vocabularyId, event.selectedItems);
+
+		if (this._requiredVocabularies.includes(parseInt(vocabularyId, 10))) {
+			setTimeout(
+				() => {
+					this._checkRequiredVocabulary(vocabularyId);
+				},
+				0
+			);
+		}
+	}
+
 	/**
 	 * Sends request to backend services
 	 * to update the categories.
@@ -242,45 +252,50 @@ class EditCategories extends Component {
 	_handleFormSubmit(event) {
 		event.preventDefault();
 
-		if (!this._validateRequiredVocabularies()) {
-			return;
-		}
-
-		let finalCategories = this._getFinalCategories();
-
-		let addedCategories = [];
-
-		if (!this.append) {
-			addedCategories = finalCategories;
-		}
-		else {
-			addedCategories = finalCategories.filter(
-				categoryId => this.initialCategories.indexOf(categoryId) == -1
-			);
-		}
-
-		let removedCategories = this.initialCategories.filter(
-			category => finalCategories.indexOf(category) == -1
-		);
-
-		let instance = this;
-
-		this._fetchCategoriesRequest(
-			this.urlUpdateCategories,
-			this.append ? 'PATCH' : 'PUT',
-			{
-				documentBulkSelection: this._getSelection(),
-				taxonomyCategoryIdsToAdd: addedCategories,
-				taxonomyCategoryIdsToRemove: removedCategories
-			}
-		).then(
-			response => {
-				instance.close();
-
-				if (instance._bulkStatusComponent) {
-					instance._bulkStatusComponent.startWatch();
+		setTimeout(
+			() => {
+				if (this._checkErrors()) {
+					return;
 				}
-			}
+
+				let finalCategories = this._getFinalCategories();
+
+				let addedCategories = [];
+
+				if (!this.append) {
+					addedCategories = finalCategories;
+				}
+				else {
+					addedCategories = finalCategories.filter(
+						categoryId => this.initialCategories.indexOf(categoryId) == -1
+					);
+				}
+
+				let removedCategories = this.initialCategories.filter(
+					category => finalCategories.indexOf(category) == -1
+				);
+
+				let instance = this;
+
+				this._fetchCategoriesRequest(
+					this.urlUpdateCategories,
+					this.append ? 'PATCH' : 'PUT',
+					{
+						documentBulkSelection: this._getSelection(),
+						taxonomyCategoryIdsToAdd: addedCategories,
+						taxonomyCategoryIdsToRemove: removedCategories
+					}
+				).then(
+					response => {
+						instance.close();
+
+						if (instance._bulkStatusComponent) {
+							instance._bulkStatusComponent.startWatch();
+						}
+					}
+				);
+			},
+			250
 		);
 	}
 
@@ -344,23 +359,6 @@ class EditCategories extends Component {
 		}
 
 		return categoriesObjList;
-	}
-
-	_validateRequiredVocabularies() {
-		let requiredVocabularies = this._requiredVocabularies;
-		let valid = true;
-
-		if (requiredVocabularies) {
-			requiredVocabularies.forEach(
-				vocabularyId => {
-					if (!this._checkRequiredVocabulary(vocabularyId)) {
-						valid = false;
-					}
-				}
-			);
-		}
-
-		return valid;
 	}
 }
 

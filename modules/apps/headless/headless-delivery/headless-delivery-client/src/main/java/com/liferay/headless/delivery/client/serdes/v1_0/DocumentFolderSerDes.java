@@ -21,8 +21,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -64,9 +66,9 @@ public class DocumentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(CreatorSerDes.toJSON(documentFolder.getCreator()));
+			sb.append(String.valueOf(documentFolder.getCreator()));
 		}
 
 		if (documentFolder.getDateCreated() != null) {
@@ -74,7 +76,7 @@ public class DocumentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -90,7 +92,7 @@ public class DocumentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -106,11 +108,11 @@ public class DocumentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(documentFolder.getDescription());
+			sb.append(_escape(documentFolder.getDescription()));
 
 			sb.append("\"");
 		}
@@ -120,7 +122,7 @@ public class DocumentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(documentFolder.getId());
 		}
@@ -130,11 +132,11 @@ public class DocumentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(documentFolder.getName());
+			sb.append(_escape(documentFolder.getName()));
 
 			sb.append("\"");
 		}
@@ -144,7 +146,7 @@ public class DocumentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"numberOfDocumentFolders\":");
+			sb.append("\"numberOfDocumentFolders\": ");
 
 			sb.append(documentFolder.getNumberOfDocumentFolders());
 		}
@@ -154,7 +156,7 @@ public class DocumentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"numberOfDocuments\":");
+			sb.append("\"numberOfDocuments\": ");
 
 			sb.append(documentFolder.getNumberOfDocuments());
 		}
@@ -164,7 +166,7 @@ public class DocumentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"siteId\":");
+			sb.append("\"siteId\": ");
 
 			sb.append(documentFolder.getSiteId());
 		}
@@ -174,7 +176,7 @@ public class DocumentFolderSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"viewableBy\":");
+			sb.append("\"viewableBy\": ");
 
 			sb.append("\"");
 
@@ -186,6 +188,13 @@ public class DocumentFolderSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		DocumentFolderJSONParser documentFolderJSONParser =
+			new DocumentFolderJSONParser();
+
+		return documentFolderJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(DocumentFolder documentFolder) {
@@ -202,8 +211,7 @@ public class DocumentFolderSerDes {
 			map.put("creator", null);
 		}
 		else {
-			map.put(
-				"creator", CreatorSerDes.toJSON(documentFolder.getCreator()));
+			map.put("creator", String.valueOf(documentFolder.getCreator()));
 		}
 
 		map.put(
@@ -270,6 +278,41 @@ public class DocumentFolderSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class DocumentFolderJSONParser

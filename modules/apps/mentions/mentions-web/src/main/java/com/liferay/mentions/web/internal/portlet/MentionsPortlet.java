@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -129,9 +130,8 @@ public class MentionsPortlet extends MVCPortlet {
 				continue;
 			}
 
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			jsonObject.put("fullName", user.getFullName());
+			JSONObject jsonObject = JSONUtil.put(
+				"fullName", user.getFullName());
 
 			String mention = "@" + user.getScreenName();
 
@@ -143,13 +143,15 @@ public class MentionsPortlet extends MVCPortlet {
 					"</a>");
 			}
 
-			jsonObject.put("mention", mention);
-
 			jsonObject.put(
+				"mention", mention
+			).put(
 				"portraitHTML",
 				UserPortraitTag.getUserPortraitHTML(
-					StringPool.BLANK, user, themeDisplay));
-			jsonObject.put("screenName", user.getScreenName());
+					StringPool.BLANK, user, themeDisplay)
+			).put(
+				"screenName", user.getScreenName()
+			);
 
 			jsonArray.put(jsonObject);
 		}

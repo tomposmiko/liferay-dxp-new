@@ -2390,13 +2390,39 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public String getForwardedHost(HttpServletRequest request) {
+		String serverName = request.getServerName();
+
 		if (!PropsValues.WEB_SERVER_FORWARDED_HOST_ENABLED) {
-			return request.getServerName();
+			return serverName;
 		}
 
-		return GetterUtil.get(
-			request.getHeader(PropsValues.WEB_SERVER_FORWARDED_HOST_HEADER),
-			request.getServerName());
+		String forwardedHost = request.getHeader(
+			PropsValues.WEB_SERVER_FORWARDED_HOST_HEADER);
+
+		if (Validator.isBlank(forwardedHost) ||
+			forwardedHost.equals(serverName)) {
+
+			return serverName;
+		}
+
+		if (_validPortalDomainCheckDisabled) {
+			if (!Validator.isHostName(forwardedHost)) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Invalid forwarded host: " + forwardedHost);
+				}
+
+				return serverName;
+			}
+		}
+		else if (!isValidPortalDomain(forwardedHost)) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Invalid forwarded host: " + forwardedHost);
+			}
+
+			return serverName;
+		}
+
+		return forwardedHost;
 	}
 
 	@Override
@@ -3292,10 +3318,7 @@ public class PortalImpl implements Portal {
 			return (LiferayPortletRequest)portletRequest;
 		}
 
-		LiferayPortletRequest liferayPortletRequest =
-			LiferayPortletUtil.getLiferayPortletRequest(portletRequest);
-
-		return liferayPortletRequest;
+		return LiferayPortletUtil.getLiferayPortletRequest(portletRequest);
 	}
 
 	@Override
@@ -3306,10 +3329,7 @@ public class PortalImpl implements Portal {
 			return (LiferayPortletResponse)portletResponse;
 		}
 
-		LiferayPortletResponse liferayPortletResponse =
-			LiferayPortletUtil.getLiferayPortletResponse(portletResponse);
-
-		return liferayPortletResponse;
+		return LiferayPortletUtil.getLiferayPortletResponse(portletResponse);
 	}
 
 	@Override

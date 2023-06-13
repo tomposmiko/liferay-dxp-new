@@ -21,8 +21,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -62,14 +64,14 @@ public class RoleSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"availableLanguages\":");
+			sb.append("\"availableLanguages\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < role.getAvailableLanguages().length; i++) {
 				sb.append("\"");
 
-				sb.append(role.getAvailableLanguages()[i]);
+				sb.append(_escape(role.getAvailableLanguages()[i]));
 
 				sb.append("\"");
 
@@ -86,9 +88,9 @@ public class RoleSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"creator\":");
+			sb.append("\"creator\": ");
 
-			sb.append(CreatorSerDes.toJSON(role.getCreator()));
+			sb.append(String.valueOf(role.getCreator()));
 		}
 
 		if (role.getDateCreated() != null) {
@@ -96,7 +98,7 @@ public class RoleSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -110,7 +112,7 @@ public class RoleSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -124,11 +126,11 @@ public class RoleSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"description\":");
+			sb.append("\"description\": ");
 
 			sb.append("\"");
 
-			sb.append(role.getDescription());
+			sb.append(_escape(role.getDescription()));
 
 			sb.append("\"");
 		}
@@ -138,7 +140,7 @@ public class RoleSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(role.getId());
 		}
@@ -148,11 +150,11 @@ public class RoleSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(role.getName());
+			sb.append(_escape(role.getName()));
 
 			sb.append("\"");
 		}
@@ -162,11 +164,11 @@ public class RoleSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"roleType\":");
+			sb.append("\"roleType\": ");
 
 			sb.append("\"");
 
-			sb.append(role.getRoleType());
+			sb.append(_escape(role.getRoleType()));
 
 			sb.append("\"");
 		}
@@ -174,6 +176,12 @@ public class RoleSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		RoleJSONParser roleJSONParser = new RoleJSONParser();
+
+		return roleJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Role role) {
@@ -199,7 +207,7 @@ public class RoleSerDes {
 			map.put("creator", null);
 		}
 		else {
-			map.put("creator", CreatorSerDes.toJSON(role.getCreator()));
+			map.put("creator", String.valueOf(role.getCreator()));
 		}
 
 		map.put(
@@ -239,6 +247,41 @@ public class RoleSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class RoleJSONParser extends BaseJSONParser<Role> {

@@ -15,6 +15,9 @@
 package com.liferay.bulk.rest.client.dto.v1_0;
 
 import com.liferay.bulk.rest.client.function.UnsafeSupplier;
+import com.liferay.bulk.rest.client.serdes.v1_0.SelectionScopeSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -87,5 +90,31 @@ public class SelectionScope {
 	}
 
 	protected Boolean selectAll;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof SelectionScope)) {
+			return false;
+		}
+
+		SelectionScope selectionScope = (SelectionScope)object;
+
+		return Objects.equals(toString(), selectionScope.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return SelectionScopeSerDes.toJSON(this);
+	}
 
 }

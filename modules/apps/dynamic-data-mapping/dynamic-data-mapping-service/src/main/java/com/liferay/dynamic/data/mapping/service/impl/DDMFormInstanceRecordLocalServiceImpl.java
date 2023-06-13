@@ -414,6 +414,14 @@ public class DDMFormInstanceRecordLocalServiceImpl
 				serviceContext);
 		}
 
+		// Asset
+
+		updateAsset(
+			userId, ddmFormInstanceRecord, ddmFormInstanceRecordVersion,
+			serviceContext.getAssetCategoryIds(),
+			serviceContext.getAssetTagNames(), serviceContext.getLocale(),
+			serviceContext.getAssetPriority());
+
 		if (isKeepFormInstanceRecordVersionLabel(
 				ddmFormInstanceRecord.getFormInstanceRecordVersion(),
 				ddmFormInstanceRecordVersion, serviceContext)) {
@@ -624,10 +632,7 @@ public class DDMFormInstanceRecordLocalServiceImpl
 	}
 
 	protected Indexer<DDMFormInstanceRecord> getDDMFormInstanceRecordIndexer() {
-		Indexer<DDMFormInstanceRecord> indexer =
-			indexerRegistry.nullSafeGetIndexer(DDMFormInstanceRecord.class);
-
-		return indexer;
+		return indexerRegistry.nullSafeGetIndexer(DDMFormInstanceRecord.class);
 	}
 
 	protected DDMStorageAdapter getDDMStorageAdapter() {

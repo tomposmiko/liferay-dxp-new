@@ -16,6 +16,8 @@ package com.liferay.document.library.web.internal.info.display.contributor;
 
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.info.display.contributor.InfoDisplayContributorField;
+import com.liferay.info.display.contributor.InfoDisplayContributorFieldType;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -47,14 +49,15 @@ public class DLFileEntryPreviewImageInfoDisplayContributorField
 	}
 
 	@Override
-	public String getType() {
-		return "image";
+	public InfoDisplayContributorFieldType getType() {
+		return InfoDisplayContributorFieldType.IMAGE;
 	}
 
 	@Override
-	public String getValue(FileEntry fileEntry, Locale locale) {
+	public Object getValue(FileEntry fileEntry, Locale locale) {
 		try {
-			return _dlURLHelper.getImagePreviewURL(fileEntry, null);
+			return JSONUtil.put(
+				"url", _dlURLHelper.getImagePreviewURL(fileEntry, null));
 		}
 		catch (Exception pe) {
 			return null;

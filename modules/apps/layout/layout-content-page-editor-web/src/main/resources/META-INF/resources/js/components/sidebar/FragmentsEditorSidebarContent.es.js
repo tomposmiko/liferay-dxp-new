@@ -54,15 +54,19 @@ class FragmentsEditorSidebarContent extends Component {
 		const {sidebarPanelId} = event.delegateTarget.dataset;
 
 		if (this.selectedSidebarPanelId === sidebarPanelId) {
-			this.store.dispatchAction(
-				UPDATE_SELECTED_SIDEBAR_PANEL_ID,
-				{sidebarPanelId: ''}
+			this.store.dispatch(
+				{
+					sidebarPanelId: '',
+					type: UPDATE_SELECTED_SIDEBAR_PANEL_ID
+				}
 			);
 		}
 		else {
-			this.store.dispatchAction(
-				UPDATE_SELECTED_SIDEBAR_PANEL_ID,
-				{sidebarPanelId}
+			this.store.dispatch(
+				{
+					sidebarPanelId,
+					type: UPDATE_SELECTED_SIDEBAR_PANEL_ID
+				}
 			);
 		}
 	}
@@ -73,9 +77,11 @@ class FragmentsEditorSidebarContent extends Component {
 	 * @review
 	 */
 	_hideSidebar() {
-		this.store.dispatchAction(
-			UPDATE_SELECTED_SIDEBAR_PANEL_ID,
-			{sidebarPanelId: ''}
+		this.store.dispatch(
+			{
+				sidebarPanelId: '',
+				type: UPDATE_SELECTED_SIDEBAR_PANEL_ID
+			}
 		);
 	}
 

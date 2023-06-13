@@ -15,6 +15,9 @@
 package com.liferay.headless.delivery.client.dto.v1_0;
 
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
+import com.liferay.headless.delivery.client.serdes.v1_0.ContentStructureFieldSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -278,5 +281,32 @@ public class ContentStructureField {
 	}
 
 	protected Boolean showLabel;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof ContentStructureField)) {
+			return false;
+		}
+
+		ContentStructureField contentStructureField =
+			(ContentStructureField)object;
+
+		return Objects.equals(toString(), contentStructureField.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return ContentStructureFieldSerDes.toJSON(this);
+	}
 
 }

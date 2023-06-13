@@ -28,8 +28,14 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -79,7 +85,7 @@ public class Document {
 	}
 
 	@Schema(
-		description = "An array of images in several resolutions and sizes, created by the adaptive media framework."
+		description = "An array of images in several resolutions and sizes, created by the Adaptive Media framework."
 	)
 	public AdaptedImage[] getAdaptedImages() {
 		return adaptedImages;
@@ -108,9 +114,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected AdaptedImage[] adaptedImages;
 
-	@Schema(
-		description = "The information of the ratings (average, number) associated to this resource."
-	)
+	@Schema(description = "The document's average rating.")
 	public AggregateRating getAggregateRating() {
 		return aggregateRating;
 	}
@@ -139,7 +143,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected AggregateRating aggregateRating;
 
-	@Schema(description = "An absolute URL to the binary Document.")
+	@Schema(description = "The document's relative URL.")
 	public String getContentUrl() {
 		return contentUrl;
 	}
@@ -167,7 +171,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String contentUrl;
 
-	@Schema(description = "The creator of the Document")
+	@Schema(description = "The document's creator.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -195,7 +199,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema(description = "The creation date of the Document.")
+	@Schema(description = "The document's creation date.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -223,7 +227,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
-	@Schema(description = "The last time a field of the Document changed.")
+	@Schema(description = "The last time a field of the document changed.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -251,7 +255,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@Schema(description = "The description of the Document")
+	@Schema(description = "The document's description.")
 	public String getDescription() {
 		return description;
 	}
@@ -280,7 +284,7 @@ public class Document {
 	protected String description;
 
 	@Schema(
-		description = "The id of the DocumentFolder where this Document is stored."
+		description = "The ID of the `DocumentFolder` where this document is stored."
 	)
 	public Long getDocumentFolderId() {
 		return documentFolderId;
@@ -309,7 +313,9 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long documentFolderId;
 
-	@Schema(description = "The content type (application/pdf) of the Document.")
+	@Schema(
+		description = "The document's content type (e.g., `application/pdf`, etc.)."
+	)
 	public String getEncodingFormat() {
 		return encodingFormat;
 	}
@@ -337,7 +343,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String encodingFormat;
 
-	@Schema(description = "The file extension of the binary file.")
+	@Schema(description = "The document's file extension.")
 	public String getFileExtension() {
 		return fileExtension;
 	}
@@ -365,7 +371,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String fileExtension;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The document's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -391,7 +397,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "A list of keywords describing the Document.")
+	@Schema(description = "A list of keywords describing the document.")
 	public String[] getKeywords() {
 		return keywords;
 	}
@@ -419,7 +425,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] keywords;
 
-	@Schema(description = "A list of child comments of this content.")
+	@Schema(description = "The number of comments on the document.")
 	public Integer getNumberOfComments() {
 		return numberOfComments;
 	}
@@ -447,7 +453,36 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfComments;
 
-	@Schema(description = "The size in bytes of the binary files.")
+	@Schema
+	public RelatedContent[] getRelatedContents() {
+		return relatedContents;
+	}
+
+	public void setRelatedContents(RelatedContent[] relatedContents) {
+		this.relatedContents = relatedContents;
+	}
+
+	@JsonIgnore
+	public void setRelatedContents(
+		UnsafeSupplier<RelatedContent[], Exception>
+			relatedContentsUnsafeSupplier) {
+
+		try {
+			relatedContents = relatedContentsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected RelatedContent[] relatedContents;
+
+	@Schema(description = "The document's size in bytes.")
 	public Long getSizeInBytes() {
 		return sizeInBytes;
 	}
@@ -475,7 +510,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long sizeInBytes;
 
-	@Schema(description = "The categories asociated with this Document.")
+	@Schema(description = "The categories associated with this document.")
 	public TaxonomyCategory[] getTaxonomyCategories() {
 		return taxonomyCategories;
 	}
@@ -505,7 +540,7 @@ public class Document {
 	protected TaxonomyCategory[] taxonomyCategories;
 
 	@Schema(
-		description = "A write only field to add TaxonomyCategory to this resource."
+		description = "A write-only field that adds `TaxonomyCategory` instances to the document."
 	)
 	public Long[] getTaxonomyCategoryIds() {
 		return taxonomyCategoryIds;
@@ -534,7 +569,7 @@ public class Document {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long[] taxonomyCategoryIds;
 
-	@Schema(description = "The main title/name of the Document.")
+	@Schema(description = "The document's main title/name.")
 	public String getTitle() {
 		return title;
 	}
@@ -563,7 +598,7 @@ public class Document {
 	protected String title;
 
 	@Schema(
-		description = "Write only property to specify the default permissions."
+		description = "A write-only property that specifies the document's default permissions."
 	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
@@ -628,16 +663,20 @@ public class Document {
 
 		sb.append("{");
 
-		sb.append("\"adaptedImages\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (adaptedImages == null) {
-			sb.append("null");
-		}
-		else {
+		if (adaptedImages != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"adaptedImages\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < adaptedImages.length; i++) {
-				sb.append(adaptedImages[i]);
+				sb.append(String.valueOf(adaptedImages[i]));
 
 				if ((i + 1) < adaptedImages.length) {
 					sb.append(", ");
@@ -647,141 +686,144 @@ public class Document {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (aggregateRating != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"aggregateRating\": ");
+			sb.append("\"aggregateRating\": ");
 
-		if (aggregateRating == null) {
-			sb.append("null");
+			sb.append(String.valueOf(aggregateRating));
 		}
-		else {
-			sb.append(aggregateRating);
-		}
 
-		sb.append(", ");
+		if (contentUrl != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"contentUrl\": ");
+			sb.append("\"contentUrl\": ");
 
-		if (contentUrl == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(contentUrl);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(contentUrl));
 
-		sb.append("\"creator\": ");
-
-		if (creator == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(creator);
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dateCreated\": ");
-
-		if (dateCreated == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateCreated);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (creator != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"creator\": ");
 
-		if (dateModified == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(dateModified);
-			sb.append("\"");
+			sb.append(String.valueOf(creator));
 		}
 
-		sb.append(", ");
+		if (dateCreated != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"dateCreated\": ");
 
-		if (description == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(description);
+
+			sb.append(liferayToJSONDateFormat.format(dateCreated));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (dateModified != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"documentFolderId\": ");
+			sb.append("\"dateModified\": ");
 
-		if (documentFolderId == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(dateModified));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"description\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
+		}
+
+		if (documentFolderId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"documentFolderId\": ");
+
 			sb.append(documentFolderId);
 		}
 
-		sb.append(", ");
+		if (encodingFormat != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"encodingFormat\": ");
+			sb.append("\"encodingFormat\": ");
 
-		if (encodingFormat == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(encodingFormat);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(encodingFormat));
 
-		sb.append("\"fileExtension\": ");
-
-		if (fileExtension == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(fileExtension);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (fileExtension != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"fileExtension\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(fileExtension));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (keywords != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywords\": ");
+			sb.append("\"keywords\": ");
 
-		if (keywords == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < keywords.length; i++) {
 				sb.append("\"");
-				sb.append(keywords[i]);
+
+				sb.append(_escape(keywords[i]));
+
 				sb.append("\"");
 
 				if ((i + 1) < keywords.length) {
@@ -792,40 +834,57 @@ public class Document {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (numberOfComments != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfComments\": ");
+			sb.append("\"numberOfComments\": ");
 
-		if (numberOfComments == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(numberOfComments);
 		}
 
-		sb.append(", ");
+		if (relatedContents != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"sizeInBytes\": ");
+			sb.append("\"relatedContents\": ");
 
-		if (sizeInBytes == null) {
-			sb.append("null");
+			sb.append("[");
+
+			for (int i = 0; i < relatedContents.length; i++) {
+				sb.append(String.valueOf(relatedContents[i]));
+
+				if ((i + 1) < relatedContents.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
-		else {
+
+		if (sizeInBytes != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"sizeInBytes\": ");
+
 			sb.append(sizeInBytes);
 		}
 
-		sb.append(", ");
+		if (taxonomyCategories != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategories\": ");
+			sb.append("\"taxonomyCategories\": ");
 
-		if (taxonomyCategories == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < taxonomyCategories.length; i++) {
-				sb.append(taxonomyCategories[i]);
+				sb.append(String.valueOf(taxonomyCategories[i]));
 
 				if ((i + 1) < taxonomyCategories.length) {
 					sb.append(", ");
@@ -835,14 +894,13 @@ public class Document {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (taxonomyCategoryIds != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategoryIds\": ");
+			sb.append("\"taxonomyCategoryIds\": ");
 
-		if (taxonomyCategoryIds == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < taxonomyCategoryIds.length; i++) {
@@ -856,30 +914,67 @@ public class Document {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (title != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\": ");
 
-		if (title == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(title);
+
+			sb.append(_escape(title));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (viewableBy != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"viewableBy\": ");
+			sb.append("\"viewableBy\": ");
 
-		if (viewableBy == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
 			sb.append(viewableBy);
+
 			sb.append("\"");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

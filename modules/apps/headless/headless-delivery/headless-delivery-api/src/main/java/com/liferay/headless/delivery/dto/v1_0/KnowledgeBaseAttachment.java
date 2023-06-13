@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -42,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "KnowledgeBaseAttachment")
 public class KnowledgeBaseAttachment {
 
-	@Schema(description = "An absolute URL to the binary file.")
+	@Schema(description = "The file's relative URL.")
 	public String getContentUrl() {
 		return contentUrl;
 	}
@@ -71,7 +74,7 @@ public class KnowledgeBaseAttachment {
 	protected String contentUrl;
 
 	@Schema(
-		description = "The media type (application/pdf...) of the binary file."
+		description = "The file's media type (e.g., application/pdf, etc.)."
 	)
 	public String getEncodingFormat() {
 		return encodingFormat;
@@ -100,7 +103,7 @@ public class KnowledgeBaseAttachment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String encodingFormat;
 
-	@Schema(description = "The file extension.")
+	@Schema(description = "The file's extension.")
 	public String getFileExtension() {
 		return fileExtension;
 	}
@@ -128,7 +131,7 @@ public class KnowledgeBaseAttachment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String fileExtension;
 
-	@Schema(description = "The identifier of the resource.")
+	@Schema(description = "The file's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -154,7 +157,7 @@ public class KnowledgeBaseAttachment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(description = "The size in bytes of the binary file.")
+	@Schema(description = "The file's size in bytes.")
 	public Long getSizeInBytes() {
 		return sizeInBytes;
 	}
@@ -182,7 +185,7 @@ public class KnowledgeBaseAttachment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long sizeInBytes;
 
-	@Schema(description = "The main title of the binary file.")
+	@Schema(description = "The file's main title.")
 	public String getTitle() {
 		return title;
 	}
@@ -238,76 +241,115 @@ public class KnowledgeBaseAttachment {
 
 		sb.append("{");
 
-		sb.append("\"contentUrl\": ");
+		if (contentUrl != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (contentUrl == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"contentUrl\": ");
+
 			sb.append("\"");
-			sb.append(contentUrl);
-			sb.append("\"");
-		}
 
-		sb.append(", ");
+			sb.append(_escape(contentUrl));
 
-		sb.append("\"encodingFormat\": ");
-
-		if (encodingFormat == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append("\"");
-			sb.append(encodingFormat);
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (encodingFormat != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"fileExtension\": ");
+			sb.append("\"encodingFormat\": ");
 
-		if (fileExtension == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(fileExtension);
+
+			sb.append(_escape(encodingFormat));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (fileExtension != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"fileExtension\": ");
 
-		if (id == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(fileExtension));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\": ");
+
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (sizeInBytes != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"sizeInBytes\": ");
+			sb.append("\"sizeInBytes\": ");
 
-		if (sizeInBytes == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(sizeInBytes);
 		}
 
-		sb.append(", ");
+		if (title != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\": ");
 
-		if (title == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(_escape(title));
+
+			sb.append("\"");
 		}
-		else {
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
 			sb.append("\"");
-			sb.append(title);
+			sb.append(entry.getKey());
+			sb.append("\":");
 			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

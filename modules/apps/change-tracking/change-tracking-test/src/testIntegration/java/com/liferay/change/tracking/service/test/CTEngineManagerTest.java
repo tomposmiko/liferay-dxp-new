@@ -558,7 +558,6 @@ public class CTEngineManagerTest {
 		Assert.assertEquals(ctEntry, ctEntries.get(0));
 	}
 
-	@Ignore
 	@Test
 	public void testGetCTEntriesWithIndexing() throws Exception {
 		_ctEngineManager.enableChangeTracking(
@@ -770,7 +769,8 @@ public class CTEngineManagerTest {
 		int originalCTEntriesCount = productionCTEntries.size();
 
 		_ctEngineManager.publishCTCollection(
-			TestPropsValues.getUserId(), ctCollection.getCtCollectionId());
+			TestPropsValues.getUserId(), ctCollection.getCtCollectionId(),
+			true);
 
 		productionCTEntries = _ctEngineManager.getCTEntries(
 			productionCTCollection.getCtCollectionId());
@@ -795,7 +795,8 @@ public class CTEngineManagerTest {
 			RandomTestUtil.randomString(), new ServiceContext());
 
 		_ctEngineManager.publishCTCollection(
-			TestPropsValues.getUserId(), ctCollection.getCtCollectionId());
+			TestPropsValues.getUserId(), ctCollection.getCtCollectionId(),
+			true);
 
 		Optional<CTCollection> productionCTCollectionOptional =
 			_ctEngineManager.getProductionCTCollectionOptional(
@@ -848,7 +849,8 @@ public class CTEngineManagerTest {
 		Assert.assertFalse(ctEntryB.isCollision());
 
 		_ctEngineManager.publishCTCollection(
-			TestPropsValues.getUserId(), ctCollectionB.getCtCollectionId());
+			TestPropsValues.getUserId(), ctCollectionB.getCtCollectionId(),
+			true);
 
 		CTProcess ctProcess = _ctProcessLocalService.fetchLatestCTProcess(
 			TestPropsValues.getCompanyId());
@@ -904,7 +906,8 @@ public class CTEngineManagerTest {
 		ctEntry = _ctEntryLocalService.updateCTEntry(ctEntry);
 
 		_ctEngineManager.publishCTCollection(
-			TestPropsValues.getUserId(), ctCollection.getCtCollectionId());
+			TestPropsValues.getUserId(), ctCollection.getCtCollectionId(),
+			true);
 
 		Optional<CTCollection> productionCTCollectionOptional =
 			_ctEngineManager.getProductionCTCollectionOptional(

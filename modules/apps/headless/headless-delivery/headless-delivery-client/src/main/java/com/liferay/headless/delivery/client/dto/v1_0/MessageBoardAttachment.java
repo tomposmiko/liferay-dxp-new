@@ -15,6 +15,9 @@
 package com.liferay.headless.delivery.client.dto.v1_0;
 
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
+import com.liferay.headless.delivery.client.serdes.v1_0.MessageBoardAttachmentSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -148,5 +151,32 @@ public class MessageBoardAttachment {
 	}
 
 	protected String title;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof MessageBoardAttachment)) {
+			return false;
+		}
+
+		MessageBoardAttachment messageBoardAttachment =
+			(MessageBoardAttachment)object;
+
+		return Objects.equals(toString(), messageBoardAttachment.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return MessageBoardAttachmentSerDes.toJSON(this);
+	}
 
 }

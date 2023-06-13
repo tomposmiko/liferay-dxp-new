@@ -15,6 +15,9 @@
 package com.liferay.headless.form.client.dto.v1_0;
 
 import com.liferay.headless.form.client.function.UnsafeSupplier;
+import com.liferay.headless.form.client.serdes.v1_0.ColumnSerDes;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
 
@@ -85,5 +88,31 @@ public class Column {
 	}
 
 	protected String value;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Column)) {
+			return false;
+		}
+
+		Column column = (Column)object;
+
+		return Objects.equals(toString(), column.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		return ColumnSerDes.toJSON(this);
+	}
 
 }

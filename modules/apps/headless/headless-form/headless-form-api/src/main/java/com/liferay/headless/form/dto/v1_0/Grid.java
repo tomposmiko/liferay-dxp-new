@@ -26,7 +26,10 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -70,6 +73,7 @@ public class Grid {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Column[] columns;
 
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -148,16 +152,17 @@ public class Grid {
 
 		sb.append("{");
 
-		sb.append("\"columns\": ");
+		if (columns != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (columns == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"columns\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < columns.length; i++) {
-				sb.append(columns[i]);
+				sb.append(String.valueOf(columns[i]));
 
 				if ((i + 1) < columns.length) {
 					sb.append(", ");
@@ -167,29 +172,27 @@ public class Grid {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (rows != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"rows\": ");
+			sb.append("\"rows\": ");
 
-		if (rows == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < rows.length; i++) {
-				sb.append(rows[i]);
+				sb.append(String.valueOf(rows[i]));
 
 				if ((i + 1) < rows.length) {
 					sb.append(", ");
@@ -197,6 +200,41 @@ public class Grid {
 			}
 
 			sb.append("]");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

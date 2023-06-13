@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutPrototype;
+import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutPrototypeLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -253,6 +255,18 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			LayoutPageTemplateEntry.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
+
+		// Layout
+
+		Layout layout = layoutLocalService.fetchLayout(
+			layoutPageTemplateEntry.getPlid());
+
+		LayoutSet layoutSet = layoutSetLocalService.fetchLayoutSet(
+			layoutPageTemplateEntry.getGroupId(), false);
+
+		if ((layout != null) && (layoutSet != null)) {
+			layoutLocalService.deleteLayout(layout);
+		}
 
 		// Layout prototype
 
@@ -516,6 +530,19 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 	public LayoutPageTemplateEntry updateLayoutPageTemplateEntry(
 			long layoutPageTemplateEntryId, long classNameId, long classTypeId)
 		throws PortalException {
+
+		List<DDMStructureLink> ddmStructureLinks =
+			_ddmStructureLinkLocalService.getStructureLinks(
+				classNameLocalService.getClassNameId(
+					LayoutPageTemplateEntry.class),
+				layoutPageTemplateEntryId);
+
+		if (ListUtil.isNotEmpty(ddmStructureLinks)) {
+			DDMStructureLink ddmStructureLink = ddmStructureLinks.get(0);
+
+			_ddmStructureLinkLocalService.deleteDDMStructureLink(
+				ddmStructureLink);
+		}
 
 		// Layout page template entry
 

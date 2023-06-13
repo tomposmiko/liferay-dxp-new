@@ -24,7 +24,12 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -40,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "DataDefinitionField")
 public class DataDefinitionField {
 
+	@Schema
 	public CustomProperty[] getCustomProperties() {
 		return customProperties;
 	}
@@ -68,6 +74,7 @@ public class DataDefinitionField {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected CustomProperty[] customProperties;
 
+	@Schema
 	public LocalizedValue[] getDefaultValue() {
 		return defaultValue;
 	}
@@ -96,6 +103,7 @@ public class DataDefinitionField {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected LocalizedValue[] defaultValue;
 
+	@Schema
 	public String getFieldType() {
 		return fieldType;
 	}
@@ -123,6 +131,7 @@ public class DataDefinitionField {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String fieldType;
 
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -148,6 +157,7 @@ public class DataDefinitionField {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
+	@Schema
 	public Boolean getIndexable() {
 		return indexable;
 	}
@@ -175,6 +185,7 @@ public class DataDefinitionField {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean indexable;
 
+	@Schema
 	public LocalizedValue[] getLabel() {
 		return label;
 	}
@@ -202,6 +213,7 @@ public class DataDefinitionField {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected LocalizedValue[] label;
 
+	@Schema
 	public Boolean getLocalizable() {
 		return localizable;
 	}
@@ -229,6 +241,7 @@ public class DataDefinitionField {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean localizable;
 
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -254,6 +267,7 @@ public class DataDefinitionField {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
+	@Schema
 	public Boolean getRepeatable() {
 		return repeatable;
 	}
@@ -281,6 +295,7 @@ public class DataDefinitionField {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean repeatable;
 
+	@Schema
 	public LocalizedValue[] getTip() {
 		return tip;
 	}
@@ -335,16 +350,17 @@ public class DataDefinitionField {
 
 		sb.append("{");
 
-		sb.append("\"customProperties\": ");
+		if (customProperties != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (customProperties == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"customProperties\": ");
+
 			sb.append("[");
 
 			for (int i = 0; i < customProperties.length; i++) {
-				sb.append(customProperties[i]);
+				sb.append(String.valueOf(customProperties[i]));
 
 				if ((i + 1) < customProperties.length) {
 					sb.append(", ");
@@ -354,18 +370,17 @@ public class DataDefinitionField {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (defaultValue != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"defaultValue\": ");
+			sb.append("\"defaultValue\": ");
 
-		if (defaultValue == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < defaultValue.length; i++) {
-				sb.append(defaultValue[i]);
+				sb.append(String.valueOf(defaultValue[i]));
 
 				if ((i + 1) < defaultValue.length) {
 					sb.append(", ");
@@ -375,53 +390,51 @@ public class DataDefinitionField {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (fieldType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"fieldType\": ");
+			sb.append("\"fieldType\": ");
 
-		if (fieldType == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(fieldType);
+
+			sb.append(_escape(fieldType));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (id != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\": ");
 
-		if (id == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(id);
 		}
 
-		sb.append(", ");
+		if (indexable != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"indexable\": ");
+			sb.append("\"indexable\": ");
 
-		if (indexable == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(indexable);
 		}
 
-		sb.append(", ");
+		if (label != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"label\": ");
+			sb.append("\"label\": ");
 
-		if (label == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < label.length; i++) {
-				sb.append(label[i]);
+				sb.append(String.valueOf(label[i]));
 
 				if ((i + 1) < label.length) {
 					sb.append(", ");
@@ -431,53 +444,51 @@ public class DataDefinitionField {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (localizable != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"localizable\": ");
+			sb.append("\"localizable\": ");
 
-		if (localizable == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(localizable);
 		}
 
-		sb.append(", ");
+		if (name != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\": ");
 
-		if (name == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
-			sb.append(name);
+
+			sb.append(_escape(name));
+
 			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (repeatable != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"repeatable\": ");
+			sb.append("\"repeatable\": ");
 
-		if (repeatable == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(repeatable);
 		}
 
-		sb.append(", ");
+		if (tip != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"tip\": ");
+			sb.append("\"tip\": ");
 
-		if (tip == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < tip.length; i++) {
-				sb.append(tip[i]);
+				sb.append(String.valueOf(tip[i]));
 
 				if ((i + 1) < tip.length) {
 					sb.append(", ");
@@ -485,6 +496,41 @@ public class DataDefinitionField {
 			}
 
 			sb.append("]");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
 		}
 
 		sb.append("}");

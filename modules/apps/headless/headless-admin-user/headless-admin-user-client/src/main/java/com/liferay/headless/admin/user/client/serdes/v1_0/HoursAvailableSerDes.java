@@ -18,8 +18,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.HoursAvailable;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,11 +60,11 @@ public class HoursAvailableSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"closes\":");
+			sb.append("\"closes\": ");
 
 			sb.append("\"");
 
-			sb.append(hoursAvailable.getCloses());
+			sb.append(_escape(hoursAvailable.getCloses()));
 
 			sb.append("\"");
 		}
@@ -72,23 +74,13 @@ public class HoursAvailableSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dayOfWeek\":");
+			sb.append("\"dayOfWeek\": ");
 
 			sb.append("\"");
 
-			sb.append(hoursAvailable.getDayOfWeek());
+			sb.append(_escape(hoursAvailable.getDayOfWeek()));
 
 			sb.append("\"");
-		}
-
-		if (hoursAvailable.getId() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"id\":");
-
-			sb.append(hoursAvailable.getId());
 		}
 
 		if (hoursAvailable.getOpens() != null) {
@@ -96,11 +88,11 @@ public class HoursAvailableSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"opens\":");
+			sb.append("\"opens\": ");
 
 			sb.append("\"");
 
-			sb.append(hoursAvailable.getOpens());
+			sb.append(_escape(hoursAvailable.getOpens()));
 
 			sb.append("\"");
 		}
@@ -108,6 +100,13 @@ public class HoursAvailableSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		HoursAvailableJSONParser hoursAvailableJSONParser =
+			new HoursAvailableJSONParser();
+
+		return hoursAvailableJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(HoursAvailable hoursAvailable) {
@@ -131,13 +130,6 @@ public class HoursAvailableSerDes {
 			map.put("dayOfWeek", String.valueOf(hoursAvailable.getDayOfWeek()));
 		}
 
-		if (hoursAvailable.getId() == null) {
-			map.put("id", null);
-		}
-		else {
-			map.put("id", String.valueOf(hoursAvailable.getId()));
-		}
-
 		if (hoursAvailable.getOpens() == null) {
 			map.put("opens", null);
 		}
@@ -146,6 +138,41 @@ public class HoursAvailableSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class HoursAvailableJSONParser
@@ -174,12 +201,6 @@ public class HoursAvailableSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dayOfWeek")) {
 				if (jsonParserFieldValue != null) {
 					hoursAvailable.setDayOfWeek((String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "id")) {
-				if (jsonParserFieldValue != null) {
-					hoursAvailable.setId(
-						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "opens")) {

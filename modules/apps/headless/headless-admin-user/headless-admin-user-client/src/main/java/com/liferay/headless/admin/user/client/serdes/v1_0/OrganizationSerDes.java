@@ -22,8 +22,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -66,11 +68,11 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"comment\":");
+			sb.append("\"comment\": ");
 
 			sb.append("\"");
 
-			sb.append(organization.getComment());
+			sb.append(_escape(organization.getComment()));
 
 			sb.append("\"");
 		}
@@ -80,11 +82,9 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"contactInformation\":");
+			sb.append("\"contactInformation\": ");
 
-			sb.append(
-				ContactInformationSerDes.toJSON(
-					organization.getContactInformation()));
+			sb.append(String.valueOf(organization.getContactInformation()));
 		}
 
 		if (organization.getDateCreated() != null) {
@@ -92,7 +92,7 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -107,7 +107,7 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -122,7 +122,7 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(organization.getId());
 		}
@@ -132,11 +132,11 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"image\":");
+			sb.append("\"image\": ");
 
 			sb.append("\"");
 
-			sb.append(organization.getImage());
+			sb.append(_escape(organization.getImage()));
 
 			sb.append("\"");
 		}
@@ -146,14 +146,14 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"keywords\":");
+			sb.append("\"keywords\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < organization.getKeywords().length; i++) {
 				sb.append("\"");
 
-				sb.append(organization.getKeywords()[i]);
+				sb.append(_escape(organization.getKeywords()[i]));
 
 				sb.append("\"");
 
@@ -170,9 +170,9 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"location\":");
+			sb.append("\"location\": ");
 
-			sb.append(LocationSerDes.toJSON(organization.getLocation()));
+			sb.append(String.valueOf(organization.getLocation()));
 		}
 
 		if (organization.getName() != null) {
@@ -180,11 +180,11 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(organization.getName());
+			sb.append(_escape(organization.getName()));
 
 			sb.append("\"");
 		}
@@ -194,7 +194,7 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"numberOfOrganizations\":");
+			sb.append("\"numberOfOrganizations\": ");
 
 			sb.append(organization.getNumberOfOrganizations());
 		}
@@ -204,11 +204,9 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"parentOrganization\":");
+			sb.append("\"parentOrganization\": ");
 
-			sb.append(
-				OrganizationSerDes.toJSON(
-					organization.getParentOrganization()));
+			sb.append(String.valueOf(organization.getParentOrganization()));
 		}
 
 		if (organization.getServices() != null) {
@@ -216,12 +214,12 @@ public class OrganizationSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"services\":");
+			sb.append("\"services\": ");
 
 			sb.append("[");
 
 			for (int i = 0; i < organization.getServices().length; i++) {
-				sb.append(ServiceSerDes.toJSON(organization.getServices()[i]));
+				sb.append(String.valueOf(organization.getServices()[i]));
 
 				if ((i + 1) < organization.getServices().length) {
 					sb.append(", ");
@@ -234,6 +232,13 @@ public class OrganizationSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		OrganizationJSONParser organizationJSONParser =
+			new OrganizationJSONParser();
+
+		return organizationJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Organization organization) {
@@ -259,8 +264,7 @@ public class OrganizationSerDes {
 		else {
 			map.put(
 				"contactInformation",
-				ContactInformationSerDes.toJSON(
-					organization.getContactInformation()));
+				String.valueOf(organization.getContactInformation()));
 		}
 
 		map.put(
@@ -296,8 +300,7 @@ public class OrganizationSerDes {
 			map.put("location", null);
 		}
 		else {
-			map.put(
-				"location", LocationSerDes.toJSON(organization.getLocation()));
+			map.put("location", String.valueOf(organization.getLocation()));
 		}
 
 		if (organization.getName() == null) {
@@ -322,8 +325,7 @@ public class OrganizationSerDes {
 		else {
 			map.put(
 				"parentOrganization",
-				OrganizationSerDes.toJSON(
-					organization.getParentOrganization()));
+				String.valueOf(organization.getParentOrganization()));
 		}
 
 		if (organization.getServices() == null) {
@@ -334,6 +336,41 @@ public class OrganizationSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class OrganizationJSONParser

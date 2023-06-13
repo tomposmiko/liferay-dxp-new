@@ -232,8 +232,10 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		Layout draftLayout = create();
 
-		if (Validator.isNotNull(serviceContext.getUuid())) {
-			draftLayout.setUuid(serviceContext.getUuid());
+		String uuid = serviceContext.getUuid();
+
+		if (Validator.isNotNull(uuid)) {
+			draftLayout.setUuid(uuid);
 		}
 
 		draftLayout.setGroupId(groupId);
@@ -302,7 +304,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			}
 		}
 
-		Layout layout = publishDraft(draftLayout);
+		Layout layout = updateDraft(draftLayout);
 
 		// Layout friendly URLs
 
@@ -900,7 +902,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException {
 
 		Layout layout = layoutPersistence.findByG_P_L_Head(
-			groupId, privateLayout, layoutId, true);
+			groupId, privateLayout, layoutId, false);
 
 		layoutLocalService.deleteLayout(layout, true, serviceContext);
 	}
@@ -943,7 +945,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		List<Layout> layouts = layoutPersistence.findByG_P_P_Head(
 			groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
-			true, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			false, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 			new LayoutPriorityComparator(false));
 
 		for (Layout layout : layouts) {
@@ -977,7 +979,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	public Layout fetchDefaultLayout(long groupId, boolean privateLayout) {
 		if (groupId > 0) {
 			List<Layout> layouts = layoutPersistence.findByG_P_Head(
-				groupId, privateLayout, true, 0, 1);
+				groupId, privateLayout, false, 0, 1);
 
 			if (!layouts.isEmpty()) {
 				return layouts.get(0);
@@ -1002,7 +1004,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		long groupId, boolean privateLayout, long parentLayoutId) {
 
 		return layoutPersistence.fetchByG_P_P_Head_First(
-			groupId, privateLayout, parentLayoutId, true,
+			groupId, privateLayout, parentLayoutId, false,
 			new LayoutPriorityComparator());
 	}
 
@@ -1012,7 +1014,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		boolean hidden) {
 
 		return layoutPersistence.fetchByG_P_P_H_Head_First(
-			groupId, privateLayout, parentLayoutId, hidden, true,
+			groupId, privateLayout, parentLayoutId, hidden, false,
 			new LayoutPriorityComparator());
 	}
 
@@ -1026,12 +1028,12 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		long groupId, boolean privateLayout, long layoutId) {
 
 		return layoutPersistence.fetchByG_P_L_Head(
-			groupId, privateLayout, layoutId, true);
+			groupId, privateLayout, layoutId, false);
 	}
 
 	@Override
 	public Layout fetchLayout(long classNameId, long classPK) {
-		return layoutPersistence.fetchByC_C_Head(classNameId, classPK, true);
+		return layoutPersistence.fetchByC_C_Head(classNameId, classPK, false);
 	}
 
 	@Override
@@ -1039,7 +1041,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		String uuid, long groupId, boolean privateLayout) {
 
 		return layoutPersistence.fetchByUUID_G_P_Head(
-			uuid, groupId, privateLayout, true);
+			uuid, groupId, privateLayout, false);
 	}
 
 	@Override
@@ -1047,7 +1049,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		long groupId, boolean privateLayout, String friendlyURL) {
 
 		return layoutPersistence.fetchByG_P_F_Head(
-			groupId, privateLayout, friendlyURL, true);
+			groupId, privateLayout, friendlyURL, false);
 	}
 
 	@Override
@@ -1056,7 +1058,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException {
 
 		return layoutPersistence.fetchByP_I_Head(
-			privateLayout, iconImageId, true);
+			privateLayout, iconImageId, false);
 	}
 
 	/**
@@ -1072,7 +1074,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		String uuid, long groupId, boolean privateLayout) {
 
 		return layoutPersistence.fetchByUUID_G_P_Head(
-			uuid, groupId, privateLayout, true);
+			uuid, groupId, privateLayout, false);
 	}
 
 	@Override
@@ -1101,7 +1103,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	public long getDefaultPlid(long groupId) {
 		if (groupId > 0) {
 			List<Layout> layouts = layoutPersistence.findByGroupId_Head(
-				groupId, true, 0, 1);
+				groupId, false, 0, 1);
 
 			if (!layouts.isEmpty()) {
 				Layout layout = layouts.get(0);
@@ -1149,7 +1151,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		if (groupId > 0) {
 			List<Layout> layouts = layoutPersistence.findByG_P_Head(
-				groupId, privateLayout, true);
+				groupId, privateLayout, false);
 
 			for (Layout layout : layouts) {
 				if (layout.isTypePortlet()) {
@@ -1225,7 +1227,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			long layoutId = GetterUtil.getLong(friendlyURL.substring(1));
 
 			layout = layoutPersistence.fetchByG_P_L_Head(
-				groupId, privateLayout, layoutId, true);
+				groupId, privateLayout, layoutId, false);
 		}
 
 		if (layout == null) {
@@ -1271,11 +1273,11 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException {
 
 		Layout layout = layoutPersistence.findByG_P_L_Head(
-			groupId, privateLayout, layoutId, true);
+			groupId, privateLayout, layoutId, false);
 
 		if (_mergeLayout(layout, groupId, privateLayout, layoutId)) {
 			return layoutPersistence.findByG_P_L_Head(
-				groupId, privateLayout, layoutId, true);
+				groupId, privateLayout, layoutId, false);
 		}
 
 		return layout;
@@ -1293,7 +1295,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	public Layout getLayoutByIconImageId(long iconImageId)
 		throws PortalException {
 
-		return layoutPersistence.findByIconImageId_Head(iconImageId, true);
+		return layoutPersistence.findByIconImageId_Head(iconImageId, false);
 	}
 
 	/**
@@ -1311,7 +1313,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException {
 
 		return layoutPersistence.findByUUID_G_P_Head(
-			uuid, groupId, privateLayout, true);
+			uuid, groupId, privateLayout, false);
 	}
 
 	/**
@@ -1383,7 +1385,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 	@Override
 	public List<Layout> getLayouts(long companyId) {
-		return layoutPersistence.findByCompanyId_Head(companyId, true);
+		return layoutPersistence.findByCompanyId_Head(companyId, false);
 	}
 
 	/**
@@ -1396,7 +1398,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 */
 	@Override
 	public List<Layout> getLayouts(long groupId, boolean privateLayout) {
-		return layoutPersistence.findByG_P_Head(groupId, privateLayout, true);
+		return layoutPersistence.findByG_P_Head(groupId, privateLayout, false);
 	}
 
 	/**
@@ -1416,7 +1418,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		OrderByComparator<Layout> obc) {
 
 		return layoutPersistence.findByG_P_Head(
-			groupId, privateLayout, true, start, end, obc);
+			groupId, privateLayout, false, start, end, obc);
 	}
 
 	/**
@@ -1499,7 +1501,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		if (MergeLayoutPrototypesThreadLocal.isInProgress()) {
 			return layoutPersistence.findByG_P_P_Head(
-				groupId, privateLayout, parentLayoutId, true, start, end, obc);
+				groupId, privateLayout, parentLayoutId, false, start, end, obc);
 		}
 
 		try {
@@ -1514,12 +1516,12 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 					start, end, obc)) {
 
 				return layoutPersistence.findByG_P_P_Head(
-					groupId, privateLayout, parentLayoutId, true, start, end,
+					groupId, privateLayout, parentLayoutId, false, start, end,
 					obc);
 			}
 
 			List<Layout> layouts = layoutPersistence.findByG_P_P_Head(
-				groupId, privateLayout, parentLayoutId, true, start, end, obc);
+				groupId, privateLayout, parentLayoutId, false, start, end, obc);
 
 			return _injectVirtualLayouts(
 				group, layoutSet, layouts, parentLayoutId);
@@ -1573,7 +1575,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Group group = groupPersistence.findByPrimaryKey(groupId);
 
 		List<Layout> layouts = layoutPersistence.findByG_P_T_Head(
-			groupId, privateLayout, type, true);
+			groupId, privateLayout, type, false);
 
 		if (!group.isUser()) {
 			return layouts;
@@ -1588,7 +1590,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		checkParentLayoutIds.add(LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
 		LayoutSet layoutSet = layoutSetPersistence.findByG_P_Head(
-			groupId, privateLayout, true);
+			groupId, privateLayout, false);
 
 		while (!checkParentLayoutIds.isEmpty()) {
 			long parentLayoutId = checkParentLayoutIds.poll();
@@ -1668,7 +1670,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		long groupId, int start, int end, OrderByComparator<Layout> obc) {
 
 		return layoutPersistence.findByGroupId_Head(
-			groupId, true, start, end, obc);
+			groupId, false, start, end, obc);
 	}
 
 	/**
@@ -1740,7 +1742,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		String layoutPrototypeUuid) {
 
 		return layoutPersistence.findByLayoutPrototypeUuid_Head(
-			layoutPrototypeUuid, true);
+			layoutPrototypeUuid, false);
 	}
 
 	@Override
@@ -1748,7 +1750,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		String layoutPrototypeUuid) {
 
 		return layoutPersistence.countByLayoutPrototypeUuid_Head(
-			layoutPrototypeUuid, true);
+			layoutPrototypeUuid, false);
 	}
 
 	/**
@@ -1762,7 +1764,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	public List<Layout> getLayoutsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return layoutPersistence.findByUuid_C_Head(uuid, companyId, true);
+		return layoutPersistence.findByUuid_C_Head(uuid, companyId, false);
 	}
 
 	/**
@@ -1781,7 +1783,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		OrderByComparator<Layout> orderByComparator) {
 
 		return layoutPersistence.findByUuid_C_Head(
-			uuid, companyId, true, start, end, orderByComparator);
+			uuid, companyId, false, start, end, orderByComparator);
 	}
 
 	@Override
@@ -1797,7 +1799,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException {
 
 		int count = layoutPersistence.countByG_P_Head(
-			group.getGroupId(), privateLayout, true);
+			group.getGroupId(), privateLayout, false);
 
 		if (!group.isUser() || !includeUserGroups) {
 			return count;
@@ -1815,7 +1817,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 					group.getCompanyId(), userGroupClassNameId, userGroupId);
 
 				count += layoutPersistence.countByG_P_Head(
-					userGroupGroup.getGroupId(), privateLayout, true);
+					userGroupGroup.getGroupId(), privateLayout, false);
 			}
 		}
 
@@ -1827,7 +1829,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Group group, boolean privateLayout, long parentLayoutId) {
 
 		return layoutPersistence.countByG_P_P_Head(
-			group.getGroupId(), privateLayout, parentLayoutId, true);
+			group.getGroupId(), privateLayout, parentLayoutId, false);
 	}
 
 	@Override
@@ -1878,7 +1880,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 	@Override
 	public int getLayoutsCount(long groupId) {
-		return layoutPersistence.countByGroupId_Head(groupId, true);
+		return layoutPersistence.countByGroupId_Head(groupId, false);
 	}
 
 	@Override
@@ -1934,7 +1936,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		if (nextLayoutId == 1) {
 			List<Layout> layouts = layoutPersistence.findByG_P_Head(
-				groupId, privateLayout, true, 0, 1, new LayoutComparator());
+				groupId, privateLayout, false, 0, 1, new LayoutComparator());
 
 			if (!layouts.isEmpty()) {
 				Layout layout = layouts.get(0);
@@ -2124,7 +2126,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	@Override
 	public boolean hasLayouts(Group group) throws PortalException {
 		List<LayoutSet> groupLayoutSets =
-			layoutSetPersistence.findByGroupId_Head(group.getGroupId(), true);
+			layoutSetPersistence.findByGroupId_Head(group.getGroupId(), false);
 
 		for (LayoutSet layoutSet : groupLayoutSets) {
 			if (layoutSet.getPageCount() > 0) {
@@ -2149,7 +2151,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 				List<LayoutSet> userGroupGroupLayoutSets =
 					layoutSetPersistence.findByGroupId_Head(
-						userGroupGroup.getGroupId(), true);
+						userGroupGroup.getGroupId(), false);
 
 				for (LayoutSet layoutSet : userGroupGroupLayoutSets) {
 					if (layoutSet.getPageCount() > 0) {
@@ -2175,7 +2177,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException {
 
 		LayoutSet layoutSet = layoutSetPersistence.findByG_P_Head(
-			group.getGroupId(), privateLayout, true);
+			group.getGroupId(), privateLayout, false);
 
 		if (layoutSet.getPageCount() > 0) {
 			return true;
@@ -2197,7 +2199,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 					group.getCompanyId(), userGroupClassNameId, userGroupId);
 
 				layoutSet = layoutSetPersistence.findByG_P_Head(
-					userGroupGroup.getGroupId(), privateLayout, true);
+					userGroupGroup.getGroupId(), privateLayout, false);
 
 				if (layoutSet.getPageCount() > 0) {
 					return true;
@@ -2223,7 +2225,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		long groupId, boolean privateLayout, long parentLayoutId) {
 
 		if (layoutPersistence.countByG_P_P_Head(
-				groupId, privateLayout, parentLayoutId, true) > 0) {
+				groupId, privateLayout, parentLayoutId, false) > 0) {
 
 			return true;
 		}
@@ -2280,8 +2282,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 	@Override
 	public Layout publishDraft(Layout layout) throws PortalException {
-		layout.setHeadId(-layout.getPrimaryKey());
-
 		return layoutPersistence.update(layout);
 	}
 
@@ -2320,7 +2320,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			}
 
 			Layout layout = layoutPersistence.findByG_P_L_Head(
-				groupId, privateLayout, layoutIds[0], true);
+				groupId, privateLayout, layoutIds[0], false);
 
 			LayoutType layoutType = layout.getLayoutType();
 
@@ -2339,7 +2339,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Set<Long> newLayoutIdsSet = new HashSet<>();
 
 		List<Layout> layouts = layoutPersistence.findByG_P_P_Head(
-			groupId, privateLayout, parentLayoutId, true);
+			groupId, privateLayout, parentLayoutId, false);
 
 		for (Layout layout : layouts) {
 			if (!layoutIdsSet.contains(layout.getLayoutId())) {
@@ -2354,7 +2354,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		for (long layoutId : layoutIdsSet) {
 			Layout layout = layoutPersistence.findByG_P_L_Head(
-				groupId, privateLayout, layoutId, true);
+				groupId, privateLayout, layoutId, false);
 
 			layout.setPriority(priority++);
 
@@ -2450,12 +2450,12 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		PortalUtil.updateImageId(
 			draftLayout, true, bytes, "iconImageId", 0, 0, 0);
 
-		return publishDraft(draftLayout);
+		return updateDraft(draftLayout);
 	}
 
 	@Override
 	public Layout updateLayout(Layout layout) throws PortalException {
-		return publishDraft(getDraft(layout));
+		return updateDraft(getDraft(layout));
 	}
 
 	/**
@@ -2475,13 +2475,13 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException {
 
 		Layout layout = layoutPersistence.findByG_P_L_Head(
-			groupId, privateLayout, layoutId, true);
+			groupId, privateLayout, layoutId, false);
 
 		Layout draftLayout = getDraft(layout);
 
 		draftLayout.setPublishDate(publishDate);
 
-		return publishDraft(draftLayout);
+		return updateDraft(draftLayout);
 	}
 
 	/**
@@ -2502,14 +2502,14 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException {
 
 		Layout layout = layoutPersistence.findByG_P_L_Head(
-			groupId, privateLayout, layoutId, true);
+			groupId, privateLayout, layoutId, false);
 
 		Layout draftLayout = getDraft(layout);
 
 		draftLayout.setClassNameId(classNameId);
 		draftLayout.setClassPK(classPK);
 
-		return publishDraft(draftLayout);
+		return updateDraft(draftLayout);
 	}
 
 	/**
@@ -2582,7 +2582,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Date now = new Date();
 
 		Layout layout = layoutPersistence.findByG_P_L_Head(
-			groupId, privateLayout, layoutId, true);
+			groupId, privateLayout, layoutId, false);
 
 		Layout draftLayout = getDraft(layout);
 
@@ -2697,7 +2697,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		typeSettingsProperties.fastLoad(typeSettings);
 
 		Layout layout = layoutPersistence.findByG_P_L_Head(
-			groupId, privateLayout, layoutId, true);
+			groupId, privateLayout, layoutId, false);
 
 		Layout draftLayout = getDraft(layout);
 
@@ -2710,7 +2710,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			draftLayout.setPublishDate(now);
 		}
 
-		return publishDraft(draftLayout);
+		return updateDraft(draftLayout);
 	}
 
 	/**
@@ -2734,7 +2734,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Date now = new Date();
 
 		Layout layout = layoutPersistence.findByG_P_L_Head(
-			groupId, privateLayout, layoutId, true);
+			groupId, privateLayout, layoutId, false);
 
 		Layout draftLayout = getDraft(layout);
 
@@ -2744,7 +2744,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		draftLayout.setColorSchemeId(colorSchemeId);
 		draftLayout.setCss(css);
 
-		return publishDraft(draftLayout);
+		return updateDraft(draftLayout);
 	}
 
 	/**
@@ -2770,7 +2770,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		draftLayout.setModifiedDate(now);
 		draftLayout.setName(name, LocaleUtil.fromLanguageId(languageId));
 
-		layout = publishDraft(draftLayout);
+		layout = updateDraft(draftLayout);
 
 		Group group = layout.getGroup();
 
@@ -2809,7 +2809,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException {
 
 		Layout layout = layoutPersistence.findByG_P_L_Head(
-			groupId, privateLayout, layoutId, true);
+			groupId, privateLayout, layoutId, false);
 
 		return updateName(layout, name, languageId);
 	}
@@ -2860,7 +2860,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Date now = new Date();
 
 		Layout layout = layoutPersistence.findByG_P_L_Head(
-			groupId, privateLayout, layoutId, true);
+			groupId, privateLayout, layoutId, false);
 
 		Layout draftLayout = getDraft(layout);
 
@@ -2971,7 +2971,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException {
 
 		List<Layout> layouts = layoutPersistence.findByG_P_Head(
-			groupId, privateLayout, true);
+			groupId, privateLayout, false);
 
 		for (Layout layout : layouts) {
 			int nextPriority = layoutLocalServiceHelper.getNextPriority(
@@ -2983,7 +2983,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 			draftLayout.setPriority(nextPriority);
 
-			publishDraft(draftLayout);
+			updateDraft(draftLayout);
 		}
 	}
 
@@ -3019,11 +3019,11 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		draftLayout.setModifiedDate(new Date());
 		draftLayout.setPriority(nextPriority);
 
-		layout = publishDraft(draftLayout);
+		layout = updateDraft(draftLayout);
 
 		List<Layout> layouts = layoutPersistence.findByG_P_P_Head(
 			layout.getGroupId(), layout.isPrivateLayout(),
-			layout.getParentLayoutId(), true);
+			layout.getParentLayoutId(), false);
 
 		boolean lessThan = false;
 
@@ -3059,7 +3059,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			curDraftLayout.setModifiedDate(layout.getModifiedDate());
 			curDraftLayout.setPriority(curNextPriority);
 
-			curLayout = publishDraft(curDraftLayout);
+			curLayout = updateDraft(curDraftLayout);
 
 			if (curLayout.equals(layout)) {
 				layout = curLayout;
@@ -3086,7 +3086,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException {
 
 		Layout layout = layoutPersistence.findByG_P_L_Head(
-			groupId, privateLayout, layoutId, true);
+			groupId, privateLayout, layoutId, false);
 
 		return updatePriority(layout, priority);
 	}
@@ -3361,7 +3361,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		if (MergeLayoutPrototypesThreadLocal.isInProgress()) {
 			return layoutPersistence.findByG_P_P_Head(
 				layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
-				parentLayoutIds, true);
+				parentLayoutIds, false);
 		}
 
 		try {
@@ -3375,12 +3375,12 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 				return layoutPersistence.findByG_P_P_Head(
 					layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
-					parentLayoutIds, true);
+					parentLayoutIds, false);
 			}
 
 			List<Layout> layouts = layoutPersistence.findByG_P_P_Head(
 				layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
-				parentLayoutIds, true);
+				parentLayoutIds, false);
 
 			return _injectVirtualLayouts(
 				group, layoutSet, layouts, parentLayoutIds);
@@ -3398,7 +3398,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		}
 
 		Layout parentLayout = layoutPersistence.fetchByG_P_L_Head(
-			groupId, privateLayout, parentLayoutId, true);
+			groupId, privateLayout, parentLayoutId, false);
 
 		if (parentLayout == null) {
 			return 0;

@@ -18,8 +18,10 @@ import com.liferay.headless.admin.workflow.client.dto.v1_0.ObjectReviewed;
 import com.liferay.headless.admin.workflow.client.json.BaseJSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -58,7 +60,7 @@ public class ObjectReviewedSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(objectReviewed.getId());
 		}
@@ -68,11 +70,11 @@ public class ObjectReviewedSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"resourceType\":");
+			sb.append("\"resourceType\": ");
 
 			sb.append("\"");
 
-			sb.append(objectReviewed.getResourceType());
+			sb.append(_escape(objectReviewed.getResourceType()));
 
 			sb.append("\"");
 		}
@@ -80,6 +82,13 @@ public class ObjectReviewedSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		ObjectReviewedJSONParser objectReviewedJSONParser =
+			new ObjectReviewedJSONParser();
+
+		return objectReviewedJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(ObjectReviewed objectReviewed) {
@@ -106,6 +115,41 @@ public class ObjectReviewedSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class ObjectReviewedJSONParser

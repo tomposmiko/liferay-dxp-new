@@ -21,8 +21,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -62,7 +64,7 @@ public class SegmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"active\":");
+			sb.append("\"active\": ");
 
 			sb.append(segment.getActive());
 		}
@@ -72,11 +74,11 @@ public class SegmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"criteria\":");
+			sb.append("\"criteria\": ");
 
 			sb.append("\"");
 
-			sb.append(segment.getCriteria());
+			sb.append(_escape(segment.getCriteria()));
 
 			sb.append("\"");
 		}
@@ -86,7 +88,7 @@ public class SegmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateCreated\":");
+			sb.append("\"dateCreated\": ");
 
 			sb.append("\"");
 
@@ -100,7 +102,7 @@ public class SegmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateModified\":");
+			sb.append("\"dateModified\": ");
 
 			sb.append("\"");
 
@@ -115,7 +117,7 @@ public class SegmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"id\":");
+			sb.append("\"id\": ");
 
 			sb.append(segment.getId());
 		}
@@ -125,11 +127,11 @@ public class SegmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"name\":");
+			sb.append("\"name\": ");
 
 			sb.append("\"");
 
-			sb.append(segment.getName());
+			sb.append(_escape(segment.getName()));
 
 			sb.append("\"");
 		}
@@ -139,7 +141,7 @@ public class SegmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"siteId\":");
+			sb.append("\"siteId\": ");
 
 			sb.append(segment.getSiteId());
 		}
@@ -149,11 +151,11 @@ public class SegmentSerDes {
 				sb.append(", ");
 			}
 
-			sb.append("\"source\":");
+			sb.append("\"source\": ");
 
 			sb.append("\"");
 
-			sb.append(segment.getSource());
+			sb.append(_escape(segment.getSource()));
 
 			sb.append("\"");
 		}
@@ -161,6 +163,12 @@ public class SegmentSerDes {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	public static Map<String, Object> toMap(String json) {
+		SegmentJSONParser segmentJSONParser = new SegmentJSONParser();
+
+		return segmentJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(Segment segment) {
@@ -224,6 +232,41 @@ public class SegmentSerDes {
 		}
 
 		return map;
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+			sb.append("\"");
+			sb.append(entry.getValue());
+			sb.append("\"");
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private static class SegmentJSONParser extends BaseJSONParser<Segment> {

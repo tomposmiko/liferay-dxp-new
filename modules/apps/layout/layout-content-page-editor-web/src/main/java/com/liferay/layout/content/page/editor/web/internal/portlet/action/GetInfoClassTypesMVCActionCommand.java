@@ -21,6 +21,7 @@ import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortlet
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -71,10 +72,11 @@ public class GetInfoClassTypesMVCActionCommand extends BaseMVCActionCommand {
 				themeDisplay.getScopeGroupId(), themeDisplay.getLocale());
 
 			for (ClassType classType : classTypes) {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-				jsonObject.put("id", classType.getClassTypeId());
-				jsonObject.put("label", classType.getName());
+				JSONObject jsonObject = JSONUtil.put(
+					"id", String.valueOf(classType.getClassTypeId())
+				).put(
+					"label", classType.getName()
+				);
 
 				jsonArray.put(jsonObject);
 			}

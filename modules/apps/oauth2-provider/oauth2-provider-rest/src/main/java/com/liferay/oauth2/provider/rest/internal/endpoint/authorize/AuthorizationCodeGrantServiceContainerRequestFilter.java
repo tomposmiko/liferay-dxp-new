@@ -17,6 +17,7 @@ package com.liferay.oauth2.provider.rest.internal.endpoint.authorize;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.rest.internal.endpoint.authorize.configuration.AuthorizeScreenConfiguration;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -159,6 +160,13 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 		if (requestURIString.startsWith(portalURL)) {
 			requestURIString = requestURIString.substring(portalURL.length());
 		}
+
+		// Workaround for LPS-94559
+
+		requestURIString = requestURIString.replaceFirst(
+			"\\?.*",
+			StringUtil.replace(
+				"?" + requestURI.getRawQuery(), CharPool.COLON, "%3a"));
 
 		loginURL = _http.addParameter(loginURL, "redirect", requestURIString);
 
