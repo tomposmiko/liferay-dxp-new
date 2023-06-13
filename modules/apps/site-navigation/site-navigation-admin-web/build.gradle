@@ -16,6 +16,7 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.site.navigation.admin.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.site.navigation.api", version: "1.1.0"
 	compileOnly group: "com.liferay", name: "com.liferay.site.navigation.service", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.staging.api", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.util.taglib", version: "3.0.0"

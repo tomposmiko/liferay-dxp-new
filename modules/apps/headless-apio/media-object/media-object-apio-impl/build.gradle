@@ -6,6 +6,7 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.category.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.document.library.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.folder.apio.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.keyword.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.media.object.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.person.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.portal.apio.api", version: "1.0.0"

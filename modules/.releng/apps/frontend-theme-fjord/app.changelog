@@ -1,0 +1,11 @@
+#
+# Liferay App Version 2.0.0
+#
+
+app.artifacts-2.0.0=\
+	com.liferay.frontend.theme.fjord.site.initializer-1.0.2.jar,\
+	fjord-theme-2.0.4.war
+
+app.change.log-2.0.0=LPS-82631 LPS-82809 LPS-82810
+
+app.git.id-2.0.0=d9f446e01a10ebd777c46a2d1facf294d1bcab06

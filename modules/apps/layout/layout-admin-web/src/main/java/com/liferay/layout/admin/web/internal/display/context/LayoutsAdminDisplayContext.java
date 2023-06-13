@@ -69,6 +69,8 @@ import com.liferay.portal.util.LayoutTypeControllerTracker;
 import com.liferay.portlet.layoutsadmin.display.context.GroupDisplayContextHelper;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
 import com.liferay.site.navigation.service.SiteNavigationMenuLocalServiceUtil;
+import com.liferay.staging.StagingGroupHelper;
+import com.liferay.staging.StagingGroupHelperUtil;
 import com.liferay.taglib.security.PermissionsURLTag;
 
 import java.util.Collections;
@@ -427,6 +429,9 @@ public class LayoutsAdminDisplayContext {
 	public List<NavigationItem> getNavigationItems() {
 		Group group = _themeDisplay.getScopeGroup();
 
+		StagingGroupHelper stagingGroupHelper =
+			StagingGroupHelperUtil.getStagingGroupHelper();
+
 		return new NavigationItemList() {
 			{
 				if (!group.isCompany()) {
@@ -441,7 +446,9 @@ public class LayoutsAdminDisplayContext {
 						});
 				}
 
-				if (!(group.isStaged() && !group.isStagingGroup())) {
+				if (!(stagingGroupHelper.isLocalLiveGroup(group) ||
+					  stagingGroupHelper.isRemoteLiveGroup(group))) {
+
 					add(
 						navigationItem -> {
 							navigationItem.setActive(
@@ -454,7 +461,8 @@ public class LayoutsAdminDisplayContext {
 				}
 
 				if (!group.isCompany() &&
-					!(group.isStaged() && !group.isStagingGroup())) {
+					!(stagingGroupHelper.isLocalLiveGroup(group) ||
+					  stagingGroupHelper.isRemoteLiveGroup(group))) {
 
 					add(
 						navigationItem -> {
@@ -539,7 +547,6 @@ public class LayoutsAdminDisplayContext {
 	public PortletURL getPortletURL() {
 		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
 
-		portletURL.setParameter("mvcRenderCommandName", "/layout/view");
 		portletURL.setParameter("tabs1", getTabs1());
 		portletURL.setParameter("navigation", getNavigation());
 
@@ -560,7 +567,6 @@ public class LayoutsAdminDisplayContext {
 	public PortletURL getRedirectURL() {
 		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
 
-		portletURL.setParameter("mvcRenderCommandName", "/layout/view");
 		portletURL.setParameter("redirect", getRedirect());
 		portletURL.setParameter("groupId", String.valueOf(getSelGroupId()));
 
