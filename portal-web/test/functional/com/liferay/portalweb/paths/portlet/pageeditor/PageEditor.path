@@ -394,11 +394,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>EXPERIENCE_MENU_BUTTON</td>
-	<td>//*[@class='page-editor__toolbar-experience']//button[contains(@id,'pageEditorToolbar_experience')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>EXPERIENCE_MODAL</td>
 	<td>//div[contains(@class,'modal-content') and contains(.,'New Experience')]</td>
 	<td></td>
@@ -430,7 +425,7 @@
 </tr>
 <tr>
 	<td>EXPERIENCE_LABEL</td>
-	<td>//div[contains(@class,'page-editor__toolbar-experience')]/label[contains(.,'Experience')]</td>
+	<td>//div[contains(@class,'page-editor__toolbar-experience')]/span[contains(.,'Experience')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -493,7 +488,7 @@
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_TITLE</td>
-	<td>//div[contains(@class,'content--open')]//div[contains(@class,'page-editor__sidebar__panel-header')][normalize-space()='${key_sidebarButton}']</td>
+	<td>//div[contains(@class,'content--open')]//header[contains(@class,'page-editor__sidebar__panel-header')][normalize-space()='${key_sidebarButton}']</td>
 	<td></td>
 </tr>
 
@@ -554,12 +549,12 @@
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COMMENT_LIST_TITLE</td>
-	<td>//div[contains(@class,'page-editor__sidebar__panel-header')and contains(.,'Comments')]</td>
+	<td>//header[contains(@class,'page-editor__sidebar__panel-header')and contains(.,'Comments')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COMMENT_SECTION_NAME</td>
-	<td>//div[contains(@class,'page-editor__sidebar__panel-header')]//span[contains(.,'${key_fragmentName}')]</td>
+	<td>//header[contains(@class,'page-editor__sidebar__panel-header')]//h1[contains(.,'${key_fragmentName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -569,7 +564,7 @@
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_REPLY_COMMENTS_EDITOR</td>
-	<td>//div[contains(@class,'alloy-editor-container') and contains(@id,'pageEditorCommentReplyEditor')]/div[contains(@data-placeholder,'Type your comment here.')]</td>
+	<td>//div[contains(@class,'alloy-editor-container')]/div[contains(@id,'pageEditorCommentReplyEditor') and contains(@data-placeholder,'Type your comment here.')]</td>
 	<td></td>
 </tr>
 <tr>

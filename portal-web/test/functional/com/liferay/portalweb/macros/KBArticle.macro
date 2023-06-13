@@ -393,7 +393,7 @@ definition {
 
 			Type(
 				locator1 = "CKEditor#BODY",
-				value1 = "[$COMMENT_CREATE_DATE$] <a href=&quot;[$ARTICLE_URL$]&quot;>View your received suggestion here</a>");
+				value1 = "[$COMMENT_CREATE_DATE$] <a href=\"[$ARTICLE_URL$]\">View your received suggestion here</a>");
 
 			SelectFrame(value1 = "relative=top");
 
@@ -411,7 +411,7 @@ definition {
 
 			Type(
 				locator1 = "CKEditor#BODY",
-				value1 = "[$COMMENT_CREATE_DATE$] <a href=&quot;[$ARTICLE_URL$]&quot;>View your suggestion that is in progress here</a>");
+				value1 = "[$COMMENT_CREATE_DATE$] <a href=\"[$ARTICLE_URL$]\">View your suggestion that is in progress here</a>");
 
 			SelectFrame(value1 = "relative=top");
 
@@ -429,7 +429,7 @@ definition {
 
 			Type(
 				locator1 = "CKEditor#BODY",
-				value1 = "[$COMMENT_CREATE_DATE$] <a href=&quot;[$ARTICLE_URL$]&quot;>View your resolved suggestion here</a>");
+				value1 = "[$COMMENT_CREATE_DATE$] <a href=\"[$ARTICLE_URL$]\">View your resolved suggestion here</a>");
 
 			SelectFrame(value1 = "relative=top");
 
@@ -1208,10 +1208,18 @@ definition {
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
-		AssertClick(
-			key_kbArticleTitle = "${kbArticleTitle}",
-			locator1 = "KnowledgeBaseSelectParent#SELECT_BUTTON",
-			value1 = "Select");
+		if (isSet(kbDisplay)) {
+			AssertClick(
+				key_kbArticleTitle = "${kbArticleTitle}",
+				locator1 = "KnowledgeBaseSelectParent#SELECT_BUTTON",
+				value1 = "Select");
+		}
+		else if (isSet(kbArticle)) {
+			AssertClick(
+				key_kbArticleTitle = "${kbArticleTitle}",
+				locator1 = "KnowledgeBaseSelectParent#SELECTOR_FIELD",
+				value1 = "${kbArticleTitle}");
+		}
 
 		SelectFrame(value1 = "relative=top");
 
@@ -1537,6 +1545,11 @@ definition {
 				AssertTextEquals(
 					locator1 = "Message#EMPTY_INFO_TAGLIB_TITLE",
 					value1 = "Knowledge base is empty.");
+			}
+			else if (isSet(suggestions)) {
+				AssertTextEquals(
+					locator1 = "Message#EMPTY_INFO",
+					value1 = "There are no suggestions.");
 			}
 			else {
 				AssertTextEquals(

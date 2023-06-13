@@ -12,7 +12,13 @@
  * details.
  */
 
-import {render, waitFor, within} from '@testing-library/react';
+import {
+	fireEvent,
+	render,
+	waitFor,
+	waitForElementToBeRemoved,
+	within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
@@ -188,6 +194,48 @@ describe('ExperienceToolbarSection', () => {
 		).toBeInTheDocument();
 		expect(
 			within(listedExperiences[2]).getByText('Default Experience')
+		).toBeInTheDocument();
+	});
+
+	it('shows active/inactive label close to the experiences name', async () => {
+		const {
+			container,
+			findByRole,
+			getAllByRole,
+			getByLabelText,
+		} = renderExperienceToolbarSection(mockState, mockConfig);
+
+		const dropDownButtonLabel = getByLabelText('experience');
+		const dropDownButton = container.querySelector(
+			'.page-editor__toolbar-experience'
+		);
+
+		userEvent.click(dropDownButtonLabel);
+
+		await findByRole('list');
+
+		const listedExperiences = getAllByRole('listitem');
+
+		/**
+		 * Experiences with active/inactive label
+		 */
+
+		expect(
+			container.querySelector('.page-editor__toolbar-experience')
+		).toBeInTheDocument();
+
+		expect(
+			within(dropDownButton).getByText('inactive')
+		).toBeInTheDocument();
+
+		expect(
+			within(listedExperiences[0]).getByText('active')
+		).toBeInTheDocument();
+		expect(
+			within(listedExperiences[1]).getByText('active')
+		).toBeInTheDocument();
+		expect(
+			within(listedExperiences[2]).getByText('inactive')
 		).toBeInTheDocument();
 	});
 
@@ -452,6 +500,12 @@ describe('ExperienceToolbarSection', () => {
 
 		await findByRole('list');
 
+		let dropdownElement = document.querySelector(
+			'.page-editor__toolbar-experience__dropdown-menu'
+		);
+
+		expect(dropdownElement).toBeInTheDocument();
+
 		const experienceItems = getAllByRole('listitem');
 
 		expect(experienceItems.length).toBe(3);
@@ -461,6 +515,11 @@ describe('ExperienceToolbarSection', () => {
 		userEvent.click(newExperienceButton);
 
 		await findByLabelText('name');
+
+		const modal = document.querySelector('.modal');
+
+		expect(modal).toBeInTheDocument();
+		expect(dropdownElement).not.toBeInTheDocument();
 
 		const nameInput = getByLabelText('name');
 		const audienceInput = getByLabelText('audience');
@@ -492,6 +551,17 @@ describe('ExperienceToolbarSection', () => {
 				type: CREATE_SEGMENTS_EXPERIENCE,
 			})
 		);
+
+		await waitForElementToBeRemoved(modal).then(() =>
+			expect(modal).not.toBeInTheDocument()
+		);
+
+		await findByRole('list');
+
+		dropdownElement = document.querySelector(
+			'.page-editor__toolbar-experience__dropdown-menu'
+		);
+		await waitFor(() => expect(dropdownElement).toBeInTheDocument());
 	});
 
 	it('calls the backend to update the experience', async () => {
@@ -796,5 +866,62 @@ describe('ExperienceToolbarSection', () => {
 				type: CREATE_SEGMENTS_EXPERIENCE,
 			})
 		);
+	});
+
+	it('respond to ESC keydown and click outside events hiding the dropdown', async () => {
+		const {findByRole, getByLabelText} = renderExperienceToolbarSection(
+			mockState,
+			mockConfig
+		);
+
+		const dropDownButton = getByLabelText('experience');
+
+		// ESC
+
+		userEvent.click(dropDownButton);
+
+		await findByRole('list');
+
+		const dropdownElement = document.querySelector(
+			'.page-editor__toolbar-experience__dropdown-menu'
+		);
+
+		expect(dropdownElement).toBeInTheDocument();
+
+		fireEvent.keyDown(document, {
+			charCode: 27,
+			code: 'Escape',
+			key: 'Escape',
+			keyCode: 27,
+		});
+
+		await waitForElementToBeRemoved(dropdownElement);
+		expect(dropdownElement).not.toBeInTheDocument();
+
+		// clickoutside
+
+		userEvent.click(dropDownButton);
+
+		await findByRole('list');
+
+		const dropdownElement2 = document.querySelector(
+			'.page-editor__toolbar-experience__dropdown-menu'
+		);
+
+		expect(dropdownElement2).toBeInTheDocument();
+
+		const outerDiv = document.querySelector('body > div');
+
+		fireEvent(
+			outerDiv,
+			new MouseEvent('click', {
+				bubbles: true,
+				cancelable: true,
+			})
+		);
+
+		waitForElementToBeRemoved(dropdownElement2).then(() => {
+			expect(dropdownElement2).not.toBeInTheDocument();
+		});
 	});
 });

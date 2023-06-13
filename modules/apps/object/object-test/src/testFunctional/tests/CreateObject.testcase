@@ -1314,9 +1314,9 @@ definition {
 
 		Role.definePermissionCP(
 			permissionDefinitionKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS_APPLICATION_PERMISSION_ACCESS_CONTROL_PANEL_CHECKBOX",
-			permissionDefinitionValue = "",
+			permissionDefinitionValue = "Access in Control Panel",
 			permissionNavigationKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS",
-			permissionNavigationValue = "Custom Objects 35",
+			permissionNavigationValue = "Object",
 			roleTitle = "Regular Role",
 			roleType = "Regular");
 
@@ -1327,9 +1327,9 @@ definition {
 
 		Role.definePermissionCP(
 			permissionDefinitionKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS_RESOURCE_PERMISSION_VIEW_OBJECT_DEFINITION_CHECKBOX",
-			permissionDefinitionValue = "",
+			permissionDefinitionValue = "View",
 			permissionNavigationKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS",
-			permissionNavigationValue = "Objects",
+			permissionNavigationValue = "Object",
 			roleTitle = "Regular Role",
 			roleType = "Regular");
 
@@ -1340,9 +1340,9 @@ definition {
 
 		Role.definePermissionCP(
 			permissionDefinitionKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS_RESOURCE_PERMISSIONS_DELETE_CHECKBOX",
-			permissionDefinitionValue = "",
+			permissionDefinitionValue = "Delete",
 			permissionNavigationKey = "CONTROL_PANEL_OBJECTS_PERMISSIONS",
-			permissionNavigationValue = "Objects",
+			permissionNavigationValue = "Object",
 			roleTitle = "Regular Role",
 			roleType = "Regular");
 
@@ -3681,6 +3681,8 @@ definition {
 	@description = "LPS-135635 - Verify it is possible to update the Searchable section before the Object is published"
 	@priority = "4"
 	test CanUpdateFieldSearchableSectionBeforePublished {
+		property portal.upstream = "quarantine";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 91",
 			objectName = "CustomObject91",
@@ -6341,6 +6343,8 @@ definition {
 	@description = "LPS-135549 - Verify that the field with String type has the option Language when the Text option is selected under the Searchable section"
 	@priority = "4"
 	test LanguageDisplayedForTextOption {
+		property portal.upstream = "quarantine";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 138",
 			objectName = "CustomObject138",

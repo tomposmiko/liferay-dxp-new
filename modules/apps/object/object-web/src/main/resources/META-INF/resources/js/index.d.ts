@@ -106,7 +106,7 @@ interface ObjectDefinition {
 	active: boolean;
 	dateCreated: string;
 	dateModified: string;
-	enabledCategorization: boolean;
+	enableCategorization: boolean;
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
@@ -218,6 +218,8 @@ type ObjectFieldSettingName =
 	| 'maximumFileSize'
 	| 'objectFieldName'
 	| 'objectRelationshipName'
+	| 'output'
+	| 'script'
 	| 'showCounter'
 	| 'showFilesInDocumentsAndMedia'
 	| 'stateFlow'

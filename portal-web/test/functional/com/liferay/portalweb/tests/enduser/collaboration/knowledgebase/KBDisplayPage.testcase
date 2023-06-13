@@ -25,6 +25,63 @@ definition {
 		}
 	}
 
+	@description = "This test ensures that the Max Nesting settings can be configured in the KB navigation fragment for a display page."
+	@priority = "5"
+	test CanUpdateMaxNestingForArticleNavigation {
+		var portalURL = PropsUtil.get("portal.url");
+
+		JSONKnowledgeBase.addkBArticle(
+			groupName = "Guest",
+			kbArticleContent = "Content",
+			kbArticleTitle = "KB parent article");
+
+		JSONKnowledgeBase.addkBChildArticle(
+			groupName = "Guest",
+			kbArticleTitle = "KB parent article",
+			kbChildArticleContent = "Content",
+			kbChildArticleTitle = "2nd tier article");
+
+		JSONKnowledgeBase.addkBGrandchildArticle(
+			groupName = "Guest",
+			kbArticleTitle = "KB parent article",
+			kbChildArticleTitle = "2nd tier article",
+			kbGrandchildArticleContent = "Grandchild Content",
+			kbGrandchildArticleTitle = "3rd tier article");
+
+		JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
+			contentType = "Knowledge Base Article",
+			displayPageTemplateEntryName = "Display Page Name",
+			groupName = "Guest");
+
+		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "guest");
+
+		DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
+
+		PageEditor.addFragment(
+			collectionName = "Content Display",
+			fragmentName = "Knowledge Base Article Navigation");
+
+		PageEditor.editKBArticleNavigationMaxNestingLevel(maxNestingLevel = "2");
+
+		PageEditor.publish();
+
+		DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+
+		Navigator.openSpecificURL(url = "${portalURL}/web/guest/k/3rd-tier-article");
+
+		AssertElementPresent(
+			key_kbArticleTitle = "KB parent article",
+			locator1 = "Fragment#KNOWLEDGE_BASE_FRAGMENT_NAVIGATION_TOP_LEVEL_HIERARCHY");
+
+		AssertElementPresent(
+			key_kbArticleTitle = "2nd tier article",
+			locator1 = "Fragment#KNOWLEDGE_BASE_FRAGMENT_NAVIGATION_SECOND_LEVEL_HIERARCHY");
+
+		AssertElementPresent(
+			key_kbArticleTitle = "3rd tier article",
+			locator1 = "Fragment#KNOWLEDGE_BASE_FRAGMENT_NAVIGATION_SELECTED_SECOND_LEVEL_HIERARCHY");
+	}
+
 	@description = "This test ensures that a KB article is displayed with the default template when accessing the KB display page URL."
 	@priority = "4"
 	test CanViewArticleWithDefaultTemplate {

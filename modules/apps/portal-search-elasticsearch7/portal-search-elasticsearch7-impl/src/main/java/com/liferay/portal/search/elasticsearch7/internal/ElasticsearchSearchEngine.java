@@ -20,10 +20,13 @@ import com.liferay.portal.events.StartupHelperUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.search.IndexSearcher;
 import com.liferay.portal.kernel.search.IndexWriter;
 import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -67,7 +70,6 @@ import org.elasticsearch.common.Strings;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -218,16 +220,6 @@ public class ElasticsearchSearchEngine implements SearchEngine {
 		_waitForYellowStatus();
 	}
 
-	public void unsetElasticsearchConnectionManager(
-		ElasticsearchConnectionManager elasticsearchConnectionManager) {
-
-		_elasticsearchConnectionManager = null;
-	}
-
-	public void unsetIndexFactory(IndexFactory indexFactory) {
-		_indexFactory = null;
-	}
-
 	@Activate
 	protected void activate(Map<String, Object> properties) {
 		_checkNodeVersions();
@@ -238,7 +230,11 @@ public class ElasticsearchSearchEngine implements SearchEngine {
 			}
 		}
 
-		_elasticsearchEngineConfigurator.configure(this);
+		for (Company company : _companyLocalService.getCompanies()) {
+			initialize(company.getCompanyId());
+		}
+
+		initialize(CompanyConstants.SYSTEM);
 	}
 
 	protected void createBackupRepository() {
@@ -253,11 +249,6 @@ public class ElasticsearchSearchEngine implements SearchEngine {
 		_searchEngineAdapter.execute(createSnapshotRepositoryRequest);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_elasticsearchEngineConfigurator.unconfigure();
-	}
-
 	protected boolean meetsMinimumVersionRequirement(
 		Version minimumVersion, String versionString) {
 
@@ -268,44 +259,6 @@ public class ElasticsearchSearchEngine implements SearchEngine {
 		}
 
 		return false;
-	}
-
-	@Reference(unbind = "-")
-	protected void setElasticsearchConfigurationWrapper(
-		ElasticsearchConfigurationWrapper elasticsearchConfigurationWrapper) {
-
-		_elasticsearchConfigurationWrapper = elasticsearchConfigurationWrapper;
-	}
-
-	@Reference
-	protected void setElasticsearchConnectionManager(
-		ElasticsearchConnectionManager elasticsearchConnectionManager) {
-
-		_elasticsearchConnectionManager = elasticsearchConnectionManager;
-	}
-
-	@Reference
-	protected void setIndexFactory(IndexFactory indexFactory) {
-		_indexFactory = indexFactory;
-	}
-
-	@Reference(unbind = "-")
-	protected void setIndexNameBuilder(IndexNameBuilder indexNameBuilder) {
-		_indexNameBuilder = indexNameBuilder;
-	}
-
-	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
-	protected void setSearchEngineAdapter(
-		SearchEngineAdapter searchEngineAdapter) {
-
-		_searchEngineAdapter = searchEngineAdapter;
-	}
-
-	@Reference(unbind = "-")
-	protected void setSearchEngineInformation(
-		SearchEngineInformation searchEngineInformation) {
-
-		_searchEngineInformation = searchEngineInformation;
 	}
 
 	private void _checkNodeVersions() {
@@ -456,6 +409,9 @@ public class ElasticsearchSearchEngine implements SearchEngine {
 	private static final Log _log = LogFactoryUtil.getLog(
 		ElasticsearchSearchEngine.class);
 
+	@Reference
+	private CompanyLocalService _companyLocalService;
+
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
 		policy = ReferencePolicy.DYNAMIC,
@@ -464,14 +420,17 @@ public class ElasticsearchSearchEngine implements SearchEngine {
 	private volatile CrossClusterReplicationHelper
 		_crossClusterReplicationHelper;
 
+	@Reference
 	private volatile ElasticsearchConfigurationWrapper
 		_elasticsearchConfigurationWrapper;
+
+	@Reference
 	private ElasticsearchConnectionManager _elasticsearchConnectionManager;
 
 	@Reference
-	private ElasticsearchEngineConfigurator _elasticsearchEngineConfigurator;
-
 	private IndexFactory _indexFactory;
+
+	@Reference
 	private IndexNameBuilder _indexNameBuilder;
 
 	@Reference(target = "(search.engine.impl=Elasticsearch)")
@@ -480,7 +439,10 @@ public class ElasticsearchSearchEngine implements SearchEngine {
 	@Reference(target = "(search.engine.impl=Elasticsearch)")
 	private IndexWriter _indexWriter;
 
+	@Reference(target = "(search.engine.impl=Elasticsearch)")
 	private SearchEngineAdapter _searchEngineAdapter;
+
+	@Reference
 	private SearchEngineInformation _searchEngineInformation;
 
 }
