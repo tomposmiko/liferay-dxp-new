@@ -35,6 +35,7 @@ import com.liferay.search.experiences.model.SXPBlueprint;
 import com.liferay.search.experiences.service.base.SXPBlueprintLocalServiceBaseImpl;
 import com.liferay.search.experiences.validator.SXPBlueprintValidator;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Petteri Karttunen
  */
 @Component(
+	enabled = false,
 	property = "model.class.name=com.liferay.search.experiences.model.SXPBlueprint",
 	service = AopService.class
 )
@@ -88,6 +90,18 @@ public class SXPBlueprintLocalServiceImpl
 		return sxpBlueprint;
 	}
 
+	@Override
+	public void deleteCompanySXPBlueprints(long companyId)
+		throws PortalException {
+
+		List<SXPBlueprint> sxpBlueprints =
+			sxpBlueprintPersistence.findByCompanyId(companyId);
+
+		for (SXPBlueprint sxpBlueprint : sxpBlueprints) {
+			sxpBlueprintLocalService.deleteSXPBlueprint(sxpBlueprint);
+		}
+	}
+
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
@@ -118,6 +132,7 @@ public class SXPBlueprintLocalServiceImpl
 		return sxpBlueprint;
 	}
 
+	@Override
 	public int getSXPBlueprintsCount(long companyId) {
 		return sxpBlueprintPersistence.countByCompanyId(companyId);
 	}
@@ -149,6 +164,7 @@ public class SXPBlueprintLocalServiceImpl
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
+	@Override
 	public SXPBlueprint updateSXPBlueprint(
 			long userId, long sxpBlueprintId, String configurationJSON,
 			Map<Locale, String> descriptionMap, String elementInstancesJSON,

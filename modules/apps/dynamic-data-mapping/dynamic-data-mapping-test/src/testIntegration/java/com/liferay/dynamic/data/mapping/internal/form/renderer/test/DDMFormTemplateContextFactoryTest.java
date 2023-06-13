@@ -173,6 +173,24 @@ public class DDMFormTemplateContextFactoryTest {
 	}
 
 	@Test
+	public void testShowPartialResultsToRespondents() throws Exception {
+		Map<String, Object> ddmFormTemplateContext =
+			DDMFormTemplateContext.Builder.newBuilder(
+				_ddmFormTemplateContextFactory
+			).withHttpServletRequest(
+				_httpServletRequest
+			).withLocale(
+				LocaleUtil.US
+			).withProperty(
+				"showPartialResultsToRespondents", true
+			).build();
+
+		Assert.assertTrue(
+			(boolean)ddmFormTemplateContext.get(
+				"showPartialResultsToRespondents"));
+	}
+
+	@Test
 	public void testShowRequiredFieldsWarning() throws Exception {
 		DDMFormTemplateContext.Builder builder =
 			DDMFormTemplateContext.Builder.newBuilder(
@@ -366,7 +384,9 @@ public class DDMFormTemplateContextFactoryTest {
 		_assertValidations(
 			actualValidationsMap, "date",
 			HashMapBuilder.put(
-				"dateRange", "dateRange({name}, \"{parameter}\")"
+				"dateRange",
+				"futureDates({name}, \"{parameter}\") AND pastDates({name}, " +
+					"\"{parameter}\")"
 			).put(
 				"futureDates", "futureDates({name}, \"{parameter}\")"
 			).put(

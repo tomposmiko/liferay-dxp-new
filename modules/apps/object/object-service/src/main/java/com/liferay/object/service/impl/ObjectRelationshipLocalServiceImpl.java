@@ -33,9 +33,12 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -61,15 +64,17 @@ import org.osgi.service.component.annotations.Reference;
 public class ObjectRelationshipLocalServiceImpl
 	extends ObjectRelationshipLocalServiceBaseImpl {
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectRelationship addObjectRelationship(
 			long userId, long objectDefinitionId1, long objectDefinitionId2,
-			Map<Locale, String> labelMap, String name, String type)
+			String deletionType, Map<Locale, String> labelMap, String name,
+			String type)
 		throws PortalException {
 
 		return _addObjectRelationship(
-			userId, objectDefinitionId1, objectDefinitionId2, labelMap, name,
-			false, type);
+			userId, objectDefinitionId1, objectDefinitionId2, deletionType,
+			labelMap, name, false, type);
 	}
 
 	@Override
@@ -136,6 +141,7 @@ public class ObjectRelationshipLocalServiceImpl
 		return deleteObjectRelationship(objectRelationship);
 	}
 
+	@Indexable(type = IndexableType.DELETE)
 	@Override
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public ObjectRelationship deleteObjectRelationship(
@@ -260,6 +266,7 @@ public class ObjectRelationshipLocalServiceImpl
 			objectDefinitionId1, start, end);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectRelationship updateObjectRelationship(
 			long objectRelationshipId, String deletionType,
@@ -318,7 +325,7 @@ public class ObjectRelationshipLocalServiceImpl
 
 		objectField.setDBTableName(dbTableName);
 
-		objectField.setIndexed(false);
+		objectField.setIndexed(true);
 		objectField.setIndexedAsKeyword(false);
 		objectField.setIndexedLanguageId(null);
 		objectField.setLabelMap(
@@ -341,8 +348,8 @@ public class ObjectRelationshipLocalServiceImpl
 
 	private ObjectRelationship _addObjectRelationship(
 			long userId, long objectDefinitionId1, long objectDefinitionId2,
-			Map<Locale, String> labelMap, String name, boolean reverse,
-			String type)
+			String deletionType, Map<Locale, String> labelMap, String name,
+			boolean reverse, String type)
 		throws PortalException {
 
 		_validate(objectDefinitionId1, objectDefinitionId2, name, type);
@@ -360,7 +367,9 @@ public class ObjectRelationshipLocalServiceImpl
 		objectRelationship.setObjectDefinitionId1(objectDefinitionId1);
 		objectRelationship.setObjectDefinitionId2(objectDefinitionId2);
 		objectRelationship.setDeletionType(
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT);
+			GetterUtil.getString(
+				deletionType,
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT));
 		objectRelationship.setLabelMap(labelMap);
 		objectRelationship.setName(name);
 		objectRelationship.setReverse(reverse);
@@ -404,8 +413,8 @@ public class ObjectRelationshipLocalServiceImpl
 
 			ObjectRelationship reverseObjectRelationship =
 				_addObjectRelationship(
-					userId, objectDefinitionId2, objectDefinitionId1, labelMap,
-					name, true, type);
+					userId, objectDefinitionId2, objectDefinitionId1,
+					deletionType, labelMap, name, true, type);
 
 			reverseObjectRelationship.setDBTableName(
 				objectRelationship.getDBTableName());

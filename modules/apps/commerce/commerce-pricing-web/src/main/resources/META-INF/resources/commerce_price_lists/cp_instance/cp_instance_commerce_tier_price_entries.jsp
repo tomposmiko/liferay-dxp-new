@@ -27,7 +27,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 %>
 
 <div class="tier-price-entries-container" id="<portlet:namespace />entriesContainer">
-	<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
+	<aui:form action="<%= portletURL %>" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
@@ -39,7 +39,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 			%>'
 			creationMenu="<%= cpInstanceCommerceTierPriceEntryDisplayContext.getCreationMenu() %>"
 			dataProviderKey="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_INSTANCE_TIER_PRICE_ENTRIES %>"
-			formId="fm"
+			formName="fm"
 			id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_INSTANCE_TIER_PRICE_ENTRIES %>"
 			itemsPerPage="<%= 10 %>"
 			namespace="<%= liferayPortletResponse.getNamespace() %>"

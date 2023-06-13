@@ -22,18 +22,20 @@ import java.util.Date;
 public class BatchPlannerLogDisplay {
 
 	public BatchPlannerLogDisplay(
-		String action, long batchEngineExportTaskId,
-		long batchEngineImportTaskId, long batchPlannerLogId, Date createDate,
-		boolean export, String internalClassName, int processedItemsCount,
-		String status, String title, int totalItemsCount, long userId) {
+		String action, String batchEngineExportTaskERC,
+		String batchEngineImportTaskERC, long batchPlannerLogId,
+		Date createDate, boolean export, String internalClassName,
+		Date modifiedDate, int processedItemsCount, int status, String title,
+		int totalItemsCount, long userId) {
 
 		_action = action;
-		_batchEngineExportTaskId = batchEngineExportTaskId;
-		_batchEngineImportTaskId = batchEngineImportTaskId;
+		_batchEngineExportTaskERC = batchEngineExportTaskERC;
+		_batchEngineImportTaskERC = batchEngineImportTaskERC;
 		_batchPlannerLogId = batchPlannerLogId;
 		_createDate = createDate;
 		_export = export;
 		_internalClassName = internalClassName;
+		_modifiedDate = modifiedDate;
 		_processedItemsCount = processedItemsCount;
 		_status = status;
 		_title = title;
@@ -45,12 +47,12 @@ public class BatchPlannerLogDisplay {
 		return _action;
 	}
 
-	public long getBatchEngineExportTaskId() {
-		return _batchEngineExportTaskId;
+	public String getBatchEngineExportTaskERC() {
+		return _batchEngineExportTaskERC;
 	}
 
-	public long getBatchEngineImportTaskId() {
-		return _batchEngineImportTaskId;
+	public String getBatchEngineImportTaskERC() {
+		return _batchEngineImportTaskERC;
 	}
 
 	public long getBatchPlannerLogId() {
@@ -65,11 +67,15 @@ public class BatchPlannerLogDisplay {
 		return _internalClassName;
 	}
 
+	public Date getModifiedDate() {
+		return _modifiedDate;
+	}
+
 	public int getProcessedItemsCount() {
 		return _processedItemsCount;
 	}
 
-	public String getStatus() {
+	public int getStatus() {
 		return _status;
 	}
 
@@ -97,14 +103,18 @@ public class BatchPlannerLogDisplay {
 			return this;
 		}
 
-		public Builder batchEngineExportTaskId(long batchEngineExportTaskId) {
-			_batchEngineExportTaskId = batchEngineExportTaskId;
+		public Builder batchEngineExportTaskERC(
+			String batchEngineExportTaskERC) {
+
+			_batchEngineExportTaskERC = batchEngineExportTaskERC;
 
 			return this;
 		}
 
-		public Builder batchEngineImportTaskId(long batchEngineImportTaskId) {
-			_batchEngineImportTaskId = batchEngineImportTaskId;
+		public Builder batchEngineImportTaskERC(
+			String batchEngineImportTaskERC) {
+
+			_batchEngineImportTaskERC = batchEngineImportTaskERC;
 
 			return this;
 		}
@@ -117,10 +127,10 @@ public class BatchPlannerLogDisplay {
 
 		public BatchPlannerLogDisplay build() {
 			return new BatchPlannerLogDisplay(
-				_action, _batchEngineExportTaskId, _batchEngineImportTaskId,
+				_action, _batchEngineExportTaskERC, _batchEngineImportTaskERC,
 				_batchPlannerLogId, _createDate, _export, _internalClassName,
-				_processedItemsCount, _status, _title, _totalItemsCount,
-				_userId);
+				_modifiedDate, _processedItemsCount, _status, _title,
+				_totalItemsCount, _userId);
 		}
 
 		public Builder createDate(Date createDate) {
@@ -141,13 +151,19 @@ public class BatchPlannerLogDisplay {
 			return this;
 		}
 
+		public Builder modifiedDate(Date modifiedDate) {
+			_modifiedDate = modifiedDate;
+
+			return this;
+		}
+
 		public Builder processedItemsCount(int processedItemsCount) {
 			_processedItemsCount = processedItemsCount;
 
 			return this;
 		}
 
-		public Builder status(String status) {
+		public Builder status(int status) {
 			_status = status;
 
 			return this;
@@ -172,14 +188,15 @@ public class BatchPlannerLogDisplay {
 		}
 
 		private String _action;
-		private long _batchEngineExportTaskId;
-		private long _batchEngineImportTaskId;
+		private String _batchEngineExportTaskERC;
+		private String _batchEngineImportTaskERC;
 		private long _batchPlannerLogId;
 		private Date _createDate;
 		private boolean _export;
 		private String _internalClassName;
+		private Date _modifiedDate;
 		private int _processedItemsCount;
-		private String _status;
+		private int _status;
 		private String _title;
 		private int _totalItemsCount;
 		private long _userId;
@@ -187,14 +204,15 @@ public class BatchPlannerLogDisplay {
 	}
 
 	private String _action;
-	private long _batchEngineExportTaskId;
-	private long _batchEngineImportTaskId;
+	private String _batchEngineExportTaskERC;
+	private String _batchEngineImportTaskERC;
 	private long _batchPlannerLogId;
 	private Date _createDate;
 	private boolean _export;
 	private String _internalClassName;
+	private Date _modifiedDate;
 	private int _processedItemsCount;
-	private String _status;
+	private int _status;
 	private String _title;
 	private int _totalItemsCount;
 	private long _userId;

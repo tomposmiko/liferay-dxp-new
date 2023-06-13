@@ -1,5 +1,19 @@
 definition {
 
+	macro addLanguageManageTranslations {
+		Click.clickNoMouseOver(locator1 = "Button#LOCALIZATION_GENERIC");
+
+		Click(locator1 = "Translation#TRANSLATION_MANAGE_BUTTON");
+
+		Click(locator1 = "Button#PLUS");
+
+		Click(
+			key_language = "${key_language}",
+			locator1 = "Translation#TRANSLATION_MANAGE_OPTION");
+
+		Click(locator1 = "Button#DONE");
+	}
+
 	macro assertFileNameFromTempFolder {
 		if (isSet(pageName)) {
 			var translationZipFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "${pageName}*.zip");
@@ -12,6 +26,20 @@ definition {
 
 		if (contains("${translationZipFileName}", "en_US")) {
 			echo("This is a exported translation file.");
+		}
+		else {
+			fail("FAIL!");
+		}
+	}
+
+	macro assertUnzippedFileNameFromTempFolder {
+		var tempDir = PropsUtil.get("output.dir.name");
+		var unzippedTranslationFileName = FileUtil.getFileName("${tempDir}/${translationFileName}.xlf");
+
+		echo("## translationFileName: ${translationFileName}");
+
+		if (contains("${unzippedTranslationFileName}", "${translationFileName}")) {
+			echo("This is a translation file.");
 		}
 		else {
 			fail("FAIL!");
@@ -50,6 +78,18 @@ definition {
 			locator1 = "Translation#CONTENT_TITLE");
 	}
 
+	macro deleteTranslationEntry {
+		LexiconEntry.delete(
+			confirmationText = "${confirmationText}",
+			rowEntry = "${translationEntry}");
+	}
+
+	macro editTranslationEntry {
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Edit",
+			rowEntry = "${translationEntry}");
+	}
+
 	macro exportTranslation {
 		AssertElementPresent(
 			key_defaultLanguage = "English (United States)",
@@ -61,6 +101,16 @@ definition {
 
 		AssertElementPresent(locator1 = "Button#EXPORT_MODAL_DISABLED");
 
+		if (isSet(viewNoExperiencesSelector)) {
+			AssertElementNotPresent(
+				key_fieldLabel = "Select Experiences",
+				locator1 = "FormFields#LABEL");
+
+			AssertElementNotPresent(
+				key_fieldLabel = "Default",
+				locator1 = "FormFields#CHECKBOX");
+		}
+
 		if (isSet(exportFileFormat)) {
 			Select(
 				locator1 = "Select#EXPORT_FILE_FORMAT",
@@ -71,6 +121,24 @@ definition {
 			Check.checkNotVisible(
 				checkboxName = "${languageList}",
 				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+
+		if (isSet(experienceList)) {
+			var position = "1";
+
+			while (IsElementNotPresent(locator1 = "Button#EXPORT_MODAL_DISABLED")) {
+				Click.clickNoWaitForVisible(
+					key_position = "${position}",
+					locator1 = "Translation#EXPERIENCE_CHECKBOX_POSITION");
+
+				var position = ${position} + 1;
+			}
+
+			for (var experienceName : list "${experienceList}") {
+				Click.clickNoWaitForVisible(
+					key_fieldName = "${experienceName}",
+					locator1 = "FormFields#CHECKBOX");
+			}
 		}
 
 		Click(locator1 = "Button#EXPORT_MODAL");
@@ -136,31 +204,38 @@ definition {
 			locator1 = "Button#SELECT_FILE",
 			value1 = "Select File");
 
-		if (isSet(uploadInvalidFile)) {
-			UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
-				locator1 = "TextInput#FILE",
-				value1 = "${uploadInvalidFile}");
+		if (isSet(dependencyfile)) {
+			UploadDependencyFile.uploadFile(fileName = "${fileName}");
 		}
 		else {
-			UploadTempFile.uploadTempFileHiddenNoMouseOver(
-				locator1 = "TextInput#FILE",
-				value1 = "${fileName}");
+			Translations.uploadTranslationsFile(
+				fileName = "${fileName}",
+				filePath = "${filePath}");
 		}
 
 		if ("${workflow}" == "true") {
 			PortletEntry.submitForPublication();
 		}
-
 		else if ("${workflowResubmit}" == "true") {
-			PortletEntry.save();
+			PortletEntry.saveAsDraft();
 		}
-
 		else if ("${validateInvalidFile}" == "true") {
 			Button.clickPublish();
 		}
-
 		else {
-			PortletEntry.publish();
+			Button.clickPublish();
+
+			if (isSet(successFileName)) {
+				Translations.viewImportResult(
+					errorMessage = "${errorMessage}",
+					errorMessageItem = "${errorMessageItem}",
+					failFileName = "${failFileName}",
+					successFileName = "${successFileName}",
+					successFileName2 = "${successFileName2}",
+					successFileNumber = "${successFileNumber}");
+			}
+
+			Click(locator1 = "Button#TRANSLATIONS_DONE");
 		}
 	}
 
@@ -201,7 +276,6 @@ definition {
 
 	macro setGoogleCloudTranslationServiceKey {
 		var lineSeparater = "\n";
-
 		var value1 = PropsUtil.get("google.cloud.translation.service.key.type");
 		var value2 = PropsUtil.get("google.cloud.translation.service.key.project.id");
 		var value3 = PropsUtil.get("google.cloud.translation.service.key.private.key.id");
@@ -211,9 +285,7 @@ definition {
 		var value8 = PropsUtil.get("google.cloud.translation.service.key.token.uri");
 		var value9 = PropsUtil.get("google.cloud.translation.service.key.auth.provider.x509.cert.url");
 		var value10 = PropsUtil.get("google.cloud.translation.service.key.client.x509.cert.url");
-
 		var keys = PropsUtil.get("google.cloud.translation.service.key.private.key");
-
 		var list = ListUtil.newList();
 
 		for (var key : list "${keys}") {
@@ -222,43 +294,73 @@ definition {
 			ListUtil.add("${list}", "${value}");
 		}
 
-		var value4 = ListUtil.toString("${list}","");
+		var value4 = ListUtil.toString("${list}", "");
+
 		var value4 = '''-----BEGIN PRIVATE KEY-----${value4}=${lineSeparater}-----END PRIVATE KEY-----${lineSeparater}''';
 
 		var attribute1 = '''"type" : "${value1}"''';
-		var attribute2 = '''"project_id" : "${value2}"''';
-		var attribute3 = '''"private_key_id" : "${value3}"''';
-		var attribute4 = '''"private_key" : "${value4}"''';
-		var attribute5 = '''"client_email" : "${value5}"''';
-		var attribute6 = '''"client_id" : "${value6}"''';
-		var attribute7 = '''"auth_uri" : "${value7}"''';
-		var attribute8 = '''"token_uri" : "${value8}"''';
-		var attribute9 = '''"auth_provider_x509_cert_url" : "${value9}"''';
-		var attribute10 = '''"client_x509_cert_url" : "${value10}"''';
 
+		var attribute2 = '''"project_id" : "${value2}"''';
+
+		var attribute3 = '''"private_key_id" : "${value3}"''';
+
+		var attribute4 = '''"private_key" : "${value4}"''';
+
+		var attribute5 = '''"client_email" : "${value5}"''';
+
+		var attribute6 = '''"client_id" : "${value6}"''';
+
+		var attribute7 = '''"auth_uri" : "${value7}"''';
+
+		var attribute8 = '''"token_uri" : "${value8}"''';
+
+		var attribute9 = '''"auth_provider_x509_cert_url" : "${value9}"''';
+
+		var attribute10 = '''"client_x509_cert_url" : "${value10}"''';
 		var list = ListUtil.newList();
 
 		ListUtil.add("${list}", "${attribute1}");
+
 		ListUtil.add("${list}", "${attribute2}");
+
 		ListUtil.add("${list}", "${attribute3}");
+
 		ListUtil.add("${list}", "${attribute4}");
+
 		ListUtil.add("${list}", "${attribute5}");
+
 		ListUtil.add("${list}", "${attribute6}");
+
 		ListUtil.add("${list}", "${attribute7}");
+
 		ListUtil.add("${list}", "${attribute8}");
+
 		ListUtil.add("${list}", "${attribute9}");
+
 		ListUtil.add("${list}", "${attribute10}");
 
 		var attributes = ListUtil.toString("${list}");
+
 		var attributes = '''{${attributes}}''';
 
 		return "${attributes}";
 	}
 
 	macro translateContentPageFile {
+		if (contains("${translationFileName}", " ") && contains("${translationFileName}", "(") && contains("${translationFileName}", ")")) {
+			var translationFileName = StringUtil.extractLast("${translationFileName}", " ");
+			var translationFileName = StringUtil.replace("${translationFileName}", "(", "?");
+			var translationFileName = StringUtil.replace("${translationFileName}", ")", "?");
+		}
+
+		if (!(isSet(pageName)) || !(isSet(pageNameTranslation))) {
+			var pageName = "false";
+			var pageNameTranslation = "false";
+		}
+
 		AntCommand(
 			locator1 = "build-test.xml",
-			value1 = "update-translation-file -Dcontentpage.translation.fragment.target.original=<![CDATA[${fragmentContent}]]></target> -Dcontentpage.translation.fragment.target=<![CDATA[${fragmentContentTranslation}]]></target> -Dcontentpage.translation.title.target.original=<![CDATA[${pageName}]]></target> -Dcontentpage.translation.title.target=<![CDATA[${pageNameTranslation}]]></target> -Dtranslation.file.encoding=${encoding} -Dtranslation.file.name=${translationFileName} -Dcontentpage.translation.file=${contentPageTranslation} -Dtranslation.zip.file.name=${translationZipFileName}");
+			value1 = "update-translation-file -Doperation=${operation} -Dcontentpage.translation.fragment.target.original=<![CDATA[${fragmentContent}]]></target> -Dcontentpage.translation.fragment.target=<![CDATA[${fragmentContentTranslation}]]></target> -Dcontentpage.translation.title.target.original=<![CDATA[${pageName}]]></target> -Dcontentpage.translation.title.target=<![CDATA[${pageNameTranslation}]]></target> -Dtranslation.file.encoding=${encoding} -Dtranslation.file.name=${translationFileName} -Dcontentpage.translation.file=${contentPageTranslation} -Dtranslation.zip.file.name=${translationZipFileName}");
 	}
 
 	macro translateFields {
@@ -335,16 +437,39 @@ definition {
 	macro translateFile {
 		AntCommand(
 			locator1 = "build-test.xml",
-			value1 = "update-translation-file -Dtranslation.content.target.original=<![CDATA[<p>${webContentContent}</p>]]></target> -Dtranslation.content.target=<![CDATA[<p>${contentTranslation}</p>]]></target> -Dtranslation.description.target.original=<![CDATA[<p>${webContentDescription}</p>]]></target> -Dtranslation.description.target=<![CDATA[<p>${descriptionTranslation}</p>]]></target> -Dtranslation.file.encoding=${encoding} -Dtranslation.title.target.original=<![CDATA[${webContentTitle}]]></target> -Dtranslation.title.target=<![CDATA[${titleTranslation}]]></target> -Dtranslation.zip.file.name=${translationZipFileName} -Dtranslation.file.name=${translationFileName} -Dtranslation.file.rename=${translationFileRename}");
+			value1 = "update-translation-file -Doperation=${operation} -Dtranslation.content.target.original=<![CDATA[<p>${webContentContent}</p>]]></target> -Dtranslation.content.target=<![CDATA[<p>${contentTranslation}</p>]]></target> -Dtranslation.description.target.original=<![CDATA[<p>${webContentDescription}</p>]]></target> -Dtranslation.description.target=<![CDATA[<p>${descriptionTranslation}</p>]]></target> -Dtranslation.file.encoding=${encoding} -Dtranslation.title.target.original=<![CDATA[${webContentTitle}]]></target> -Dtranslation.title.target=<![CDATA[${titleTranslation}]]></target> -Dtranslation.zip.file.name=${translationZipFileName} -Dtranslation.file.name=${translationFileName} -Dtranslation.file.rename=${translationFileRename}");
 	}
 
 	macro translateFragmentField {
+		AssertSelectedLabel(
+			locator1 = "Select#SELECT_ID",
+			selectFieldId = "experience-selector",
+			value1 = "Default");
+
+		AssertElementPresent(locator1 = "Translation#BASIC_INFORMATION");
+
+		if (isSet(experienceName)) {
+			Select(
+				locator1 = "Translation#EXPERIENCE_SELECTOR",
+				value1 = "${experienceName}");
+
+			AssertSelectedLabel(
+				locator1 = "Select#SELECT_ID",
+				selectFieldId = "experience-selector",
+				value1 = "${experienceName}");
+
+			AssertElementNotPresent(locator1 = "Translation#BASIC_INFORMATION");
+		}
+
 		if ("${fieldName}" == "HTML") {
+			Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON");
+
 			Type.typeCodeMirrorEditorNoError(
 				locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
 				value1 = "${fragmentText}");
-		}
 
+			Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON");
+		}
 		else {
 			Type(
 				key_fieldName = "${fieldName}",
@@ -353,27 +478,36 @@ definition {
 		}
 	}
 
-	macro translateSpecificFieldsWithGoogle {
-		for (var fieldName : list "${fieldNameList}") {
-			Click.clickNoMouseOver(
-				key_title = "Auto Translate ${fieldName} Field",
-				locator1 = "Button#ANY_TITLE");
+	macro translateSpecificFieldWithGoogle {
+		Click.clickNoMouseOver(
+			key_title = "Auto Translate ${fieldName} Field",
+			locator1 = "Button#ANY_TITLE");
 
-			AssertTextEquals(
-				key_fieldName = "${fieldName}",
-				locator1 = "Message#SUCCESS_SPECIFIC_FORM_FIELD_REQUIRED",
-				value1 = "Field Translated");
-		}
+		AssertTextEquals(
+			key_fieldName = "${fieldName}",
+			locator1 = "Message#SUCCESS_SPECIFIC_FORM_FIELD_REQUIRED",
+			value1 = "Field Translated");
 	}
 
 	macro translateWithGoogle {
 		Click(
 			key_text = "Auto Translate",
 			locator1 = "Button#ANY");
+	}
 
-		AssertTextEquals(
-			locator1 = "Toolbar#FEEDBACK",
-			value1 = "Successfully received translations.");
+	macro updateTranslateFileID {
+		AntCommand(
+			locator1 = "build-test.xml",
+			value1 = "update-translation-file-id -Dtranslation.file.name=${translationFileName} -Dtranslation.entry.type=${translationEntryType} -Dtranslation.zip.file.name=${translationZipFileName}");
+	}
+
+	macro uploadTranslationsFile {
+		var tempFileDirectory = selenium.getOutputDirName();
+		var filePath = "${tempFileDirectory}/${filePath}/${fileName}";
+
+		UploadFile(
+			locator1 = "TextInput#FILE",
+			value1 = "${filePath}");
 	}
 
 	macro viewBaseFields {
@@ -455,12 +589,62 @@ definition {
 		}
 	}
 
+	macro viewEmptyState {
+		AssertTextEquals(
+			locator1 = "Message#EMPTY_INFO",
+			value1 = "No entries were found.");
+	}
+
 	macro viewEnabledFieldTranslationButtons {
 		for (var fieldName : list "${fieldNameList}") {
 			AssertVisible(
 				key_title = "Auto Translate ${fieldName} Field",
 				locator1 = "Button#ANY_TITLE");
 		}
+	}
+
+	macro viewErrorMessages {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Message#ERROR_IMPORT_TRANSLATIONS",
+			value1 = "${errorMessage}");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Message#ERROR_IMPORT_TRANSLATIONS_ITEM_MESSAGE",
+			value1 = "${errorMessageItem}");
+	}
+
+	macro viewImportResult {
+		if (isSet(successFileName)) {
+			AssertTextEquals(
+				locator1 = "Message#SUCCESS_IMPORT_TRANSLATIONS",
+				value1 = "${successFileNumber}");
+
+			AssertTextEquals(
+				locator1 = "Message#SUCCESS_IMPORT_TRANSLATIONS_ITEM",
+				value1 = "${successFileName}");
+
+			if (isSet(successFileName2)) {
+				AssertTextEquals(
+					locator1 = "Message#SUCCESS_IMPORT_TRANSLATIONS_ITEM_2",
+					value1 = "${successFileName2}");
+			}
+		}
+
+		if (isSet(failFileName)) {
+			Translations.viewErrorMessages(
+				errorMessage = "${errorMessage}",
+				errorMessageItem = "${errorMessageItem}");
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "Message#ERROR_IMPORT_TRANSLATIONS_ITEM",
+				value1 = "${failFileName}");
+		}
+	}
+
+	macro viewNoTranslationEntry {
+		AssertElementNotPresent(
+			ey_rowEntry = "${title}",
+			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME");
 	}
 
 	macro viewTargetFields {
@@ -560,14 +744,14 @@ definition {
 			key_currentLocale = StringUtil.lowerCase("${currentTargetLocale}"),
 			locator1 = "Button#TRANSLATIONS_LOCALIZATION");
 
-		for (var targetLocale : list "${targetLocale}" ) {
+		for (var targetLocale : list "${targetLocale}") {
 			AssertElementPresent(
 				key_locale = "${targetLocale}",
 				locator1 = "Translation#DROPDOWN_MENU_ITEM");
 		}
 
 		if (isSet(noTargetLocale)) {
-			for (var noTargetLocale : list "${noTargetLocale}" ) {
+			for (var noTargetLocale : list "${noTargetLocale}") {
 				AssertElementNotPresent(
 					key_locale = "${noTargetLocale}",
 					locator1 = "Translation#DROPDOWN_MENU_ITEM");
@@ -658,6 +842,17 @@ definition {
 				locator1 = "MenuItem#DROPDOWN_MENU_ITEM_SPECIFIC",
 				value1 = "Import Translation");
 		}
+	}
+
+	macro viewUntranslatedStatus {
+		Click.clickNoMouseOver(
+			key_currentLocale = StringUtil.lowerCase("en-US"),
+			locator1 = "Button#TRANSLATIONS_LOCALIZATION");
+
+		AssertTextEquals(
+			key_localizedLanguage = "${locale}",
+			locator1 = "Translation#TRANSLATION_STATUS_TITLE",
+			value1 = "Not Translated");
 	}
 
 }

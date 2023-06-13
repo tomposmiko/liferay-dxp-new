@@ -244,18 +244,16 @@ public class JobFactory {
 			return pluginsUpstreamJob;
 		}
 
-		if (jobName.startsWith("test-portal-acceptance-pullrequest(") ||
-			jobName.equals("test-portal-source-format")) {
-
+		if (jobName.startsWith("test-portal-acceptance-pullrequest(")) {
 			PortalAcceptancePullRequestJob portalAcceptancePullRequestJob =
 				new PortalAcceptancePullRequestJob(
-					jobName, buildProfile, testSuiteName);
+					jobName, buildProfile, testSuiteName, branchName);
 
 			if (_isCentralMergePullRequest(
 					portalAcceptancePullRequestJob.getGitWorkingDirectory())) {
 
 				portalAcceptancePullRequestJob = new CentralMergePullRequestJob(
-					jobName, buildProfile);
+					jobName, buildProfile, branchName);
 			}
 
 			_jobs.put(jobKey, portalAcceptancePullRequestJob);
@@ -267,7 +265,7 @@ public class JobFactory {
 			_jobs.put(
 				jobKey,
 				new PortalAcceptanceUpstreamJob(
-					jobName, buildProfile, testSuiteName));
+					jobName, buildProfile, testSuiteName, branchName));
 
 			return _jobs.get(jobKey);
 		}
@@ -340,11 +338,21 @@ public class JobFactory {
 			return _jobs.get(jobKey);
 		}
 
+		if (jobName.equals("test-portal-source-format")) {
+			PortalAcceptancePullRequestJob portalAcceptancePullRequestJob =
+				new PortalAcceptancePullRequestJob(
+					jobName, buildProfile, "sf", branchName);
+
+			_jobs.put(jobKey, portalAcceptancePullRequestJob);
+
+			return portalAcceptancePullRequestJob;
+		}
+
 		if (jobName.startsWith("test-portal-testsuite-upstream(")) {
 			_jobs.put(
 				jobKey,
 				new PortalTestSuiteUpstreamJob(
-					jobName, buildProfile, testSuiteName));
+					jobName, buildProfile, testSuiteName, branchName));
 
 			return _jobs.get(jobKey);
 		}

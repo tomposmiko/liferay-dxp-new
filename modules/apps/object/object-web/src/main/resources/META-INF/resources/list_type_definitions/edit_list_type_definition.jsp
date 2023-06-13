@@ -18,7 +18,6 @@
 
 <%
 ListTypeDefinition listTypeDefinition = (ListTypeDefinition)request.getAttribute(ObjectWebKeys.LIST_TYPE_DEFINITION);
-
 ViewListTypeEntriesDisplayContext viewListTypeEntriesDisplayContext = (ViewListTypeEntriesDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 %>
 
@@ -35,7 +34,7 @@ ViewListTypeEntriesDisplayContext viewListTypeEntriesDisplayContext = (ViewListT
 
 					<aui:model-context bean="<%= listTypeDefinition %>" model="<%= ListTypeDefinition.class %>" />
 
-					<aui:input name="name" required="<%= true %>" value="<%= listTypeDefinition.getName(themeDisplay.getLocale()) %>" />
+					<aui:input disabled="<%= !viewListTypeEntriesDisplayContext.hasUpdateListTypeDefinitionPermission() %>" name="name" required="<%= true %>" value="<%= listTypeDefinition.getName(themeDisplay.getLocale()) %>" />
 				</div>
 
 				<div class="sheet">
@@ -54,7 +53,7 @@ ViewListTypeEntriesDisplayContext viewListTypeEntriesDisplayContext = (ViewListT
 						apiURL="<%= viewListTypeEntriesDisplayContext.getAPIURL() %>"
 						clayDataSetActionDropdownItems="<%= viewListTypeEntriesDisplayContext.getClayDataSetActionDropdownItems() %>"
 						creationMenu="<%= viewListTypeEntriesDisplayContext.getCreationMenu() %>"
-						formId="fm"
+						formName="fm"
 						id="<%= ListTypeClayDataSetDisplayNames.LIST_TYPE_DEFINITION_ITEMS %>"
 						itemsPerPage="<%= 20 %>"
 						namespace="<%= liferayPortletResponse.getNamespace() %>"
@@ -68,7 +67,7 @@ ViewListTypeEntriesDisplayContext viewListTypeEntriesDisplayContext = (ViewListT
 			<div class="side-panel-content__footer">
 				<aui:button cssClass="btn-cancel mr-1" name="cancel" value='<%= LanguageUtil.get(request, "cancel") %>' />
 
-				<aui:button name="save" type="submit" value='<%= LanguageUtil.get(request, "save") %>' />
+				<aui:button disabled="<%= !viewListTypeEntriesDisplayContext.hasUpdateListTypeDefinitionPermission() %>" name="save" type="submit" value='<%= LanguageUtil.get(request, "save") %>' />
 			</div>
 		</div>
 	</form>
@@ -132,7 +131,7 @@ ViewListTypeEntriesDisplayContext viewListTypeEntriesDisplayContext = (ViewListT
 					name_i18n: localizedNames,
 				}),
 				headers: new Headers({
-					Accept: 'application/json',
+					'Accept': 'application/json',
 					'Content-Type': 'application/json',
 				}),
 				method: 'PUT',

@@ -20,11 +20,6 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			ApplicationsMenu.gotoPortlet(
-				category = "Publications",
-				panel = "Applications",
-				portlet = "Publications");
-
 			Publications.disablePublications();
 		}
 	}
@@ -41,20 +36,11 @@ definition {
 			groupName = "Guest",
 			title = "WC WebContent Title");
 
-		Publications.gotoReviewChanges(
-			gotoManagePublications = "true",
+		PublicationsNavigator.gotoReviewChanges(
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name");
 
-		PublicationsChanges.openCommentsSidebar();
-
-		PublicationsChanges.addComment(commentValue = "Good to Publish");
-
-		PublicationsChanges.editComment(
-			commentValue = "Good to Publish",
-			commentValueEdit = "It is not ready to Publish",
-			userName = "Test Test");
-
-		PublicationsChanges.deleteComment(commentValue = "It is not ready to Publish");
+		PublicationsChanges.assertPublicationsCommentsCRUDPermissions();
 	}
 
 	@description = "Assert Publications user can add/delete/publish publication with all permissions of Publications, can't add/publish a new publicaiton without add/publish publication permission."
@@ -122,20 +108,15 @@ definition {
 			password = "test",
 			userEmailAddress = "userea@liferay.com");
 
-		Publications.gotoPublish(
-			gotoManagePublications = "true",
+		PublicationsNavigator.gotoPublish(
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name");
 
 		Publications.publishPublication(publicationName = "Publication Name");
 
 		Publications.createNewPublication(
-			gotoManagePublications = "true",
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name 2");
-
-		AssertTextPresent(
-			key_publicationName = "Publication Name 2",
-			locator1 = "Publications#PUBLICATIONS_INDICATOR_TITLE",
-			value1 = "Publication Name 2");
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Publications",
@@ -161,18 +142,7 @@ definition {
 			password = "test",
 			userEmailAddress = "userea@liferay.com");
 
-		Click(locator1 = "Publications#PUBLICATIONS_INDICATOR_BUTTON");
-
-		AssertElementNotPresent(
-			key_menuItem = "Create New Publication",
-			locator1 = "MenuItem#ANY_MENU_ITEM");
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
-
-		AssertElementNotPresent(locator1 = "Button#PLUS");
+		PublicationsPermissions.assertNoPermissionToCreatePublication();
 
 		User.logoutPG();
 
@@ -200,219 +170,7 @@ definition {
 			password = "test",
 			userEmailAddress = "userea@liferay.com");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
-
-		Click(
-			key_publicationName = "Publication Name 3",
-			locator1 = "Publications#LIST_PUBLICATION_ELLIPSIS");
-
-		AssertElementNotPresent(
-			key_menuItem = "Publish",
-			locator1 = "MenuItem#ANY_MENU_ITEM");
-
-		Publications.selectPublication(publicationName = "Publication Name 3");
-
-		Click(locator1 = "Publications#PUBLICATIONS_INDICATOR_BUTTON");
-
-		AssertElementNotPresent(
-			key_menuItem = "Publish",
-			locator1 = "MenuItem#ANY_MENU_ITEM");
-	}
-
-	@description = "Assert modification conflict displays when modify the same document in two Publications"
-	@priority = "5"
-	test AssertModificationConflictDisplays {
-		property portal.acceptance = "true";
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest",
-			mimeType = "text/plain",
-			sourceFileName = "Document_1.txt");
-
-		JSONPublications.addPublication(publicationName = "Publication 1 Name");
-
-		JSONPublications.selectPublication(publicationName = "Publication 1 Name");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.editCP(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentDescriptionEdit = "DM Document Description Edit 1",
-			dmDocumentTitle = "DM Document Title",
-			dmDocumentTitleEdit = "DM Document Title Edit 1");
-
-		JSONPublications.addPublication(publicationName = "Publication 2 Name");
-
-		JSONPublications.selectPublication(publicationName = "Publication 2 Name");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.editCP(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentDescriptionEdit = "DM Document Description Edit 2",
-			dmDocumentTitle = "DM Document Title",
-			dmDocumentTitleEdit = "DM Document Title Edit 2");
-
-		JSONPublications.selectPublication(publicationName = "Publication 1 Name");
-
-		JSONPublications.publishPublication(publicationName = "Publication 1 Name");
-
-		Publications.viewPublicationPublished(publicationName = "Publication 1 Name");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title Edit 1");
-
-		DMDocument.viewCP(dmDocumentTitle = "DM Document Title Edit 1");
-
-		JSONPublications.selectPublication(publicationName = "Publication 2 Name");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title Edit 2");
-
-		DMDocument.viewCP(dmDocumentTitle = "DM Document Title Edit 2");
-
-		Publications.gotoReviewChanges(publicationName = "Publication 2 Name");
-
-		Publications.gotoPublish(publicationName = "Publication 2 Name");
-
-		Publications.viewNeedsManualResolution(
-			entryTitle = "DM Document Title Edit 2",
-			warningMessage = "Modification Conflict: The conflict cannot be automatically resolved.");
-
-		Publications.viewNeedsManualResolution(
-			entryTitle = "DM Document Title Edit 2",
-			warningMessage = "Duplicate Document Version: The document version was updated to latest.");
-	}
-
-	@description = "Assert the conflict changes disply when modifying and deleting the same document in two Publications"
-	@priority = "4"
-	test AssertModificationDeletionConflictDisplays {
-		property portal.acceptance = "true";
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest",
-			mimeType = "text/plain",
-			sourceFileName = "Document_1.txt");
-
-		JSONPublications.addPublication(publicationName = "Publication Name 1");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 1");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.editCP(
-			dmDocumentTitle = "DM Document Title",
-			dmDocumentTitleEdit = "DM Document Title Edit");
-
-		JSONPublications.addPublication(publicationName = "Publication Name 2");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 2");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.deleteCP(dmDocumentTitle = "DM Document Title");
-
-		ProductMenu.gotoPortlet(
-			category = "Recycle Bin",
-			portlet = "Recycle Bin");
-
-		RecycleBin.emptyCP();
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 1");
-
-		JSONPublications.publishPublication(publicationName = "Publication Name 1");
-
-		Publications.viewPublicationPublished(publicationName = "Publication Name 1");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title Edit");
-
-		DMDocument.viewCP(dmDocumentTitle = "DM Document Title Edit");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 2");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.viewDefault();
-
-		Publications.gotoPublish(publicationName = "Publication Name 2");
-
-		Publications.viewNeedsManualResolution(
-			entryTitle = "Asset",
-			warningMessage = "Modification Deletion Conflict: Deletion conflicts with a modification.");
-
-		Publications.viewNeedsManualResolution(
-			entryTitle = "Document Version",
-			warningMessage = "Modification Deletion Conflict: Deletion conflicts with a modification.");
-
-		Publications.viewNeedsManualResolution(
-			entryTitle = "Document",
-			warningMessage = "Modification Deletion Conflict: Deletion conflicts with a modification.");
-	}
-
-	@description = "Assert there are no conflict changes when deleting the same document in two Publications"
-	@priority = "4"
-	test AssertNoConflictForDeletionsCombinationPublications {
-		property portal.acceptance = "true";
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.doc");
-
-		JSONPublications.addPublication(publicationName = "Publication Name 1");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 1");
-
-		JSONDocument.deleteFile(
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest");
-
-		JSONPublications.addPublication(publicationName = "Publication Name 2");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 2");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		JSONDocument.deleteFile(
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 1");
-
-		JSONPublications.publishPublication(publicationName = "Publication Name 1");
-
-		Publications.viewPublicationPublished(publicationName = "Publication Name 1");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.viewDefault();
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 2");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.viewDefault();
-
-		Publications.gotoPublish(publicationName = "Publication Name 2");
-
-		AssertElementNotPresent(locator1 = "Publications#NEEDS_MANUAL_RESOLUTION_TABLE");
-
-		JSONPublications.publishPublication(publicationName = "Publication Name 2");
-
-		Publications.viewPublicationPublished(publicationName = "Publication Name 2");
+		PublicationsPermissions.assertNoPermissionToPublishPublication(publicationName = "Publication Name 3");
 	}
 
 	@description = "Assert Non-privileged user cannot see Publications bar."
@@ -480,84 +238,6 @@ definition {
 		Publications.viewPublicationOrderInHistory(publicationList = "Publication Name 2,Publication Name 3,Publication Name 1");
 	}
 
-	@priority = "5"
-	test ConflictingPublicationsAutomaticallyResolved {
-		JSONWebcontent.addWebContent(
-			content = "WC WebContent Content",
-			groupName = "Guest",
-			title = "WC WebContent Title");
-
-		JSONPublications.addPublication(publicationName = "Publication Name");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
-
-		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
-
-		WebContent.editCP(
-			webContentContentEdit = "WC WebContent Content 1 Edit",
-			webContentTitle = "WC WebContent Title",
-			webContentTitleEdit = "WC WebContent Title");
-
-		Publications.createNewPublication(publicationName = "Publication 2 Name");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
-
-		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
-
-		WebContent.editCP(
-			webContentContentEdit = "WC WebContent Content 2 Edit",
-			webContentTitle = "WC WebContent Title",
-			webContentTitleEdit = "WC WebContent Title");
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
-
-		Navigator.gotoNavTab(navTab = "Ongoing");
-
-		Publications.assertDiscardIsUnavailableForInactivePublication(
-			changeCategory = "Web Content Article",
-			changeTitle = "WC WebContent Title",
-			publicationName = "Publication Name");
-
-		JSONPublications.publishPublication(publicationName = "Publication 2 Name");
-
-		Publications.viewPublicationPublished(publicationName = "Publication 2 Name");
-
-		Publications.gotoPublish(
-			gotoManagePublications = "true",
-			publicationName = "Publication Name");
-
-		Publications.viewAutomaticallyResolved(
-			entryTitle = "Test Test added a Web Content Article",
-			successMessage = "The article version was updated to latest.");
-
-		Publications.viewAutomaticallyResolved(
-			entryTitle = "Test Test modified a Asset",
-			successMessage = "The conflict was automatically resolved.");
-
-		AssertElementNotPresent(locator1 = "Publications#NEEDS_MANUAL_RESOLUTION_TABLE");
-
-		AssertElementNotPresent(
-			key_warningMessage = "The conflict cannot be automatically resolved.",
-			locator1 = "Message#WARNING_SPECIFIC");
-
-		JSONPublications.publishPublication(publicationName = "Publication Name");
-
-		Publications.viewPublicationPublished(publicationName = "Publication Name");
-	}
-
 	@priority = "4"
 	test DiscardSubsetsofChangesInPublication {
 		JSONPublications.addPublication(publicationName = "Publication Name");
@@ -569,13 +249,7 @@ definition {
 			groupName = "Guest",
 			title = "WC WebContent Title");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
-
-		NavItem.gotoStructures();
+		WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "guest");
 
 		WebContentStructures.addCP(
 			structureDescription = "WC Structure Description",
@@ -587,13 +261,7 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
-
-		NavItem.gotoTemplates();
+		WebContentTemplates.openWebContentTemplatesAdmin(siteURLKey = "guest");
 
 		WebContentTemplates.addCP(
 			structureName = "WC Structure Name",
@@ -601,11 +269,7 @@ definition {
 			templateFieldNames = "Text",
 			templateName = "WC Template Name");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -617,17 +281,13 @@ definition {
 
 		PortletEntry.publish();
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		Publications.discardChanges(
+		PublicationsChanges.discardChanges(
 			changeCategory = "Dynamic Data Mapping Structure",
 			changeTitle = "WC Structure Name");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		WebContent.viewNotPresentCP(webContentTitle = "WC WebContent Title 2 Edit");
 
@@ -649,11 +309,7 @@ definition {
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		WebContent.viewNotPresentCP(webContentTitle = "WC WebContent Title 2 Edit");
 
@@ -670,6 +326,41 @@ definition {
 		AssertElementNotPresent(
 			key_tableEntry = "WC Template Name",
 			locator1 = "LexiconTable#TABLE_ENTRY");
+	}
+
+	@priority = "4"
+	test IsLocalizedInPublicationsAdmin {
+		property test.name.skip.portal.instance = "Publications#IsLocalizedInPublicationsAdmin";
+
+		User.openUsersAdmin();
+
+		User.editDisplaySettingsCP(
+			languageName = "español (España)",
+			userScreenName = "test");
+
+		JSONPublications.addPublication(publicationName = "Publication Name");
+
+		PublicationsNavigator.openPublicationsAdmin();
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Publications#MANAGE_PUBLICATIONS_PAGE_TITLE",
+			value1 = "Listas de cambios");
+
+		AssertTextEquals.assertPartialText(
+			key_navItem = "Continua",
+			locator1 = "NavBar#ACTIVE_NAV_ITEM_LINK",
+			value1 = "Continua");
+
+		AssertTextEquals.assertPartialText(
+			key_tableHeader = "Publicación",
+			locator1 = "LexiconTable#TABLE_HEADER",
+			value1 = "Publicación");
+
+		AssertTextEquals.assertPartialText(
+			key_columnName = "status",
+			key_tableEntry = "En progreso",
+			locator1 = "LexiconTable#TABLE_ENTRY_INFO",
+			value1 = "En progreso");
 	}
 
 	@description = "Assert publications changes can search and sort"
@@ -686,8 +377,8 @@ definition {
 				title = "WC Title ${count}");
 		}
 
-		Publications.gotoReviewChanges(
-			gotoManagePublications = "true",
+		PublicationsNavigator.gotoReviewChanges(
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name");
 
 		Search.searchCP(searchTerm = "1");
@@ -741,13 +432,13 @@ definition {
 			groupName = "Guest");
 
 		Publications.createNewPublication(
-			gotoManagePublications = "true",
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name");
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContentFolder.gotoCP(
@@ -767,7 +458,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContentFolder.gotoCP(
@@ -782,22 +473,22 @@ definition {
 
 		PortletEntry.publish();
 
-		Publications.gotoPublish(
-			gotoManagePublications = "true",
+		PublicationsNavigator.gotoPublish(
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication 2 Name");
 
 		Publications.publishPublication(publicationName = "Publication 2 Name");
 
 		Publications.selectPublication(publicationName = "Publication Name");
 
-		Publications.gotoPublish(publicationName = "Publication Name");
+		PublicationsNavigator.gotoPublish(publicationName = "Publication Name");
 
 		Publications.publishPublication(publicationName = "Publication Name");
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContentFolder.gotoCP(
@@ -818,7 +509,7 @@ definition {
 		property portal.acceptance = "true";
 
 		Publications.createNewPublication(
-			gotoManagePublications = "true",
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name");
 
 		JSONWebcontent.addWebContent(
@@ -827,7 +518,7 @@ definition {
 			title = "WC WebContent Title");
 
 		Publications.schedulePublication(
-			gotoManagePublications = "true",
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name");
 
 		Publications.schedulePublication(
@@ -841,283 +532,38 @@ definition {
 			value1 = "No publication has been scheduled yet.");
 	}
 
-	@description = "Assert the conflict changes disply when modifying and deleting the same document in two Publications and discard the changes"
 	@priority = "5"
-	test ResolveDeletionModificationConflictPublicationsByDiscarding {
+	test RevertPublicationAndPublishNow {
 		property portal.acceptance = "true";
+
+		JSONPublications.addPublication(publicationName = "Publication Name");
+
+		JSONPublications.selectPublication(publicationName = "Publication Name");
 
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
 			groupName = "Guest",
 			title = "WC WebContent Title");
 
-		JSONPublications.addPublication(publicationName = "Publication 1 Name");
+		JSONPublications.publishPublication(publicationName = "Publication Name");
 
-		JSONPublications.selectPublication(publicationName = "Publication 1 Name");
+		Publications.viewPublicationPublished(publicationName = "Publication Name");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
-
-		WebContent.deleteCP(
-			siteURLKey = "Guest",
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "WC WebContent Title");
-
-		JSONPublications.addPublication(publicationName = "Publication 2 Name");
-
-		JSONPublications.selectPublication(publicationName = "Publication 2 Name");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
-
-		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
-
-		WebContent.editCP(
-			webContentContentEdit = "WC WebContent Content 2 Edit",
-			webContentTitle = "WC WebContent Title",
-			webContentTitleEdit = "WC WebContent Title 2 Edit");
-
-		Publications.gotoReviewChanges(
-			gotoManagePublications = "true",
-			publicationName = "Publication 1 Name");
-
-		PublicationsChanges.viewChangesViaChangesStyle(
-			changeCategory = "Web Content Article",
-			changeSite = "Guest",
-			changeTitle = "WC WebContent Title",
-			changeType = "Deleted",
-			changeUser = "Test Test");
-
-		PublicationsChanges.viewChangesViaContextStyle(
-			changeCategory = "Web Content Article",
-			changeDescription = "Test Test deleted a Web Content Article in Guest",
-			changeTitle = "WC WebContent Title");
-
-		JSONPublications.publishPublication(publicationName = "Publication 1 Name");
-
-		Publications.viewPublicationPublished(publicationName = "Publication 1 Name");
-
-		Navigator.gotoNavTab(navTab = "History");
-
-		PublicationsChanges.viewChangesViaChangesStyle(
-			changeCategory = "Web Content Article",
-			changeSite = "Guest",
-			changeTitle = "WC WebContent Title",
-			changeType = "Deleted",
-			changeUser = "Test Test",
-			publicationName = "Publication 1 Name",
-			publishedPublication = "true");
-
-		// Workaround LPS-134018
-
-		/*WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
-
-		WebContent.viewNotPresentCP(webContentTitle = "WC WebContent Title");*/
-
-		JSONPublications.selectPublication(publicationName = "Publication 2 Name");
-
-		/*WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
-
-		WebContent.viewTitle(webContentTitle = "WC WebContent Title 2 Edit");*/
-
-		Publications.gotoReviewChanges(publicationName = "Publication 2 Name");
-
-		PublicationsChanges.viewChangesViaChangesStyle(
-			changeCategory = "Web Content Article",
-			changeSite = "Guest",
-			changeTitle = "WC WebContent Title 2 Edit",
-			changeType = "Added",
-			changeUser = "Test Test");
-
-		PublicationsChanges.viewChangesViaContextStyle(
-			changeCategory = "Web Content Article",
-			changeDescription = "Test Test added a Web Content Article in Guest",
-			changeTitle = "WC WebContent Title 2 Edit");
-
-		Publications.gotoPublish(publicationName = "Publication 2 Name");
-
-		Publications.viewNeedsManualResolution(
-			entryTitle = "WC WebContent Title 2 Edit",
-			warningMessage = "Deletion Modification Conflict: Modification conflicts with a deletion.");
-
-		Publications.gotoViewChangeDiffInConflictingPublications(entryTitle = "WC WebContent Title 2 Edit");
-
-		Publications.viewChangeDiff(
-			columnName = "Title",
-			columnValueInPublication = "WC WebContent Title 2 Edit",
-			entryDeletedInProduction = "true",
-			publicationName = "Publication 2 Name");
-
-		IFrame.closeFrame();
-
-		Pause(locator1 = "3000");
-
-		Publications.discardChanges(
-			changeCategory = "Asset",
-			changeTitle = "WC WebContent Title 2 Edit",
-			conflictingChanges = "true",
-			entryTitle = "WC WebContent Title 2 Edit");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
-
-		WebContent.viewNotPresentCP(webContentTitle = "WC WebContent Title 2 Edit");
-
-		WebContent.viewNotPresentCP(webContentTitle = "WC WebContent Title");
-
-		JSONPublications.publishPublication(publicationName = "Publication 2 Name");
-
-		Publications.viewPublicationPublished(publicationName = "Publication 2 Name");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
-
-		AssertTextEquals(
-			locator1 = "Message#EMPTY_INFO",
-			value1 = "No web content was found.");
-	}
-
-	@description = "Assert the conflict changes disply when adding the same folder Name in two Publications and resolve by editing"
-	@priority = "5"
-	test ResolveDuplicateNameConflictPublicationsByEdting {
-		property portal.acceptance = "true";
-
-		JSONPublications.addPublication(publicationName = "Publication Name 1");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 1");
-
-		JSONFolder.addFolder(
-			dmFolderDescription = "DM Folder Description",
-			dmFolderName = "DM Folder Name ",
-			groupName = "Guest");
-
-		JSONPublications.addPublication(publicationName = "Publication Name 2");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 2");
-
-		JSONFolder.addFolder(
-			dmFolderDescription = "DM Folder Description",
-			dmFolderName = "DM Folder Name",
-			groupName = "Guest");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 1");
-
-		JSONPublications.publishPublication(publicationName = "Publication Name 1");
-
-		Publications.viewPublicationPublished(publicationName = "Publication Name 1");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Documents and Media");
-
-		DMFolder.viewCP(dmFolderName = "DM Folder Name");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name 2");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Documents and Media");
-
-		DMFolder.viewCP(dmFolderName = "DM Folder Name");
-
-		Publications.gotoPublish(publicationName = "Publication Name 2");
-
-		Publications.viewNeedsManualResolution(
-			entryTitle = "DM Folder Name",
-			warningMessage = "Duplicate Folder Name: Rename the folder in the publication.");
-
-		PublicationsChanges.gotoEditChanges(
-			conflictingChanges = "true",
-			entryTitle = "DM Folder Name");
-
-		PortletEntry.inputName(name = "DM Folder Name Edit");
-
-		PortletEntry.inputDescription(description = "DM Folder Description Edit");
-
-		Button.clickSave();
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "Message#SUCCESS",
-			value1 = "No unresolved conflicts, ready to publish.");
-
-		Publications.publishPublication(publicationName = "Publication Name 2");
-	}
-
-	@priority = "5"
-	test RevertPublicationAndPublishNow {
-		property portal.acceptance = "true";
-
-		Publications.createNewPublication(
-			gotoManagePublications = "true",
-			publicationName = "Publication Name");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
-
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "Web Content Title");
-
-		PortletEntry.publish();
-
-		Publications.gotoPublish(publicationName = "Publication Name");
-
-		Publications.publishPublication(publicationName = "Publication Name");
-
-		AssertTextPresent(
-			key_publicationName = "Production",
-			locator1 = "Publications#PUBLICATIONS_INDICATOR_TITLE",
-			value1 = "Production");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		AssertElementPresent(
-			key_webContentTitle = "Web Content Title",
+			key_webContentTitle = "WC WebContent Title",
 			locator1 = "WC#ENTRY_LIST_TITLE");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
-
-		Navigator.gotoNavTab(navTab = "History");
+		PublicationsNavigator.openPublicationsHistory();
 
 		Publications.revertPublication(
 			publicationName = "Publication Name",
 			publishNow = "true");
 
-		Publications.publishPublication(publicationName = "Revert &quot;Publication Name&quot;");
+		JSONPublications.publishPublication(publicationName = "Revert &quot;Publication Name&quot;");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		AssertTextEquals(
 			locator1 = "Message#EMPTY_INFO",
@@ -1126,137 +572,73 @@ definition {
 
 	@priority = "5"
 	test SchedulePublication {
-		Publications.createNewPublication(
-			gotoManagePublications = "true",
-			publicationName = "Publication Name 1");
+		JSONPublications.addPublication(publicationName = "Publication Name 1");
 
-		Navigator.openURL();
+		JSONPublications.selectPublication(publicationName = "Publication Name 1");
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent 1 Content",
+			groupName = "Guest",
+			title = "WC WebContent 1 Title");
 
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "WC WebContent 1 Content",
-			webContentTitle = "WC WebContent 1 Title");
-
-		PortletEntry.publish();
+		PublicationsNavigator.openPublicationsAdmin();
 
 		Publications.schedulePublication(publicationName = "Publication Name 1");
 
-		Pause(locator1 = "240000");
-
 		Publications.assertScheduledPublicationPublished(publicationName = "Publication Name 1");
 
-		Publications.createNewPublication(publicationName = "Publication Name 2");
+		JSONPublications.addPublication(publicationName = "Publication Name 2");
 
-		Navigator.openURL();
+		JSONPublications.selectPublication(publicationName = "Publication Name 2");
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
-
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "WC WebContent 2 Content",
-			webContentTitle = "WC WebContent 2 Title");
-
-		PortletEntry.publish();
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent 2 Content",
+			groupName = "Guest",
+			title = "WC WebContent 2 Title");
 
 		Publications.schedulePublication(
-			gotoManagePublications = "true",
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name 2");
-
-		Pause(locator1 = "240000");
 
 		Publications.assertScheduledPublicationPublished(publicationName = "Publication Name 2");
 
-		Publications.createNewPublication(publicationName = "Publication Name 3");
+		JSONPublications.addPublication(publicationName = "Publication Name 3");
 
-		Navigator.openURL();
+		JSONPublications.selectPublication(publicationName = "Publication Name 3");
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Web Content");
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent 3 Content",
+			groupName = "Guest",
+			title = "WC WebContent 3 Title");
 
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "WC WebContent 3 Content",
-			webContentTitle = "WC WebContent 3 Title");
-
-		PortletEntry.publish();
-
-		Publications.schedulePublication(publicationName = "Publication Name 3");
-
-		Pause(locator1 = "240000");
+		Publications.schedulePublication(
+			gotoPublicationsAdmin = "true",
+			publicationName = "Publication Name 3");
 
 		Publications.assertScheduledPublicationPublished(publicationName = "Publication Name 3");
 	}
 
 	@priority = "5"
 	test SearchPublishedPublications {
-		Publications.createNewPublication(
-			gotoManagePublications = "true",
-			publicationName = "Apple");
+		for (var publicationName : list "Apple,Banana,Cherry") {
+			JSONPublications.addPublication(publicationName = "${publicationName}");
+		}
 
-		Publications.createNewPublication(publicationName = "Banana");
-
-		Publications.createNewPublication(publicationName = "Cherry");
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
-
-		Navigator.gotoNavTab(navTab = "Ongoing");
+		PublicationsNavigator.openPublicationsAdmin();
 
 		for (var publicationName : list "Apple,Banana,Cherry") {
 			Publications.search(publicationName = "${publicationName}");
 		}
 
-		Navigator.openURL();
+		for (var publicationName : list "Apple,Banana,Cherry") {
+			JSONPublications.selectPublication(publicationName = "${publicationName}");
 
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
+			JSONLayout.addPublicLayout(
+				groupName = "Guest",
+				layoutName = "${publicationName}");
 
-		SitePages.addPublicPage(pageName = "Cherry");
-
-		Publications.gotoPublish(publicationName = "Cherry");
-
-		Publications.publishPublication(publicationName = "Cherry");
-
-		Publications.selectPublication(publicationName = "Banana");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
-
-		SitePages.addPublicPage(pageName = "Banana");
-
-		Publications.gotoPublish(publicationName = "Banana");
-
-		Publications.publishPublication(publicationName = "Banana");
-
-		Publications.selectPublication(publicationName = "Apple");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
-
-		SitePages.addPublicPage(pageName = "Apple");
-
-		Publications.gotoPublish(publicationName = "Apple");
-
-		Publications.publishPublication(publicationName = "Apple");
+			JSONPublications.publishPublication(publicationName = "${publicationName}");
+		}
 
 		Navigator.gotoNavTab(navTab = "History");
 

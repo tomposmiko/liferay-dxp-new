@@ -14,25 +14,38 @@
 
 package com.liferay.search.experiences.internal.blueprint.search.request.enhancer;
 
+import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.aggregation.Aggregations;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.geolocation.GeoBuilders;
 import com.liferay.portal.search.highlight.FieldConfigBuilderFactory;
 import com.liferay.portal.search.highlight.HighlightBuilderFactory;
 import com.liferay.portal.search.query.Queries;
+import com.liferay.portal.search.rescore.RescoreBuilderFactory;
 import com.liferay.portal.search.script.Scripts;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.significance.SignificanceHeuristics;
 import com.liferay.portal.search.sort.Sorts;
+import com.liferay.portal.vulcan.dto.converter.DTOConverter;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
 import com.liferay.search.experiences.blueprint.search.request.enhancer.SXPBlueprintSearchRequestEnhancer;
 import com.liferay.search.experiences.internal.blueprint.highlight.HighlightConverter;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterData;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterDataCreator;
-import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterParser;
+import com.liferay.search.experiences.internal.blueprint.property.PropertyExpander;
+import com.liferay.search.experiences.internal.blueprint.property.PropertyResolver;
 import com.liferay.search.experiences.internal.blueprint.query.QueryConverter;
 import com.liferay.search.experiences.internal.blueprint.script.ScriptConverter;
 import com.liferay.search.experiences.internal.blueprint.search.request.body.contributor.AggsSXPSearchRequestBodyContributor;
@@ -42,12 +55,27 @@ import com.liferay.search.experiences.internal.blueprint.search.request.body.con
 import com.liferay.search.experiences.internal.blueprint.search.request.body.contributor.SXPSearchRequestBodyContributor;
 import com.liferay.search.experiences.internal.blueprint.search.request.body.contributor.SortSXPSearchRequestBodyContributor;
 import com.liferay.search.experiences.internal.blueprint.search.request.body.contributor.SuggestSXPSearchRequestBodyContributor;
+import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
+import com.liferay.search.experiences.rest.dto.v1_0.ElementDefinition;
+import com.liferay.search.experiences.rest.dto.v1_0.ElementInstance;
+import com.liferay.search.experiences.rest.dto.v1_0.Field;
+import com.liferay.search.experiences.rest.dto.v1_0.FieldSet;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
+import com.liferay.search.experiences.rest.dto.v1_0.SXPElement;
+import com.liferay.search.experiences.rest.dto.v1_0.TypeOptions;
+import com.liferay.search.experiences.rest.dto.v1_0.UiConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.util.ConfigurationUtil;
 import com.liferay.search.experiences.rest.dto.v1_0.util.SXPBlueprintUtil;
 
+import java.io.Serializable;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.apache.commons.lang.StringUtils;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -56,19 +84,12 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Petteri Karttunen
  */
-@Component(immediate = true, service = SXPBlueprintSearchRequestEnhancer.class)
+@Component(
+	enabled = false, immediate = true,
+	service = SXPBlueprintSearchRequestEnhancer.class
+)
 public class SXPBlueprintSearchRequestEnhancerImpl
 	implements SXPBlueprintSearchRequestEnhancer {
-
-	@Override
-	public void enhance(
-		SearchRequestBuilder searchRequestBuilder,
-		com.liferay.search.experiences.model.SXPBlueprint sxpBlueprint) {
-
-		_enhance(
-			searchRequestBuilder,
-			SXPBlueprintUtil.toSXPBlueprint(sxpBlueprint));
-	}
 
 	@Override
 	public void enhance(
@@ -79,6 +100,23 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 			SXPBlueprintUtil.toSXPBlueprint(sxpBlueprintJSON));
 	}
 
+	@Override
+	public void enhance(
+		SearchRequestBuilder searchRequestBuilder,
+		com.liferay.search.experiences.model.SXPBlueprint sxpBlueprint) {
+
+		DTOConverter
+			<com.liferay.search.experiences.model.SXPBlueprint, SXPBlueprint>
+				dtoConverter = _getDTOConverter();
+
+		try {
+			_enhance(searchRequestBuilder, dtoConverter.toDTO(sxpBlueprint));
+		}
+		catch (Exception exception) {
+			throw new RuntimeException(exception);
+		}
+	}
+
 	@Activate
 	protected void activate() {
 		HighlightConverter highlightConverter = new HighlightConverter(
@@ -87,30 +125,25 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 		ScriptConverter scriptConverter = new ScriptConverter(_scripts);
 
 		_sxpSearchRequestBodyContributors = Arrays.asList(
+
+			// TODO AdvancedSXPSearchRequestBodyContributor with fetchSource
+
 			new AggsSXPSearchRequestBodyContributor(
 				_aggregations, _geoBuilders, highlightConverter, queryConverter,
 				scriptConverter, _significanceHeuristics, _sorts),
 			new GeneralSXPSearchRequestBodyContributor(),
 			new HighlightSXPSearchRequestBodyContributor(highlightConverter),
 			new QuerySXPSearchRequestBodyContributor(
-				_complexQueryPartBuilderFactory, queryConverter),
+				_complexQueryPartBuilderFactory, queryConverter,
+				_rescoreBuilderFactory),
 			new SuggestSXPSearchRequestBodyContributor(),
 			new SortSXPSearchRequestBodyContributor(
 				_geoBuilders, queryConverter, scriptConverter, _sorts));
 	}
 
 	private void _contributeSXPSearchRequestBodyContributors(
-		SearchRequestBuilder searchRequestBuilder, SXPBlueprint sxpBlueprint,
+		Configuration configuration, SearchRequestBuilder searchRequestBuilder,
 		SXPParameterData sxpParameterData) {
-
-		SXPParameter sxpParameter = sxpParameterData.getSXPParameterByName(
-			"system.excluded_search_request_body_contributors");
-
-		String[] names = null;
-
-		if (sxpParameter != null) {
-			names = (String[])sxpParameter.getValue();
-		}
 
 		if (ListUtil.isEmpty(_sxpSearchRequestBodyContributors)) {
 			return;
@@ -121,15 +154,9 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 		for (SXPSearchRequestBodyContributor sxpSearchRequestBodyContributor :
 				_sxpSearchRequestBodyContributors) {
 
-			if (ArrayUtil.contains(
-					names, sxpSearchRequestBodyContributor.getName())) {
-
-				continue;
-			}
-
 			try {
 				sxpSearchRequestBodyContributor.contribute(
-					searchRequestBuilder, sxpBlueprint, sxpParameterData);
+					configuration, searchRequestBuilder, sxpParameterData);
 			}
 			catch (Exception exception) {
 				runtimeException.addSuppressed(exception);
@@ -142,67 +169,282 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 	}
 
 	private void _enhance(
+		ElementInstance elementInstance,
+		SearchRequestBuilder searchRequestBuilder,
+		SXPParameterData sxpParameterData) {
+
+		Configuration configuration = _getConfiguration(
+			elementInstance, sxpParameterData);
+
+		if (configuration == null) {
+			return;
+		}
+
+		_contributeSXPSearchRequestBodyContributors(
+			configuration, searchRequestBuilder, sxpParameterData);
+	}
+
+	private void _enhance(
 		SearchRequestBuilder searchRequestBuilder, SXPBlueprint sxpBlueprint) {
+
+		if ((sxpBlueprint.getConfiguration() == null) &&
+			ArrayUtil.isEmpty(sxpBlueprint.getElementInstances())) {
+
+			return;
+		}
+
+		Configuration configuration = sxpBlueprint.getConfiguration();
+
+		if (configuration != null) {
+			MapUtil.isNotEmptyForEach(
+				configuration.getSearchContextAttributes(),
+				(key, value) -> searchRequestBuilder.withSearchContext(
+					searchContext -> searchContext.setAttribute(
+						key, (Serializable)value)));
+		}
 
 		SXPParameterData sxpParameterData = _sxpParameterDataCreator.create(
 			searchRequestBuilder.withSearchContextGet(
 				searchContext -> searchContext),
 			sxpBlueprint);
 
-		// TODO From and size
+		if (configuration != null) {
+			_contributeSXPSearchRequestBodyContributors(
+				_expand(
+					configuration,
+					(name, options) -> _resolveProperty(
+						name, options, sxpParameterData)),
+				searchRequestBuilder, sxpParameterData);
+		}
 
-		searchRequestBuilder.emptySearchEnabled(
-			true
-		).excludeContributors(
-			"com.liferay.search.experiences.blueprint"
-		).explain(
-			_isExplain(sxpParameterData)
-		).includeResponseString(
-			_isIncludeResponseString(sxpParameterData)
-		);
-
-		_contributeSXPSearchRequestBodyContributors(
-			searchRequestBuilder, _expand(sxpBlueprint, sxpParameterData),
-			sxpParameterData);
+		ArrayUtil.isNotEmptyForEach(
+			sxpBlueprint.getElementInstances(),
+			elementInstance -> _enhance(
+				elementInstance, searchRequestBuilder, sxpParameterData));
 	}
 
-	private SXPBlueprint _expand(
-		SXPBlueprint sxpBlueprint1, SXPParameterData sxpParameterData) {
+	private Configuration _expand(
+		Configuration configuration, PropertyResolver... propertyResolvers) {
 
-		SXPBlueprint sxpBlueprint2 = SXPBlueprint.toDTO(
-			String.valueOf(sxpBlueprint1));
+		PropertyExpander propertyExpander = new PropertyExpander(
+			propertyResolvers);
 
-		sxpBlueprint2.setConfiguration(
-			ConfigurationUtil.toConfiguration(
-				SXPParameterParser.parse(
-					String.valueOf(sxpBlueprint1.getConfiguration()),
-					sxpParameterData)));
-
-		return sxpBlueprint2;
+		return ConfigurationUtil.toConfiguration(
+			propertyExpander.expand(String.valueOf(configuration)));
 	}
 
-	private boolean _isExplain(SXPParameterData sxpParameterData) {
-		SXPParameter sxpParameter = sxpParameterData.getSXPParameterByName(
-			"system.explain");
+	private Configuration _getConfiguration(
+		ElementInstance elementInstance, SXPParameterData sxpParameterData) {
 
-		if (sxpParameter == null) {
+		if (elementInstance.getConfigurationEntry() != null) {
+			return _expand(
+				elementInstance.getConfigurationEntry(),
+				(name, options) -> _resolveProperty(
+					name, options, sxpParameterData));
+		}
+
+		SXPElement sxpElement = elementInstance.getSxpElement();
+
+		if (sxpElement == null) {
+			return null;
+		}
+
+		ElementDefinition elementDefinition = sxpElement.getElementDefinition();
+
+		if (elementDefinition == null) {
+			return null;
+		}
+
+		Configuration configuration = elementDefinition.getConfiguration();
+
+		if (configuration == null) {
+			return null;
+		}
+
+		return _expand(
+			configuration,
+			(name, options) -> _resolveProperty(
+				name, options, sxpParameterData),
+			(name, options) -> {
+				String shortName = StringUtils.substringAfter(
+					name, "configuration.");
+
+				if (Validator.isNull(shortName)) {
+					return null;
+				}
+
+				UiConfiguration uiConfiguration =
+					elementDefinition.getUiConfiguration();
+
+				Map<String, Object> values =
+					elementInstance.getUiConfigurationValues();
+
+				if ((uiConfiguration == null) ||
+					(uiConfiguration.getFieldSets() == null) ||
+					(values == null)) {
+
+					return null;
+				}
+
+				return _unpack(
+					_getField(uiConfiguration.getFieldSets(), shortName),
+					values.get(shortName));
+			});
+	}
+
+	private DTOConverter
+		<com.liferay.search.experiences.model.SXPBlueprint, SXPBlueprint>
+			_getDTOConverter() {
+
+		String dtoClassName =
+			com.liferay.search.experiences.model.SXPBlueprint.class.getName();
+
+		return (DTOConverter
+			<com.liferay.search.experiences.model.SXPBlueprint, SXPBlueprint>)
+				_dtoConverterRegistry.getDTOConverter(dtoClassName);
+	}
+
+	private Field _getField(Field[] fields, String name) {
+		if (ArrayUtil.isEmpty(fields)) {
+			return null;
+		}
+
+		for (Field field : fields) {
+			if (Objects.equals(field.getName(), name)) {
+				return field;
+			}
+		}
+
+		return null;
+	}
+
+	private Field _getField(FieldSet[] fieldSets, String name) {
+		if (ArrayUtil.isEmpty(fieldSets)) {
+			return null;
+		}
+
+		for (FieldSet fieldSet : fieldSets) {
+			Field field = _getField(fieldSet.getFields(), name);
+
+			if (field != null) {
+				return field;
+			}
+		}
+
+		return null;
+	}
+
+	private String _getType(Field field) {
+		if (field != null) {
+			return field.getType();
+		}
+
+		return null;
+	}
+
+	private String _getUnitSuffix(Field field) {
+		if (field != null) {
+			TypeOptions typeOptions = field.getTypeOptions();
+
+			if (typeOptions != null) {
+				return typeOptions.getUnitSuffix();
+			}
+		}
+
+		return null;
+	}
+
+	private boolean _isNullable(Field field) {
+		if (field == null) {
 			return false;
 		}
 
-		return GetterUtil.getBoolean(sxpParameter.getValue());
+		TypeOptions typeOptions = field.getTypeOptions();
+
+		if (typeOptions == null) {
+			return false;
+		}
+
+		return GetterUtil.getBoolean(typeOptions.getNullable());
 	}
 
-	private boolean _isIncludeResponseString(
+	private Object _resolveProperty(
+		String name, Map<String, String> options,
 		SXPParameterData sxpParameterData) {
 
 		SXPParameter sxpParameter = sxpParameterData.getSXPParameterByName(
-			"system.include_response_string");
+			name);
 
-		if (sxpParameter == null) {
-			return false;
+		if ((sxpParameter == null) || !sxpParameter.isTemplateVariable()) {
+			return null;
 		}
 
-		return GetterUtil.getBoolean(sxpParameter.getValue());
+		return sxpParameter.evaluateToString(options);
+	}
+
+	private String _toFieldMappingString(JSONObject jsonObject) {
+		StringBundler sb = new StringBundler(5);
+
+		sb.append(jsonObject.get("field"));
+
+		String locale = jsonObject.getString("locale");
+
+		if (Validator.isNotNull(locale)) {
+			sb.append(CharPool.UNDERLINE);
+			sb.append(locale);
+		}
+
+		Object boost = jsonObject.get("boost");
+
+		if (boost != null) {
+			sb.append(CharPool.CARET);
+			sb.append(boost);
+		}
+
+		return sb.toString();
+	}
+
+	private Object _unpack(Field field, Object value) {
+		String type = _getType(field);
+
+		if ((value instanceof JSONObject) &&
+			Objects.equals(type, "fieldMapping")) {
+
+			return _toFieldMappingString((JSONObject)value);
+		}
+
+		if ((value instanceof JSONArray) &&
+			Objects.equals(type, "fieldMappingList")) {
+
+			List<String> fields = new ArrayList<>();
+
+			for (Object item : (JSONArray)value) {
+				fields.add(_toFieldMappingString((JSONObject)item));
+			}
+
+			return JSONFactoryUtil.createJSONArray(fields);
+		}
+
+		if ((value instanceof String) && Objects.equals(type, "json")) {
+			try {
+				return JSONFactoryUtil.createJSONObject((String)value);
+			}
+			catch (JSONException jsonException) {
+				return ReflectionUtil.throwException(jsonException);
+			}
+		}
+
+		if (_isNullable(field) && Validator.isNull(value)) {
+			return null;
+		}
+
+		String unitSuffix = _getUnitSuffix(field);
+
+		if (unitSuffix != null) {
+			return value + unitSuffix;
+		}
+
+		return value;
 	}
 
 	@Reference
@@ -210,6 +452,9 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 
 	@Reference
 	private ComplexQueryPartBuilderFactory _complexQueryPartBuilderFactory;
+
+	@Reference
+	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Reference
 	private FieldConfigBuilderFactory _fieldConfigBuilderFactory;
@@ -222,6 +467,9 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 
 	@Reference
 	private Queries _queries;
+
+	@Reference
+	private RescoreBuilderFactory _rescoreBuilderFactory;
 
 	@Reference
 	private Scripts _scripts;

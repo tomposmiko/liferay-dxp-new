@@ -59,8 +59,8 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -81,11 +81,13 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -182,31 +184,18 @@ public class StagingImplTest {
 
 	@Test
 	public void testInitialPublication() throws Exception {
-		long companyId = _group.getCompanyId();
-
-		StagingConfiguration stagingConfiguration =
-			ConfigurationProviderUtil.getCompanyConfiguration(
-				StagingConfiguration.class, companyId);
-
-		boolean stagingDeleteTempLAROnSuccess =
-			stagingConfiguration.stagingDeleteTempLAROnSuccess();
-
-		Dictionary<String, Object> properties = new Hashtable<>();
-
-		properties.put("stagingDeleteTempLAROnSuccess", false);
-
-		ConfigurationProviderUtil.saveCompanyConfiguration(
-			StagingConfiguration.class, companyId, properties);
-
 		try {
+			ConfigurationProviderUtil.saveCompanyConfiguration(
+				StagingConfiguration.class, _group.getCompanyId(),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"stagingDeleteTempLAROnSuccess", false
+				).build());
+
 			doTestInitialPublication();
 		}
 		finally {
-			properties.put(
-				"stagingDeleteTempLAROnSuccess", stagingDeleteTempLAROnSuccess);
-
-			ConfigurationProviderUtil.saveCompanyConfiguration(
-				StagingConfiguration.class, companyId, properties);
+			ConfigurationProviderUtil.deleteCompanyConfiguration(
+				StagingConfiguration.class, _group.getCompanyId());
 		}
 	}
 
@@ -340,13 +329,18 @@ public class StagingImplTest {
 
 		String includePattern = String.valueOf(_group.getGroupId()) + "*.lar";
 
-		String[] larFileNames = FileUtil.find(
-			SystemProperties.get(SystemProperties.TMP_DIR), includePattern,
-			null);
+		List<String> larFileNames = new ArrayList<>();
 
-		Arrays.sort(larFileNames);
+		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
+				Paths.get(SystemProperties.get(SystemProperties.TMP_DIR)),
+				includePattern)) {
 
-		File larFile = new File(larFileNames[larFileNames.length - 1]);
+			directoryStream.forEach(path -> larFileNames.add(path.toString()));
+		}
+
+		larFileNames.sort(null);
+
+		File larFile = new File(larFileNames.get(larFileNames.size() - 1));
 
 		PortletDataContext portletDataContext =
 			PortletDataContextFactoryUtil.createImportPortletDataContext(

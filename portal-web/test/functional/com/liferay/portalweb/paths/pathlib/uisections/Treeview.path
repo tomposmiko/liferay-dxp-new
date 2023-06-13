@@ -11,13 +11,8 @@
 
 <tbody>
 <tr>
-	<td>NODE_COLLAPSE_BUTTON</td>
-	<td>//div[contains(@class,'treeview-node-list')]//button[contains(@class,'treeview-node-list')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>NODE_COLLAPSED</td>
-	<td>//div[contains(@class,'treeview-node-main') and @aria-expanded='false']/div[@class='treeview-node-toggler'] | //span[contains(@class,'glyphicon-plus')] | //div[contains(@class,'treeview-node-list')]/button[contains(@class,'treeview-node-list') and @aria-expanded='false']</td>
+	<td>//div[contains(@class,'treeview-node-list')]/button[contains(@class,'treeview-node-list') and @aria-expanded='false'] | //div[contains(@class,'tree-collapsed')]//span[not(contains(@class,'hidden'))]//*[name()='svg'][contains(@class,'icon-plus')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -47,7 +42,7 @@
 </tr>
 <tr>
 	<td>NODE_LIST</td>
-	<td>//div[contains(@class,'treeview-node-list') and contains(.,'${key_nodeListName}')]/div[contains(@class,'card')]</td>
+	<td>//div[contains(@class,'treeview-node-list')] | //li[contains(@class,'tree-node')]</td>
 	<td></td>
 </tr>
 <tr>

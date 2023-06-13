@@ -112,11 +112,24 @@ definition {
 				value1 = "${pageName}");
 		}
 
+		if (isSet(entryExternalURL)) {
+			AssertTextEquals(
+				key_text = "URL",
+				locator1 = "TextInput#ANY",
+				value1 = "${entryExternalURL}");
+		}
+
 		Click(locator1 = "CKEditor#OK_BUTTON");
 	}
 
 	macro assertEditorPresent {
 		AssertElementPresent(locator1 = "CKEditor#BODY_FIELD");
+	}
+
+	macro assertSourceContent {
+		Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON");
+
+		AssertElementPresent(locator1 = "CKEditor#BODY_SOURCE_VALUE_1");
 	}
 
 	macro assertSourceValue {

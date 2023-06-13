@@ -14,12 +14,10 @@
 
 package com.liferay.frontend.taglib.clay.servlet.taglib;
 
-import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.frontend.taglib.clay.data.set.ClayDataSetDisplayViewSerializer;
 import com.liferay.frontend.taglib.clay.data.set.filter.ClayDataSetFilterSerializer;
 import com.liferay.frontend.taglib.clay.data.set.model.ClayPaginationEntry;
 import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
-import com.liferay.frontend.taglib.clay.internal.js.loader.modules.extender.npm.NPMResolverProvider;
 import com.liferay.frontend.taglib.clay.internal.servlet.ServletContextUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
@@ -31,7 +29,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.taglib.util.IncludeTag;
 
@@ -60,13 +57,6 @@ public class HeadlessDataSetDisplayTag extends IncludeTag {
 
 			if (_creationMenu == null) {
 				_creationMenu = new CreationMenu();
-			}
-
-			NPMResolver npmResolver = NPMResolverProvider.getNPMResolver();
-
-			if ((npmResolver != null) && Validator.isNull(_module)) {
-				_module = npmResolver.resolveModuleName(
-					"frontend-taglib-clay/data_set_display/entry");
 			}
 
 			_setActiveViewSettingsJSON();
@@ -107,16 +97,16 @@ public class HeadlessDataSetDisplayTag extends IncludeTag {
 		return _formId;
 	}
 
+	public String getFormName() {
+		return _formName;
+	}
+
 	public String getId() {
 		return _id;
 	}
 
 	public int getItemsPerPage() {
 		return _itemsPerPage;
-	}
-
-	public String getModule() {
-		return _module;
 	}
 
 	public String getNamespace() {
@@ -195,6 +185,10 @@ public class HeadlessDataSetDisplayTag extends IncludeTag {
 
 	public void setFormId(String formId) {
 		_formId = formId;
+	}
+
+	public void setFormName(String formName) {
+		_formName = formName;
 	}
 
 	public void setId(String id) {
@@ -287,9 +281,9 @@ public class HeadlessDataSetDisplayTag extends IncludeTag {
 		_clayPaginationEntries = null;
 		_creationMenu = new CreationMenu();
 		_formId = null;
+		_formName = null;
 		_id = null;
 		_itemsPerPage = 0;
-		_module = null;
 		_namespace = null;
 		_nestedItemsKey = null;
 		_nestedItemsReferenceKey = null;
@@ -345,11 +339,11 @@ public class HeadlessDataSetDisplayTag extends IncludeTag {
 		httpServletRequest.setAttribute(
 			"clay:headless-data-set-display:formId", _formId);
 		httpServletRequest.setAttribute(
+			"clay:headless-data-set-display:formName", _formName);
+		httpServletRequest.setAttribute(
 			"clay:headless-data-set-display:id", _id);
 		httpServletRequest.setAttribute(
 			"clay:headless-data-set-display:itemsPerPage", _itemsPerPage);
-		httpServletRequest.setAttribute(
-			"clay:headless-data-set-display:module", _module);
 		httpServletRequest.setAttribute(
 			"clay:headless-data-set-display:namespace", _namespace);
 		httpServletRequest.setAttribute(
@@ -440,7 +434,7 @@ public class HeadlessDataSetDisplayTag extends IncludeTag {
 			clayPaginationEntry);
 	}
 
-	private static final String _PAGE = "/headless_data_set_display/page.jsp";
+	private static final String _PAGE = "/headless_data_set/page.jsp";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		HeadlessDataSetDisplayTag.class);
@@ -459,9 +453,9 @@ public class HeadlessDataSetDisplayTag extends IncludeTag {
 	private List<ClayPaginationEntry> _clayPaginationEntries;
 	private CreationMenu _creationMenu = new CreationMenu();
 	private String _formId;
+	private String _formName;
 	private String _id;
 	private int _itemsPerPage;
-	private String _module;
 	private String _namespace;
 	private String _nestedItemsKey;
 	private String _nestedItemsReferenceKey;

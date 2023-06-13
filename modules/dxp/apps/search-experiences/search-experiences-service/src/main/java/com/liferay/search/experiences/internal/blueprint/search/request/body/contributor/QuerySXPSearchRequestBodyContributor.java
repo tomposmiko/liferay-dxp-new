@@ -17,20 +17,30 @@ package com.liferay.search.experiences.internal.blueprint.search.request.body.co
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.search.filter.ComplexQueryPart;
+import com.liferay.portal.search.filter.ComplexQueryPartBuilder;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
+import com.liferay.portal.search.rescore.Rescore.ScoreMode;
+import com.liferay.portal.search.rescore.RescoreBuilder;
+import com.liferay.portal.search.rescore.RescoreBuilderFactory;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.search.experiences.internal.blueprint.condition.SXPConditionEvaluator;
 import com.liferay.search.experiences.internal.blueprint.exception.InvalidQueryEntryException;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterData;
+import com.liferay.search.experiences.internal.blueprint.property.PropertyValidator;
 import com.liferay.search.experiences.internal.blueprint.query.QueryConverter;
 import com.liferay.search.experiences.rest.dto.v1_0.Clause;
 import com.liferay.search.experiences.rest.dto.v1_0.Condition;
 import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
 import com.liferay.search.experiences.rest.dto.v1_0.QueryConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.QueryEntry;
-import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
+import com.liferay.search.experiences.rest.dto.v1_0.Rescore;
 
 import java.beans.ExceptionListener;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * @author Petteri Karttunen
@@ -40,18 +50,18 @@ public class QuerySXPSearchRequestBodyContributor
 
 	public QuerySXPSearchRequestBodyContributor(
 		ComplexQueryPartBuilderFactory complexQueryPartBuilderFactory,
-		QueryConverter queryConverter) {
+		QueryConverter queryConverter,
+		RescoreBuilderFactory rescoreBuilderFactory) {
 
 		_complexQueryPartBuilderFactory = complexQueryPartBuilderFactory;
 		_queryConverter = queryConverter;
+		_rescoreBuilderFactory = rescoreBuilderFactory;
 	}
 
 	@Override
 	public void contribute(
-		SearchRequestBuilder searchRequestBuilder, SXPBlueprint sxpBlueprint,
+		Configuration configuration, SearchRequestBuilder searchRequestBuilder,
 		SXPParameterData sxpParameterData) {
-
-		Configuration configuration = sxpBlueprint.getConfiguration();
 
 		QueryConfiguration queryConfiguration =
 			configuration.getQueryConfiguration();
@@ -85,28 +95,41 @@ public class QuerySXPSearchRequestBodyContributor
 	}
 
 	private boolean _evaluate(
-		Condition condition, SXPParameterData sxpParameterData) {
+		Condition condition, RuntimeException runtimeException,
+		SXPParameterData sxpParameterData) {
 
 		if (condition == null) {
 			return true;
 		}
 
-		SXPConditionEvaluator sxpConditionEvaluator = new SXPConditionEvaluator(
-			sxpParameterData);
+		try {
+			SXPConditionEvaluator sxpConditionEvaluator =
+				new SXPConditionEvaluator(sxpParameterData);
 
-		return sxpConditionEvaluator.evaluate(condition);
+			return sxpConditionEvaluator.evaluate(
+				PropertyValidator.validate(condition));
+		}
+		catch (Exception exception) {
+			runtimeException.addSuppressed(exception);
+
+			throw runtimeException;
+		}
 	}
 
-	private void _processClause(
-		Clause clause, SearchRequestBuilder searchRequestBuilder) {
+	private <X, Y> void _process(
+		Consumer<Y> consumer, ExceptionListener exceptionListener,
+		Function<X, Y> function, X[] objects) {
 
-		searchRequestBuilder.addComplexQueryPart(
-			_complexQueryPartBuilderFactory.builder(
-			).occur(
-				clause.getOccur()
-			).query(
-				_queryConverter.toQuery((JSONObject)clause.getQuery())
-			).build());
+		ArrayUtil.isNotEmptyForEach(
+			objects,
+			object -> {
+				try {
+					consumer.accept(function.apply(object));
+				}
+				catch (Exception exception) {
+					exceptionListener.exceptionThrown(exception);
+				}
+			});
 	}
 
 	private void _processQueryEntries(
@@ -135,33 +158,93 @@ public class QuerySXPSearchRequestBodyContributor
 		SearchRequestBuilder searchRequestBuilder,
 		SXPParameterData sxpParameterData) {
 
-		if (!GetterUtil.getBoolean(queryEntry.getEnabled()) ||
-			!_evaluate(queryEntry.getCondition(), sxpParameterData)) {
-
+		if (!GetterUtil.getBoolean(queryEntry.getEnabled(), true)) {
 			return;
 		}
 
 		InvalidQueryEntryException invalidQueryEntryException =
 			InvalidQueryEntryException.at(index);
 
-		ArrayUtil.isNotEmptyForEach(
-			queryEntry.getClauses(),
-			clause -> {
-				try {
-					_processClause(clause, searchRequestBuilder);
-				}
-				catch (Exception exception) {
-					invalidQueryEntryException.addSuppressed(exception);
-				}
-			});
+		if (!_evaluate(
+				queryEntry.getCondition(), invalidQueryEntryException,
+				sxpParameterData)) {
+
+			return;
+		}
+
+		ExceptionListener exceptionListener =
+			invalidQueryEntryException::addSuppressed;
+
+		_process(
+			searchRequestBuilder::addComplexQueryPart, exceptionListener,
+			this::_toComplexQueryPart, queryEntry.getClauses());
+		_process(
+			searchRequestBuilder::addPostFilterQueryPart, exceptionListener,
+			this::_toComplexQueryPart, queryEntry.getPostFilterClauses());
+		_process(
+			searchRequestBuilder::addRescore, exceptionListener,
+			this::_toRescore, queryEntry.getRescores());
 
 		if (ArrayUtil.isNotEmpty(invalidQueryEntryException.getSuppressed())) {
 			throw invalidQueryEntryException;
 		}
 	}
 
+	private ComplexQueryPart _toComplexQueryPart(Clause clause) {
+		ComplexQueryPartBuilder complexQueryPartBuilder =
+			_complexQueryPartBuilderFactory.builder();
+
+		if (clause.getAdditive() != null) {
+			complexQueryPartBuilder.additive(clause.getAdditive());
+		}
+
+		if (clause.getDisabled() != null) {
+			complexQueryPartBuilder.disabled(clause.getDisabled());
+		}
+
+		return complexQueryPartBuilder.boost(
+			clause.getBoost()
+		).field(
+			clause.getField()
+		).name(
+			clause.getName()
+		).occur(
+			clause.getOccur()
+		).parent(
+			clause.getParent()
+		).query(
+			_queryConverter.toQuery((JSONObject)clause.getQuery())
+		).type(
+			clause.getType()
+		).value(
+			clause.getValue()
+		).build();
+	}
+
+	private com.liferay.portal.search.rescore.Rescore _toRescore(
+		Rescore rescore) {
+
+		RescoreBuilder rescoreBuilder = _rescoreBuilderFactory.builder(
+			_queryConverter.toQuery((JSONObject)rescore.getQuery()));
+
+		if (rescore.getScoreMode() != null) {
+			rescoreBuilder.scoreMode(
+				ScoreMode.valueOf(
+					StringUtil.toUpperCase(rescore.getScoreMode())));
+		}
+
+		return rescoreBuilder.queryWeight(
+			rescore.getQueryWeight()
+		).rescoreQueryWeight(
+			rescore.getRescoreQueryWeight()
+		).windowSize(
+			rescore.getWindowSize()
+		).build();
+	}
+
 	private final ComplexQueryPartBuilderFactory
 		_complexQueryPartBuilderFactory;
 	private final QueryConverter _queryConverter;
+	private final RescoreBuilderFactory _rescoreBuilderFactory;
 
 }

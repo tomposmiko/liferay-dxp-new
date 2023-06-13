@@ -12,15 +12,15 @@
  * details.
  */
 
+import {DataSet} from '@liferay/frontend-data-set-web';
+import {render} from '@liferay/frontend-js-react-web';
 import React from 'react';
-
-import datasetDisplayLauncher from '../../../../frontend-taglib/frontend-taglib-clay/src/main/resources/META-INF/resources/data_set_display/entry';
 
 import '../../src/main/resources/META-INF/resources/styles/main.scss';
 
-import '../../../../frontend-taglib/frontend-taglib-clay/src/main/resources/META-INF/resources/data_set_display/styles/main.scss';
+const datasetDisplayLauncher = (...data) => render(DataSet, ...data);
 
-const fluidDataSetDisplayProps = {
+const fluidDataSetProps = {
 	activeViewSettings: {},
 	apiURL: '/dataset-display-nested-items',
 	appURL: '/o/frontend-taglib-clay/app',
@@ -106,7 +106,6 @@ const fluidDataSetDisplayProps = {
 		initialTotalItems: 40,
 	},
 	showPagination: true,
-	spritemap: './assets/clay/icons.svg',
 	style: 'fluid',
 	views: [
 		{
@@ -214,12 +213,14 @@ const fluidDataSetDisplayProps = {
 						<h4 className="bg-dark mb-0 p-3 text-center text-white">
 							Hey, I&apos;m a custom template from the outside
 						</h4>
+
 						{props.items.map((item) => (
 							<div
 								className="bg-white p-3 text-center"
 								key={item.skuId}
 							>
 								<strong className="mr-3">{item.skuId}</strong>
+
 								{item.name}
 							</div>
 						))}
@@ -234,7 +235,7 @@ const fluidDataSetDisplayProps = {
 	],
 };
 
-const emailsDataSetDisplayProps = {
+const emailsDataSetProps = {
 	activeViewSettings: {},
 	apiURL: '/dataset-display-email-data',
 	creationMenuItems: [
@@ -276,7 +277,6 @@ const emailsDataSetDisplayProps = {
 		initialDelta: 10,
 	},
 	showPagination: true,
-	spritemap: './assets/clay/icons.svg',
 	style: 'stacked',
 	views: [
 		{
@@ -320,7 +320,6 @@ const selectableTableProps = {
 	},
 	selectedItemsKey: 'countryId',
 	showPagination: true,
-	spritemap: './assets/clay/icons.svg',
 	views: [
 		{
 			contentRenderer: 'selectableTable',
@@ -336,7 +335,7 @@ const selectableTableProps = {
 
 const today = new Date();
 
-const ordersDataSetDisplayProps = {
+const ordersDataSetProps = {
 	activeViewSettings: {
 		name: 'table',
 	},
@@ -470,7 +469,6 @@ const ordersDataSetDisplayProps = {
 			key: 'createDate',
 		},
 	],
-	spritemap: './assets/clay/icons.svg',
 	views: [
 		{
 			contentRenderer: 'table',
@@ -525,7 +523,7 @@ const ordersDataSetDisplayProps = {
 	],
 };
 
-const productsDataSetDisplayProps = {
+const productsDataSetProps = {
 	activeViewSettings: {},
 	apiURL:
 		'/o/headless-commerce-admin-catalog/v1.0/products/?nestedFields=skus%2Ccatalog',
@@ -675,7 +673,6 @@ const productsDataSetDisplayProps = {
 			key: 'modifiedDate',
 		},
 	],
-	spritemap: './assets/clay/icons.svg',
 	views: [
 		{
 			contentRenderer: 'table',
@@ -747,7 +744,7 @@ const productsDataSetDisplayProps = {
 	],
 };
 
-const priceListsDataSetDisplayProps = {
+const priceListsDataSetProps = {
 	activeViewSettings: {},
 	apiURL: '/o/headless-commerce-admin-pricing/v2.0/price-lists',
 	enableInlineEditMode: false,
@@ -809,7 +806,6 @@ const priceListsDataSetDisplayProps = {
 	},
 	selectedItemsKey: 'id',
 	showPagination: true,
-	spritemap: './assets/clay/icons.svg',
 	views: [
 		{
 			contentRenderer: 'table',
@@ -865,22 +861,22 @@ const priceListsDataSetDisplayProps = {
 };
 
 datasetDisplayLauncher(
-	ordersDataSetDisplayProps,
+	ordersDataSetProps,
 	document.getElementById('orders-dataset-display-root')
 );
 
 datasetDisplayLauncher(
-	productsDataSetDisplayProps,
+	productsDataSetProps,
 	document.getElementById('products-dataset-display-root')
 );
 
 datasetDisplayLauncher(
-	priceListsDataSetDisplayProps,
+	priceListsDataSetProps,
 	document.getElementById('price-list-dataset-display-root')
 );
 
 datasetDisplayLauncher(
-	fluidDataSetDisplayProps,
+	fluidDataSetProps,
 	document.getElementById('fluid-dataset-display-root')
 );
 
@@ -890,6 +886,6 @@ datasetDisplayLauncher(
 );
 
 datasetDisplayLauncher(
-	emailsDataSetDisplayProps,
+	emailsDataSetProps,
 	document.getElementById('emails-dataset-display-root')
 );

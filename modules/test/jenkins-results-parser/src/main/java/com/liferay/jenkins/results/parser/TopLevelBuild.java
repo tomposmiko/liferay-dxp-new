@@ -205,6 +205,7 @@ public abstract class TopLevelBuild extends BaseBuild {
 		return getTempMap(tempMapName);
 	}
 
+	@Override
 	public JSONObject getBuildResultsJSONObject(
 		String[] buildResults, String[] testStatuses, String[] dataTypes) {
 
@@ -261,48 +262,6 @@ public abstract class TopLevelBuild extends BaseBuild {
 		buildResultsJSONObject.put("upstreamBranchSHA", getUpstreamBranchSHA());
 
 		return buildResultsJSONObject;
-	}
-
-	public String getCompanionBranchName() {
-		TopLevelBuild topLevelBuild = getTopLevelBuild();
-
-		Map<String, String> gitRepositoryGitDetailsTempMap =
-			topLevelBuild.getCompanionGitRepositoryDetailsTempMap();
-
-		return gitRepositoryGitDetailsTempMap.get("github.sender.branch.name");
-	}
-
-	public Map<String, String> getCompanionGitRepositoryDetailsTempMap() {
-		String branchName = getBranchName();
-		String branchType = "ee";
-		String gitRepositoryType = getBaseGitRepositoryType();
-
-		if (branchName.endsWith("-private")) {
-			branchType = "base";
-		}
-
-		String tempMapName = JenkinsResultsParserUtil.combine(
-			"git.", gitRepositoryType, ".", branchType, ".properties");
-
-		return getTempMap(tempMapName);
-	}
-
-	public String getCompanionGitRepositorySHA() {
-		TopLevelBuild topLevelBuild = getTopLevelBuild();
-
-		Map<String, String> gitRepositoryGitDetailsTempMap =
-			topLevelBuild.getCompanionGitRepositoryDetailsTempMap();
-
-		return gitRepositoryGitDetailsTempMap.get("github.sender.branch.sha");
-	}
-
-	public String getCompanionUsername() {
-		TopLevelBuild topLevelBuild = getTopLevelBuild();
-
-		Map<String, String> gitRepositoryGitDetailsTempMap =
-			topLevelBuild.getCompanionGitRepositoryDetailsTempMap();
-
-		return gitRepositoryGitDetailsTempMap.get("github.sender.username");
 	}
 
 	public Build getControllerBuild() {
@@ -802,6 +761,22 @@ public abstract class TopLevelBuild extends BaseBuild {
 	@Override
 	protected void archiveJSON() {
 		super.archiveJSON();
+
+		BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase(this);
+
+		try {
+			JSONObject buildDatabaseJSONObject = new JSONObject(
+				JenkinsResultsParserUtil.read(
+					buildDatabase.getBuildDatabaseFile()));
+
+			writeArchiveFile(
+				buildDatabaseJSONObject.toString(4),
+				getArchivePath() + "/build-database.json");
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(
+				"Unable to archive build database file", ioException);
+		}
 
 		try {
 			Properties buildProperties =

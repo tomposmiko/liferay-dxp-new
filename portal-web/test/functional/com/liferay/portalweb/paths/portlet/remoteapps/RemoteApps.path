@@ -41,6 +41,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>TABLE_ENTRY_TYPE_REMOTE_TABLE</td>
+	<td>//div[contains(@class,'dnd-td') and contains(text(), '${key_tableEntryType}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TABLE_ENTRY_URL</td>
 	<td>//table//tbody//td[contains(text(),'${key_tableEntryURL}')]</td>
 	<td></td>
@@ -48,6 +53,16 @@
 <tr>
 	<td>TABLE_ENTRY_URL_REMOTE_TABLE</td>
 	<td>//div[contains(@class,'dnd-td') and contains(text(),'${key_tableEntryURL}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>VANILLA_COUNTER_PAGE_COLUMN_N</td>
+	<td>//div[contains(@id,'main-content')]//div[contains(@class, 'col')]['${column_number}']//vanilla-counter</td>
+	<td></td>
+</tr>
+<tr>
+	<td>VANILLA_COUNTER_REMOTE_APP</td>
+	<td>//vanilla-counter</td>
 	<td></td>
 </tr>
 </tbody>

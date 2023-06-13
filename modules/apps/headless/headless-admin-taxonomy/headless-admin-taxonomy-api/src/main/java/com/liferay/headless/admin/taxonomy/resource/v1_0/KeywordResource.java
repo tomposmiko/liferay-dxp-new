@@ -76,7 +76,7 @@ public interface KeywordResource {
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putAssetLibraryKeywordPermission(
+			putAssetLibraryKeywordPermissionsPage(
 				Long assetLibraryId,
 				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
@@ -118,7 +118,7 @@ public interface KeywordResource {
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putSiteKeywordPermission(
+			putSiteKeywordPermissionsPage(
 				Long siteId,
 				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;

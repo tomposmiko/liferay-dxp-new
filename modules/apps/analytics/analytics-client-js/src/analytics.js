@@ -21,6 +21,7 @@ import EventMessageQueue from './queues/eventMessageQueue';
 import EventQueue from './queues/eventsQueue';
 import IdentityMessageQueue from './queues/identityMessageQueue';
 import {
+	ANALYTICS_CLIENT_VERSION,
 	FLUSH_INTERVAL,
 	QUEUE_PRIORITY_DEFAULT,
 	QUEUE_PRIORITY_IDENTITY,
@@ -74,6 +75,8 @@ class Analytics {
 			flushInterval: config.flushInterval || FLUSH_INTERVAL,
 			identityEndpoint: `${endpointUrl}/identity`,
 		});
+
+		instance.version = ANALYTICS_CLIENT_VERSION;
 
 		// Register initial middlewares
 
@@ -207,10 +210,12 @@ class Analytics {
 	 * @param {Object} options Complementary information about the request
 	 */
 	track(eventId, eventProps, options = {}) {
+		const {assetType, ...otherEventProps} = eventProps || {};
+
 		if (
 			this._isTrackingDisabled() ||
 			instance._disposed ||
-			!isValidEvent({eventId, eventProps})
+			!isValidEvent({eventId, eventProps: otherEventProps})
 		) {
 			return;
 		}
@@ -218,13 +223,15 @@ class Analytics {
 		// eslint-disable-next-line
 		const mergedOptions = Object.assign({}, TRACK_DEFAULT_OPTIONS, options);
 
+		const applicationId = assetType || mergedOptions.applicationId;
+
 		const currentContextHash = this._getCurrentContextHash();
 
 		instance[STORAGE_KEY_EVENTS].addItem(
 			normalizeEvent(
 				eventId,
-				mergedOptions.applicationId,
-				eventProps,
+				applicationId,
+				otherEventProps,
 				currentContextHash
 			)
 		);
@@ -312,7 +319,7 @@ class Analytics {
 	_getContext() {
 		const {context} = middlewares.reduce(
 			(request, middleware) => middleware(request, this),
-			{context: {}}
+			{context: {channelId: instance.config.channelId}}
 		);
 
 		for (const key in context) {
@@ -372,8 +379,7 @@ class Analytics {
 	}
 
 	_isNewUserIdRequired() {
-		const {dataSourceId} = this.config;
-		const {identity} = this.config;
+		const {dataSourceId, identity} = this.config;
 
 		const storedIdentityHash = getItem(STORAGE_KEY_IDENTITY);
 		const storedUserId = getItem(STORAGE_KEY_USER_ID);
@@ -409,8 +415,8 @@ class Analytics {
 	_isTrackingDisabled() {
 		return (
 			ENV.ac_client_disable_tracking ||
-			navigator.doNotTrack == '1' ||
-			navigator.doNotTrack == 'yes'
+			navigator.doNotTrack === '1' ||
+			navigator.doNotTrack === 'yes'
 		);
 	}
 
@@ -461,7 +467,7 @@ class Analytics {
 
 		expirationDate.setDate(expirationDate.getDate() + 365);
 
-		document.cookie = `${key}=${data}; expires= ${expirationDate.toUTCString()}; path=/`;
+		document.cookie = `${key}=${data}; expires=${expirationDate.toUTCString()}; path=/; Secure`;
 	}
 
 	/**

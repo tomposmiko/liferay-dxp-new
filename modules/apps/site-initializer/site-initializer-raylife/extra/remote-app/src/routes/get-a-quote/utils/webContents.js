@@ -1,4 +1,4 @@
-import {toSlug} from '~/common/utils';
+import {toSlug} from '../../../common/utils';
 
 const PRODUCT_QUOTE = [
 	'general-liability',
@@ -7,5 +7,6 @@ const PRODUCT_QUOTE = [
 	'business-owners-policy',
 ];
 
-export const allowedProductQuote = (title) =>
-	PRODUCT_QUOTE.includes(toSlug(title));
+export function allowedProductQuote(title) {
+	return PRODUCT_QUOTE.includes(toSlug(title));
+}

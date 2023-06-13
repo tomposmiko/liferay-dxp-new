@@ -50,6 +50,8 @@ definition {
 			}
 		}
 
+		WebContentStructures.addTranslations(localeList = "pt-BR");
+
 		PortletEntry.changeLocale(locale = "pt-BR");
 
 		WebContentStructures.addName(structureName = "WC Structure Title - pt-BR");
@@ -327,6 +329,8 @@ definition {
 
 		DataEngine.toggleFieldRepeatable(fieldFieldLabel = "Text");
 
+		WebContentStructures.addTranslations(localeList = "pt-BR");
+
 		PortletEntry.changeLocale(locale = "pt-BR");
 
 		DataEngine.editFieldLabel(
@@ -442,6 +446,8 @@ definition {
 		DataEngine.addField(
 			fieldFieldLabel = "Text",
 			fieldName = "Text");
+
+		WebContentStructures.addTranslations(localeList = "zh-CN");
 
 		PortletEntry.changeLocale(locale = "zh-CN");
 
@@ -563,6 +569,8 @@ definition {
 			fieldFieldLabel = "Text",
 			fieldName = "Text");
 
+		WebContentStructures.addTranslations(localeList = "zh-CN");
+
 		PortletEntry.changeLocale(locale = "zh-CN");
 
 		DataEngine.editFieldLabel(
@@ -662,6 +670,8 @@ definition {
 		NavItem.gotoStructures();
 
 		WebContentNavigator.gotoEditStructure(structureName = "WC Structure Title");
+
+		Translations.addLanguageManageTranslations(key_language = "pt-BR");
 
 		PortletEntry.changeLocale(locale = "pt-BR");
 
@@ -829,6 +839,8 @@ definition {
 			fieldFieldLabel = "Text",
 			fieldName = "Text");
 
+		WebContentStructures.addTranslations(localeList = "pt-BR");
+
 		PortletEntry.changeLocale(locale = "pt-BR");
 
 		DataEngine.editFieldLabel(
@@ -910,6 +922,8 @@ definition {
 				optionFieldLabel = "Columns",
 				optionValue = "Option ${index}");
 		}
+
+		WebContentStructures.addTranslations(localeList = "ca-ES");
 
 		PortletEntry.changeLocale(locale = "ca-ES");
 
@@ -1180,6 +1194,8 @@ definition {
 		NavItem.gotoStructures();
 
 		WebContentNavigator.gotoEditStructure(structureName = "WC Structure Title");
+
+		Translations.addLanguageManageTranslations(key_language = "ca-ES");
 
 		PortletEntry.changeLocale(locale = "ca-ES");
 
@@ -1560,6 +1576,8 @@ definition {
 		DataEngine.addField(
 			fieldFieldLabel = "Text",
 			fieldName = "Text");
+
+		Translations.addLanguageManageTranslations(key_language = "zh-CN");
 
 		PortletEntry.changeLocale(locale = "zh-CN");
 

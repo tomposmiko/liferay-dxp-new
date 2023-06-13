@@ -88,7 +88,7 @@ public abstract class BaseDataListViewResourceImpl
 	@javax.ws.rs.Path("/data-definitions/{dataDefinitionId}/data-list-views")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public void deleteDataListViewsDataDefinition(
+	public void deleteDataDefinitionDataListView(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("dataDefinitionId")
@@ -584,9 +584,7 @@ public abstract class BaseDataListViewResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), entityModel);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid filter " + filterString, exception);
-			}
+			_log.error("Invalid filter " + filterString, exception);
 		}
 
 		return null;

@@ -10,12 +10,7 @@ definition {
 	setUp {
 		SignIn.signIn();
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Search");
-
-		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+		SearchAdministration.executeReindex();
 	}
 
 	@priority = "5"
@@ -207,6 +202,16 @@ definition {
 		property test.run.environment = "EE";
 
 		Upgrade.viewClassicSearchPortletConfiguration();
+	}
+
+	@priority = "5"
+	test ViewResultRankingsEntryArchive7310 {
+		property data.archive.type = "data-archive-search-result-rankings";
+		property portal.version = "7.3.10";
+		property remote.elasticsearch.enabled = "true";
+		property test.run.environment = "EE";
+
+		Upgrade.viewResultRankingsEntry();
 	}
 
 	@priority = "5"

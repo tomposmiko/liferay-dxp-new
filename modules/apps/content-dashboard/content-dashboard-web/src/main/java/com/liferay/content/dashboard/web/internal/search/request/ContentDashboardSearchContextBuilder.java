@@ -19,11 +19,15 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyConstants;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.document.library.kernel.model.DLFileEntryType;
+import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -35,9 +39,11 @@ import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
@@ -86,6 +92,7 @@ public class ContentDashboardSearchContextBuilder {
 					_assetCategoryLocalService, _assetVocabularyLocalService),
 				ParamUtil.getStringValues(_httpServletRequest, "assetTagId"),
 				ParamUtil.getLongValues(_httpServletRequest, "authorIds"),
+				PortalUtil.getCompanyId(_httpServletRequest),
 				ParamUtil.getStringValues(
 					_httpServletRequest, "fileExtension")));
 
@@ -236,42 +243,22 @@ public class ContentDashboardSearchContextBuilder {
 
 	private BooleanClause[] _getBooleanClauses(
 		AssetCategoryIds assetCategoryIds, String[] assetTagNames,
-		long[] authorIds, String[] fileExtensions) {
+		long[] authorIds, long companyId, String[] fileExtensions) {
 
 		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
 
 		BooleanFilter booleanFilter = new BooleanFilter();
 
-		Optional<Filter> assetCategoryIdsFilterOptional =
-			_getAssetCategoryIdsFilterOptional(assetCategoryIds);
-
-		if (assetCategoryIdsFilterOptional.isPresent()) {
-			booleanFilter.add(
-				assetCategoryIdsFilterOptional.get(), BooleanClauseOccur.MUST);
-		}
-
-		Optional<Filter> assetTagNamesFilterOptional =
-			_getAssetTagNamesFilterOptional(assetTagNames);
-
-		if (assetTagNamesFilterOptional.isPresent()) {
-			booleanFilter.add(
-				assetTagNamesFilterOptional.get(), BooleanClauseOccur.MUST);
-		}
-
-		Optional<Filter> authorIdsFilterOptional = _getAuthorIdsFilterOptional(
-			authorIds);
-
-		if (authorIdsFilterOptional.isPresent()) {
-			booleanFilter.add(
-				authorIdsFilterOptional.get(), BooleanClauseOccur.MUST);
-		}
-
-		Optional<Filter> fileExtensionsFilterOptional =
-			_getFileExtensionsFilterOptional(fileExtensions);
-
-		fileExtensionsFilterOptional.map(
-			fileExtensionsFilter -> booleanFilter.add(
-				fileExtensionsFilterOptional.get(), BooleanClauseOccur.MUST));
+		Stream.of(
+			_getAssetCategoryIdsFilterOptional(assetCategoryIds),
+			_getAssetTagNamesFilterOptional(assetTagNames),
+			_getAuthorIdsFilterOptional(authorIds),
+			_getFileExtensionsFilterOptional(fileExtensions),
+			_getGoogleDriveShortcutFilterOptional(companyId)
+		).forEach(
+			filterOptional -> filterOptional.map(
+				filter -> booleanFilter.add(filter, BooleanClauseOccur.MUST))
+		);
 
 		booleanQueryImpl.setPreBooleanFilter(booleanFilter);
 
@@ -295,6 +282,36 @@ public class ContentDashboardSearchContextBuilder {
 		}
 
 		return Optional.of(termsFilter);
+	}
+
+	private Optional<Filter> _getGoogleDriveShortcutFilterOptional(
+		long companyId) {
+
+		try {
+			Company company = CompanyLocalServiceUtil.getCompany(companyId);
+
+			DLFileEntryType googleDocsDLFileEntryType =
+				DLFileEntryTypeLocalServiceUtil.fetchFileEntryType(
+					company.getGroupId(), "GOOGLE_DOCS");
+
+			if (googleDocsDLFileEntryType == null) {
+				return Optional.empty();
+			}
+
+			BooleanFilter booleanFilter = new BooleanFilter();
+
+			booleanFilter.addTerm(
+				"classTypeId",
+				String.valueOf(googleDocsDLFileEntryType.getFileEntryTypeId()),
+				BooleanClauseOccur.MUST_NOT);
+
+			return Optional.of(booleanFilter);
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
+		}
+
+		return Optional.empty();
 	}
 
 	private BooleanFilter _getTermsFilter(String field, long[] values) {

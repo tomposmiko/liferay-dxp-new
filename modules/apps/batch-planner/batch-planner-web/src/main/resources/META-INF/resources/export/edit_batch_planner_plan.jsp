@@ -24,24 +24,23 @@ long batchPlannerPlanId = ParamUtil.getLong(renderRequest, "batchPlannerPlanId")
 renderResponse.setTitle(LanguageUtil.get(request, "export"));
 %>
 
-<portlet:actionURL name="/batch_planner/edit_export_batch_planner_plan" var="exportBatchPlannerPlanURL" />
-
 <div class="container pt-4">
-	<form action="<%= exportBatchPlannerPlanURL %>" method="POST" name="<portlet:namespace />fm">
-		<aui:input name="redirect" type="hidden" value="<%= backURL %>" />
-		<aui:input name="batchPlannerPlanId" type="hidden" value="<%= batchPlannerPlanId %>" />
-		<aui:input name="export" type="hidden" value="<%= true %>" />
+	<form id="<portlet:namespace />fm" name="<portlet:namespace />fm">
+		<input id="<portlet:namespace />batchPlannerPlanId" name="<portlet:namespace />batchPlannerPlanId" type="hidden" value="<%= batchPlannerPlanId %>" />
+		<input id="<portlet:namespace />export" name="<portlet:namespace />export" type="hidden" value="<%= true %>" />
+		<input id="<portlet:namespace />taskItemDelegateName" name="<portlet:namespace />taskItemDelegateName" type="hidden" value="DEFAULT" />
 
 		<div class="card">
 			<h4 class="card-header"><%= LanguageUtil.get(request, "export-settings") %></h4>
 
 			<div class="card-body">
-				<liferay-frontend:edit-form-body>
-					<aui:input name="name" />
 
-					<%
-					EditBatchPlannerPlanDisplayContext editBatchPlannerPlanDisplayContext = (EditBatchPlannerPlanDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
-					%>
+				<%
+				EditBatchPlannerPlanDisplayContext editBatchPlannerPlanDisplayContext = (EditBatchPlannerPlanDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
+				%>
+
+				<liferay-frontend:edit-form-body>
+					<div id="<portlet:namespace />templateSelect"></div>
 
 					<clay:row>
 						<clay:col
@@ -141,16 +140,73 @@ renderResponse.setTitle(LanguageUtil.get(request, "export"));
 			</div>
 		</liferay-frontend:edit-form-body>
 
-		<div class="mt-4">
+		<div class="mt-4" id="<portlet:namespace />formButtons">
 			<liferay-frontend:edit-form-footer>
-				<aui:button name="export" type="submit" value="export" />
+				<clay:link
+					displayType="secondary"
+					href="<%= backURL %>"
+					label="cancel"
+					type="button"
+				/>
 
-				<aui:button href="<%= backURL %>" type="cancel" />
+				<span>
+					<react:component
+						module="js/SaveTemplate"
+						props='<%=
+							HashMapBuilder.<String, Object>put(
+								"formSaveAsTemplateDataQuerySelector", "#" + liferayPortletResponse.getNamespace() + "fm"
+							).put(
+								"formSaveAsTemplateURL",
+								ResourceURLBuilder.createResourceURL(
+									renderResponse
+								).setCMD(
+									Constants.SAVE
+								).setParameter(
+									"template", true
+								).setResourceID(
+									"/batch_planner/edit_export_batch_planner_plan"
+								).buildString()
+							).put(
+								"namespace", liferayPortletResponse.getNamespace()
+							).build()
+						%>'
+					/>
+				</span>
+				<span>
+					<react:component
+						module="js/export/Export"
+						props='<%=
+							HashMapBuilder.<String, Object>put(
+								"formExportDataQuerySelector", "#" + liferayPortletResponse.getNamespace() + "fm"
+							).put(
+								"formExportURL",
+								ResourceURLBuilder.createResourceURL(
+									renderResponse
+								).setCMD(
+									Constants.EXPORT
+								).setResourceID(
+									"/batch_planner/edit_export_batch_planner_plan"
+								).buildString()
+							).build()
+						%>'
+					/>
+				</span>
 			</liferay-frontend:edit-form-footer>
 		</div>
 	</form>
 </div>
 
 <liferay-frontend:component
-	module="js/export_edit_batch_planner_plan"
+	context='<%=
+		HashMapBuilder.<String, Object>put(
+			"initialTemplateClassName", editBatchPlannerPlanDisplayContext.getSelectedInternalClassName()
+		).put(
+			"initialTemplateHeadlessEndpoint", editBatchPlannerPlanDisplayContext.getSelectedHeadlessEndpoint()
+		).put(
+			"initialTemplateMapping", editBatchPlannerPlanDisplayContext.getSelectedBatchPlannerPlanMappings()
+		).put(
+			"templatesOptions", editBatchPlannerPlanDisplayContext.getTemplateSelectOptions()
+		).build()
+	%>'
+	module="js/edit_batch_planner_plan"
 />

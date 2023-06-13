@@ -22,6 +22,7 @@ import com.liferay.commerce.order.CommerceOrderHttpHelper;
 import com.liferay.commerce.order.CommerceOrderValidatorRegistry;
 import com.liferay.commerce.order.CommerceOrderValidatorResult;
 import com.liferay.commerce.order.content.web.internal.display.context.CommerceOrderContentDisplayContext;
+import com.liferay.commerce.order.importer.type.CommerceOrderImporterTypeRegistry;
 import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelService;
 import com.liferay.commerce.percentage.PercentageFormatter;
 import com.liferay.commerce.price.CommerceOrderPriceCalculation;
@@ -31,6 +32,8 @@ import com.liferay.commerce.service.CommerceOrderNoteService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.service.CommerceOrderTypeService;
 import com.liferay.commerce.service.CommerceShipmentItemService;
+import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -112,14 +115,15 @@ public class CommerceOpenOrderContentPortlet extends MVCPortlet {
 				commerceOrderContentDisplayContext =
 					new CommerceOrderContentDisplayContext(
 						_commerceAddressService, _commerceChannelLocalService,
+						_commerceOrderImporterTypeRegistry,
 						_commerceOrderNoteService,
 						_commerceOrderPriceCalculation, _commerceOrderService,
 						_commerceOrderTypeService,
 						_commercePaymentMethodGroupRelService,
-						_commerceShipmentItemService,
+						_commerceShipmentItemService, _dlAppLocalService,
 						_portal.getHttpServletRequest(renderRequest),
-						_modelResourcePermission, _percentageFormatter,
-						_portletResourcePermission);
+						_itemSelector, _modelResourcePermission,
+						_percentageFormatter, _portletResourcePermission);
 
 			CommerceOrder commerceOrder = getCommerceOrder(renderRequest);
 
@@ -187,6 +191,10 @@ public class CommerceOpenOrderContentPortlet extends MVCPortlet {
 	private CommerceOrderHttpHelper _commerceOrderHttpHelper;
 
 	@Reference
+	private CommerceOrderImporterTypeRegistry
+		_commerceOrderImporterTypeRegistry;
+
+	@Reference
 	private CommerceOrderNoteService _commerceOrderNoteService;
 
 	@Reference
@@ -207,6 +215,12 @@ public class CommerceOpenOrderContentPortlet extends MVCPortlet {
 
 	@Reference
 	private CommerceShipmentItemService _commerceShipmentItemService;
+
+	@Reference
+	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private ItemSelector _itemSelector;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.commerce.model.CommerceOrder)"

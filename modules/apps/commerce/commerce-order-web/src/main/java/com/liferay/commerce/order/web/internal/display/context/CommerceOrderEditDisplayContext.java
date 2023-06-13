@@ -15,6 +15,7 @@
 package com.liferay.commerce.order.web.internal.display.context;
 
 import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.configuration.CommerceOrderItemDecimalQuantityConfiguration;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.frontend.model.HeaderActionModel;
 import com.liferay.commerce.frontend.model.StepModel;
@@ -29,11 +30,13 @@ import com.liferay.commerce.notification.service.CommerceNotificationQueueEntryL
 import com.liferay.commerce.order.engine.CommerceOrderEngine;
 import com.liferay.commerce.order.status.CommerceOrderStatus;
 import com.liferay.commerce.order.status.CommerceOrderStatusRegistry;
-import com.liferay.commerce.order.web.internal.display.context.util.CommerceOrderRequestHelper;
+import com.liferay.commerce.order.web.internal.display.context.helper.CommerceOrderRequestHelper;
 import com.liferay.commerce.order.web.internal.servlet.taglib.ui.constants.CommerceOrderScreenNavigationConstants;
 import com.liferay.commerce.payment.model.CommercePaymentMethodGroupRel;
 import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelLocalService;
+import com.liferay.commerce.product.model.CPMeasurementUnit;
 import com.liferay.commerce.product.model.CommerceChannel;
+import com.liferay.commerce.product.service.CPMeasurementUnitService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceOrderNoteService;
@@ -59,6 +62,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.webserver.WebServerServletTokenUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+import java.math.BigDecimal;
+
 import java.text.DateFormat;
 import java.text.Format;
 
@@ -83,6 +88,8 @@ public class CommerceOrderEditDisplayContext {
 			CommerceNotificationQueueEntryLocalService
 				commerceNotificationQueueEntryLocalService,
 			CommerceOrderEngine commerceOrderEngine,
+			CommerceOrderItemDecimalQuantityConfiguration
+				commerceOrderItemDecimalQuantityConfiguration,
 			CommerceOrderItemService commerceOrderItemService,
 			CommerceOrderNoteService commerceOrderNoteService,
 			CommerceOrderService commerceOrderService,
@@ -91,6 +98,7 @@ public class CommerceOrderEditDisplayContext {
 			CommercePaymentMethodGroupRelLocalService
 				commercePaymentMethodGroupRelLocalService,
 			CommerceShipmentService commerceShipmentService,
+			CPMeasurementUnitService cpMeasurementUnitService,
 			RenderRequest renderRequest)
 		throws PortalException {
 
@@ -98,6 +106,8 @@ public class CommerceOrderEditDisplayContext {
 		_commerceNotificationQueueEntryLocalService =
 			commerceNotificationQueueEntryLocalService;
 		_commerceOrderEngine = commerceOrderEngine;
+		_commerceOrderItemDecimalQuantityConfiguration =
+			commerceOrderItemDecimalQuantityConfiguration;
 		_commerceOrderItemService = commerceOrderItemService;
 		_commerceOrderNoteService = commerceOrderNoteService;
 		_commerceOrderService = commerceOrderService;
@@ -106,6 +116,7 @@ public class CommerceOrderEditDisplayContext {
 		_commercePaymentMethodGroupRelLocalService =
 			commercePaymentMethodGroupRelLocalService;
 		_commerceShipmentService = commerceShipmentService;
+		_cpMeasurementUnitService = cpMeasurementUnitService;
 
 		long commerceOrderId = ParamUtil.getLong(
 			renderRequest, "commerceOrderId");
@@ -428,6 +439,30 @@ public class CommerceOrderEditDisplayContext {
 		).buildPortletURL();
 	}
 
+	public List<CPMeasurementUnit> getCPMeasurementUnits()
+		throws PortalException {
+
+		return _cpMeasurementUnitService.getCPMeasurementUnits(
+			_commerceOrderRequestHelper.getCompanyId(), QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	public BigDecimal getDecimalQuantity(CommerceOrderItem commerceOrderItem) {
+		BigDecimal decimalQuantity = commerceOrderItem.getDecimalQuantity();
+
+		if ((decimalQuantity == null) ||
+			decimalQuantity.equals(BigDecimal.ZERO)) {
+
+			decimalQuantity = BigDecimal.valueOf(
+				commerceOrderItem.getQuantity());
+		}
+
+		return decimalQuantity.setScale(
+			_commerceOrderItemDecimalQuantityConfiguration.
+				maximumFractionDigits(),
+			_commerceOrderItemDecimalQuantityConfiguration.roundingMode());
+	}
+
 	public String getDescriptiveCommerceAddress(CommerceAddress commerceAddress)
 		throws PortalException {
 
@@ -695,6 +730,8 @@ public class CommerceOrderEditDisplayContext {
 	private final Format _commerceOrderDateFormatDateTime;
 	private final CommerceOrderEngine _commerceOrderEngine;
 	private CommerceOrderItem _commerceOrderItem;
+	private final CommerceOrderItemDecimalQuantityConfiguration
+		_commerceOrderItemDecimalQuantityConfiguration;
 	private final CommerceOrderItemService _commerceOrderItemService;
 	private final CommerceOrderNoteService _commerceOrderNoteService;
 	private final CommerceOrderRequestHelper _commerceOrderRequestHelper;
@@ -705,5 +742,6 @@ public class CommerceOrderEditDisplayContext {
 		_commercePaymentMethodGroupRelLocalService;
 	private CommerceShipment _commerceShipment;
 	private final CommerceShipmentService _commerceShipmentService;
+	private final CPMeasurementUnitService _cpMeasurementUnitService;
 
 }

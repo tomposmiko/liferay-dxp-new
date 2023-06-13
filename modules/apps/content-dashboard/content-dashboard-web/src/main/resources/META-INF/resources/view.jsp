@@ -20,7 +20,7 @@
 ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (ContentDashboardAdminDisplayContext)request.getAttribute(ContentDashboardWebKeys.CONTENT_DASHBOARD_ADMIN_DISPLAY_CONTEXT);
 %>
 
-<div class="sidebar-wrapper">
+<div class="cadmin sidebar-wrapper">
 	<clay:container-fluid
 		cssClass="container-form-lg"
 	>
@@ -88,11 +88,20 @@ ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (Conte
 			cssClass="c-mt-5"
 			size="<%= StringPool.BLANK %>"
 		>
-			<h2 class="sheet-title">
-				<span class="component-title">
-					<%= LanguageUtil.format(request, "content-x", contentDashboardAdminDisplayContext.getSearchContainer().getTotal(), false) %>
-				</span>
-			</h2>
+			<div class="align-items-center d-flex justify-content-between mb-4">
+				<h2 class="mb-0 sheet-title">
+					<span class="component-title">
+						<%= LanguageUtil.format(request, "content-x", contentDashboardAdminDisplayContext.getSearchContainer().getTotal(), false) %>
+					</span>
+				</h2>
+
+				<div>
+					<react:component
+						module="js/components/DownloadSpreadsheetButton/DownloadSpreadsheetButton"
+						props="<%= contentDashboardAdminDisplayContext.getXlsProps() %>"
+					/>
+				</div>
+			</div>
 
 			<clay:management-toolbar
 				cssClass="content-dashboard-management-toolbar"

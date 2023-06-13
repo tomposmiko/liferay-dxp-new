@@ -79,6 +79,24 @@ List<String> errorMessages = (List<String>)request.getAttribute(CommerceWebKeys.
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 	<aui:input name="commerceOrderId" type="hidden" value="<%= String.valueOf(commerceOrder.getCommerceOrderId()) %>" />
 
+	<liferay-ui:error embed="<%= false %>" exception="<%= CommerceOrderImporterTypeException.class %>" message="the-import-process-failed" />
+
+	<liferay-ui:error embed="<%= false %>" exception="<%= CommerceOrderImporterTypeException.class %>">
+
+		<%
+		String commerceOrderImporterTypeKey = (String)SessionErrors.get(renderRequest, CommerceOrderImporterTypeException.class);
+		%>
+
+		<c:choose>
+			<c:when test="<%= Validator.isNull(commerceOrderImporterTypeKey) %>">
+				<liferay-ui:message key="the-import-process-failed" />
+			</c:when>
+			<c:otherwise>
+				<liferay-ui:message arguments="<%= commerceOrderImporterTypeKey %>" key="the-x-could-not-be-imported" />
+			</c:otherwise>
+		</c:choose>
+	</liferay-ui:error>
+
 	<liferay-ui:error exception="<%= CommerceOrderValidatorException.class %>">
 
 		<%
@@ -100,6 +118,38 @@ List<String> errorMessages = (List<String>)request.getAttribute(CommerceWebKeys.
 		%>
 
 	</liferay-ui:error>
+
+	<liferay-ui:error embed="<%= false %>" key="notImportedRowsCount">
+
+		<%
+		int notImportedRowsCount = (int)SessionErrors.get(renderRequest, "notImportedRowsCount");
+		%>
+
+		<c:choose>
+			<c:when test="<%= notImportedRowsCount > 1 %>">
+				<liferay-ui:message arguments="<%= notImportedRowsCount %>" key="x-rows-were-not-imported" translateArguments="<%= false %>" />
+			</c:when>
+			<c:otherwise>
+				<liferay-ui:message key="1-row-was-not-imported" />
+			</c:otherwise>
+		</c:choose>
+	</liferay-ui:error>
+
+	<liferay-ui:success key="importedRowsCount">
+
+		<%
+		int importedRowsCount = (int)SessionMessages.get(renderRequest, "importedRowsCount");
+		%>
+
+		<c:choose>
+			<c:when test="<%= importedRowsCount > 1 %>">
+				<liferay-ui:message arguments="<%= importedRowsCount %>" key="x-rows-were-imported-successfully" translateArguments="<%= false %>" />
+			</c:when>
+			<c:otherwise>
+				<liferay-ui:message key="1-row-was-imported-successfully" />
+			</c:otherwise>
+		</c:choose>
+	</liferay-ui:success>
 
 	<aui:model-context bean="<%= commerceOrder %>" model="<%= CommerceOrder.class %>" />
 
@@ -300,6 +350,50 @@ List<String> errorMessages = (List<String>)request.getAttribute(CommerceWebKeys.
 		showWhenSingleIcon="<%= true %>"
 		triggerCssClass="btn btn-lg btn-monospaced btn-primary position-fixed thumb-menu"
 	>
+
+		<%
+		PortletURL viewCommerceOrderImporterTypeURL = PortletURLBuilder.createRenderURL(
+			renderResponse
+		).setMVCRenderCommandName(
+			"/commerce_open_order_content/view_commerce_order_importer_type"
+		).setParameter(
+			"commerceOrderId", commerceOrder.getCommerceOrderId()
+		).setWindowState(
+			LiferayWindowState.POP_UP
+		).buildPortletURL();
+
+		for (CommerceOrderImporterType commerceOrderImporterType : commerceOrderContentDisplayContext.getCommerceImporterTypes(commerceOrder)) {
+			String commerceOrderImporterTypeKey = commerceOrderImporterType.getKey();
+			String commerceOrderImporterTypeLabel = commerceOrderImporterType.getLabel(locale);
+
+			viewCommerceOrderImporterTypeURL.setParameter("commerceOrderImporterTypeKey", commerceOrderImporterTypeKey);
+
+			String viewCommerceOrderImporterTypeURLString = viewCommerceOrderImporterTypeURL.toString();
+		%>
+
+			<liferay-ui:icon
+				cssClass="<%= commerceOrderImporterTypeKey %>"
+				message="<%= commerceOrderImporterTypeLabel %>"
+				url="<%= viewCommerceOrderImporterTypeURLString %>"
+			/>
+
+			<liferay-frontend:component
+				context='<%=
+					HashMapBuilder.<String, Object>put(
+						"commerceOrderImporterTypeKey", commerceOrderImporterTypeKey
+					).put(
+						"title", commerceOrderImporterTypeLabel
+					).put(
+						"url", viewCommerceOrderImporterTypeURLString
+					).build()
+				%>'
+				module="js/edit_commerce_order"
+			/>
+
+		<%
+		}
+		%>
+
 		<liferay-ui:icon
 			message="print"
 			url='<%= "javascript:window.print();" %>'
@@ -326,6 +420,12 @@ List<String> errorMessages = (List<String>)request.getAttribute(CommerceWebKeys.
 			<liferay-ui:icon-delete
 				message="remove-all-items"
 				url="<%= deleteOrderContentURL %>"
+			/>
+
+			<liferay-ui:icon
+				icon="print"
+				message="print"
+				url="<%= commerceOrderContentDisplayContext.getExportCommerceOrderReportURL() %>"
 			/>
 		</c:if>
 	</liferay-ui:icon-menu>

@@ -15,12 +15,7 @@ definition {
 
 		AssertLocation(value1 = "${portalURL}/web/guest?SM_USER=test@liferay.com");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Search");
-
-		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+		SearchAdministration.executeReindex();
 	}
 
 	@priority = "5"
@@ -45,7 +40,11 @@ definition {
 
 		Upgrade.addDMWithDocumentTypesAndMetadataSets();
 
+		Upgrade.editDocumentTypesAndMetadataSets();
+
 		Upgrade.editAndDeleteDocuments();
+
+		Upgrade.deleteDocumentTypesAndMetadataSets();
 	}
 
 	@priority = "5"
@@ -60,7 +59,11 @@ definition {
 
 		Upgrade.addDMWithDocumentTypesAndMetadataSets();
 
+		Upgrade.editDocumentTypesAndMetadataSets();
+
 		Upgrade.editAndDeleteDocuments();
+
+		Upgrade.deleteDocumentTypesAndMetadataSets();
 	}
 
 	@priority = "5"
@@ -75,7 +78,11 @@ definition {
 
 		Upgrade.addDMWithDocumentTypesAndMetadataSets();
 
+		Upgrade.editDocumentTypesAndMetadataSets();
+
 		Upgrade.editAndDeleteDocuments();
+
+		Upgrade.deleteDocumentTypesAndMetadataSets();
 	}
 
 	@priority = "5"
@@ -108,7 +115,11 @@ definition {
 
 		Upgrade.addDMWithDocumentTypesAndMetadataSets();
 
+		Upgrade.editDocumentTypesAndMetadataSets();
+
 		Upgrade.editAndDeleteDocuments();
+
+		Upgrade.deleteDocumentTypesAndMetadataSets();
 	}
 
 }

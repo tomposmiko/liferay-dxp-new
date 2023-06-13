@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -60,20 +62,21 @@ public class Parameter implements Serializable {
 	}
 
 	@Schema
-	public String getDateFormat() {
-		return dateFormat;
+	@Valid
+	public Object getDefaultValue() {
+		return defaultValue;
 	}
 
-	public void setDateFormat(String dateFormat) {
-		this.dateFormat = dateFormat;
+	public void setDefaultValue(Object defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 
 	@JsonIgnore
-	public void setDateFormat(
-		UnsafeSupplier<String, Exception> dateFormatUnsafeSupplier) {
+	public void setDefaultValue(
+		UnsafeSupplier<Object, Exception> defaultValueUnsafeSupplier) {
 
 		try {
-			dateFormat = dateFormatUnsafeSupplier.get();
+			defaultValue = defaultValueUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -85,23 +88,23 @@ public class Parameter implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String dateFormat;
+	protected Object defaultValue;
 
 	@Schema
-	public Double getDefaultValueDouble() {
-		return defaultValueDouble;
+	public String getFormat() {
+		return format;
 	}
 
-	public void setDefaultValueDouble(Double defaultValueDouble) {
-		this.defaultValueDouble = defaultValueDouble;
+	public void setFormat(String format) {
+		this.format = format;
 	}
 
 	@JsonIgnore
-	public void setDefaultValueDouble(
-		UnsafeSupplier<Double, Exception> defaultValueDoubleUnsafeSupplier) {
+	public void setFormat(
+		UnsafeSupplier<String, Exception> formatUnsafeSupplier) {
 
 		try {
-			defaultValueDouble = defaultValueDoubleUnsafeSupplier.get();
+			format = formatUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -113,24 +116,22 @@ public class Parameter implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Double defaultValueDouble;
+	protected String format;
 
 	@Schema
 	@Valid
-	public Float getDefaultValueFloat() {
-		return defaultValueFloat;
+	public Object getMax() {
+		return max;
 	}
 
-	public void setDefaultValueFloat(Float defaultValueFloat) {
-		this.defaultValueFloat = defaultValueFloat;
+	public void setMax(Object max) {
+		this.max = max;
 	}
 
 	@JsonIgnore
-	public void setDefaultValueFloat(
-		UnsafeSupplier<Float, Exception> defaultValueFloatUnsafeSupplier) {
-
+	public void setMax(UnsafeSupplier<Object, Exception> maxUnsafeSupplier) {
 		try {
-			defaultValueFloat = defaultValueFloatUnsafeSupplier.get();
+			max = maxUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -142,227 +143,22 @@ public class Parameter implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Float defaultValueFloat;
-
-	@Schema
-	public Integer getDefaultValueInteger() {
-		return defaultValueInteger;
-	}
-
-	public void setDefaultValueInteger(Integer defaultValueInteger) {
-		this.defaultValueInteger = defaultValueInteger;
-	}
-
-	@JsonIgnore
-	public void setDefaultValueInteger(
-		UnsafeSupplier<Integer, Exception> defaultValueIntegerUnsafeSupplier) {
-
-		try {
-			defaultValueInteger = defaultValueIntegerUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Integer defaultValueInteger;
-
-	@Schema
-	public Long getDefaultValueLong() {
-		return defaultValueLong;
-	}
-
-	public void setDefaultValueLong(Long defaultValueLong) {
-		this.defaultValueLong = defaultValueLong;
-	}
-
-	@JsonIgnore
-	public void setDefaultValueLong(
-		UnsafeSupplier<Long, Exception> defaultValueLongUnsafeSupplier) {
-
-		try {
-			defaultValueLong = defaultValueLongUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long defaultValueLong;
-
-	@Schema
-	public String getDefaultValueString() {
-		return defaultValueString;
-	}
-
-	public void setDefaultValueString(String defaultValueString) {
-		this.defaultValueString = defaultValueString;
-	}
-
-	@JsonIgnore
-	public void setDefaultValueString(
-		UnsafeSupplier<String, Exception> defaultValueStringUnsafeSupplier) {
-
-		try {
-			defaultValueString = defaultValueStringUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String defaultValueString;
-
-	@Schema
-	public Integer[] getDefaultValuesIntegerArray() {
-		return defaultValuesIntegerArray;
-	}
-
-	public void setDefaultValuesIntegerArray(
-		Integer[] defaultValuesIntegerArray) {
-
-		this.defaultValuesIntegerArray = defaultValuesIntegerArray;
-	}
-
-	@JsonIgnore
-	public void setDefaultValuesIntegerArray(
-		UnsafeSupplier<Integer[], Exception>
-			defaultValuesIntegerArrayUnsafeSupplier) {
-
-		try {
-			defaultValuesIntegerArray =
-				defaultValuesIntegerArrayUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Integer[] defaultValuesIntegerArray;
-
-	@Schema
-	public Long[] getDefaultValuesLongArray() {
-		return defaultValuesLongArray;
-	}
-
-	public void setDefaultValuesLongArray(Long[] defaultValuesLongArray) {
-		this.defaultValuesLongArray = defaultValuesLongArray;
-	}
-
-	@JsonIgnore
-	public void setDefaultValuesLongArray(
-		UnsafeSupplier<Long[], Exception>
-			defaultValuesLongArrayUnsafeSupplier) {
-
-		try {
-			defaultValuesLongArray = defaultValuesLongArrayUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long[] defaultValuesLongArray;
-
-	@Schema
-	public String[] getDefaultValuesStringArray() {
-		return defaultValuesStringArray;
-	}
-
-	public void setDefaultValuesStringArray(String[] defaultValuesStringArray) {
-		this.defaultValuesStringArray = defaultValuesStringArray;
-	}
-
-	@JsonIgnore
-	public void setDefaultValuesStringArray(
-		UnsafeSupplier<String[], Exception>
-			defaultValuesStringArrayUnsafeSupplier) {
-
-		try {
-			defaultValuesStringArray =
-				defaultValuesStringArrayUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String[] defaultValuesStringArray;
-
-	@Schema
-	public Double getMaxValueDouble() {
-		return maxValueDouble;
-	}
-
-	public void setMaxValueDouble(Double maxValueDouble) {
-		this.maxValueDouble = maxValueDouble;
-	}
-
-	@JsonIgnore
-	public void setMaxValueDouble(
-		UnsafeSupplier<Double, Exception> maxValueDoubleUnsafeSupplier) {
-
-		try {
-			maxValueDouble = maxValueDoubleUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Double maxValueDouble;
+	protected Object max;
 
 	@Schema
 	@Valid
-	public Float getMaxValueFloat() {
-		return maxValueFloat;
+	public Object getMin() {
+		return min;
 	}
 
-	public void setMaxValueFloat(Float maxValueFloat) {
-		this.maxValueFloat = maxValueFloat;
+	public void setMin(Object min) {
+		this.min = min;
 	}
 
 	@JsonIgnore
-	public void setMaxValueFloat(
-		UnsafeSupplier<Float, Exception> maxValueFloatUnsafeSupplier) {
-
+	public void setMin(UnsafeSupplier<Object, Exception> minUnsafeSupplier) {
 		try {
-			maxValueFloat = maxValueFloatUnsafeSupplier.get();
+			min = minUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -374,202 +170,31 @@ public class Parameter implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Float maxValueFloat;
-
-	@Schema
-	public Integer getMaxValueInteger() {
-		return maxValueInteger;
-	}
-
-	public void setMaxValueInteger(Integer maxValueInteger) {
-		this.maxValueInteger = maxValueInteger;
-	}
-
-	@JsonIgnore
-	public void setMaxValueInteger(
-		UnsafeSupplier<Integer, Exception> maxValueIntegerUnsafeSupplier) {
-
-		try {
-			maxValueInteger = maxValueIntegerUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Integer maxValueInteger;
-
-	@Schema
-	public Long getMaxValueLong() {
-		return maxValueLong;
-	}
-
-	public void setMaxValueLong(Long maxValueLong) {
-		this.maxValueLong = maxValueLong;
-	}
-
-	@JsonIgnore
-	public void setMaxValueLong(
-		UnsafeSupplier<Long, Exception> maxValueLongUnsafeSupplier) {
-
-		try {
-			maxValueLong = maxValueLongUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long maxValueLong;
-
-	@Schema
-	public Double getMinValueDouble() {
-		return minValueDouble;
-	}
-
-	public void setMinValueDouble(Double minValueDouble) {
-		this.minValueDouble = minValueDouble;
-	}
-
-	@JsonIgnore
-	public void setMinValueDouble(
-		UnsafeSupplier<Double, Exception> minValueDoubleUnsafeSupplier) {
-
-		try {
-			minValueDouble = minValueDoubleUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Double minValueDouble;
+	protected Object min;
 
 	@Schema
 	@Valid
-	public Float getMinValueFloat() {
-		return minValueFloat;
-	}
-
-	public void setMinValueFloat(Float minValueFloat) {
-		this.minValueFloat = minValueFloat;
+	public Type getType() {
+		return type;
 	}
 
 	@JsonIgnore
-	public void setMinValueFloat(
-		UnsafeSupplier<Float, Exception> minValueFloatUnsafeSupplier) {
-
-		try {
-			minValueFloat = minValueFloatUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Float minValueFloat;
-
-	@Schema
-	public Integer getMinValueInteger() {
-		return minValueInteger;
-	}
-
-	public void setMinValueInteger(Integer minValueInteger) {
-		this.minValueInteger = minValueInteger;
-	}
-
-	@JsonIgnore
-	public void setMinValueInteger(
-		UnsafeSupplier<Integer, Exception> minValueIntegerUnsafeSupplier) {
-
-		try {
-			minValueInteger = minValueIntegerUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Integer minValueInteger;
-
-	@Schema
-	public Long getMinValueLong() {
-		return minValueLong;
-	}
-
-	public void setMinValueLong(Long minValueLong) {
-		this.minValueLong = minValueLong;
-	}
-
-	@JsonIgnore
-	public void setMinValueLong(
-		UnsafeSupplier<Long, Exception> minValueLongUnsafeSupplier) {
-
-		try {
-			minValueLong = minValueLongUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long minValueLong;
-
-	@Schema
-	@Valid
-	public ParameterType getParameterType() {
-		return parameterType;
-	}
-
-	@JsonIgnore
-	public String getParameterTypeAsString() {
-		if (parameterType == null) {
+	public String getTypeAsString() {
+		if (type == null) {
 			return null;
 		}
 
-		return parameterType.toString();
+		return type.toString();
 	}
 
-	public void setParameterType(ParameterType parameterType) {
-		this.parameterType = parameterType;
+	public void setType(Type type) {
+		this.type = type;
 	}
 
 	@JsonIgnore
-	public void setParameterType(
-		UnsafeSupplier<ParameterType, Exception> parameterTypeUnsafeSupplier) {
-
+	public void setType(UnsafeSupplier<Type, Exception> typeUnsafeSupplier) {
 		try {
-			parameterType = parameterTypeUnsafeSupplier.get();
+			type = typeUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -581,7 +206,7 @@ public class Parameter implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected ParameterType parameterType;
+	protected Type type;
 
 	@Override
 	public boolean equals(Object object) {
@@ -610,228 +235,91 @@ public class Parameter implements Serializable {
 
 		sb.append("{");
 
-		if (dateFormat != null) {
+		if (defaultValue != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"dateFormat\": ");
+			sb.append("\"defaultValue\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(dateFormat));
-
-			sb.append("\"");
-		}
-
-		if (defaultValueDouble != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
+			if (defaultValue instanceof Map) {
+				sb.append(
+					JSONFactoryUtil.createJSONObject((Map<?, ?>)defaultValue));
 			}
-
-			sb.append("\"defaultValueDouble\": ");
-
-			sb.append(defaultValueDouble);
-		}
-
-		if (defaultValueFloat != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"defaultValueFloat\": ");
-
-			sb.append(defaultValueFloat);
-		}
-
-		if (defaultValueInteger != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"defaultValueInteger\": ");
-
-			sb.append(defaultValueInteger);
-		}
-
-		if (defaultValueLong != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"defaultValueLong\": ");
-
-			sb.append(defaultValueLong);
-		}
-
-		if (defaultValueString != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"defaultValueString\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(defaultValueString));
-
-			sb.append("\"");
-		}
-
-		if (defaultValuesIntegerArray != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"defaultValuesIntegerArray\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < defaultValuesIntegerArray.length; i++) {
-				sb.append(defaultValuesIntegerArray[i]);
-
-				if ((i + 1) < defaultValuesIntegerArray.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
-		if (defaultValuesLongArray != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"defaultValuesLongArray\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < defaultValuesLongArray.length; i++) {
-				sb.append(defaultValuesLongArray[i]);
-
-				if ((i + 1) < defaultValuesLongArray.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
-		if (defaultValuesStringArray != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"defaultValuesStringArray\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < defaultValuesStringArray.length; i++) {
+			else if (defaultValue instanceof String) {
 				sb.append("\"");
-
-				sb.append(_escape(defaultValuesStringArray[i]));
-
+				sb.append(_escape((String)defaultValue));
 				sb.append("\"");
-
-				if ((i + 1) < defaultValuesStringArray.length) {
-					sb.append(", ");
-				}
 			}
-
-			sb.append("]");
+			else {
+				sb.append(defaultValue);
+			}
 		}
 
-		if (maxValueDouble != null) {
+		if (format != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"maxValueDouble\": ");
-
-			sb.append(maxValueDouble);
-		}
-
-		if (maxValueFloat != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"maxValueFloat\": ");
-
-			sb.append(maxValueFloat);
-		}
-
-		if (maxValueInteger != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"maxValueInteger\": ");
-
-			sb.append(maxValueInteger);
-		}
-
-		if (maxValueLong != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"maxValueLong\": ");
-
-			sb.append(maxValueLong);
-		}
-
-		if (minValueDouble != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"minValueDouble\": ");
-
-			sb.append(minValueDouble);
-		}
-
-		if (minValueFloat != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"minValueFloat\": ");
-
-			sb.append(minValueFloat);
-		}
-
-		if (minValueInteger != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"minValueInteger\": ");
-
-			sb.append(minValueInteger);
-		}
-
-		if (minValueLong != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"minValueLong\": ");
-
-			sb.append(minValueLong);
-		}
-
-		if (parameterType != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"parameterType\": ");
+			sb.append("\"format\": ");
 
 			sb.append("\"");
 
-			sb.append(parameterType);
+			sb.append(_escape(format));
+
+			sb.append("\"");
+		}
+
+		if (max != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"max\": ");
+
+			if (max instanceof Map) {
+				sb.append(JSONFactoryUtil.createJSONObject((Map<?, ?>)max));
+			}
+			else if (max instanceof String) {
+				sb.append("\"");
+				sb.append(_escape((String)max));
+				sb.append("\"");
+			}
+			else {
+				sb.append(max);
+			}
+		}
+
+		if (min != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"min\": ");
+
+			if (min instanceof Map) {
+				sb.append(JSONFactoryUtil.createJSONObject((Map<?, ?>)min));
+			}
+			else if (min instanceof String) {
+				sb.append("\"");
+				sb.append(_escape((String)min));
+				sb.append("\"");
+			}
+			else {
+				sb.append(min);
+			}
+		}
+
+		if (type != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"type\": ");
+
+			sb.append("\"");
+
+			sb.append(type);
 
 			sb.append("\"");
 		}
@@ -848,22 +336,23 @@ public class Parameter implements Serializable {
 	)
 	public String xClassName;
 
-	@GraphQLName("ParameterType")
-	public static enum ParameterType {
+	@GraphQLName("Type")
+	public static enum Type {
 
-		DATE("Date"), DOUBLE("Double"), FLOAT("Float"), INTEGER("Integer"),
-		INTEGER_ARRAY("IntegerArray"), LONG("Long"), LONG_ARRAY("LongArray"),
-		STRING("String"), STRING_ARRAY("StringArray"), TIME_RANGE("TimeRange");
+		BOOLEAN("Boolean"), DATE("Date"), DOUBLE("Double"), FLOAT("Float"),
+		INTEGER("Integer"), INTEGER_ARRAY("IntegerArray"), LONG("Long"),
+		LONG_ARRAY("LongArray"), STRING("String"), STRING_ARRAY("StringArray"),
+		TIME_RANGE("TimeRange");
 
 		@JsonCreator
-		public static ParameterType create(String value) {
+		public static Type create(String value) {
 			if ((value == null) || value.equals("")) {
 				return null;
 			}
 
-			for (ParameterType parameterType : values()) {
-				if (Objects.equals(parameterType.getValue(), value)) {
-					return parameterType;
+			for (Type type : values()) {
+				if (Objects.equals(type.getValue(), value)) {
+					return type;
 				}
 			}
 
@@ -880,7 +369,7 @@ public class Parameter implements Serializable {
 			return _value;
 		}
 
-		private ParameterType(String value) {
+		private Type(String value) {
 			_value = value;
 		}
 
@@ -889,9 +378,9 @@ public class Parameter implements Serializable {
 	}
 
 	private static String _escape(Object object) {
-		String string = String.valueOf(object);
-
-		return string.replaceAll("\"", "\\\\\"");
+		return StringUtil.replace(
+			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
+			_JSON_ESCAPE_STRINGS[1]);
 	}
 
 	private static boolean _isArray(Object value) {
@@ -917,7 +406,7 @@ public class Parameter implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(entry.getKey());
+			sb.append(_escape(entry.getKey()));
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -949,7 +438,7 @@ public class Parameter implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(value);
+				sb.append(_escape(value));
 				sb.append("\"");
 			}
 			else {
@@ -965,5 +454,10 @@ public class Parameter implements Serializable {
 
 		return sb.toString();
 	}
+
+	private static final String[][] _JSON_ESCAPE_STRINGS = {
+		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
+		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
+	};
 
 }

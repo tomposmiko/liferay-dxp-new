@@ -71,6 +71,8 @@ definition {
 
 		PortletEntry.inputName(name = "${accountName}");
 
+		AssertElementPresent(locator1 = "Account#VALID_DOMAINS_EMPTY_INFO_MESSAGE");
+
 		AssertClick(
 			locator1 = "Account#VALID_DOMAINS_ADD_BUTTON",
 			value1 = "Add");
@@ -301,7 +303,6 @@ definition {
 
 			Button.clickDone();
 		}
-
 		else {
 			for (var tagName : list "${tagNameList}") {
 				var tagName = StringUtil.lowerCase("${tagName}");
@@ -453,7 +454,12 @@ definition {
 			locator1 = "Button#SAVE",
 			value1 = "Save");
 
-		Alert.viewSuccessMessage();
+		if (IsElementPresent(locator1 = "Message#ERROR_REQUEST_FAILED")) {
+			Button.clickCancel();
+		}
+		else {
+			Alert.viewSuccessMessage();
+		}
 	}
 
 	macro addNewUserWithInvalidDomain {
@@ -494,7 +500,16 @@ definition {
 			locator1 = "Button#SAVE",
 			value1 = "Save");
 
-		Alert.viewSuccessMessage();
+		// Assert error message if it is being added by Account Admin
+
+		if (isSet(asAccountAdmin)) {
+			AssertTextEquals.assertPartialText(
+				locator1 = "Message#ERROR",
+				value1 = "Your request failed to complete.");
+		}
+		else {
+			Alert.viewSuccessMessage();
+		}
 	}
 
 	macro addNewUserWithSameDomain {
@@ -867,6 +882,12 @@ definition {
 				value1 = "${addressCity}");
 		}
 
+		if (isSet(addressCountry)) {
+			Select(
+				locator1 = "Select#COUNTRY",
+				value1 = "${addressCountry}");
+		}
+
 		if (isSet(addressRegion)) {
 			Select(
 				locator1 = "Select#REGION",
@@ -877,12 +898,6 @@ definition {
 			Type(
 				locator1 = "TextInput#POSTAL_CODE",
 				value1 = "${addressPostalCode}");
-		}
-
-		if (isSet(addressCountry)) {
-			Select(
-				locator1 = "Select#COUNTRY",
-				value1 = "${addressCountry}");
 		}
 
 		if (isSet(phoneNumber)) {
@@ -945,7 +960,29 @@ definition {
 			locator1 = "Portlet#TITLE",
 			value1 = "Edit ${accountName}");
 
-		PortletEntry.inputName(name = "${accountNameEdit}");
+		if (isSet(accountNameEdit)) {
+			PortletEntry.inputName(name = "${accountNameEdit}");
+		}
+
+		if (isSet(domainNames)) {
+			AssertClick(
+				locator1 = "Account#VALID_DOMAINS_ADD_BUTTON",
+				value1 = "Add");
+
+			SelectFrame(locator1 = "IFrame#ADD_DOMAIN");
+
+			PortletEntry.inputText(
+				fieldLabel = "Domain",
+				text = "${domainNames}");
+
+			Button.clickSave();
+
+			for (var domainName : list "${domainNames}") {
+				AssertElementPresent(
+					key_domainName = "${domainName}",
+					locator1 = "Account#VALID_DOMAINS_DOMAIN_NAME");
+			}
+		}
 
 		if (isSet(accountDescriptionEdit)) {
 			PortletEntry.inputDescription(description = "${accountDescriptionEdit}");
@@ -1124,6 +1161,8 @@ definition {
 				locator1 = "Button#UPDATE",
 				value1 = "Update");
 		}
+
+		Alert.viewSuccessMessage();
 	}
 
 	macro setDefaultBillingAddress {
@@ -1406,29 +1445,9 @@ definition {
 	}
 
 	macro viewSelectedAccount {
-		Search.searchPG(
-			portletName = "Account Management",
-			searchTerm = "${selectedAccountSearchTerm}");
-
-		LexiconEntry.viewEntryName(rowEntry = "${selectedAccount}");
-
-		LexiconEntry.viewNoEntry(rowEntry = "${previousAccount}");
-
 		AssertElementPresent(
-			key_text = "check",
-			locator1 = "Icon#ANY");
-
-		Search.searchPG(
-			portletName = "Account Management",
-			searchTerm = "${previousAccountSearchTerm}");
-
-		LexiconEntry.viewEntryName(rowEntry = "${previousAccount}");
-
-		LexiconEntry.viewNoEntry(rowEntry = "${selectedAccount}");
-
-		AssertElementNotPresent(
-			key_text = "check",
-			locator1 = "Icon#ANY");
+			key_entryName = "${entryName}",
+			locator1 = "Account#SELECT_ACCOUNT_ENTRY_CHECKMARK");
 	}
 
 }

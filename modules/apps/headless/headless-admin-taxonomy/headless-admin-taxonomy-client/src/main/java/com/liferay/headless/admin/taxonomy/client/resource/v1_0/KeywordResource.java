@@ -77,12 +77,12 @@ public interface KeywordResource {
 				Long assetLibraryId, String roleNames)
 		throws Exception;
 
-	public Page<Permission> putAssetLibraryKeywordPermission(
+	public Page<Permission> putAssetLibraryKeywordPermissionsPage(
 			Long assetLibraryId, Permission[] permissions)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putAssetLibraryKeywordPermissionHttpResponse(
+			putAssetLibraryKeywordPermissionsPageHttpResponse(
 				Long assetLibraryId, Permission[] permissions)
 		throws Exception;
 
@@ -169,11 +169,11 @@ public interface KeywordResource {
 			Long siteId, String roleNames)
 		throws Exception;
 
-	public Page<Permission> putSiteKeywordPermission(
+	public Page<Permission> putSiteKeywordPermissionsPage(
 			Long siteId, Permission[] permissions)
 		throws Exception;
 
-	public HttpInvoker.HttpResponse putSiteKeywordPermissionHttpResponse(
+	public HttpInvoker.HttpResponse putSiteKeywordPermissionsPageHttpResponse(
 			Long siteId, Permission[] permissions)
 		throws Exception;
 
@@ -605,12 +605,12 @@ public interface KeywordResource {
 			return httpInvoker.invoke();
 		}
 
-		public Page<Permission> putAssetLibraryKeywordPermission(
+		public Page<Permission> putAssetLibraryKeywordPermissionsPage(
 				Long assetLibraryId, Permission[] permissions)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putAssetLibraryKeywordPermissionHttpResponse(
+				putAssetLibraryKeywordPermissionsPageHttpResponse(
 					assetLibraryId, permissions);
 
 			String content = httpResponse.getContent();
@@ -651,7 +651,7 @@ public interface KeywordResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putAssetLibraryKeywordPermissionHttpResponse(
+				putAssetLibraryKeywordPermissionsPageHttpResponse(
 					Long assetLibraryId, Permission[] permissions)
 			throws Exception {
 
@@ -1694,12 +1694,12 @@ public interface KeywordResource {
 			return httpInvoker.invoke();
 		}
 
-		public Page<Permission> putSiteKeywordPermission(
+		public Page<Permission> putSiteKeywordPermissionsPage(
 				Long siteId, Permission[] permissions)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putSiteKeywordPermissionHttpResponse(siteId, permissions);
+				putSiteKeywordPermissionsPageHttpResponse(siteId, permissions);
 
 			String content = httpResponse.getContent();
 
@@ -1738,8 +1738,9 @@ public interface KeywordResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse putSiteKeywordPermissionHttpResponse(
-				Long siteId, Permission[] permissions)
+		public HttpInvoker.HttpResponse
+				putSiteKeywordPermissionsPageHttpResponse(
+					Long siteId, Permission[] permissions)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();

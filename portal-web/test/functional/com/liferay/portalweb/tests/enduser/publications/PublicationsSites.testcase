@@ -20,11 +20,6 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			ApplicationsMenu.gotoPortlet(
-				category = "Publications",
-				panel = "Applications",
-				portlet = "Publications");
-
 			Publications.disablePublications();
 		}
 	}
@@ -59,11 +54,11 @@ definition {
 			portlet = "Pages",
 			site = "Child Site Name");
 
-		SitePages.addPublicPage(pageName = "Child Site Page");
+		PagesAdmin.addPublicPage(pageName = "Child Site Page");
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Site",
 			changeSite = "Site Name",
 			changeTitle = "Child Site Name",
@@ -97,9 +92,9 @@ definition {
 
 		Site.viewCP(siteName = "Site Name");
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Site",
 			changeSite = "Global",
 			changeTitle = "Site Name",

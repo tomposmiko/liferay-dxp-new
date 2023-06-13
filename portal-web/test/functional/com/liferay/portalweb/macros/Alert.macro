@@ -13,7 +13,7 @@ definition {
 	}
 
 	macro confirmSecurity {
-		if (IsElementPresent(key_title="Your connection is not private", locator1 = "Header#H1_TITLE")) {
+		if (IsElementPresent(key_title = "Your connection is not private", locator1 = "Header#H1_TITLE")) {
 			Click(locator1 = "Button#ADVANCED");
 
 			AssertElementPresent(
@@ -24,6 +24,13 @@ definition {
 				key_text = "Proceed to localhost (unsafe)",
 				locator1 = "Link#ANY");
 		}
+	}
+
+	macro viewConversionMessage {
+		AssertVisible(
+			key_alertMessage = "${alertMessage}",
+			key_type = "${alertType}",
+			locator1 = "Message#CONVERSION_ALERT_MESSAGE");
 	}
 
 	macro viewDuplicateErrorMessage {
@@ -40,7 +47,8 @@ definition {
 
 	macro viewExpireContentFailedMessage {
 		AssertTextEquals.assertPartialText(
-			locator1 = "Message#ERROR_1",
+			key_alertMessage = "Please enter a valid expiration date.",
+			locator1 = "Message#ERROR_ENTER_A_VALID_VALUE",
 			value1 = "Please enter a valid expiration date.");
 	}
 

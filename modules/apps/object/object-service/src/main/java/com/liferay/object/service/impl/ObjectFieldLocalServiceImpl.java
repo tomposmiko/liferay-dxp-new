@@ -14,18 +14,18 @@
 
 package com.liferay.object.service.impl;
 
-import com.liferay.object.exception.DuplicateObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
 import com.liferay.object.exception.ObjectFieldLabelException;
 import com.liferay.object.exception.ObjectFieldNameException;
+import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
 import com.liferay.object.exception.ObjectFieldTypeException;
 import com.liferay.object.exception.RequiredObjectFieldException;
-import com.liferay.object.exception.ReservedObjectFieldException;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.base.ObjectFieldLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
+import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -149,6 +149,9 @@ public class ObjectFieldLocalServiceImpl
 
 		objectField = objectFieldPersistence.remove(objectField);
 
+		_objectLayoutColumnPersistence.removeByObjectFieldId(
+			objectField.getObjectFieldId());
+
 		if (Objects.equals(
 				objectDefinition.getExtensionDBTableName(),
 				objectField.getDBTableName())) {
@@ -158,9 +161,6 @@ public class ObjectFieldLocalServiceImpl
 					objectField.getDBTableName(),
 					objectField.getDBColumnName()));
 		}
-
-		// TODO What happens if you delete an object field that is associated to
-		// an object layout?
 
 		return objectField;
 	}
@@ -234,8 +234,20 @@ public class ObjectFieldLocalServiceImpl
 		}
 
 		_validateIndexed(indexed, indexedAsKeyword, indexedLanguageId, type);
-		_validateName(objectFieldId, objectDefinition, name);
-		validateType(type);
+
+		if (Validator.isNotNull(objectField.getRelationshipType())) {
+			if (!Objects.equals(objectField.getName(), name) ||
+				!Objects.equals(objectField.getType(), type)) {
+
+				throw new ObjectFieldRelationshipTypeException(
+					"Object field relationship name and type cannot be " +
+						"changed");
+			}
+		}
+		else {
+			_validateName(objectFieldId, objectDefinition, name);
+			validateType(type);
+		}
 
 		objectField.setListTypeDefinitionId(listTypeDefinitionId);
 		objectField.setIndexed(indexed);
@@ -330,33 +342,31 @@ public class ObjectFieldLocalServiceImpl
 		throws PortalException {
 
 		if (Validator.isNull(name)) {
-			throw new ObjectFieldNameException("Name is null");
+			throw new ObjectFieldNameException.MustNotBeNull();
 		}
 
 		char[] nameCharArray = name.toCharArray();
 
 		for (char c : nameCharArray) {
 			if (!Validator.isChar(c) && !Validator.isDigit(c)) {
-				throw new ObjectFieldNameException(
-					"Name must only contain letters and digits");
+				throw new ObjectFieldNameException.
+					MustOnlyContainLettersAndDigits();
 			}
 		}
 
 		if (!Character.isLowerCase(nameCharArray[0])) {
-			throw new ObjectFieldNameException(
-				"The first character of a name must be a lower case letter");
+			throw new ObjectFieldNameException.MustBeginWithLowerCaseLetter();
 		}
 
 		if (nameCharArray.length > 41) {
-			throw new ObjectFieldNameException(
-				"Names must be less than 41 characters");
+			throw new ObjectFieldNameException.MustBeLessThan41Characters();
 		}
 
 		if (_reservedNames.contains(StringUtil.toLowerCase(name)) ||
 			StringUtil.equalsIgnoreCase(
 				objectDefinition.getPKObjectFieldName(), name)) {
 
-			throw new ReservedObjectFieldException("Reserved name " + name);
+			throw new ObjectFieldNameException.MustNotBeReserved(name);
 		}
 
 		ObjectField objectField = objectFieldPersistence.fetchByODI_N(
@@ -365,24 +375,23 @@ public class ObjectFieldLocalServiceImpl
 		if ((objectField != null) &&
 			(objectField.getObjectFieldId() != objectFieldId)) {
 
-			throw new DuplicateObjectFieldException("Duplicate name " + name);
+			throw new ObjectFieldNameException.MustNotBeDuplicate(name);
 		}
 	}
 
 	@Reference
 	private ObjectDefinitionPersistence _objectDefinitionPersistence;
 
+	@Reference
+	private ObjectLayoutColumnPersistence _objectLayoutColumnPersistence;
+
 	private final Set<String> _reservedNames = SetUtil.fromArray(
-		new String[] {
-			"companyid", "createdate", "groupid", "id", "lastpublishdate",
-			"modifieddate", "status", "statusbyuserid", "statusbyusername",
-			"statusdate", "userid", "username"
-		});
+		"companyid", "createdate", "groupid", "id", "lastpublishdate",
+		"modifieddate", "status", "statusbyuserid", "statusbyusername",
+		"statusdate", "userid", "username");
 	private final Set<String> _types = SetUtil.fromArray(
-		new String[] {
-			"BigDecimal", "Blob", "Boolean", "Date", "Double", "Integer",
-			"Long", "String"
-		});
+		"BigDecimal", "Blob", "Boolean", "Clob", "Date", "Double", "Integer",
+		"Long", "String");
 
 	@Reference
 	private UserLocalService _userLocalService;

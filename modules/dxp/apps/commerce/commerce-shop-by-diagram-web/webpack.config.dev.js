@@ -93,6 +93,10 @@ module.exports = {
 	],
 	resolve: {
 		alias: {
+			'@liferay/frontend-data-set-web': path.resolve(
+				__dirname,
+				'../../../../node_modules/@liferay/frontend-data-set-web/src/main/resources/META-INF/resources/index.js'
+			),
 			'@liferay/frontend-js-react-web': path.resolve(
 				__dirname,
 				'../../../../node_modules/@liferay/frontend-js-react-web/src/main/resources/META-INF/resources/js/index.ts'
@@ -100,6 +104,14 @@ module.exports = {
 			'@liferay/frontend-js-state-web': path.resolve(
 				__dirname,
 				'../../../../node_modules/@liferay/frontend-js-state-web/src/main/resources/META-INF/resources/index.ts'
+			),
+			'commerce-frontend-js/components/add_to_cart/AddToCart': path.resolve(
+				__dirname,
+				'../../../../node_modules/commerce-frontend-js/src/main/resources/META-INF/resources/components/add_to_cart/AddToCart.js'
+			),
+			'commerce-frontend-js/components/add_to_cart/AddToCartButton': path.resolve(
+				__dirname,
+				'../../../../node_modules/commerce-frontend-js/src/main/resources/META-INF/resources/components/add_to_cart/AddToCartButton.js'
 			),
 			'commerce-frontend-js/components/autocomplete/Autocomplete': path.resolve(
 				__dirname,
@@ -109,13 +121,25 @@ module.exports = {
 				__dirname,
 				'../../../../node_modules/commerce-frontend-js/src/main/resources/META-INF/resources/components/infinite_scroller/InfiniteScroller.js'
 			),
+			'commerce-frontend-js/components/quantity_selector/QuantitySelector': path.resolve(
+				__dirname,
+				'../../../../node_modules/commerce-frontend-js/src/main/resources/META-INF/resources/components/quantity_selector/QuantitySelector.js'
+			),
+			'commerce-frontend-js/utilities/hooks': path.resolve(
+				__dirname,
+				'../../../../node_modules/commerce-frontend-js/src/main/resources/META-INF/resources/utilities/hooks.js'
+			),
+			'commerce-frontend-js/utilities/index': path.resolve(
+				__dirname,
+				'../../../../node_modules/commerce-frontend-js/src/main/resources/META-INF/resources/utilities/index.js'
+			),
+			'commerce-frontend-js/utilities/quantities': path.resolve(
+				__dirname,
+				'../../../../node_modules/commerce-frontend-js/src/main/resources/META-INF/resources/utilities/quantities.js'
+			),
 			'frontend-js-web': path.resolve(
 				__dirname,
 				'../../../../node_modules/frontend-js-web/src/main/resources/META-INF/resources/index.es.js'
-			),
-			'frontend-taglib-clay/data_set_display/utils/eventsDefinitions': path.resolve(
-				__dirname,
-				'../../../../node_modules/frontend-taglib-clay/src/main/resources/META-INF/resources/data_set_display/utils/eventsDefinitions.js'
 			),
 		},
 		extensions: ['.js', '.jsx', '.ts', '.tsx'],

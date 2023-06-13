@@ -27,8 +27,6 @@
 				"orderRuleId", corEntryId
 			).put(
 				"rootPortletId", portletDisplay.getRootPortletId()
-			).put(
-				"spritemap", themeDisplay.getPathThemeImages() + "/lexicon/icons.svg"
 			).build()
 		%>'
 		module="js/account_groups"
@@ -41,7 +39,7 @@
 		<clay:headless-data-set-display
 			apiURL="<%= corEntryQualifiersDisplayContext.getAccountGroupCOREntriesAPIURL() %>"
 			clayDataSetActionDropdownItems="<%= corEntryQualifiersDisplayContext.getAccountGroupClayDataSetActionDropdownItems() %>"
-			formId="fm"
+			formName="fm"
 			id="<%= COREntryClayDataSetDisplayNames.COR_ENTRY_QUALIFIER_ACCOUNT_GROUPS %>"
 			itemsPerPage="<%= 10 %>"
 			namespace="<%= liferayPortletResponse.getNamespace() %>"

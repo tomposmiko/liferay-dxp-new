@@ -4,6 +4,7 @@ definition {
 	property app.server.bundles.size = "1";
 	property custom.properties = "tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=";
 	property databases.size = "1";
+	property minimum.slave.ram = "24";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Staging";
@@ -40,17 +41,7 @@ definition {
 	test AssertLongPublicationProcessMessage {
 		property test.name.skip.portal.instance = "RemoteStaging#AssertLongPublicationProcessMessage";
 
-		ServerAdministration.openServerAdmin();
-
-		var script = TestCase.getFileContent(
-			fileName = "create-300-web-content-articles.groovy",
-			filePath = "enduser/staging/usecase");
-
-		ServerAdministration.executeScript(
-			language = "Groovy",
-			script = "${script}");
-
-		Pause(locator1 = "60000");
+		Staging.runGroovyScript();
 
 		Staging.openStagingAdmin(siteURLKey = "site-name");
 
@@ -60,9 +51,13 @@ definition {
 			locator1 = "Message#TOOLTIP",
 			value1 = "Custom Publish Process");
 
+		Staging.publishCustomPublication(remoteStaging = "true");
+
 		Staging.publishCustomPublication(
+			checkContentNameList = "Web Content",
 			headerTitle = "New Publish Process",
 			inProcess = "true",
+			rangeAll = "true",
 			remoteStaging = "true");
 	}
 
@@ -71,9 +66,9 @@ definition {
 	test AssertValidationErrors {
 		property test.name.skip.portal.instance = "RemoteStaging#AssertValidationErrors";
 
-		SitePages.openPagesAdmin(siteURLKey = "site-name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "site-name");
 
-		SitePages.addPublicPage(pageName = "Second Test Page");
+		PagesAdmin.addPublicPage(pageName = "Second Test Page");
 
 		JSONGroup.deleteGroupByName(
 			groupName = "Remote Site",
@@ -94,21 +89,13 @@ definition {
 	test PublishCustomFieldDeletionviaRemoteStaging {
 		property test.name.skip.portal.instance = "RemoteStaging#PublishCustomFieldDeletionviaRemoteStaging";
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Custom Fields");
-
 		CustomFields.addCP(
 			customFieldName = "Text Field",
 			customFieldType = "Input Field",
 			customInputDataType = "Text",
-			resourceName = "Document");
+			modelResource = "com.liferay.document.library.kernel.model.DLFileEntry");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Custom Fields");
+		CustomFields.openCustomFieldAdmin();
 
 		LAR.exportPortlet(
 			larFileName = "custom_fields.portlet.lar",
@@ -121,10 +108,7 @@ definition {
 			specificURL = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Custom Fields");
+		CustomFields.openCustomFieldAdmin(baseURL = "http://localhost:9080");
 
 		LAR.importPortlet(larFileName = "custom_fields.portlet.lar");
 
@@ -136,9 +120,7 @@ definition {
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Documents and Media");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
 		DMDocument.addCP(
 			customFieldText = "DM Document Custom Field",
@@ -166,9 +148,9 @@ definition {
 			pageName = "Staging Test Page",
 			siteName = "Remote Site");
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Documents and Media");
+		DMNavigator.openDocumentsAndMediaAdmin(
+			baseURL = "http://localhost:9080",
+			siteURLKey = "remote-site");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
 
@@ -183,19 +165,13 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Custom Fields");
+		CustomFields.openCustomFieldAdmin();
 
 		CustomFields.deleteCP(
 			customFieldName = "Text Field",
 			resourceName = "Document");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Custom Fields");
+		CustomFields.openCustomFieldAdmin();
 
 		LAR.exportPortlet(
 			exportIndividualDeletions = "true",
@@ -209,10 +185,7 @@ definition {
 			specificURL = "http://localhost:9080",
 			userEmailAddress = "test@liferay.com");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Custom Fields");
+		CustomFields.openCustomFieldAdmin(baseURL = "http://localhost:9080");
 
 		LAR.importPortlet(
 			importDeletions = "true",
@@ -226,9 +199,7 @@ definition {
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Documents and Media");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
 
@@ -257,9 +228,9 @@ definition {
 			pageName = "Staging Test Page",
 			siteName = "Remote Site");
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Documents and Media");
+		DMNavigator.openDocumentsAndMediaAdmin(
+			baseURL = "http://localhost:9080",
+			siteURLKey = "remote-site");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
 
@@ -277,7 +248,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Documents and Media");
 
 		DMNavigator.gotoDocumentType();
@@ -288,7 +259,7 @@ definition {
 			dmDocumentTypeName = "DM Document Type Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Documents and Media");
 
 		DMDocument.addCP(
@@ -328,7 +299,7 @@ definition {
 			siteName = "Remote Site");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Documents and Media");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Type Title");
@@ -410,21 +381,22 @@ definition {
 
 		WebContent.viewTitle(webContentTitle = "Web Content Title");
 
-		Navigator.gotoSitePage(
-			pageName = "Staging Test Page",
-			siteName = "Site Name");
+		Staging.openStagingAdmin(siteURLKey = "site-name");
 
-		var dateRangeEndDate = '''1/2''';
+		Staging.addCustomPublication();
 
-		var dateRangeStartDate = '''1/1''';
+		Staging.configurePublishToLive(
+			contentDateRange = "Date Range",
+			dateRangeEndDate = '''10/12/2019''',
+			dateRangeStartDate = '''10/11/2019''');
 
-		Staging.setContentDateRange(
-			dateRangeEndDate = "${dateRangeEndDate}",
-			dateRangeStartDate = "${dateRangeStartDate}");
+		Staging.viewDateRange(
+			dateRangeEndDate = '''10/12/2019''',
+			dateRangeStartDate = '''10/11/2019''');
 
-		var key_contentName = "Web Content";
-
-		AssertElementNotPresent(locator1 = "PagesConfiguration#CONTENT_CHOOSE_CONTENT_CONTENT_CHECKBOX");
+		AssertElementNotPresent(
+			key_contentName = "Web Content",
+			locator1 = "PagesConfiguration#CONTENT_CHOOSE_CONTENT_CONTENT_CHECKBOX");
 
 		Navigator.gotoSitePage(
 			pageName = "Staging Test Page",

@@ -17,6 +17,7 @@ import {ModalContext} from '../../../../../../src/main/resources/META-INF/resour
 import SingleReassignModal from '../../../../../../src/main/resources/META-INF/resources/js/components/instance-list-page/modal/reassign/single/SingleReassignModal.es';
 import ToasterProvider from '../../../../../../src/main/resources/META-INF/resources/js/shared/components/toaster/ToasterProvider.es';
 import {MockRouter} from '../../../../../mock/MockRouter.es';
+import FetchMock, {fetchMockResponse} from '../../../../../mock/fetch.es';
 
 import '@testing-library/jest-dom/extend-expect';
 
@@ -53,12 +54,11 @@ describe('The SingleReassignModal component should', () => {
 		},
 	];
 
-	const clientMock = {
-		get: jest
-			.fn()
-			.mockRejectedValueOnce(new Error('Request failed'))
-			.mockResolvedValueOnce({
-				data: {
+	const fetchMock = new FetchMock({
+		GET: {
+			default: [
+				fetchMockResponse({}, false),
+				fetchMockResponse({
 					items: [
 						{
 							assigneePerson: {id: 2, name: 'Test Test'},
@@ -73,18 +73,21 @@ describe('The SingleReassignModal component should', () => {
 						},
 					],
 					totalCount: items.length,
-				},
-			})
-			.mockResolvedValue({data: {items}}),
-		post: jest
-			.fn()
-			.mockRejectedValueOnce(new Error('Request failed'))
-			.mockResolvedValue({data: {items: []}}),
-	};
+				}),
+				fetchMockResponse({items}),
+			],
+		},
+		POST: {
+			default: [
+				fetchMockResponse(new Error('Request failed'), false),
+				fetchMockResponse({items: []}),
+			],
+		},
+	});
 
 	beforeAll(async () => {
 		const renderResult = render(
-			<MockRouter client={clientMock}>
+			<MockRouter>
 				<SingleReassignModal />
 			</MockRouter>,
 			{
@@ -97,6 +100,14 @@ describe('The SingleReassignModal component should', () => {
 		await act(async () => {
 			jest.runAllTimers();
 		});
+	});
+
+	beforeEach(() => {
+		fetchMock.mock();
+	});
+
+	afterEach(() => {
+		fetchMock.reset();
 	});
 
 	it('Render modal with error message and retry', async () => {

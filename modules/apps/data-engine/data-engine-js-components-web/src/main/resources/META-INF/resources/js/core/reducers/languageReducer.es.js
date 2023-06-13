@@ -21,19 +21,34 @@ import {generateName, getRepeatedIndex} from '../../utils/repeatable.es';
 import {PagesVisitor} from '../../utils/visitors.es';
 import {EVENT_TYPES} from '../actions/eventTypes.es';
 
-const deleteLanguageId = (languageId, pages) => {
+const deleteLanguageId = (pages, ...languageIds) => {
 	const visitor = new PagesVisitor(pages);
 
 	return visitor.mapFields((field) => {
 		const {localizedValue} = field;
-		const newLocalizedValue = {...localizedValue};
+		const updatedField = {...field};
 
-		delete newLocalizedValue[languageId];
+		if (localizedValue) {
+			const newLocalizedValue = {...localizedValue};
 
-		return {
-			...field,
-			localizedValue: newLocalizedValue,
-		};
+			languageIds.forEach((languageId) => {
+				delete newLocalizedValue[languageId];
+			});
+
+			updatedField.localizedValue = newLocalizedValue;
+		}
+
+		if (field.settingsContext) {
+			updatedField.settingsContext = {
+				...field.settingsContext,
+				pages: deleteLanguageId(
+					field.settingsContext.pages,
+					...languageIds
+				),
+			};
+		}
+
+		return updatedField;
 	});
 };
 
@@ -55,7 +70,10 @@ const getLocalizedValue = ({
 	const defaultValue = localizedValue[defaultLanguageId];
 
 	if (localizedValue) {
-		if (localizedValue[editingLanguageId] != null) {
+		if (
+			localizedValue[editingLanguageId] !== null &&
+			localizedValue[editingLanguageId] !== undefined
+		) {
 			if (
 				Array.isArray(localizedValue[editingLanguageId]) &&
 				!localizedValue[editingLanguageId]?.length &&
@@ -108,9 +126,13 @@ const updateFieldLanguage = ({
 }) => {
 	const settingsVisitor = new PagesVisitor(settingsContext.pages);
 
-	const currentOptions = settingsVisitor.findField(
+	const fieldOptions = settingsVisitor.findField(
 		({fieldName}) => fieldName === 'options'
-	)?.value[editingLanguageId];
+	);
+
+	const currentOptions =
+		fieldOptions?.value[editingLanguageId] ??
+		fieldOptions?.value[defaultLanguageId];
 
 	const pages = settingsVisitor.mapFields((field) => {
 		const updatedField = localizeField(
@@ -119,13 +141,11 @@ const updateFieldLanguage = ({
 			editingLanguageId
 		);
 
-		if (
-			field.fieldName === 'predefinedValue' &&
-			currentOptions?.length > 1 &&
-			currentOptions[0].edited
-		) {
-			return {...updatedField, options: currentOptions};
+		if (currentOptions && field.fieldName === 'predefinedValue') {
+			updatedField.options = currentOptions;
 		}
+
+		updatedField.locale = editingLanguageId;
 
 		return updatedField;
 	});
@@ -143,6 +163,7 @@ const updateFieldLanguage = ({
 			defaultLanguageId,
 			editingLanguageId
 		),
+		locale: editingLanguageId,
 		name: generateName(name, {
 			instanceId: instanceId || generateInstanceId(),
 			repeatedIndex: getRepeatedIndex(name),
@@ -164,11 +185,51 @@ const updateFieldLanguage = ({
 	return newField;
 };
 
+const removeLanguageFromForm = (focusedField, pages, ...deletedLanguageIds) => {
+	let updatedPages = deleteLanguageId(pages, ...deletedLanguageIds);
+
+	const visitor = new PagesVisitor(updatedPages);
+
+	let updatedFocusedField = {};
+
+	// TODO: Supposed to be a visitor.findField() but is not working
+
+	visitor.mapFields((field) => {
+		if (field.instanceId === focusedField.instanceId) {
+			updatedFocusedField = field;
+		}
+	});
+
+	updatedPages = visitor.mapPages((page) => {
+		const {contentRenderer, localizedDescription, localizedTitle} = page;
+
+		if (contentRenderer === 'success') {
+			return page;
+		}
+
+		deletedLanguageIds.forEach((languageId) => {
+			delete localizedDescription[languageId];
+			delete localizedTitle[languageId];
+		});
+
+		return {
+			...page,
+			localizedDescription,
+			localizedTitle,
+		};
+	});
+
+	return {
+		focusedField: updatedFocusedField,
+		pages: updatedPages,
+	};
+};
+
 /**
  * NOTE: This is a literal copy of the old LayoutProvider logic. Small changes
  * were made only to adapt to the reducer.
  */
-export default (state, action) => {
+export default function languageReducer(state, action) {
 	switch (action.type) {
 		case EVENT_TYPES.LANGUAGE.CHANGE: {
 			const {
@@ -260,7 +321,6 @@ export default (state, action) => {
 					};
 				},
 				true,
-				true,
 				true
 			);
 
@@ -283,81 +343,48 @@ export default (state, action) => {
 				availableLanguageIds: [...availableLanguageIds, languageId],
 			};
 		}
+		case EVENT_TYPES.LANGUAGE.UPDATE: {
+			const {availableLanguageIds, focusedField, pages} = state;
+
+			const activeLanguageIds = action.payload.activeLanguageIds;
+
+			const activeLanguageSet = new Set(activeLanguageIds);
+			const deletedLanguageIds = availableLanguageIds.filter(
+				(languageId) => !activeLanguageSet.has(languageId)
+			);
+
+			const availableLanguageSet = new Set(availableLanguageIds);
+			const addedLanguageIds = activeLanguageIds.filter(
+				(languageId) => !availableLanguageSet.has(languageId)
+			);
+
+			if (!deletedLanguageIds.length) {
+				return addedLanguageIds.length
+					? {availableLanguageIds: [...activeLanguageIds]}
+					: state;
+			}
+
+			return {
+				availableLanguageIds: activeLanguageIds,
+				...removeLanguageFromForm(
+					focusedField,
+					pages,
+					...deletedLanguageIds
+				),
+			};
+		}
 		case EVENT_TYPES.LANGUAGE.DELETE: {
 			const {languageIds} = action.payload;
 			const {availableLanguageIds, focusedField, pages} = state;
-
-			// The TranslationManager API does not return the removed languageId
-			// but the list of new locales available but the operation will always
-			// be synchronous, the user removes a locale and `availableLocales` is
-			// triggered and then we call the reducer, it will not be an asynchronous
-			// operation where the locales are removed are accumulated and sent in
-			// a batch.
-
-			const [languageId] = languageIds;
-
-			let newFocusedField = focusedField;
-
-			if (newFocusedField.settingsContext) {
-				newFocusedField = {
-					...newFocusedField,
-					settingsContext: {
-						...newFocusedField.settingsContext,
-						pages: deleteLanguageId(
-							languageId,
-							newFocusedField.settingsContext.pages
-						),
-					},
-				};
-			}
-
-			const visitor = new PagesVisitor(pages);
-
-			const newPages = visitor.mapPages((page) => {
-				const {
-					contentRenderer,
-					localizedDescription,
-					localizedTitle,
-				} = page;
-
-				if (contentRenderer === 'success') {
-					return page;
-				}
-
-				delete localizedDescription[languageId];
-				delete localizedTitle[languageId];
-
-				return {
-					...page,
-					localizedDescription,
-					localizedTitle,
-				};
-			});
-
-			visitor.setPages(newPages);
 
 			return {
 				availableLanguageIds: availableLanguageIds.filter(
 					(id) => !languageIds.includes(id)
 				),
-				focusedField: newFocusedField,
-				pages: visitor.mapFields((field) => {
-					const {settingsContext} = field;
-
-					return {
-						...field,
-						settingsContext: {
-							...settingsContext,
-							pages: deleteLanguageId(
-								languageId,
-								settingsContext.pages
-							),
-						},
-					};
-				}),
+				...removeLanguageFromForm(focusedField, pages, ...languageIds),
 			};
 		}
 		default:
 			return state;
 	}
-};
+}

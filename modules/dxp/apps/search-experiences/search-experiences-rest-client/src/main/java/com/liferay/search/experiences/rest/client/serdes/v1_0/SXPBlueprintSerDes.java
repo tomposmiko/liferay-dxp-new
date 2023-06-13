@@ -14,14 +14,19 @@
 
 package com.liferay.search.experiences.rest.client.serdes.v1_0;
 
+import com.liferay.search.experiences.rest.client.dto.v1_0.ElementInstance;
 import com.liferay.search.experiences.rest.client.dto.v1_0.SXPBlueprint;
 import com.liferay.search.experiences.rest.client.json.BaseJSONParser;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -55,6 +60,9 @@ public class SXPBlueprintSerDes {
 
 		sb.append("{");
 
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
 		if (sxpBlueprint.getConfiguration() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -63,6 +71,21 @@ public class SXPBlueprintSerDes {
 			sb.append("\"configuration\": ");
 
 			sb.append(String.valueOf(sxpBlueprint.getConfiguration()));
+		}
+
+		if (sxpBlueprint.getCreateDate() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"createDate\": ");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(sxpBlueprint.getCreateDate()));
+
+			sb.append("\"");
 		}
 
 		if (sxpBlueprint.getDescription() != null) {
@@ -79,6 +102,39 @@ public class SXPBlueprintSerDes {
 			sb.append("\"");
 		}
 
+		if (sxpBlueprint.getDescription_i18n() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"description_i18n\": ");
+
+			sb.append(_toJSON(sxpBlueprint.getDescription_i18n()));
+		}
+
+		if (sxpBlueprint.getElementInstances() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"elementInstances\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < sxpBlueprint.getElementInstances().length;
+				 i++) {
+
+				sb.append(
+					String.valueOf(sxpBlueprint.getElementInstances()[i]));
+
+				if ((i + 1) < sxpBlueprint.getElementInstances().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		if (sxpBlueprint.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -87,6 +143,21 @@ public class SXPBlueprintSerDes {
 			sb.append("\"id\": ");
 
 			sb.append(sxpBlueprint.getId());
+		}
+
+		if (sxpBlueprint.getModifiedDate() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"modifiedDate\": ");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(sxpBlueprint.getModifiedDate()));
+
+			sb.append("\"");
 		}
 
 		if (sxpBlueprint.getTitle() != null) {
@@ -99,6 +170,30 @@ public class SXPBlueprintSerDes {
 			sb.append("\"");
 
 			sb.append(_escape(sxpBlueprint.getTitle()));
+
+			sb.append("\"");
+		}
+
+		if (sxpBlueprint.getTitle_i18n() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"title_i18n\": ");
+
+			sb.append(_toJSON(sxpBlueprint.getTitle_i18n()));
+		}
+
+		if (sxpBlueprint.getUserName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"userName\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(sxpBlueprint.getUserName()));
 
 			sb.append("\"");
 		}
@@ -122,6 +217,9 @@ public class SXPBlueprintSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
 		if (sxpBlueprint.getConfiguration() == null) {
 			map.put("configuration", null);
 		}
@@ -129,6 +227,15 @@ public class SXPBlueprintSerDes {
 			map.put(
 				"configuration",
 				String.valueOf(sxpBlueprint.getConfiguration()));
+		}
+
+		if (sxpBlueprint.getCreateDate() == null) {
+			map.put("createDate", null);
+		}
+		else {
+			map.put(
+				"createDate",
+				liferayToJSONDateFormat.format(sxpBlueprint.getCreateDate()));
 		}
 
 		if (sxpBlueprint.getDescription() == null) {
@@ -139,6 +246,24 @@ public class SXPBlueprintSerDes {
 				"description", String.valueOf(sxpBlueprint.getDescription()));
 		}
 
+		if (sxpBlueprint.getDescription_i18n() == null) {
+			map.put("description_i18n", null);
+		}
+		else {
+			map.put(
+				"description_i18n",
+				String.valueOf(sxpBlueprint.getDescription_i18n()));
+		}
+
+		if (sxpBlueprint.getElementInstances() == null) {
+			map.put("elementInstances", null);
+		}
+		else {
+			map.put(
+				"elementInstances",
+				String.valueOf(sxpBlueprint.getElementInstances()));
+		}
+
 		if (sxpBlueprint.getId() == null) {
 			map.put("id", null);
 		}
@@ -146,11 +271,34 @@ public class SXPBlueprintSerDes {
 			map.put("id", String.valueOf(sxpBlueprint.getId()));
 		}
 
+		if (sxpBlueprint.getModifiedDate() == null) {
+			map.put("modifiedDate", null);
+		}
+		else {
+			map.put(
+				"modifiedDate",
+				liferayToJSONDateFormat.format(sxpBlueprint.getModifiedDate()));
+		}
+
 		if (sxpBlueprint.getTitle() == null) {
 			map.put("title", null);
 		}
 		else {
 			map.put("title", String.valueOf(sxpBlueprint.getTitle()));
+		}
+
+		if (sxpBlueprint.getTitle_i18n() == null) {
+			map.put("title_i18n", null);
+		}
+		else {
+			map.put("title_i18n", String.valueOf(sxpBlueprint.getTitle_i18n()));
+		}
+
+		if (sxpBlueprint.getUserName() == null) {
+			map.put("userName", null);
+		}
+		else {
+			map.put("userName", String.valueOf(sxpBlueprint.getUserName()));
 		}
 
 		return map;
@@ -181,9 +329,35 @@ public class SXPBlueprintSerDes {
 							(String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "createDate")) {
+				if (jsonParserFieldValue != null) {
+					sxpBlueprint.setCreateDate(
+						toDate((String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
 				if (jsonParserFieldValue != null) {
 					sxpBlueprint.setDescription((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "description_i18n")) {
+				if (jsonParserFieldValue != null) {
+					sxpBlueprint.setDescription_i18n(
+						(Map)SXPBlueprintSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "elementInstances")) {
+				if (jsonParserFieldValue != null) {
+					sxpBlueprint.setElementInstances(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ElementInstanceSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new ElementInstance[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
@@ -192,9 +366,27 @@ public class SXPBlueprintSerDes {
 						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "modifiedDate")) {
+				if (jsonParserFieldValue != null) {
+					sxpBlueprint.setModifiedDate(
+						toDate((String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "title")) {
 				if (jsonParserFieldValue != null) {
 					sxpBlueprint.setTitle((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "title_i18n")) {
+				if (jsonParserFieldValue != null) {
+					sxpBlueprint.setTitle_i18n(
+						(Map)SXPBlueprintSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "userName")) {
+				if (jsonParserFieldValue != null) {
+					sxpBlueprint.setUserName((String)jsonParserFieldValue);
 				}
 			}
 		}

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.petra.function.UnsafeTriConsumer;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -41,9 +42,11 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
+import com.liferay.search.experiences.rest.client.dto.v1_0.Field;
 import com.liferay.search.experiences.rest.client.dto.v1_0.SXPBlueprint;
 import com.liferay.search.experiences.rest.client.http.HttpInvoker;
 import com.liferay.search.experiences.rest.client.pagination.Page;
@@ -57,6 +60,8 @@ import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +73,9 @@ import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -182,6 +189,7 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 
 		sxpBlueprint.setDescription(regex);
 		sxpBlueprint.setTitle(regex);
+		sxpBlueprint.setUserName(regex);
 
 		String json = SXPBlueprintSerDes.toJSON(sxpBlueprint);
 
@@ -191,12 +199,13 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 
 		Assert.assertEquals(regex, sxpBlueprint.getDescription());
 		Assert.assertEquals(regex, sxpBlueprint.getTitle());
+		Assert.assertEquals(regex, sxpBlueprint.getUserName());
 	}
 
 	@Test
 	public void testGetSXPBlueprintsPage() throws Exception {
 		Page<SXPBlueprint> page = sxpBlueprintResource.getSXPBlueprintsPage(
-			null, Pagination.of(1, 10));
+			null, null, Pagination.of(1, 10), null);
 
 		long totalCount = page.getTotalCount();
 
@@ -207,7 +216,7 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			randomSXPBlueprint());
 
 		page = sxpBlueprintResource.getSXPBlueprintsPage(
-			null, Pagination.of(1, 10));
+			null, null, Pagination.of(1, 10), null);
 
 		Assert.assertEquals(totalCount + 2, page.getTotalCount());
 
@@ -221,9 +230,64 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 	}
 
 	@Test
+	public void testGetSXPBlueprintsPageWithFilterDateTimeEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.DATE_TIME);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		SXPBlueprint sxpBlueprint1 = randomSXPBlueprint();
+
+		sxpBlueprint1 = testGetSXPBlueprintsPage_addSXPBlueprint(sxpBlueprint1);
+
+		for (EntityField entityField : entityFields) {
+			Page<SXPBlueprint> page = sxpBlueprintResource.getSXPBlueprintsPage(
+				null, getFilterString(entityField, "between", sxpBlueprint1),
+				Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(sxpBlueprint1),
+				(List<SXPBlueprint>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSXPBlueprintsPageWithFilterStringEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.STRING);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		SXPBlueprint sxpBlueprint1 = testGetSXPBlueprintsPage_addSXPBlueprint(
+			randomSXPBlueprint());
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		SXPBlueprint sxpBlueprint2 = testGetSXPBlueprintsPage_addSXPBlueprint(
+			randomSXPBlueprint());
+
+		for (EntityField entityField : entityFields) {
+			Page<SXPBlueprint> page = sxpBlueprintResource.getSXPBlueprintsPage(
+				null, getFilterString(entityField, "eq", sxpBlueprint1),
+				Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(sxpBlueprint1),
+				(List<SXPBlueprint>)page.getItems());
+		}
+	}
+
+	@Test
 	public void testGetSXPBlueprintsPageWithPagination() throws Exception {
 		Page<SXPBlueprint> totalPage =
-			sxpBlueprintResource.getSXPBlueprintsPage(null, null);
+			sxpBlueprintResource.getSXPBlueprintsPage(null, null, null, null);
 
 		int totalCount = GetterUtil.getInteger(totalPage.getTotalCount());
 
@@ -237,7 +301,7 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			randomSXPBlueprint());
 
 		Page<SXPBlueprint> page1 = sxpBlueprintResource.getSXPBlueprintsPage(
-			null, Pagination.of(1, totalCount + 2));
+			null, null, Pagination.of(1, totalCount + 2), null);
 
 		List<SXPBlueprint> sxpBlueprints1 =
 			(List<SXPBlueprint>)page1.getItems();
@@ -246,7 +310,7 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			sxpBlueprints1.toString(), totalCount + 2, sxpBlueprints1.size());
 
 		Page<SXPBlueprint> page2 = sxpBlueprintResource.getSXPBlueprintsPage(
-			null, Pagination.of(2, totalCount + 2));
+			null, null, Pagination.of(2, totalCount + 2), null);
 
 		Assert.assertEquals(totalCount + 3, page2.getTotalCount());
 
@@ -257,11 +321,128 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			sxpBlueprints2.toString(), 1, sxpBlueprints2.size());
 
 		Page<SXPBlueprint> page3 = sxpBlueprintResource.getSXPBlueprintsPage(
-			null, Pagination.of(1, totalCount + 3));
+			null, null, Pagination.of(1, totalCount + 3), null);
 
 		assertContains(sxpBlueprint1, (List<SXPBlueprint>)page3.getItems());
 		assertContains(sxpBlueprint2, (List<SXPBlueprint>)page3.getItems());
 		assertContains(sxpBlueprint3, (List<SXPBlueprint>)page3.getItems());
+	}
+
+	@Test
+	public void testGetSXPBlueprintsPageWithSortDateTime() throws Exception {
+		testGetSXPBlueprintsPageWithSort(
+			EntityField.Type.DATE_TIME,
+			(entityField, sxpBlueprint1, sxpBlueprint2) -> {
+				BeanUtils.setProperty(
+					sxpBlueprint1, entityField.getName(),
+					DateUtils.addMinutes(new Date(), -2));
+			});
+	}
+
+	@Test
+	public void testGetSXPBlueprintsPageWithSortInteger() throws Exception {
+		testGetSXPBlueprintsPageWithSort(
+			EntityField.Type.INTEGER,
+			(entityField, sxpBlueprint1, sxpBlueprint2) -> {
+				BeanUtils.setProperty(sxpBlueprint1, entityField.getName(), 0);
+				BeanUtils.setProperty(sxpBlueprint2, entityField.getName(), 1);
+			});
+	}
+
+	@Test
+	public void testGetSXPBlueprintsPageWithSortString() throws Exception {
+		testGetSXPBlueprintsPageWithSort(
+			EntityField.Type.STRING,
+			(entityField, sxpBlueprint1, sxpBlueprint2) -> {
+				Class<?> clazz = sxpBlueprint1.getClass();
+
+				String entityFieldName = entityField.getName();
+
+				java.lang.reflect.Method method = clazz.getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.isAssignableFrom(Map.class)) {
+					BeanUtils.setProperty(
+						sxpBlueprint1, entityFieldName,
+						Collections.singletonMap("Aaa", "Aaa"));
+					BeanUtils.setProperty(
+						sxpBlueprint2, entityFieldName,
+						Collections.singletonMap("Bbb", "Bbb"));
+				}
+				else if (entityFieldName.contains("email")) {
+					BeanUtils.setProperty(
+						sxpBlueprint1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()) +
+									"@liferay.com");
+					BeanUtils.setProperty(
+						sxpBlueprint2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()) +
+									"@liferay.com");
+				}
+				else {
+					BeanUtils.setProperty(
+						sxpBlueprint1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanUtils.setProperty(
+						sxpBlueprint2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+			});
+	}
+
+	protected void testGetSXPBlueprintsPageWithSort(
+			EntityField.Type type,
+			UnsafeTriConsumer
+				<EntityField, SXPBlueprint, SXPBlueprint, Exception>
+					unsafeTriConsumer)
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(type);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		SXPBlueprint sxpBlueprint1 = randomSXPBlueprint();
+		SXPBlueprint sxpBlueprint2 = randomSXPBlueprint();
+
+		for (EntityField entityField : entityFields) {
+			unsafeTriConsumer.accept(entityField, sxpBlueprint1, sxpBlueprint2);
+		}
+
+		sxpBlueprint1 = testGetSXPBlueprintsPage_addSXPBlueprint(sxpBlueprint1);
+
+		sxpBlueprint2 = testGetSXPBlueprintsPage_addSXPBlueprint(sxpBlueprint2);
+
+		for (EntityField entityField : entityFields) {
+			Page<SXPBlueprint> ascPage =
+				sxpBlueprintResource.getSXPBlueprintsPage(
+					null, null, Pagination.of(1, 2),
+					entityField.getName() + ":asc");
+
+			assertEquals(
+				Arrays.asList(sxpBlueprint1, sxpBlueprint2),
+				(List<SXPBlueprint>)ascPage.getItems());
+
+			Page<SXPBlueprint> descPage =
+				sxpBlueprintResource.getSXPBlueprintsPage(
+					null, null, Pagination.of(1, 2),
+					entityField.getName() + ":desc");
+
+			assertEquals(
+				Arrays.asList(sxpBlueprint2, sxpBlueprint1),
+				(List<SXPBlueprint>)descPage.getItems());
+		}
 	}
 
 	protected SXPBlueprint testGetSXPBlueprintsPage_addSXPBlueprint(
@@ -284,6 +465,25 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 	}
 
 	protected SXPBlueprint testPostSXPBlueprint_addSXPBlueprint(
+			SXPBlueprint sxpBlueprint)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPostSXPBlueprintValidate() throws Exception {
+		SXPBlueprint randomSXPBlueprint = randomSXPBlueprint();
+
+		SXPBlueprint postSXPBlueprint =
+			testPostSXPBlueprintValidate_addSXPBlueprint(randomSXPBlueprint);
+
+		assertEquals(randomSXPBlueprint, postSXPBlueprint);
+		assertValid(postSXPBlueprint);
+	}
+
+	protected SXPBlueprint testPostSXPBlueprintValidate_addSXPBlueprint(
 			SXPBlueprint sxpBlueprint)
 		throws Exception {
 
@@ -438,6 +638,33 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			"This method needs to be implemented");
 	}
 
+	@Test
+	public void testPostSXPBlueprintCopy() throws Exception {
+		SXPBlueprint randomSXPBlueprint = randomSXPBlueprint();
+
+		SXPBlueprint postSXPBlueprint =
+			testPostSXPBlueprintCopy_addSXPBlueprint(randomSXPBlueprint);
+
+		assertEquals(randomSXPBlueprint, postSXPBlueprint);
+		assertValid(postSXPBlueprint);
+	}
+
+	protected SXPBlueprint testPostSXPBlueprintCopy_addSXPBlueprint(
+			SXPBlueprint sxpBlueprint)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGetSXPBlueprintExport() throws Exception {
+		Assert.assertTrue(false);
+	}
+
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
+
 	protected SXPBlueprint testGraphQLSXPBlueprint_addSXPBlueprint()
 		throws Exception {
 
@@ -531,6 +758,14 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("createDate", additionalAssertFieldName)) {
+				if (sxpBlueprint.getCreateDate() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("description", additionalAssertFieldName)) {
 				if (sxpBlueprint.getDescription() == null) {
 					valid = false;
@@ -539,8 +774,48 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("description_i18n", additionalAssertFieldName)) {
+				if (sxpBlueprint.getDescription_i18n() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("elementInstances", additionalAssertFieldName)) {
+				if (sxpBlueprint.getElementInstances() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("modifiedDate", additionalAssertFieldName)) {
+				if (sxpBlueprint.getModifiedDate() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("title", additionalAssertFieldName)) {
 				if (sxpBlueprint.getTitle() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
+				if (sxpBlueprint.getTitle_i18n() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("userName", additionalAssertFieldName)) {
+				if (sxpBlueprint.getUserName() == null) {
 					valid = false;
 				}
 
@@ -651,10 +926,43 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("createDate", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpBlueprint1.getCreateDate(),
+						sxpBlueprint2.getCreateDate())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("description", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						sxpBlueprint1.getDescription(),
 						sxpBlueprint2.getDescription())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("description_i18n", additionalAssertFieldName)) {
+				if (!equals(
+						(Map)sxpBlueprint1.getDescription_i18n(),
+						(Map)sxpBlueprint2.getDescription_i18n())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("elementInstances", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpBlueprint1.getElementInstances(),
+						sxpBlueprint2.getElementInstances())) {
 
 					return false;
 				}
@@ -672,9 +980,42 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("modifiedDate", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpBlueprint1.getModifiedDate(),
+						sxpBlueprint2.getModifiedDate())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("title", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						sxpBlueprint1.getTitle(), sxpBlueprint2.getTitle())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
+				if (!equals(
+						(Map)sxpBlueprint1.getTitle_i18n(),
+						(Map)sxpBlueprint2.getTitle_i18n())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("userName", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpBlueprint1.getUserName(),
+						sxpBlueprint2.getUserName())) {
 
 					return false;
 				}
@@ -784,6 +1125,38 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("createDate")) {
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							sxpBlueprint.getCreateDate(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(sxpBlueprint.getCreateDate(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(sxpBlueprint.getCreateDate()));
+			}
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("description")) {
 			sb.append("'");
 			sb.append(String.valueOf(sxpBlueprint.getDescription()));
@@ -792,14 +1165,70 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("description_i18n")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("elementInstances")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("modifiedDate")) {
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							sxpBlueprint.getModifiedDate(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							sxpBlueprint.getModifiedDate(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(sxpBlueprint.getModifiedDate()));
+			}
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("title")) {
 			sb.append("'");
 			sb.append(String.valueOf(sxpBlueprint.getTitle()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("title_i18n")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("userName")) {
+			sb.append("'");
+			sb.append(String.valueOf(sxpBlueprint.getUserName()));
 			sb.append("'");
 
 			return sb.toString();
@@ -849,10 +1278,14 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 	protected SXPBlueprint randomSXPBlueprint() throws Exception {
 		return new SXPBlueprint() {
 			{
+				createDate = RandomTestUtil.nextDate();
 				description = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
+				modifiedDate = RandomTestUtil.nextDate();
 				title = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				userName = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 			}
 		};
 	}

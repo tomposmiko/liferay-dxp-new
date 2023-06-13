@@ -186,9 +186,19 @@ public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
 						layoutFullURL, "p_l_back_url", backURL);
 				}
 
-				httpServletResponse.sendRedirect(
-					_http.addParameter(
-						layoutFullURL, "p_l_mode", Constants.EDIT));
+				layoutFullURL = _http.addParameter(
+					layoutFullURL, "p_l_mode", Constants.EDIT);
+
+				long segmentsExperienceId = ParamUtil.getLong(
+					httpServletRequest, "segmentsExperienceId", -1);
+
+				if (segmentsExperienceId != -1) {
+					layoutFullURL = _http.setParameter(
+						layoutFullURL, "segmentsExperienceId",
+						segmentsExperienceId);
+				}
+
+				httpServletResponse.sendRedirect(layoutFullURL);
 			}
 			else {
 				requestDispatcher.include(httpServletRequest, servletResponse);
@@ -246,6 +256,15 @@ public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
 		return true;
 	}
 
+	@Override
+	protected ServletResponse createServletResponse(
+		HttpServletResponse httpServletResponse,
+		UnsyncStringWriter unsyncStringWriter) {
+
+		return new PipingServletResponse(
+			httpServletResponse, unsyncStringWriter);
+	}
+
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *             #createServletResponse(HttpServletResponse,
@@ -257,15 +276,6 @@ public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
 		HttpServletResponse httpServletResponse,
 		com.liferay.portal.kernel.io.unsync.UnsyncStringWriter
 			unsyncStringWriter) {
-
-		return new PipingServletResponse(
-			httpServletResponse, unsyncStringWriter);
-	}
-
-	@Override
-	protected ServletResponse createServletResponse(
-		HttpServletResponse httpServletResponse,
-		UnsyncStringWriter unsyncStringWriter) {
 
 		return new PipingServletResponse(
 			httpServletResponse, unsyncStringWriter);

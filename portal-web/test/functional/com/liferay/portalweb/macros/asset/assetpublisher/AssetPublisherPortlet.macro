@@ -43,6 +43,16 @@ definition {
 		SiteSelector.viewSite(site = "${siteName}");
 	}
 
+	macro changePagination {
+		Click(locator1 = "Pagination#CURRENT_PAGE_MENU");
+
+		MenuItem.click(menuItem = "${paginationItem}");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Pagination#CURRENT_PAGE_MENU",
+			value1 = "Page ${currentPageNumber}");
+	}
+
 	macro clickAssetTitle {
 		Click(
 			key_assetTitle = "${assetTitle}",
@@ -145,7 +155,7 @@ definition {
 
 		var key_sortOrder = "${sortOrder}";
 
-		if ((isSet(sortOrder)) && (IsVisible(locator1 = "APConfiguration#ORDERING_AND_GROUPING_ORDER_DIRECTIONAL_ICON"))) {
+		if (isSet(sortOrder) && (IsVisible(locator1 = "APConfiguration#ORDERING_AND_GROUPING_ORDER_DIRECTIONAL_ICON"))) {
 			Click(locator1 = "APConfiguration#ORDERING_AND_GROUPING_ORDER_DIRECTIONAL_ICON");
 		}
 
@@ -242,8 +252,6 @@ definition {
 		Click(locator1 = "Button#SELECT_CATEGORIES");
 
 		AssetCategorization.gotoSelectCategory();
-
-		AssertVisible(locator1 = "Treeview#NODE_COLLAPSE_BUTTON");
 
 		Portlet.selectTreeNode(nodeName = "${categoryName}");
 
@@ -487,7 +495,6 @@ definition {
 					locator1 = "Message#EMPTY_INFO",
 					value1 = "No asset libraries were found.");
 			}
-
 			else {
 				SiteSelector.selectSite(site = "${depotName}");
 
@@ -503,7 +510,6 @@ definition {
 					key_depotName = "${depotName}",
 					locator1 = "APConfiguration#ASSET_SELECTION_MANUAL_ASSET_ENTRIES_SELECT_IN_DEPOT");
 			}
-
 			else {
 				Click(locator1 = "APConfiguration#ASSET_SELECTION_MANUAL_ASSET_ENTRIES_SELECT_BUTTON");
 			}
@@ -526,7 +532,6 @@ definition {
 						key_rowEntry = "${assetTitle}",
 						locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_CHECKBOX");
 				}
-
 				else {
 					WaitForElementPresent(
 						key_rowEntry = "${assetTitle}",
@@ -1013,7 +1018,14 @@ definition {
 				key_card = "${depotName}",
 				locator1 = "Card#CARD_TITLE");
 
-			Click(locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE_CARD");
+			if (isSet(collectionsDisable)) {
+				AssertTextEquals(
+					locator1 = "Message#INFO",
+					value1 = "Info:This application is not supported for Asset Libraries. Please, go back to scope selection.");
+			}
+			else {
+				Click(locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE_CARD");
+			}
 		}
 		else {
 			LexiconEntry.changeDisplayStyle(displayStyle = "list");
@@ -1021,17 +1033,19 @@ definition {
 			Click(locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE");
 		}
 
-		SelectFrameTop();
+		if (isSet(assetListName)) {
+			SelectFrameTop();
 
-		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
-		AssertTextEquals(
-			locator1 = "APConfiguration#ASSET_SELECTION_ASSET_LIST_TITLE",
-			value1 = "${assetListName}");
+			AssertTextEquals(
+				locator1 = "APConfiguration#ASSET_SELECTION_ASSET_LIST_TITLE",
+				value1 = "${assetListName}");
 
-		PortletEntry.save();
+			PortletEntry.save();
 
-		SelectFrameTop();
+			SelectFrameTop();
+		}
 	}
 
 	macro viewAssetDetailsPG {
@@ -1041,7 +1055,12 @@ definition {
 			locator1 = "AP#ASSET_ABSTRACT_TITLE",
 			value1 = "${assetTitle}");
 
-		AssetPublisherPortlet.clickAssetTitle(assetTitle = "${assetTitle}");
+		if ("${displayTemplate}" == "Full Content") {
+			Click(locator1 = "AP#ASSET_DETAILS_LINK");
+		}
+		else {
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "${assetTitle}");
+		}
 
 		if ("${assetType}" == "Web Content Folder") {
 			AssertTextEquals.assertPartialText(

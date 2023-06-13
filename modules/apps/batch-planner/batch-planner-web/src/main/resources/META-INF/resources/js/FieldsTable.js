@@ -14,35 +14,68 @@
 
 import {ClayCheckbox} from '@clayui/form';
 import ClayTable from '@clayui/table';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+
+import {
+	SCHEMA_SELECTED_EVENT,
+	TEMPLATE_SELECTED_EVENT,
+	TEMPLATE_SOILED,
+} from './constants';
+import getFieldsFromSchema from './getFieldsFromSchema';
 
 function FieldsTable({portletNamespace}) {
-	const [fields, updateFields] = useState([]);
-	const [selectedFields, updateSelectedFields] = useState([]);
+	const [fields, setFields] = useState([]);
+	const [selectedFields, setSelectedFields] = useState([]);
+	const useTemplateMappingRef = useRef();
 
 	useEffect(() => {
 		const handleSchemaUpdated = (event) => {
 			if (event.schema) {
-				const newSelectedFields = [];
-				const newFields = [];
+				const newFields = getFieldsFromSchema(event.schema);
 
-				for (const name in event.schema) {
-					newFields.push(name);
-					newSelectedFields.push(name);
+				setFields(newFields);
+				if (!useTemplateMappingRef.current) {
+					setSelectedFields(newFields);
 				}
-
-				updateFields(newFields);
-				updateSelectedFields(newSelectedFields);
 			}
 			else {
-				updateFields([]);
-				updateSelectedFields([]);
+				setFields([]);
+				if (!useTemplateMappingRef.current) {
+					setSelectedFields([]);
+				}
 			}
 		};
 
-		Liferay.on('schema-selected', handleSchemaUpdated);
+		const handleTemplateUpdate = (event) => {
+			const {template} = event;
 
-		return () => Liferay.detach('schema-selected', handleSchemaUpdated);
+			if (template) {
+				useTemplateMappingRef.current = true;
+				setSelectedFields(
+					Object.keys(template.mapping).map((fields) => ({
+						label: fields,
+						value: fields,
+					}))
+				);
+			}
+			else {
+				useTemplateMappingRef.current = false;
+			}
+		};
+
+		const handleTemplateSoiled = () => {
+			useTemplateMappingRef.current = false;
+		};
+
+		Liferay.on(SCHEMA_SELECTED_EVENT, handleSchemaUpdated);
+		Liferay.on(TEMPLATE_SELECTED_EVENT, handleTemplateUpdate);
+		Liferay.on(TEMPLATE_SOILED, handleTemplateSoiled);
+
+		return () => {
+			Liferay.detach(SCHEMA_SELECTED_EVENT, handleSchemaUpdated);
+			Liferay.detach(TEMPLATE_SELECTED_EVENT, handleTemplateUpdate);
+			Liferay.detach(TEMPLATE_SOILED, handleTemplateSoiled);
+		};
 	}, []);
 
 	if (!fields.length) {
@@ -54,6 +87,7 @@ function FieldsTable({portletNamespace}) {
 			<h4 className="card-header py-3">
 				{Liferay.Language.get('entity-attributes')}
 			</h4>
+
 			<div className="card-body p-0">
 				<ClayTable borderless hover={false} responsive={false}>
 					<ClayTable.Head>
@@ -73,14 +107,15 @@ function FieldsTable({portletNamespace}) {
 											selectedFields.length ===
 											fields.length
 										) {
-											updateSelectedFields([]);
+											setSelectedFields([]);
 										}
 										else {
-											updateSelectedFields(fields);
+											setSelectedFields(fields);
 										}
 									}}
 								/>
 							</ClayTable.Cell>
+
 							<ClayTable.Cell
 								className="table-cell-expand-small"
 								headingCell
@@ -89,42 +124,52 @@ function FieldsTable({portletNamespace}) {
 							</ClayTable.Cell>
 						</ClayTable.Row>
 					</ClayTable.Head>
+
 					<ClayTable.Body>
 						{fields.map((field) => {
-							const included = selectedFields.includes(field);
+							const included = selectedFields.some(
+								(selectedField) =>
+									selectedField.value === field.value
+							);
 
 							return (
-								<ClayTable.Row key={field}>
+								<ClayTable.Row key={field.label}>
 									<ClayTable.Cell>
 										<ClayCheckbox
 											checked={included}
-											id={`${portletNamespace}fieldName_${field}`}
+											id={`${portletNamespace}fieldName_${field.label}`}
 											name={`${portletNamespace}fieldName`}
 											onChange={() => {
+												if (useTemplateMappingRef) {
+													Liferay.fire(
+														TEMPLATE_SOILED
+													);
+												}
 												if (included) {
-													updateSelectedFields(
+													setSelectedFields(
 														selectedFields.filter(
 															(selected) =>
-																selected !==
-																field
+																selected.value !==
+																field.value
 														)
 													);
 												}
 												else {
-													updateSelectedFields([
+													setSelectedFields([
 														...selectedFields,
 														field,
 													]);
 												}
 											}}
-											value={field}
+											value={field.value}
 										/>
 									</ClayTable.Cell>
+
 									<ClayTable.Cell>
 										<label
-											htmlFor={`${portletNamespace}fieldName_${field}`}
+											htmlFor={`${portletNamespace}fieldName_${field.label}`}
 										>
-											{field}
+											{field.label}
 										</label>
 									</ClayTable.Cell>
 								</ClayTable.Row>

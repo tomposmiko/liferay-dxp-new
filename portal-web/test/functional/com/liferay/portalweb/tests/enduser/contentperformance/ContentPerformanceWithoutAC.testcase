@@ -1,0 +1,250 @@
+@component-name = "portal-ab-test"
+definition {
+
+	property portal.release = "false";
+	property portal.upstream = "true";
+	property property.group = "analytics.cloud.profile";
+	property testray.main.component.name = "Content Performance";
+
+	setUp {
+		task ("Go to DXP portal, login and create site") {
+			TestCase.setUpPortalInstance();
+
+			User.firstLoginPG();
+
+			Navigator.openURL();
+
+			JSONGroup.addGroup(groupName = "Test Site Name");
+		}
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+		}
+	}
+
+	@description = "LPS-132406: Given the Content Performance Panel
+	When the users leave the page because the session expires or s/he does log out
+	Then they find the panel closed"
+	@priority = "3"
+	test ContentPerformanceClosed {
+		task ("Open Content Performance panel") {
+			ContentPerformance.openContentPerformance();
+
+			AssertElementPresent(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_START_FREE_TRIAL");
+		}
+
+		task ("Logout and login") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "test@liferay.com",
+				userLoginFullName = "Test Test");
+		}
+
+		task ("Check if panel is closed") {
+			AssertElementNotPresent(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_START_FREE_TRIAL");
+		}
+	}
+
+	@description = "LPS-108856: When user opens Content Performance panel and AC is not connected, a Dont show me this again button is displayed"
+	@ignore = "true"
+	@priority = "3"
+	test DontShowButton {
+		task ("Assert if element is not present") {
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Click on the") {
+			AssertElementPresent(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_DO_NOT_SHOW_AGAIN",
+				value1 = "Do not show me this again.");
+		}
+	}
+
+	@description = "LPS-105216: Validate that Free trial and dismiss buttons are displayed when AC is disabled"
+	@ignore = "true"
+	@priority = "5"
+	test FreeTrialButtonPresent {
+		task ("Open Content Performance and Assert if element is present") {
+			if (IsVisible(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_PANEL")) {
+				Click(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
+			}
+
+			Click(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
+
+			AssertElementPresent(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_START_FREE_TRIAL",
+				value1 = "Start Free Trial");
+
+			AssertElementPresent(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_DO_NOT_SHOW_AGAIN",
+				value1 = "Do not show me this again.");
+		}
+	}
+
+	@description = "LPS-108856: When user clicks on Dont show me this again button, the Content Performance panel disappears"
+	@ignore = "true"
+	@priority = "5"
+	test HideContentPerformancePanel {
+
+		// TODO LPS-139239 HideContentPerformancePanel pending implementation
+
+	}
+
+	@description = "LPS-126044: When DXP is not connected to AC, the metrics icon is not shown in the bar above the blog display page in the view mode"
+	@ignore = "true"
+	@priority = "3"
+	test MetricsIconNotVisibleInBlogDisplayPage {
+
+		// TODO LPS-144030 MetricsIconNotVisibleInBlogDisplayPage pending implementation
+
+	}
+
+	@description = "LPS-126044: When DXP is not connected to AC, the metrics icon is not shown in the bar above the document display page in the view mode"
+	@ignore = "true"
+	@priority = "3"
+	test MetricsIconNotVisibleInDocumentDisplayPage {
+
+		// TODO LPS-144030 MetricsIconNotVisibleInDocumentDisplayPage pending implementation
+
+	}
+
+	@description = "LPS-126047: When DXP is not connected to AC, the metrics icon is not shown in the bar above the widget page in the view mode"
+	@ignore = "true"
+	@priority = "3"
+	test MetricsIconNotVisibleInWidgetPage {
+
+		// TODO LPS-144029 MetricsIconNotVisibleInWidgetPage pending implementation
+
+	}
+
+	@description = "LPS-118006: When the DXP is not connected to AC, if the user clicks on the Metrics button, the sidebar panel shows up and displays a button titled Dont show me this again and a message informing the user that the panel will show up again if AC is connected"
+	@priority = "4"
+	test MetricsInContentDashboardACDisabled {
+		task ("Create a Web Content and set a Display Page") {
+			JSONWebcontent.addWebContent(
+				content = "Webcontent Content",
+				groupName = "Test Site Name",
+				title = "WC Content");
+		}
+
+		task ("Create and Publish a Display Page Template with Fragment") {
+			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
+				contentType = "Web Content Article",
+				displayPageTemplateEntryName = "Display Page Name",
+				groupName = "Test Site Name",
+				subType = "Basic Web Content");
+
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
+
+			Button.clickPublish();
+
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+		}
+
+		task ("Check in Content Dashboard and open Content Performance Panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+
+			ContentPerformance.showMetricsButton();
+		}
+
+		task ("Check if elements present") {
+			AssertElementPresent(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_START_FREE_TRIAL",
+				value1 = "Start Free Trial");
+
+			AssertElementPresent(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_DO_NOT_SHOW_AGAIN",
+				value1 = "Do not show me this again.");
+		}
+	}
+
+	@description = "LPS-118006: When the DXP is connected to AC after the user has clicked the Don't show me this again button, the Metrics option is shown again, and the sidebar panel with instructions to sync, and without the Dont show me this again button shows up when the user clicks on it"
+	@ignore = "true"
+	@priority = "4"
+	test MetricsInContentDashboardACEnabled {
+
+		// TODO LPS-139257 MetricsInContentDashboardACEnabled pending implementation
+
+	}
+
+	@description = "LPS-108856: When user opens Content Performance panel and AC is connected but not synced, the Content Performance panel displays instructions to sync to AC (Dont show me this again button and the message is not displayed)"
+	@ignore = "true"
+	@priority = "3"
+	test NotSyncedPanel {
+		task ("Open Analytics Cloud") {
+			var analyticsCloudURL = PropsUtil.get("analytics.cloud.url");
+
+			Navigator.openURL(baseURL = "${analyticsCloudURL}");
+		}
+
+		task ("Take token from Analytics Cloud") {
+			AnalyticsCloud.loginAnalyticsCloud(
+				emailAddress = "test@liferay.com",
+				password = "test");
+
+			AnalyticsCloud.takeTokenFromAnalyticsCloud();
+		}
+
+		task ("Go to DXP portal, login and create site") {
+			TestCase.setUpPortalInstance();
+
+			User.firstLoginPG();
+
+			Navigator.openURL();
+		}
+
+		task ("Connect with Analytics Cloud and back to Home Page") {
+			ContentPerformance.onlyConectWithAnalyticsCloud();
+
+			Navigator.openURL();
+		}
+
+		task ("Open Content Performance") {
+			ContentPerformance.openContentPerformance();
+
+			if (IsVisible(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_PANEL")) {
+				Click(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
+			}
+
+			Click(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
+		}
+
+		task ("Assert if button is not present and instructions are present") {
+			AssertElementNotPresent(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_DO_NOT_SHOW_AGAIN",
+				value1 = "Do not show me this again.");
+
+			AssertElementPresent(
+				locator1 = "ContentPerformance#INSTRUCTIONS_SYNC_AC",
+				value1 = "Sync to Liferay Analytics Cloud");
+		}
+
+		task ("End connection with Analytics Cloud") {
+			var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+			Navigator.openURL();
+
+			AnalyticsCloud.teardownAnalyticsCloud();
+
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+
+			if ("${testPortalInstance}" == "true") {
+				PortalInstances.tearDownCP();
+			}
+		}
+	}
+
+}

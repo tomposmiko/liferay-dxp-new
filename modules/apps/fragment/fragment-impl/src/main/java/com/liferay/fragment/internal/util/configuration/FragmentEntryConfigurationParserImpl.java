@@ -82,7 +82,9 @@ public class FragmentEntryConfigurationParserImpl
 
 			defaultValuesJSONObject.put(
 				fragmentConfigurationField.getName(),
-				getFieldValue(fragmentConfigurationField, null));
+				getFieldValue(
+					fragmentConfigurationField,
+					LocaleUtil.getMostRelevantLocale(), null));
 		}
 
 		return defaultValuesJSONObject;
@@ -181,23 +183,10 @@ public class FragmentEntryConfigurationParserImpl
 		return configurationDefaultValuesJSONObject;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getConfigurationJSONObject(String, String)}
-	 */
-	@Deprecated
-	@Override
-	public JSONObject getConfigurationJSONObject(
-			String configuration, String editableValues,
-			long[] segmentsExperienceIds)
-		throws JSONException {
-
-		return getConfigurationJSONObject(configuration, editableValues);
-	}
-
 	@Override
 	public Map<String, Object> getContextObjects(
-		JSONObject configurationValuesJSONObject, String configuration) {
+		JSONObject configurationValuesJSONObject, String configuration,
+		long[] segmentsEntryIds) {
 
 		HashMap<String, Object> contextObjects = new HashMap<>();
 
@@ -228,7 +217,8 @@ public class FragmentEntryConfigurationParserImpl
 					"collectionSelector")) {
 
 				Object contextListObject = _getInfoListObjectEntry(
-					configurationValuesJSONObject.getString(name));
+					configurationValuesJSONObject.getString(name),
+					segmentsEntryIds);
 
 				if (contextListObject != null) {
 					contextObjects.put(
@@ -238,19 +228,6 @@ public class FragmentEntryConfigurationParserImpl
 		}
 
 		return contextObjects;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getContextObjects(JSONObject, String)}
-	 */
-	@Deprecated
-	@Override
-	public Map<String, Object> getContextObjects(
-		JSONObject configurationValuesJSONObject, String configuration,
-		long[] segmentsExperienceIds) {
-
-		return getContextObjects(configurationValuesJSONObject, configuration);
 	}
 
 	@Override
@@ -340,20 +317,6 @@ public class FragmentEntryConfigurationParserImpl
 		return _getFieldValue(FragmentConfigurationFieldDataType.STRING, value);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 * #getFieldValue(String, String, Locale, String)}
-	 */
-	@Deprecated
-	@Override
-	public Object getFieldValue(
-		FragmentConfigurationField fragmentConfigurationField, String value) {
-
-		return getFieldValue(
-			fragmentConfigurationField, LocaleUtil.getMostRelevantLocale(),
-			value);
-	}
-
 	@Override
 	public Object getFieldValue(
 		String configuration, String editableValues, Locale locale,
@@ -400,18 +363,6 @@ public class FragmentEntryConfigurationParserImpl
 	}
 
 	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public Object getFieldValue(
-		String configuration, String editableValues,
-		long[] segmentsExperienceIds, String name) {
-
-		return getFieldValue(configuration, editableValues, name);
-	}
-
-	/**
 	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
 	 * #getFieldValue(String, String, Locale, String)}
 	 */
@@ -455,27 +406,6 @@ public class FragmentEntryConfigurationParserImpl
 			});
 
 		return fragmentConfigurationFields;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public JSONObject getSegmentedConfigurationValues(
-		long[] segmentsExperienceIds,
-		JSONObject configurationValuesJSONObject) {
-
-		return configurationValuesJSONObject;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public boolean isPersonalizationSupported(JSONObject jsonObject) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -673,17 +603,15 @@ public class FragmentEntryConfigurationParserImpl
 	}
 
 	private JSONObject _getInfoDisplayObjectEntryJSONObject(String value) {
-		if (Validator.isNull(value)) {
+		if (Validator.isNull(value) ||
+			Objects.equals(value, JSONFactoryUtil.getNullJSON())) {
+
 			return JSONFactoryUtil.createJSONObject();
 		}
 
 		try {
 			JSONObject configurationValueJSONObject =
 				JSONFactoryUtil.createJSONObject(value);
-
-			if (configurationValueJSONObject.length() == 0) {
-				return null;
-			}
 
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 				JSONFactoryUtil.looseSerialize(
@@ -721,7 +649,9 @@ public class FragmentEntryConfigurationParserImpl
 		return null;
 	}
 
-	private Object _getInfoListObjectEntry(String value) {
+	private Object _getInfoListObjectEntry(
+		String value, long[] segmentsEntryIds) {
+
 		if (Validator.isNull(value)) {
 			return Collections.emptyList();
 		}
@@ -750,9 +680,16 @@ public class FragmentEntryConfigurationParserImpl
 				return Collections.emptyList();
 			}
 
+			DefaultLayoutListRetrieverContext
+				defaultLayoutListRetrieverContext =
+					new DefaultLayoutListRetrieverContext();
+
+			defaultLayoutListRetrieverContext.setSegmentsEntryIds(
+				segmentsEntryIds);
+
 			return layoutListRetriever.getList(
 				listObjectReferenceFactory.getListObjectReference(jsonObject),
-				new DefaultLayoutListRetrieverContext());
+				defaultLayoutListRetrieverContext);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {

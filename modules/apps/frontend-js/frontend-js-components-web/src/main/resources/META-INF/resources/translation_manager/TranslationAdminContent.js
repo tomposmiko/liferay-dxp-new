@@ -17,7 +17,6 @@ import ClayDropDown from '@clayui/drop-down';
 import {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
-import ClayManagementToolbar from '@clayui/management-toolbar';
 import ClayModal from '@clayui/modal';
 import ClayTable from '@clayui/table';
 import PropTypes from 'prop-types';
@@ -71,44 +70,32 @@ const TranslationAdminContent = ({
 				{Liferay.Language.get('manage-translations')}
 			</ClayModal.Header>
 
-			<ClayModal.Body scrollable>
-				<ClayManagementToolbar
-					aria-label={ariaLabels.managementToolbar}
-				>
-					<ClayManagementToolbar.Search showMobile={true}>
-						<ClayInput.Group>
-							<ClayInput.GroupItem>
-								<ClayInput
-									aria-label={Liferay.Language.get('search')}
-									insetAfter={true}
-									onChange={(event) => {
-										const {value} = event.target;
+			<ClayModal.Header withTitle={false}>
+				<ClayInput.Group className="align-items-center">
+					<ClayInput.GroupItem>
+						<ClayInput
+							aria-label={Liferay.Language.get('search')}
+							insetAfter={true}
+							onChange={(event) =>
+								setSearchValue(event.target.value)
+							}
+							placeholder={Liferay.Language.get('search')}
+							value={searchValue}
+						/>
 
-										setSearchValue(value);
-									}}
-									placeholder={Liferay.Language.get('search')}
-									value={searchValue}
-								/>
+						<ClayInput.GroupInsetItem after tag="span">
+							<ClayButtonWithIcon
+								aria-label={Liferay.Language.get('search')}
+								displayType="unstyled"
+								onClick={() => {
+									setSearchValue('');
+								}}
+								symbol={searchValue ? 'times' : 'search'}
+							/>
+						</ClayInput.GroupInsetItem>
+					</ClayInput.GroupItem>
 
-								<ClayInput.GroupInsetItem after tag="span">
-									<ClayButtonWithIcon
-										aria-label={Liferay.Language.get(
-											'search'
-										)}
-										displayType="unstyled"
-										onClick={() => {
-											setSearchValue('');
-										}}
-										symbol={
-											searchValue ? 'times' : 'search'
-										}
-									/>
-								</ClayInput.GroupInsetItem>
-							</ClayInput.GroupItem>
-						</ClayInput.Group>
-					</ClayManagementToolbar.Search>
-
-					<ClayManagementToolbar.ItemList>
+					<ClayInput.GroupItem shrink>
 						<ClayDropDown
 							active={
 								creationMenuActive &&
@@ -118,8 +105,11 @@ const TranslationAdminContent = ({
 							onActiveChange={setCreationMenuActive}
 							trigger={
 								<ClayButtonWithIcon
+									className="lfr-portal-tooltip"
 									disabled={availableLocales.length === 0}
+									small
 									symbol="plus"
+									title={Liferay.Language.get('add')}
 								/>
 							}
 						>
@@ -139,9 +129,11 @@ const TranslationAdminContent = ({
 								})}
 							</ClayDropDown.ItemList>
 						</ClayDropDown>
-					</ClayManagementToolbar.ItemList>
-				</ClayManagementToolbar>
+					</ClayInput.GroupItem>
+				</ClayInput.Group>
+			</ClayModal.Header>
 
+			<ClayModal.Body className="pb-0 pt-3" scrollable>
 				<ClayTable>
 					<ClayTable.Head>
 						<ClayTable.Row>
@@ -205,14 +197,19 @@ const TranslationAdminContent = ({
 
 									<ClayTable.Cell>
 										{!isDefaultLocale && (
-											<ClayIcon
-												className="inline-item"
+											<ClayButtonWithIcon
+												className="lfr-portal-tooltip"
+												displayType="unstyled"
+												monospaced={false}
 												onClick={() =>
 													onRemoveLocale(
 														activeLocale.id
 													)
 												}
 												symbol="trash"
+												title={Liferay.Language.get(
+													'delete'
+												)}
 											/>
 										)}
 									</ClayTable.Cell>
@@ -228,6 +225,7 @@ const TranslationAdminContent = ({
 						<ClayButton displayType="secondary" onClick={onCancel}>
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
+
 						<ClayButton displayType="primary" onClick={onDone}>
 							{Liferay.Language.get('done')}
 						</ClayButton>

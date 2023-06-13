@@ -27,10 +27,12 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+
 		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8312 | Test Summary: Session technology card shows what browsers are accessing the site the most"
+	@ignore = "true"
 	@priority = "5"
 	test ShowsBrowsersAccessingSiteMost {
 		property portal.upstream = "quarantine";
@@ -64,7 +66,7 @@ definition {
 				userLoginEmailAddress = "ac@liferay.com",
 				userLoginFullName = "ac ac");
 
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -99,6 +101,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8313 | Test Summary: Session technology card shows what devices are accessing the site the most"
+	@ignore = "true"
 	@priority = "5"
 	test ShowsDevicesAccessingSiteMost {
 		property portal.upstream = "quarantine";
@@ -132,7 +135,7 @@ definition {
 				userLoginEmailAddress = "ac@liferay.com",
 				userLoginFullName = "ac ac");
 
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}

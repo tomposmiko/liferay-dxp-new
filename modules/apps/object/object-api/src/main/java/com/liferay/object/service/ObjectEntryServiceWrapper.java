@@ -26,6 +26,10 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class ObjectEntryServiceWrapper
 	implements ObjectEntryService, ServiceWrapper<ObjectEntryService> {
 
+	public ObjectEntryServiceWrapper() {
+		this(null);
+	}
+
 	public ObjectEntryServiceWrapper(ObjectEntryService objectEntryService) {
 		_objectEntryService = objectEntryService;
 	}
@@ -103,6 +107,15 @@ public class ObjectEntryServiceWrapper
 	@Override
 	public String getOSGiServiceIdentifier() {
 		return _objectEntryService.getOSGiServiceIdentifier();
+	}
+
+	@Override
+	public boolean hasModelResourcePermission(
+			com.liferay.object.model.ObjectEntry objectEntry, String actionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryService.hasModelResourcePermission(
+			objectEntry, actionId);
 	}
 
 	@Override

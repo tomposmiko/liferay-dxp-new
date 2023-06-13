@@ -32,6 +32,7 @@ import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalArticleServiceUtil;
 import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.journal.util.JournalConverter;
+import com.liferay.journal.web.internal.configuration.FFJournalAutoSaveDraftConfiguration;
 import com.liferay.journal.web.internal.security.permission.resource.JournalArticlePermission;
 import com.liferay.journal.web.internal.security.permission.resource.JournalFolderPermission;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
@@ -87,6 +88,11 @@ public class JournalEditArticleDisplayContext {
 		_httpServletRequest = httpServletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 		_article = article;
+
+		_ffJournalAutoSaveDraftConfiguration =
+			(FFJournalAutoSaveDraftConfiguration)
+				_httpServletRequest.getAttribute(
+					FFJournalAutoSaveDraftConfiguration.class.getName());
 
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -188,9 +194,13 @@ public class JournalEditArticleDisplayContext {
 		return _classPK;
 	}
 
-	public Map<String, Object> getComponentContext() {
+	public Map<String, Object> getComponentContext() throws PortalException {
 		return HashMapBuilder.<String, Object>put(
 			"articleId", getArticleId()
+		).put(
+			"autoSaveDraftEnabled",
+			_ffJournalAutoSaveDraftConfiguration.
+				journalArticleAutoSaveDraftEnabled()
 		).put(
 			"availableLocales", _getAvailableLanguageIds()
 		).put(
@@ -199,6 +209,8 @@ public class JournalEditArticleDisplayContext {
 			"contentTitle", "titleMapAsXML"
 		).put(
 			"defaultLanguageId", getDefaultArticleLanguageId()
+		).put(
+			"hasSavePermission", hasSavePermission()
 		).build();
 	}
 
@@ -732,6 +744,11 @@ public class JournalEditArticleDisplayContext {
 		return _changeStructure;
 	}
 
+	public boolean isJournalArticleAutoSaveDraftEnabled() {
+		return _ffJournalAutoSaveDraftConfiguration.
+			journalArticleAutoSaveDraftEnabled();
+	}
+
 	public boolean isNeverExpire() {
 		if (_neverExpire != null) {
 			return _neverExpire;
@@ -944,6 +961,8 @@ public class JournalEditArticleDisplayContext {
 	private String _ddmTemplateKey;
 	private String _defaultArticleLanguageId;
 	private String _defaultLanguageId;
+	private final FFJournalAutoSaveDraftConfiguration
+		_ffJournalAutoSaveDraftConfiguration;
 	private Long _folderId;
 	private String _folderName;
 	private Long _groupId;

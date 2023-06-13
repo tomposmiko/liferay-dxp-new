@@ -364,6 +364,11 @@ public abstract class BaseObjectFieldResourceImpl
 			existingObjectField.setName(objectField.getName());
 		}
 
+		if (objectField.getRelationshipType() != null) {
+			existingObjectField.setRelationshipType(
+				objectField.getRelationshipType());
+		}
+
 		if (objectField.getRequired() != null) {
 			existingObjectField.setRequired(objectField.getRequired());
 		}
@@ -626,9 +631,7 @@ public abstract class BaseObjectFieldResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), entityModel);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid filter " + filterString, exception);
-			}
+			_log.error("Invalid filter " + filterString, exception);
 		}
 
 		return null;

@@ -6,11 +6,15 @@ definition {
 	property testray.main.component.name = "Site Pages Administration";
 
 	setUp {
-		TestCase.setUpPortalInstance();
+		task ("Set up instance and sign in") {
+			TestCase.setUpPortalInstance();
 
-		User.firstLoginPG();
+			User.firstLoginPG();
+		}
 
-		JSONGroup.addGroup(groupName = "Test Site Name");
+		task ("Add a site") {
+			JSONGroup.addGroup(groupName = "Test Site Name");
+		}
 	}
 
 	tearDown {
@@ -31,9 +35,9 @@ definition {
 		var pageName = '''<script>alert(123);</script>''';
 
 		task ("Add a widget page with XSS page name") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-			SitePages.addPublicPage(pageName = "${pageName}");
+			PagesAdmin.addPublicPage(pageName = "${pageName}");
 		}
 
 		task ("Navigate to the widget page") {
@@ -57,7 +61,7 @@ definition {
 		}
 
 		task ("Navigate to the Pages admin") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 		}
 
 		task ("View the alert not shown") {

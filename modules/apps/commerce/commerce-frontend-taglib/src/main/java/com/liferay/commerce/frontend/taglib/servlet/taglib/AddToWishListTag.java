@@ -14,13 +14,13 @@
 
 package com.liferay.commerce.frontend.taglib.servlet.taglib;
 
-import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.frontend.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
 import com.liferay.commerce.product.catalog.CPSku;
 import com.liferay.commerce.product.content.util.CPContentHelper;
+import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -41,16 +41,9 @@ public class AddToWishListTag extends IncludeTag {
 		try {
 			HttpServletRequest httpServletRequest = getRequest();
 
-			CommerceContext commerceContext =
+			_commerceAccountId = CommerceUtil.getCommerceAccountId(
 				(CommerceContext)httpServletRequest.getAttribute(
-					CommerceWebKeys.COMMERCE_CONTEXT);
-
-			CommerceAccount commerceAccount =
-				commerceContext.getCommerceAccount();
-
-			if (commerceAccount != null) {
-				_commerceAccountId = commerceAccount.getCommerceAccountId();
-			}
+					CommerceWebKeys.COMMERCE_CONTEXT));
 
 			CPSku cpSku = _cpContentHelper.getDefaultCPSku(_cpCatalogEntry);
 
@@ -63,14 +56,6 @@ public class AddToWishListTag extends IncludeTag {
 
 			if (cpSku != null) {
 				_skuId = cpSku.getCPInstanceId();
-			}
-
-			String pathThemeImages = themeDisplay.getPathThemeImages();
-
-			_spritemap = pathThemeImages + "/icons.svg";
-
-			if (pathThemeImages.contains("classic")) {
-				_spritemap = pathThemeImages + "/lexicon/icons.svg";
 			}
 		}
 		catch (Exception exception) {
@@ -101,7 +86,6 @@ public class AddToWishListTag extends IncludeTag {
 		setNamespacedAttribute(httpServletRequest, "inWishList", _inWishList);
 		setNamespacedAttribute(httpServletRequest, "large", _large);
 		setNamespacedAttribute(httpServletRequest, "skuId", _skuId);
-		setNamespacedAttribute(httpServletRequest, "spritemap", _spritemap);
 	}
 
 	public void setCPCatalogEntry(CPCatalogEntry cpCatalogEntry) {
@@ -135,7 +119,6 @@ public class AddToWishListTag extends IncludeTag {
 		_inWishList = false;
 		_large = false;
 		_skuId = 0;
-		_spritemap = null;
 	}
 
 	@Override
@@ -157,6 +140,5 @@ public class AddToWishListTag extends IncludeTag {
 	private boolean _inWishList;
 	private boolean _large;
 	private long _skuId;
-	private String _spritemap;
 
 }

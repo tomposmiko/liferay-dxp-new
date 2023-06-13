@@ -1,6 +1,6 @@
 import React, {createContext, useEffect, useReducer} from 'react';
-import {TIP_EVENT_DISMISS} from '~/common/utils/events';
-import {AVAILABLE_STEPS} from '~/routes/get-a-quote/utils/constants';
+import {TIP_EVENT_DISMISS} from '../../../common/utils/events';
+import {AVAILABLE_STEPS} from '../../../routes/get-a-quote/utils/constants';
 
 import {setSelectedTrigger} from './actions';
 import {reducer} from './reducer';
@@ -15,15 +15,15 @@ const initialState = {
 			[AVAILABLE_STEPS.PROPERTY.section]: 0,
 		},
 		section: 'basics',
-		subsection: 'business-type',
-		title: "Welcome! Let's start.",
+		subsection: 'product-quote',
+		title: 'Welcome! Select a product.',
 	},
 	selectedTrigger: '',
 };
 
 export const AppContext = createContext({});
 
-export const AppProvider = ({children}) => {
+export function AppProvider({children}) {
 	const [state, dispatch] = useReducer(reducer, initialState);
 
 	useEffect(() => {
@@ -39,4 +39,4 @@ export const AppProvider = ({children}) => {
 			{children}
 		</AppContext.Provider>
 	);
-};
+}

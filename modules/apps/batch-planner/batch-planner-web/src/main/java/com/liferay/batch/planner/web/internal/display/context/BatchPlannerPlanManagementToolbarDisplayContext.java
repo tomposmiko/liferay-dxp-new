@@ -60,14 +60,14 @@ public class BatchPlannerPlanManagementToolbarDisplayContext
 				PortletURLBuilder.createActionURL(
 					liferayPortletResponse
 				).setActionName(
-					"/batch_planner/edit_batch_planner_plan"
+					"/batch_planner/delete_batch_planner_plan"
 				).setCMD(
 					Constants.DELETE
 				).setNavigation(
 					getNavigation()
 				).buildString()
 			).setIcon(
-				"times-circle"
+				"trash"
 			).setLabel(
 				LanguageUtil.get(httpServletRequest, "delete")
 			).setQuickAction(

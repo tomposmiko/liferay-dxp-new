@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect} from 'react';
 import {Controller, useFormContext} from 'react-hook-form';
-import {Radio} from '~/common/components/fragments/Forms/Radio';
+import {Radio} from '../../../../../../../common/components/fragments/Forms/Radio';
 
-export const BusinessTypeRadioGroup = ({
+export function BusinessTypeRadioGroup({
 	businessTypes = [],
 	form,
 	setNewSelectedProduct,
-}) => {
+}) {
 	const {control, setValue} = useFormContext();
 
 	const selectedBusinessType = businessTypes.find(
@@ -39,13 +39,14 @@ export const BusinessTypeRadioGroup = ({
 				'basics.properties.segment',
 				categoryProperties.find(({key}) => key === 'Segment')?.value
 			);
-		} catch (error) {
+		}
+		catch (error) {
 			console.warn(error);
 		}
 	};
 
 	return (
-		<fieldset className="content-column" id="businessType">
+		<fieldset id="businessType">
 			<Controller
 				control={control}
 				defaultValue=""
@@ -69,4 +70,4 @@ export const BusinessTypeRadioGroup = ({
 			/>
 		</fieldset>
 	);
-};
+}

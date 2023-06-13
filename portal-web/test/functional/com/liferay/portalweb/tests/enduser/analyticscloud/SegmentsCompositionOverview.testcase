@@ -28,16 +28,8 @@ definition {
 		ACUtils.tearDownAC();
 	}
 
-	@description = "Feature ID: Legacy | Automation ID: LRAC-8494 | Test Summary: Assert Segment Overview shows include anonymous"
-	@ignore = "true"
-	@priority = "3"
-	test AssertSegmentOverviewShowsIncludeAnonymous {
-
-		// TODO LRAC-8494 PENDING IMPLEMENTATION
-
-	}
-
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8493 | Test Summary: Segment Composition shows Active and Known individuals"
+	@ignore = "true"
 	@priority = "3"
 	test SegmentCompositionShowsActiveAndKnownIndividuals {
 		property portal.upstream = "quarantine";
@@ -66,11 +58,11 @@ definition {
 				userLoginEmailAddress = "testac@liferay.com",
 				userLoginFullName = "Test Test");
 
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
-
-			BlogsNavigator.gotoPG(entryTitle = "Blogs AC Title");
 		}
 
 		task ("Launch AC and navigate to Segments") {

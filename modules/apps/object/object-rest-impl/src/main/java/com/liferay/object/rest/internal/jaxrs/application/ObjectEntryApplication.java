@@ -15,6 +15,7 @@
 package com.liferay.object.rest.internal.jaxrs.application;
 
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.internal.jaxrs.container.request.filter.ObjectDefinitionIdContainerRequestFilter;
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceImpl;
 import com.liferay.object.rest.internal.resource.v1_0.OpenAPIResourceImpl;
@@ -24,6 +25,9 @@ import com.liferay.portal.vulcan.openapi.DTOProperty;
 import com.liferay.portal.vulcan.openapi.OpenAPISchemaFilter;
 import com.liferay.portal.vulcan.resource.OpenAPIResource;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +56,7 @@ public class ObjectEntryApplication extends Application {
 
 		objects.add(
 			new ObjectDefinitionIdContainerRequestFilter(
-				_applicationName, _objectDefinitionId));
+				_objectDefinitionId, _objectDefinitionName));
 		objects.add(
 			new OpenAPIResourceImpl(
 				_openAPIResource, _getOpenAPISchemaFilter(_applicationPath),
@@ -81,6 +85,29 @@ public class ObjectEntryApplication extends Application {
 			_objectDefinitionId);
 	}
 
+	private DTOProperty _getDTOProperty(ObjectField objectField) {
+		if (objectField.getListTypeDefinitionId() != 0) {
+			DTOProperty dtoProperty = new DTOProperty(
+				Collections.singletonMap("x-parent-map", "properties"),
+				objectField.getName(), ListEntry.class.getSimpleName());
+
+			dtoProperty.setDTOProperties(
+				Arrays.asList(
+					new DTOProperty(
+						Collections.singletonMap("x-parent-map", "properties"),
+						"key", String.class.getSimpleName()),
+					new DTOProperty(
+						Collections.singletonMap("x-parent-map", "properties"),
+						"name", String.class.getSimpleName())));
+
+			return dtoProperty;
+		}
+
+		return new DTOProperty(
+			Collections.singletonMap("x-parent-map", "properties"),
+			objectField.getName(), objectField.getType());
+	}
+
 	private OpenAPISchemaFilter _getOpenAPISchemaFilter(
 		String applicationPath) {
 
@@ -88,14 +115,14 @@ public class ObjectEntryApplication extends Application {
 
 		openAPISchemaFilter.setApplicationPath(applicationPath);
 
-		DTOProperty dtoProperty = new DTOProperty("ObjectEntry", "object");
+		DTOProperty dtoProperty = new DTOProperty(
+			new HashMap<>(), "ObjectEntry", "object");
 
 		Stream<ObjectField> stream = _objectFields.stream();
 
 		dtoProperty.setDTOProperties(
 			stream.map(
-				objectField -> new DTOProperty(
-					objectField.getName(), objectField.getType())
+				objectField -> _getDTOProperty(objectField)
 			).collect(
 				Collectors.toList()
 			));

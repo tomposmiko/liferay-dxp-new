@@ -5,7 +5,7 @@ definition {
 	macro _checkForRSSTitleCP {
 		if (IsElementNotPresent(locator1 = "RSS#FEED_TITLE")) {
 			ProductMenu.gotoPortlet(
-				category = "Content &amp; Data",
+				category = "Content & Data",
 				portlet = "Wiki",
 				site = "${site}");
 
@@ -68,7 +68,7 @@ definition {
 
 		Pause(locator1 = "5000");
 
-		if (IsElementPresent(locator1 = "Header#H4_TITLE", key_title = "Uploading")) {
+		if (IsElementPresent(key_title = "Uploading", locator1 = "Header#H4_TITLE")) {
 			Refresh();
 
 			Click(locator1 = "Checkbox#SELECT_ALL");
@@ -147,6 +147,14 @@ definition {
 			value1 = "Publish");
 
 		Alert.viewSuccessMessage();
+	}
+
+	macro addChildPageViaEllipsis {
+		var key_wikiChildPageTitle = "${wikiChildPageTitle}";
+
+		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Add Child Page");
+
+		PortletEntry.inputTitle(title = "${key_wikiChildPageTitle}");
 	}
 
 	macro addComment {
@@ -281,8 +289,6 @@ definition {
 			value1 = "${wikiFrontPageContent}");
 
 		SelectFrame(value1 = "relative=top");
-
-		PortletEntry.publish();
 	}
 
 	macro addFrontPagePG {
@@ -332,7 +338,6 @@ definition {
 
 			CKEditor.addSourceContent(content = "${wikiPageContent}");
 		}
-
 		else {
 			SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
 
@@ -527,6 +532,17 @@ definition {
 		if (isSet(saveAsDraft)) {
 			WikiEntry.saveAsDraft();
 		}
+		else if ("${wikiPageTitleVariation}" == "Invalid") {
+			AssertClick(
+				locator1 = "Button#PUBLISH",
+				value1 = "Publish");
+
+			Alert.viewRequestFailedToComplete();
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "Message#ERROR_ENTER_A_VALID_TITLE",
+				value1 = "Please enter a valid title.");
+		}
 		else {
 			AssertClick(
 				locator1 = "Button#PUBLISH",
@@ -590,6 +606,13 @@ definition {
 			value1 = "Change Parent");
 
 		Alert.viewSuccessMessage();
+	}
+
+	macro clickWikiPage {
+		AssertClick(
+			key_workflowInstanceName = "${workflowInstanceName}",
+			locator1 = "AssetWorkflow#DETAILS_WORKFLOW_TITLE",
+			value1 = "${workflowInstanceName}");
 	}
 
 	macro compareVersionsCP {
@@ -1193,7 +1216,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Wiki");
 
 		WikiNavigator.gotoNode(wikiNodeName = "Main");
@@ -1704,6 +1727,13 @@ definition {
 		AssertTextEquals(
 			locator1 = "Link#REDIRECT",
 			value1 = "${wikiPageRedirectLink}");
+	}
+
+	macro viewRelatedAsset {
+		AssertTextEquals(
+			key_relatedAssetTitle = "${relatedAssetTitle}",
+			locator1 = "AssetRelatedAssets#ASSET_TITLE",
+			value1 = "${relatedAssetTitle}");
 	}
 
 	macro viewRSS {

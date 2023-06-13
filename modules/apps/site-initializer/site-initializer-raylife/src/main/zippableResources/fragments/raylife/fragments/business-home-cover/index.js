@@ -13,10 +13,9 @@
  * details.
  */
 
-const product = fragmentElement.querySelector('#product');
-
-const fetchHeadless = async (url) => {
+const fetchHeadless = async (url, options) => {
 	const response = await fetch(`${window.location.origin}/${url}`, {
+		...options,
 		headers: {
 			'Content-Type': 'application/json',
 			'x-csrf-token': Liferay.authToken,
@@ -28,23 +27,35 @@ const fetchHeadless = async (url) => {
 	return data;
 };
 
-const retrieveQuoteContainer = fragmentElement.querySelector('#retrieve-quote');
-const newQuoteContainer = fragmentElement.querySelector('#new-quote');
 const businessEmailDeliveredContainer = fragmentElement.querySelector(
-	'.business-email-delivered'
+	'#business-email-delivered'
 );
+const continueQuoteButton = fragmentElement.querySelector('#continue-quote');
+const emailInput = fragmentElement.querySelector('#email');
+const emailContainer = fragmentElement.querySelector('#email-container');
+const emailErrorFeedback = fragmentElement.querySelector(
+	'#email-container .form-feedback-group .form-feedback-item'
+);
+const zipErrorFeedback = fragmentElement.querySelector(
+	'#zip-container .form-feedback-group .form-feedback-item'
+);
+
+const getQuoteForm = fragmentElement.querySelector('#get-quote-form');
+const newQuoteButton = fragmentElement.querySelector('#new-quote-button');
+const newQuoteContainer = fragmentElement.querySelector('#new-quote');
 const newQuoteFormContainer = fragmentElement.querySelector('.new-quote-form');
-
-// Action Buttons
-
 const retrieveQuoteButton = fragmentElement.querySelector(
 	'#retrieve-quote-button'
 );
-const newQuoteButton = fragmentElement.querySelector('#new-quote-button');
-const continueQuoteButton = fragmentElement.querySelector('#continue-quote');
-const getQuoteForm = fragmentElement.querySelector('#get-quote-form');
+const retrieveQuoteContainer = fragmentElement.querySelector('#retrieve-quote');
+const scopeGroupId = Liferay.ThemeDisplay.getScopeGroupId();
 const zipContainer = fragmentElement.querySelector('#zip-container');
-const productContainer = fragmentElement.querySelector('#product-container');
+
+window.onload = function () {
+	document.getElementById('zip').focus();
+};
+
+document.getElementById('zip').focus();
 
 retrieveQuoteButton.onclick = function () {
 	retrieveQuoteContainer.classList.add('d-none', 'invisible');
@@ -56,76 +67,89 @@ newQuoteButton.onclick = function () {
 	retrieveQuoteContainer.classList.remove('d-none', 'invisible');
 };
 
-continueQuoteButton.onclick = function () {
-	const email = newQuoteFormContainer.querySelector('input').value;
+emailInput.oninput = function () {
+	emailContainer.classList.remove('has-error');
+	emailErrorFeedback.innerText = '';
 
-	fetch(`https://jsonplaceholder.typicode.com/users/1`)
-		.then((response) => response.json())
-		.then((json) => {
-			const title = businessEmailDeliveredContainer.querySelector('h2');
-			const paragraph = businessEmailDeliveredContainer.querySelector(
-				'p'
-			);
+	if (emailInput.value) {
+		return continueQuoteButton.classList.remove('disabled');
+	}
 
-			title.innerHTML = title.textContent.replace('{name}', json.name);
-
-			paragraph.innerHTML = paragraph.textContent.replace(
-				'{email}',
-				email
-			);
-
-			businessEmailDeliveredContainer.classList.remove(
-				'd-none',
-				'invisible'
-			);
-			newQuoteFormContainer.classList.remove('d-flex', 'invisible');
-			newQuoteFormContainer.classList.add('d-none', 'invisible');
-		});
+	continueQuoteButton.classList.add('disabled');
 };
 
-const getProductName = (productId) => {
-	const options = product.options;
+continueQuoteButton.onclick = async function () {
+	if (
+		!new RegExp(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g).test(emailInput.value)
+	) {
+		emailErrorFeedback.innerHTML =
+			'<span class="form-feedback-indicator"></span> Please enter a valid email address';
 
-	for (let i = 0; i < options.length; i++) {
-		if (options[i].value === productId) {
-			return options[i].label;
-		}
+		return emailContainer.classList.add('has-error');
 	}
+
+	const raylifeApplicationResponse = await fetchHeadless(
+		`o/c/raylifeapplications/scopes/${scopeGroupId}?filter=email eq '${emailInput.value}'`
+	);
+
+	if (!raylifeApplicationResponse.items.length) {
+		emailErrorFeedback.innerHTML =
+			'<span class="form-feedback-indicator"></span> We were unable to find your quote. Please start a new one.';
+
+		return emailContainer.classList.add('has-error');
+	}
+
+	const raylifeApplication = raylifeApplicationResponse.items[0];
+	const title = businessEmailDeliveredContainer.querySelector('h2');
+	const paragraph = businessEmailDeliveredContainer.querySelector('p');
+
+	title.innerHTML = title.textContent.replace(
+		'{name}',
+		`${raylifeApplication.firstName}`
+	);
+
+	paragraph.innerHTML = paragraph.textContent.replace(
+		'{email}',
+		emailInput.value
+	);
+
+	businessEmailDeliveredContainer.classList.remove('d-none', 'invisible');
+	newQuoteFormContainer.classList.remove('d-flex', 'invisible');
+	newQuoteFormContainer.classList.add('d-none', 'invisible');
+
+	await fetchHeadless(`o/c/quoteretrieves/scopes/${scopeGroupId}`, {
+		body: JSON.stringify({
+			productName: 'Business Home Cover',
+			quoteRetrieveLink: `${origin}${window.location.pathname}/get-a-quote?applicationId=${raylifeApplication.id}`,
+			retrieveEmail: emailInput.value,
+		}),
+		method: 'POST',
+	});
 };
 
 getQuoteForm.onsubmit = function (event) {
 	event.preventDefault();
+
 	const formData = new FormData(event.target);
 	const formProps = Object.fromEntries(formData);
 	const maxCharactersZIP = 5;
 
 	zipContainer.classList.remove('has-error');
-	productContainer.classList.remove('has-error');
+	zipErrorFeedback.innerText = '';
 
 	if (localStorage.getItem('raylife-back-to-edit')) {
 		localStorage.removeItem('raylife-back-to-edit');
 	}
 
-	if (
-		!formProps.zip ||
-		formProps.zip.length !== maxCharactersZIP ||
-		!formProps.product
-	) {
+	if (!formProps.zip || formProps.zip.length !== maxCharactersZIP) {
 		if (!formProps.zip || formProps.zip.length !== maxCharactersZIP) {
+			zipErrorFeedback.innerHTML =
+				'<span class="form-feedback-indicator"></span> Enter a valid 5 digit Zip';
 			zipContainer.classList.add('has-error');
-		}
-		if (!formProps.product) {
-			productContainer.classList.add('has-error');
 		}
 	}
 	else {
-		localStorage.setItem(
-			'raylife-product',
-			JSON.stringify({
-				...formProps,
-				productName: getProductName(formProps.product),
-			})
-		);
+		localStorage.setItem('raylife-product', JSON.stringify(formProps));
 
 		const {pathname} = new URL(Liferay.ThemeDisplay.getCanonicalURL());
 
@@ -138,28 +162,3 @@ fragmentElement.querySelector('#zip').onkeypress = (event) => {
 
 	return !(charCode > 31 && (charCode < 48 || charCode > 57));
 };
-
-(async () => {
-	try {
-		const taxonomyVocabularies = await fetchHeadless(
-			`/o/headless-admin-taxonomy/v1.0/sites/${themeDisplay.getCompanyGroupId()}/taxonomy-vocabularies?filter=name eq 'Raylife'`
-		);
-
-		if (!taxonomyVocabularies?.items[0]) {
-			return console.error('No Taxonomy Vocabulary found');
-		}
-
-		const taxonomyCategories = await fetchHeadless(
-			`/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies/${taxonomyVocabularies.items[0].id}/taxonomy-categories`
-		);
-
-		taxonomyCategories?.items.forEach((taxonomyVocabulary) => {
-			product.add(
-				new Option(taxonomyVocabulary.name, taxonomyVocabulary.id)
-			);
-		});
-	}
-	catch (error) {
-		console.error(error.message);
-	}
-})();

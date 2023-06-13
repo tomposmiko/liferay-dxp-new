@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -175,7 +176,23 @@ public class VarPoshiElement extends PoshiElement {
 			return;
 		}
 
-		if (isValidUtilityClassName(value) || value.startsWith("selenium.")) {
+		if ((!isValidFunctionFileName(value) && !isValidMacroFileName(value)) ||
+			value.startsWith("selenium.")) {
+
+			Matcher matcher = _varValueMathExpressionPattern.matcher(value);
+
+			if (matcher.matches()) {
+				String mathOperation = _mathOperatorsMap.get(matcher.group(2));
+
+				String mathUtilValue = StringUtil.combine(
+					"MathUtil#", mathOperation, "('", matcher.group(1), "', '",
+					matcher.group(3), "')");
+
+				addAttribute("method", mathUtilValue);
+
+				return;
+			}
+
 			value = value.replaceFirst("\\.", "#");
 
 			String content = getParentheticalContent(value);
@@ -186,20 +203,6 @@ public class VarPoshiElement extends PoshiElement {
 			}
 
 			addAttribute("method", value);
-
-			return;
-		}
-
-		Matcher matcher = _varValueMathExpressionPattern.matcher(value);
-
-		if (matcher.find()) {
-			String mathOperation = _mathOperatorsMap.get(matcher.group(2));
-
-			String mathUtilValue = StringUtil.combine(
-				"MathUtil#", mathOperation, "('", matcher.group(1), "', '",
-				matcher.group(3), "')");
-
-			addAttribute("method", mathUtilValue);
 		}
 	}
 
@@ -267,7 +270,8 @@ public class VarPoshiElement extends PoshiElement {
 				}
 			}
 			else if (valueAttributeName.equals("method")) {
-				if (isValidUtilityClassName(value) ||
+				if ((!isValidFunctionFileName(value) &&
+					 !isValidMacroFileName(value)) ||
 					value.startsWith("selenium#")) {
 
 					value = value.replaceFirst("#", ".");
@@ -275,13 +279,42 @@ public class VarPoshiElement extends PoshiElement {
 					String content = getParentheticalContent(value);
 
 					if (!content.equals("")) {
-						value = StringUtil.replace(
-							value, content, swapParameterQuotations(content));
+						Matcher matcher = _mathUtilMethodCallPattern.matcher(
+							value);
+
+						String mathOperator = "";
+
+						if (matcher.find()) {
+							for (Map.Entry<String, String> entry :
+									_mathOperatorsMap.entrySet()) {
+
+								if (Objects.equals(
+										entry.getValue(), matcher.group(1))) {
+
+									mathOperator = " " + entry.getKey() + " ";
+
+									break;
+								}
+							}
+						}
+
+						if (!mathOperator.equals("") &&
+							!(parentElement instanceof ExecutePoshiElement)) {
+
+							value =
+								matcher.group(2) + mathOperator +
+									matcher.group(3);
+						}
+						else {
+							value = StringUtil.replace(
+								value, content,
+								swapParameterQuotations(content));
+						}
 					}
 				}
 			}
 			else {
-				value = StringEscapeUtils.escapeXml(value);
+				value = StringUtil.replace(value, "\"", "&quot;");
 
 				value = doubleQuoteContent(value);
 			}
@@ -383,32 +416,31 @@ public class VarPoshiElement extends PoshiElement {
 
 		parametersString = parametersString.trim();
 
-		boolean singleQuote = false;
-
-		if (parametersString.endsWith("'") &&
-			parametersString.startsWith("'")) {
-
-			singleQuote = true;
-		}
-
 		List<String> parameters = getMethodParameters(parametersString);
 
 		for (String parameter : parameters) {
-			if (singleQuote) {
+			parameter = parameter.trim();
+
+			if (parameter.endsWith("'") && parameter.startsWith("'")) {
 				parameter = getSingleQuotedContent(parameter);
 
 				parameter = StringUtil.replace(parameter, "\\\'", "'");
-				parameter = StringUtil.replace(parameter, "\"", "&quot;");
+				parameter = StringUtil.replace(parameter, "&quot;", "\"");
+
+				parameter = StringUtil.replace(parameter, "\"", "\\\"");
 
 				parameter = doubleQuoteContent(parameter);
 			}
-			else {
+			else if (parameter.endsWith("\"") && parameter.startsWith("\"")) {
 				parameter = getDoubleQuotedContent(parameter);
 
 				parameter = StringUtil.replace(parameter, "'", "\\\'");
-				parameter = StringUtil.replace(parameter, "&quot;", "\"");
+				parameter = StringUtil.replace(parameter, "\\\"", "\"");
 
 				parameter = singleQuoteContent(parameter);
+			}
+			else {
+				parameter = parameter.trim();
 			}
 
 			sb.append(parameter);
@@ -447,7 +479,7 @@ public class VarPoshiElement extends PoshiElement {
 
 	private static final String _VAR_VALUE_REGEX;
 
-	private static final String _VAR_VALUE_STRING_REGEX = "\".*?\"";
+	private static final String _VAR_VALUE_STRING_REGEX = "\".*\"";
 
 	private static final Map<String, String> _mathOperatorsMap =
 		new HashMap<String, String>() {
@@ -458,6 +490,8 @@ public class VarPoshiElement extends PoshiElement {
 				put("/", "quotient");
 			}
 		};
+	private static final Pattern _mathUtilMethodCallPattern = Pattern.compile(
+		"MathUtil\\.(\\w+)\\('(.+)', '(.+)'\\)");
 	private static final Pattern _statementPattern;
 	private static final Pattern _varValueMathExpressionPattern;
 

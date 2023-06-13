@@ -35,15 +35,15 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-130964. Change display style in Fragments and Widgets panel."
+	@description = "This is a test for LPS-130964 and LPS-76741. Change display style in Fragments and Widgets panel."
 	@priority = "4"
 	test ChangeDisplayStyle {
 		task ("Navigate to the Pages admin in new site") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 		}
 
 		task ("Access to content page at edit mode") {
-			SitePages.gotoPageMenuItem(
+			PagesAdmin.gotoPageEllipsisMenuItem(
 				menuItem = "Edit",
 				pageName = "Test Content Page Name");
 
@@ -56,31 +56,31 @@ definition {
 
 		task ("View the tooltip when hover on the display style button") {
 			MouseOver(
-				key_displayStyle = "list",
+				key_switchTo = "card",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON");
 
 			AssertVisible(
-				key_content = "Change View",
+				key_content = "Switch to Card View",
 				locator1 = "Tooltip#FLOATING_TOOLTIP_CONTENT");
 		}
 
 		task ("Change to card display style") {
 			Click(
-				key_displayStyle = "list",
+				key_switchTo = "card",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON");
 
 			AssertVisible(
-				key_displayStyle = "card",
+				key_switchTo = "list",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON");
 		}
 
 		task ("View the tooltip when hover on the display style button") {
 			MouseOver(
-				key_displayStyle = "card",
+				key_switchTo = "list",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON");
 
 			AssertVisible(
-				key_content = "Change View",
+				key_content = "Switch to List View",
 				locator1 = "Tooltip#FLOATING_TOOLTIP_CONTENT");
 		}
 
@@ -89,7 +89,7 @@ definition {
 		}
 
 		task ("Access to content page at edit mode again") {
-			SitePages.gotoPageMenuItem(
+			PagesAdmin.gotoPageEllipsisMenuItem(
 				menuItem = "Edit",
 				pageName = "Test Content Page Name");
 
@@ -100,8 +100,20 @@ definition {
 			PageEditor.gotoTab(tabName = "Fragments and Widgets");
 
 			AssertVisible(
-				key_displayStyle = "card",
+				key_switchTo = "list",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON");
+		}
+
+		task ("Navigate Back to Site Pages") {
+			Navigator.gotoBack();
+		}
+
+		task ("Access to content page can be edited at view mode") {
+			PagesAdmin.gotoPageEllipsisMenuItem(
+				menuItem = "View",
+				pageName = "Test Content Page Name");
+
+			ContentPages.gotoPageEditor();
 		}
 	}
 
@@ -120,7 +132,7 @@ definition {
 
 		task ("View the display style is list") {
 			AssertVisible(
-				key_displayStyle = "list",
+				key_switchTo = "card",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON");
 		}
 
@@ -153,11 +165,11 @@ definition {
 
 		task ("Change to card display style") {
 			Click(
-				key_displayStyle = "list",
+				key_switchTo = "card",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON");
 
 			AssertVisible(
-				key_displayStyle = "card",
+				key_switchTo = "list",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON");
 		}
 
@@ -187,7 +199,7 @@ definition {
 
 		task ("View the display style is list") {
 			AssertVisible(
-				key_displayStyle = "list",
+				key_switchTo = "card",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON");
 		}
 
@@ -227,11 +239,11 @@ definition {
 			Navigator.gotoNavTab(navTab = "Fragments");
 
 			Click(
-				key_displayStyle = "list",
+				key_switchTo = "card",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON");
 
 			AssertVisible(
-				key_displayStyle = "card",
+				key_switchTo = "list",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON");
 		}
 

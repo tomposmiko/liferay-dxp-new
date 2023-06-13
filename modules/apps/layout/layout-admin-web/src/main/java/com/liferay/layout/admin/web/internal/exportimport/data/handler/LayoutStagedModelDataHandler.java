@@ -55,7 +55,9 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.seo.model.LayoutSEOEntry;
+import com.liferay.layout.seo.model.LayoutSEOSite;
 import com.liferay.layout.seo.service.LayoutSEOEntryLocalService;
+import com.liferay.layout.seo.service.LayoutSEOSiteLocalService;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
@@ -411,6 +413,16 @@ public class LayoutStagedModelDataHandler
 			}
 		}
 
+		LayoutSEOSite layoutSEOSite =
+			_layoutSEOSiteLocalService.fetchLayoutSEOSiteByGroupId(
+				portletDataContext.getScopeGroupId());
+
+		if (layoutSEOSite != null) {
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, layout, layoutSEOSite,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+		}
+
 		LayoutSEOEntry layoutSEOEntry =
 			_layoutSEOEntryLocalService.fetchLayoutSEOEntry(
 				layout.getGroupId(), layout.isPrivateLayout(),
@@ -687,9 +699,8 @@ public class LayoutStagedModelDataHandler
 		Layout importedLayout = null;
 
 		if (existingLayout == null) {
-			long plid = _counterLocalService.increment(Layout.class.getName());
-
-			importedLayout = _layoutLocalService.createLayout(plid);
+			importedLayout = _layoutLocalService.createLayout(
+				_layoutLocalServiceHelper.getUniquePlid());
 
 			if (layoutsImportMode.equals(
 					PortletDataHandlerKeys.
@@ -962,17 +973,9 @@ public class LayoutStagedModelDataHandler
 
 					priority = TransactionInvokerUtil.invoke(
 						_transactionConfig,
-						new Callable<Integer>() {
-
-							@Override
-							public Integer call() throws Exception {
-								return _layoutLocalServiceHelper.
-									getNextPriority(
-										groupId, finalPrivateLayout,
-										finalParentLayoutId, null, -1);
-							}
-
-						});
+						() -> _layoutLocalServiceHelper.getNextPriority(
+							groupId, finalPrivateLayout, finalParentLayoutId,
+							null, -1));
 				}
 
 				importedLayout.setPriority(priority);
@@ -1916,6 +1919,19 @@ public class LayoutStagedModelDataHandler
 	protected void importLayoutSEOEntries(
 			PortletDataContext portletDataContext, Layout layout)
 		throws PortletDataException {
+
+		List<Element> layoutSEOSiteElements =
+			portletDataContext.getReferenceDataElements(
+				layout, LayoutSEOSite.class);
+
+		for (Element layoutSEOSiteElement : layoutSEOSiteElements) {
+			LayoutSEOSite layoutSEOSite =
+				(LayoutSEOSite)portletDataContext.getZipEntryAsObject(
+					layoutSEOSiteElement.attributeValue("path"));
+
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, layoutSEOSite);
+		}
 
 		List<Element> layoutSEOEntryElements =
 			portletDataContext.getReferenceDataElements(
@@ -2866,6 +2882,9 @@ public class LayoutStagedModelDataHandler
 
 	@Reference
 	private LayoutSEOEntryLocalService _layoutSEOEntryLocalService;
+
+	@Reference
+	private LayoutSEOSiteLocalService _layoutSEOSiteLocalService;
 
 	private LayoutSetBranchLocalService _layoutSetBranchLocalService;
 	private LayoutSetLocalService _layoutSetLocalService;

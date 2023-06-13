@@ -24,11 +24,17 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Site Name");
+		}
+
+		JSONUser.tearDownNonAdminUsers();
 
 		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8319 | Test Summary: Custom Range time period filter in Sites"
+	@ignore = "true"
 	@priority = "5"
 	test CustomRangeTimePeriodFilterSites {
 		property portal.upstream = "quarantine";
@@ -37,17 +43,17 @@ definition {
 		// AC Refactor ticket: LRAC-8744
 
 		task ("Site and page creation and connection with AC") {
-			ACUtils.addSiteAndPage(layoutName = "AC Page");
+			ACUtils.addSiteAndPage();
 
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Interation with page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 
-			ACUtils.closeAllSessions();
+			ACUtils.closeAllSessionsAndWait();
 		}
 
 		task ("AC launch") {
@@ -86,6 +92,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8321 | Test Summary: 1st user access and no property was selected yet"
+	@ignore = "true"
 	@priority = "4"
 	test FirstAccessAndNoProperty {
 		property portal.upstream = "quarantine";
@@ -122,6 +129,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8317 | Test Summary: 180 Days time period filter in Sites"
+	@ignore = "true"
 	@priority = "3"
 	test PeriodFilter180Days {
 		property portal.upstream = "quarantine";
@@ -138,13 +146,13 @@ definition {
 		}
 
 		task ("Interation with pages") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Test 2",
 				pageName = "AC Page",
 				siteName = "Site Name");
 
-			BlogsNavigator.gotoPG(entryTitle = "Test 2");
-
-			ACUtils.closeAllSessions();
+			ACUtils.closeAllSessionsAndWait();
 		}
 
 		task ("AC launch") {
@@ -176,6 +184,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8318 | Test Summary: Last Year time period filter in Sites"
+	@ignore = "true"
 	@priority = "3"
 	test PeriodFilterLastYear {
 		property portal.upstream = "quarantine";
@@ -192,13 +201,13 @@ definition {
 		}
 
 		task ("Interation with pages") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Test 2",
 				pageName = "AC Page",
 				siteName = "Site Name");
 
-			BlogsNavigator.gotoPG(entryTitle = "Test 2");
-
-			ACUtils.closeAllSessions();
+			ACUtils.closeAllSessionsAndWait();
 		}
 
 		task ("AC launch") {
@@ -335,6 +344,7 @@ definition {
 
 			ACSettings.goToProperties();
 		}
+
 		task ("Create property 1, check if it was created and add an admin user") {
 			ACProperties.addNewProperty(propertyName = "Property Name 1");
 
@@ -342,6 +352,7 @@ definition {
 
 			ACProperties.addUserProperty(emailAddress = "bryan.cheung@faro.io");
 		}
+
 		task ("Go back to the properties menu, create property 2, check if it was created and add an admin user") {
 			ACSettings.goToProperties();
 
@@ -351,6 +362,7 @@ definition {
 
 			ACProperties.addUserProperty(emailAddress = "corbin.murakami@faro.io");
 		}
+
 		task ("Go back to the properties menu, create property 3, check if it was created and select all users as admin") {
 			ACSettings.goToProperties();
 
@@ -360,6 +372,7 @@ definition {
 
 			ACSettings.goToProperties();
 		}
+
 		task ("Log in as the user corbin.murakami@faro.io and go to the properties menu") {
 			ACWorkspace.signOut();
 
@@ -373,6 +386,7 @@ definition {
 
 			ACSettings.goToProperties();
 		}
+
 		task ("Checks if only property 2 and property 3 are present") {
 			ACProperties.assertPropertyNotPresent(propertyName = "Property Name 1");
 

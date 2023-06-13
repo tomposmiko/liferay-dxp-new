@@ -1,13 +1,13 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import {useEffect, useState} from 'react';
-import {LiferayService} from '~/common/services/liferay';
+import {LiferayService} from '../../../common/services/liferay';
 
-export const useBusinessTypes = () => {
+export function useBusinessTypes() {
 	const [data, setData] = useState();
 	const [error, setError] = useState();
 
 	useEffect(() => {
 		loadBusinessTypes();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const loadBusinessTypes = async (search = '') => {
@@ -20,7 +20,8 @@ export const useBusinessTypes = () => {
 			setError('');
 
 			return setData(response);
-		} catch (error) {
+		}
+		catch (error) {
 			return setError(
 				'Unable to make the request. Please try again later.'
 			);
@@ -38,4 +39,4 @@ export const useBusinessTypes = () => {
 		isLoading: !data && !error,
 		reload: loadBusinessTypes,
 	};
-};
+}

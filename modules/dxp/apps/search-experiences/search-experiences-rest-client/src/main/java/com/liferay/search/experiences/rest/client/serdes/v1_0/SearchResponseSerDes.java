@@ -14,7 +14,6 @@
 
 package com.liferay.search.experiences.rest.client.serdes.v1_0;
 
-import com.liferay.search.experiences.rest.client.dto.v1_0.Document;
 import com.liferay.search.experiences.rest.client.dto.v1_0.SearchResponse;
 import com.liferay.search.experiences.rest.client.json.BaseJSONParser;
 
@@ -23,7 +22,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -57,36 +55,6 @@ public class SearchResponseSerDes {
 
 		sb.append("{");
 
-		if (searchResponse.getDocuments() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"documents\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < searchResponse.getDocuments().length; i++) {
-				sb.append(String.valueOf(searchResponse.getDocuments()[i]));
-
-				if ((i + 1) < searchResponse.getDocuments().length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
-		if (searchResponse.getMaxScore() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"maxScore\": ");
-
-			sb.append(searchResponse.getMaxScore());
-		}
-
 		if (searchResponse.getPage() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -107,20 +75,6 @@ public class SearchResponseSerDes {
 			sb.append(searchResponse.getPageSize());
 		}
 
-		if (searchResponse.getRequest() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"request\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(searchResponse.getRequest()));
-
-			sb.append("\"");
-		}
-
 		if (searchResponse.getRequestString() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -131,20 +85,6 @@ public class SearchResponseSerDes {
 			sb.append("\"");
 
 			sb.append(_escape(searchResponse.getRequestString()));
-
-			sb.append("\"");
-		}
-
-		if (searchResponse.getResponse() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"response\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(searchResponse.getResponse()));
 
 			sb.append("\"");
 		}
@@ -161,16 +101,6 @@ public class SearchResponseSerDes {
 			sb.append(_escape(searchResponse.getResponseString()));
 
 			sb.append("\"");
-		}
-
-		if (searchResponse.getSearchRequest() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"searchRequest\": ");
-
-			sb.append(String.valueOf(searchResponse.getSearchRequest()));
 		}
 
 		if (searchResponse.getTotalHits() != null) {
@@ -202,20 +132,6 @@ public class SearchResponseSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
-		if (searchResponse.getDocuments() == null) {
-			map.put("documents", null);
-		}
-		else {
-			map.put("documents", String.valueOf(searchResponse.getDocuments()));
-		}
-
-		if (searchResponse.getMaxScore() == null) {
-			map.put("maxScore", null);
-		}
-		else {
-			map.put("maxScore", String.valueOf(searchResponse.getMaxScore()));
-		}
-
 		if (searchResponse.getPage() == null) {
 			map.put("page", null);
 		}
@@ -230,13 +146,6 @@ public class SearchResponseSerDes {
 			map.put("pageSize", String.valueOf(searchResponse.getPageSize()));
 		}
 
-		if (searchResponse.getRequest() == null) {
-			map.put("request", null);
-		}
-		else {
-			map.put("request", String.valueOf(searchResponse.getRequest()));
-		}
-
 		if (searchResponse.getRequestString() == null) {
 			map.put("requestString", null);
 		}
@@ -246,13 +155,6 @@ public class SearchResponseSerDes {
 				String.valueOf(searchResponse.getRequestString()));
 		}
 
-		if (searchResponse.getResponse() == null) {
-			map.put("response", null);
-		}
-		else {
-			map.put("response", String.valueOf(searchResponse.getResponse()));
-		}
-
 		if (searchResponse.getResponseString() == null) {
 			map.put("responseString", null);
 		}
@@ -260,15 +162,6 @@ public class SearchResponseSerDes {
 			map.put(
 				"responseString",
 				String.valueOf(searchResponse.getResponseString()));
-		}
-
-		if (searchResponse.getSearchRequest() == null) {
-			map.put("searchRequest", null);
-		}
-		else {
-			map.put(
-				"searchRequest",
-				String.valueOf(searchResponse.getSearchRequest()));
 		}
 
 		if (searchResponse.getTotalHits() == null) {
@@ -299,25 +192,7 @@ public class SearchResponseSerDes {
 			SearchResponse searchResponse, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "documents")) {
-				if (jsonParserFieldValue != null) {
-					searchResponse.setDocuments(
-						Stream.of(
-							toStrings((Object[])jsonParserFieldValue)
-						).map(
-							object -> DocumentSerDes.toDTO((String)object)
-						).toArray(
-							size -> new Document[size]
-						));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "maxScore")) {
-				if (jsonParserFieldValue != null) {
-					searchResponse.setMaxScore(
-						Double.valueOf((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "page")) {
+			if (Objects.equals(jsonParserFieldName, "page")) {
 				if (jsonParserFieldValue != null) {
 					searchResponse.setPage(
 						Integer.valueOf((String)jsonParserFieldValue));
@@ -329,33 +204,16 @@ public class SearchResponseSerDes {
 						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "request")) {
-				if (jsonParserFieldValue != null) {
-					searchResponse.setRequest((Object)jsonParserFieldValue);
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "requestString")) {
 				if (jsonParserFieldValue != null) {
 					searchResponse.setRequestString(
 						(String)jsonParserFieldValue);
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "response")) {
-				if (jsonParserFieldValue != null) {
-					searchResponse.setResponse((Object)jsonParserFieldValue);
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "responseString")) {
 				if (jsonParserFieldValue != null) {
 					searchResponse.setResponseString(
 						(String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "searchRequest")) {
-				if (jsonParserFieldValue != null) {
-					searchResponse.setSearchRequest(
-						SearchRequestSerDes.toDTO(
-							(String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "totalHits")) {

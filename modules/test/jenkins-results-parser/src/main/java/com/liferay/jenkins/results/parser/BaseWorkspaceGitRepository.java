@@ -276,13 +276,14 @@ public abstract class BaseWorkspaceGitRepository
 
 		gitWorkingDirectory.checkoutLocalGitBranch(localGitBranch);
 
+		gitWorkingDirectory.createLocalGitBranch(
+			getUpstreamBranchName(), true, getBaseBranchSHA());
+
 		gitWorkingDirectory.reset("--hard " + localGitBranch.getSHA());
 
 		gitWorkingDirectory.clean();
 
 		gitWorkingDirectory.displayLog();
-
-		writePropertiesFiles();
 
 		_setUp = true;
 	}
@@ -477,20 +478,24 @@ public abstract class BaseWorkspaceGitRepository
 
 			String propertyName = buildPropertyOptions.get(0);
 
-			List<String> propertyOptions = new ArrayList<>();
-
-			propertyOptions.add(propertyName);
-
-			propertyOptions.addAll(getPropertyOptions());
+			List<String> propertyOptions = new ArrayList<>(
+				getPropertyOptions());
 
 			propertyOptions.removeAll(Collections.singleton(null));
 
 			String propertyValue = JenkinsResultsParserUtil.getProperty(
-				buildProperties, propertyType,
+				buildProperties, propertyType + "[" + propertyName + "]",
 				propertyOptions.toArray(new String[0]));
 
 			if (propertyValue == null) {
 				continue;
+			}
+
+			if (JenkinsResultsParserUtil.isWindows() &&
+				propertyValue.startsWith("/") &&
+				!propertyValue.startsWith("/c/")) {
+
+				propertyValue = "C:" + propertyValue;
 			}
 
 			properties.put(propertyName, propertyValue);
@@ -500,13 +505,7 @@ public abstract class BaseWorkspaceGitRepository
 	}
 
 	protected Set<String> getPropertyOptions() {
-		Set<String> propertyOptions = new HashSet<>(_propertyOptions);
-
-		if (JenkinsResultsParserUtil.isWindows()) {
-			propertyOptions.add("windows");
-		}
-
-		return propertyOptions;
+		return _propertyOptions;
 	}
 
 	private LocalGitBranch _createPullRequestLocalGitBranch() {
@@ -561,6 +560,9 @@ public abstract class BaseWorkspaceGitRepository
 		if (!gitWorkingDirectory.localSHAExists(baseBranchSHA)) {
 			gitWorkingDirectory.fetch(_getUpstreamRemoteGitRef());
 		}
+
+		gitWorkingDirectory.createLocalGitBranch(
+			getUpstreamBranchName(), true, baseBranchSHA);
 
 		return gitWorkingDirectory.getRebasedLocalGitBranch(
 			getBranchName(), getSenderBranchName(),

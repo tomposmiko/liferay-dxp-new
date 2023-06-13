@@ -183,6 +183,7 @@
 			display: block;
 			left: unset;
 			padding: 10px 0;
+			position: relative !important;
 
 			.btn {
 				margin-left: 0;
@@ -672,7 +673,7 @@
 	}
 
 	.yui3-calendar-weekday {
-		color: #4599e2;
+		color: $primary-d2;
 	}
 
 	.yui3-calendar-day {

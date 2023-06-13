@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.model.impl.VirtualLayout;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
@@ -165,7 +166,11 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 						layout.getGroupId(), layout.getPlid(), true);
 
 			String data = layoutPageTemplateStructure.getData(
-				_getSegmentsExperienceIds());
+				_getSegmentsExperienceId());
+
+			if (Validator.isNull(data)) {
+				return _layoutStructure;
+			}
 
 			String masterLayoutData = _getMasterLayoutData(httpServletRequest);
 
@@ -226,13 +231,22 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 		return themeDisplay.getPlid();
 	}
 
-	private long[] _getSegmentsExperienceIds() {
+	private long _getSegmentsExperienceId() {
 		HttpServletRequest httpServletRequest = getRequest();
 
-		return GetterUtil.getLongValues(
+		long selectedSegmentsExperienceId = ParamUtil.getLong(
+			httpServletRequest, "segmentsExperienceId", -1);
+
+		if (selectedSegmentsExperienceId != -1) {
+			return selectedSegmentsExperienceId;
+		}
+
+		long[] segmentsExperienceIds = GetterUtil.getLongValues(
 			httpServletRequest.getAttribute(
 				SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS),
 			new long[] {SegmentsExperienceConstants.ID_DEFAULT});
+
+		return segmentsExperienceIds[0];
 	}
 
 	private LayoutStructure _mergeLayoutStructure(

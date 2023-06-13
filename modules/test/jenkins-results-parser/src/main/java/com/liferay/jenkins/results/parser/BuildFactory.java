@@ -17,7 +17,6 @@ package com.liferay.jenkins.results.parser;
 import java.io.IOException;
 import java.io.StringReader;
 
-import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Matcher;
 
@@ -90,27 +89,16 @@ public class BuildFactory {
 			}
 		}
 
+		if (jobName.contains("legacy")) {
+			return new LegacyTopLevelBuild(url, (TopLevelBuild)parentBuild);
+		}
+
 		if (jobName.equals("root-cause-analysis-tool")) {
 			return new RootCauseAnalysisToolBuild(
 				url, (TopLevelBuild)parentBuild);
 		}
 
 		if (jobName.startsWith("test-portal-acceptance-pullrequest")) {
-			String testSuite = null;
-
-			try {
-				testSuite = JenkinsResultsParserUtil.getBuildParameter(
-					url, "CI_TEST_SUITE");
-			}
-			catch (RuntimeException runtimeException) {
-				System.out.println(runtimeException.getMessage());
-			}
-
-			if (Objects.equals(testSuite, "bundle")) {
-				return new StandaloneTopLevelBuild(
-					url, (TopLevelBuild)parentBuild);
-			}
-
 			return new PullRequestPortalTopLevelBuild(
 				url, (TopLevelBuild)parentBuild);
 		}
@@ -173,6 +161,11 @@ public class BuildFactory {
 		}
 
 		if (jobName.contains("portal")) {
+			if (jobName.contains("upstream")) {
+				return new UpstreamPortalTopLevelBuild(
+					url, (TopLevelBuild)parentBuild);
+			}
+
 			return new PortalTopLevelBuild(url, (TopLevelBuild)parentBuild);
 		}
 
@@ -220,6 +213,9 @@ public class BuildFactory {
 			_BUILD_URL_SUFFIX_REGEX),
 		JenkinsResultsParserUtil.combine(
 			".*?Test/+[^/]+/+(?<master>test-[0-9]-[0-9]{1,2})/",
+			"(?<jobName>[^/]+)/?", _BUILD_URL_SUFFIX_REGEX),
+		JenkinsResultsParserUtil.combine(
+			"file:/.*", "(?<master>test-[0-9]-[0-9]{1,2})/",
 			"(?<jobName>[^/]+)/?", _BUILD_URL_SUFFIX_REGEX));
 
 }

@@ -14,6 +14,7 @@
 
 package com.liferay.change.tracking.internal;
 
+import com.liferay.change.tracking.internal.helper.CTTableMapperHelper;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.spi.exception.CTEventException;
 import com.liferay.change.tracking.spi.listener.CTEventListener;
@@ -180,8 +181,8 @@ public class CTServiceRegistry {
 
 	@Deactivate
 	protected void deactivate() {
-		ServiceTrackerList<CTEventListener, CTEventListener>
-			serviceTrackerList = _serviceTrackerList;
+		ServiceTrackerList<CTEventListener> serviceTrackerList =
+			_serviceTrackerList;
 
 		if (serviceTrackerList != null) {
 			serviceTrackerList.close();
@@ -195,11 +196,9 @@ public class CTServiceRegistry {
 		}
 	}
 
-	private ServiceTrackerList<CTEventListener, CTEventListener>
-		_getServiceTrackerList() {
-
-		ServiceTrackerList<CTEventListener, CTEventListener>
-			serviceTrackerList = _serviceTrackerList;
+	private ServiceTrackerList<CTEventListener> _getServiceTrackerList() {
+		ServiceTrackerList<CTEventListener> serviceTrackerList =
+			_serviceTrackerList;
 
 		if (serviceTrackerList != null) {
 			return serviceTrackerList;
@@ -251,8 +250,7 @@ public class CTServiceRegistry {
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
 
-	private volatile ServiceTrackerList<CTEventListener, CTEventListener>
-		_serviceTrackerList;
+	private volatile ServiceTrackerList<CTEventListener> _serviceTrackerList;
 	private volatile ServiceTrackerMap<Long, CTService<?>> _serviceTrackerMap;
 
 }

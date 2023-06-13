@@ -1,31 +1,33 @@
 /**
  * @returns {string} Liferay Group Id
  */
-export const getLiferayGroupId = () => {
+export function getLiferayGroupId() {
 	try {
 		// eslint-disable-next-line no-undef
 		const groupId = Liferay.ThemeDisplay.getSiteGroupId();
 
 		return groupId;
-	} catch (error) {
+	}
+	catch (error) {
 		console.warn('Not able to find Liferay Group Id\n', error);
 
 		return '';
 	}
-};
+}
 
 /**
  * @returns {string} Liferay Scope Group Id
  */
-export const getScopeGroupId = () => {
+export function getScopeGroupId() {
 	try {
 		// eslint-disable-next-line no-undef
 		const scopeGroupId = Liferay.ThemeDisplay.getScopeGroupId();
 
 		return scopeGroupId;
-	} catch (error) {
+	}
+	catch (error) {
 		console.warn('Not able to find Liferay Scope Group Id\n', error);
 
 		return '';
 	}
-};
+}

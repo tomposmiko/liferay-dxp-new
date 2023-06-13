@@ -471,6 +471,16 @@ public class DDMServiceUpgrade implements UpgradeStepRegistrator {
 			"5.0.0", "5.1.0",
 			new com.liferay.dynamic.data.mapping.internal.upgrade.v5_1_0.
 				DDMFieldUpgradeProcess());
+
+		registry.register(
+			"5.1.0", "5.1.1",
+			new com.liferay.dynamic.data.mapping.internal.upgrade.v5_1_1.
+				DDMValidationUpgradeProcess(_jsonFactory));
+
+		registry.register(
+			"5.1.1", "5.1.2",
+			new com.liferay.dynamic.data.mapping.internal.upgrade.v5_1_2.
+				DDMFormInstanceUpgradeProcess(_jsonFactory));
 	}
 
 	@Activate

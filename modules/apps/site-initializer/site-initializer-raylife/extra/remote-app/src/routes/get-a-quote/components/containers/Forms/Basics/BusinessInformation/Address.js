@@ -1,16 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useRef} from 'react';
 import {useFormContext} from 'react-hook-form';
-import {ControlledInput} from '~/common/components/connectors/Controlled/Input';
-import {ZIPControlledInput} from '~/common/components/connectors/Controlled/Input/WithMask/ZIP';
-import {StatesControlledSelect} from '~/common/components/connectors/Controlled/Select/States';
-import {Input} from '~/common/components/fragments/Forms/Input';
-import {useLocation} from '~/routes/get-a-quote/hooks/useLocation';
+import {ControlledInput} from '../../../../../../../common/components/connectors/Controlled/Input';
+import {ZIPControlledInput} from '../../../../../../../common/components/connectors/Controlled/Input/WithMask/ZIP';
+import {StatesControlledSelect} from '../../../../../../../common/components/connectors/Controlled/Select/States';
+import {Input} from '../../../../../../../common/components/fragments/Forms/Input';
+import {useLocation} from '../../../../../hooks/useLocation';
 
 const setFormPath = (value) =>
 	`basics.businessInformation.business.location.${value}`;
 
-export const BusinessInformationAddress = () => {
+export function BusinessInformationAddress() {
 	const ref = useRef();
 	const {setAutoComplete} = useLocation();
 	const {control, register, setValue} = useFormContext();
@@ -22,6 +22,7 @@ export const BusinessInformationAddress = () => {
 	}, [ref]);
 
 	const updateFormWithGoogleAddress = (address) => {
+
 		// We need to put shouldValidate at least in one Field
 		// to force validation to others
 
@@ -35,17 +36,12 @@ export const BusinessInformationAddress = () => {
 	};
 
 	return (
-		<>
-			<div
-				className="content-row"
-				style={{
-					display: 'grid',
-					gridTemplateColumns: '1fr 29.7%',
-				}}
-			>
+		<div className="d-flex flex-column">
+			<div className="d-flex justify-content-between">
 				<ControlledInput
 					control={control}
 					inputProps={{
+						className: 'flex-grow-1 mr-4 p-0',
 						placeholder: 'Street address',
 						ref,
 					}}
@@ -56,19 +52,19 @@ export const BusinessInformationAddress = () => {
 
 				<Input
 					{...register(setFormPath('addressApt'))}
+					className="apt p-0"
 					label="&nbsp;"
 					placeholder="Apt/Suite (optional)"
 				/>
+			</div>
 
-				<div
-					className="content-row"
-					style={{
-						display: 'grid',
-						gridTemplateColumns: '1fr 25.2%',
-					}}
-				>
+			<div className="d-flex flex-row justify-content-between my-5">
+				<div className="d-flex flex-grow-1">
 					<ControlledInput
 						control={control}
+						inputProps={{
+							className: ' flex-grow-1 p-0',
+						}}
 						label="City"
 						name={setFormPath('city')}
 						rules={{required: 'City is required.'}}
@@ -76,6 +72,9 @@ export const BusinessInformationAddress = () => {
 
 					<StatesControlledSelect
 						control={control}
+						inputProps={{
+							className: 'flex-grow-1 p-0 mx-4',
+						}}
 						label="State"
 						name={setFormPath('state')}
 						rules={{
@@ -84,7 +83,7 @@ export const BusinessInformationAddress = () => {
 					/>
 				</div>
 
-				<div className="content-row">
+				<div className="d-flex">
 					<ZIPControlledInput
 						control={control}
 						label="ZIP"
@@ -95,6 +94,6 @@ export const BusinessInformationAddress = () => {
 					/>
 				</div>
 			</div>
-		</>
+		</div>
 	);
-};
+}

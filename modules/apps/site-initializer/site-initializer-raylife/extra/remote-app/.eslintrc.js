@@ -19,7 +19,7 @@ try {
 }
 catch (error) {
 	throw new Error(
-		'@liferay/npm-scripts is not installed; please run "ant setup-sdk"',
+		'@liferay/npm-scripts is not installed; please run "ant setup-sdk"'
 	);
 }
 
@@ -32,5 +32,7 @@ module.exports = {
 		'no-case-declarations': 'off',
 		'no-empty': ['error', {allowEmptyCatch: true}],
 		'no-prototype-builtins': 'off',
+		'promise/catch-or-return': 'off',
+		'quote-props': 'off',
 	},
 };

@@ -14,7 +14,6 @@
 
 package com.liferay.dynamic.data.mapping.form.evaluator.internal.function;
 
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.DateFormatFactoryImpl;
@@ -41,57 +40,16 @@ public class FutureDatesFunctionTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_futureDatesFunction.setDDMExpressionParameterAccessor(
-			new DefaultDDMExpressionParameterAccessor());
-
 		_setUpDateFormatFactoryUtil();
 	}
 
 	@Test
-	public void testApplyFalse1() {
+	public void testApplyFalse() {
 		LocalDate yesterdayLocalDate = _todayLocalDate.minusDays(1);
 
 		Assert.assertFalse(
 			_futureDatesFunction.apply(
-				yesterdayLocalDate.toString(),
-				JSONUtil.put(
-					"startsFrom", JSONUtil.put("type", "responseDate")
-				).toString()));
-	}
-
-	@Test
-	public void testApplyFalse2() {
-		Assert.assertFalse(
-			_futureDatesFunction.apply(
-				null,
-				JSONUtil.put(
-					"startsFrom", JSONUtil.put("type", "responseDate")
-				).toString()));
-	}
-
-	@Test
-	public void testApplyFalseCustomDays() {
-		Assert.assertFalse(_apply(_todayLocalDate.minusDays(14), "days", -12));
-		Assert.assertFalse(_apply(_todayLocalDate.plusDays(10), "days", 12));
-		Assert.assertFalse(_apply(_todayLocalDate.plusDays(11), "days", 12));
-	}
-
-	@Test
-	public void testApplyFalseCustomMonths() {
-		Assert.assertFalse(
-			_apply(_todayLocalDate.minusMonths(14), "months", -12));
-		Assert.assertFalse(
-			_apply(_todayLocalDate.plusMonths(10), "months", 12));
-		Assert.assertFalse(
-			_apply(_todayLocalDate.plusMonths(11), "months", 12));
-	}
-
-	@Test
-	public void testApplyFalseCustomYears() {
-		Assert.assertFalse(
-			_apply(_todayLocalDate.minusYears(14), "years", -12));
-		Assert.assertFalse(_apply(_todayLocalDate.plusYears(10), "years", 12));
-		Assert.assertFalse(_apply(_todayLocalDate.plusYears(11), "years", 12));
+				yesterdayLocalDate.toString(), _todayLocalDate.toString()));
 	}
 
 	@Test
@@ -100,50 +58,19 @@ public class FutureDatesFunctionTest {
 
 		Assert.assertTrue(
 			_futureDatesFunction.apply(
-				tomorrowLocalDate.toString(),
-				JSONUtil.put(
-					"startsFrom", JSONUtil.put("type", "responseDate")
-				).toString()));
-	}
+				tomorrowLocalDate.toString(), _todayLocalDate.toString()));
 
-	@Test
-	public void testApplyTrueCustomDays() {
-		Assert.assertTrue(_apply(_todayLocalDate.minusDays(10), "days", -12));
-		Assert.assertTrue(_apply(_todayLocalDate.plusDays(14), "days", 12));
-		Assert.assertTrue(_apply(_todayLocalDate.plusDays(999), "days", 999));
-	}
-
-	@Test
-	public void testApplyTrueCustomMonths() {
 		Assert.assertTrue(
-			_apply(_todayLocalDate.minusMonths(10), "months", -12));
-		Assert.assertTrue(_apply(_todayLocalDate.plusMonths(14), "months", 12));
-		Assert.assertTrue(
-			_apply(_todayLocalDate.plusMonths(999), "months", 999));
+			_futureDatesFunction.apply(
+				_todayLocalDate.toString(), _todayLocalDate.toString()));
 	}
 
 	@Test
-	public void testApplyTrueCustomYears() {
-		Assert.assertTrue(_apply(_todayLocalDate.minusYears(10), "years", -12));
-		Assert.assertTrue(_apply(_todayLocalDate.plusYears(14), "years", 12));
-		Assert.assertTrue(_apply(_todayLocalDate.plusYears(999), "years", 999));
-	}
-
-	private Boolean _apply(LocalDate localDate, String unit, int quantity) {
-		return _futureDatesFunction.apply(
-			localDate.toString(),
-			JSONUtil.put(
-				"startsFrom",
-				JSONUtil.put(
-					"date", "responseDate"
-				).put(
-					"quantity", quantity
-				).put(
-					"type", "customDate"
-				).put(
-					"unit", unit
-				)
-			).toString());
+	public void testApplyWithoutValues() {
+		Assert.assertFalse(
+			_futureDatesFunction.apply(null, _todayLocalDate.toString()));
+		Assert.assertFalse(
+			_futureDatesFunction.apply(_todayLocalDate.toString(), null));
 	}
 
 	private void _setUpDateFormatFactoryUtil() {

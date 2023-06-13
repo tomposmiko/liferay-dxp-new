@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -143,6 +144,64 @@ public class QueryEntry implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean enabled;
 
+	@Schema
+	@Valid
+	public Clause[] getPostFilterClauses() {
+		return postFilterClauses;
+	}
+
+	public void setPostFilterClauses(Clause[] postFilterClauses) {
+		this.postFilterClauses = postFilterClauses;
+	}
+
+	@JsonIgnore
+	public void setPostFilterClauses(
+		UnsafeSupplier<Clause[], Exception> postFilterClausesUnsafeSupplier) {
+
+		try {
+			postFilterClauses = postFilterClausesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Clause[] postFilterClauses;
+
+	@Schema
+	@Valid
+	public Rescore[] getRescores() {
+		return rescores;
+	}
+
+	public void setRescores(Rescore[] rescores) {
+		this.rescores = rescores;
+	}
+
+	@JsonIgnore
+	public void setRescores(
+		UnsafeSupplier<Rescore[], Exception> rescoresUnsafeSupplier) {
+
+		try {
+			rescores = rescoresUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Rescore[] rescores;
+
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
@@ -210,6 +269,46 @@ public class QueryEntry implements Serializable {
 			sb.append(enabled);
 		}
 
+		if (postFilterClauses != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"postFilterClauses\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < postFilterClauses.length; i++) {
+				sb.append(String.valueOf(postFilterClauses[i]));
+
+				if ((i + 1) < postFilterClauses.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		if (rescores != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"rescores\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < rescores.length; i++) {
+				sb.append(String.valueOf(rescores[i]));
+
+				if ((i + 1) < rescores.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -223,9 +322,9 @@ public class QueryEntry implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		String string = String.valueOf(object);
-
-		return string.replaceAll("\"", "\\\\\"");
+		return StringUtil.replace(
+			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
+			_JSON_ESCAPE_STRINGS[1]);
 	}
 
 	private static boolean _isArray(Object value) {
@@ -251,7 +350,7 @@ public class QueryEntry implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(entry.getKey());
+			sb.append(_escape(entry.getKey()));
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -283,7 +382,7 @@ public class QueryEntry implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(value);
+				sb.append(_escape(value));
 				sb.append("\"");
 			}
 			else {
@@ -299,5 +398,10 @@ public class QueryEntry implements Serializable {
 
 		return sb.toString();
 	}
+
+	private static final String[][] _JSON_ESCAPE_STRINGS = {
+		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
+		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
+	};
 
 }

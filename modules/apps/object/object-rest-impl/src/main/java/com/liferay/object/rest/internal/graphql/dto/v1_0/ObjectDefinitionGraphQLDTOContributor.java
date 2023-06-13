@@ -20,6 +20,7 @@ import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.scope.ObjectScopeProvider;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -29,6 +30,7 @@ import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.graphql.dto.GraphQLDTOContributor;
 import com.liferay.portal.vulcan.graphql.dto.GraphQLDTOProperty;
+import com.liferay.portal.vulcan.list.type.ListEntry;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -41,6 +43,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,11 +65,37 @@ public class ObjectDefinitionGraphQLDTOContributor
 				objectDefinition.getPKObjectFieldName(), Long.class));
 
 		for (ObjectField objectField : objectFields) {
-			graphQLDTOProperties.add(
-				GraphQLDTOProperty.of(
-					objectField.getName(),
-					_typedClasses.getOrDefault(
-						objectField.getType(), Object.class)));
+			if (objectField.getListTypeDefinitionId() != 0) {
+				graphQLDTOProperties.add(
+					GraphQLDTOProperty.of(
+						objectField.getName(), ListEntry.class));
+			}
+			else if (Objects.equals(
+						objectField.getRelationshipType(), "oneToMany")) {
+
+				String objectFieldName = objectField.getName();
+
+				String[] objectFieldNameParts = objectFieldName.split(
+					StringPool.UNDERLINE);
+
+				String relationshipIdName = objectFieldNameParts[3];
+
+				graphQLDTOProperties.add(
+					GraphQLDTOProperty.of(relationshipIdName, Long.class));
+
+				String relationshipName = StringUtil.replaceLast(
+					relationshipIdName, "Id", "");
+
+				graphQLDTOProperties.add(
+					GraphQLDTOProperty.of(relationshipName, Object.class));
+			}
+			else {
+				graphQLDTOProperties.add(
+					GraphQLDTOProperty.of(
+						objectField.getName(),
+						_typedClasses.getOrDefault(
+							objectField.getType(), Object.class)));
+			}
 		}
 
 		return new ObjectDefinitionGraphQLDTOContributor(
@@ -157,6 +186,7 @@ public class ObjectDefinitionGraphQLDTOContributor
 		return _resourceName;
 	}
 
+	@Override
 	public String getTypeName() {
 		return _typeName;
 	}

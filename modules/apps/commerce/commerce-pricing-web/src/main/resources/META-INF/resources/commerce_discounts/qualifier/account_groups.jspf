@@ -74,7 +74,7 @@
 					fieldName: 'name',
 				},
 			],
-			spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
+			spritemap: '<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
 			titleLabel:
 				'<%= LanguageUtil.get(request, "add-existing-account-group") %>',
 		});
@@ -87,7 +87,7 @@
 		<clay:headless-data-set-display
 			apiURL="<%= commerceDiscountQualifiersDisplayContext.getDiscountAccountGroupsAPIURL() %>"
 			clayDataSetActionDropdownItems="<%= commerceDiscountQualifiersDisplayContext.getAccountGroupClayDataSetActionDropdownItems() %>"
-			formId="fm"
+			formName="fm"
 			id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_QUALIFIER_ACCOUNT_GROUPS %>"
 			itemsPerPage="<%= 10 %>"
 			namespace="<%= liferayPortletResponse.getNamespace() %>"

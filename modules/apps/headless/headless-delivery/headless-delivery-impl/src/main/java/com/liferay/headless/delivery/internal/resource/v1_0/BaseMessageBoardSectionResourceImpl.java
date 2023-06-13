@@ -442,8 +442,9 @@ public abstract class BaseMessageBoardSectionResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putMessageBoardSectionPermission",
-					resourceName, resourceId)
+					ActionKeys.PERMISSIONS,
+					"putMessageBoardSectionPermissionsPage", resourceName,
+					resourceId)
 			).build(),
 			resourceId, resourceName, roleNames);
 	}
@@ -475,7 +476,7 @@ public abstract class BaseMessageBoardSectionResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putMessageBoardSectionPermission(
+			putMessageBoardSectionPermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("messageBoardSectionId")
@@ -510,8 +511,9 @@ public abstract class BaseMessageBoardSectionResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putMessageBoardSectionPermission",
-					resourceName, resourceId)
+					ActionKeys.PERMISSIONS,
+					"putMessageBoardSectionPermissionsPage", resourceName,
+					resourceId)
 			).build(),
 			resourceId, resourceName, null);
 	}
@@ -917,7 +919,8 @@ public abstract class BaseMessageBoardSectionResourceImpl
 				"replace",
 				addAction(
 					ActionKeys.PERMISSIONS,
-					"putSiteMessageBoardSectionPermission", portletName, siteId)
+					"putSiteMessageBoardSectionPermissionsPage", portletName,
+					siteId)
 			).build(),
 			siteId, portletName, roleNames);
 	}
@@ -947,7 +950,7 @@ public abstract class BaseMessageBoardSectionResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putSiteMessageBoardSectionPermission(
+			putSiteMessageBoardSectionPermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteId")
@@ -980,7 +983,8 @@ public abstract class BaseMessageBoardSectionResourceImpl
 				"replace",
 				addAction(
 					ActionKeys.PERMISSIONS,
-					"putSiteMessageBoardSectionPermission", portletName, siteId)
+					"putSiteMessageBoardSectionPermissionsPage", portletName,
+					siteId)
 			).build(),
 			siteId, portletName, null);
 	}
@@ -1232,9 +1236,7 @@ public abstract class BaseMessageBoardSectionResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), entityModel);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid filter " + filterString, exception);
-			}
+			_log.error("Invalid filter " + filterString, exception);
 		}
 
 		return null;

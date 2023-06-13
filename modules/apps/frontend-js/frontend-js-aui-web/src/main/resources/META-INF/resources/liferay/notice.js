@@ -91,6 +91,7 @@ AUI.add(
 
 			instance._timeout = options.timeout;
 
+			// eslint-disable-next-line @liferay/aui/no-get-body
 			instance._body = A.getBody();
 
 			instance._useToggleButton = false;
@@ -106,7 +107,7 @@ AUI.add(
 				instance._useToggleButton = true;
 			}
 
-			if (instance._noticeType == 'warning') {
+			if (instance._noticeType === 'warning') {
 				instance._noticeClass = 'alert-danger popup-alert-warning';
 			}
 
@@ -251,6 +252,7 @@ AUI.add(
 				var returnVal;
 
 				if (instance._useAnimation) {
+					// eslint-disable-next-line @liferay/aui/no-merge
 					var animationConfig = A.merge(instance._animationConfig, {
 						top: -instance._notice.get('offsetHeight') + STR_PX,
 					});
@@ -357,6 +359,7 @@ AUI.add(
 					instance._useCloseButton = true;
 
 					if (!instance._body) {
+						// eslint-disable-next-line @liferay/aui/no-get-body
 						instance._body = A.getBody();
 					}
 

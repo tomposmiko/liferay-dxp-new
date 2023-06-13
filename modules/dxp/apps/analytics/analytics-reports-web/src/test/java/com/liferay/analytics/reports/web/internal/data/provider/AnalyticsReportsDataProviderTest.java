@@ -96,9 +96,14 @@ public class AnalyticsReportsDataProviderTest {
 							"social", 735L
 						).toString())));
 
+		TimeSpan timeSpan = TimeSpan.of("last-7-days");
+
+		TimeRange timeRange = timeSpan.toTimeRange(0);
+
 		Map<String, AcquisitionChannel> acquisitionChannels =
 			analyticsReportsDataProvider.getAcquisitionChannels(
-				RandomTestUtil.randomLong(), RandomTestUtil.randomString());
+				RandomTestUtil.randomLong(), timeRange,
+				RandomTestUtil.randomString());
 
 		Assert.assertEquals(
 			acquisitionChannels.toString(), 5, acquisitionChannels.size());
@@ -134,9 +139,14 @@ public class AnalyticsReportsDataProviderTest {
 							"liferay.com", 1.0
 						).toString())));
 
+		TimeSpan timeSpan = TimeSpan.of("last-7-days");
+
+		TimeRange timeRange = timeSpan.toTimeRange(0);
+
 		List<ReferringURL> referringURLS =
 			analyticsReportsDataProvider.getDomainReferringURLs(
-				RandomTestUtil.randomLong(), RandomTestUtil.randomString());
+				RandomTestUtil.randomLong(), timeRange,
+				RandomTestUtil.randomString());
 
 		Assert.assertEquals(referringURLS.toString(), 3, referringURLS.size());
 		Assert.assertEquals(
@@ -217,9 +227,14 @@ public class AnalyticsReportsDataProviderTest {
 							3.0
 						).toString())));
 
+		TimeSpan timeSpan = TimeSpan.of("last-7-days");
+
+		TimeRange timeRange = timeSpan.toTimeRange(0);
+
 		List<ReferringURL> referringURLS =
 			analyticsReportsDataProvider.getPageReferringURLs(
-				RandomTestUtil.randomLong(), RandomTestUtil.randomString());
+				RandomTestUtil.randomLong(), timeRange,
+				RandomTestUtil.randomString());
 
 		Assert.assertEquals(referringURLS.toString(), 3, referringURLS.size());
 		Assert.assertEquals(
@@ -255,9 +270,14 @@ public class AnalyticsReportsDataProviderTest {
 							"linkedin", 1.0
 						).toString())));
 
+		TimeSpan timeSpan = TimeSpan.of("last-7-days");
+
+		TimeRange timeRange = timeSpan.toTimeRange(0);
+
 		List<ReferringSocialMedia> referringSocialMediaList =
 			analyticsReportsDataProvider.getReferringSocialMediaList(
-				RandomTestUtil.randomLong(), RandomTestUtil.randomString());
+				RandomTestUtil.randomLong(), timeRange,
+				RandomTestUtil.randomString());
 
 		Assert.assertEquals(
 			referringSocialMediaList.toString(), 3,
@@ -282,23 +302,23 @@ public class AnalyticsReportsDataProviderTest {
 						"/read-count", "12345"
 					).put(
 						"/read-counts",
-						() -> {
-							LocalDate localDate = LocalDate.now();
-
-							return JSONUtil.put(
-								"histogram",
+						JSONUtil.put(
+							"histogram",
+							JSONUtil.put(
 								JSONUtil.put(
-									JSONUtil.put(
-										"key",
-										localDate.format(
-											DateTimeFormatter.ISO_LOCAL_DATE)
-									).put(
-										"value", 5
-									))
-							).put(
-								"value", 5
-							).toJSONString();
-						}
+									"key",
+									() -> {
+										LocalDate localDate = LocalDate.now();
+
+										return localDate.format(
+											DateTimeFormatter.ISO_LOCAL_DATE);
+									}
+								).put(
+									"value", 5
+								))
+						).put(
+							"value", 5
+						).toJSONString()
 					).build()));
 
 		Long totalReads = analyticsReportsDataProvider.getTotalReads(
@@ -325,23 +345,23 @@ public class AnalyticsReportsDataProviderTest {
 						"/view-count", "12345"
 					).put(
 						"/view-counts",
-						() -> {
-							LocalDate localDate = LocalDate.now();
-
-							return JSONUtil.put(
-								"histogram",
+						JSONUtil.put(
+							"histogram",
+							JSONUtil.put(
 								JSONUtil.put(
-									JSONUtil.put(
-										"key",
-										localDate.format(
-											DateTimeFormatter.ISO_LOCAL_DATE)
-									).put(
-										"value", 5
-									))
-							).put(
-								"value", 5
-							).toJSONString();
-						}
+									"key",
+									() -> {
+										LocalDate localDate = LocalDate.now();
+
+										return localDate.format(
+											DateTimeFormatter.ISO_LOCAL_DATE);
+									}
+								).put(
+									"value", 5
+								))
+						).put(
+							"value", 5
+						).toJSONString()
 					).build()));
 
 		Long totalViews = analyticsReportsDataProvider.getTotalViews(
@@ -399,9 +419,14 @@ public class AnalyticsReportsDataProviderTest {
 						).toString()
 					).build()));
 
+		TimeSpan timeSpan = TimeSpan.of("last-7-days");
+
+		TimeRange timeRange = timeSpan.toTimeRange(0);
+
 		Map<String, TrafficChannel> trafficChannels =
 			analyticsReportsDataProvider.getTrafficChannels(
-				RandomTestUtil.randomLong(), RandomTestUtil.randomString());
+				RandomTestUtil.randomLong(), timeRange,
+				RandomTestUtil.randomString());
 
 		Assert.assertEquals(
 			trafficChannels.toString(), 3, trafficChannels.size());
@@ -423,8 +448,13 @@ public class AnalyticsReportsDataProviderTest {
 		AnalyticsReportsDataProvider analyticsReportsDataProvider =
 			new AnalyticsReportsDataProvider(_getHttp(new IOException()));
 
+		TimeSpan timeSpan = TimeSpan.of("last-7-days");
+
+		TimeRange timeRange = timeSpan.toTimeRange(0);
+
 		analyticsReportsDataProvider.getTrafficChannels(
-			RandomTestUtil.randomLong(), RandomTestUtil.randomString());
+			RandomTestUtil.randomLong(), timeRange,
+			RandomTestUtil.randomString());
 	}
 
 	@Test
@@ -516,9 +546,14 @@ public class AnalyticsReportsDataProviderTest {
 						).toString()
 					).build()));
 
+		TimeSpan timeSpan = TimeSpan.of("last-7-days");
+
+		TimeRange timeRange = timeSpan.toTimeRange(0);
+
 		Map<String, TrafficChannel> trafficChannels =
 			analyticsReportsDataProvider.getTrafficChannels(
-				RandomTestUtil.randomLong(), RandomTestUtil.randomString());
+				RandomTestUtil.randomLong(), timeRange,
+				RandomTestUtil.randomString());
 
 		Assert.assertEquals(
 			trafficChannels.toString(), 2, trafficChannels.size());
@@ -592,9 +627,14 @@ public class AnalyticsReportsDataProviderTest {
 						).toString()
 					).build()));
 
+		TimeSpan timeSpan = TimeSpan.of("last-7-days");
+
+		TimeRange timeRange = timeSpan.toTimeRange(0);
+
 		Map<String, TrafficChannel> trafficChannels =
 			analyticsReportsDataProvider.getTrafficChannels(
-				RandomTestUtil.randomLong(), RandomTestUtil.randomString());
+				RandomTestUtil.randomLong(), timeRange,
+				RandomTestUtil.randomString());
 
 		Assert.assertEquals(
 			String.valueOf(

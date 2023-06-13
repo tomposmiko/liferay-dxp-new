@@ -16,11 +16,13 @@ package com.liferay.mentions.web.internal.editor.configuration;
 
 import com.liferay.mentions.constants.MentionsPortletKeys;
 import com.liferay.mentions.matcher.MentionsMatcherUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
+import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -40,22 +42,6 @@ public class BaseMentionsEditorConfigContributor
 		JSONObject jsonObject, Map<String, Object> inputEditorTaglibAttributes,
 		ThemeDisplay themeDisplay,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory) {
-
-		PortletURL portletURL = getPortletURL(
-			themeDisplay, requestBackedPortletURLFactory);
-
-		String source =
-			portletURL.toString() + "&" +
-				PortalUtil.getPortletNamespace(MentionsPortletKeys.MENTIONS);
-
-		String tplResults = StringBundler.concat(
-			"<div class=\"p-1 autofit-row autofit-row-center\">",
-			"<div class=\"autofit-col inline-item-before\">{portraitHTML}",
-			"</div><div class=\"autofit-col autofit-col-expand\">",
-			"<strong class=\"text-truncate\">{fullName}</strong>",
-			"<div class=\"autofit-col-expand\">",
-			"<small class=\"text-truncate\">@{screenName}</small></div></div>",
-			"</div>");
 
 		jsonObject.put(
 			"autocomplete",
@@ -77,13 +63,31 @@ public class BaseMentionsEditorConfigContributor
 					).put(
 						"resultTextLocator", "screenName"
 					).put(
-						"source", source
+						"source",
+						() -> {
+							PortletURL portletURL = getPortletURL(
+								themeDisplay, requestBackedPortletURLFactory);
+
+							return StringBundler.concat(
+								portletURL.toString(), "&",
+								PortalUtil.getPortletNamespace(
+									MentionsPortletKeys.MENTIONS));
+						}
 					).put(
 						"term", "@"
 					).put(
 						"tplReplace", "{mention}"
 					).put(
-						"tplResults", tplResults
+						"tplResults",
+						StringBundler.concat(
+							"<div class=\"p-1 autofit-row ",
+							"autofit-row-center\"><div class=\"autofit-col ",
+							"inline-item-before\">{portraitHTML}</div><div ",
+							"class=\"autofit-col autofit-col-expand\">",
+							"<strong class=\"text-truncate\">{fullName}",
+							"</strong><div class=\"autofit-col-expand\">",
+							"<small class=\"text-truncate\">@{screenName}",
+							"</small></div></div></div>")
 					))
 			));
 
@@ -104,8 +108,20 @@ public class BaseMentionsEditorConfigContributor
 		ThemeDisplay themeDisplay,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory) {
 
-		return requestBackedPortletURLFactory.createResourceURL(
-			MentionsPortletKeys.MENTIONS);
+		String discussionPortletId = themeDisplay.getPpid();
+
+		if (Validator.isBlank(discussionPortletId)) {
+			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+			discussionPortletId = portletDisplay.getId();
+		}
+
+		return PortletURLBuilder.create(
+			requestBackedPortletURLFactory.createResourceURL(
+				MentionsPortletKeys.MENTIONS)
+		).setParameter(
+			"discussionPortletId", discussionPortletId
+		).buildPortletURL();
 	}
 
 }

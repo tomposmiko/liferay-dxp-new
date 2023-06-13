@@ -148,6 +148,9 @@ public class BatchPlannerPlanPersistenceTest {
 
 		newBatchPlannerPlan.setName(RandomTestUtil.randomString());
 
+		newBatchPlannerPlan.setTaskItemDelegateName(
+			RandomTestUtil.randomString());
+
 		newBatchPlannerPlan.setTemplate(RandomTestUtil.randomBoolean());
 
 		_batchPlannerPlans.add(_persistence.update(newBatchPlannerPlan));
@@ -194,6 +197,9 @@ public class BatchPlannerPlanPersistenceTest {
 		Assert.assertEquals(
 			existingBatchPlannerPlan.getName(), newBatchPlannerPlan.getName());
 		Assert.assertEquals(
+			existingBatchPlannerPlan.getTaskItemDelegateName(),
+			newBatchPlannerPlan.getTaskItemDelegateName());
+		Assert.assertEquals(
 			existingBatchPlannerPlan.isTemplate(),
 			newBatchPlannerPlan.isTemplate());
 	}
@@ -228,6 +234,14 @@ public class BatchPlannerPlanPersistenceTest {
 		_persistence.countByC_N(0L, "null");
 
 		_persistence.countByC_N(0L, (String)null);
+	}
+
+	@Test
+	public void testCountByC_T() throws Exception {
+		_persistence.countByC_T(
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
+
+		_persistence.countByC_T(0L, RandomTestUtil.randomBoolean());
 	}
 
 	@Test
@@ -269,7 +283,7 @@ public class BatchPlannerPlanPersistenceTest {
 			"companyId", true, "userId", true, "userName", true, "createDate",
 			true, "modifiedDate", true, "active", true, "export", true,
 			"externalType", true, "externalURL", true, "internalClassName",
-			true, "name", true, "template", true);
+			true, "name", true, "taskItemDelegateName", true, "template", true);
 	}
 
 	@Test
@@ -581,6 +595,8 @@ public class BatchPlannerPlanPersistenceTest {
 		batchPlannerPlan.setInternalClassName(RandomTestUtil.randomString());
 
 		batchPlannerPlan.setName(RandomTestUtil.randomString());
+
+		batchPlannerPlan.setTaskItemDelegateName(RandomTestUtil.randomString());
 
 		batchPlannerPlan.setTemplate(RandomTestUtil.randomBoolean());
 

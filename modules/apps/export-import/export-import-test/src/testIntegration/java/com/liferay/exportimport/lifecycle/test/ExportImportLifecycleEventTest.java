@@ -180,18 +180,24 @@ public class ExportImportLifecycleEventTest {
 
 	@Test
 	public void testFailedLayoutLocalPublishing() throws Exception {
-		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+		try (LogCapture logCapture1 = LoggerTestUtil.configureLog4JLogger(
 				"com.liferay.portal.background.task.internal.messaging." +
 					"BackgroundTaskMessageListener",
 				LoggerTestUtil.ERROR)) {
 
 			long targetGroupId = RandomTestUtil.nextLong();
 
-			StagingUtil.publishLayouts(
-				TestPropsValues.getUserId(), _group.getGroupId(), targetGroupId,
-				false, new long[0], _parameterMap);
+			try (LogCapture logCapture2 = LoggerTestUtil.configureLog4JLogger(
+					"com.liferay.exportimport.internal.lifecycle." +
+						"LoggerExportImportLifecycleListener",
+					LoggerTestUtil.ERROR)) {
 
-			List<LogEntry> logEntries = logCapture.getLogEntries();
+				StagingUtil.publishLayouts(
+					TestPropsValues.getUserId(), _group.getGroupId(),
+					targetGroupId, false, new long[0], _parameterMap);
+			}
+
+			List<LogEntry> logEntries = logCapture1.getLogEntries();
 
 			LogEntry logEntry = logEntries.get(0);
 
@@ -281,16 +287,23 @@ public class ExportImportLifecycleEventTest {
 	public void testFailedPortletLocalPublishing() throws Exception {
 		User user = TestPropsValues.getUser();
 
-		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+		try (LogCapture logCapture1 = LoggerTestUtil.configureLog4JLogger(
 				"com.liferay.portal.background.task.internal.messaging." +
 					"BackgroundTaskMessageListener",
 				LoggerTestUtil.ERROR)) {
 
-			StagingUtil.publishPortlet(
-				user.getUserId(), _group.getGroupId(), _liveGroup.getGroupId(),
-				0, 0, StringPool.BLANK, _parameterMap);
+			try (LogCapture logCapture2 = LoggerTestUtil.configureLog4JLogger(
+					"com.liferay.exportimport.internal.lifecycle." +
+						"LoggerExportImportLifecycleListener",
+					LoggerTestUtil.ERROR)) {
 
-			List<LogEntry> logEntries = logCapture.getLogEntries();
+				StagingUtil.publishPortlet(
+					user.getUserId(), _group.getGroupId(),
+					_liveGroup.getGroupId(), 0, 0, StringPool.BLANK,
+					_parameterMap);
+			}
+
+			List<LogEntry> logEntries = logCapture1.getLogEntries();
 
 			LogEntry logEntry = logEntries.get(0);
 

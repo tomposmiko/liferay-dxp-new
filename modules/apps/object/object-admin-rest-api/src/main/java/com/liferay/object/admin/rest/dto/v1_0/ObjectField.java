@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -283,6 +284,45 @@ public class ObjectField implements Serializable {
 	protected String name;
 
 	@Schema
+	@Valid
+	public RelationshipType getRelationshipType() {
+		return relationshipType;
+	}
+
+	@JsonIgnore
+	public String getRelationshipTypeAsString() {
+		if (relationshipType == null) {
+			return null;
+		}
+
+		return relationshipType.toString();
+	}
+
+	public void setRelationshipType(RelationshipType relationshipType) {
+		this.relationshipType = relationshipType;
+	}
+
+	@JsonIgnore
+	public void setRelationshipType(
+		UnsafeSupplier<RelationshipType, Exception>
+			relationshipTypeUnsafeSupplier) {
+
+		try {
+			relationshipType = relationshipTypeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected RelationshipType relationshipType;
+
+	@Schema
 	public Boolean getRequired() {
 		return required;
 	}
@@ -461,6 +501,20 @@ public class ObjectField implements Serializable {
 			sb.append("\"");
 		}
 
+		if (relationshipType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"relationshipType\": ");
+
+			sb.append("\"");
+
+			sb.append(relationshipType);
+
+			sb.append("\"");
+		}
+
 		if (required != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -497,11 +551,50 @@ public class ObjectField implements Serializable {
 	)
 	public String xClassName;
 
+	@GraphQLName("RelationshipType")
+	public static enum RelationshipType {
+
+		ONE_TO_MANY("oneToMany"), ONE_TO_ONE("oneToOne");
+
+		@JsonCreator
+		public static RelationshipType create(String value) {
+			if ((value == null) || value.equals("")) {
+				return null;
+			}
+
+			for (RelationshipType relationshipType : values()) {
+				if (Objects.equals(relationshipType.getValue(), value)) {
+					return relationshipType;
+				}
+			}
+
+			throw new IllegalArgumentException("Invalid enum value: " + value);
+		}
+
+		@JsonValue
+		public String getValue() {
+			return _value;
+		}
+
+		@Override
+		public String toString() {
+			return _value;
+		}
+
+		private RelationshipType(String value) {
+			_value = value;
+		}
+
+		private final String _value;
+
+	}
+
 	@GraphQLName("Type")
 	public static enum Type {
 
-		BIG_DECIMAL("BigDecimal"), BOOLEAN("Boolean"), DATE("Date"),
-		DOUBLE("Double"), INTEGER("Integer"), LONG("Long"), STRING("String");
+		BIG_DECIMAL("BigDecimal"), BOOLEAN("Boolean"), CLOB("Clob"),
+		DATE("Date"), DOUBLE("Double"), INTEGER("Integer"), LONG("Long"),
+		STRING("String");
 
 		@JsonCreator
 		public static Type create(String value) {
@@ -537,9 +630,9 @@ public class ObjectField implements Serializable {
 	}
 
 	private static String _escape(Object object) {
-		String string = String.valueOf(object);
-
-		return string.replaceAll("\"", "\\\\\"");
+		return StringUtil.replace(
+			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
+			_JSON_ESCAPE_STRINGS[1]);
 	}
 
 	private static boolean _isArray(Object value) {
@@ -565,7 +658,7 @@ public class ObjectField implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(entry.getKey());
+			sb.append(_escape(entry.getKey()));
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -597,7 +690,7 @@ public class ObjectField implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(value);
+				sb.append(_escape(value));
 				sb.append("\"");
 			}
 			else {
@@ -613,5 +706,10 @@ public class ObjectField implements Serializable {
 
 		return sb.toString();
 	}
+
+	private static final String[][] _JSON_ESCAPE_STRINGS = {
+		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
+		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
+	};
 
 }

@@ -13,7 +13,6 @@
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
-import {ClayIconSpriteContext} from '@clayui/icon';
 import ClaySticker from '@clayui/sticker';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
@@ -62,6 +61,7 @@ function Item(props) {
 					}
 				/>
 			</ClaySticker>
+
 			<ClayButtonWithIcon
 				className="mini-compare-delete"
 				displayType="unstyled"
@@ -74,7 +74,7 @@ function Item(props) {
 }
 
 function MiniCompare(props) {
-	const [items, updateItems] = useState(props.items);
+	const [items, setItems] = useState(props.items);
 
 	compareCookie.setValue(
 		props.commerceChannelGroupId,
@@ -88,7 +88,7 @@ function MiniCompare(props) {
 				thumbnail,
 			};
 
-			updateItems((items) => {
+			setItems((items) => {
 				const included = items.find((element) => element.id === id);
 
 				toggleStatus(props.commerceChannelGroupId, id, !included);
@@ -117,47 +117,39 @@ function MiniCompare(props) {
 	}, [items, props.itemsLimit]);
 
 	return (
-		<ClayIconSpriteContext.Provider value={props.spritemap}>
-			<div
-				className={classnames(
-					'mini-compare',
-					!!items.length && 'active'
-				)}
-			>
-				{Array(props.itemsLimit)
-					.fill(null)
-					.map((_el, i) => {
-						const currentItem = items[i] || {};
+		<div className={classnames('mini-compare', !!items.length && 'active')}>
+			{Array(props.itemsLimit)
+				.fill(null)
+				.map((_el, i) => {
+					const currentItem = items[i] || {};
 
-						return (
-							<Item
-								{...currentItem}
-								key={i}
-								onDelete={(event) => {
-									event.preventDefault();
-									updateItems(
-										items.filter(
-											(v) => v.id !== currentItem.id
-										)
-									);
-									toggleStatus(
-										props.commerceChannelGroupId,
-										currentItem.id,
-										false
-									);
-									Liferay.fire(
-										ITEM_REMOVED_FROM_COMPARE,
-										currentItem
-									);
-								}}
-							/>
-						);
-					})}
-				<a className="btn btn-primary" href={props.compareProductsURL}>
-					{Liferay.Language.get('compare')}
-				</a>
-			</div>
-		</ClayIconSpriteContext.Provider>
+					return (
+						<Item
+							{...currentItem}
+							key={i}
+							onDelete={(event) => {
+								event.preventDefault();
+								setItems(
+									items.filter((v) => v.id !== currentItem.id)
+								);
+								toggleStatus(
+									props.commerceChannelGroupId,
+									currentItem.id,
+									false
+								);
+								Liferay.fire(
+									ITEM_REMOVED_FROM_COMPARE,
+									currentItem
+								);
+							}}
+						/>
+					);
+				})}
+
+			<a className="btn btn-primary" href={props.compareProductsURL}>
+				{Liferay.Language.get('compare')}
+			</a>
+		</div>
 	);
 }
 
@@ -173,7 +165,6 @@ MiniCompare.propTypes = {
 	),
 	itemsLimit: PropTypes.number,
 	portletNamespace: PropTypes.string.isRequired,
-	spritemap: PropTypes.string,
 };
 
 MiniCompare.defaultProps = {

@@ -1,11 +1,14 @@
 import React from 'react';
-import {StepItem} from '~/common/components/fragments/Step/Item';
-import {StepList} from '~/common/components/fragments/Step/List';
-import {STORAGE_KEYS, Storage} from '~/common/services/liferay/storage';
-import {useStepWizard} from '~/routes/get-a-quote/hooks/useStepWizard';
-import {AVAILABLE_STEPS} from '~/routes/get-a-quote/utils/constants';
+import {StepItem} from '../../../../common/components/fragments/Step/Item';
+import {StepList} from '../../../../common/components/fragments/Step/List';
+import {
+	STORAGE_KEYS,
+	Storage,
+} from '../../../../common/services/liferay/storage';
+import {useStepWizard} from '../../hooks/useStepWizard';
+import {AVAILABLE_STEPS} from '../../utils/constants';
 
-export const Steps = () => {
+export function Steps() {
 	const {selectedStep, setSection} = useStepWizard();
 
 	return (
@@ -13,16 +16,16 @@ export const Steps = () => {
 			<StepItem
 				onClick={() => {
 					Storage.setItem(STORAGE_KEYS.BASIC_STEP_CLICKED, true);
-					setSection(AVAILABLE_STEPS.BASICS_BUSINESS_TYPE);
+					setSection(AVAILABLE_STEPS.BASICS_PRODUCT_QUOTE);
 				}}
 				percentage={
 					selectedStep.percentage[
-						AVAILABLE_STEPS.BASICS_BUSINESS_TYPE.section
+						AVAILABLE_STEPS.BASICS_PRODUCT_QUOTE.section
 					]
 				}
 				selected={
 					selectedStep.section ===
-					AVAILABLE_STEPS.BASICS_BUSINESS_TYPE.section
+					AVAILABLE_STEPS.BASICS_PRODUCT_QUOTE.section
 				}
 			>
 				Basics
@@ -65,4 +68,4 @@ export const Steps = () => {
 			</StepItem>
 		</StepList>
 	);
-};
+}

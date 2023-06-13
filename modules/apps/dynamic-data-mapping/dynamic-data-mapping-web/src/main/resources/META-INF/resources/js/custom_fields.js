@@ -208,7 +208,7 @@ AUI.add(
 			styles.forEach((item) => {
 				var rule = item.split(':');
 
-				if (rule.length == 2) {
+				if (rule.length === 2) {
 					var key = camelize(rule[0]);
 					var value = rule[1].trim();
 
@@ -357,13 +357,13 @@ AUI.add(
 						'0_json': JSON.stringify(criterionJSON),
 						'1_json': JSON.stringify(criterionJSON),
 						'2_json': JSON.stringify(uploadCriterionJSON),
-						criteria:
+						'criteria':
 							'com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion',
-						itemSelectedEventName:
+						'itemSelectedEventName':
 							portletNamespace + 'selectDocumentLibrary',
-						p_p_id: Liferay.PortletKeys.ITEM_SELECTOR,
-						p_p_mode: 'view',
-						p_p_state: 'pop_up',
+						'p_p_id': Liferay.PortletKeys.ITEM_SELECTOR,
+						'p_p_mode': 'view',
+						'p_p_state': 'pop_up',
 					};
 
 					var documentLibrarySelectorURL = Liferay.Util.PortletURL.createPortletURL(
@@ -376,11 +376,11 @@ AUI.add(
 
 				_getUploadURL() {
 					var uploadParameters = {
-						cmd: 'add_temp',
+						'cmd': 'add_temp',
 						'javax.portlet.action':
 							'/document_library/upload_file_entry',
-						p_auth: Liferay.authToken,
-						p_p_id: Liferay.PortletKeys.DOCUMENT_LIBRARY,
+						'p_auth': Liferay.authToken,
+						'p_p_id': Liferay.PortletKeys.DOCUMENT_LIBRARY,
 					};
 
 					var uploadURL = Liferay.Util.PortletURL.createActionURL(
@@ -989,12 +989,14 @@ AUI.add(
 
 			var defaultLocale = translationManager.get('defaultLocale');
 
+			// eslint-disable-next-line @liferay/aui/no-object
 			var value = A.Object.getValue(localizationMap, [locale, attribute]);
 
 			if (isValue(value)) {
 				return value;
 			}
 
+			// eslint-disable-next-line @liferay/aui/no-object
 			value = A.Object.getValue(localizationMap, [
 				defaultLocale,
 				attribute,
@@ -1005,6 +1007,7 @@ AUI.add(
 			}
 
 			for (var localizationMapLocale in localizationMap) {
+				// eslint-disable-next-line @liferay/aui/no-object
 				value = A.Object.getValue(localizationMap, [
 					localizationMapLocale,
 					attribute,
@@ -1049,21 +1052,21 @@ AUI.add(
 
 			var indexTypeOptions = {
 				'': Liferay.Language.get('no'),
-				keyword: Liferay.Language.get('yes'),
+				'keyword': Liferay.Language.get('yes'),
 			};
 
-			if (type == 'ddm-image' || type == 'text') {
+			if (type === 'ddm-image' || type === 'text') {
 				indexTypeOptions = {
 					'': Liferay.Language.get('not-indexable'),
-					keyword: Liferay.Language.get('indexable-keyword'),
-					text: Liferay.Language.get('indexable-text'),
+					'keyword': Liferay.Language.get('indexable-keyword'),
+					'text': Liferay.Language.get('indexable-text'),
 				};
 			}
 
-			if (type == 'ddm-text-html' || type == 'textarea') {
+			if (type === 'ddm-text-html' || type === 'textarea') {
 				indexTypeOptions = {
 					'': Liferay.Language.get('not-indexable'),
-					text: Liferay.Language.get('indexable-text'),
+					'text': Liferay.Language.get('indexable-text'),
 				};
 			}
 
@@ -1287,7 +1290,7 @@ AUI.add(
 										var domEvent = event.domEvent;
 
 										if (
-											domEvent.keyCode == 9 &&
+											Number(domEvent.keyCode) === 9 &&
 											domEvent.target.hasClass(
 												'yui3-calendar-grid'
 											)

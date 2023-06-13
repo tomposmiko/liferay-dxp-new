@@ -36,7 +36,7 @@ PortletURL portletURL = cpDefinitionLinkDisplayContext.getPortletURL();
 	</aui:form>
 
 	<div class="pt-4" id="<portlet:namespace />productDefinitionLinksContainer">
-		<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
+		<aui:form action="<%= portletURL %>" method="post" name="fm">
 			<aui:input name="<%= Constants.CMD %>" type="hidden" />
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
@@ -48,7 +48,7 @@ PortletURL portletURL = cpDefinitionLinkDisplayContext.getPortletURL();
 				%>'
 				creationMenu="<%= cpDefinitionLinkDisplayContext.getCreationMenu() %>"
 				dataProviderKey="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_LINKS %>"
-				formId="fm"
+				formName="fm"
 				id="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_LINKS %>"
 				itemsPerPage="<%= 10 %>"
 				namespace="<%= liferayPortletResponse.getNamespace() %>"

@@ -575,16 +575,18 @@ public abstract class BaseDocumentResourceTestCase {
 	}
 
 	@Test
-	public void testPutAssetLibraryDocumentPermission() throws Exception {
+	public void testPutAssetLibraryDocumentPermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Document document = testPutAssetLibraryDocumentPermission_addDocument();
+		Document document =
+			testPutAssetLibraryDocumentPermissionsPage_addDocument();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
-			documentResource.putAssetLibraryDocumentPermissionHttpResponse(
+			documentResource.putAssetLibraryDocumentPermissionsPageHttpResponse(
 				testDepotEntry.getDepotEntryId(),
 				new Permission[] {
 					new Permission() {
@@ -597,7 +599,7 @@ public abstract class BaseDocumentResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			documentResource.putAssetLibraryDocumentPermissionHttpResponse(
+			documentResource.putAssetLibraryDocumentPermissionsPageHttpResponse(
 				testDepotEntry.getDepotEntryId(),
 				new Permission[] {
 					new Permission() {
@@ -609,7 +611,7 @@ public abstract class BaseDocumentResourceTestCase {
 				}));
 	}
 
-	protected Document testPutAssetLibraryDocumentPermission_addDocument()
+	protected Document testPutAssetLibraryDocumentPermissionsPage_addDocument()
 		throws Exception {
 
 		return documentResource.postAssetLibraryDocument(
@@ -1161,16 +1163,17 @@ public abstract class BaseDocumentResourceTestCase {
 	}
 
 	@Test
-	public void testPutDocumentPermission() throws Exception {
+	public void testPutDocumentPermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Document document = testPutDocumentPermission_addDocument();
+		Document document = testPutDocumentPermissionsPage_addDocument();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
-			documentResource.putDocumentPermissionHttpResponse(
+			documentResource.putDocumentPermissionsPageHttpResponse(
 				document.getId(),
 				new Permission[] {
 					new Permission() {
@@ -1183,7 +1186,7 @@ public abstract class BaseDocumentResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			documentResource.putDocumentPermissionHttpResponse(
+			documentResource.putDocumentPermissionsPageHttpResponse(
 				0L,
 				new Permission[] {
 					new Permission() {
@@ -1195,7 +1198,7 @@ public abstract class BaseDocumentResourceTestCase {
 				}));
 	}
 
-	protected Document testPutDocumentPermission_addDocument()
+	protected Document testPutDocumentPermissionsPage_addDocument()
 		throws Exception {
 
 		return documentResource.postSiteDocument(
@@ -1741,16 +1744,17 @@ public abstract class BaseDocumentResourceTestCase {
 	}
 
 	@Test
-	public void testPutSiteDocumentPermission() throws Exception {
+	public void testPutSiteDocumentPermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Document document = testPutSiteDocumentPermission_addDocument();
+		Document document = testPutSiteDocumentPermissionsPage_addDocument();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
-			documentResource.putSiteDocumentPermissionHttpResponse(
+			documentResource.putSiteDocumentPermissionsPageHttpResponse(
 				document.getSiteId(),
 				new Permission[] {
 					new Permission() {
@@ -1763,7 +1767,7 @@ public abstract class BaseDocumentResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			documentResource.putSiteDocumentPermissionHttpResponse(
+			documentResource.putSiteDocumentPermissionsPageHttpResponse(
 				document.getSiteId(),
 				new Permission[] {
 					new Permission() {
@@ -1775,7 +1779,7 @@ public abstract class BaseDocumentResourceTestCase {
 				}));
 	}
 
-	protected Document testPutSiteDocumentPermission_addDocument()
+	protected Document testPutSiteDocumentPermissionsPage_addDocument()
 		throws Exception {
 
 		return documentResource.postSiteDocument(

@@ -32,8 +32,8 @@ import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.fragment.validator.FragmentEntryValidator;
 import com.liferay.headless.delivery.dto.v1_0.FragmentLink;
 import com.liferay.headless.delivery.dto.v1_0.PageElement;
-import com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0.structure.importer.util.PortletConfigurationImporterHelper;
-import com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0.structure.importer.util.PortletPermissionsImporterHelper;
+import com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0.structure.importer.helper.PortletConfigurationImporterHelper;
+import com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0.structure.importer.helper.PortletPermissionsImporterHelper;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.petra.string.StringPool;
@@ -46,11 +46,13 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -196,7 +198,7 @@ public class FragmentLayoutStructureItemImporter
 		}
 
 		FragmentEntry fragmentEntry = _getFragmentEntry(
-			fragmentKey, layout.getGroupId());
+			layout.getCompanyId(), layout.getGroupId(), fragmentKey);
 
 		FragmentRenderer fragmentRenderer =
 			_fragmentRendererTracker.getFragmentRenderer(fragmentKey);
@@ -244,19 +246,23 @@ public class FragmentLayoutStructureItemImporter
 			"com.liferay.fragment.entry.processor.background.image." +
 				"BackgroundImageFragmentEntryProcessor",
 			_toBackgroundImageFragmentEntryProcessorJSONObject(
-				(List<Object>)definitionMap.get("fragmentFields")));
+				(List<Object>)definitionMap.get("fragmentFields"))
+		).put(
+			"com.liferay.fragment.entry.processor.editable." +
+				"EditableFragmentEntryProcessor",
+			() -> {
+				JSONObject editableFragmentEntryProcessorJSONObject =
+					_toEditableFragmentEntryProcessorJSONObject(
+						editableTypes,
+						(List<Object>)definitionMap.get("fragmentFields"));
 
-		JSONObject editableFragmentEntryProcessorJSONObject =
-			_toEditableFragmentEntryProcessorJSONObject(
-				editableTypes,
-				(List<Object>)definitionMap.get("fragmentFields"));
+				if (editableFragmentEntryProcessorJSONObject.length() > 0) {
+					return editableFragmentEntryProcessorJSONObject;
+				}
 
-		if (editableFragmentEntryProcessorJSONObject.length() > 0) {
-			fragmentEntryProcessorValuesJSONObject.put(
-				"com.liferay.fragment.entry.processor.editable." +
-					"EditableFragmentEntryProcessor",
-				editableFragmentEntryProcessorJSONObject);
-		}
+				return null;
+			}
+		);
 
 		Map<String, String> configurationTypes = _getConfigurationTypes(
 			configuration);
@@ -620,17 +626,28 @@ public class FragmentLayoutStructureItemImporter
 		return configurationTypes;
 	}
 
-	private FragmentEntry _getFragmentEntry(String fragmentKey, long groupId) {
+	private FragmentEntry _getFragmentEntry(
+			long companyId, long groupId, String fragmentKey)
+		throws Exception {
+
 		FragmentEntry fragmentEntry =
 			_fragmentEntryLocalService.fetchFragmentEntry(groupId, fragmentKey);
 
-		if (fragmentEntry == null) {
-			fragmentEntry =
-				_fragmentCollectionContributorTracker.getFragmentEntry(
-					fragmentKey);
+		if (fragmentEntry != null) {
+			return fragmentEntry;
 		}
 
-		return fragmentEntry;
+		Company company = _companyLocalService.getCompanyById(companyId);
+
+		fragmentEntry = _fragmentEntryLocalService.fetchFragmentEntry(
+			company.getGroupId(), fragmentKey);
+
+		if (fragmentEntry != null) {
+			return fragmentEntry;
+		}
+
+		return _fragmentCollectionContributorTracker.getFragmentEntry(
+			fragmentKey);
 	}
 
 	private String _getProcessedHTML(
@@ -988,6 +1005,9 @@ public class FragmentLayoutStructureItemImporter
 
 	private static final Pattern _pattern = Pattern.compile(
 		"\\[resources:(.+?)\\]");
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private FragmentCollectionContributorTracker

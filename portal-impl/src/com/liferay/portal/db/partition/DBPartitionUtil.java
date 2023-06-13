@@ -28,6 +28,8 @@ import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.jdbc.CurrentConnectionUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -70,8 +72,7 @@ public class DBPartitionUtil {
 			InfrastructureUtil.getDataSource());
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				"create schema if not exists " + _getSchemaName(companyId) +
-					" character set utf8")) {
+				_getCreateSchemaSQL(companyId))) {
 
 			preparedStatement.executeUpdate();
 
@@ -148,7 +149,7 @@ public class DBPartitionUtil {
 			DatabaseMetaData databaseMetaData = connection.getMetaData();
 
 			try (ResultSet resultSet = databaseMetaData.getTables(
-					dbInspector.getCatalog(), dbInspector.getSchema(), null,
+					_defaultSchemaName, dbInspector.getSchema(), null,
 					new String[] {"TABLE"});
 				Statement statement = connection.createStatement()) {
 
@@ -380,6 +381,12 @@ public class DBPartitionUtil {
 		};
 	}
 
+	private static String _getCreateSchemaSQL(long companyId) {
+		return StringBundler.concat(
+			"create schema if not exists ", _getSchemaName(companyId),
+			" character set ", _getSessionCharsetEncoding());
+	}
+
 	private static String _getCreateTableSQL(long companyId, String tableName) {
 		return StringBundler.concat(
 			"create table if not exists ", _getSchemaName(companyId),
@@ -414,6 +421,30 @@ public class DBPartitionUtil {
 		}
 
 		return _DATABASE_PARTITION_SCHEMA_NAME_PREFIX + companyId;
+	}
+
+	private static String _getSessionCharsetEncoding() {
+		Connection connection = CurrentConnectionUtil.getConnection(
+			InfrastructureUtil.getDataSource());
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				"select variable_value from " +
+					"performance_schema.session_variables where " +
+						"variable_name = 'character_set_client'");
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			if (resultSet.next()) {
+				return resultSet.getString("variable_value");
+			}
+
+			return "utf8";
+		}
+		catch (Exception exception) {
+			_log.error(
+				"Unable to get session character set encoding", exception);
+
+			return "utf8";
+		}
 	}
 
 	private static boolean _isControlTable(
@@ -567,6 +598,9 @@ public class DBPartitionUtil {
 		GetterUtil.get(
 			PropsUtil.get("database.partition.schema.name.prefix"),
 			"lpartition_");
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DBPartitionUtil.class);
 
 	private static final Set<String> _controlTableNames = new HashSet<>(
 		Arrays.asList("Company", "VirtualHost"));

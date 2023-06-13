@@ -12,7 +12,7 @@ Here are some of the types of changes documented in this file:
 * Execution requirements: Java version, J2EE Version, browser versions, etc.
 * Deprecations or end of support: For example, warning that a certain feature or API will be dropped in an upcoming version.
 
-*This document has been reviewed through the breaking change entry at commit `6e818a6b84c5`.*
+*This document has been reviewed through the breaking change entry at commit `ac5b1e9670b1`.*
 
 Each change must have a brief descriptive title and contain the following information:
 
@@ -857,7 +857,7 @@ The native OSGi API makes the bridged API unnecessary.
 
 ---------------------------------------
 
-## Remove support for Web Content in Document Types
+## Removed Support for Web Content in Document Types
 - ** Date:** 2021-Sep-30
 - ** JIRA Ticket:** [LPS-139710](https://issues.liferay.com/browse/LPS-139710)
 
@@ -867,37 +867,106 @@ Support for Web Content fields in Document Types has been removed.
 
 ### Who is affected?
 
-Anyone with Document Types that contain Web Content field types.
+This affects anyone using a Web Content field Document Type.
 
 ### How should I update my code?
 
-Remove all references to this field type to avoid issues.
+Remove all references to Web Content field Document Types.
 
 ### Why was this change made?
 
-This is an accidental feature, included in Documents and Media with no clear use case behind it. Additionally, it is causing circularity problems when linking together Web Contents and Documents when staging is enabled.
+The Web Content field Document Type was an accidental feature included in Documents and Media. Its use case was unclear. When staging was enabled, the feature was causing circularity problems between Web Content articles linked to Documents and Media documents.
 
 ---------------------------------------
 
-### OpenId Connect provider signing algorithm must be configured if different to RS256
+### OpenID Connect Provider Signing Algorithm Must Be Configured If Different From RS256
 
 - **Date:** 2021-Sep-30
-- **JIRA Ticket:** LPS-138756
+- **JIRA Ticket:** [LPS-138756](https://issues.liferay.com/browse/LPS-138756)
 
 #### What changed?
 
-The portal's OpenId Connect client now requires admins to explicitly state the ID Token signing algorithm agreed with the provider.
+The portal's OpenID Connect client now requires explicitly stating the ID Token signing algorithm agreed with the provider.
 
 #### Who is affected?
 
-Anyone integrating OpenId Connect providers that sign ID Tokens using a different signing algorithm to the **first** algorithm listed as their supported signing algorithms. The list is served by the provider's Discovery Endpoint, or configured offline in portal.
+This affects anyone integrating OpenID Connect providers that sign ID Tokens using a signing algorithm other than the **first** supported signing algorithm listed in the UI. The list is served by the provider's Discovery Endpoint, or configured offline in the UI.
 
 #### How should I update my code?
 
-Review the "OpenId Connect Provider Connection" configuration(s). Specify the agreed algorithm in "Registered ID Token Signing Algorithm".
+In the UI, review the OpenID Connect Provider Connection configuration(s). Specify the agreed algorithm as the Registered ID Token Signing Algorithm.
 
 #### Why was this change made?
 
-In order to better support all signing algorithms supported by OpenId Connect providers.
+This improves using all signing algorithms supported by OpenID Connect providers.
+
+---------------------------------------
+
+### Restricted the Service Builder Task to Service Module Folders that have a Service XML File
+
+- **Date:** 2021-Nov-02
+- **JIRA Ticket:** [LPS-129696](https://issues.liferay.com/browse/LPS-129696)
+
+#### What changed?
+
+Automatically applied the Service Builder plugin to all OSGi projects but restricted the `buildService` task target to `*-service` module folders that contain a `service.xml` file.
+
+#### Who is affected?
+
+This affects you if you are running the `buildService` task in a the Liferay Workspace.
+
+#### How should I update my code?
+
+This requires no code changes. When you run the `buildService` task, you must target a `*-service` module folder that contains a `service.xml` file.
+
+#### Why was this change made?
+
+This was done to clarify the folder that `buildService` should target.
+
+---------------------------------------
+
+## Title
+- **Date: 2021-Dic-16**
+- **JIRA Ticket: [LPS-125034](https://issues.liferay.com/browse/LPS-125034)**
+
+### What changed?
+
+The `addFragmentEntry` methods from `FragmentEntryLocalService` and `FragmentEntryService` have been removed.
+
+### Who is affected?
+
+This affects you if you use `FragmentEntryLocalService` and `FragmentEntryService` to add fragment entries.
+
+### How should I update my code?
+
+Use the new method `addFragmentEntry` in `FragmentEntryLocalService` and `FragmentEntryService`. Note, that they include a new `String` parameter for the `icon` of a `FragmentEntry`.
+
+### Why was this change made?
+
+This change removes unnecessary methods.
+
+---------------------------------------
+
+## Title
+- **Date: 2021-Dic-17**
+- **JIRA Ticket: [LPS-141471](https://issues.liferay.com/browse/LPS-141471)**
+
+### What changed?
+
+The `getSegmentsExperienceIds` method from `FragmentEntryProcessorContext`, `DefaultFragmentEntryProcessorContext`, `FragmentRendererContext` and `DefaultFragmentRendererContext` has been removed.
+The method with signature `getContextObjects(JSONObject, String)` from `FragmentEntryConfigurationParser` has been removed.
+
+### Who is affected?
+
+This affects you if you use `FragmentEntryProcessorContext`, `DefaultFragmentEntryProcessorContext`, `FragmentRendererContext` or `DefaultFragmentRendererContext` to get the `long array` of `segmentsExperienceIds` or if you use the method with signature `getContextObjects(JSONObject, String)` from `FragmentEntryConfigurationParser`.
+
+### How should I update my code?
+
+Use `getSegmentsEntryIds` in `FragmentEntryProcessorContext`, `DefaultFragmentEntryProcessorContext`, `FragmentRendererContext` and `DefaultFragmentRendererContext`.
+Use the method with signature `getContextObjects(JSONObject, String, long[])` from `FragmentEntryConfigurationParser`, where the third parameter represents the `long array` of `segmentsEntryIds`.
+
+### Why was this change made?
+
+This change removes unnecessary methods.
 
 ---------------------------------------

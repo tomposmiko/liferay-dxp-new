@@ -1,10 +1,11 @@
 import {useEffect, useState} from 'react';
 import {useFormContext} from 'react-hook-form';
-import {LiferayService} from '~/common/services/liferay';
-import {STORAGE_KEYS, Storage} from '~/common/services/liferay/storage';
-import {smoothScroll} from '~/common/utils/scroll';
-import {useStepWizard} from '~/routes/get-a-quote/hooks/useStepWizard';
-import {verifyInputAgentPage} from '~/routes/get-a-quote/utils/contact-agent';
+import {LiferayService} from '../../../common/services/liferay';
+import {STORAGE_KEYS, Storage} from '../../../common/services/liferay/storage';
+import {clearExitAlert} from '../../../common/utils/exitAlert';
+import {smoothScroll} from '../../../common/utils/scroll';
+import {useStepWizard} from '../hooks/useStepWizard';
+import {verifyInputAgentPage} from '../utils/contact-agent';
 
 const liferaySiteName = LiferayService.getLiferaySiteName();
 
@@ -49,14 +50,15 @@ const useFormActions = (form, previousSection, nextSection, errorMessage) => {
 			Storage.setItem(STORAGE_KEYS.CONTEXTUAL_MESSAGE, phraseAgentPage);
 			window.location.href = `${liferaySiteName}/get-in-touch`;
 			validated = false;
-		} else {
+		}
+		else {
 			Storage.removeItem(STORAGE_KEYS.CONTEXTUAL_MESSAGE);
 		}
 
 		return validated;
 	};
 
-	const _SaveData = async () => {
+	const onSave = async () => {
 		setError('continueButton', {});
 		try {
 			const response = await LiferayService.createOrUpdateRaylifeApplication(
@@ -66,7 +68,8 @@ const useFormActions = (form, previousSection, nextSection, errorMessage) => {
 			setApplicationId(response.data.id);
 
 			return response;
-		} catch (error) {
+		}
+		catch (error) {
 			setError('continueButton', {
 				message:
 					errorMessage ||
@@ -78,7 +81,7 @@ const useFormActions = (form, previousSection, nextSection, errorMessage) => {
 	};
 
 	const onPrevious = async () => {
-		await _SaveData();
+		await onSave();
 
 		if (previousSection) {
 			setSection(previousSection);
@@ -87,18 +90,14 @@ const useFormActions = (form, previousSection, nextSection, errorMessage) => {
 		smoothScroll();
 	};
 
-	const onSave = async () => {
-		await _SaveData();
-
-		window.location.href = liferaySiteName;
-	};
-
 	/**
 	 * @state disabled for now
 	 * @param {*} data
 	 */
 	const onNext = async () => {
-		await _SaveData();
+		await onSave();
+
+		clearExitAlert();
 
 		const validated = _onValidation();
 

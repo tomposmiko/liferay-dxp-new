@@ -11,8 +11,10 @@
 
 import ClayButton from '@clayui/button';
 import ClayList from '@clayui/list';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
+import className from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useContext, useMemo, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
 
 import {
 	ChartDispatchContext,
@@ -20,7 +22,11 @@ import {
 	useDateTitle,
 	useIsPreviousPeriodButtonDisabled,
 } from '../../context/ChartStateContext';
-import {StoreStateContext} from '../../context/StoreContext';
+import ConnectionContext from '../../context/ConnectionContext';
+import {
+	StoreDispatchContext,
+	StoreStateContext,
+} from '../../context/StoreContext';
 import {generateDateFormatters as dateFormat} from '../../utils/dateFormat';
 import {numberFormat} from '../../utils/numberFormat';
 import Hint from '../Hint';
@@ -31,9 +37,10 @@ const ITEMS_TO_SHOW = 5;
 
 export default function ReferralDetail({
 	currentPage,
-	showTimeSpanSelector = false,
+	handleDetailPeriodChange,
 	timeSpanOptions,
 	trafficShareDataProvider,
+	trafficSourcesDataProvider,
 	trafficVolumeDataProvider,
 }) {
 	const {languageTag} = useContext(StoreStateContext);
@@ -59,43 +66,89 @@ export default function ReferralDetail({
 		return dateFormatters.formatChartTitle([firstDate, lastDate]);
 	}, [dateFormatters, firstDate, lastDate]);
 
-	const dispatch = useContext(ChartDispatchContext);
+	const dispatch = useContext(StoreDispatchContext);
 
-	const {timeSpanKey, timeSpanOffset} = useContext(ChartStateContext);
+	const chartDispatch = useContext(ChartDispatchContext);
+
+	const {pieChartLoading, timeSpanKey, timeSpanOffset} = useContext(
+		ChartStateContext
+	);
+
+	const {validAnalyticsConnection} = useContext(ConnectionContext);
 
 	const isPreviousPeriodButtonDisabled = useIsPreviousPeriodButtonDisabled();
 
-	const handleTimeSpanChange = (event) => {
-		const {value} = event.target;
+	const firstUpdateRef = useRef(true);
 
-		dispatch({payload: {key: value}, type: 'CHANGE_TIME_SPAN_KEY'});
-	};
+	const trafficSourceDetailClasses = className(
+		'c-p-3 traffic-source-detail',
+		{
+			'traffic-source-detail--loading': pieChartLoading,
+		}
+	);
+
+	useEffect(() => {
+		if (firstUpdateRef.current) {
+			firstUpdateRef.current = false;
+
+			return;
+		}
+
+		if (validAnalyticsConnection) {
+			chartDispatch({
+				payload: {
+					loading: true,
+				},
+				type: 'SET_PIE_CHART_LOADING',
+			});
+
+			trafficSourcesDataProvider()
+				.then((trafficSources) =>
+					handleDetailPeriodChange(trafficSources, 'referral')
+				)
+				.catch(() => {
+					dispatch({type: 'ADD_WARNING'});
+				})
+				.finally(() => {
+					chartDispatch({
+						payload: {
+							loading: false,
+						},
+						type: 'SET_PIE_CHART_LOADING',
+					});
+				});
+		}
+	}, [
+		chartDispatch,
+		dispatch,
+		handleDetailPeriodChange,
+		timeSpanKey,
+		timeSpanOffset,
+		trafficSourcesDataProvider,
+		validAnalyticsConnection,
+	]);
 
 	return (
-		<div className="c-p-3 traffic-source-detail">
-			{showTimeSpanSelector && (
-				<>
-					<div className="c-mb-3 c-mt-2">
-						<TimeSpanSelector
-							disabledNextTimeSpan={timeSpanOffset === 0}
-							disabledPreviousPeriodButton={
-								isPreviousPeriodButtonDisabled
-							}
-							onNextTimeSpanClick={() =>
-								dispatch({type: 'NEXT_TIME_SPAN'})
-							}
-							onPreviousTimeSpanClick={() =>
-								dispatch({type: 'PREV_TIME_SPAN'})
-							}
-							onTimeSpanChange={handleTimeSpanChange}
-							timeSpanKey={timeSpanKey}
-							timeSpanOptions={timeSpanOptions}
-						/>
-					</div>
-
-					{title && <h5 className="c-mb-4">{title}</h5>}
-				</>
+		<div className={trafficSourceDetailClasses}>
+			{pieChartLoading && (
+				<ClayLoadingIndicator
+					className="chart-loading-indicator"
+					small
+				/>
 			)}
+
+			<div className="c-mb-3 c-mt-2">
+				<TimeSpanSelector
+					disabledNextTimeSpan={timeSpanOffset === 0}
+					disabledPreviousPeriodButton={
+						isPreviousPeriodButtonDisabled
+					}
+					timeSpanKey={timeSpanKey}
+					timeSpanOptions={timeSpanOptions}
+				/>
+			</div>
+
+			{title && <h5 className="c-mb-4">{title}</h5>}
 
 			<TotalCount
 				className="c-mb-2"
@@ -125,6 +178,7 @@ export default function ReferralDetail({
 						<ClayList.ItemTitle className="text-truncate-inline">
 							<span className="text-truncate">
 								{Liferay.Language.get('top-referring-pages')}
+
 								<span className="text-secondary">
 									<Hint
 										message={Liferay.Language.get(
@@ -138,12 +192,14 @@ export default function ReferralDetail({
 							</span>
 						</ClayList.ItemTitle>
 					</ClayList.ItemField>
+
 					<ClayList.ItemField>
 						<ClayList.ItemTitle>
 							<span>{Liferay.Language.get('traffic')}</span>
 						</ClayList.ItemTitle>
 					</ClayList.ItemField>
 				</ClayList.Item>
+
 				{referringPages
 					.slice(0, isReferringPagesExpanded ? 10 : ITEMS_TO_SHOW)
 					.map(({trafficAmount, url}) => {
@@ -166,6 +222,7 @@ export default function ReferralDetail({
 										</span>
 									</ClayList.ItemText>
 								</ClayList.ItemField>
+
 								<ClayList.ItemField expand>
 									<span className="align-self-end font-weight-semi-bold text-dark">
 										{numberFormat(
@@ -203,6 +260,7 @@ export default function ReferralDetail({
 						<ClayList.ItemTitle className="text-truncate-inline">
 							<span className="text-truncate">
 								{Liferay.Language.get('top-referring-domains')}
+
 								<span className="text-secondary">
 									<Hint
 										message={Liferay.Language.get(
@@ -216,12 +274,14 @@ export default function ReferralDetail({
 							</span>
 						</ClayList.ItemTitle>
 					</ClayList.ItemField>
+
 					<ClayList.ItemField>
 						<ClayList.ItemTitle>
 							<span>{Liferay.Language.get('traffic')}</span>
 						</ClayList.ItemTitle>
 					</ClayList.ItemField>
 				</ClayList.Item>
+
 				{referringDomains
 					.slice(0, isReferringDomainsExpanded ? 10 : ITEMS_TO_SHOW)
 					.map(({trafficAmount, url}) => {
@@ -244,6 +304,7 @@ export default function ReferralDetail({
 										</span>
 									</ClayList.ItemText>
 								</ClayList.ItemField>
+
 								<ClayList.ItemField expand>
 									<span className="align-self-end font-weight-semi-bold text-dark">
 										{numberFormat(
@@ -282,7 +343,7 @@ export default function ReferralDetail({
 
 ReferralDetail.propTypes = {
 	currentPage: PropTypes.object.isRequired,
-	showTimeSpanSelector: PropTypes.bool,
+	handleDetailPeriodChange: PropTypes.func.isRequired,
 	timeSpanOptions: PropTypes.arrayOf(
 		PropTypes.shape({
 			key: PropTypes.string,
@@ -290,5 +351,6 @@ ReferralDetail.propTypes = {
 		})
 	).isRequired,
 	trafficShareDataProvider: PropTypes.func.isRequired,
+	trafficSourcesDataProvider: PropTypes.func.isRequired,
 	trafficVolumeDataProvider: PropTypes.func.isRequired,
 };

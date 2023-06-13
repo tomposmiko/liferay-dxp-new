@@ -22,7 +22,6 @@ import {DEFAULT_LABELS} from './util/labels';
  * (exported for test purposes)
  */
 export const DEFAULT_MINI_CART_CONTEXT_VALUE = {
-	CartResource: {},
 	CartViews: {},
 	actionURLs: {},
 	cartState: {},
@@ -34,7 +33,6 @@ export const DEFAULT_MINI_CART_CONTEXT_VALUE = {
 	labels: DEFAULT_LABELS,
 	openCart: () => {},
 	setIsUpdating: () => {},
-	spritemap: '',
 	summaryDataMapper: () => {},
 	toggleable: true,
 	updateCartModel: () => {},

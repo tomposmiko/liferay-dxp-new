@@ -27,6 +27,10 @@ public class BatchPlannerLogLocalServiceWrapper
 	implements BatchPlannerLogLocalService,
 			   ServiceWrapper<BatchPlannerLogLocalService> {
 
+	public BatchPlannerLogLocalServiceWrapper() {
+		this(null);
+	}
+
 	public BatchPlannerLogLocalServiceWrapper(
 		BatchPlannerLogLocalService batchPlannerLogLocalService) {
 
@@ -247,6 +251,14 @@ public class BatchPlannerLogLocalServiceWrapper
 
 		return _batchPlannerLogLocalService.fetchBatchPlannerLog(
 			batchPlannerLogId);
+	}
+
+	@Override
+	public com.liferay.batch.planner.model.BatchPlannerLog fetchBatchPlannerLog(
+		String batchEngineTaskERC, boolean export) {
+
+		return _batchPlannerLogLocalService.fetchBatchPlannerLog(
+			batchEngineTaskERC, export);
 	}
 
 	@Override

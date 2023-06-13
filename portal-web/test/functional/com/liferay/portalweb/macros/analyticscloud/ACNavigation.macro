@@ -6,6 +6,12 @@ definition {
 			value1 = "${headerTitle}");
 	}
 
+	macro backNavigation {
+		var key_pageName = "${pageName}";
+
+		Click(locator1 = "ACNavigation#BACK_NAVIGATION");
+	}
+
 	macro clickCancelButton {
 		Click(locator1 = "ACDXPSettings#AC_GENERIC_CANCEL_BUTTON");
 	}
@@ -38,6 +44,10 @@ definition {
 
 	macro goToAssets {
 		ACNavigation.goToSidebarOption(sidebarOption = "assets");
+	}
+
+	macro goToEventAnalysis {
+		ACNavigation.goToSidebarOption(sidebarOption = "event-analysis");
 	}
 
 	macro goToIndividuals {

@@ -27,6 +27,10 @@ public class CSDiagramEntryLocalServiceWrapper
 	implements CSDiagramEntryLocalService,
 			   ServiceWrapper<CSDiagramEntryLocalService> {
 
+	public CSDiagramEntryLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CSDiagramEntryLocalServiceWrapper(
 		CSDiagramEntryLocalService csDiagramEntryLocalService) {
 
@@ -270,6 +274,15 @@ public class CSDiagramEntryLocalServiceWrapper
 		getActionableDynamicQuery() {
 
 		return _csDiagramEntryLocalService.getActionableDynamicQuery();
+	}
+
+	@Override
+	public java.util.List
+		<com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry>
+			getCPDefinitionRelatedCSDiagramEntries(long cpDefinitionId) {
+
+		return _csDiagramEntryLocalService.
+			getCPDefinitionRelatedCSDiagramEntries(cpDefinitionId);
 	}
 
 	/**

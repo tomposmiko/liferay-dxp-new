@@ -44,7 +44,7 @@ definition {
 
 			PortalInstances.tearDownCP();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 
 			Site.tearDownCP();
 		}
@@ -64,7 +64,6 @@ definition {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "source-site-name");
 
 		LAR.importPortlet(
-			filePath = "enduser/collaboration/blogs",
 			larFileName = "Blogs.portlet.lar",
 			uploadFrom = "dependencies");
 
@@ -84,10 +83,11 @@ definition {
 	@priority = "4"
 	@refactordone
 	test CanImportEntryWithComment {
+		property testray.component.names = "Comment";
+
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
 		LAR.importPortlet(
-			filePath = "enduser/collaboration/blogs",
 			larFileName = "BlogWithComment.lar",
 			uploadFrom = "dependencies");
 

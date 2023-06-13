@@ -45,8 +45,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.net.URL;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -79,8 +77,16 @@ public abstract class BaseSourceCheck implements SourceCheck {
 
 	@Override
 	public boolean isEnabled(String absolutePath) {
-		return isAttributeValue(
-			SourceFormatterCheckUtil.ENABLED_KEY, absolutePath, true);
+		Class<?> clazz = getClass();
+
+		if (_filterCheckNames.contains(clazz.getSimpleName()) ||
+			isAttributeValue(
+				SourceFormatterCheckUtil.ENABLED_KEY, absolutePath, true)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -143,6 +149,11 @@ public abstract class BaseSourceCheck implements SourceCheck {
 	@Override
 	public void setFileExtensions(List<String> fileExtensions) {
 		_fileExtensions = fileExtensions;
+	}
+
+	@Override
+	public void setFilterCheckNames(List<String> filterCheckNames) {
+		_filterCheckNames = filterCheckNames;
 	}
 
 	@Override
@@ -547,16 +558,6 @@ public abstract class BaseSourceCheck implements SourceCheck {
 			return new FileInputStream(file);
 		}
 
-		String portalBranchName = getAttributeValue(
-			SourceFormatterUtil.GIT_LIFERAY_PORTAL_BRANCH, absolutePath);
-
-		URL url = SourceFormatterUtil.getPortalGitURL(
-			fileName, portalBranchName);
-
-		if (url != null) {
-			return url.openStream();
-		}
-
 		return null;
 	}
 
@@ -829,6 +830,7 @@ public abstract class BaseSourceCheck implements SourceCheck {
 	private final Map<String, List<String>> _excludesValuesMap =
 		new ConcurrentHashMap<>();
 	private List<String> _fileExtensions;
+	private List<String> _filterCheckNames;
 	private int _maxDirLevel;
 	private int _maxLineLength;
 	private List<String> _pluginsInsideModulesDirectoryNames;

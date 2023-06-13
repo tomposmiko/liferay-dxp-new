@@ -11,8 +11,13 @@
 
 <tbody>
 <tr>
+	<td>ALERT_BOX</td>
+	<td>//div[@class='sidebar-body'] //div[contains(@class, 'alert')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>API_FIELD</td>
-	<td>//textarea[contains(@id, 'apiKey')]</td>
+	<td>//textarea[contains(@name, 'apiKey')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -46,8 +51,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FAILING_CHECK_CATEGORY_NAME</td>
+	<td>//button[contains(@class, 'panel-header') and contains(., '${failingCheckCategory}')]/.. //li[contains(.,'${failingCheckName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FAILING_CHECK_DETAIL_TEXT</td>
+	<td>//div[contains(@class, 'text-secondary') and contains(., '${key_text}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FAILING_CHECK_NAME</td>
 	<td>//span[contains(@class, 'text-secondary') and contains(@class, 'w-100') and contains(@class, 'c-inner') and contains (text(), '${failingCheckName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FAILING_CHECK_NAME_QUANTITY</td>
+	<td>//span[contains(@class, 'text-secondary') and contains(@class, 'w-100') and contains(@class, 'c-inner') and contains (text(), '${failingCheckName}')] //*[contains(@class,'badge-item')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -76,6 +96,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>LOCALE_BUTTON</td>
+	<td>//div[contains(@class,'sidebar-body')] //button[*[name()='svg'][contains(@class,'lexicon-icon')]]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>NO_ISSUES_MESSAGE</td>
 	<td>//div[contains(@class, 'font-weight-semi-bold')]</td>
 	<td></td>
@@ -91,8 +116,28 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PANEL_PAGE_URL</td>
+	<td>//div[contains(@class, 'sidebar-body')] //*[contains(@class, 'text-secondary') and contains(.,'${partialUrl}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PANEL_TITLE</td>
 	<td>//div[contains(@class, 'panel-title')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREFERRED_STRATEGY_DROPDOWN</td>
+	<td>//*[contains(.,'Preferred Strategy')] //div[contains(@class, 'form-builder-select-field')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREFERRED_STRATEGY_OPTION</td>
+	<td>//button[@label='${strategy}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREFERRED_STRATEGY_OPTION_SELECTED</td>
+	<td>//*[contains(.,'Preferred Strategy')] //div[contains(@class, 'form-builder-select-field')] //div[@class='option-selected']</td>
 	<td></td>
 </tr>
 <tr>

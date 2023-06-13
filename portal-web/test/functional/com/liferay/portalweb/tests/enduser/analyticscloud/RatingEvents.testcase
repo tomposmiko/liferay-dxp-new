@@ -61,13 +61,11 @@ definition {
 		}
 
 		task ("View the blog entry and rate it") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
-
-			BlogsNavigator.gotoEntryPG(
-				entryContent = "This is the blog test for AC",
-				entryTitle = "Blogs AC Title");
 
 			Ratings.rateThumb(
 				blogRating = "true",

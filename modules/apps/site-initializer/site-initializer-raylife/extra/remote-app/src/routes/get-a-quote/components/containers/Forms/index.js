@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {STORAGE_KEYS, Storage} from '~/common/services/liferay/storage';
-import {useStepWizard} from '~/routes/get-a-quote/hooks/useStepWizard';
-import {AVAILABLE_STEPS} from '~/routes/get-a-quote/utils/constants';
+import {useStepWizard} from '../../../hooks/useStepWizard';
+import {AVAILABLE_STEPS} from '../../../utils/constants';
+import {getLoadedContentFlag} from '../../../utils/util';
 
 import {FormBasicBusinessInformation} from './Basics/BusinessInformation';
 import {FormBasicBusinessType} from './Basics/BusinessType';
@@ -14,10 +14,11 @@ const compare = (a, b) => {
 	return a.section === b.section && a.subsection === b.subsection;
 };
 
-export const Forms = ({form}) => {
+export function Forms({form}) {
 	const {selectedStep, setSection} = useStepWizard();
 	const [loaded, setLoaded] = useState(false);
 	const [loadedSections, setLoadedSections] = useState(false);
+	const {backToEdit} = getLoadedContentFlag();
 
 	useEffect(() => {
 		if (!loaded && form) {
@@ -27,33 +28,35 @@ export const Forms = ({form}) => {
 	}, [form]);
 
 	useEffect(() => {
-		if (
-			loaded &&
-			Storage.itemExist(STORAGE_KEYS.BACK_TO_EDIT) &&
-			JSON.parse(Storage.getItem(STORAGE_KEYS.BACK_TO_EDIT))
-		) {
+		if (backToEdit) {
 			loadSections();
-		} else {
+		}
+		else {
 			setLoadedSections(true);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [loaded]);
 
 	const loadSections = () => {
-		const stepName = Object.keys(form)[
-			Object.keys(form).length - 1
-		].toLowerCase();
+		const sectionFormKeys = Object.keys(form);
+
+		const stepName = sectionFormKeys[
+			sectionFormKeys.length - 1
+		]?.toLowerCase();
+
 		switch (stepName) {
 			case 'basics':
 				const stepBasicName = Object.keys(form?.basics)[
 					Object.keys(form?.basics).length - 1
-				].toLowerCase();
+				]?.toLowerCase();
 
 				if (stepBasicName === 'businessInformation') {
 					setSection(AVAILABLE_STEPS.BASICS_BUSINESS_INFORMATION);
-				} else if (stepBasicName === 'business-type') {
+				}
+				else if (stepBasicName === 'business-type') {
 					setSection(AVAILABLE_STEPS.BASICS_BUSINESS_TYPE);
-				} else {
+				}
+				else {
 					setSection(AVAILABLE_STEPS.BASICS_PRODUCT_QUOTE);
 				}
 				break;
@@ -101,4 +104,4 @@ export const Forms = ({form}) => {
 	}
 
 	return <div></div>;
-};
+}

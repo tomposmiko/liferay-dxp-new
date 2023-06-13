@@ -18,7 +18,7 @@ AUI.add(
 		var AArray = A.Array;
 		var Lang = A.Lang;
 
-		var BODY = A.getBody();
+		var BODY = document.body;
 
 		var instanceOf = A.instanceOf;
 		var isArray = Array.isArray;
@@ -257,24 +257,22 @@ AUI.add(
 
 				validator: {
 					setter(val) {
-						var config = A.merge(
-							{
-								fieldStrings: {
-									name: {
-										required: Liferay.Language.get(
-											'this-field-is-required'
-										),
-									},
-								},
-								rules: {
-									name: {
-										required: true,
-										structureFieldName: true,
-									},
+						var config = {
+							fieldStrings: {
+								name: {
+									required: Liferay.Language.get(
+										'this-field-is-required'
+									),
 								},
 							},
-							val
-						);
+							rules: {
+								name: {
+									required: true,
+									structureFieldName: true,
+								},
+							},
+							...val,
+						};
 
 						return config;
 					},
@@ -797,8 +795,8 @@ AUI.add(
 				_toggleInputDirection(locale) {
 					var rtl = Liferay.Language.direction[locale] === 'rtl';
 
-					BODY.toggleClass('form-builder-ltr-inputs', !rtl);
-					BODY.toggleClass('form-builder-rtl-inputs', rtl);
+					BODY.classList.toggle('form-builder-ltr-inputs', !rtl);
+					BODY.classList.toggle('form-builder-rtl-inputs', rtl);
 				},
 
 				_toggleOptionsEditorInputs(editor) {
@@ -972,10 +970,10 @@ AUI.add(
 					field.set('strings', instance.get('strings'));
 
 					var fieldHiddenAttributeMap = {
-						checkbox: instance.MAP_HIDDEN_FIELD_ATTRS.checkbox,
+						'checkbox': instance.MAP_HIDDEN_FIELD_ATTRS.checkbox,
 						'ddm-separator':
 							instance.MAP_HIDDEN_FIELD_ATTRS.separator,
-						default: instance.MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
+						'default': instance.MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
 					};
 
 					var hiddenAtributes =
@@ -1127,7 +1125,7 @@ AUI.add(
 						!A.Text.Unicode.test(item, 'L') &&
 						!A.Text.Unicode.test(item, 'N') &&
 						!A.Text.Unicode.test(item, 'Pd') &&
-						item != STR_UNDERSCORE
+						item !== STR_UNDERSCORE
 					) {
 						key = key.replace(item, STR_SPACE);
 					}
@@ -1173,7 +1171,7 @@ AUI.add(
 						!A.Text.Unicode.test(item, 'L') &&
 						!A.Text.Unicode.test(item, 'N') &&
 						!A.Text.Unicode.test(item, 'Pd') &&
-						item != STR_UNDERSCORE
+						item !== STR_UNDERSCORE
 					) {
 						valid = false;
 

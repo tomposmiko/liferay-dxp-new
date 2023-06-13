@@ -22,6 +22,7 @@ import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormTemplateContextFactory;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.form.web.internal.configuration.DDMFormWebConfiguration;
+import com.liferay.dynamic.data.mapping.form.web.internal.configuration.activator.FFSubmissionsSettingsConfigurationActivator;
 import com.liferay.dynamic.data.mapping.form.web.internal.instance.lifecycle.AddDefaultSharedFormLayoutPortalInstanceLifecycleListener;
 import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesSerializer;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordWriterTracker;
@@ -157,6 +158,33 @@ public class DDMFormAdminDisplayContextTest extends PowerMockito {
 
 		Assert.assertEquals(
 			getSharedFormURL(), _ddmFormAdminDisplayContext.getSharedFormURL());
+	}
+
+	@Test
+	public void testIsShowPartialResultsToRespondents() throws Exception {
+		Assert.assertFalse(
+			_ddmFormAdminDisplayContext.isShowPartialResultsToRespondents(
+				null));
+
+		DDMFormInstanceSettings ddmFormInstanceSettings = mock(
+			DDMFormInstanceSettings.class);
+
+		DDMFormInstance ddmFormInstance = _mockDDMFormInstance(
+			ddmFormInstanceSettings);
+
+		Assert.assertFalse(
+			_ddmFormAdminDisplayContext.isShowPartialResultsToRespondents(
+				ddmFormInstance));
+
+		when(
+			ddmFormInstanceSettings.showPartialResultsToRespondents()
+		).thenReturn(
+			true
+		);
+
+		Assert.assertTrue(
+			_ddmFormAdminDisplayContext.isShowPartialResultsToRespondents(
+				ddmFormInstance));
 	}
 
 	protected String getSharedFormURL() {
@@ -304,8 +332,10 @@ public class DDMFormAdminDisplayContextTest extends PowerMockito {
 			mock(DDMFormWebConfiguration.class),
 			mock(DDMStorageAdapterTracker.class),
 			mock(DDMStructureLocalService.class),
-			mock(DDMStructureService.class), mock(JSONFactory.class),
-			mock(NPMResolver.class), null, mock(Portal.class));
+			mock(DDMStructureService.class),
+			mock(FFSubmissionsSettingsConfigurationActivator.class),
+			mock(JSONFactory.class), mock(NPMResolver.class), null,
+			mock(Portal.class));
 	}
 
 	protected void setUpLanguageUtil() {
@@ -369,6 +399,21 @@ public class DDMFormAdminDisplayContextTest extends PowerMockito {
 		);
 
 		return ddmFormContextToDDMFormValues;
+	}
+
+	private DDMFormInstance _mockDDMFormInstance(
+			DDMFormInstanceSettings ddmFormInstanceSettings)
+		throws Exception {
+
+		DDMFormInstance ddmFormInstance = mock(DDMFormInstance.class);
+
+		when(
+			ddmFormInstance.getSettingsModel()
+		).thenReturn(
+			ddmFormInstanceSettings
+		);
+
+		return ddmFormInstance;
 	}
 
 	private String _read(String fileName) throws Exception {

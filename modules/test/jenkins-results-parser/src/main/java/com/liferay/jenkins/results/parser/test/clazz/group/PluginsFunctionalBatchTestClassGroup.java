@@ -89,6 +89,7 @@ public class PluginsFunctionalBatchTestClassGroup
 			getJobName());
 	}
 
+	@Override
 	protected List<List<String>> getPoshiTestClassGroups(File testBaseDir) {
 		String query = getTestBatchRunPropertyQuery(testBaseDir);
 
@@ -131,8 +132,6 @@ public class PluginsFunctionalBatchTestClassGroup
 					portalWorkingDirectory,
 					"portal-web/test/test-portal-web-ext.properties"),
 				new File(testBaseDir, "test.properties"));
-
-			properties.setProperty("ignore.errors.util.classes", "true");
 
 			if (!JenkinsResultsParserUtil.isNullOrEmpty(testBaseDirPath)) {
 				properties.setProperty("test.base.dir.name", testBaseDirPath);

@@ -254,11 +254,13 @@ definition {
 		Navigator.openSpecificURL(url = "http://www.able.com:8080/site-page");
 
 		AssertElementPresent(locator1 = "//link[@hreflang='x-default'][@href='http://www.able.com:8080']");
+
 		AssertElementPresent(locator1 = "//link[@hreflang='en-US'][@href='http://www.able.com:8080']");
 
 		Navigator.openSpecificURL(url = "http://www.able.com:8080");
 
 		AssertElementPresent(locator1 = "//link[@hreflang='x-default'][@href='http://www.able.com:8080']");
+
 		AssertElementPresent(locator1 = "//link[@hreflang='en-US'][@href='http://www.able.com:8080']");
 	}
 
@@ -396,18 +398,17 @@ definition {
 		}
 
 		task ("View the inline text is localized on Home page") {
-			AssertTextEquals(
-				key_fragmentName = "heading",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "Bienvenido a Liferay");
+			ContentPages.viewFragmentText(
+				fragmentName = "heading",
+				id = "element-text",
+				text = "Bienvenido a Liferay");
 		}
 
 		task ("View the tree page is shown on Home page") {
-			AssertVisible(
+			ContentPages.viewFragmentImage(
+				fragmentName = "image",
 				id = "image-square",
-				key_image = "tree.png",
-				key_imageDescription = "Responsive Image",
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_IMAGE_PROPERTIES");
+				image = "tree.png");
 		}
 
 		task ("View the default instance language is Spanish") {
@@ -459,6 +460,66 @@ definition {
 		}
 	}
 
+	@description = "This is a use case for LRQA-67974 for user available time zones restricted by instance available time zones."
+	@priority = "3"
+	test RestrictInstanceAvailableTimeZones {
+		property custom.properties = "time.zones=America/Phoenix,UTC,Asia/Tokyo";
+		property test.name.skip.portal.instance = "Locale#RestrictInstanceAvailableTimeZones";
+
+		User.firstLoginPG();
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Instance Settings");
+
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Localization",
+			configurationName = "Time Zone",
+			configurationScope = "Virtual Instance Scope");
+
+		task ("Assert some default available time zones for instances and users") {
+			Click(locator1 = "Select#TIME_ZONE");
+
+			for (var timeZone : list "(UTC -11:00) Samoa Standard Time,(UTC -10:00) Hawaii Standard Time") {
+				AssertTextNotPresent(
+					locator1 = "Select#TIME_ZONE",
+					value1 = "${timeZone}");
+			}
+
+			for (var timeZone : list "(UTC -07:00) Mountain Standard Time (America/Phoenix),(UTC) Coordinated Universal Time,(UTC +09:00) Japan Standard Time") {
+				AssertTextPresent(
+					locator1 = "Select#TIME_ZONE",
+					value1 = "${timeZone}");
+			}
+		}
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.gotoEditCP(userScreenName = "test");
+
+		UserNavigator.gotoDisplaySettings();
+
+		task ("Assert some default available time zones for instances and users") {
+			Click(locator1 = "Select#TIME_ZONE");
+
+			for (var timeZone : list "(UTC -11:00) Samoa Standard Time,(UTC -10:00) Hawaii Standard Time") {
+				AssertTextNotPresent(
+					locator1 = "Select#TIME_ZONE",
+					value1 = "${timeZone}");
+			}
+
+			for (var timeZone : list "(UTC -07:00) Mountain Standard Time (America/Phoenix),(UTC) Coordinated Universal Time,(UTC +09:00) Japan Standard Time") {
+				AssertTextPresent(
+					locator1 = "Select#TIME_ZONE",
+					value1 = "${timeZone}");
+			}
+		}
+	}
+
 	@priority = "3"
 	test UserLockoutShowsTimezoneInformation {
 		property test.name.skip.portal.instance = "Locale#UserLockoutShowsTimezoneInformation";
@@ -472,7 +533,7 @@ definition {
 			configurationName = "Time Zone",
 			configurationScope = "Virtual Instance Scope");
 
-		PortalSettings.configureTimeZone(timeZone = "(UTC +02:00) Central European Summer Time");
+		PortalSettings.configureTimeZone(timeZone = "(UTC +05:00) Pakistan Time");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -502,7 +563,7 @@ definition {
 		task ("Assert Timezone is included with account lockout message.") {
 			AssertTextEquals.assertPartialText(
 				locator1 = "Message#ERROR_DISMISSIBLE",
-				value1 = "CEST.");
+				value1 = "PKT.");
 		}
 	}
 
@@ -566,7 +627,7 @@ definition {
 		task ("Assert the default enabled locales in Web Content match what is normally available") {
 			Click(locator1 = "Button#LOCALIZATION_GENERIC");
 
-			for (var language : list "ar_SA,ca_ES,zh_CN,nl_NL,fi_FI,fr_FR,de_DE,hu_HU,ja_JP,pt_BR,es_ES,sv_SE") {
+			for (var language : list "ar-SA,ca-ES,zh-CN,nl-NL,fi-FI,fr-FR,de-DE,hu-HU,ja-JP,pt-BR,es-ES,sv-SE") {
 				AssertElementPresent(
 					key_locale = "${language}",
 					locator1 = "Translation#LOCALIZATION_NAME");
@@ -574,8 +635,10 @@ definition {
 		}
 	}
 
-	@priority = "4"
+	@priority = "5"
 	test ViewLocaleInNewVirtualInstance {
+		property portal.acceptance = "true";
+		property test.assert.warning.exceptions = "true";
 		property test.name.skip.portal.instance = "Locale#ViewLocaleInNewVirtualInstance";
 
 		User.firstLoginPG();
@@ -593,6 +656,13 @@ definition {
 			domain = "www.able.com",
 			portalInstanceId = "www.able.com",
 			virtualHost = "www.able.com");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "System",
+			panel = "Control Panel",
+			portlet = "Virtual Instances");
+
+		PortalInstances.viewCP(virtualHost = "www.able.com");
 
 		User.firstLoginUI(
 			localization = "IT",
@@ -651,7 +721,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test Page");
+		PagesAdmin.addPublicPage(pageName = "Test Page");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",

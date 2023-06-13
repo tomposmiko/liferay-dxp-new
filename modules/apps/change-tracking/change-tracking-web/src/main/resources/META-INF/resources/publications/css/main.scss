@@ -378,6 +378,11 @@ table.publications-render-view {
 		padding-left: 0;
 	}
 
+	.btn.active {
+		background-color: rgba(39, 40, 51, 0.06);
+		color: #272833;
+	}
+
 	.publication-name {
 		color: #272833;
 		font-size: 18px;
@@ -392,8 +397,7 @@ table.publications-render-view {
 
 .publications-view-changes-wrapper {
 	.breadcrumb {
-		padding-bottom: 0;
-		padding-top: 0;
+		margin-bottom: 20px;
 	}
 
 	.management-bar {
@@ -411,8 +415,6 @@ table.publications-render-view {
 	}
 
 	.publications-changes-content {
-		margin-top: 20px;
-
 		.panel-body {
 			margin-top: 1rem;
 			padding-bottom: 0;

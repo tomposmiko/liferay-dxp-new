@@ -14,20 +14,15 @@
 
 import ClayButton from '@clayui/button';
 import classnames from 'classnames';
-import React from 'react';
+import React, {useState} from 'react';
 
 import * as DefaultVariant from '../../../core/components/PageRenderer/DefaultVariant.es';
 import {useConfig} from '../../../core/hooks/useConfig.es';
 import {MultiStep} from '../components/MultiStep.es';
 import {PaginationControls} from '../components/PaginationControls.es';
+import PartialResults from '../components/PartialResults';
 
-export const Column = ({
-	children,
-	column,
-	columnRef,
-	editable,
-	...otherProps
-}) => {
+export function Column({children, column, columnRef, editable, ...otherProps}) {
 	const firstField = column.fields[0];
 
 	return (
@@ -42,11 +37,11 @@ export const Column = ({
 			{children}
 		</DefaultVariant.Column>
 	);
-};
+}
 
 Column.displayName = 'WizardVariant.Column';
 
-export const Container = ({
+export function Container({
 	activePage,
 	children,
 	editable,
@@ -54,56 +49,93 @@ export const Container = ({
 	pages,
 	readOnly,
 	strings = null,
-}) => {
-	const {showSubmitButton, submitLabel} = useConfig();
+}) {
+	const [showReport, setShowReport] = useState(false);
+
+	const {
+		ffShowPartialResultsEnabled,
+		formReportDataURL,
+		hasDescription,
+		showSubmitButton,
+		submitLabel,
+	} = useConfig();
+
+	const onClick = () => {
+		setShowReport(true);
+	};
+
+	if (showReport) {
+		const alertElement = document.querySelector(
+			'.lfr-ddm__show-partial-results-alert'
+		);
+
+		alertElement.classList.add(
+			'lfr-ddm__show-partial-results-alert--hidden'
+		);
+	}
 
 	return (
-		<div className="ddm-form-page-container wizard">
-			{pages.length > 1 && pageIndex === activePage && (
-				<MultiStep
-					activePage={activePage}
-					editable={editable}
-					pages={pages}
+		<>
+			{showReport ? (
+				<PartialResults
+					hasDescription={hasDescription}
+					onShow={() => setShowReport(false)}
+					reportDataURL={formReportDataURL}
 				/>
-			)}
-
-			<div
-				className={classnames(
-					'ddm-layout-builder ddm-page-container-layout',
-					{
-						hide: activePage !== pageIndex,
-					}
-				)}
-			>
-				<div className="form-builder-layout">{children}</div>
-			</div>
-
-			{pageIndex === activePage && (
-				<>
-					{pages.length > 0 && (
-						<PaginationControls
+			) : (
+				<div className="ddm-form-page-container wizard">
+					{pages.length > 1 && pageIndex === activePage && (
+						<MultiStep
 							activePage={activePage}
-							readOnly={readOnly}
-							showSubmitButton={showSubmitButton}
-							strings={strings}
-							submitLabel={submitLabel}
-							total={pages.length}
+							editable={editable}
+							pages={pages}
 						/>
 					)}
 
-					{!pages.length && showSubmitButton && (
-						<ClayButton
-							className="float-right lfr-ddm-form-submit"
-							id="ddm-form-submit"
-							type="submit"
-						>
-							{submitLabel}
-						</ClayButton>
+					<div
+						className={classnames(
+							'ddm-layout-builder ddm-page-container-layout',
+							{
+								hide: activePage !== pageIndex,
+							}
+						)}
+					>
+						<div className="form-builder-layout">{children}</div>
+					</div>
+
+					{pageIndex === activePage && (
+						<>
+							{pages.length > 0 && (
+								<PaginationControls
+									activePage={activePage}
+									onClick={onClick}
+									readOnly={readOnly}
+									showSubmitButton={showSubmitButton}
+									strings={strings}
+									submitLabel={submitLabel}
+									total={pages.length}
+								/>
+							)}
+
+							{!pages.length && showSubmitButton && (
+								<ClayButton
+									className={
+										ffShowPartialResultsEnabled
+											? 'float-left'
+											: 'float-right'
+									}
+									id="ddm-form-submit"
+									type="submit"
+								>
+									{submitLabel}
+								</ClayButton>
+							)}
+						</>
 					)}
-				</>
+				</div>
 			)}
-		</div>
+		</>
 	);
-};
+}
 
 Container.displayName = 'WizardVariant.Container';

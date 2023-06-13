@@ -40,15 +40,13 @@ definition {
 		Pause(locator1 = "10000");
 
 		if (isSet(dmDocumentContent)) {
-			Pause(locator1 = "10000");
+			WaitForElementPresent(locator1 = "OneDrive#DOCUMENTS_CONTENT");
 
-			Click(locator1 = "OneDrive#DOCUMENTS_CONTENT");
-
-			Pause(locator1 = "10000");
-
-			Type(
+			Type.sendKeys(
 				locator1 = "OneDrive#DOCUMENTS_CONTENT",
 				value1 = "${dmDocumentContent}");
+
+			WaitForElementPresent(locator1 = "OneDrive#DOCUMENTS_SAVE_STATUS");
 		}
 
 		Navigator.closeWindow();
@@ -73,11 +71,19 @@ definition {
 	macro editTitle {
 		Pause(locator1 = "10000");
 
+		WaitForPageLoad();
+
 		SelectWindow.selectPopUp(locator1 = "null");
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#WEB_APPLICATION");
 
 		Click(locator1 = "OneDrive#DOCUMENTS_TITLE");
+
+		if (IsElementNotPresent(locator1 = "OneDrive#DOCUMENTS_TITLE_RENAME")) {
+			while (IsElementNotPresent(locator1 = "OneDrive#DOCUMENTS_TITLE_RENAME")) {
+				Click(locator1 = "OneDrive#DOCUMENTS_TITLE");
+			}
+		}
 
 		Type(
 			locator1 = "OneDrive#DOCUMENTS_TITLE_RENAME",
@@ -86,6 +92,10 @@ definition {
 		KeyPress(
 			locator1 = "OneDrive#DOCUMENTS_TITLE_RENAME",
 			value1 = "\RETURN");
+
+		WaitForPageLoad();
+
+		WaitForElementPresent(locator1 = "OneDrive#DOCUMENTS_SAVE_STATUS");
 
 		Navigator.closeWindow();
 

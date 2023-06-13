@@ -638,20 +638,21 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 	}
 
 	@Test
-	public void testPutAssetLibraryStructuredContentFolderPermission()
+	public void testPutAssetLibraryStructuredContentFolderPermissionsPage()
 		throws Exception {
 
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		StructuredContentFolder structuredContentFolder =
-			testPutAssetLibraryStructuredContentFolderPermission_addStructuredContentFolder();
+			testPutAssetLibraryStructuredContentFolderPermissionsPage_addStructuredContentFolder();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			structuredContentFolderResource.
-				putAssetLibraryStructuredContentFolderPermissionHttpResponse(
+				putAssetLibraryStructuredContentFolderPermissionsPageHttpResponse(
 					testDepotEntry.getDepotEntryId(),
 					new Permission[] {
 						new Permission() {
@@ -665,7 +666,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			structuredContentFolderResource.
-				putAssetLibraryStructuredContentFolderPermissionHttpResponse(
+				putAssetLibraryStructuredContentFolderPermissionsPageHttpResponse(
 					testDepotEntry.getDepotEntryId(),
 					new Permission[] {
 						new Permission() {
@@ -678,7 +679,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 	}
 
 	protected StructuredContentFolder
-			testPutAssetLibraryStructuredContentFolderPermission_addStructuredContentFolder()
+			testPutAssetLibraryStructuredContentFolderPermissionsPage_addStructuredContentFolder()
 		throws Exception {
 
 		return structuredContentFolderResource.
@@ -1134,20 +1135,21 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 	}
 
 	@Test
-	public void testPutSiteStructuredContentFolderPermission()
+	public void testPutSiteStructuredContentFolderPermissionsPage()
 		throws Exception {
 
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		StructuredContentFolder structuredContentFolder =
-			testPutSiteStructuredContentFolderPermission_addStructuredContentFolder();
+			testPutSiteStructuredContentFolderPermissionsPage_addStructuredContentFolder();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			structuredContentFolderResource.
-				putSiteStructuredContentFolderPermissionHttpResponse(
+				putSiteStructuredContentFolderPermissionsPageHttpResponse(
 					structuredContentFolder.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1161,7 +1163,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			structuredContentFolderResource.
-				putSiteStructuredContentFolderPermissionHttpResponse(
+				putSiteStructuredContentFolderPermissionsPageHttpResponse(
 					structuredContentFolder.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1174,7 +1176,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 	}
 
 	protected StructuredContentFolder
-			testPutSiteStructuredContentFolderPermission_addStructuredContentFolder()
+			testPutSiteStructuredContentFolderPermissionsPage_addStructuredContentFolder()
 		throws Exception {
 
 		return structuredContentFolderResource.postSiteStructuredContentFolder(
@@ -1205,18 +1207,21 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 	}
 
 	@Test
-	public void testPutStructuredContentFolderPermission() throws Exception {
+	public void testPutStructuredContentFolderPermissionsPage()
+		throws Exception {
+
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		StructuredContentFolder structuredContentFolder =
-			testPutStructuredContentFolderPermission_addStructuredContentFolder();
+			testPutStructuredContentFolderPermissionsPage_addStructuredContentFolder();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			structuredContentFolderResource.
-				putStructuredContentFolderPermissionHttpResponse(
+				putStructuredContentFolderPermissionsPageHttpResponse(
 					structuredContentFolder.getId(),
 					new Permission[] {
 						new Permission() {
@@ -1230,7 +1235,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			structuredContentFolderResource.
-				putStructuredContentFolderPermissionHttpResponse(
+				putStructuredContentFolderPermissionsPageHttpResponse(
 					0L,
 					new Permission[] {
 						new Permission() {
@@ -1243,7 +1248,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 	}
 
 	protected StructuredContentFolder
-			testPutStructuredContentFolderPermission_addStructuredContentFolder()
+			testPutStructuredContentFolderPermissionsPage_addStructuredContentFolder()
 		throws Exception {
 
 		return structuredContentFolderResource.postSiteStructuredContentFolder(

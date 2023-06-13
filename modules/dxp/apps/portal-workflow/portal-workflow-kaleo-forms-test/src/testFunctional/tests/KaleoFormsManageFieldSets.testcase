@@ -15,7 +15,7 @@ definition {
 		User.firstLoginPG();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Kaleo Forms Admin");
 
 		KaleoFormsAdmin.addProcess();
@@ -70,89 +70,101 @@ definition {
 
 			Workflow.tearDownWorkflowDefinitions();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 		}
 	}
 
 	@description = "Verify that the user can create a new field set on Manage FIeld Sets Area."
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanCreateANewFieldSet {
+		Click(locator1 = "Button#PLUS");
 
-		// TODO LRQA-70705 CanCreateANewFieldSet pending implementation
-
+		KaleoFormsManageFieldSets.createNewFieldSet(
+			fieldSetName = "New Field Set",
+			fieldType = "Text");
 	}
 
 	@description = "Verify that the user can delete a field set."
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanDeleteAFieldSet {
+		KaleoFormsManageFieldSets.deleteOneFieldSet(fieldSetName = "Inventory");
 
-		// TODO LRQA-70707 CanDeleteAFieldSet pending implementation
-
+		KaleoFormsManageFieldSets.viewFieldSetCannotBeFound(fieldSetName = "Inventory");
 	}
 
 	@description = "Verify that user can filter by modified date and ID."
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanFilterByModifiedDate {
+		ManagementBar.setFilterAndOrder(filterBy = "Modified Date");
 
-		// TODO LRQA-70711 CanFilterByModifiedDate pending implementation
+		KaleoFormsManageFieldSets.viewFieldSetOrder(fieldSetList = "Contacts,Events,Inventory,Issues Tracking,Meeting Minutes,To Do");
 
+		KaleoFormsManageFieldSets.editFieldSets(
+			nameFieldset = "Contacts",
+			newNameFieldset = "Contacts Test");
+
+		ManagementBar.setFilterAndOrder(filterBy = "Modified Date");
+
+		KaleoFormsManageFieldSets.viewFieldSetOrder(fieldSetList = "Events,Inventory,Issues Tracking,Meeting Minutes,To Do,Contacts Test");
 	}
 
 	@description = "Verify that the user can not delete a field set that is required by one or more templates."
-	@ignore = "Test Stub"
 	@priority = "4"
-	test CanNotDeleteFieldSets {
-
-		// TODO LRQA-70709 CanNotDeleteFieldSets pending implementation
-
+	test CanNotDeleteFieldSetInUse {
+		KaleoFormsManageFieldSets.viewFieldSetCannotBeDeleted(fieldSetName = "Contacts");
 	}
 
 	@description = "Verify that user can Reverse sort Direction and if the elements reverse position."
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanReverseSortDirectionTheElement {
+		KaleoFormsManageFieldSets.clickFilterAndOrderBy(filterOption = "ID");
 
-		// TODO LRQA-70710 CanReverseSortDirectionTheElement pending implementation
+		KaleoFormsManageFieldSets.viewUpDirectionOfSortButton();
 
+		KaleoFormsManageFieldSets.viewFieldSetOrder(fieldSetList = "Contacts,Events,Inventory,Issues Tracking,Meeting Minutes,To Do");
+
+		Workflow.clickRevertSortDirection();
+
+		KaleoFormsManageFieldSets.viewFieldSetOrder(fieldSetList = "To Do,Meeting Minutes,Issues Tracking,Inventory,Events,Contacts");
 	}
 
 	@description = "Verify that the user can search for a field set on manage field set page."
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanSearchFieldSet {
-
-		// TODO LRQA-70706 CanSearchFieldSet pending implementation
-
+		KaleoFormsManageFieldSets.searchFieldSet(fieldSetName = "Inventory");
 	}
 
 	@description = "Verify that user can view of values on columns -ID-, -Name-,  -Description-, -Scope-, -Modified Date-."
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanViewValuesOnColumns {
+		KaleoFormsManageFieldSets.editFieldSets(
+			nameFieldset = "Contacts",
+			newDescription = "Contacts description edited",
+			newNameFieldset = "Contacts Edited");
 
-		// TODO LRQA-70712 CanViewValuesOnColumns pending implementation
-
+		KaleoFormsManageFieldSets.viewValuesOnColumns(
+			descriptionField = "Contacts description edited",
+			modifiedDateField = "0 Seconds Ago",
+			nameField = "Contacts Edited",
+			rowNumber = "6");
 	}
 
 	@description = "Verify that the user can navigate to the next page."
-	@ignore = "Test Stub"
 	@priority = "3"
 	test NavigateToTheNextPage {
+		Pagination.changePagination(itemsPerPage = "4");
 
-		// TODO LRQA-70713 NavigateToTheNextPage pending implementation
+		KaleoFormsAdmin.viewNextFieldSetPage();
 
+		Pagination.viewResults(results = "Showing 5 to 6 of 6 entries.");
+
+		KaleoFormsManageFieldSets.viewPageNumber(pageNumberList = "2");
 	}
 
 	@description = "Verify that when there are no results for the search, it displays the message -No Field Sets were found-."
-	@ignore = "Test Stub"
 	@priority = "3"
 	test NotViewResultTheSearch {
-
-		// TODO LRQA-70708 NotViewResultTheSearch pending implementation
-
+		KaleoFormsManageFieldSets.viewFieldSetCannotBeFound(fieldSetName = "Acrw23f");
 	}
 
 }

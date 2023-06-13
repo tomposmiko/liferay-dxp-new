@@ -14,22 +14,17 @@
 
 package com.liferay.site.initializer.extender.internal;
 
+import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
-import com.liferay.commerce.account.util.CommerceAccountRoleHelper;
-import com.liferay.commerce.currency.service.CommerceCurrencyLocalService;
-import com.liferay.commerce.initializer.util.CPDefinitionsImporter;
-import com.liferay.commerce.initializer.util.CommerceInventoryWarehousesImporter;
-import com.liferay.commerce.product.importer.CPFileImporter;
-import com.liferay.commerce.product.service.CPMeasurementUnitLocalService;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.dynamic.data.mapping.util.DefaultDDMStructureHelper;
 import com.liferay.fragment.importer.FragmentsImporter;
+import com.liferay.headless.admin.list.type.resource.v1_0.ListTypeDefinitionResource;
+import com.liferay.headless.admin.list.type.resource.v1_0.ListTypeEntryResource;
 import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyCategoryResource;
 import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyVocabularyResource;
-import com.liferay.headless.commerce.admin.catalog.resource.v1_0.CatalogResource;
-import com.liferay.headless.commerce.admin.channel.resource.v1_0.ChannelResource;
 import com.liferay.headless.delivery.resource.v1_0.DocumentFolderResource;
 import com.liferay.headless.delivery.resource.v1_0.DocumentResource;
 import com.liferay.headless.delivery.resource.v1_0.StructuredContentFolderResource;
@@ -39,6 +34,8 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServ
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
+import com.liferay.object.admin.rest.resource.v1_0.ObjectRelationshipResource;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -69,6 +66,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
 
@@ -94,11 +93,8 @@ public class SiteInitializerExtender
 
 		SiteInitializerExtension siteInitializerExtension =
 			new SiteInitializerExtension(
-				_assetListEntryLocalService, bundle, _bundleContext,
-				_catalogResourceFactory, _channelResourceFactory,
-				_commerceAccountRoleHelper, _commerceCurrencyLocalService,
-				_commerceInventoryWarehousesImporter, _cpDefinitionsImporter,
-				_cpFileImporter, _cpMeasurementUnitLocalService,
+				_assetCategoryLocalService, _assetListEntryLocalService, bundle,
+				_bundleContext, _commerceReferencesHolder,
 				_ddmStructureLocalService, _ddmTemplateLocalService,
 				_defaultDDMStructureHelper, _dlURLHelper,
 				_documentFolderResourceFactory, _documentResourceFactory,
@@ -107,8 +103,12 @@ public class SiteInitializerExtender
 				_layoutLocalService, _layoutPageTemplateEntryLocalService,
 				_layoutPageTemplatesImporter,
 				_layoutPageTemplateStructureLocalService,
-				_layoutSetLocalService, _objectDefinitionResourceFactory,
-				_objectEntryLocalService, _portal, _remoteAppEntryLocalService,
+				_layoutSetLocalService, _listTypeDefinitionResource,
+				_listTypeDefinitionResourceFactory, _listTypeEntryResource,
+				_listTypeEntryResourceFactory, _objectDefinitionLocalService,
+				_objectDefinitionResourceFactory,
+				_objectRelationshipResourceFactory, _objectEntryLocalService,
+				_portal, _remoteAppEntryLocalService,
 				_resourcePermissionLocalService, _roleLocalService,
 				_sapEntryLocalService, _settingsFactory,
 				_siteNavigationMenuItemLocalService,
@@ -154,35 +154,19 @@ public class SiteInitializerExtender
 	}
 
 	@Reference
+	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Reference
 	private AssetListEntryLocalService _assetListEntryLocalService;
 
 	private BundleContext _bundleContext;
 	private BundleTracker<?> _bundleTracker;
 
-	@Reference
-	private CatalogResource.Factory _catalogResourceFactory;
-
-	@Reference
-	private ChannelResource.Factory _channelResourceFactory;
-
-	@Reference
-	private CommerceAccountRoleHelper _commerceAccountRoleHelper;
-
-	@Reference
-	private CommerceCurrencyLocalService _commerceCurrencyLocalService;
-
-	@Reference
-	private CommerceInventoryWarehousesImporter
-		_commerceInventoryWarehousesImporter;
-
-	@Reference
-	private CPDefinitionsImporter _cpDefinitionsImporter;
-
-	@Reference
-	private CPFileImporter _cpFileImporter;
-
-	@Reference
-	private CPMeasurementUnitLocalService _cpMeasurementUnitLocalService;
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private CommerceReferencesHolder _commerceReferencesHolder;
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
@@ -235,10 +219,30 @@ public class SiteInitializerExtender
 	private LayoutSetLocalService _layoutSetLocalService;
 
 	@Reference
+	private ListTypeDefinitionResource _listTypeDefinitionResource;
+
+	@Reference
+	private ListTypeDefinitionResource.Factory
+		_listTypeDefinitionResourceFactory;
+
+	@Reference
+	private ListTypeEntryResource _listTypeEntryResource;
+
+	@Reference
+	private ListTypeEntryResource.Factory _listTypeEntryResourceFactory;
+
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
 	private ObjectDefinitionResource.Factory _objectDefinitionResourceFactory;
 
 	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Reference
+	private ObjectRelationshipResource.Factory
+		_objectRelationshipResourceFactory;
 
 	@Reference
 	private Portal _portal;

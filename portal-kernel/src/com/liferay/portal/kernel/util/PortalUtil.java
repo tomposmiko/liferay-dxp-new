@@ -949,6 +949,10 @@ public class PortalUtil {
 		return _portal.getFullName(firstName, middleName, lastName);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static String getGlobalLibDir() {
 		return _portal.getGlobalLibDir();
 	}
@@ -1986,10 +1990,6 @@ public class PortalUtil {
 
 	public static boolean isSystemRole(String roleName) {
 		return _portal.isSystemRole(roleName);
-	}
-
-	public static boolean isUpdateAvailable() {
-		return _portal.isUpdateAvailable();
 	}
 
 	public static boolean isValidResourceId(String resourceId) {

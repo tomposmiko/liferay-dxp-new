@@ -20,8 +20,10 @@ import ClayLabel from '@clayui/label';
 import ClayLayout from '@clayui/layout';
 import ClayLink from '@clayui/link';
 import ClayNavigationBar from '@clayui/navigation-bar';
+import ClayTable from '@clayui/table';
+import classNames from 'classnames';
 import {fetch} from 'frontend-js-web';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 const LocalizationDropdown = ({
 	currentLocale,
@@ -49,6 +51,7 @@ const LocalizationDropdown = ({
 								symbol={currentLocale.symbol}
 							/>
 						</span>
+
 						<span className="btn-section">
 							{currentLocale.label}
 						</span>
@@ -91,6 +94,7 @@ const LocalizationDropdown = ({
 												{locale.label}
 											</ClayLayout.ContentSection>
 										</ClayLayout.ContentCol>
+
 										<ClayLayout.ContentCol containerElement="span">
 											<ClayLayout.ContentSection>
 												<ClayLabel
@@ -122,22 +126,28 @@ const LocalizationDropdown = ({
 	);
 };
 
-export default ({
+export default function ChangeTrackingRenderView({
+	childEntries,
 	dataURL,
 	defaultLocale,
 	description,
 	discardURL,
 	getCache,
+	handleNavigation,
+	parentEntries,
 	showDropdown,
 	showHeader = true,
+	showHideable,
 	spritemap,
 	title,
 	updateCache,
-}) => {
+}) {
 	const CHANGE_TYPE_ADDED = 'added';
 	const CHANGE_TYPE_DELETED = 'deleted';
 	const CHANGE_TYPE_MODIFIED = 'modified';
 	const CHANGE_TYPE_PRODUCTION = 'production';
+	const CONTENT_TYPE_CHILDREN = 'children';
+	const CONTENT_TYPE_PARENTS = 'parents';
 	const CONTENT_TYPE_RENDER = 'data';
 	const CONTENT_TYPE_PREVIEW = 'display';
 	const VIEW_LEFT = 'VIEW_LEFT';
@@ -153,7 +163,15 @@ export default ({
 		view: VIEW_UNIFIED,
 	});
 
+	const dataURLRef = useRef(null);
+
 	useEffect(() => {
+		if (dataURL === dataURLRef.current) {
+			return;
+		}
+
+		dataURLRef.current = dataURL;
+
 		let cachedData = null;
 
 		if (getCache) {
@@ -163,7 +181,9 @@ export default ({
 		if (cachedData && cachedData.changeType) {
 			if (cachedData.changeType === CHANGE_TYPE_PRODUCTION) {
 				setState({
+					children: childEntries,
 					contentType: CONTENT_TYPE_RENDER,
+					parents: parentEntries,
 					renderData: cachedData,
 					view: VIEW_LEFT,
 				});
@@ -174,7 +194,9 @@ export default ({
 			}
 
 			const newState = {
+				children: childEntries,
 				contentType: CONTENT_TYPE_PREVIEW,
+				parents: parentEntries,
 				renderData: cachedData,
 				view: VIEW_UNIFIED,
 			};
@@ -265,7 +287,9 @@ export default ({
 				}
 
 				const newState = {
+					children: childEntries,
 					contentType: CONTENT_TYPE_PREVIEW,
+					parents: parentEntries,
 					renderData: json,
 					view: VIEW_UNIFIED,
 				};
@@ -338,7 +362,7 @@ export default ({
 					},
 				});
 			});
-	}, [dataURL, getCache, updateCache]);
+	}, [childEntries, dataURL, getCache, parentEntries, updateCache]);
 
 	let currentLocale = selectedLocale;
 	let currentTitle = title;
@@ -369,7 +393,9 @@ export default ({
 
 	const setContentType = (contentType) => {
 		setState({
+			children: state.children,
 			contentType,
+			parents: state.parents,
 			renderData: state.renderData,
 			view: state.view,
 		});
@@ -724,7 +750,11 @@ export default ({
 	};
 
 	const renderDiffLegend = () => {
-		if (state.view !== VIEW_UNIFIED) {
+		if (
+			(state.contentType !== CONTENT_TYPE_PREVIEW &&
+				state.contentType !== CONTENT_TYPE_RENDER) ||
+			state.view !== VIEW_UNIFIED
+		) {
 			return '';
 		}
 
@@ -742,9 +772,11 @@ export default ({
 					<span className="diff-html-added legend-item">
 						{Liferay.Language.get('added')}
 					</span>
+
 					<span className="diff-html-removed legend-item">
 						{Liferay.Language.get('deleted')}
 					</span>
+
 					<span className="diff-html-changed">
 						{Liferay.Language.get('format-changes')}
 					</span>
@@ -874,7 +906,9 @@ export default ({
 				label: getContentSelectTitle(view),
 				onClick: () => {
 					setState({
+						children: state.children,
 						contentType: state.contentType,
+						parents: state.parents,
 						renderData: state.renderData,
 						view,
 					});
@@ -977,6 +1011,91 @@ export default ({
 		);
 	};
 
+	const getTableRows = (nodes) => {
+		const rows = [];
+
+		if (!nodes) {
+			return rows;
+		}
+
+		let currentTypeName = '';
+
+		const filteredNodes = nodes
+			.filter((item) => showHideable || !item.hideable)
+			.sort((a, b) => {
+				const typeNameA = a.typeName.toLowerCase();
+				const typeNameB = b.typeName.toLowerCase();
+
+				if (typeNameA < typeNameB) {
+					return -1;
+				}
+
+				if (typeNameA > typeNameB) {
+					return 1;
+				}
+
+				const titleA = a.title.toLowerCase();
+				const titleB = b.title.toLowerCase();
+
+				if (titleA < titleB) {
+					return -1;
+				}
+
+				if (titleA > titleB) {
+					return 1;
+				}
+
+				return 0;
+			});
+
+		if (filteredNodes.length === 0) {
+			return (
+				<div className="taglib-empty-result-message">
+					<div className="taglib-empty-search-result-message-header" />
+
+					<div className="sheet-text text-center">
+						{Liferay.Language.get(
+							'there-are-no-changes-to-display-in-this-view'
+						)}
+					</div>
+				</div>
+			);
+		}
+
+		for (let i = 0; i < filteredNodes.length; i++) {
+			const node = filteredNodes[i];
+
+			if (node.typeName !== currentTypeName) {
+				currentTypeName = node.typeName;
+
+				rows.push(
+					<ClayTable.Row divider>
+						<ClayTable.Cell>{node.typeName}</ClayTable.Cell>
+					</ClayTable.Row>
+				);
+			}
+
+			rows.push(
+				<ClayTable.Row
+					className="cursor-pointer"
+					onClick={() => handleNavigation(node.nodeId)}
+				>
+					<ClayTable.Cell>
+						<div className="publication-name">{node.title}</div>
+
+						{node.description && (
+							<div className="publication-description">
+								{node.description}
+							</div>
+						)}
+					</ClayTable.Cell>
+				</ClayTable.Row>
+			);
+		}
+
+		return rows;
+	};
+
 	const renderEntry = () => {
 		if (!state.renderData) {
 			if (loading) {
@@ -1010,45 +1129,228 @@ export default ({
 		}
 
 		return (
-			<table className="publications-render-view table">
-				{renderToolbar()}
+			<ClayTable
+				className={classNames('publications-render-view', {
+					'publications-table':
+						state.contentType === CONTENT_TYPE_PARENTS ||
+						state.contentType === CONTENT_TYPE_CHILDREN,
+				})}
+				hover={
+					state.contentType === CONTENT_TYPE_PARENTS ||
+					state.contentType === CONTENT_TYPE_CHILDREN
+				}
+			>
+				<ClayTable.Head>{renderToolbar()}</ClayTable.Head>
 
-				{renderDividers()}
+				<ClayTable.Body>
+					{(state.contentType === CONTENT_TYPE_PREVIEW ||
+						state.contentType === CONTENT_TYPE_RENDER) && (
+						<>
+							{renderDividers()}
 
-				<tr>
-					{(state.view === VIEW_LEFT ||
-						state.view === VIEW_SPLIT) && (
-						<td className="publications-render-view-content">
-							{renderPreviewLeft()}
-						</td>
+							<tr>
+								{(state.view === VIEW_LEFT ||
+									state.view === VIEW_SPLIT) && (
+									<td className="publications-render-view-content">
+										{renderPreviewLeft()}
+									</td>
+								)}
+
+								{(state.view === VIEW_RIGHT ||
+									state.view === VIEW_SPLIT) && (
+									<td className="publications-render-view-content">
+										{renderPreviewRight()}
+									</td>
+								)}
+
+								{state.view === VIEW_UNIFIED && (
+									<td className="publications-render-view-content">
+										{renderPreviewUnified()}
+									</td>
+								)}
+							</tr>
+						</>
 					)}
 
-					{(state.view === VIEW_RIGHT ||
-						state.view === VIEW_SPLIT) && (
-						<td className="publications-render-view-content">
-							{renderPreviewRight()}
-						</td>
-					)}
+					{state.contentType === CONTENT_TYPE_PARENTS &&
+						getTableRows(state.parents)}
 
-					{state.view === VIEW_UNIFIED && (
-						<td className="publications-render-view-content">
-							{renderPreviewUnified()}
-						</td>
-					)}
-				</tr>
-			</table>
+					{state.contentType === CONTENT_TYPE_CHILDREN &&
+						getTableRows(state.children)}
+				</ClayTable.Body>
+			</ClayTable>
 		);
 	};
 
 	const renderToolbar = () => {
-		if (state.renderData.changeType === CHANGE_TYPE_PRODUCTION) {
-			return '';
-		}
-
 		let columns = 1;
 
-		if (state.view === VIEW_SPLIT) {
+		if (
+			state.contentType !== CONTENT_TYPE_PARENTS &&
+			state.contentType !== CONTENT_TYPE_CHILDREN &&
+			state.view === VIEW_SPLIT
+		) {
 			columns = 2;
+		}
+
+		const items = [];
+
+		items.push(
+			<ClayNavigationBar.Item
+				active={state.contentType === CONTENT_TYPE_PREVIEW}
+			>
+				<ClayLink
+					className={
+						!Object.prototype.hasOwnProperty.call(
+							state.renderData,
+							'leftPreview'
+						) &&
+						!Object.prototype.hasOwnProperty.call(
+							state.renderData,
+							'leftLocalizedPreview'
+						) &&
+						!Object.prototype.hasOwnProperty.call(
+							state.renderData,
+							'rightPreview'
+						) &&
+						!Object.prototype.hasOwnProperty.call(
+							state.renderData,
+							'rightLocalizedPreview'
+						)
+							? 'nav-link btn-link disabled'
+							: 'nav-link'
+					}
+					displayType="unstyled"
+					onClick={() => {
+						if (
+							state &&
+							state.view === VIEW_UNIFIED &&
+							state.renderData &&
+							!Object.prototype.hasOwnProperty.call(
+								state.renderData,
+								'unifiedPreview'
+							) &&
+							!Object.prototype.hasOwnProperty.call(
+								state.renderData,
+								'unifiedLocalizedPreview'
+							)
+						) {
+							setState({
+								children: state.children,
+								contentType: CONTENT_TYPE_PREVIEW,
+								parents: state.parents,
+								renderData: state.renderData,
+								view: VIEW_SPLIT,
+							});
+
+							return;
+						}
+
+						setContentType(CONTENT_TYPE_PREVIEW);
+					}}
+					title={
+						!Object.prototype.hasOwnProperty.call(
+							state.renderData,
+							'leftPreview'
+						) &&
+						!Object.prototype.hasOwnProperty.call(
+							state.renderData,
+							'leftLocalizedPreview'
+						) &&
+						!Object.prototype.hasOwnProperty.call(
+							state.renderData,
+							'rightPreview'
+						) &&
+						!Object.prototype.hasOwnProperty.call(
+							state.renderData,
+							'rightLocalizedPreview'
+						)
+							? Liferay.Language.get(
+									'item-does-not-have-a-content-display'
+							  )
+							: ''
+					}
+				>
+					{Liferay.Language.get('display')}
+				</ClayLink>
+			</ClayNavigationBar.Item>
+		);
+
+		items.push(
+			<ClayNavigationBar.Item
+				active={state.contentType === CONTENT_TYPE_RENDER}
+			>
+				<ClayLink
+					className="nav-link"
+					displayType="unstyled"
+					onClick={() => setContentType(CONTENT_TYPE_RENDER)}
+				>
+					{Liferay.Language.get('data')}
+				</ClayLink>
+			</ClayNavigationBar.Item>
+		);
+
+		if (
+			(state.parents && state.parents.length > 0) ||
+			(state.children && state.children.length > 0)
+		) {
+			items.push(
+				<div className="autofit-col row-divider">
+					<div />
+				</div>
+			);
+
+			items.push(
+				<ClayNavigationBar.Item
+					active={state.contentType === CONTENT_TYPE_PARENTS}
+				>
+					<ClayLink
+						className={
+							state.parents && state.parents.length > 0
+								? 'nav-link'
+								: 'nav-link btn-link disabled'
+						}
+						data-tooltip-align="top"
+						displayType="unstyled"
+						onClick={() => setContentType(CONTENT_TYPE_PARENTS)}
+						title={
+							state.parents && state.parents.length > 0
+								? ''
+								: Liferay.Language.get(
+										'item-does-not-have-any-parents'
+								  )
+						}
+					>
+						{Liferay.Language.get('parents')}
+					</ClayLink>
+				</ClayNavigationBar.Item>
+			);
+
+			items.push(
+				<ClayNavigationBar.Item
+					active={state.contentType === CONTENT_TYPE_CHILDREN}
+				>
+					<ClayLink
+						className={
+							state.children && state.children.length > 0
+								? 'nav-link'
+								: 'nav-link btn-link disabled'
+						}
+						data-tooltip-align="top"
+						displayType="unstyled"
+						onClick={() => setContentType(CONTENT_TYPE_CHILDREN)}
+						title={
+							state.children && state.children.length > 0
+								? ''
+								: Liferay.Language.get(
+										'item-does-not-have-any-children'
+								  )
+						}
+					>
+						{Liferay.Language.get('children')}
+					</ClayLink>
+				</ClayNavigationBar.Item>
+			);
 		}
 
 		return (
@@ -1063,104 +1365,7 @@ export default ({
 								spritemap={spritemap}
 								triggerLabel={Liferay.Language.get('display')}
 							>
-								<ClayNavigationBar.Item
-									active={
-										state.contentType ===
-										CONTENT_TYPE_PREVIEW
-									}
-								>
-									<ClayLink
-										className={
-											!Object.prototype.hasOwnProperty.call(
-												state.renderData,
-												'leftPreview'
-											) &&
-											!Object.prototype.hasOwnProperty.call(
-												state.renderData,
-												'leftLocalizedPreview'
-											) &&
-											!Object.prototype.hasOwnProperty.call(
-												state.renderData,
-												'rightPreview'
-											) &&
-											!Object.prototype.hasOwnProperty.call(
-												state.renderData,
-												'rightLocalizedPreview'
-											)
-												? 'nav-link btn-link disabled'
-												: 'nav-link'
-										}
-										displayType="unstyled"
-										onClick={() => {
-											if (
-												state &&
-												state.view === VIEW_UNIFIED &&
-												state.renderData &&
-												!Object.prototype.hasOwnProperty.call(
-													state.renderData,
-													'unifiedPreview'
-												) &&
-												!Object.prototype.hasOwnProperty.call(
-													state.renderData,
-													'unifiedLocalizedPreview'
-												)
-											) {
-												setState({
-													contentType: CONTENT_TYPE_PREVIEW,
-													renderData:
-														state.renderData,
-													view: VIEW_SPLIT,
-												});
-
-												return;
-											}
-
-											setContentType(
-												CONTENT_TYPE_PREVIEW
-											);
-										}}
-										title={
-											!Object.prototype.hasOwnProperty.call(
-												state.renderData,
-												'leftPreview'
-											) &&
-											!Object.prototype.hasOwnProperty.call(
-												state.renderData,
-												'leftLocalizedPreview'
-											) &&
-											!Object.prototype.hasOwnProperty.call(
-												state.renderData,
-												'rightPreview'
-											) &&
-											!Object.prototype.hasOwnProperty.call(
-												state.renderData,
-												'rightLocalizedPreview'
-											)
-												? Liferay.Language.get(
-														'item-does-not-have-a-content-display'
-												  )
-												: ''
-										}
-									>
-										{Liferay.Language.get('display')}
-									</ClayLink>
-								</ClayNavigationBar.Item>
-								<ClayNavigationBar.Item
-									active={
-										state.contentType ===
-										CONTENT_TYPE_RENDER
-									}
-								>
-									<ClayLink
-										className="nav-link"
-										displayType="unstyled"
-										onClick={() =>
-											setContentType(CONTENT_TYPE_RENDER)
-										}
-									>
-										{Liferay.Language.get('data')}
-									</ClayLink>
-								</ClayNavigationBar.Item>
+								{items}
 							</ClayNavigationBar>
 						</div>
 
@@ -1189,15 +1394,18 @@ export default ({
 								spritemap={spritemap}
 							/>
 						)}
+
 					<div className="autofit-col autofit-col-expand">
 						<h2>{currentTitle}</h2>
 
 						<div className="entry-description">{description}</div>
 					</div>
+
 					{renderDropdownMenu()}
 				</div>
 			)}
+
 			<div className="sheet-section">{renderEntry()}</div>
 		</div>
 	);
-};
+}

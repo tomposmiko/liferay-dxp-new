@@ -459,7 +459,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-136947. It checks that unsupported files cannot be uploaded to Blogs."
-	@ignore = "true"
+	@ignore = "Test Stub"
 	@priority = "3"
 	test CannotUploadUnsupportedFilesToBlogs {
 		property portal.acceptance = "false";
@@ -772,7 +772,7 @@ definition {
 		ItemSelector.searchDMImages(imageFileName = "Document_1.jpg");
 	}
 
-	@description = "This ensures that the background image of a fragment can be added."
+	@description = "This is a use case for LPS-106776. This ensures that the background image of a fragment can be added."
 	@priority = "5"
 	@refactordone
 	test CanSelectBackgroundImageForFragment {
@@ -809,9 +809,7 @@ definition {
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-content-page-name");
 
-		AssertVisible(
-			key_imageName = "Document_1.jpeg",
-			locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+		ContentPages.viewFragmentBackgroundImage(image = "Document_1.jpeg");
 	}
 
 	@description = "This test covers LPS-119553. It ensures that the assets in the connected site can not be filtered out after navigating to the depot through the breadcrumb."
@@ -1256,7 +1254,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-136945. It checks that only 'File Upload,' 'Folder,' and 'External Video Shortcut' options appear when adding a document."
-	@ignore = "true"
+	@ignore = "Test Stub"
 	@priority = "3"
 	test OnlyRelevantSelectionsAppearWhenAddingDocuments {
 		property portal.acceptance = "false";
@@ -1266,7 +1264,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-136943. It checks that only 'File Upload' and 'Folder' options appear when adding images."
-	@ignore = "true"
+	@ignore = "Test Stub"
 	@priority = "3"
 	test OnlyRelevantSelectionsAppearWhenAddingImages {
 		property portal.acceptance = "false";
@@ -1276,7 +1274,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-136944. It checks that only 'File Upload,' 'Folder,' and 'External Video Shortcut' options appear when adding a video."
-	@ignore = "true"
+	@ignore = "Test Stub"
 	@priority = "3"
 	test OnlyRelevantSelectionsAppearWhenAddingVideos {
 		property portal.acceptance = "false";
@@ -1295,7 +1293,7 @@ definition {
 
 		JSONGroup.addGroup(
 			groupName = "Site A",
-			type = "Private");
+			membershipType = "Private");
 
 		JSONGroup.addGroup(groupName = "Site X");
 
@@ -1314,7 +1312,7 @@ definition {
 
 		User.gotoAddPage(userName = "userfn userln");
 
-		SitePages.addPrivatePage(pageName = "Private Test Page");
+		PagesAdmin.addPrivatePage(pageName = "Private Test Page");
 
 		Navigator.gotoSpecificURLPage(
 			pageName = "Private Test Page",

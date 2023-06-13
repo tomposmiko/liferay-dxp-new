@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.4.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_4_0.dtd">
 
-<service-builder auto-namespace-tables="false" mvcc-enabled="false" package-path="com.liferay.commerce.product">
+<service-builder auto-namespace-tables="false" mvcc-enabled="true" package-path="com.liferay.commerce.product">
 	<author>Marco Leo</author>
 	<namespace>Commerce</namespace>
 	<entity external-reference-code="true" local-service="true" name="CommerceCatalog" remote-service="true">
@@ -648,6 +648,10 @@
 		<column db-name="deliverySubTypeSettings" name="deliverySubscriptionTypeSettings" type="String" />
 		<column name="deliveryMaxSubscriptionCycles" type="long" />
 		<column name="unspsc" type="String" />
+		<column name="discontinued" type="boolean" />
+		<column name="discontinuedDate" type="Date" />
+		<column name="replacementCPInstanceUuid" type="String" />
+		<column name="replacementCProductId" type="long" />
 		<column name="status" type="int" />
 		<column name="statusByUserId" type="long" />
 		<column name="statusByUserName" type="String" />
@@ -678,11 +682,15 @@
 			<finder-column name="groupId" />
 			<finder-column name="status" />
 		</finder>
+		<finder name="C_SKU" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="sku" />
+		</finder>
 		<finder name="C_C" return-type="CPInstance" unique="true">
 			<finder-column name="CPDefinitionId" />
 			<finder-column name="CPInstanceUuid" />
 		</finder>
-		<finder name="C_S" return-type="CPInstance" unique="true">
+		<finder name="CPDI_SKU" return-type="CPInstance" unique="true">
 			<finder-column name="CPDefinitionId" />
 			<finder-column name="sku" />
 		</finder>
@@ -785,13 +793,12 @@
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
 		</finder>
-		<finder name="C_T" return-type="Collection">
-			<finder-column name="companyId" />
-			<finder-column name="type" />
-		</finder>
-		<finder name="C_K_T" return-type="CPMeasurementUnit" unique="true">
+		<finder name="C_K" return-type="CPMeasurementUnit" unique="true">
 			<finder-column name="companyId" />
 			<finder-column case-sensitive="false" name="key" />
+		</finder>
+		<finder name="C_T" return-type="Collection">
+			<finder-column name="companyId" />
 			<finder-column name="type" />
 		</finder>
 		<finder name="C_P_T" return-type="Collection">
@@ -1055,6 +1062,7 @@
 		<exception>CPDefinitionProductTypeName</exception>
 		<exception>CPDisplayLayoutEntry</exception>
 		<exception>CPDisplayLayoutLayoutUuid</exception>
+		<exception>CPInstanceDiscontinuedDate</exception>
 		<exception>CPInstanceDisplayDate</exception>
 		<exception>CPInstanceExpirationDate</exception>
 		<exception>CPInstanceJson</exception>
@@ -1067,6 +1075,7 @@
 		<exception>CPSpecificationOptionKey</exception>
 		<exception>CPSpecificationOptionTitle</exception>
 		<exception>CPTaxCategoryName</exception>
+		<exception>DuplicateCommerceChannel</exception>
 		<exception>DuplicateCommerceChannelRel</exception>
 		<exception>DuplicateCPAttachmentFileEntry</exception>
 		<exception>DuplicateCPDefinitionOptionRelKey</exception>

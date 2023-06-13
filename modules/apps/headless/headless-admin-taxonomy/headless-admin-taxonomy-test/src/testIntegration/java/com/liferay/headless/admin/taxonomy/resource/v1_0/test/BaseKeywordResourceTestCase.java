@@ -550,16 +550,18 @@ public abstract class BaseKeywordResourceTestCase {
 	}
 
 	@Test
-	public void testPutAssetLibraryKeywordPermission() throws Exception {
+	public void testPutAssetLibraryKeywordPermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Keyword keyword = testPutAssetLibraryKeywordPermission_addKeyword();
+		Keyword keyword =
+			testPutAssetLibraryKeywordPermissionsPage_addKeyword();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
-			keywordResource.putAssetLibraryKeywordPermissionHttpResponse(
+			keywordResource.putAssetLibraryKeywordPermissionsPageHttpResponse(
 				testDepotEntry.getDepotEntryId(),
 				new Permission[] {
 					new Permission() {
@@ -572,7 +574,7 @@ public abstract class BaseKeywordResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			keywordResource.putAssetLibraryKeywordPermissionHttpResponse(
+			keywordResource.putAssetLibraryKeywordPermissionsPageHttpResponse(
 				testDepotEntry.getDepotEntryId(),
 				new Permission[] {
 					new Permission() {
@@ -584,7 +586,7 @@ public abstract class BaseKeywordResourceTestCase {
 				}));
 	}
 
-	protected Keyword testPutAssetLibraryKeywordPermission_addKeyword()
+	protected Keyword testPutAssetLibraryKeywordPermissionsPage_addKeyword()
 		throws Exception {
 
 		return keywordResource.postAssetLibraryKeyword(
@@ -1185,16 +1187,17 @@ public abstract class BaseKeywordResourceTestCase {
 	}
 
 	@Test
-	public void testPutSiteKeywordPermission() throws Exception {
+	public void testPutSiteKeywordPermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Keyword keyword = testPutSiteKeywordPermission_addKeyword();
+		Keyword keyword = testPutSiteKeywordPermissionsPage_addKeyword();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
-			keywordResource.putSiteKeywordPermissionHttpResponse(
+			keywordResource.putSiteKeywordPermissionsPageHttpResponse(
 				keyword.getSiteId(),
 				new Permission[] {
 					new Permission() {
@@ -1207,7 +1210,7 @@ public abstract class BaseKeywordResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			keywordResource.putSiteKeywordPermissionHttpResponse(
+			keywordResource.putSiteKeywordPermissionsPageHttpResponse(
 				keyword.getSiteId(),
 				new Permission[] {
 					new Permission() {
@@ -1219,7 +1222,7 @@ public abstract class BaseKeywordResourceTestCase {
 				}));
 	}
 
-	protected Keyword testPutSiteKeywordPermission_addKeyword()
+	protected Keyword testPutSiteKeywordPermissionsPage_addKeyword()
 		throws Exception {
 
 		return keywordResource.postSiteKeyword(

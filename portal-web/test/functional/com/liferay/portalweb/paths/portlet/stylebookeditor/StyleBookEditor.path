@@ -10,6 +10,12 @@
 </thead>
 
 <tbody>
+<!--PAGE_DESIGN_OPTIONS-->
+<tr>
+	<td>STYLE_BOOK_CARD_SELECTED</td>
+	<td>//li[contains(@class,'active')]//div[contains(@class,'card')][contains(.,'${key_card}')] | //div[contains(@class,'card')][contains(@class,'active')][contains(.,'${key_styleBookName}')]</td>
+	<td></td>
+</tr>
 <!--PAGE_PREVIEW-->
 <tr>
 	<td>CONTRIBUTED_FRAGMENT_INLINE_CONTENT</td>
@@ -23,7 +29,7 @@
 </tr>
 <tr>
 	<td>NO_PAGE_MESSAGE</td>
-	<td>//div[contains(@class,'no-page-message')][normalize-space(text())='You cannot preview the style book because there are no pages in this site.']</td>
+	<td>//div[contains(@class,'empty-state-text')][normalize-space(text())='You cannot preview the style book because your site is empty.']</td>
 	<td></td>
 </tr>
 <tr>
@@ -36,6 +42,11 @@
 	<td>//div[contains(@class,'page-preview-info-bar')]//button[contains(@class,'dropdown-toggle')]</td>
 	<td></td>
 </tr>
+<tr>
+	<td>PREVIEW_SELECTOR</td>
+	<td>xpath=(//button[contains(@class,'style-book-editor__preview-selector')])[${index}]</td>
+	<td></td>
+</tr>
 <!--SIDEBAR-->
 <tr>
 	<td>DRAFT_SAVED_MESSAGE</td>
@@ -44,7 +55,7 @@
 </tr>
 <tr>
 	<td>FORM_CONTROL_SELECT_BUTTON</td>
-	<td>//button[contains(@class,'form-control-select')]</td>
+	<td>//div[contains(@class,'sidebar')]//button[contains(@class,'form-control-select')]</td>
 	<td></td>
 </tr>
 <tr>

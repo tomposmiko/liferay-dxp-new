@@ -81,7 +81,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -115,6 +115,8 @@ definition {
 	@description = "Feature ID: LRAC-7532 | Automation ID: LRAC-8539 | Test Summary: Create multiple custom asset report"
 	@priority = "5"
 	test CanCreateMultipleCustomAssetReport {
+		property portal.acceptance = "true";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}
@@ -126,7 +128,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -166,6 +168,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8095 | Test Summary: Can delete a custom asset report"
+	@ignore = "true"
 	@priority = "5"
 	test CanDeleteCustomAssetReport {
 		property portal.upstream = "quarantine";
@@ -182,7 +185,7 @@ definition {
 				userLoginEmailAddress = "userea@liferay.com",
 				userLoginFullName = "userfn userln");
 
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -196,6 +199,7 @@ definition {
 
 			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
+
 		task ("Add a new Custom Asset Report") {
 			ACNavigation.goToAssets();
 
@@ -357,12 +361,12 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8132 | Test Summary: Custom asset list shows a list of custom assets"
 	@priority = "5"
 	test CanShowsCustomAssetList {
+		property portal.upstream = "quarantine";
+
 		var assetName = "Custom Asset Analytics Cloud,Custom Asset Analytics Cloud 2,Custom Asset Analytics Cloud 3";
 
 		for (var layoutName : list "AC Page 2,AC Page 3") {
-			JSONLayout.addPublicLayout(
-				groupName = "Site Name",
-				layoutName = "${layoutName}");
+			ACUtils.addPage(layoutName = "${layoutName}");
 		}
 
 		for (var n : list "2,3") {

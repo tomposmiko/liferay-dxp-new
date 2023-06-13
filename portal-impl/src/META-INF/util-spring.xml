@@ -68,11 +68,6 @@
 			<bean class="com.liferay.portal.dao.orm.common.PortalCustomSQLImpl" />
 		</property>
 	</bean>
-	<bean class="com.liferay.portal.kernel.deploy.DeployManagerUtil">
-		<property name="deployManager">
-			<bean class="com.liferay.portal.deploy.DeployManagerImpl" />
-		</property>
-	</bean>
 	<bean class="com.liferay.portal.kernel.deploy.hot.HotDeployUtil" id="com.liferay.portal.kernel.deploy.hot.HotDeployUtil">
 		<property name="hotDeploy">
 			<bean class="com.liferay.portal.deploy.hot.HotDeployImpl" />
@@ -117,11 +112,6 @@
 	<bean class="com.liferay.portal.kernel.image.SpriteProcessorUtil" id="com.liferay.portal.kernel.image.SpriteProcessorUtil">
 		<property name="spriteProcessor">
 			<bean class="com.liferay.portal.image.SpriteProcessorImpl" />
-		</property>
-	</bean>
-	<bean class="com.liferay.portal.kernel.javadoc.JavadocManagerUtil" id="com.liferay.portal.kernel.javadoc.JavadocManagerUtil">
-		<property name="javadocManager">
-			<bean class="com.liferay.portal.javadoc.JavadocManagerImpl" />
 		</property>
 	</bean>
 	<bean class="com.liferay.portal.json.JSONFactoryImpl" id="com.liferay.portal.kernel.json.JSONFactory" />
@@ -381,11 +371,6 @@
 	<bean class="com.liferay.portal.kernel.xmlrpc.XmlRpcUtil" id="com.liferay.portal.kernel.xmlrpc.XmlRpcUtil">
 		<property name="xmlRpc" ref="com.liferay.portal.kernel.xmlrpc.XmlRpc" />
 	</bean>
-	<bean class="com.liferay.portal.kernel.xuggler.XugglerUtil" id="com.liferay.portal.kernel.xuggler.XugglerUtil">
-		<property name="xuggler">
-			<bean class="com.liferay.portal.xuggler.XugglerImpl" />
-		</property>
-	</bean>
 	<bean class="com.liferay.portal.zip.ZipReaderFactoryImpl" id="com.liferay.portal.kernel.zip.ZipReaderFactory" />
 	<bean class="com.liferay.portal.kernel.zip.ZipReaderFactoryUtil" id="com.liferay.portal.kernel.zip.ZipReaderFactoryUtil">
 		<property name="zipReaderFactory" ref="com.liferay.portal.kernel.zip.ZipReaderFactory" />
@@ -395,9 +380,7 @@
 		<property name="zipWriterFactory" ref="com.liferay.portal.kernel.zip.ZipWriterFactory" />
 	</bean>
 	<bean class="com.liferay.portal.language.LanguageImpl" id="com.liferay.portal.language.LanguageImpl" />
-	<bean class="com.liferay.portal.language.LanguageResources" id="com.liferay.portal.language.LanguageResources">
-		<property name="config" value="content.Language,content.Language-ext" />
-	</bean>
+	<bean class="com.liferay.portal.language.LanguageResources" id="com.liferay.portal.language.LanguageResources" />
 	<bean class="com.liferay.portal.model.adapter.builder.ServiceTrackerMapModelAdapterBuilderLocator" id="com.liferay.portal.model.adapter.builder.ServiceTrackerMapModelAdapterBuilderLocator" />
 	<bean class="com.liferay.portal.service.permission.GroupPermissionImpl" id="com.liferay.portal.service.permission.GroupPermissionImpl" />
 	<bean class="com.liferay.portal.service.permission.UserPermissionImpl" id="com.liferay.portal.service.permission.UserPermissionImpl" />

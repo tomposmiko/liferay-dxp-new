@@ -637,8 +637,9 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putKnowledgeBaseArticlePermission",
-					resourceName, resourceId)
+					ActionKeys.PERMISSIONS,
+					"putKnowledgeBaseArticlePermissionsPage", resourceName,
+					resourceId)
 			).build(),
 			resourceId, resourceName, roleNames);
 	}
@@ -670,7 +671,7 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putKnowledgeBaseArticlePermission(
+			putKnowledgeBaseArticlePermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("knowledgeBaseArticleId")
@@ -706,8 +707,9 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putKnowledgeBaseArticlePermission",
-					resourceName, resourceId)
+					ActionKeys.PERMISSIONS,
+					"putKnowledgeBaseArticlePermissionsPage", resourceName,
+					resourceId)
 			).build(),
 			resourceId, resourceName, null);
 	}
@@ -1438,7 +1440,7 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 				"replace",
 				addAction(
 					ActionKeys.PERMISSIONS,
-					"putSiteKnowledgeBaseArticlePermission", portletName,
+					"putSiteKnowledgeBaseArticlePermissionsPage", portletName,
 					siteId)
 			).build(),
 			siteId, portletName, roleNames);
@@ -1469,7 +1471,7 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putSiteKnowledgeBaseArticlePermission(
+			putSiteKnowledgeBaseArticlePermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteId")
@@ -1502,7 +1504,7 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 				"replace",
 				addAction(
 					ActionKeys.PERMISSIONS,
-					"putSiteKnowledgeBaseArticlePermission", portletName,
+					"putSiteKnowledgeBaseArticlePermissionsPage", portletName,
 					siteId)
 			).build(),
 			siteId, portletName, null);
@@ -1832,9 +1834,7 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), entityModel);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid filter " + filterString, exception);
-			}
+			_log.error("Invalid filter " + filterString, exception);
 		}
 
 		return null;

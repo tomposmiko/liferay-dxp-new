@@ -28,8 +28,9 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-120190. Can add fragments into drop zone of Dropdown fragment."
+	@description = "This is a test for LPS-120190 and LPS-125164. Can add fragments into drop zone of Dropdown fragment."
 	@priority = "5"
+	@uitest
 	test AddFragmentIntoDropdownPanel {
 		property portal.acceptance = "true";
 
@@ -69,11 +70,15 @@ definition {
 		}
 
 		task ("Add a page based on custom master page") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				masterLayoutName = "Custom Masters Page Template",
 				pageName = "Test Content Page");
+		}
+
+		task ("Assert the console does not occur NPE error") {
+			AssertConsoleTextNotPresent(value1 = "java.lang.NullPointerException");
 		}
 
 		task ("Assert the dropdown panel is collapsed") {
@@ -123,6 +128,7 @@ definition {
 
 	@description = "This is a test for LPS-120190. Can define the displayed behavior of dropdown panel in Dropdown fragment."
 	@priority = "5"
+	@uitest
 	test DefineDisplayedBehaviorOfDropdownPanel {
 		property portal.acceptance = "true";
 
@@ -179,7 +185,7 @@ definition {
 		}
 
 		task ("Add a page based on custom master page") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				masterLayoutName = "Custom Masters Page Template",
@@ -269,9 +275,7 @@ definition {
 
 			PageEditor.clickManagementBar();
 
-			AssertNotVisible(
-				key_fragmentName = "Dropdown",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Dropdown");
 
 			AssertAttributeValue(
 				attribute1 = "aria-expanded",
@@ -305,9 +309,7 @@ definition {
 
 			PageEditor.clickManagementBar();
 
-			AssertNotVisible(
-				key_fragmentName = "Dropdown",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Dropdown");
 
 			AssertAttributeValue(
 				attribute1 = "aria-expanded",
@@ -324,6 +326,7 @@ definition {
 
 	@description = "This is a test for LPS-120190. Can define the panel type of Dropdown fragment."
 	@priority = "5"
+	@uitest
 	test DefinePanelType {
 		property portal.acceptance = "true";
 
@@ -405,6 +408,7 @@ definition {
 
 	@description = "This is a test for LPS-120190. Can edit the text of dropdown button in Dropdown fragment."
 	@priority = "5"
+	@uitest
 	test EditInlineContent {
 		property portal.acceptance = "true";
 
@@ -445,7 +449,7 @@ definition {
 		}
 
 		task ("Add a page based on custom master page") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				masterLayoutName = "Custom Masters Page Template",

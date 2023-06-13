@@ -36,6 +36,8 @@ definition {
 	@description = "Automation ID: LRAC-8832 | Test Summary: Add DXP data source and configure only one site"
 	@priority = "3"
 	test AddDataSourceForOneSite {
+		property portal.release = "true";
+
 		task ("Add site and page") {
 			ACUtils.addSiteAndPage();
 		}
@@ -74,7 +76,7 @@ definition {
 		task ("Launch DXP and go to site") {
 			ACUtils.launchDXP();
 
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -99,26 +101,9 @@ definition {
 			ACCards.viewMetricValue(
 				cardTitle = "${propertyName} Activities",
 				metricName = "Unique Visitors",
-				metricValue = "1");
+				metricValue = "1",
+				timeFilter = "Last 24 hours");
 		}
-	}
-
-	@description = "Automation ID: LRAC-8830 | Test Summary: Add DXP data source and configure only an Organization's users"
-	@ignore = "true"
-	@priority = "3"
-	test AddDataSourceForOrganizationUsers {
-
-		// TODO LRAC-8830 AddDataSourceForOrganizationUsers
-
-	}
-
-	@description = "Automation ID: LRAC-8831 | Test Summary: Add DXP data source and configure only an User Group's users"
-	@ignore = "true"
-	@priority = "3"
-	test AddDataSourceForUsersGroups {
-
-		// TODO LRAC-8831 AddDataSourceForUsersGroups
-
 	}
 
 	@description = "Automation ID: LRAC-8108 | Test Summary: Add date source page that allows user to choose type of data source"
@@ -140,6 +125,8 @@ definition {
 	@description = "Automation ID: LRAC-8835 | Test Summary: Assert Liferay Data Source Contact Count Preview"
 	@priority = "4"
 	test AssertLiferayDataSourceContactCountPreview {
+		property portal.release = "true";
+
 		task ("Connect DXP to AC") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
 		}
@@ -149,7 +136,7 @@ definition {
 
 			Click(locator1 = "ACDXPSettings#SYNC_CONTACTS_OPTION");
 
-			var currentContacts = selenium.getText(locator1 = "ACDXPSettings#SYNC_ALL_CONTACTS_NUMBER");
+			var currentContacts = selenium.getText("ACDXPSettings#SYNC_ALL_CONTACTS_NUMBER");
 			var numberContacts = StringUtil.extractDigits("${currentContacts}");
 		}
 
@@ -165,10 +152,8 @@ definition {
 
 		task ("Add 1 into the value of the variable and format the string") {
 			var numberContacts = ${numberContacts} + 1;
-
-			var newContacts = StringUtil.add("Sync All (", "${numberContacts}","");
-
-			var newContacts = StringUtil.add("${newContacts}", " Contacts)","");
+			var newContacts = StringUtil.add("Sync All (", "${numberContacts}", "");
+			var newContacts = StringUtil.add("${newContacts}", " Contacts)", "");
 		}
 
 		task ("Go to contact data and assert that the number of contacts updated") {
@@ -187,6 +172,8 @@ definition {
 	@description = "Automation ID: LRAC-8834 | Test Summary: Assert the Liferay DXP Data Source Status"
 	@priority = "3"
 	test AssertLiferayDataSourceStatus {
+		property portal.release = "true";
+
 		task ("Connect DXP to AC") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
 
@@ -226,7 +213,7 @@ definition {
 
 			ACSettings.goToDataSources();
 
-			var entries = selenium.getText(locator1 = "ACUtils#RESULT_MESSAGE");
+			var entries = selenium.getText("ACUtils#RESULT_MESSAGE");
 
 			ACSettings.clickGenericAddOrConfirmationButton();
 
@@ -267,6 +254,8 @@ definition {
 	@description = "Sync Liferay Data Source Contacts"
 	@priority = "5"
 	test CanSyncAllContactsFromDXPToAC {
+		property portal.release = "true";
+
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
 			userFirstName = "userfn",
@@ -303,6 +292,8 @@ definition {
 	@description = "Validate if the user can connect AC to DXP"
 	@priority = "5"
 	test ConnectACtoDXP {
+		property portal.release = "true";
+
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
 	}
 
@@ -344,18 +335,11 @@ definition {
 		AnalyticsCloud.takeInvalidTokenFromAnalyticsCloud();
 	}
 
-	@description = "Automation ID: LRAC-8820 | Test Summary: There is a list of connected data sources including a table of properties/status"
-	@ignore = "true"
-	@priority = "5"
-	test ListOfConnectedDataSourcesIncludingTablePropertiesStatus {
-
-		// TODO LRAC-8820 ListOfConnectedDataSourcesIncludingTablePropertiesStatus
-
-	}
-
 	@description = "Automation ID: LRAC-8839 | Test Summary: Preview the number of Organization contacts to sync"
 	@priority = "3"
 	test OrganizationContactSyncPreview {
+		property portal.release = "true";
+
 		task ("Create a new user, a new organization and assign the organization for the created user") {
 			JSONUser.addUser(
 				userEmailAddress = "userea@liferay.com",
@@ -399,8 +383,7 @@ definition {
 
 			Click(locator1 = "ACDXPSettings#SYNC_CONTACTS_OPTION");
 
-			var entrieOrg = selenium.getText(locator1 = "ACDXPSettings#SYNC_BY_ORGANIZATIONS_PREVIEW");
-
+			var entrieOrg = selenium.getText("ACDXPSettings#SYNC_BY_ORGANIZATIONS_PREVIEW");
 			var numberOrg = StringUtil.extractDigits("${entrieOrg}");
 
 			AssertTextEquals(
@@ -452,7 +435,6 @@ definition {
 			Click(locator1 = "ACDXPSettings#SYNC_CONTACTS_OPTION");
 
 			var newNumberOrg = ${numberOrg} + 1;
-
 			var newEntrieOrg = StringUtil.add("${newNumberOrg}", " Organizations Selected", "");
 
 			AssertTextEquals(
@@ -461,18 +443,11 @@ definition {
 		}
 	}
 
-	@description = "Automation ID: LRAC-8833 | Test Summary: Preview number of contacts to be added when configuring contacts"
-	@ignore = "true"
-	@priority = "5"
-	test PreviewNumberOfContactsToAddedWhenSyncContacts {
-
-		// TODO LRAC-8833 PreviewNumberOfContactsToAddedWhenSyncContacts
-
-	}
-
 	@description = "Automation ID: LRAC-8822 | Test Summary: Sync Liferay Data Source Contacts by User Groups"
 	@priority = "4"
 	test SyncDataSourceContactsByGroups {
+		property portal.release = "true";
+
 		task ("Add user, group and assign user to group") {
 			JSONUser.addUser(
 				userEmailAddress = "userea@liferay.com",
@@ -534,6 +509,8 @@ definition {
 	@description = "Automation ID: LRAC-8823 | Test Summary: Sync Liferay Data Source Contacts by Organizations"
 	@priority = "4"
 	test SyncDataSourceContactsByOrganizations {
+		property portal.release = "true";
+
 		task ("Create a new user, a new organization and assign the organization for the created user") {
 			JSONUser.addUser(
 				userEmailAddress = "userea@liferay.com",
@@ -608,6 +585,8 @@ definition {
 	@description = "Automation ID: LRAC-8824 | Test Summary: Preview the number of User Group contacts to sync"
 	@priority = "4"
 	test UserGroupContactSyncPreview {
+		property portal.release = "true";
+
 		var user = "ac";
 		var groupsList = "User Group1,User Group2";
 
@@ -651,8 +630,7 @@ definition {
 
 			Click(locator1 = "ACDXPSettings#SYNC_CONTACTS_OPTION");
 
-			var entrieGrup = selenium.getText(locator1 = "ACDXPSettings#SYNC_BY_USER_GROUPS_PREVIEW");
-
+			var entrieGrup = selenium.getText("ACDXPSettings#SYNC_BY_USER_GROUPS_PREVIEW");
 			var numberGrup = StringUtil.extractDigits("${entrieGrup}");
 
 			AssertTextEquals(
@@ -670,7 +648,6 @@ definition {
 			Click(locator1 = "ACDXPSettings#SYNC_CONTACTS_OPTION");
 
 			var newNumberGrup = ${numberGrup} + 1;
-
 			var newEntrieGrup = StringUtil.add("${newNumberGrup}", " User Groups Selected", "");
 
 			AssertTextEquals(
@@ -680,8 +657,14 @@ definition {
 	}
 
 	@description = "Automation ID: LRAC-8128 | Test Summary: View asset added by DXP data source"
+	@ignore = "true"
 	@priority = "5"
 	test ViewAssetAddedByDXPDataSource {
+		property portal.release = "true";
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10060
+
 		task ("Create site, page and add a blog to the page") {
 			ACUtils.addSiteAndPage();
 
@@ -693,11 +676,11 @@ definition {
 		}
 
 		task ("View the blog") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
-
-			BlogsNavigator.gotoPG(entryTitle = "Blogs AC Title");
 		}
 
 		task ("Close DXP, launch AC and switch the propety") {
@@ -724,6 +707,7 @@ definition {
 	}
 
 	@description = "Automation ID: LRAC-8127 | Test Summary: View page added by DXP data source"
+	@ignore = "true"
 	@priority = "5"
 	test ViewPageAddedByDXPDataSource {
 		property portal.upstream = "quarantine";
@@ -733,11 +717,12 @@ definition {
 
 		task ("Connect DXP to AC") {
 			ACUtils.addSiteAndPage();
+
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Go to page and get data") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}

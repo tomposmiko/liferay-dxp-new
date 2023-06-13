@@ -20,11 +20,6 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			ApplicationsMenu.gotoPortlet(
-				category = "Publications",
-				panel = "Applications",
-				portlet = "Publications");
-
 			Publications.disablePublications();
 		}
 	}
@@ -49,9 +44,9 @@ definition {
 			threadBody = "MB Thread Message Body",
 			threadSubject = "MB Thread Message Subject");
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Message Boards Category",
 			changeSite = "Guest",
 			changeTitle = "Message Boards Category",
@@ -116,11 +111,11 @@ definition {
 			assetContent = "MB Thread Reply Body Edit",
 			assetTitle = "RE: MB Thread Message Subject Edit");
 
-		Publications.gotoReviewChanges(
-			gotoManagePublications = "true",
+		PublicationsNavigator.gotoReviewChanges(
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Message Boards Message",
 			changeSite = "Site Name",
 			changeTitle = "RE: MB Thread Message Subject Edit",
@@ -157,18 +152,18 @@ definition {
 			replyBody = "MB Thread Reply Body",
 			threadSubject = "MB Thread Message Subject");
 
-		Publications.gotoReviewChanges(
-			gotoManagePublications = "true",
+		PublicationsNavigator.gotoReviewChanges(
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Message Boards Message",
 			changeSite = "Guest",
 			changeTitle = "MB Thread Message Subject",
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Message Boards Message",
 			changeOrder = "2",
 			changeSite = "Guest",
@@ -176,27 +171,12 @@ definition {
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Message Boards Thread",
 			changeSite = "Guest",
 			changeTitle = "MB Thread Message Subject",
 			changeType = "Added",
 			changeUser = "Test Test");
-
-		PublicationsChanges.viewChangesViaContextStyle(
-			changeCategory = "Message Boards Message",
-			changeDescription = "Test Test added a Message Boards Message in Guest",
-			changeTitle = "MB Thread Message Subject");
-
-		PublicationsChanges.viewChangesViaContextStyle(
-			changeCategory = "Message Boards Message",
-			changeDescription = "Test Test added a Message Boards Message in Guest",
-			changeTitle = "RE: MB Thread Message Subject");
-
-		PublicationsChanges.viewChangesViaContextStyle(
-			changeCategory = "Message Boards Thread",
-			changeDescription = "Test Test added a Message Boards Thread in Guest",
-			changeTitle = "MB Thread Message Subject");
 
 		JSONPublications.publishPublication(publicationName = "Publication Name");
 
@@ -258,16 +238,16 @@ definition {
 			threadSplitSubject = "MB Thread Split Subject",
 			threadSubject = "MB Thread Message Subject");
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Message Boards Message",
 			changeSite = "Guest",
 			changeTitle = "MB Thread Split Subject",
 			changeType = "Modified",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Message Boards Message",
 			changeOrder = "2",
 			changeSite = "Guest",
@@ -275,14 +255,14 @@ definition {
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Message Boards Thread",
 			changeSite = "Guest",
 			changeTitle = "MB Thread Message Subject",
 			changeType = "Modified",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Message Boards Thread",
 			changeOrder = "2",
 			changeSite = "Guest",
@@ -324,6 +304,8 @@ definition {
 			threadBodyEdit = "MB Thread Message Body Edit",
 			threadSubjectEdit = "MB Thread Message Subject Edit");
 
+		PortletEntry.publish();
+
 		JSONPublications.addPublication(publicationName = "Publication Name 2");
 
 		JSONPublications.selectPublication(publicationName = "Publication Name 2");
@@ -358,8 +340,8 @@ definition {
 
 		MessageboardsThread.viewDefaultCP(threadSubject = "MB Thread Message Subject");
 
-		Publications.gotoPublish(
-			gotoManagePublications = "true",
+		PublicationsNavigator.gotoPublish(
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name 2");
 
 		Publications.viewNeedsManualResolution(
@@ -374,7 +356,7 @@ definition {
 			entryTitle = "Message Boards Message",
 			warningMessage = "Modification Deletion Conflict: Deletion conflicts with a modification.");
 
-		Publications.discardChanges(
+		PublicationsChanges.discardChanges(
 			changeCategory = "Message Boards Thread",
 			changeTitle = "Message Boards Thread",
 			conflictingChanges = "true",

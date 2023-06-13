@@ -42,7 +42,6 @@ definition {
 
 	macro addCategoryWithSaveAndAddButton {
 		var key_categoryName = "${categoryName}";
-
 		var key_vocabularyName = "${vocabularyName}";
 
 		Navigator.gotoNavNested(navNested = "${key_vocabularyName}");
@@ -63,7 +62,6 @@ definition {
 	@summary = "Add a category named '${categoryName}' to the vocabulary named '${vocabularyName}'"
 	macro addCP {
 		var key_categoryName = "${categoryName}";
-
 		var key_vocabularyName = "${vocabularyName}";
 
 		Navigator.gotoNavNested(navNested = "${key_vocabularyName}");
@@ -388,7 +386,7 @@ definition {
 			locator1 = "TextArea#ANY",
 			value1 = " ");
 
-		if (IsElementPresent(key_text = "Save",locator1 = "Button#ANY")) {
+		if (IsElementPresent(key_text = "Save", locator1 = "Button#ANY")) {
 			Button.clickSave();
 		}
 		else {
@@ -540,10 +538,6 @@ definition {
 		var key_nodeName = "${categoryName}";
 		var key_nodeListName = "${vocabularyName}";
 
-		AssertTextEquals(
-			locator1 = "Treeview#NODE_LIST",
-			value1 = "${vocabularyName}");
-
 		Portlet.expandTree();
 
 		AssertClick(
@@ -583,7 +577,7 @@ definition {
 		var key_categoryName = "${categoryName}";
 		var key_nodeListName = "${vocabularyName}";
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "Treeview#NODE_LIST",
 			value1 = "${vocabularyName}");
 

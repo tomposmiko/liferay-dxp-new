@@ -318,14 +318,14 @@
 			<property name="description" value="Checks that `CreationMenuBuilder` is used when possible." />
 			<property name="enforceBuilderNames" value="" />
 			<message key="builder.include" value="Include method call ''{0}'' ({1}) in ''{2}'' ({3})" />
-			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3})" />
-			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4})" />
+			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3}), possibly by using a lambda function" />
+			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4}) by using a lambda function" />
 			<message key="builder.use" value="Use ''{0}'' ({1}, {2})" />
 			<message key="builder.use.instead" value="Use ''{0}'' instead of new instance of ''{1}''" />
 		</module>
-		<module name="com.liferay.source.formatter.checkstyle.checks.DeprecatedUsageCheck">
+		<module name="com.liferay.source.formatter.checkstyle.checks.DeprecatedAPICheck">
 			<property name="category" value="Bug Prevention" />
-			<property name="description" value="Finds calls to deprecated classes or methods." />
+			<property name="description" value="Finds calls to deprecated classes, constructors, fields or methods." />
 			<property name="enabled" value="false" />
 			<message key="constructor.call.deprecated" value="Constructor ''{0}'' has been deprecated" />
 			<message key="field.call.deprecated" value="Field ''{0}'' has been deprecated" />
@@ -411,8 +411,8 @@
 			<property name="description" value="Checks that `DropdownItemBuilder`, `LabelItemBuilder` or `NavigationItemBuilder` is used when possible." />
 			<property name="enforceBuilderNames" value="" />
 			<message key="builder.include" value="Include method call ''{0}'' ({1}) in ''{2}'' ({3})" />
-			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3})" />
-			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4})" />
+			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3}), possibly by using a lambda function" />
+			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4}) by using a lambda function" />
 			<message key="builder.use" value="Use ''{0}'' ({1}, {2})" />
 			<message key="builder.use.instead" value="Use ''{0}'' instead of new instance of ''{1}''" />
 			<message key="null.value.incorrect" value="Null values are not allowed in ''{0}''" />
@@ -423,8 +423,8 @@
 			<property name="description" value="Checks that `DropdownItemListBuilder`, `LabelItemListBuilder` or `NavigationItemListBuilder` is used when possible." />
 			<property name="enforceBuilderNames" value="" />
 			<message key="builder.include" value="Include method call ''{0}'' ({1}) in ''{2}'' ({3})" />
-			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3})" />
-			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4})" />
+			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3}), possibly by using a lambda function" />
+			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4}) by using a lambda function" />
 			<message key="builder.use" value="Use ''{0}'' ({1}, {2})" />
 			<message key="builder.use.instead" value="Use ''{0}'' instead of new instance of ''{1}''" />
 		</module>
@@ -447,6 +447,7 @@
 			<property name="description" value="Checks for utilization of class `JSONUtil`." />
 			<message key="json.util.put.all.use" value="Use ''JSONUtil.putAll'' instead of chaining on ''JSONUtil.put''" />
 			<message key="json.util.put.use" value="Combine calls ''{0}'' ({1}) and ''{2}'' ({3}) into single call ''{4}''" />
+			<message key="json.util.to.string.use" value="Use ''toString'' instead of ''String.valueOf''" />
 		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.LambdaCheck">
 			<property name="category" value="Styling" />
@@ -487,8 +488,8 @@
 			<property name="description" value="Checks that `ConcurrentHashMapBuilder`, `HashMapBuilder`, `LinkedHashMapBuilder` or `TreeMapBuilder` is used when possible." />
 			<property name="enforceBuilderNames" value="" />
 			<message key="builder.include" value="Include method call ''{0}'' ({1}) in ''{2}'' ({3})" />
-			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3})" />
-			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4})" />
+			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3}), possibly by using a lambda function" />
+			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4}) by using a lambda function" />
 			<message key="builder.use" value="Use ''{0}'' ({1}, {2})" />
 			<message key="builder.use.instead" value="Use ''{0}'' instead of new instance of ''{1}''" />
 			<message key="null.value.incorrect" value="Null values are not allowed in ''{0}''" />
@@ -538,12 +539,6 @@
 			<property name="category" value="Bug Prevention" />
 			<property name="description" value="Verifies that a method or global variable has a modifier specified." />
 			<message key="modifier.missing" value="Missing modifier for ''{0}''" />
-		</module>
-		<module name="com.liferay.source.formatter.checkstyle.checks.MissingOverrideCheck">
-			<property name="category" value="Bug Prevention" />
-			<property name="description" value="Verifies that a method that overrides a method in a superclass has the @Override annotation." />
-			<property name="enabled" value="false" />
-			<message key="override.missing" value="Missing @Override" />
 		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.MissingParenthesesCheck">
 			<property name="category" value="Styling" />
@@ -629,8 +624,8 @@
 			<property name="enforceBuilderNames" value="" />
 			<message key="build.string.use" value="No need to call ''{0}.toString'', use ''buildString'' instead of ''{1}''" />
 			<message key="builder.include" value="Include method call ''{0}'' ({1}) in ''{2}'' ({3})" />
-			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3})" />
-			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4})" />
+			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3}), possibly by using a lambda function" />
+			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4}) by using a lambda function" />
 			<message key="builder.use" value="Use ''{0}'' ({1}, {2})" />
 			<message key="builder.use.instead" value="Use ''{0}'' instead of new instance of ''{1}''" />
 			<message key="if.statement.inline" value="Inline if-statement inside ''{0}'' ({1}) using a lambda function" />
@@ -688,6 +683,14 @@
 			<property name="description" value="Finds cases where a redundant `toString()` is called on variable type `String`." />
 			<message key="string.cast.unneeded" value="No need to call ''.toString()'' on type String" />
 		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.SystemEventCheck">
+			<property name="category" value="Bug Prevention" />
+			<property name="description" value="Finds missing or redundant usage of @SystemEvent for delete events." />
+			<property name="enabled" value="false" />
+			<message key="system.event.missing" value="Missing ''@SystemEvent(type = SystemEventConstants.TYPE_DELETE)'' for method ''{0}''" />
+			<message key="system.event.unneeded.1" value="@SystemEvent on method ''{0}'' is not needed, because the first parameter is not ''{1}''" />
+			<message key="system.event.unneeded.2" value="@SystemEvent on method ''{0}'' is not needed, because ''{1}'' does not implement ''ClassedModel''" />
+		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.TernaryOperatorCheck">
 			<property name="category" value="Styling" />
 			<property name="description" value="Finds use of ternary operator in `java` files (use if statement instead)." />
@@ -732,8 +735,8 @@
 			<property name="description" value="Checks that `UnicodePropertiesBuilder` is used when possible." />
 			<property name="enforceBuilderNames" value="" />
 			<message key="builder.include" value="Include method call ''{0}'' ({1}) in ''{2}'' ({3})" />
-			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3})" />
-			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4})" />
+			<message key="builder.inline.1" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3}), possibly by using a lambda function" />
+			<message key="builder.inline.2" value="Inline variable definition ''{0}'' ({1}) and dependent statements ({2}) inside ''{3}'' ({4}) by using a lambda function" />
 			<message key="builder.use" value="Use ''{0}'' ({1}, {2})" />
 			<message key="builder.use.instead" value="Use ''{0}'' instead of new instance of ''{1}''" />
 			<message key="null.value.incorrect" value="Null values are not allowed in ''{0}''" />
@@ -790,6 +793,24 @@
 			<property name="category" value="Bug Prevention" />
 			<property name="description" value="Finds cases where the variable should be wrapped into an inner class in order to defer array elements initialization." />
 			<message key="variable.info.unwrapped" value="Wrap the variable ''{0}'' into an inner class ''Concealer'' in order to defer array elements initialization, see LPS-72768" />
+		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.UpgradeDeprecatedAPICheck">
+			<property name="category" value="Upgrade" />
+			<property name="description" value="Finds calls to deprecated classes, constructors, fields or methods after an upgrade" />
+			<message key="constructor.call.deprecated" value="Constructor ''{0}'' has been deprecated in version ''{1}''" />
+			<message key="field.call.deprecated" value="Field ''{0}'' has been deprecated in version ''{1}''" />
+			<message key="method.call.deprecated" value="Method ''{0}'' has been deprecated in version ''{1}''" />
+			<message key="type.call.deprecated" value="Type ''{0}'' has been deprecated in version ''{1}''" />
+		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.UpgradeRemovedAPICheck">
+			<property name="category" value="Upgrade" />
+			<property name="description" value="Finds cases where calls are made to removed API after an upgrade." />
+			<message key="class.not.found.1" value="Class ''{0}'' no longer exists, or has been moved, in version ''{1}''" />
+			<message key="class.not.found.2" value="Class ''{0}'' no longer exists in version ''{1}'', possible changed to ''{2}''" />
+			<message key="class.not.found.3" value="Class ''{0}'' no longer exists in version ''{1}'', possible changed to one of the following: {2}" />
+			<message key="constructor.not.found" value="Constructor for ''{0}'' no longer exists, or the signature has changed, in version ''{1}''" />
+			<message key="method.not.found" value="Method ''{0}'' no longer exists, or the signature has changed, in class ''{1}'' for version ''{2}''" />
+			<message key="variable.not.found" value="Variable ''{0}'' no longer exists in class ''{1}'' for version ''{2}''" />
 		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.ValidatorIsNullCheck">
 			<property name="category" value="Bug Prevention" />

@@ -29,7 +29,7 @@ definition {
 			Navigator.openURL();
 
 			ProductMenu.gotoPortlet(
-				category = "Content &amp; Data",
+				category = "Content & Data",
 				panel = "Site Administration",
 				portlet = "Documents and Media",
 				site = "${siteName}");
@@ -46,7 +46,7 @@ definition {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");
@@ -78,7 +78,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media");
 
@@ -191,7 +191,7 @@ definition {
 		ProductMenu.gotoSite(site = "Space Program Academy of Continuing Education");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");
@@ -207,7 +207,7 @@ definition {
 
 		for (var entryCount : list "1,2,3") {
 			ProductMenu.gotoPortlet(
-				category = "Content &amp; Data",
+				category = "Content & Data",
 				panel = "Site Administration",
 				portlet = "Documents and Media",
 				site = "${siteName}");
@@ -277,7 +277,7 @@ definition {
 
 		for (var entryCount : list "1,2,3") {
 			ProductMenu.gotoPortlet(
-				category = "Content &amp; Data",
+				category = "Content & Data",
 				panel = "Site Administration",
 				portlet = "Documents and Media",
 				site = "${siteName}");
@@ -296,7 +296,7 @@ definition {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");
@@ -324,7 +324,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media");
 
@@ -339,7 +339,7 @@ definition {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");
@@ -369,7 +369,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media");
 
@@ -385,12 +385,64 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-69303. Verify created file can be shared. "
-	@ignore = "true"
 	@priority = "3"
 	test CanShareAFile {
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		// TODO LRQA-69303 CanShareAFile pending implementation
+		var user = "DXP";
 
+		ProductMenu.gotoPortlet(
+			category = "Content & Data",
+			panel = "Site Administration",
+			portlet = "Documents and Media",
+			site = "${siteName}");
+
+		Workflow.configureWorkflowViaPortlet(workflowDefinition = "Single Approver");
+
+		DMDocument.addWithWorkflowCP(
+			dmDocumentFile = "Document_1.jpg",
+			dmDocumentTitle = "Document_1.jpg");
+
+		DMDocument.viewStatus(
+			dmDocumentStatus = "Pending",
+			dmDocumentTitle = "Document_1.jpg");
+
+		JSONUser.addUser(
+			userEmailAddress = "${user}@liferay.com",
+			userFirstName = "${user}",
+			userLastName = "${user}",
+			userScreenName = "${user}");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "${user}@liferay.com");
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content & Data",
+			panel = "Site Administration",
+			portlet = "Documents and Media");
+
+		DepotNavigator.gotoShare(dmDocumentTitle = "Document_1");
+
+		Asset.share(
+			sharingPermissions = "Update",
+			userEmailAddress = "${user}@liferay.com",
+			userName = "${user} ${user}");
+
+		Navigator.openURL();
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "${user}@liferay.com",
+			userLoginFullName = "${user} ${user}");
+
+		UserBar.gotoDropdownItem(dropdownItem = "Shared Content");
+
+		AssertElementPresent(
+			key_status = "Not Visible",
+			locator1 = "Sharing#SHARED_CONTENT_CONTENT_STATUS");
 	}
 
 	@priority = "4"
@@ -398,7 +450,7 @@ definition {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");
@@ -445,7 +497,7 @@ definition {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");
@@ -559,7 +611,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");
@@ -576,7 +628,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");
@@ -615,7 +667,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");
@@ -637,7 +689,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");
@@ -682,7 +734,7 @@ definition {
 	@priority = "3"
 	test SetSingleApproverToDocumentsAndMedia {
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media");
 
@@ -695,10 +747,11 @@ definition {
 	@priority = "3"
 	test StatusBecomeDraftAfterCheckout {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
 		var documentTitle = "Document_1";
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");
@@ -728,7 +781,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media");
 
@@ -745,23 +798,23 @@ definition {
 	@priority = "3"
 	test StatusPendingAfterCheckoutCancel {
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media");
 
 		Workflow.configureWorkflowViaPortlet(workflowDefinition = "Single Approver");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media");
 
-		DMDocument.addWithWorkflowCP(
-			dmDocumentFile = "workflow.png",
-			dmDocumentTitle = "DM Document Title");
+		WorkflowDocumentsAndMedia.addFileWithWorkflow(
+			dmDocumentTitle = "DM Document Title",
+			workflowPNGFile = "workflow.png");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media");
 
@@ -792,7 +845,7 @@ definition {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media",
 			site = "${siteName}");

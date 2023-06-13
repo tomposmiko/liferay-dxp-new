@@ -331,7 +331,7 @@ AUI.add(
 							checkedNodes.push(plid);
 						}
 
-						if (localCheckedIndex == -1) {
+						if (localCheckedIndex === -1) {
 							localCheckedNodes.push(plid);
 						}
 
@@ -389,15 +389,13 @@ AUI.add(
 
 					var root = host.get('root');
 
-					data = A.merge(
-						{
-							groupId: root.groupId,
-							privateLayout: root.privateLayout,
-							recursive: true,
-							treeId,
-						},
-						data
-					);
+					data = {
+						groupId: root.groupId,
+						privateLayout: root.privateLayout,
+						recursive: true,
+						treeId,
+						...data,
+					};
 
 					Liferay.Util.fetch(
 						themeDisplay.getPathMain() +

@@ -30,11 +30,13 @@ BatchPlannerPlanManagementToolbarDisplayContext batchPlannerPlanManagementToolba
 
 <clay:management-toolbar
 	managementToolbarDisplayContext="<%= batchPlannerPlanManagementToolbarDisplayContext %>"
+	propsTransformer="js/BatchPlannerPlanManagementToolbarPropsTransformer"
 />
 
 <clay:container-fluid>
-	<aui:form method="post" name="fm">
-		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+	<form id="<portlet:namespace />fm" method="post" name="<portlet:namespace />fm">
+		<input id="<portlet:namespace />batchPlannerPlanIds" name="<portlet:namespace />batchPlannerPlanIds" type="hidden" />
+		<input id="<portlet:namespace />redirect" name="<portlet:namespace />redirect" type="hidden" value="<%= currentURL %>" />
 
 		<liferay-ui:search-container
 			searchContainer="<%= batchPlannerPlanSearchContainer %>"
@@ -66,6 +68,11 @@ BatchPlannerPlanManagementToolbarDisplayContext batchPlannerPlanManagementToolba
 				/>
 
 				<liferay-ui:search-container-column-text
+					name="create-date"
+					value="<%= dateFormatDateTime.format(batchPlannerPlan.getCreateDate()) %>"
+				/>
+
+				<liferay-ui:search-container-column-text
 					name="action"
 					value='<%= LanguageUtil.get(request, batchPlannerPlan.isExport() ? "export" : "import") %>'
 				/>
@@ -76,18 +83,13 @@ BatchPlannerPlanManagementToolbarDisplayContext batchPlannerPlanManagementToolba
 				/>
 
 				<liferay-ui:search-container-column-text
+					name="format"
+					value="<%= batchPlannerPlan.getExternalType() %>"
+				/>
+
+				<liferay-ui:search-container-column-text
 					name="user"
 					value="<%= batchPlannerPlan.getUserName() %>"
-				/>
-
-				<liferay-ui:search-container-column-text
-					name="create-date"
-					value="<%= dateFormatDateTime.format(batchPlannerPlan.getCreateDate()) %>"
-				/>
-
-				<liferay-ui:search-container-column-text
-					name="status"
-					value='<%= LanguageUtil.get(request, batchPlannerPlan.isActive() ? "active" : "inactive") %>'
 				/>
 
 				<liferay-ui:search-container-column-jsp
@@ -100,5 +102,5 @@ BatchPlannerPlanManagementToolbarDisplayContext batchPlannerPlanManagementToolba
 				markupView="lexicon"
 			/>
 		</liferay-ui:search-container>
-	</aui:form>
+	<form>
 </clay:container-fluid>

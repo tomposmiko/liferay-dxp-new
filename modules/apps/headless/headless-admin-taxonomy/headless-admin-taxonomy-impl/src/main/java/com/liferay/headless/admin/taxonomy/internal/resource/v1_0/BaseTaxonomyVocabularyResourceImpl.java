@@ -280,8 +280,8 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 				"replace",
 				addAction(
 					ActionKeys.PERMISSIONS,
-					"putAssetLibraryTaxonomyVocabularyPermission", portletName,
-					assetLibraryId)
+					"putAssetLibraryTaxonomyVocabularyPermissionsPage",
+					portletName, assetLibraryId)
 			).build(),
 			assetLibraryId, portletName, roleNames);
 	}
@@ -311,7 +311,7 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putAssetLibraryTaxonomyVocabularyPermission(
+			putAssetLibraryTaxonomyVocabularyPermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("assetLibraryId")
@@ -344,8 +344,8 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 				"replace",
 				addAction(
 					ActionKeys.PERMISSIONS,
-					"putAssetLibraryTaxonomyVocabularyPermission", portletName,
-					assetLibraryId)
+					"putAssetLibraryTaxonomyVocabularyPermissionsPage",
+					portletName, assetLibraryId)
 			).build(),
 			assetLibraryId, portletName, null);
 	}
@@ -691,7 +691,8 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 				"replace",
 				addAction(
 					ActionKeys.PERMISSIONS,
-					"putSiteTaxonomyVocabularyPermission", portletName, siteId)
+					"putSiteTaxonomyVocabularyPermissionsPage", portletName,
+					siteId)
 			).build(),
 			siteId, portletName, roleNames);
 	}
@@ -719,7 +720,7 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putSiteTaxonomyVocabularyPermission(
+			putSiteTaxonomyVocabularyPermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteId")
@@ -752,7 +753,8 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 				"replace",
 				addAction(
 					ActionKeys.PERMISSIONS,
-					"putSiteTaxonomyVocabularyPermission", portletName, siteId)
+					"putSiteTaxonomyVocabularyPermissionsPage", portletName,
+					siteId)
 			).build(),
 			siteId, portletName, null);
 	}
@@ -1118,8 +1120,9 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putTaxonomyVocabularyPermission",
-					resourceName, resourceId)
+					ActionKeys.PERMISSIONS,
+					"putTaxonomyVocabularyPermissionsPage", resourceName,
+					resourceId)
 			).build(),
 			resourceId, resourceName, roleNames);
 	}
@@ -1149,7 +1152,7 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putTaxonomyVocabularyPermission(
+			putTaxonomyVocabularyPermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("taxonomyVocabularyId")
@@ -1184,8 +1187,9 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putTaxonomyVocabularyPermission",
-					resourceName, resourceId)
+					ActionKeys.PERMISSIONS,
+					"putTaxonomyVocabularyPermissionsPage", resourceName,
+					resourceId)
 			).build(),
 			resourceId, resourceName, null);
 	}
@@ -1434,9 +1438,7 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), entityModel);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid filter " + filterString, exception);
-			}
+			_log.error("Invalid filter " + filterString, exception);
 		}
 
 		return null;

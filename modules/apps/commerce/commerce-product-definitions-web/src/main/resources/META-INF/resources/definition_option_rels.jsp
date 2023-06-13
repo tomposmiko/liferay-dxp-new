@@ -129,7 +129,7 @@ CPDefinition cpDefinition = cpDefinitionOptionRelDisplayContext.getCPDefinition(
 						fieldName: ['name', 'LANG'],
 					},
 				],
-				spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
+				spritemap: '<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
 				titleLabel: '<%= LanguageUtil.get(request, "add-existing-option") %>',
 			});
 		</aui:script>
@@ -139,20 +139,22 @@ CPDefinition cpDefinition = cpDefinitionOptionRelDisplayContext.getCPDefinition(
 			elementClasses="mt-4"
 			title='<%= LanguageUtil.get(request, "options") %>'
 		>
-			<clay:data-set-display
-				contextParams='<%=
-					HashMapBuilder.<String, String>put(
-						"cpDefinitionId", String.valueOf(cpDefinitionOptionRelDisplayContext.getCPDefinitionId())
-					).build()
-				%>'
-				dataProviderKey="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTIONS %>"
-				id="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTIONS %>"
-				itemsPerPage="<%= 10 %>"
-				namespace="<%= liferayPortletResponse.getNamespace() %>"
-				pageNumber="<%= 1 %>"
-				portletURL="<%= currentURLObj %>"
-				selectedItemsKey="cpdefinitionOptionRelId"
-			/>
+			<aui:form action="<%= cpDefinitionOptionRelDisplayContext.getPortletURL() %>" method="post" name="fm">
+				<clay:data-set-display
+					contextParams='<%=
+						HashMapBuilder.<String, String>put(
+							"cpDefinitionId", String.valueOf(cpDefinitionOptionRelDisplayContext.getCPDefinitionId())
+						).build()
+					%>'
+					dataProviderKey="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTIONS %>"
+					id="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTIONS %>"
+					itemsPerPage="<%= 10 %>"
+					namespace="<%= liferayPortletResponse.getNamespace() %>"
+					pageNumber="<%= 1 %>"
+					portletURL="<%= currentURLObj %>"
+					selectedItemsKey="cpdefinitionOptionRelId"
+				/>
+			</aui:form>
 		</commerce-ui:panel>
 	</div>
 </c:if>

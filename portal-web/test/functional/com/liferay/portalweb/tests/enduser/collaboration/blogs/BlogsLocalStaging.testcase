@@ -123,19 +123,55 @@ definition {
 	}
 
 	@description = "This is a test for LPS-136789. It checks that a blog with a layout reference can be published."
-	@ignore = "true"
 	@priority = "3"
 	test CanPublishBlogWithLayoutReference {
-		property portal.acceptance = "false";
+		var portalURL = PropsUtil.get("portal.url");
 
-		// TODO LPS-136789 CanPublishBlogWithLayoutReference pending implementation
+		JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
+			contentType = "Blogs Entry",
+			displayPageTemplateEntryName = "Display Page Name",
+			groupName = "Site Name-staging",
+			site = "false");
 
+		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "site-name-staging");
+
+		DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
+
+		PageEditor.clickPublish();
+
+		DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+
+		JSONBlog.addEntry(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title",
+			groupName = "Site Name (Staging)",
+			site = "false");
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Blogs Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		Navigator.gotoSitePage(
+			pageName = "Staging Blogs Page",
+			siteName = "Site Name");
+
+		BlogsNavigator.gotoEntryPG(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title");
+
+		ControlMenu.viewHeaderTitle(headerTitle = "Display Page Name");
+
+		AssertLocation(value1 = "${portalURL}/web/site-name/b/blogs-entry-title");
 	}
 
 	@description = "This is a test for LPS-136790. It checks that a blog with a deleted cover image can be published using the SAP."
 	@priority = "4"
 	test CanPublishDeletedCoverImageViaSAP {
-		var imageId	= JSONBlog.uploadBlogImage(
+		var imageId = JSONBlog.uploadBlogImage(
 			groupName = "Site Name (Staging)",
 			site = "false",
 			sourceFileName = "Document_1.jpg");
@@ -829,7 +865,7 @@ definition {
 	@description = "This is a test for LPS-136791. It checks that the cover image can be updated and republished using the SAP."
 	@priority = "4"
 	test CanRepublishCoverImageViaSAP {
-		var imageId	= JSONBlog.uploadBlogImage(
+		var imageId = JSONBlog.uploadBlogImage(
 			groupName = "Site Name (Staging)",
 			site = "false",
 			sourceFileName = "Document_1.jpg");
@@ -849,7 +885,7 @@ definition {
 			confirmMessage = "Are you sure you want to publish to live?",
 			entryTitle = "Blogs Entry Title");
 
-		var imageId	= JSONBlog.uploadBlogImage(
+		var imageId = JSONBlog.uploadBlogImage(
 			groupName = "Site Name (Staging)",
 			site = "false",
 			sourceFileName = "Document_2.jpg");

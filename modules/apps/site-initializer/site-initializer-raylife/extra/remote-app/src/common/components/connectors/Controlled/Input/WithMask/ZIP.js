@@ -1,13 +1,18 @@
 import React from 'react';
-import {ZIP_REGEX} from '~/common/utils/patterns';
-
 import {ControlledInputWithMask} from '.';
 
-export const ZIPControlledInput = ({rules = {}, inputProps = {}, ...props}) => {
+import {ZIP_REGEX} from '../../../../../utils/patterns';
+
+export function ZIPControlledInput({rules = {}, inputProps = {}, ...props}) {
 	return (
 		<ControlledInputWithMask
 			{...props}
-			inputProps={{format: '#####', mask: '_', ...inputProps}}
+			inputProps={{
+				className: 'zip',
+				format: '#####',
+				mask: '_',
+				...inputProps,
+			}}
 			rules={{
 				pattern: {
 					message: 'Must be a five digit number.',
@@ -17,4 +22,4 @@ export const ZIPControlledInput = ({rules = {}, inputProps = {}, ...props}) => {
 			}}
 		/>
 	);
-};
+}

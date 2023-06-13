@@ -19,14 +19,16 @@ import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.form.web.internal.configuration.DDMFormWebConfiguration;
+import com.liferay.dynamic.data.mapping.form.web.internal.configuration.activator.FFSubmissionsSettingsConfigurationActivator;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
 import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
@@ -58,12 +60,15 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PropsImpl;
 import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderRequest;
 import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderResponse;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -156,8 +161,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 
 	@Test
 	public void testAutosaveWithNondefaultUser1() throws Exception {
-		RenderRequest renderRequest =
-			_mockRenderRequestAutosaveWithNondefaultUser();
+		RenderRequest renderRequest = _mockRenderRequestWithDefaultUser(false);
 
 		DDMFormInstanceSettings ddmFormInstanceSettings =
 			_mockDDMFormInstanceSettingsAutosaveWithNondefaultUser();
@@ -176,8 +180,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 
 	@Test
 	public void testAutosaveWithNondefaultUser2() throws Exception {
-		RenderRequest renderRequest =
-			_mockRenderRequestAutosaveWithNondefaultUser();
+		RenderRequest renderRequest = _mockRenderRequestWithDefaultUser(false);
 
 		DDMFormInstanceSettings ddmFormInstanceSettings =
 			_mockDDMFormInstanceSettingsAutosaveWithNondefaultUser();
@@ -202,8 +205,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 
 	@Test
 	public void testAutosaveWithNondefaultUser3() throws Exception {
-		RenderRequest renderRequest =
-			_mockRenderRequestAutosaveWithNondefaultUser();
+		RenderRequest renderRequest = _mockRenderRequestWithDefaultUser(false);
 
 		DDMFormInstanceSettings ddmFormInstanceSettings =
 			_mockDDMFormInstanceSettingsAutosaveWithNondefaultUser();
@@ -224,6 +226,37 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 			_createDDMFormDisplayContext(renderRequest);
 
 		Assert.assertFalse(ddmFormDisplayContext.isAutosaveEnabled());
+	}
+
+	@Test
+	public void testCreateDDMFormRenderingContext() throws Exception {
+		DDMFormInstanceSettings ddmFormInstanceSettings = mock(
+			DDMFormInstanceSettings.class);
+
+		_mockDDMFormInstance(ddmFormInstanceSettings);
+
+		DDMFormDisplayContext ddmFormDisplayContext =
+			_createDDMFormDisplayContext();
+
+		DDMFormRenderingContext ddmFormRenderingContext =
+			ddmFormDisplayContext.createDDMFormRenderingContext(new DDMForm());
+
+		Assert.assertFalse(
+			(boolean)ddmFormRenderingContext.getProperty(
+				"showPartialResultsToRespondents"));
+
+		when(
+			ddmFormInstanceSettings.showPartialResultsToRespondents()
+		).thenReturn(
+			true
+		);
+
+		ddmFormRenderingContext =
+			ddmFormDisplayContext.createDDMFormRenderingContext(new DDMForm());
+
+		Assert.assertTrue(
+			(boolean)ddmFormRenderingContext.getProperty(
+				"showPartialResultsToRespondents"));
 	}
 
 	@Test
@@ -250,6 +283,18 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 
 		Assert.assertEquals(
 			LocaleUtil.SPAIN, ddmFormRenderingContext.getLocale());
+	}
+
+	@Test
+	public void testDefaultUserHasSubmittedAnEntry() throws Exception {
+		_mockDDMFormInstance(
+			_mockDDMFormInstanceSettingsLimitToOneSubmissionPerUserEnabled());
+
+		DDMFormDisplayContext ddmFormDisplayContext =
+			_createDDMFormDisplayContext(
+				_mockRenderRequestWithDefaultUser(true));
+
+		Assert.assertFalse(ddmFormDisplayContext.hasSubmittedAnEntry());
 	}
 
 	@Test
@@ -381,6 +426,29 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 	}
 
 	@Test
+	public void testIsLimitToOneSubmissionPerUser() throws Exception {
+		DDMFormInstanceSettings ddmFormInstanceSettings = mock(
+			DDMFormInstanceSettings.class);
+
+		_mockDDMFormInstance(ddmFormInstanceSettings);
+
+		DDMFormDisplayContext ddmFormDisplayContext =
+			_createDDMFormDisplayContext();
+
+		Assert.assertFalse(
+			ddmFormDisplayContext.isLimitToOneSubmissionPerUserEnabled());
+
+		when(
+			ddmFormInstanceSettings.limitToOneSubmissionPerUser()
+		).thenReturn(
+			true
+		);
+
+		Assert.assertTrue(
+			ddmFormDisplayContext.isLimitToOneSubmissionPerUserEnabled());
+	}
+
+	@Test
 	public void testIsSharedFormWithoutPortletSession() throws Exception {
 		MockRenderRequest mockRenderRequest = _mockRenderRequest();
 
@@ -470,6 +538,29 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 	}
 
 	@Test
+	public void testIsShowPartialResultsToRespondents() throws Exception {
+		DDMFormInstanceSettings ddmFormInstanceSettings = mock(
+			DDMFormInstanceSettings.class);
+
+		_mockDDMFormInstance(ddmFormInstanceSettings);
+
+		DDMFormDisplayContext ddmFormDisplayContext =
+			_createDDMFormDisplayContext();
+
+		Assert.assertFalse(
+			ddmFormDisplayContext.isShowPartialResultsToRespondents());
+
+		when(
+			ddmFormInstanceSettings.showPartialResultsToRespondents()
+		).thenReturn(
+			true
+		);
+
+		Assert.assertTrue(
+			ddmFormDisplayContext.isShowPartialResultsToRespondents());
+	}
+
+	@Test
 	public void testIsShowSuccessPage() throws Exception {
 		_mockDDMFormInstance(mock(DDMFormInstanceSettings.class));
 
@@ -510,6 +601,41 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		Assert.assertFalse(ddmFormDisplayContext.isShowSuccessPage());
 	}
 
+	@Test
+	public void testNondefaultUserHasSubmittedAnEntryFalse() throws Exception {
+		_mockDDMFormInstance(
+			_mockDDMFormInstanceSettingsLimitToOneSubmissionPerUserEnabled());
+
+		_mockDDMFormInstanceRecordVersionLocalService(Collections.emptyList());
+
+		DDMFormDisplayContext ddmFormDisplayContext =
+			_createDDMFormDisplayContext(
+				_mockRenderRequestWithDefaultUser(false));
+
+		Assert.assertFalse(ddmFormDisplayContext.hasSubmittedAnEntry());
+	}
+
+	@Test
+	public void testNondefaultUserHasSubmittedAnEntryTrue() throws Exception {
+		_mockDDMFormInstance(
+			_mockDDMFormInstanceSettingsLimitToOneSubmissionPerUserEnabled());
+
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion = mock(
+			DDMFormInstanceRecordVersion.class);
+
+		ddmFormInstanceRecordVersion.setStatus(
+			WorkflowConstants.STATUS_APPROVED);
+
+		_mockDDMFormInstanceRecordVersionLocalService(
+			Collections.singletonList(ddmFormInstanceRecordVersion));
+
+		DDMFormDisplayContext ddmFormDisplayContext =
+			_createDDMFormDisplayContext(
+				_mockRenderRequestWithDefaultUser(false));
+
+		Assert.assertTrue(ddmFormDisplayContext.hasSubmittedAnEntry());
+	}
+
 	private DDMForm _createDDMForm(
 		Set<Locale> availableLocales, Locale locale) {
 
@@ -542,14 +668,15 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		return new DDMFormDisplayContext(
 			mock(DDMFormFieldTypeServicesTracker.class),
 			_ddmFormInstanceLocalService,
-			mock(DDMFormInstanceRecordLocalService.class),
-			mock(DDMFormInstanceRecordVersionLocalService.class),
-			_ddmFormInstanceService, _mockDDMFormInstanceVersionLocalService(),
+			mock(DDMFormInstanceRecordService.class),
+			_ddmFormInstanceRecordVersionLocalService, _ddmFormInstanceService,
+			_mockDDMFormInstanceVersionLocalService(),
 			mock(DDMFormRenderer.class), mock(DDMFormValuesFactory.class),
 			mock(DDMFormValuesMerger.class), _ddmFormWebConfiguration,
-			mock(DDMStorageAdapterTracker.class), mock(GroupLocalService.class),
-			new JSONFactoryImpl(), null, null, mock(Portal.class),
-			renderRequest, new MockRenderResponse(),
+			mock(DDMStorageAdapterTracker.class),
+			mock(FFSubmissionsSettingsConfigurationActivator.class),
+			mock(GroupLocalService.class), new JSONFactoryImpl(), null, null,
+			mock(Portal.class), renderRequest, new MockRenderResponse(),
 			mock(RoleLocalService.class), mock(UserLocalService.class),
 			_workflowDefinitionLinkLocalService);
 	}
@@ -624,6 +751,18 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		);
 	}
 
+	private void _mockDDMFormInstanceRecordVersionLocalService(
+		List<DDMFormInstanceRecordVersion> ddmFormInstanceRecordVersions) {
+
+		when(
+			_ddmFormInstanceRecordVersionLocalService.
+				getFormInstanceRecordVersions(
+					Matchers.anyLong(), Matchers.anyLong())
+		).thenReturn(
+			ddmFormInstanceRecordVersions
+		);
+	}
+
 	private DDMFormInstanceSettings
 			_mockDDMFormInstanceSettingsAutosaveWithNondefaultUser()
 		throws Exception {
@@ -643,6 +782,21 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 			_ddmFormInstanceService.fetchFormInstance(Matchers.anyLong())
 		).thenReturn(
 			ddmFormInstance
+		);
+
+		return ddmFormInstanceSettings;
+	}
+
+	private DDMFormInstanceSettings
+		_mockDDMFormInstanceSettingsLimitToOneSubmissionPerUserEnabled() {
+
+		DDMFormInstanceSettings ddmFormInstanceSettings = mock(
+			DDMFormInstanceSettings.class);
+
+		when(
+			ddmFormInstanceSettings.limitToOneSubmissionPerUser()
+		).thenReturn(
+			true
 		);
 
 		return ddmFormInstanceSettings;
@@ -722,7 +876,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		return mockRenderRequest;
 	}
 
-	private RenderRequest _mockRenderRequestAutosaveWithNondefaultUser()
+	private RenderRequest _mockRenderRequestWithDefaultUser(boolean defaultUser)
 		throws Exception {
 
 		MockRenderRequest mockRenderRequest = _mockRenderRequest();
@@ -736,7 +890,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		when(
 			user.isDefaultUser()
 		).thenReturn(
-			Boolean.FALSE
+			defaultUser
 		);
 
 		when(
@@ -856,6 +1010,10 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 
 	@Mock
 	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
+
+	@Mock
+	private DDMFormInstanceRecordVersionLocalService
+		_ddmFormInstanceRecordVersionLocalService;
 
 	@Mock
 	private DDMFormInstanceService _ddmFormInstanceService;

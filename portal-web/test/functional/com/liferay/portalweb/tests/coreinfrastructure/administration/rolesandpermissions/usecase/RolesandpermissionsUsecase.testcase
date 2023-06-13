@@ -40,8 +40,46 @@ definition {
 
 			DMDocument.tearDownCP();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 		}
+	}
+
+	@description = "This is a use case for LPS-133818. Able to add Site Administration permissions for specific site."
+	@priority = "4"
+	test CanAddSitePermissionForSpecificSite {
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		JSONRole.addRegularRole(
+			roleKey = "Roles Regrole Name",
+			roleTitle = "Roles Regrole Name");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Roles");
+
+		Role.definePermissionCmdCP(
+			permissionDefinitionKey = "SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_GENERAL_PERMISSIONS_ACCESS_IN_SITE_ADMINISTRATION_CHECKBOX",
+			permissionDefinitionValue = "Access in Site and Asset Library Administration",
+			roleTitle = "Roles Regrole Name",
+			siteNameScope = "${siteName}");
+
+		Role.viewPermissionCP(
+			permissionDefinitionValue = "Access in Site and Asset Library Administration",
+			permissionNavigationValue = "Documents and Media",
+			siteNameScope = "${siteName}");
+
+		Role.viewPermissionCP(
+			permissionDefinitionValue = "View",
+			permissionNavigationValue = "Documents and Media > Documents",
+			siteNameScope = "${siteName}");
+
+		Role.viewPermissionCP(
+			permissionDefinitionValue = "View Site and Asset Library Administration Menu",
+			permissionNavigationValue = "Site Settings > Site",
+			siteNameScope = "${siteName}");
+
+		AssertConsoleTextNotPresent(value1 = "javax.portlet.PortletException");
 	}
 
 	@priority = "4"
@@ -171,7 +209,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Site Page Name");
+		PagesAdmin.addPublicPage(pageName = "Site Page Name");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -375,7 +413,7 @@ definition {
 			portlet = "Pages",
 			site = "${siteName}");
 
-		SitePages.addPublicPage(pageName = "Bookmarks Page");
+		PagesAdmin.addPublicPage(pageName = "Bookmarks Page");
 
 		Navigator.gotoPage(pageName = "Bookmarks Page");
 
@@ -403,7 +441,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Bookmarks Page");
+		PagesAdmin.addPublicPage(pageName = "Bookmarks Page");
 
 		Navigator.gotoSitePage(
 			pageName = "Bookmarks Page",
@@ -512,13 +550,13 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPrivatePage(pageName = "Private Blogs Page");
+		PagesAdmin.addPrivatePage(pageName = "Private Blogs Page");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PermissionsInline.gotoSitepageCP(
+		PermissionsInline.gotoSitePageCP(
 			pageName = "Private Blogs Page",
 			privacy = "Private Pages");
 
@@ -948,7 +986,7 @@ definition {
 			portlet = "Pages",
 			site = "${siteName}");
 
-		SitePages.addPublicPage(pageName = "Bookmarks Page");
+		PagesAdmin.addPublicPage(pageName = "Bookmarks Page");
 
 		Navigator.gotoPage(pageName = "Bookmarks Page");
 
@@ -1070,7 +1108,7 @@ definition {
 
 		Navigator.openURL();
 
-		SitePages.openPagesAdmin(siteURLKey = "Site Name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "People",
@@ -1090,13 +1128,13 @@ definition {
 			teamName = "Site Team Name",
 			userScreenName = "usersn1");
 
-		SitePages.openPagesAdmin(siteURLKey = "Site Name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(
+		PagesAdmin.addPublicPage(
 			pageName = "USA Ice Hockey Team Blog",
 			pageTemplateName = "Blog");
 
@@ -1214,7 +1252,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(
+		PagesAdmin.addPublicPage(
 			pageName = "Search Page",
 			pageTemplateName = "Search");
 
@@ -1227,7 +1265,7 @@ definition {
 			entryTitle = "Test Blog");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		BlogsNavigator.gotoBlogsEntryPermissionsCP(entryTitle = "Test Blog");
@@ -1383,7 +1421,7 @@ definition {
 			entryTitle = "Test Blog");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		BlogsNavigator.gotoBlogsEntryPermissionsCP(entryTitle = "Test Blog");
@@ -1504,7 +1542,7 @@ definition {
 
 		Role.viewPermissionCP(
 			permissionDefinitionValue = "View Site and Asset Library Administration Menu",
-			permissionNavigationValue = "Settings &gt; Site");
+			permissionNavigationValue = "Settings > Site");
 	}
 
 	@description = "This is a use case for LPS-97321. All subdirectories in Define Permissions should display."
@@ -1615,7 +1653,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPrivatePage(pageName = "Private Page");
+		PagesAdmin.addPrivatePage(pageName = "Private Page");
 
 		User.logoutPG();
 
@@ -1675,9 +1713,9 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Site Page Name");
+		PagesAdmin.addPublicPage(pageName = "Site Page Name");
 
-		SitePages.addPrivatePage(pageName = "Site Page Name");
+		PagesAdmin.addPrivatePage(pageName = "Site Page Name");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -1726,7 +1764,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		AssertVisible(locator1 = "Button#PLUS");

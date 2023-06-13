@@ -34,6 +34,8 @@ definition {
 	@description = "Sites Overview Cards appear on load"
 	@priority = "3"
 	test CanViewSitesOverviewDashboardCards {
+		property portal.acceptance = "false";
+
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
 
 		ACUtils.launchAC();
@@ -52,7 +54,7 @@ definition {
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-		Navigator.gotoSitePage(
+		ACUtils.navigateToSitePage(
 			pageName = "AC Page",
 			siteName = "Site Name");
 
@@ -79,9 +81,11 @@ definition {
 		}
 
 		task ("View the page and go to AC") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
+
+			ACUtils.closeAllSessionsAndWait();
 
 			ACUtils.launchAC();
 		}

@@ -56,7 +56,7 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 	}
 
 	attachItemSelectorPreviewComponent() {
-		const itemsNodes = Array.from(this.all('.item-preview'));
+		const itemsNodes = Array.from(this.all('.item-preview-editable'));
 
 		const items = itemsNodes.map((node) => node.dataset);
 
@@ -467,7 +467,7 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 
 		if (
 			validExtensions === '*' ||
-			validExtensions.indexOf(fileExtension) != -1
+			validExtensions.indexOf(fileExtension) !== -1
 		) {
 			const maxFileSize = this.maxFileSize;
 

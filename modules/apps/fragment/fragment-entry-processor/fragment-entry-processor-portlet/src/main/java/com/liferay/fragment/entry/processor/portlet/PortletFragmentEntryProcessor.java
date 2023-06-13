@@ -50,9 +50,10 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.PortletPreferencesImpl;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -197,11 +198,11 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 							"on-the-same-page"));
 			}
 
-			String defaultPreferences = StringPool.BLANK;
-
 			long plid = ParamUtil.getLong(
 				fragmentEntryProcessorContext.getHttpServletRequest(),
 				"p_l_id");
+
+			String defaultPreferences = StringPool.BLANK;
 
 			if (originalFragmentEntryLink != null) {
 				defaultPreferences = _getPreferences(
@@ -279,6 +280,33 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 		}
 
 		return false;
+	}
+
+	private boolean _comparePreferences(
+		PortletPreferences currentPortletPreferences,
+		PortletPreferences sourcePortletPreferences) {
+
+		Map<String, String[]> currentPreferences =
+			currentPortletPreferences.getMap();
+
+		Map<String, String[]> sourcePreferences =
+			sourcePortletPreferences.getMap();
+
+		if (currentPreferences.size() != sourcePreferences.size()) {
+			return false;
+		}
+
+		for (Map.Entry<String, String[]> entry :
+				currentPreferences.entrySet()) {
+
+			if (!Arrays.equals(
+					sourcePreferences.get(entry.getKey()), entry.getValue())) {
+
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private Document _getDocument(String html) {
@@ -413,9 +441,6 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 			plid = layoutPlid;
 		}
 
-		String portletPreferencesXML = PortletPreferencesFactoryUtil.toXML(
-			jxPortletPreferences);
-
 		for (com.liferay.portal.kernel.model.PortletPreferences
 				portletPreferencesImpl : portletPreferencesList) {
 
@@ -424,10 +449,8 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 					portletPreferencesImpl);
 
 			if ((plid != portletPreferencesImpl.getPlid()) ||
-				Objects.equals(
-					PortletPreferencesFactoryUtil.toXML(
-						currentPortletPreferences),
-					portletPreferencesXML)) {
+				_comparePreferences(
+					currentPortletPreferences, jxPortletPreferences)) {
 
 				continue;
 			}

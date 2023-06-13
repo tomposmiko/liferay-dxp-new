@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchInstanceException;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
@@ -43,16 +44,19 @@ import com.liferay.portal.workflow.kaleo.model.KaleoInstanceTable;
 import com.liferay.portal.workflow.kaleo.model.impl.KaleoInstanceImpl;
 import com.liferay.portal.workflow.kaleo.model.impl.KaleoInstanceModelImpl;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoInstancePersistence;
+import com.liferay.portal.workflow.kaleo.service.persistence.KaleoInstanceUtil;
 import com.liferay.portal.workflow.kaleo.service.persistence.impl.constants.KaleoPersistenceConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -4330,6 +4334,12 @@ public class KaleoInstancePersistenceImpl
 		"kaleoInstance.completionDate = ?";
 
 	public KaleoInstancePersistenceImpl() {
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("active", "active_");
+
+		setDBColumnNames(dbColumnNames);
+
 		setModelClass(KaleoInstance.class);
 
 		setModelImplClass(KaleoInstanceImpl.class);
@@ -4855,6 +4865,11 @@ public class KaleoInstancePersistenceImpl
 	}
 
 	@Override
+	public Set<String> getBadColumnNames() {
+		return _badColumnNames;
+	}
+
+	@Override
 	protected EntityCache getEntityCache() {
 		return entityCache;
 	}
@@ -5062,11 +5077,31 @@ public class KaleoInstancePersistenceImpl
 				"completionDate"
 			},
 			false);
+
+		_setKaleoInstanceUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
+		_setKaleoInstanceUtilPersistence(null);
+
 		entityCache.removeCache(KaleoInstanceImpl.class.getName());
+	}
+
+	private void _setKaleoInstanceUtilPersistence(
+		KaleoInstancePersistence kaleoInstancePersistence) {
+
+		try {
+			Field field = KaleoInstanceUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, kaleoInstancePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@Override
@@ -5131,6 +5166,9 @@ public class KaleoInstancePersistenceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		KaleoInstancePersistenceImpl.class);
+
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(
+		new String[] {"active"});
 
 	@Override
 	protected FinderCache getFinderCache() {

@@ -16,12 +16,9 @@ package com.liferay.commerce.shop.by.diagram.admin.web.internal.product.type;
 
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
 import com.liferay.commerce.product.content.render.CPContentRenderer;
-import com.liferay.commerce.shop.by.diagram.admin.web.internal.display.context.CSDiagramCPTypeDisplayContext;
 import com.liferay.commerce.shop.by.diagram.constants.CSDiagramCPTypeConstants;
 import com.liferay.commerce.shop.by.diagram.constants.CSDiagramWebKeys;
-import com.liferay.commerce.shop.by.diagram.service.CSDiagramSettingService;
-import com.liferay.commerce.shop.by.diagram.type.CSDiagramTypeRegistry;
-import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.commerce.shop.by.diagram.util.CSDiagramCPTypeHelper;
 import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -71,10 +68,7 @@ public class CSDiagramCPContentRenderer implements CPContentRenderer {
 		throws Exception {
 
 		httpServletRequest.setAttribute(
-			CSDiagramWebKeys.CS_DIAGRAM_CP_TYPE_DISPLAY_CONTEXT,
-			new CSDiagramCPTypeDisplayContext(
-				_csDiagramSettingService, _csDiagramTypeRegistry,
-				_dlURLHelper));
+			CSDiagramWebKeys.CS_DIAGRAM_CP_TYPE_HELPER, _csDiagramCPTypeHelper);
 
 		_jspRenderer.renderJSP(
 			_servletContext, httpServletRequest, httpServletResponse,
@@ -82,13 +76,7 @@ public class CSDiagramCPContentRenderer implements CPContentRenderer {
 	}
 
 	@Reference
-	private CSDiagramSettingService _csDiagramSettingService;
-
-	@Reference
-	private CSDiagramTypeRegistry _csDiagramTypeRegistry;
-
-	@Reference
-	private DLURLHelper _dlURLHelper;
+	private CSDiagramCPTypeHelper _csDiagramCPTypeHelper;
 
 	@Reference
 	private JSPRenderer _jspRenderer;

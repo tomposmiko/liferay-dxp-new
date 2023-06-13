@@ -145,7 +145,7 @@ definition {
 			entryComment = "WC WebContent Content Comment",
 			userFullName = "Test Test (You)");
 
-		OSGiConfig.deployOSGiConfigs(
+		OSGiConfig.deployOSGiConfigFile(
 			OSGiConfigFileName = "com.liferay.journal.configuration.JournalServiceConfiguration.config",
 			OSGiConfigs = "articleCommentsEnabled=B&quot;false&quot;");
 
@@ -189,6 +189,62 @@ definition {
 			echo("Config file content: ${fileContent}");
 
 			fail("Unable to find expected config value: ${expectedText}");
+		}
+	}
+
+	@description = "This is a use case for LPS-79394. This test check that system settings scope is corrected."
+	@priority = "5"
+	test CheckSystemSettingsScopeIsCorrected {
+		property test.name.skip.portal.instance = "SystemSettings#CheckSystemSettingsScopeIsCorrected";
+
+		task ("Naviagte to System Settings") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Configuration",
+				panel = "Control Panel",
+				portlet = "System Settings");
+		}
+
+		task ("Enable OpenSSO Configuration") {
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "SSO",
+				configurationName = "OpenSSO",
+				configurationScope = "System Scope");
+
+			FormFields.enableCheckbox(fieldName = "Enabled");
+
+			SystemSettings.saveConfiguration();
+		}
+
+		task ("Naviagte to Instance Settings") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Configuration",
+				panel = "Control Panel",
+				portlet = "Instance Settings");
+		}
+
+		task ("Disable OpenSSO Configuration") {
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "SSO",
+				configurationName = "OpenSSO",
+				configurationScope = "Virtual Instance Scope");
+
+			FormFields.disableCheckbox(fieldName = "enabled");
+
+			SystemSettings.saveConfiguration();
+		}
+
+		task ("Check System Settings scope is corrected") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Configuration",
+				panel = "Control Panel",
+				portlet = "System Settings");
+
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "SSO",
+				configurationName = "OpenSSO",
+				configurationScope = "System Scope");
+
+			FormFields.viewCheckboxChecked(fieldName = "Enabled");
 		}
 	}
 

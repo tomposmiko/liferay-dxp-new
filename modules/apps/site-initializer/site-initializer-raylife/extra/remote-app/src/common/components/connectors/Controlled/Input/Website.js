@@ -1,12 +1,15 @@
 import React from 'react';
-import {WEBSITE_REGEX} from '~/common/utils/patterns';
-
 import {ControlledInput} from '.';
 
-export const WebsiteControlledInput = ({rules, ...props}) => {
+import {WEBSITE_REGEX} from '../../../../utils/patterns';
+
+export function WebsiteControlledInput({rules, ...props}) {
 	return (
 		<ControlledInput
 			{...props}
+			inputProps={{
+				className: 'd-flex mb-5 mr-0',
+			}}
 			rules={{
 				pattern: {
 					message: 'Should be a valid website address.',
@@ -16,4 +19,4 @@ export const WebsiteControlledInput = ({rules, ...props}) => {
 			}}
 		/>
 	);
-};
+}

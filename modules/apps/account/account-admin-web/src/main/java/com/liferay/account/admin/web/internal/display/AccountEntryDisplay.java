@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -70,6 +69,10 @@ public class AccountEntryDisplay {
 	public static AccountEntryDisplay of(long accountEntryId) {
 		return of(
 			AccountEntryLocalServiceUtil.fetchAccountEntry(accountEntryId));
+	}
+
+	public AccountEntry getAccountEntry() {
+		return _accountEntry;
 	}
 
 	public long getAccountEntryId() {
@@ -121,10 +124,10 @@ public class AccountEntryDisplay {
 		return _logoId;
 	}
 
-	public String getLogoURL(ThemeDisplay themeDisplay) {
+	public String getLogoURL(String imagePath) {
 		return StringBundler.concat(
-			themeDisplay.getPathImage(), "/account_entry_logo?img_id=",
-			getLogoId(), "&t=", WebServerServletTokenUtil.getToken(_logoId));
+			imagePath, "/account_entry_logo?img_id=", _logoId, "&t=",
+			WebServerServletTokenUtil.getToken(_logoId));
 	}
 
 	public String getName() {
@@ -159,13 +162,12 @@ public class AccountEntryDisplay {
 		return _active;
 	}
 
-	public boolean isEmailDomainValidationEnabled(ThemeDisplay themeDisplay) {
+	public boolean isEmailDomainValidationEnabled(long companyId) {
 		try {
 			AccountEntryEmailDomainsConfiguration
 				accountEntryEmailDomainsConfiguration =
 					ConfigurationProviderUtil.getCompanyConfiguration(
-						AccountEntryEmailDomainsConfiguration.class,
-						themeDisplay.getCompanyId());
+						AccountEntryEmailDomainsConfiguration.class, companyId);
 
 			if (accountEntryEmailDomainsConfiguration.
 					enableEmailDomainValidation()) {
@@ -196,8 +198,8 @@ public class AccountEntryDisplay {
 		return false;
 	}
 
-	public boolean isValidateUserEmailAddress(ThemeDisplay themeDisplay) {
-		if (isEmailDomainValidationEnabled(themeDisplay) &&
+	public boolean isValidateUserEmailAddress(long companyId) {
+		if (isEmailDomainValidationEnabled(companyId) &&
 			ListUtil.isNotEmpty(getDomains())) {
 
 			return true;
@@ -207,6 +209,7 @@ public class AccountEntryDisplay {
 	}
 
 	private AccountEntryDisplay() {
+		_accountEntry = null;
 		_accountEntryId = 0;
 		_active = true;
 		_defaultBillingAddress = null;
@@ -225,6 +228,8 @@ public class AccountEntryDisplay {
 	}
 
 	private AccountEntryDisplay(AccountEntry accountEntry) {
+		_accountEntry = accountEntry;
+
 		_accountEntryId = accountEntry.getAccountEntryId();
 		_active = _isActive(accountEntry);
 		_defaultBillingAddress = accountEntry.getDefaultBillingAddress();
@@ -371,6 +376,7 @@ public class AccountEntryDisplay {
 	private static final Log _log = LogFactoryUtil.getLog(
 		AccountEntryDisplay.class);
 
+	private final AccountEntry _accountEntry;
 	private final long _accountEntryId;
 	private final boolean _active;
 	private final Address _defaultBillingAddress;

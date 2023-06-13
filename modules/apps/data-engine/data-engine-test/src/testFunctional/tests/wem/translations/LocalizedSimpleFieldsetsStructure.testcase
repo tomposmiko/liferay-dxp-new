@@ -51,13 +51,12 @@ definition {
 		Click.clickNoMouseOver(locator1 = "Button#LOCALIZATION_GENERIC");
 
 		AssertElementPresent(
-			key_locale = "en_US",
-			locator1 = "Translation#LOCALIZATION_NAME",
-			value1 = "lexicon-icon-en-us");
+			key_text = "en-us",
+			locator1 = "MenuItem#ANY_ICON");
 
-		AssertElementPresent(
-			key_locale = "en_US",
-			locator1 = "Translation#LOCALIZATION_NAME",
+		AssertTextEquals(
+			key_localizedLanguage = "en-US",
+			locator1 = "Translation#TRANSLATION_STATUS_TITLE",
 			value1 = "Default");
 	}
 
@@ -97,6 +96,8 @@ definition {
 			key_fieldFieldLabel = "Date",
 			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER_LABEL");
 
+		Translations.addLanguageManageTranslations(key_language = "pt-BR");
+
 		DataEngine.viewFieldsetTranslation(
 			fieldNameList = "Date",
 			fieldsetName = "Fieldset Name",
@@ -125,6 +126,8 @@ definition {
 		AssertVisible(
 			key_fieldFieldLabel = "Text",
 			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER_LABEL");
+
+		Translations.addLanguageManageTranslations(key_language = "pt-BR");
 
 		PortletEntry.changeLocale(
 			locale = "pt-BR",
@@ -177,17 +180,23 @@ definition {
 
 		DataEngine.addFieldsetToBuilder(fieldsetName = "${fieldsetNameEN}");
 
+		Translations.addLanguageManageTranslations(key_language = "pt-BR");
+
 		PortletEntry.changeLocale(locale = "pt-BR");
 
 		DataEngine.editFieldsetsLabel(
 			fieldsetLabel = "${fieldsetNameEN}",
 			fieldsetLabelEdit = "Fieldset Name pt-BR");
 
+		Translations.addLanguageManageTranslations(key_language = "de-DE");
+
 		PortletEntry.changeLocale(locale = "de-DE");
 
 		DataEngine.editFieldsetsLabel(
 			fieldsetLabel = "${fieldsetNameEN}",
 			fieldsetLabelEdit = "Fieldset Name de-DE");
+
+		Translations.addLanguageManageTranslations(key_language = "es-ES");
 
 		PortletEntry.changeLocale(locale = "es-ES");
 
@@ -228,6 +237,8 @@ definition {
 			fieldName = "Rich Text",
 			targetFieldLabel = "Text");
 
+		Translations.addLanguageManageTranslations(key_language = "pt-BR");
+
 		PortletEntry.changeLocale(
 			locale = "pt-BR",
 			modal = "true");
@@ -251,6 +262,8 @@ definition {
 			fieldFieldLabelEdit = "Rico Texto",
 			fieldsetModal = "true");
 
+		Translations.addLanguageManageTranslations(key_language = "es-ES");
+
 		PortletEntry.changeLocale(
 			locale = "es-ES",
 			modal = "true");
@@ -273,6 +286,8 @@ definition {
 			fieldFieldLabel = "Rich Text",
 			fieldFieldLabelEdit = "Rica Texto",
 			fieldsetModal = "true");
+
+		Translations.addLanguageManageTranslations(key_language = "ja-JP");
 
 		PortletEntry.changeLocale(
 			locale = "ja-JP",
@@ -432,6 +447,8 @@ definition {
 				fieldsGroupLabelEdit = "${prefix} Fields Group");
 		}
 
+		Translations.addLanguageManageTranslations(key_language = "pt-BR");
+
 		PortletEntry.changeLocale(
 			locale = "pt-BR",
 			modal = "true");
@@ -475,6 +492,8 @@ definition {
 			fieldFieldLabelEdit = "Numérico",
 			fieldsetModal = "true");
 
+		Translations.addLanguageManageTranslations(key_language = "es-ES");
+
 		PortletEntry.changeLocale(
 			locale = "es-ES",
 			modal = "true");
@@ -517,6 +536,8 @@ definition {
 			fieldFieldLabel = "${numericField}",
 			fieldFieldLabelEdit = "Numérico",
 			fieldsetModal = "true");
+
+		Translations.addLanguageManageTranslations(key_language = "de-DE");
 
 		PortletEntry.changeLocale(
 			locale = "de-DE",
@@ -768,6 +789,8 @@ definition {
 				fieldsGroupLabelEdit = "${prefix} Fields Group");
 		}
 
+		Translations.addLanguageManageTranslations(key_language = "pt-BR");
+
 		PortletEntry.changeLocale(
 			locale = "pt-BR",
 			modal = "true");
@@ -811,6 +834,8 @@ definition {
 			fieldFieldLabelEdit = "Quarto Texto",
 			fieldsetModal = "true");
 
+		Translations.addLanguageManageTranslations(key_language = "es-ES");
+
 		PortletEntry.changeLocale(
 			locale = "es-ES",
 			modal = "true");
@@ -853,6 +878,8 @@ definition {
 			fieldFieldLabel = "Fourth Text",
 			fieldFieldLabelEdit = "Cuarto Texto",
 			fieldsetModal = "true");
+
+		Translations.addLanguageManageTranslations(key_language = "de-DE");
 
 		PortletEntry.changeLocale(
 			locale = "de-DE",

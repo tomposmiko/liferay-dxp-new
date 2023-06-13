@@ -199,7 +199,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test Page");
+		PagesAdmin.addPublicPage(pageName = "Test Page");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -341,6 +341,40 @@ definition {
 		if ("${homePageModificationDate3}" != "${homePageModificationDate1}") {
 			echo("The modification date of home page is updated.");
 		}
+	}
+
+	@description = "This is a use case for LPS-131903 and LPS-132256 - Verified that users can not attempt to edit pages when disable changes."
+	@priority = "3"
+	test CannotEditSiteLinkedToDisabledPageModificationSiteTemplate {
+		property portal.acceptance = "true";
+
+		SiteTemplates.addCP(
+			disableChanges = "true",
+			siteTemplateName = "Site Template Name");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites");
+
+		Site.addCP(
+			siteName = "Site Template Site Name",
+			siteTemplateName = "Site Template Name",
+			siteType = "Site Template");
+
+		Navigator.openSiteURL(siteName = "Site Template Site Name");
+
+		Page.viewPageLockCheck();
+
+		AssertElementNotPresent(locator1 = "Icon#EDIT_PENCIL");
+
+		MouseOver(
+			key_pageName = "Home",
+			locator1 = "Home#PAGE");
+
+		AssertElementNotPresent(locator1 = "Portlet#OPTIONS_ICON");
+
+		MenuItem.viewNotPresent(menuItem = "Permissions");
 	}
 
 	@description = "This is a use case for LPS-84497."
@@ -574,7 +608,7 @@ definition {
 		ProductMenuHelper.closeProductMenu();
 
 		ApplicationsMenu.gotoPortlet(
-			category = "Sitios web",
+			category = "Sitios Web",
 			panel = "Panel de control",
 			portlet = "Plantillas de sitio web");
 
@@ -833,7 +867,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "View",
 			pageName = "Home");
 

@@ -1077,18 +1077,19 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	}
 
 	@Test
-	public void testPutMessageBoardThreadPermission() throws Exception {
+	public void testPutMessageBoardThreadPermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		MessageBoardThread messageBoardThread =
-			testPutMessageBoardThreadPermission_addMessageBoardThread();
+			testPutMessageBoardThreadPermissionsPage_addMessageBoardThread();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			messageBoardThreadResource.
-				putMessageBoardThreadPermissionHttpResponse(
+				putMessageBoardThreadPermissionsPageHttpResponse(
 					messageBoardThread.getId(),
 					new Permission[] {
 						new Permission() {
@@ -1102,7 +1103,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			messageBoardThreadResource.
-				putMessageBoardThreadPermissionHttpResponse(
+				putMessageBoardThreadPermissionsPageHttpResponse(
 					0L,
 					new Permission[] {
 						new Permission() {
@@ -1115,7 +1116,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	}
 
 	protected MessageBoardThread
-			testPutMessageBoardThreadPermission_addMessageBoardThread()
+			testPutMessageBoardThreadPermissionsPage_addMessageBoardThread()
 		throws Exception {
 
 		return messageBoardThreadResource.postSiteMessageBoardThread(
@@ -1684,18 +1685,21 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	}
 
 	@Test
-	public void testPutSiteMessageBoardThreadPermission() throws Exception {
+	public void testPutSiteMessageBoardThreadPermissionsPage()
+		throws Exception {
+
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		MessageBoardThread messageBoardThread =
-			testPutSiteMessageBoardThreadPermission_addMessageBoardThread();
+			testPutSiteMessageBoardThreadPermissionsPage_addMessageBoardThread();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			messageBoardThreadResource.
-				putSiteMessageBoardThreadPermissionHttpResponse(
+				putSiteMessageBoardThreadPermissionsPageHttpResponse(
 					messageBoardThread.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1709,7 +1713,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			messageBoardThreadResource.
-				putSiteMessageBoardThreadPermissionHttpResponse(
+				putSiteMessageBoardThreadPermissionsPageHttpResponse(
 					messageBoardThread.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1722,7 +1726,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	}
 
 	protected MessageBoardThread
-			testPutSiteMessageBoardThreadPermission_addMessageBoardThread()
+			testPutSiteMessageBoardThreadPermissionsPage_addMessageBoardThread()
 		throws Exception {
 
 		return messageBoardThreadResource.postSiteMessageBoardThread(

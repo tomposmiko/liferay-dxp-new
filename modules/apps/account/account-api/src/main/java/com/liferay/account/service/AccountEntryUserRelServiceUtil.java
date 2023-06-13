@@ -39,12 +39,13 @@ public class AccountEntryUserRelServiceUtil {
 	public static AccountEntryUserRel addAccountEntryUserRel(
 			long accountEntryId, long creatorUserId, String screenName,
 			String emailAddress, java.util.Locale locale, String firstName,
-			String middleName, String lastName, long prefixId, long suffixId)
+			String middleName, String lastName, long prefixId, long suffixId,
+			String jobTitle)
 		throws PortalException {
 
 		return getService().addAccountEntryUserRel(
 			accountEntryId, creatorUserId, screenName, emailAddress, locale,
-			firstName, middleName, lastName, prefixId, suffixId);
+			firstName, middleName, lastName, prefixId, suffixId, jobTitle);
 	}
 
 	public static AccountEntryUserRel addAccountEntryUserRelByEmailAddress(
@@ -58,12 +59,38 @@ public class AccountEntryUserRelServiceUtil {
 			userExternalReferenceCode, serviceContext);
 	}
 
+	public static void addAccountEntryUserRels(
+			long accountEntryId, long[] accountUserIds)
+		throws PortalException {
+
+		getService().addAccountEntryUserRels(accountEntryId, accountUserIds);
+	}
+
+	public static AccountEntryUserRel addPersonTypeAccountEntryUserRel(
+			long accountEntryId, long creatorUserId, String screenName,
+			String emailAddress, java.util.Locale locale, String firstName,
+			String middleName, String lastName, long prefixId, long suffixId,
+			String jobTitle)
+		throws PortalException {
+
+		return getService().addPersonTypeAccountEntryUserRel(
+			accountEntryId, creatorUserId, screenName, emailAddress, locale,
+			firstName, middleName, lastName, prefixId, suffixId, jobTitle);
+	}
+
 	public static void deleteAccountEntryUserRelByEmailAddress(
 			long accountEntryId, String emailAddress)
 		throws PortalException {
 
 		getService().deleteAccountEntryUserRelByEmailAddress(
 			accountEntryId, emailAddress);
+	}
+
+	public static void deleteAccountEntryUserRels(
+			long accountEntryId, long[] accountUserIds)
+		throws PortalException {
+
+		getService().deleteAccountEntryUserRels(accountEntryId, accountUserIds);
 	}
 
 	/**
@@ -73,6 +100,13 @@ public class AccountEntryUserRelServiceUtil {
 	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
+	}
+
+	public static void setPersonTypeAccountEntryUser(
+			long accountEntryId, long userId)
+		throws PortalException {
+
+		getService().setPersonTypeAccountEntryUser(accountEntryId, userId);
 	}
 
 	public static AccountEntryUserRelService getService() {

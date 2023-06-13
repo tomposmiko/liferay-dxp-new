@@ -33,10 +33,8 @@ import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -51,27 +49,18 @@ public class AutoDeployDir {
 
 	public static final String DEFAULT_NAME = "defaultAutoDeployDir";
 
-	public static void deploy(
-			AutoDeploymentContext autoDeploymentContext,
-			List<AutoDeployListener> autoDeployListeners)
+	public static void deploy(AutoDeploymentContext autoDeploymentContext)
 		throws AutoDeployException {
 
-		if (_serviceTrackerList != null) {
-			Iterator<AutoDeployListener> iterator =
-				_serviceTrackerList.iterator();
+		for (AutoDeployListener autoDeployListener : _serviceTrackerList) {
+			if (autoDeployListener.isDeployable(autoDeploymentContext)) {
+				autoDeployListener.deploy(autoDeploymentContext);
 
-			while (iterator.hasNext()) {
-				AutoDeployListener autoDeployListener = iterator.next();
+				File file = autoDeploymentContext.getFile();
 
-				if (autoDeployListener.isDeployable(autoDeploymentContext)) {
-					autoDeployListener.deploy(autoDeploymentContext);
+				file.delete();
 
-					File file = autoDeploymentContext.getFile();
-
-					file.delete();
-
-					return;
-				}
+				return;
 			}
 		}
 
@@ -140,40 +129,22 @@ public class AutoDeployDir {
 		FileUtil.move(file, new File(dirName, fileName));
 	}
 
-	public AutoDeployDir(
-		String name, File deployDir, File destDir, long interval,
-		List<AutoDeployListener> autoDeployListeners) {
-
+	public AutoDeployDir(String name, File deployDir, long interval) {
 		_name = name;
 		_deployDir = deployDir;
-		_destDir = destDir;
 		_interval = interval;
-
-		_autoDeployListeners = new CopyOnWriteArrayList<>(autoDeployListeners);
 	}
 
 	public File getDeployDir() {
 		return _deployDir;
 	}
 
-	public File getDestDir() {
-		return _destDir;
-	}
-
 	public long getInterval() {
 		return _interval;
 	}
 
-	public List<AutoDeployListener> getListeners() {
-		return _autoDeployListeners;
-	}
-
 	public String getName() {
 		return _name;
-	}
-
-	public void registerListener(AutoDeployListener listener) {
-		_autoDeployListeners.add(listener);
 	}
 
 	public void start() {
@@ -226,10 +197,6 @@ public class AutoDeployDir {
 		_serviceTrackerList.close();
 	}
 
-	public void unregisterListener(AutoDeployListener autoDeployListener) {
-		_autoDeployListeners.remove(autoDeployListener);
-	}
-
 	protected AutoDeploymentContext buildAutoDeploymentContext(File file) {
 		AutoDeploymentContext autoDeploymentContext =
 			new AutoDeploymentContext();
@@ -275,7 +242,7 @@ public class AutoDeployDir {
 			AutoDeploymentContext autoDeploymentContext =
 				buildAutoDeploymentContext(file);
 
-			deploy(autoDeploymentContext, _autoDeployListeners);
+			deploy(autoDeploymentContext);
 
 			return;
 		}
@@ -374,17 +341,14 @@ public class AutoDeployDir {
 	private static final Log _log = LogFactoryUtil.getLog(AutoDeployDir.class);
 
 	private static AutoDeployScanner _autoDeployScanner;
-	private static final ServiceTrackerList
-		<AutoDeployListener, AutoDeployListener> _serviceTrackerList =
-			ServiceTrackerListFactory.open(
-				SystemBundleUtil.getBundleContext(), AutoDeployListener.class);
+	private static final ServiceTrackerList<AutoDeployListener>
+		_serviceTrackerList = ServiceTrackerListFactory.open(
+			SystemBundleUtil.getBundleContext(), AutoDeployListener.class);
 	private static final Pattern _versionPattern = Pattern.compile(
 		"-[\\d]+((\\.[\\d]+)+(-.+)*)\\.war$");
 
-	private final List<AutoDeployListener> _autoDeployListeners;
 	private final Map<String, Long> _blacklistFileTimestamps = new HashMap<>();
 	private final File _deployDir;
-	private final File _destDir;
 	private final long _interval;
 	private final String _name;
 

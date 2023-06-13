@@ -142,20 +142,14 @@ definition {
 
 			MastersPageTemplatesAdmin.gotoMasters(masterLayoutName = "Custom Masters Page Template");
 
-			AssertElementPresent(
-				key_elementType = "Container",
-				key_position = "1",
-				locator1 = "PageEditor#LAYOUT_ELEMENTS_HEADER");
+			PageEditor.viewFragment(fragmentName = "Container");
 
 			AssertElementPresent(
 				key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Heading')]",
 				key_position = "1",
 				locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 
-			AssertElementPresent(
-				key_elementType = "Grid",
-				key_position = "1",
-				locator1 = "PageEditor#LAYOUT_ELEMENTS_HEADER");
+			PageEditor.viewFragment(fragmentName = "Grid");
 
 			AssertElementPresent(
 				key_columnNumber = "1",
@@ -388,10 +382,9 @@ definition {
 				scope = "Master");
 
 			PageEditor.editFragmentHTML(
-				editableId = "element-html",
 				fileName = "fragment_static_text.html",
-				filePath = "enduser/wem/layout/pagetemplate/masterspagetemplate",
-				fragmentName = "HTML");
+				fragmentName = "HTML",
+				id = "element-html");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -449,9 +442,7 @@ definition {
 			MastersPageTemplatesAdmin.gotoMasters(masterLayoutName = "Custom Masters Page Template");
 
 			for (var fragmentName : list "Heading,HTML,Image") {
-				AssertElementPresent(
-					key_fragmentName = "${fragmentName}",
-					locator1 = "Fragment#FRAGMENT_HEADER");
+				PageEditor.viewFragment(fragmentName = "${fragmentName}");
 			}
 
 			PageEditor.viewFragmentEditableText(
@@ -563,9 +554,7 @@ definition {
 
 			MastersPageTemplatesAdmin.gotoMasters(masterLayoutName = "Custom Masters Page Template");
 
-			AssertElementPresent(
-				key_fragmentName = "Categories Navigation",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.viewFragment(fragmentName = "Categories Navigation");
 
 			MouseOver.mouseOverNotVisible(
 				key_portletName = "Categories Navigation",
@@ -729,9 +718,7 @@ definition {
 
 			SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-			UploadFileWithCustomPath.uploadArchiveFile(
-				fileName = "master-page-invalid-value.zip",
-				filePath = "enduser/wem/layout/pagetemplate/masterspagetemplate");
+			UploadDependencyFile.uploadArchiveFile(fileName = "master-page-invalid-value.zip");
 
 			Button.clickImport();
 		}

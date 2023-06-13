@@ -89,7 +89,7 @@ public abstract class BaseDataLayoutResourceImpl
 	@javax.ws.rs.Path("/data-definitions/{dataDefinitionId}/data-layouts")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public void deleteDataLayoutsDataDefinition(
+	public void deleteDataDefinitionDataLayout(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("dataDefinitionId")
@@ -665,9 +665,7 @@ public abstract class BaseDataLayoutResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), entityModel);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid filter " + filterString, exception);
-			}
+			_log.error("Invalid filter " + filterString, exception);
 		}
 
 		return null;

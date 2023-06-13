@@ -12,7 +12,16 @@
  * details.
  */
 
-import React, {useCallback, useContext, useEffect, useRef} from 'react';
+import ClayEmptyState from '@clayui/empty-state';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
+import classNames from 'classnames';
+import React, {
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react';
 
 import PreviewInfoBar from './PreviewInfoBar';
 import {StyleBookContext} from './StyleBookContext';
@@ -20,13 +29,17 @@ import {config} from './config';
 
 export default function LayoutPreview() {
 	const iframeRef = useRef();
+	const [iframeLoaded, setIframeLoaded] = useState(false);
 
-	const {frontendTokensValues = {}, previewLayout} = useContext(
-		StyleBookContext
-	);
+	const {
+		frontendTokensValues = {},
+		previewLayout,
+		loading,
+		setLoading,
+	} = useContext(StyleBookContext);
 
 	const loadFrontendTokenValues = useCallback(() => {
-		if (iframeRef.current) {
+		if (iframeLoaded) {
 			const root = iframeRef.current.contentDocument.documentElement;
 
 			if (root) {
@@ -38,9 +51,11 @@ export default function LayoutPreview() {
 						);
 					}
 				);
+
+				setLoading(false);
 			}
 		}
-	}, [frontendTokensValues]);
+	}, [frontendTokensValues, setLoading, iframeLoaded]);
 
 	useEffect(() => {
 		loadFrontendTokenValues();
@@ -55,40 +70,41 @@ export default function LayoutPreview() {
 	return (
 		<>
 			<div className="style-book-editor__page-preview">
-				{previewLayout?.layoutURL ? (
+				{loading && previewLayout?.url && (
+					<div className="align-items-center d-flex h-100 justify-content-center">
+						<ClayLoadingIndicator />
+					</div>
+				)}
+
+				{previewLayout?.url ? (
 					<>
 						{!config.templatesPreviewEnabled && <PreviewInfoBar />}
 						<iframe
-							className="style-book-editor__page-preview-frame"
+							className={classNames(
+								'style-book-editor__page-preview-frame',
+								{'d-none': loading}
+							)}
 							onLoad={() => {
 								loadOverlay(iframeRef);
+								setIframeLoaded(true);
 								loadFrontendTokenValues();
 							}}
 							ref={iframeRef}
-							src={urlWithPreviewParameter(
-								previewLayout?.layoutURL
-							)}
+							src={previewLayout?.url}
 						/>
 					</>
 				) : (
-					<div className="style-book-editor__page-preview-no-page-message">
-						{Liferay.Language.get(
-							'you-cannot-preview-the-style-book-because-there-are-no-pages-in-this-site'
+					<ClayEmptyState
+						className="h-100 justify-content-center mt-0 style-book-editor__page-preview-empty-site-message"
+						description={Liferay.Language.get(
+							'you-cannot-preview-the-style-book-because-your-site-is-empty'
 						)}
-					</div>
+						imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.gif`}
+					/>
 				)}
 			</div>
 		</>
 	);
-}
-
-function urlWithPreviewParameter(url) {
-	const nextURL = new URL(url);
-
-	nextURL.searchParams.set('p_l_mode', 'preview');
-	nextURL.searchParams.set('styleBookEntryPreview', true);
-
-	return nextURL.href;
 }
 
 function loadOverlay(iframeRef) {

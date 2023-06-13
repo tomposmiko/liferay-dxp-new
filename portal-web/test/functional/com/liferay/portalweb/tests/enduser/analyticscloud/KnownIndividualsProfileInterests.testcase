@@ -44,6 +44,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9132 | Test Summary: Individuals interest details has a tab that shows active pages"
+	@ignore = "true"
 	@priority = "3"
 	test AssertIndividualsinterestActivePages {
 		property portal.upstream = "quarantine";
@@ -56,7 +57,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -85,6 +86,7 @@ definition {
 			ACInterests.clickInterest(interestTopic = "ac page 1");
 
 			var portalURL = PropsUtil.get("portal.url");
+
 			var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 			ACInterests.viewInterestPage(
@@ -94,6 +96,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9131 | Test Summary: Individuals interest details has a tab that shows inactive pages"
+	@ignore = "true"
 	@priority = "3"
 	test AssertIndividualsInterestInactivePages {
 		property portal.upstream = "quarantine";
@@ -106,7 +109,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -141,6 +144,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8950 | Test Summary: Interests that are associated with the individual appear in the list"
+	@ignore = "true"
 	@priority = "5"
 	test InterestsAssociatedWithIndividualAppearInList {
 		property portal.upstream = "quarantine";
@@ -156,9 +160,7 @@ definition {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			for (var layoutName : list "Movies,Music,Science,Sports,Technology") {
-				JSONLayout.addPublicLayout(
-					groupName = "Site Name",
-					layoutName = "${layoutName}");
+				ACUtils.addPage(layoutName = "${layoutName}");
 			}
 		}
 
@@ -178,7 +180,7 @@ definition {
 				userLoginFullName = "ac ac");
 
 			for (var pageName : list "Movies,Music,Science,Sports,Technology") {
-				Navigator.gotoSitePage(
+				ACUtils.navigateToSitePage(
 					pageName = "${pageName}",
 					siteName = "Site Name");
 			}

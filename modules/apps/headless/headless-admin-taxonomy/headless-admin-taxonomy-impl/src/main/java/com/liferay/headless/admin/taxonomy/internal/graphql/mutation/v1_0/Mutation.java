@@ -104,7 +104,7 @@ public class Mutation {
 
 	@GraphQLField
 	public java.util.Collection<com.liferay.portal.vulcan.permission.Permission>
-			updateAssetLibraryKeywordPermission(
+			updateAssetLibraryKeywordPermissionsPage(
 				@GraphQLName("assetLibraryId") @NotEmpty String assetLibraryId,
 				@GraphQLName("permissions")
 					com.liferay.portal.vulcan.permission.Permission[]
@@ -116,7 +116,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			keywordResource -> {
 				Page paginationPage =
-					keywordResource.putAssetLibraryKeywordPermission(
+					keywordResource.putAssetLibraryKeywordPermissionsPage(
 						Long.valueOf(assetLibraryId), permissions);
 
 				return paginationPage.getItems();
@@ -233,7 +233,7 @@ public class Mutation {
 
 	@GraphQLField
 	public java.util.Collection<com.liferay.portal.vulcan.permission.Permission>
-			updateSiteKeywordPermission(
+			updateSiteKeywordPermissionsPage(
 				@GraphQLName("siteKey") @NotEmpty String siteKey,
 				@GraphQLName("permissions")
 					com.liferay.portal.vulcan.permission.Permission[]
@@ -244,8 +244,9 @@ public class Mutation {
 			_keywordResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			keywordResource -> {
-				Page paginationPage = keywordResource.putSiteKeywordPermission(
-					Long.valueOf(siteKey), permissions);
+				Page paginationPage =
+					keywordResource.putSiteKeywordPermissionsPage(
+						Long.valueOf(siteKey), permissions);
 
 				return paginationPage.getItems();
 			});
@@ -345,7 +346,7 @@ public class Mutation {
 
 	@GraphQLField
 	public java.util.Collection<com.liferay.portal.vulcan.permission.Permission>
-			updateTaxonomyCategoryPermission(
+			updateTaxonomyCategoryPermissionsPage(
 				@GraphQLName("taxonomyCategoryId") String taxonomyCategoryId,
 				@GraphQLName("permissions")
 					com.liferay.portal.vulcan.permission.Permission[]
@@ -357,7 +358,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			taxonomyCategoryResource -> {
 				Page paginationPage =
-					taxonomyCategoryResource.putTaxonomyCategoryPermission(
+					taxonomyCategoryResource.putTaxonomyCategoryPermissionsPage(
 						taxonomyCategoryId, permissions);
 
 				return paginationPage.getItems();
@@ -396,6 +397,49 @@ public class Mutation {
 						taxonomyVocabularyId, callbackURL, object));
 	}
 
+	@GraphQLField(
+		description = "Deletes the site's taxonomy category by external reference code."
+	)
+	public boolean
+			deleteTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
+				@GraphQLName("taxonomyVocabularyId") Long taxonomyVocabularyId,
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_taxonomyCategoryResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			taxonomyCategoryResource ->
+				taxonomyCategoryResource.
+					deleteTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
+						taxonomyVocabularyId, externalReferenceCode));
+
+		return true;
+	}
+
+	@GraphQLField(
+		description = "Updates the site's taxonomy category with the given external reference code, or creates it if it not exists."
+	)
+	public TaxonomyCategory
+			updateTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
+				@GraphQLName("taxonomyVocabularyId") Long taxonomyVocabularyId,
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("taxonomyCategory") TaxonomyCategory
+					taxonomyCategory)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_taxonomyCategoryResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			taxonomyCategoryResource ->
+				taxonomyCategoryResource.
+					putTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
+						taxonomyVocabularyId, externalReferenceCode,
+						taxonomyCategory));
+	}
+
 	@GraphQLField
 	public TaxonomyVocabulary createAssetLibraryTaxonomyVocabulary(
 			@GraphQLName("assetLibraryId") @NotEmpty String assetLibraryId,
@@ -429,7 +473,7 @@ public class Mutation {
 
 	@GraphQLField
 	public java.util.Collection<com.liferay.portal.vulcan.permission.Permission>
-			updateAssetLibraryTaxonomyVocabularyPermission(
+			updateAssetLibraryTaxonomyVocabularyPermissionsPage(
 				@GraphQLName("assetLibraryId") @NotEmpty String assetLibraryId,
 				@GraphQLName("permissions")
 					com.liferay.portal.vulcan.permission.Permission[]
@@ -442,7 +486,7 @@ public class Mutation {
 			taxonomyVocabularyResource -> {
 				Page paginationPage =
 					taxonomyVocabularyResource.
-						putAssetLibraryTaxonomyVocabularyPermission(
+						putAssetLibraryTaxonomyVocabularyPermissionsPage(
 							Long.valueOf(assetLibraryId), permissions);
 
 				return paginationPage.getItems();
@@ -522,7 +566,7 @@ public class Mutation {
 
 	@GraphQLField
 	public java.util.Collection<com.liferay.portal.vulcan.permission.Permission>
-			updateSiteTaxonomyVocabularyPermission(
+			updateSiteTaxonomyVocabularyPermissionsPage(
 				@GraphQLName("siteKey") @NotEmpty String siteKey,
 				@GraphQLName("permissions")
 					com.liferay.portal.vulcan.permission.Permission[]
@@ -535,7 +579,7 @@ public class Mutation {
 			taxonomyVocabularyResource -> {
 				Page paginationPage =
 					taxonomyVocabularyResource.
-						putSiteTaxonomyVocabularyPermission(
+						putSiteTaxonomyVocabularyPermissionsPage(
 							Long.valueOf(siteKey), permissions);
 
 				return paginationPage.getItems();
@@ -623,7 +667,7 @@ public class Mutation {
 
 	@GraphQLField
 	public java.util.Collection<com.liferay.portal.vulcan.permission.Permission>
-			updateTaxonomyVocabularyPermission(
+			updateTaxonomyVocabularyPermissionsPage(
 				@GraphQLName("taxonomyVocabularyId") Long taxonomyVocabularyId,
 				@GraphQLName("permissions")
 					com.liferay.portal.vulcan.permission.Permission[]
@@ -635,8 +679,9 @@ public class Mutation {
 			this::_populateResourceContext,
 			taxonomyVocabularyResource -> {
 				Page paginationPage =
-					taxonomyVocabularyResource.putTaxonomyVocabularyPermission(
-						taxonomyVocabularyId, permissions);
+					taxonomyVocabularyResource.
+						putTaxonomyVocabularyPermissionsPage(
+							taxonomyVocabularyId, permissions);
 
 				return paginationPage.getItems();
 			});

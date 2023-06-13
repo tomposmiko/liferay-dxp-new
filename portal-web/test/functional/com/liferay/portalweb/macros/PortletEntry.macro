@@ -28,15 +28,16 @@ definition {
 		}
 		else {
 			Click(
-				key_locale = StringUtil.replace("${locale}", "-", "_"),
+				key_locale = "${locale}",
 				locator1 = "Translation#LOCALIZATION_NAME");
 		}
 	}
 
 	macro changeLocaleSummary {
 		Click.clickNoMouseOver(locator1 = "Button#LOCALIZATION_SUMMARY");
+
 		Click(
-			key_locale = StringUtil.replace("${locale}", "-", "_"),
+			key_locale = "${locale}",
 			locator1 = "Translation#LOCALIZATION_NAME");
 	}
 
@@ -83,16 +84,12 @@ definition {
 	}
 
 	macro inputDescription {
-		Click(locator1 = "TextArea#DESCRIPTION");
-
 		Type(
 			locator1 = "TextArea#DESCRIPTION",
 			value1 = "${description}");
 	}
 
 	macro inputDescriptionTextInput {
-		Click(locator1 = "TextInput#DESCRIPTION");
-
 		Type(
 			locator1 = "TextInput#DESCRIPTION",
 			value1 = "${description}");
@@ -107,26 +104,18 @@ definition {
 	}
 
 	macro inputName {
-		Click(locator1 = "TextInput#NAME");
-
 		Type(
 			locator1 = "TextInput#NAME",
 			value1 = "${name}");
 	}
 
 	macro inputStructureKeyTextInput {
-		Click(locator1 = "TextInput#STRUCTURE_KEY_FIELD");
-
 		Type(
 			locator1 = "TextInput#STRUCTURE_KEY_FIELD",
 			value1 = "${structureKey}");
 	}
 
 	macro inputText {
-		Click(
-			key_fieldLabel = "${fieldLabel}",
-			locator1 = "TextInput#GENERIC_TEXT_INPUT");
-
 		Type(
 			key_fieldLabel = "${fieldLabel}",
 			locator1 = "TextInput#GENERIC_TEXT_INPUT",
@@ -134,10 +123,6 @@ definition {
 	}
 
 	macro inputTextArea {
-		Click(
-			key_text = "${fieldId}",
-			locator1 = "TextArea#ANY");
-
 		Type(
 			key_text = "${fieldId}",
 			locator1 = "TextArea#ANY",
@@ -145,11 +130,20 @@ definition {
 	}
 
 	macro inputTitle {
-		Click(locator1 = "TextInput#TITLE");
-
 		Type(
 			locator1 = "TextInput#TITLE",
 			value1 = "${title}");
+	}
+
+	macro LastSelectAll {
+		if (IsNotChecked.isNotCheckedNotVisible(locator1 = "Checkbox#LEXICON_SELECT_ALL_INPUT_LAST")) {
+			Click(locator1 = "Checkbox#LEXICON_SELECT_ALL_CONTAINER_LAST");
+		}
+		else if (IsNotChecked(locator1 = "Checkbox#SELECT_ALL")) {
+			Click(locator1 = "Checkbox#SELECT_ALL");
+		}
+
+		AssertChecked.assertCheckedNotVisible(locator1 = "Checkbox#LEXICON_SELECT_ALL_INPUT_LAST");
 	}
 
 	macro publish {

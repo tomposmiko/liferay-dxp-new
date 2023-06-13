@@ -15,8 +15,6 @@
 AUI.add(
 	'liferay-scheduler-models',
 	(A) => {
-		var AObject = A.Object;
-
 		var DateMath = A.DataType.DateMath;
 		var Lang = A.Lang;
 
@@ -386,7 +384,7 @@ AUI.add(
 
 					return (
 						instance.get('recurrence') !== STR_BLANK ||
-						instance.get('calendarBookingId') !=
+						instance.get('calendarBookingId') !==
 							instance.get('recurringCalendarBookingId')
 					);
 				},
@@ -422,11 +420,11 @@ AUI.add(
 				},
 
 				syncNodeTitleUI() {
-					var instance = this,
-						format = instance.get('titleDateFormat'),
-						startDate = instance.get('startDate'),
-						endDate = instance.get('endDate'),
-						title = [];
+					var instance = this;
+					var format = instance.get('titleDateFormat');
+					var startDate = instance.get('startDate');
+					var endDate = instance.get('endDate');
+					var title = [];
 
 					if (format.startDate) {
 						title.push(
@@ -641,7 +639,7 @@ AUI.add(
 
 					var calendarContainer = scheduler.get('calendarContainer');
 
-					var calendarIds = AObject.keys(
+					var calendarIds = Object.keys(
 						calendarContainer.get('availableCalendars')
 					);
 

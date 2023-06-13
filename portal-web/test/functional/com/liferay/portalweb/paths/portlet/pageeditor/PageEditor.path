@@ -44,11 +44,6 @@
 </tr>
 <!--COLLECTION_DISPLAY-->
 <tr>
-	<td>CLICK_COLLECTION_DISPLAY</td>
-	<td>//div[@aria-label='Select Collection Display']</td>
-	<td></td>
-</tr>
-<tr>
 	<td>COLLECTION_DISPLAY_EMPTY_STATE</td>
 	<td>xpath=(//div[contains(@class,'block')])[${index}]//div[contains(@class,'empty-state')]</td>
 	<td></td>
@@ -66,21 +61,6 @@
 <tr>
 	<td>COLLECTION_ITEM</td>
 	<td>xpath=(//div[contains(@id,'main-content')]//div[@class='row'])[${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>COLLECTION_ITEM_AVERAGE_STAR</td>
-	<td>//div[@class='row'][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//div[contains(@class,'ratings-stars')]//*[name()='svg'][contains(@class,'ratings-stars-average-icon')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>COLLECTION_ITEM_AVERAGE_STAR_RESULT</td>
-	<td>//div[@class='row'][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//div[contains(@class,'ratings-stars')]//span[contains(@class,'ratings-stars-average-text')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>COLLECTION_ITEM_CONTENT</td>
-	<td>//div[contains(@class,'page-editor__topper') and contains(.,'${key_fragmentName}')]//div[contains(@class,'page-editor__collection')]/div[@class='row'][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//*[contains(@class,'content') and contains(.,'${key_entryContent}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -139,11 +119,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>COLLECTION_ITEM_FILTER_COLLECTION</td>
-	<td>//button[contains(@class,'dropdown-item')][contains(text(),'Filter Collection')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>COLLECTION_ITEM_IMAGE</td>
 	<td>//div[contains(@class,'page-editor__topper') and contains(.,'${key_fragmentName}')]//div[contains(@class,'page-editor__collection')]/div[@class='row'][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//*[contains(@style,'${key_entryImage}')]</td>
 	<td></td>
@@ -174,16 +149,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>COLLECTION_ITEM_RATING_STAR_DISABLE</td>
-	<td>//div[@class='row'][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//div[contains(@class,'ratings-stars')]//button[@title='Ratings are disabled in Staging']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>COLLECTION_ITEM_RATING_STAR_EMPTY</td>
-	<td>//div[@class='row'][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//div[contains(@class,'ratings-stars')]//button[contains(@title,'Vote')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>COLLECTION_ITEM_TITLE</td>
 	<td>//div[contains(@class,'page-editor__topper') and contains(.,'${key_fragmentName}')]//div[contains(@class,'page-editor__collection')]/div[@class='row'][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//*[contains(@class,'item__title') and contains(.,'${key_entryTitle}')]</td>
 	<td></td>
@@ -194,40 +159,10 @@
 </td>
 	<td></td>
 </tr>
-<tr>
-	<td>COLLECTION_ITEM_VIEW_COLLECTION_OPTIONS</td>
-	<td>//button[contains(@aria-label,'View Collection Options')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>COLLECTION_ITEM_YOUR_RATING_STAR</td>
-	<td>//div[@class='row'][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//div[contains(@class,'ratings-stars')]//button[contains(@class,'dropdown-toggle')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>COLLECTION_ITEM_YOUR_RATING_STAR_COUNT</td>
-	<td>//div[contains(@class,'ratings-stars-dropdown show')]//button[contains(.,'Rate this ${key_ratingStarCount} out of 5')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>COLLECTION_ITEM_YOUR_RATING_STAR_RESULT</td>
-	<td>//div[@class='row'][${key_rowPosition}]/div[contains(@class,'col')][${key_colPosition}]//div[contains(@class,'ratings-stars')]//button[contains(@title,'You have rated this ${key_ratingStarCount} out of 5')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>COLLECTION_ITEM_YOUR_RATING_STAR_DELETE</td>
-	<td>//div[contains(@class,'ratings-stars-dropdown show')]//button[contains(@class,'dropdown-item') and contains(.,'Delete')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>COLLECTION_ITEM_YOUR_RATING_STAR_DELETE_DISABLE</td>
-	<td>//div[contains(@class,'ratings-stars-dropdown show')]//button[contains(@class,'dropdown-item disabled') and contains(.,'Delete')]</td>
-	<td></td>
-</tr>
 <!--COLLECTION_FILTER-->
 <tr>
 	<td>COLLECTION_FILTER_DROPDOWN_TOGGLE</td>
-	<td>//p[normalize-space(text())='${key_title}']//following-sibling::div//button[contains(@class,'dropdown-toggle')]</td>
+	<td>//label[normalize-space(text())='${key_title}']//following-sibling::div//button[contains(@class,'dropdown-toggle')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -237,12 +172,28 @@
 </tr>
 <tr>
 	<td>COLLECTION_FILTER_SOURCE_LABEL_INVISIBLE</td>
-	<td>//div[.//button[contains(@class,'dropdown-toggle')]]//p[contains(@class,'font-weight-bold')][normalize-space(text())='${sourceLabel}'][contains(@class,'sr-only')]</td>
+	<td>//div[.//button[contains(@class,'dropdown-toggle')]]//label[normalize-space(text())='${sourceLabel}'][contains(@class,'sr-only')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>COLLECTION_FILTER_SOURCE_LABEL_VISIBLE</td>
-	<td>//div[.//button[contains(@class,'dropdown-toggle')]]//p[contains(@class,'font-weight-semi-bold')][normalize-space(text())='${sourceLabel}'][not(contains(@class,'sr-only'))]</td>
+	<td>//div[.//button[contains(@class,'dropdown-toggle')]]//label[normalize-space(text())='${sourceLabel}'][not(contains(@class,'sr-only'))]</td>
+	<td></td>
+</tr>
+<!--COLOR_PICKER-->
+<tr>
+	<td>COLOR_SWATCH_CATEGORY</td>
+	<td>xpath=(//div[contains(@class,'dropdown-menu')][contains(@class,'show')]//span[contains(@class,'subtitle')][normalize-space(text())='${panel}']//following-sibling::div//span[contains(@class,'secondary')])[${index}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COLOR_SWATCH_ITEM</td>
+	<td>xpath=(//div[contains(@class,'dropdown-menu')][contains(@class,'show')]//span[contains(@class,'subtitle')][normalize-space(text())='${panel}']//following-sibling::div[.//span[contains(@class,'secondary')][normalize-space(text())='${category}']]//button[contains(@class,'clay-color-btn')])[${index}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COLOR_SWATCH_PANEL</td>
+	<td>xpath=(//div[contains(@class,'dropdown-menu')][contains(@class,'show')]//span[contains(@class,'subtitle')])[${index}]</td>
 	<td></td>
 </tr>
 <!--CONTENT_PAGE-->
@@ -293,11 +244,6 @@
 </tr>
 <!--DISPLAY_PAGE_TEMPLATE-->
 <tr>
-	<td>ASSET_CONTENT</td>
-	<td>//div[contains(@data-analytics-asset-title,'${key_assetTitle}')]//*[contains(.,'${key_assetContent}')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>ENTRY_COVER_IMAGE</td>
 	<td>//div[contains(@class,'cover-image') and contains(@style,'${key_imageFileName}')]</td>
 	<td></td>
@@ -340,6 +286,11 @@
 </tr>
 <!--EXPERIENCE-->
 <tr>
+	<td>EXPERIENCE_ACTIVE_LABEL</td>
+	<td>//*[contains(@class, 'text-truncate-inline')]//*[contains(text(),'${key_experienceName}')]/parent::span//span[contains(text(),'Active')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>EXPERIENCE_BUTTON_NAME</td>
 	<td>//div[contains(@class,'page-editor__toolbar-experience')]/button[contains(.,'${key_experienceName}')]</td>
 	<td></td>
@@ -360,6 +311,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EXPERIENCE_DEPRIORITIZE_BUTTON</td>
+	<td>//div[contains(@class,'toolbar-experience')]//button[@*[contains(.,'Deprioritize Experience')]]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>EXPERIENCE_DUPLICATE_BUTTON</td>
 	<td>//div[contains(@class,'toolbar-experience')]//button[@*[contains(.,'Duplicate Experience')]]</td>
 	<td></td>
@@ -370,13 +326,28 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EXPERIENCE_DROPDOWN</td>
+	<td>//div[contains(@class,'page-editor__toolbar-experience__dropdown-menu')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EXPERIENCE_ORDER_NAMES</td>
+	<td>xpath=(//span[contains(@class,'text-truncate-inline')])[${key_index}]//span[text()='${key_experienceName}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>EXPERIENCE_PRIORITIZE_BUTTON</td>
-	<td>//div[contains(@class,'toolbar-experience')]//button[@*[contains(.,'Prioritize Experience')]]</td>
+	<td>xpath=(//div[contains(@class,'toolbar-experience')]//button[@*[contains(.,'Prioritize Experience')]])[${key_index}]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>EXPERIENCE_SEGMENT_ANYONE</td>
 	<td>//select[@id='_com_liferay_layout_content_page_editor_web_internal_portlet_ContentPageEditorPortlet_segmentsExperienceSegment']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EXPERIENCE_SEGMENT_NAMES</td>
+	<td>//span[contains(@class,'text-truncate-inline')]//span[text()='${key_experienceName}']/parent::span/following-sibling::span[text()='${key_segmentName}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -570,7 +541,7 @@
 <!--FRAGMENTS_AND_WIDGETS_PANEL-->
 <tr>
 	<td>FRAGMENTS_AND_WIDGETS_DISPLAY_STYLE_BUTTON</td>
-	<td>//div[contains(@class,'fragments-widgets-panel')]//button[contains(@class,'tooltip')][*[name()='svg'][contains(@class,'icon-${key_displayStyle}')]]</td>
+	<td>//div[contains(@class,'fragments-widgets-panel')]//button[contains(@class,'tooltip')][*[name()='svg'][contains(@class,'icon-${key_switchTo}')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -659,11 +630,6 @@
 <tr>
 	<td>GRID_COLUMN_RESIZER</td>
 	<td>//div[contains(@class,'page-editor__col')][${key_position}]//button[contains(@class,'page-editor__col__resizer')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>LAYOUT_ELEMENTS_HEADER</td>
-	<td>xpath=(//div[contains(@class,'page-editor__topper__bar') and contains(.,'${key_elementType}')]//li[contains(@class,'title')])[${key_position}]</td>
 	<td></td>
 </tr>
 <!--LAYOUT_ELEMENTS_CONFIGURATION-->

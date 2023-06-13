@@ -16,12 +16,7 @@ definition {
 		User.firstLoginPG();
 
 		if ("${testPortalInstance}" != "true") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Configuration",
-				panel = "Control Panel",
-				portlet = "Search");
-
-			SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+			SearchAdministration.executeReindex();
 
 			ApplicationsMenu.gotoSite(site = "${siteName}");
 		}
@@ -31,11 +26,11 @@ definition {
 			panel = "Site Administration",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(
+		PagesAdmin.addPublicPage(
 			pageName = "Calendar Page",
 			sitePageType = "Widget Page");
 
-		SitePages.configurePage(
+		PagesAdmin.configurePage(
 			columnName = "1 Column",
 			pageName = "Calendar Page",
 			privacy = "Public Pages",
@@ -85,7 +80,7 @@ definition {
 
 			Calendar.tearDown();
 
-			Page.tearDownPG();
+			PagesAdmin.tearDownCP();
 
 			Workflow.tearDownSiteWorkflow();
 		}
@@ -237,7 +232,7 @@ definition {
 	@description = "Verify that a calendar event on draft can be approved"
 	@priority = "4"
 	test CalendarWithDraftStatusCanBecomeApproved {
-		property portal.upstream = "quarantine";
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		CalendarNavigator.gotoAddEvent();
 
@@ -250,7 +245,7 @@ definition {
 		Navigator.gotoPage(pageName = "Calendar Page");
 
 		CalendarEvent.viewDetails(
-			calendarName = "Liferay DXP",
+			calendarName = "${siteName}",
 			eventTitle = "Event Title Draft",
 			eventType = "Regular");
 
@@ -281,7 +276,7 @@ definition {
 		Navigator.gotoPage(pageName = "Calendar Page");
 
 		CalendarEvent.viewDetails(
-			calendarName = "Liferay DXP",
+			calendarName = "${siteName}",
 			eventTitle = "Event Title Draft",
 			eventType = "Regular");
 

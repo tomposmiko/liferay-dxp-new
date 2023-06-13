@@ -33,7 +33,7 @@ definition {
 
 			WebContent.tearDownCP();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 		}
 	}
 
@@ -379,7 +379,9 @@ definition {
 			locator1 = "TextInput#ANY");
 
 		AssertElementNotPresent(locator1 = "Checkbox#REMEMBER_ME");
+
 		AssertElementNotPresent(locator1 = "Link#FORGOT_PASSWORD");
+
 		AssertElementNotPresent(locator1 = "Link#CREATE_ACCOUNT");
 	}
 
@@ -427,7 +429,9 @@ definition {
 
 		Page.uploadFileForLogo(logoFile = "Document_2.png");
 
-		AssertElementPresent(locator1 = "Button#DELETE_LAYOUT_LOGO");
+		AssertElementPresent(
+			key_text = "Delete",
+			locator1 = "Button#ANY");
 
 		AssertElementNotPresent(
 			key_text = "Delete",
@@ -443,7 +447,8 @@ definition {
 			configurationScope = "Virtual Instance Scope");
 
 		AssertClick(
-			locator1 = "Button#DELETE_LAYOUT_LOGO",
+			key_text = "Delete",
+			locator1 = "Button#ANY",
 			value1 = "Delete");
 
 		PortletEntry.save();
@@ -519,7 +524,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.togglePrivacy(privacy = "Public Pages");
+		PagesAdmin.togglePrivacy(privacy = "Public Pages");
 
 		Click(
 			key_pageName = "Public Pages",
@@ -550,6 +555,7 @@ definition {
 		var articleId = JSONWebcontentSetter.setArticleId(
 			groupName = "Terms of Use Site",
 			title = "Terms of Use WC Title");
+
 		var groupId = JSONGroupSetter.setGroupId(groupName = "Terms of Use Site");
 
 		FormFields.viewCheckboxChecked(fieldName = "terms-of-use-required");
@@ -841,10 +847,10 @@ definition {
 			userScreenName = "usersn");
 	}
 
-	@ignore = "true"
 	@priority = "4"
 	test ExportedFactoryConfigurationCanBeImported {
-		property portal.acceptance = "sharry";
+		property portal.acceptance = "true";
+		property test.name.skip.portal.instance = "InstanceSettings#ExportedFactoryConfigurationCanBeImported";
 
 		var openIDConnectClientID = PropsUtil.get("google.client.id.1");
 		var openIDConnectClientSecret = PropsUtil.get("google.client.secret.1");
@@ -876,24 +882,26 @@ definition {
 			fail("FAIL! Cannot find the configuration file exported from edit page for single factory.");
 		}
 
-		var tempFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "com.liferay.portal.security.sso.openid.connect.internal.configuration.OpenIdConnectProviderConfiguration~*.config");
+		var tempFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "com.liferay.portal.security.sso.openid.connect.internal.configuration.OpenIdConnectProviderConfiguration_*.config");
 
-		OSGiConfig.deployOSGiConfigFile(
+		OSGiConfig.copyOSGiConfigFile(
 			OSGiConfigFileBaseDir = "${tempFileDirectory}",
 			OSGiConfigFileName = "${tempFileName}");
 
-		Portlet.shutdownServer();
-
-		Portlet.startServer();
-
-		Navigator.openSpecificURL(url = "${portalURL}/c/portal/logout");
-
-		User.firstLoginPG();
+		Pause(locator = "60000");
 
 		PortalSettings.gotoConfiguration(
 			configurationCategory = "SSO",
 			configurationName = "OpenID Connect Provider Connection",
 			configurationScope = "Virtual Instance Scope");
+
+		while (IsElementNotPresent(key_rowEntry = "Google", locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME")) {
+			Pause(locator1 = "1000");
+
+			Refresh();
+
+			echo("Refreshed Page");
+		}
 
 		LexiconEntry.viewEntryName(rowEntry = "Google");
 
@@ -1066,6 +1074,7 @@ definition {
 		AssertElementPresent(locator1 = "Button#UPDATE");
 
 		var tempFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "com.liferay.account.configuration.AccountEntryEmailDomainsConfiguration.scoped-*.config");
+
 		var tempFileDirectory = selenium.getOutputDirName();
 		var exportedConfigFile = FileUtil.exists("${tempFileDirectory}/${tempFileName}");
 
@@ -1077,7 +1086,6 @@ definition {
 		}
 	}
 
-	@ignore = "true"
 	@priority = "4"
 	test SingleFactoryConfigurationCanBeExported {
 		var openIDConnectClientID = PropsUtil.get("google.client.id.1");
@@ -1102,6 +1110,7 @@ definition {
 		LexiconEntry.viewEntryName(rowEntry = "Google");
 
 		var tempFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "com.liferay.portal.security.sso.openid.connect.internal.configuration.OpenIdConnectProviderConfiguration-*.config");
+
 		var tempFileDirectory = selenium.getOutputDirName();
 		var exportedConfigFile = FileUtil.exists("${tempFileDirectory}/${tempFileName}");
 
@@ -1121,7 +1130,9 @@ definition {
 		LexiconEntry.gotoAdd();
 
 		AssertElementPresent(locator1 = "UsersAndOrganizationsEditUser#DETAILS_SCREEN_NAME_FIELD");
+
 		AssertElementNotPresent(locator1 = "UsersAndOrganizationsEditUser#DETAILS_GENDER_SELECT");
+
 		AssertElementPresent(locator1 = "UsersAndOrganizationsEditUser#DETAILS_BIRTHDAY_FIELD");
 
 		PortalSettings.gotoConfiguration(
@@ -1142,7 +1153,9 @@ definition {
 		LexiconEntry.gotoAdd();
 
 		AssertElementNotPresent(locator1 = "UsersAndOrganizationsEditUser#DETAILS_SCREEN_NAME_FIELD");
+
 		AssertNotVisible(locator1 = "UsersAndOrganizationsEditUser#DETAILS_BIRTHDAY_FIELD");
+
 		AssertElementPresent(locator1 = "UsersAndOrganizationsEditUser#DETAILS_GENDER_SELECT");
 
 		User.openUsersAdmin();
@@ -1170,7 +1183,9 @@ definition {
 		LexiconEntry.gotoEntry(rowEntry = "FirstName LastName");
 
 		AssertNotEditable(locator1 = "UsersAndOrganizationsEditUser#DETAILS_SCREEN_NAME_FIELD");
+
 		AssertNotVisible(locator1 = "UsersAndOrganizationsEditUser#DETAILS_BIRTHDAY_FIELD");
+
 		AssertElementPresent(locator1 = "UsersAndOrganizationsEditUser#DETAILS_GENDER_SELECT");
 	}
 
@@ -1299,7 +1314,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "AP Test Page");
+		PagesAdmin.addPublicPage(pageName = "AP Test Page");
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
@@ -1324,7 +1339,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "AP Test Page");
+		PagesAdmin.addPublicPage(pageName = "AP Test Page");
 
 		Navigator.gotoPage(pageName = "AP Test Page");
 

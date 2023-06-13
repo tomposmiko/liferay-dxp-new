@@ -281,14 +281,6 @@ public abstract class BaseBuild implements Build {
 	public String getBaseGitRepositorySHA(String gitRepositoryName) {
 		TopLevelBuild topLevelBuild = getTopLevelBuild();
 
-		if (gitRepositoryName.equals("liferay-jenkins-ee")) {
-			Map<String, String> topLevelBuildStartPropertiesTempMap =
-				topLevelBuild.getStartPropertiesTempMap();
-
-			return topLevelBuildStartPropertiesTempMap.get(
-				"JENKINS_GITHUB_UPSTREAM_BRANCH_SHA");
-		}
-
 		if ((topLevelBuild instanceof WorkspaceBuild) && !fromArchive) {
 			WorkspaceBuild workspaceBuild = (WorkspaceBuild)topLevelBuild;
 
@@ -298,6 +290,14 @@ public abstract class BaseBuild implements Build {
 				workspace.getPrimaryWorkspaceGitRepository();
 
 			return workspaceGitRepository.getBaseBranchSHA();
+		}
+
+		if (gitRepositoryName.equals("liferay-jenkins-ee")) {
+			Map<String, String> topLevelBuildStartPropertiesTempMap =
+				topLevelBuild.getStartPropertiesTempMap();
+
+			return topLevelBuildStartPropertiesTempMap.get(
+				"JENKINS_GITHUB_UPSTREAM_BRANCH_SHA");
 		}
 
 		Map<String, String> gitRepositoryGitDetailsTempMap =
@@ -840,6 +840,7 @@ public abstract class BaseBuild implements Build {
 		return upstreamJobFailureMessageElement;
 	}
 
+	@Override
 	public Map<String, String> getInjectedEnvironmentVariablesMap()
 		throws IOException {
 
@@ -2262,38 +2263,6 @@ public abstract class BaseBuild implements Build {
 		downloadSampleURL(getArchivePath(), true, getBuildURL(), "api/json");
 		downloadSampleURL(
 			getArchivePath(), false, getBuildURL(), "testReport/api/json");
-
-		if (!getStartPropertiesTempMap().isEmpty()) {
-			try {
-				JSONObject startPropertiesTempMapJSONObject =
-					JenkinsResultsParserUtil.toJSONObject(
-						getStartPropertiesTempMapURL());
-
-				writeArchiveFile(
-					startPropertiesTempMapJSONObject.toString(4),
-					getArchivePath() + "/start.properties.json");
-			}
-			catch (IOException ioException) {
-				throw new RuntimeException(
-					"Unable to create start.properties.json", ioException);
-			}
-		}
-
-		if (!getStopPropertiesTempMap().isEmpty()) {
-			try {
-				JSONObject stopPropertiesTempMapJSONObject =
-					JenkinsResultsParserUtil.toJSONObject(
-						getStopPropertiesTempMapURL());
-
-				writeArchiveFile(
-					stopPropertiesTempMapJSONObject.toString(4),
-					getArchivePath() + "/stop.properties.json");
-			}
-			catch (IOException ioException) {
-				throw new RuntimeException(
-					"Unable to create stop.properties.json", ioException);
-			}
-		}
 	}
 
 	protected void checkForReinvocation(String consoleText) {

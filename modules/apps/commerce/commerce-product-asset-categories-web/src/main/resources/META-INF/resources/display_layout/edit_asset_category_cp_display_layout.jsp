@@ -38,7 +38,7 @@ if (cpDisplayLayout != null) {
 	}
 
 	if (selLayout != null) {
-		layoutBreadcrumb = categoryCPDisplayLayoutDisplayContext.getLayoutBreadcrumb(selLayout);
+		layoutBreadcrumb = selLayout.getBreadcrumb(locale);
 	}
 }
 %>
@@ -109,9 +109,9 @@ if (cpDisplayLayout != null) {
 		).put(
 			"itemSelectorUrl", categoryCPDisplayLayoutDisplayContext.getItemSelectorUrl(renderRequest)
 		).put(
-			"locale", locale
-		).put(
 			"portletNamespace", liferayPortletResponse.getNamespace()
+		).put(
+			"title", (assetCategory == null) ? null : assetCategory.getTitle(locale)
 		).build()
 	%>'
 	module="js/EditAssetCategoryCPDisplayLayout"

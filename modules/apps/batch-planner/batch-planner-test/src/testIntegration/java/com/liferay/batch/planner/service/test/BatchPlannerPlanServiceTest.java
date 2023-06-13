@@ -17,6 +17,7 @@ package com.liferay.batch.planner.service.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.batch.planner.constants.BatchPlannerPlanConstants;
 import com.liferay.batch.planner.exception.BatchPlannerPlanExternalTypeException;
+import com.liferay.batch.planner.exception.BatchPlannerPlanInternalClassNameException;
 import com.liferay.batch.planner.exception.BatchPlannerPlanNameException;
 import com.liferay.batch.planner.exception.DuplicateBatchPlannerPlanException;
 import com.liferay.batch.planner.model.BatchPlannerPlan;
@@ -59,7 +60,7 @@ public class BatchPlannerPlanServiceTest {
 			_batchPlannerPlanService.addBatchPlannerPlan(
 				true, BatchPlannerPlanConstants.EXTERNAL_TYPE_CSV,
 				"/" + RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(), name, false);
+				RandomTestUtil.randomString(), name, null, false);
 
 		Assert.assertEquals(
 			BatchPlannerPlanConstants.EXTERNAL_TYPE_CSV,
@@ -70,7 +71,7 @@ public class BatchPlannerPlanServiceTest {
 			_batchPlannerPlanService.addBatchPlannerPlan(
 				true, "", "/" + RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				false);
+				null, false);
 
 			Assert.fail();
 		}
@@ -89,8 +90,21 @@ public class BatchPlannerPlanServiceTest {
 		try {
 			_batchPlannerPlanService.addBatchPlannerPlan(
 				true, BatchPlannerPlanConstants.EXTERNAL_TYPE_CSV,
+				"/" + RandomTestUtil.randomString(), null, name, null, false);
+
+			Assert.fail();
+		}
+		catch (BatchPlannerPlanInternalClassNameException
+					batchPlannerPlanInternalClassNameException) {
+
+			Assert.assertNotNull(batchPlannerPlanInternalClassNameException);
+		}
+
+		try {
+			_batchPlannerPlanService.addBatchPlannerPlan(
+				true, BatchPlannerPlanConstants.EXTERNAL_TYPE_CSV,
 				"/" + RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(), "", false);
+				RandomTestUtil.randomString(), "", null, true);
 
 			Assert.fail();
 		}
@@ -108,7 +122,7 @@ public class BatchPlannerPlanServiceTest {
 				true, BatchPlannerPlanConstants.EXTERNAL_TYPE_CSV,
 				"/" + RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(maxLength + 1), false);
+				RandomTestUtil.randomString(maxLength + 1), null, false);
 
 			Assert.fail();
 		}
@@ -122,7 +136,7 @@ public class BatchPlannerPlanServiceTest {
 			_batchPlannerPlanService.addBatchPlannerPlan(
 				true, BatchPlannerPlanConstants.EXTERNAL_TYPE_CSV,
 				"/" + RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(), name, false);
+				RandomTestUtil.randomString(), name, null, false);
 
 			Assert.fail();
 		}

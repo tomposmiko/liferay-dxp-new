@@ -334,6 +334,35 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 		return false;
 	}
 
+	private void _findBundlesWithFragmentsToRefresh(Set<Bundle> bundles) {
+		Set<String> hostBundleSymbolicNames = new HashSet<>();
+
+		for (Bundle bundle : bundles) {
+			if ((bundle.getState() != Bundle.UNINSTALLED) &&
+				_isFragment(bundle)) {
+
+				hostBundleSymbolicNames.add(_getFragmentHost(bundle));
+			}
+		}
+
+		if (hostBundleSymbolicNames.isEmpty()) {
+			return;
+		}
+
+		for (Bundle bundle : _bundleContext.getBundles()) {
+			if (hostBundleSymbolicNames.remove(bundle.getSymbolicName())) {
+				int hostBundleState = bundle.getState();
+
+				if ((hostBundleState == Bundle.ACTIVE) ||
+					(hostBundleState == Bundle.RESOLVED) ||
+					(hostBundleState == Bundle.STARTING)) {
+
+					bundles.add(bundle);
+				}
+			}
+		}
+	}
+
 	private void _findBundlesWithOptionalPackagesToRefresh(
 		Set<Bundle> refreshBundles) {
 
@@ -513,6 +542,28 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 		synchronized (_currentManagedArtifacts) {
 			return new ArrayList<>(_currentManagedArtifacts.values());
 		}
+	}
+
+	/**
+	 * @see com.liferay.portal.fragment.bundle.watcher.internal.PortalFragmentBundleWatcher#_getFragmentHost
+	 */
+	private String _getFragmentHost(Bundle bundle) {
+		Dictionary<String, String> dictionary = bundle.getHeaders(
+			StringPool.BLANK);
+
+		String fragmentHost = dictionary.get(Constants.FRAGMENT_HOST);
+
+		if (fragmentHost == null) {
+			return null;
+		}
+
+		int index = fragmentHost.indexOf(CharPool.SEMICOLON);
+
+		if (index != -1) {
+			fragmentHost = fragmentHost.substring(0, index);
+		}
+
+		return fragmentHost;
 	}
 
 	private List<String> _getWatchedDirPaths() {
@@ -1012,6 +1063,8 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 			bundles.addAll(installedBundles);
 
+			_findBundlesWithFragmentsToRefresh(bundles);
+
 			_findBundlesWithOptionalPackagesToRefresh(bundles);
 
 			if (!bundles.isEmpty()) {
@@ -1349,8 +1402,7 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 	private final Map<File, Artifact> _currentManagedArtifacts =
 		new HashMap<>();
 	private final Set<Bundle> _delayedStart = new HashSet<>();
-	private final ServiceTrackerList<FileInstaller, FileInstaller>
-		_fileInstallers;
+	private final ServiceTrackerList<FileInstaller> _fileInstallers;
 	private final String _filter;
 	private int _frameworkStartLevel;
 	private final Map<File, Artifact> _installationFailures = new HashMap<>();

@@ -91,9 +91,22 @@ export default function DragPreview() {
 
 	const layoutDataItem = layoutData.items[item?.id];
 
-	const icon =
-		item?.icon ||
-		getItemIcon(layoutDataItem, fragmentEntryLinks, fragments, widgets);
+	let icon;
+
+	if (item?.icon) {
+		icon = item.icon;
+	}
+	else if (layoutDataItem) {
+		icon = getItemIcon(
+			layoutDataItem,
+			fragmentEntryLinks,
+			fragments,
+			widgets
+		);
+	}
+	else if (process.env.NODE_ENV === 'development') {
+		console.error('There is no icon for item ', item);
+	}
 
 	return (
 		<div className="page-editor__drag-preview">
@@ -115,6 +128,7 @@ export default function DragPreview() {
 						<ClayIcon className="mt-0" symbol={icon} />
 					</div>
 				)}
+
 				<span className="ml-3 text-truncate">
 					{item?.name ? item.name : Liferay.Language.get('element')}
 				</span>

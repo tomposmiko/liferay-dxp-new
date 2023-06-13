@@ -21,7 +21,6 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.atom.AtomCollectionAdapter;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
@@ -131,24 +130,6 @@ public class PortletBagImpl implements PortletBag {
 		}
 
 		return _toList(_assetRendererFactoryInstances);
-	}
-
-	@Override
-	public List<AtomCollectionAdapter<?>> getAtomCollectionAdapterInstances() {
-		if (_atomCollectionAdapterInstances == null) {
-			synchronized (this) {
-				if (_atomCollectionAdapterInstances == null) {
-					_atomCollectionAdapterInstances =
-						ServiceTrackerListFactory.open(
-							_bundleContext,
-							(Class<AtomCollectionAdapter<?>>)
-								(Class<?>)AtomCollectionAdapter.class,
-							_filterString);
-				}
-			}
-		}
-
-		return _toList(_atomCollectionAdapterInstances);
 	}
 
 	@Override
@@ -586,7 +567,7 @@ public class PortletBagImpl implements PortletBag {
 		_portletName = portletName;
 	}
 
-	private <T> List<T> _toList(ServiceTrackerList<T, T> serviceTrackerList) {
+	private <T> List<T> _toList(ServiceTrackerList<T> serviceTrackerList) {
 		List<T> list = new ArrayList<>(serviceTrackerList.size());
 
 		serviceTrackerList.forEach(list::add);
@@ -597,76 +578,56 @@ public class PortletBagImpl implements PortletBag {
 	private static final BundleContext _bundleContext =
 		SystemBundleUtil.getBundleContext();
 
-	private volatile ServiceTrackerList
-		<AssetRendererFactory<?>, AssetRendererFactory<?>>
-			_assetRendererFactoryInstances;
-	private volatile ServiceTrackerList
-		<AtomCollectionAdapter<?>, AtomCollectionAdapter<?>>
-			_atomCollectionAdapterInstances;
-	private volatile ServiceTrackerList
-		<ConfigurationAction, ConfigurationAction>
-			_configurationActionInstances;
-	private volatile ServiceTrackerList<ControlPanelEntry, ControlPanelEntry>
+	private volatile ServiceTrackerList<AssetRendererFactory<?>>
+		_assetRendererFactoryInstances;
+	private volatile ServiceTrackerList<ConfigurationAction>
+		_configurationActionInstances;
+	private volatile ServiceTrackerList<ControlPanelEntry>
 		_controlPanelEntryInstances;
-	private volatile ServiceTrackerList
-		<CustomAttributesDisplay, CustomAttributesDisplay>
-			_customAttributesDisplayInstances;
+	private volatile ServiceTrackerList<CustomAttributesDisplay>
+		_customAttributesDisplayInstances;
 	private final String _filterString;
 	private final FriendlyURLMapperTracker _friendlyURLMapperTracker;
-	private volatile ServiceTrackerList<Indexer<?>, Indexer<?>>
-		_indexerInstances;
-	private volatile ServiceTrackerList<OpenSearch, OpenSearch>
-		_openSearchInstances;
-	private volatile ServiceTrackerList
-		<PermissionPropagator, PermissionPropagator>
-			_permissionPropagatorInstances;
-	private volatile ServiceTrackerList<PollerProcessor, PollerProcessor>
+	private volatile ServiceTrackerList<Indexer<?>> _indexerInstances;
+	private volatile ServiceTrackerList<OpenSearch> _openSearchInstances;
+	private volatile ServiceTrackerList<PermissionPropagator>
+		_permissionPropagatorInstances;
+	private volatile ServiceTrackerList<PollerProcessor>
 		_pollerProcessorInstances;
-	private volatile ServiceTrackerList<MessageListener, MessageListener>
+	private volatile ServiceTrackerList<MessageListener>
 		_popMessageListenerInstances;
-	private volatile ServiceTrackerList<PortletDataHandler, PortletDataHandler>
+	private volatile ServiceTrackerList<PortletDataHandler>
 		_portletDataHandlerInstances;
 	private Portlet _portletInstance;
-	private volatile ServiceTrackerList
-		<PortletLayoutListener, PortletLayoutListener>
-			_portletLayoutListenerInstances;
+	private volatile ServiceTrackerList<PortletLayoutListener>
+		_portletLayoutListenerInstances;
 	private String _portletName;
-	private volatile ServiceTrackerList
-		<PreferencesValidator, PreferencesValidator>
-			_preferencesValidatorInstances;
+	private volatile ServiceTrackerList<PreferencesValidator>
+		_preferencesValidatorInstances;
 	private final String _resourceBundleBaseName;
 	private volatile ResourceBundleLoader _resourceBundleLoader;
-	private volatile ServiceTrackerList
-		<SchedulerEventMessageListener, SchedulerEventMessageListener>
-			_schedulerEventMessageListeners;
+	private volatile ServiceTrackerList<SchedulerEventMessageListener>
+		_schedulerEventMessageListeners;
 	private final List<ServiceRegistration<?>> _serviceRegistrations;
 	private final ServletContext _servletContext;
-	private volatile ServiceTrackerList
-		<SocialActivityInterpreter, SocialActivityInterpreter>
-			_socialActivityInterpreterInstances;
-	private volatile ServiceTrackerList
-		<SocialRequestInterpreter, SocialRequestInterpreter>
-			_socialRequestInterpreterInstances;
-	private volatile ServiceTrackerList
-		<StagedModelDataHandler<?>, StagedModelDataHandler<?>>
-			_stagedModelDataHandlerInstances;
-	private volatile ServiceTrackerList<TemplateHandler, TemplateHandler>
+	private volatile ServiceTrackerList<SocialActivityInterpreter>
+		_socialActivityInterpreterInstances;
+	private volatile ServiceTrackerList<SocialRequestInterpreter>
+		_socialRequestInterpreterInstances;
+	private volatile ServiceTrackerList<StagedModelDataHandler<?>>
+		_stagedModelDataHandlerInstances;
+	private volatile ServiceTrackerList<TemplateHandler>
 		_templateHandlerInstances;
-	private volatile ServiceTrackerList<TrashHandler, TrashHandler>
-		_trashHandlerInstances;
-	private volatile ServiceTrackerList<URLEncoder, URLEncoder>
-		_urlEncoderInstances;
-	private volatile ServiceTrackerList
-		<UserNotificationDefinition, UserNotificationDefinition>
-			_userNotificationDefinitionInstances;
-	private volatile ServiceTrackerList
-		<UserNotificationHandler, UserNotificationHandler>
-			_userNotificationHandlerInstances;
-	private volatile ServiceTrackerList<WebDAVStorage, WebDAVStorage>
-		_webDAVStorageInstances;
-	private volatile ServiceTrackerList<WorkflowHandler<?>, WorkflowHandler<?>>
+	private volatile ServiceTrackerList<TrashHandler> _trashHandlerInstances;
+	private volatile ServiceTrackerList<URLEncoder> _urlEncoderInstances;
+	private volatile ServiceTrackerList<UserNotificationDefinition>
+		_userNotificationDefinitionInstances;
+	private volatile ServiceTrackerList<UserNotificationHandler>
+		_userNotificationHandlerInstances;
+	private volatile ServiceTrackerList<WebDAVStorage> _webDAVStorageInstances;
+	private volatile ServiceTrackerList<WorkflowHandler<?>>
 		_workflowHandlerInstances;
-	private volatile ServiceTrackerList<Method, Method> _xmlRpcMethodInstances;
+	private volatile ServiceTrackerList<Method> _xmlRpcMethodInstances;
 
 	@SuppressWarnings("deprecation")
 	private static class PermissionPropagatorServiceTrackerCustomizer

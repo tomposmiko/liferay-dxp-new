@@ -52,6 +52,7 @@ definition {
 	@description = "LPS-135888 - Verify that the user with Account role type can Approve the task"
 	@priority = "5"
 	test AccountUserCanApproveTask {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "MyWorkflowTasks#AccountUserCanApproveTask";
 
 		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
@@ -174,7 +175,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -208,7 +209,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -239,7 +240,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -284,7 +285,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -333,7 +334,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -441,6 +442,7 @@ definition {
 	@description = "LPS-135888 - Verify that the task is assigned to the user with Account role type"
 	@priority = "4"
 	test CanAssignTaskToUserWithAccountRole {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "MyWorkflowTasks#CanAssignTaskToUserWithAccountRole";
 
 		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
@@ -820,15 +822,6 @@ definition {
 			title = "Blogs Entry 2");
 	}
 
-	@description = "Verify that the user can assign a task to another user in the Assigned to Me tab"
-	@ignore = "Test Stub"
-	@priority = "5"
-	test CanReassignTask {
-
-		// TODO LRQA-68850 CanReassignTask pending implementation
-
-	}
-
 	@description = "Verify that the user is able to Reverse Sort Direction by clicking the icon"
 	@priority = "2"
 	test CanReverseSortDirection {
@@ -1018,7 +1011,6 @@ definition {
 	}
 
 	@description = "Verify that in Update Due Date, the due date is required"
-	@ignore = "true"
 	@priority = "3"
 	test DueDateIsRequired {
 		JSONBlog.addEntry(
@@ -1033,7 +1025,9 @@ definition {
 			workflowAssetTitle = "Blogs Entry Title 1",
 			workflowTask = "Review");
 
-		Alert.viewErrorMessage(errorMessage = "Please enter a valid due date.");
+		AssertTextEquals.assertPartialText(
+			locator1 = "MyWorkflowTasks#DUE_DATE_ALERT",
+			value1 = "Please enter a valid due date.");
 	}
 
 	@description = "Verify that in Update Due Date modal, the user can not insert a past date"
@@ -1207,7 +1201,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -1240,7 +1234,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -1257,7 +1251,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -1292,7 +1286,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -1371,7 +1365,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -1406,7 +1400,7 @@ definition {
 			userLoginFullName = "test test");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -1482,12 +1476,82 @@ definition {
 	}
 
 	@description = "LPS-135888 - Verify that when the user delete the order, the task is not displayed under My Workflow Tasks"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test TaskIsNotDisplayedAfterOrderIsDeleted {
+		property portal.upstream = "quarantine";
 
-		// TODO LRQA-69108 TaskIsNotDisplayedAfterOrderIsDeleted pending implementation
+		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
 
+		ApplicationsMenu.gotoPortlet(
+			category = "Accounts",
+			panel = "Control Panel",
+			portlet = "Accounts");
+
+		Accounts.addBusinessAccount(
+			accountDescription = "Account Description",
+			accountName = "Account Name");
+
+		Accounts.addNewUserToBusinessAccount(
+			accountName = "Account Name",
+			assigneeName = "userfn",
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		Accounts.addAssigneeToRoleViaUsersTab(
+			accountRoleTitle = "Account Administrator",
+			accountUserName = "userfn userln");
+
+		CommerceNavigator.gotoPortlet(
+			category = "Store Management",
+			portlet = "Channels");
+
+		CommerceNavigator.gotoEntry(entryName = "Minium Portal");
+
+		Select(
+			key_title = "Buyer Order Approval Workflow",
+			locator1 = "CommerceEntry#CATALOGS_FORM",
+			value1 = "Single Approver (Version 1)");
+
+		Button.clickSave();
+
+		ApplicationsMenu.gotoSite(site = "Minium");
+
+		FrontStore.addInitializerProductToCart(
+			productName = "U-Joint",
+			productQuantity = "1");
+
+		CommerceNavigator.gotoMiniCart();
+
+		Button.click(button = "Review Order");
+
+		Button.click(button = "Submit");
+
+		Navigator.openURL();
+
+		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
+
+		Workflow.viewTaskAssignedToMyRoles(
+			workflowAssetTitle = "Order",
+			workflowAssetType = "Commerce Order",
+			workflowTask = "Review");
+
+		ApplicationsMenu.gotoSite(site = "Minium");
+
+		CommerceJSONOrdersAPI._deleteAllCommerceOrders();
+
+		CommerceNavigator.gotoPortlet(
+			category = "Order Management",
+			portlet = "Orders");
+
+		IsElementPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER");
+
+		Navigator.openURL();
+
+		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
+
+		Workflow.viewDefaultMyWorkflowTasksCP();
 	}
 
 	@priority = "5"
@@ -1497,7 +1561,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 

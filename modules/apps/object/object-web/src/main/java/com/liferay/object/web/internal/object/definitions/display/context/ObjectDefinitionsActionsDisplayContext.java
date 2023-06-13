@@ -17,7 +17,6 @@ package com.liferay.object.web.internal.object.definitions.display.context;
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
-import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingException;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
@@ -31,11 +30,13 @@ import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.action.trigger.ObjectActionTrigger;
 import com.liferay.object.action.trigger.ObjectActionTriggerRegistry;
+import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
-import com.liferay.object.web.internal.display.context.util.ObjectRequestHelper;
+import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -56,6 +57,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
@@ -118,7 +121,7 @@ public class ObjectDefinitionsActionsDisplayContext {
 	public CreationMenu getCreationMenu() throws Exception {
 		CreationMenu creationMenu = new CreationMenu();
 
-		if (!_hasAddObjectActionPermission()) {
+		if (!hasUpdateObjectDefinitionPermission()) {
 			return creationMenu;
 		}
 
@@ -236,8 +239,16 @@ public class ObjectDefinitionsActionsDisplayContext {
 			_objectRequestHelper.getLiferayPortletResponse());
 	}
 
+	public boolean hasUpdateObjectDefinitionPermission()
+		throws PortalException {
+
+		return _objectDefinitionModelResourcePermission.contains(
+			_objectRequestHelper.getPermissionChecker(),
+			getObjectDefinitionId(), ActionKeys.UPDATE);
+	}
+
 	public String renderDDMForm(PageContext pageContext)
-		throws DDMFormRenderingException {
+		throws PortalException {
 
 		ObjectActionExecutor objectActionExecutor = getObjectActionExecutor();
 
@@ -247,6 +258,28 @@ public class ObjectDefinitionsActionsDisplayContext {
 
 		DDMForm ddmForm = DDMFormFactory.create(
 			objectActionExecutor.getSettings());
+
+		if (StringUtil.equals(
+				objectActionExecutor.getKey(),
+				ObjectActionExecutorConstants.KEY_WEBHOOK)) {
+
+			List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
+
+			Stream<DDMFormField> stream = ddmFormFields.stream();
+
+			Optional<DDMFormField> ddmFormFieldOptional = stream.filter(
+				ddmFormField -> ddmFormField.getName(
+				).equals(
+					"url"
+				)
+			).findFirst();
+
+			if (ddmFormFieldOptional.isPresent()) {
+				DDMFormField ddmFormField = ddmFormFieldOptional.get();
+
+				ddmFormField.setProperty("required", true);
+			}
+		}
 
 		DDMFormRenderingContext ddmFormRenderingContext =
 			new DDMFormRenderingContext();
@@ -274,6 +307,8 @@ public class ObjectDefinitionsActionsDisplayContext {
 		ddmFormRenderingContext.setPortletNamespace(
 			liferayPortletResponse.getNamespace());
 
+		ddmFormRenderingContext.setReadOnly(
+			!hasUpdateObjectDefinitionPermission());
 		ddmFormRenderingContext.setShowRequiredFieldsWarning(true);
 
 		return _ddmFormRenderer.render(
@@ -341,12 +376,6 @@ public class ObjectDefinitionsActionsDisplayContext {
 		}
 
 		return value;
-	}
-
-	private boolean _hasAddObjectActionPermission() throws Exception {
-		return _objectDefinitionModelResourcePermission.contains(
-			_objectRequestHelper.getPermissionChecker(),
-			getObjectDefinitionId(), ActionKeys.UPDATE);
 	}
 
 	private final DDMFormRenderer _ddmFormRenderer;

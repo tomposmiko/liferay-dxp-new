@@ -34,12 +34,14 @@ import com.liferay.translation.model.TranslationEntry;
 import com.liferay.translation.snapshot.TranslationSnapshot;
 import com.liferay.translation.snapshot.TranslationSnapshotProvider;
 import com.liferay.translation.web.internal.display.context.ViewTranslationDisplayContext;
+import com.liferay.translation.web.internal.helper.InfoItemHelper;
 
 import java.io.ByteArrayInputStream;
 
 import java.nio.charset.StandardCharsets;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -104,37 +106,22 @@ public class TranslationEntryAssetRenderer
 
 	@Override
 	public String getTitle(Locale locale) {
-		try {
-			AssetRendererFactory<?> assetRendererFactory =
-				AssetRendererFactoryRegistryUtil.
-					getAssetRendererFactoryByClassNameId(
-						_translationEntry.getClassNameId());
+		InfoItemHelper infoItemHelper = new InfoItemHelper(
+			_translationEntry.getClassName(), _infoItemServiceTracker);
 
-			if (assetRendererFactory == null) {
-				return LanguageUtil.get(locale, "translation");
-			}
+		Optional<String> infoItemTitleOptional =
+			infoItemHelper.getInfoItemTitleOptional(
+				_translationEntry.getClassPK(), locale);
 
-			AssetRenderer<?> assetRenderer = _getAssetRenderer(
-				assetRendererFactory);
-
-			if (assetRenderer == null) {
-				return LanguageUtil.get(locale, "translation");
-			}
-
-			return LanguageUtil.format(
-				locale, "translation-of-x-to-x",
-				new Object[] {
-					assetRenderer.getTitle(locale),
-					StringUtil.replace(
-						_translationEntry.getLanguageId(), CharPool.UNDERLINE,
-						CharPool.DASH)
-				});
-		}
-		catch (PortalException portalException) {
-			_log.error(portalException, portalException);
-
-			return LanguageUtil.get(locale, "translation");
-		}
+		return LanguageUtil.format(
+			locale, "translation-of-x-to-x",
+			new Object[] {
+				infoItemTitleOptional.orElseGet(
+					() -> _getAssetRendererTitle(locale)),
+				StringUtil.replace(
+					_translationEntry.getLanguageId(), CharPool.UNDERLINE,
+					CharPool.DASH)
+			});
 	}
 
 	@Override
@@ -202,6 +189,33 @@ public class TranslationEntryAssetRenderer
 			}
 
 			return null;
+		}
+	}
+
+	private String _getAssetRendererTitle(Locale locale) {
+		try {
+			AssetRendererFactory<?> assetRendererFactory =
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassNameId(
+						_translationEntry.getClassNameId());
+
+			if (assetRendererFactory == null) {
+				return LanguageUtil.get(locale, "translation");
+			}
+
+			AssetRenderer<?> assetRenderer = _getAssetRenderer(
+				assetRendererFactory);
+
+			if (assetRenderer == null) {
+				return LanguageUtil.get(locale, "translation");
+			}
+
+			return assetRenderer.getTitle(locale);
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
+
+			return LanguageUtil.get(locale, "translation");
 		}
 	}
 

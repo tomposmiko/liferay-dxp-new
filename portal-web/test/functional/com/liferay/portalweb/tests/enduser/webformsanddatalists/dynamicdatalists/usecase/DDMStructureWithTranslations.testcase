@@ -13,14 +13,12 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLDataDefinition.addCP();
 
-		var sourceJSON = TestCase.getFileContent(
-			fileName = "complexDDMStructure.json",
-			filePath = "enduser/webformsanddatalists/dynamicdatalists/usecase");
+		var sourceJSON = TestCase.getFileContent(fileName = "complexDDMStructure.json");
 
 		DynamicDataMapping.addFieldViaJSON(sourceJSON = "${sourceJSON}");
 
@@ -33,7 +31,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLList.addCP();
@@ -45,7 +43,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 	}
 

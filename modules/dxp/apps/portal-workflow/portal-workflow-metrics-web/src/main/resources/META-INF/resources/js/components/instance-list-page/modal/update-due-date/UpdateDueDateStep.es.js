@@ -11,6 +11,7 @@
 
 import {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
+import ClayList from '@clayui/list';
 import ClayModal from '@clayui/modal';
 import getCN from 'classnames';
 import React, {useContext, useEffect, useRef, useState} from 'react';
@@ -109,7 +110,8 @@ function UpdateDueDateStep({className, dueDate = new Date()}) {
 						}`}
 					>
 						<label htmlFor="dateInput">
-							{Liferay.Language.get('new-due-date')}{' '}
+							{Liferay.Language.get('new-due-date') + ' '}
+
 							<span className="reference-mark">
 								<ClayIcon symbol="asterisk" />
 							</span>
@@ -183,15 +185,16 @@ function TimePickerInputWithOptions({format, isAmPm, setValue, value}) {
 					}}
 				>
 					<div className="arrow"></div>
+
 					<div className="inline-scroller">
 						<div className="popover-body">
 							{options.map((option, index) => (
-								<li
+								<ClayList.Item
 									key={index}
 									onMouseDown={() => setValue(option)}
 								>
 									{option}
-								</li>
+								</ClayList.Item>
 							))}
 						</div>
 					</div>

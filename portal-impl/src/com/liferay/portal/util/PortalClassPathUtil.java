@@ -20,7 +20,6 @@ import com.liferay.petra.process.ProcessLog;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -110,26 +109,21 @@ public class PortalClassPathUtil {
 
 		StringBundler sb = new StringBundler(8);
 
-		String appServerGlobalClassPath = _buildClassPath(
-			classLoader, ServletException.class.getName());
-
-		sb.append(appServerGlobalClassPath);
+		sb.append(
+			_buildClassPath(classLoader, ServletException.class.getName()));
 
 		sb.append(File.pathSeparator);
+		sb.append(
+			_buildClassPath(
+				classLoader, CentralizedThreadLocal.class.getName()));
 
-		String portalGlobalClassPath = _buildClassPath(
-			classLoader, CentralizedThreadLocal.class.getName(),
-			PortalException.class.getName());
-
-		sb.append(portalGlobalClassPath);
-
-		String globalClassPath = sb.toString();
+		String bootstrapClassPath = sb.toString();
 
 		sb.append(File.pathSeparator);
 		sb.append(
 			_buildClassPath(
 				classLoader,
-				"com.liferay.portal.internal.servlet.MainServlet"));
+				"com.liferay.shielded.container.ShieldedContainerInitializer"));
 
 		if (servletContext != null) {
 			sb.append(File.pathSeparator);
@@ -142,7 +136,7 @@ public class PortalClassPathUtil {
 		ProcessConfig.Builder builder = new ProcessConfig.Builder();
 
 		builder.setArguments(_processArgs);
-		builder.setBootstrapClassPath(globalClassPath);
+		builder.setBootstrapClassPath(bootstrapClassPath);
 		builder.setReactClassLoader(classLoader);
 		builder.setRuntimeClassPath(portalClassPath);
 

@@ -1,10 +1,10 @@
 import classNames from 'classnames';
 import React from 'react';
 import {Controller} from 'react-hook-form';
-import {MoreInfoButton} from '~/common/components/fragments/Buttons/MoreInfo';
-import {InputWithMask} from '~/common/components/fragments/Forms/Input/WithMask';
+import {MoreInfoButton} from '../../../../fragments/Buttons/MoreInfo';
+import {InputWithMask} from '../../../../fragments/Forms/Input/WithMask';
 
-export const ControlledInputWithMask = ({
+export function ControlledInputWithMask({
 	name,
 	label,
 	rules,
@@ -13,7 +13,7 @@ export const ControlledInputWithMask = ({
 	inputProps = {},
 	renderInput = true,
 	...props
-}) => {
+}) {
 	const newRules = renderInput ? rules : {required: false};
 
 	return (
@@ -23,9 +23,9 @@ export const ControlledInputWithMask = ({
 			name={name}
 			render={({field, fieldState}) => (
 				<InputWithMask
-					className={classNames({
+					className={`${classNames({
 						'd-none': !renderInput,
-					})}
+					})} mb-5`}
 					error={fieldState.error}
 					label={label}
 					renderActions={
@@ -40,4 +40,4 @@ export const ControlledInputWithMask = ({
 			{...props}
 		/>
 	);
-};
+}

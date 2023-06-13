@@ -14,6 +14,7 @@
 
 package com.liferay.search.experiences.rest.resource.v1_0;
 
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -58,7 +59,7 @@ public interface SXPElementResource {
 	}
 
 	public Page<SXPElement> getSXPElementsPage(
-			String search, Pagination pagination)
+			String search, Filter filter, Pagination pagination, Sort[] sorts)
 		throws Exception;
 
 	public SXPElement postSXPElement(SXPElement sxpElement) throws Exception;
@@ -66,6 +67,8 @@ public interface SXPElementResource {
 	public Response postSXPElementBatch(
 			SXPElement sxpElement, String callbackURL, Object object)
 		throws Exception;
+
+	public SXPElement postSXPElementValidate(String string) throws Exception;
 
 	public void deleteSXPElement(Long sxpElementId) throws Exception;
 
@@ -77,6 +80,10 @@ public interface SXPElementResource {
 
 	public SXPElement patchSXPElement(Long sxpElementId, SXPElement sxpElement)
 		throws Exception;
+
+	public SXPElement postSXPElementCopy(Long sxpElementId) throws Exception;
+
+	public Response getSXPElementExport(Long sxpElementId) throws Exception;
 
 	public default void setContextAcceptLanguage(
 		AcceptLanguage contextAcceptLanguage) {

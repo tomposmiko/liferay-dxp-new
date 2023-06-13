@@ -60,12 +60,7 @@ definition {
 		}
 
 		task ("Execute reindex all") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Configuration",
-				panel = "Control Panel",
-				portlet = "Search");
-
-			SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+			SearchAdministration.executeReindex();
 		}
 
 		task ("Assign user to organization") {
@@ -206,6 +201,41 @@ definition {
 				webContentContent = "WC WebContent Content",
 				webContentStatus = "Draft",
 				webContentTitle = "WC Webcontent Title");
+		}
+	}
+
+	@description = "This is a test for LPS-132428. The user could configure Asset Publisher after adding the Kaleo Forms admin portlet to blacklist."
+	@priority = "4"
+	test ConfigureAssetPublisherAfterAddingKaleoFormsAdminPortletToBlackList {
+		property test.name.skip.portal.instance = "AssetPublisherUseCase#ConfigureAssetPublisherAfterAddingKaleoFormsAdminPortletToBlackList";
+		property test.run.environment = "EE";
+
+		task ("Add the Kaleo Forms admin portlet to blacklist") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Configuration",
+				panel = "Control Panel",
+				portlet = "System Settings");
+
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "Module Container",
+				configurationName = "Component Blacklist",
+				configurationScope = "System Scope");
+
+			BundleBlacklist.blacklistModuleAndComponentConfiguration(
+				label = "Blacklist Component Names",
+				symbolicName = "com.liferay.portal.workflow.kaleo.forms.web.internal.portlet.KaleoFormsAdminPortlet");
+		}
+
+		task ("Configure the Asset Publisher") {
+			Navigator.gotoSitePage(
+				pageName = "Asset Publisher Page",
+				siteName = "Test Site Name");
+
+			AssetPublisherPortlet.configureDisplaySettings(displaySettings = "Print");
+		}
+
+		task ("View no NullPointerException thrown") {
+			AssertConsoleTextNotPresent(value1 = "java.lang.NullPointerException");
 		}
 	}
 
@@ -1374,6 +1404,54 @@ definition {
 		}
 	}
 
+	@description = "This is a test for LPS-142468. The View link shouldn't be shown in details page."
+	@priority = "3"
+	test ViewDetailsLinkNotShownInDetailsPage {
+		task ("Add a web content") {
+			JSONWebcontent.addWebContent(
+				content = "Web Content Content",
+				groupName = "Test Site Name",
+				title = "Web Content Title");
+		}
+
+		task ("The View details link is not shown in details page when use default template") {
+			Navigator.gotoSitePage(
+				pageName = "Asset Publisher Page",
+				siteName = "Test Site Name");
+
+			AssetPublisherPortlet.viewAssetDetailsPG(
+				assetContent = "Web Content Content",
+				assetTitle = "Web Content Title");
+
+			AssertElementNotPresent(
+				key_assetTitle = "Web Content Title",
+				locator1 = "AP#ASSET_DETAILS_LINK");
+
+			Click(locator1 = "APAsset#ASSET_BACK_TO_ICON");
+		}
+
+		task ("Change the display template of Asset Publisher to Full Content") {
+			Portlet.gotoPortletOptions(
+				portletName = "Asset Publisher",
+				portletOption = "Configuration");
+
+			AssetPublisherPortlet.configureDisplayTemplatePG(displayTemplate = "Full Content");
+
+			IFrame.closeFrame();
+		}
+
+		task ("The View details link is not shown in details page when use full content template") {
+			AssetPublisherPortlet.viewAssetDetailsPG(
+				assetContent = "Web Content Content",
+				assetTitle = "Web Content Title",
+				displayTemplate = "Full Content");
+
+			AssertElementNotPresent(
+				key_assetTitle = "Web Content Title",
+				locator1 = "AP#ASSET_DETAILS_LINK");
+		}
+	}
+
 	@description = "View document types shown in manual selection."
 	@priority = "4"
 	test ViewDocumentTypeShownInManualSelection {
@@ -1638,7 +1716,7 @@ import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 try {
 	def bundleContext = SystemBundleUtil.getBundleContext();
 
-	def serviceReference = bundleContext.getServiceReference("com.liferay.asset.publisher.web.internal.messaging.AssetEntriesCheckerHelper");
+	def serviceReference = bundleContext.getServiceReference("com.liferay.asset.publisher.web.internal.messaging.helper.AssetEntriesCheckerHelper");
 
 	def assetEntriesCheckerHelper = bundleContext.getService(serviceReference);
 

@@ -1,5 +1,61 @@
 # Poshi Runner Change Log
 
+## 1.0.324
+
+### Other
+
+* [LPS-141109](https://issues.liferay.com/browse/LPS-141109) - SF: Rebuild Poshi Script
+* [LRCI-2648](https://issues.liferay.com/browse/LRCI-2648) - Shift Testray 1 over to GCP instead of the Testray Mount
+
+### Script
+
+* [POSHI-211](https://issues.liferay.com/browse/POSHI-211) - Fix poshi script parsing to generate Poshi files
+
+### WebDriver
+
+* [POSHI-208](https://issues.liferay.com/browse/POSHI-208) - Update Ocular for use and replacement within Poshi
+* [POSHI-220](https://issues.liferay.com/browse/POSHI-220) - Add size method to ListUtil
+
+## 1.0.322
+
+### Other
+
+* [LPS-142690](https://issues.liferay.com/browse/LPS-142690) - Add task source-formatter-missing-override
+
+### Script
+
+* [POSHI-202](https://issues.liferay.com/browse/POSHI-202) - Change poshi script parsing to be independent of using java reflection for util classes
+* [POSHI-211](https://issues.liferay.com/browse/POSHI-211) - Fix poshi script parsing to generate Poshi files
+
+## 1.0.321
+
+### Script
+
+* [POSHI-202](https://issues.liferay.com/browse/POSHI-202) - Change poshi script parsing to be independent of using java reflection for util classes
+* [POSHI-211](https://issues.liferay.com/browse/POSHI-211) - Fix poshi script parsing to generate Poshi files
+
+## 1.0.320
+
+### Script
+
+* [POSHI-211](https://issues.liferay.com/browse/POSHI-211) - Fix poshi script parsing to generate Poshi files
+
+## 1.0.319
+
+### Resources
+
+* [POSHI-209](https://issues.liferay.com/browse/POSHI-209) - Update function files to poshi script
+* [POSHI-210](https://issues.liferay.com/browse/POSHI-210) - Update allowable resource jar names to include default resource jar
+
+### Script
+
+* [POSHI-203](https://issues.liferay.com/browse/POSHI-203) - Fix poshi script parsing for annotations that contain double quotation mark
+
+### WebDriver
+
+* [POSHI-208](https://issues.liferay.com/browse/POSHI-208) - Update Ocular for use and replacement within Poshi
+* [POSHI-213](https://issues.liferay.com/browse/POSHI-213) - Update typeKeys method to accept shortcut keys
+
 ## 1.0.316
 
 ### Other

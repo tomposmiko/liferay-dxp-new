@@ -44,6 +44,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8849 | Test Summary: Add a CSV data source with an individual whose email matches another individual that already has activities and check that the indiviual details are updated"
 	@priority = "5"
 	test AddCSVWithIndividualWhoseEmailMatchesAnotherIndividualAlreadyHasActivitiesCheckIndividualDetailsUpdated {
+		property portal.upstream = "quarantine";
+
 		task ("Add user") {
 			JSONUser.addUser(
 				userEmailAddress = "ac@liferay.com",
@@ -63,7 +65,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}

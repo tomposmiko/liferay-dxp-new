@@ -14,6 +14,7 @@
 
 package com.liferay.search.experiences.rest.resource.v1_0;
 
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -58,7 +59,7 @@ public interface SXPBlueprintResource {
 	}
 
 	public Page<SXPBlueprint> getSXPBlueprintsPage(
-			String search, Pagination pagination)
+			String search, Filter filter, Pagination pagination, Sort[] sorts)
 		throws Exception;
 
 	public SXPBlueprint postSXPBlueprint(SXPBlueprint sxpBlueprint)
@@ -66,6 +67,9 @@ public interface SXPBlueprintResource {
 
 	public Response postSXPBlueprintBatch(
 			SXPBlueprint sxpBlueprint, String callbackURL, Object object)
+		throws Exception;
+
+	public SXPBlueprint postSXPBlueprintValidate(String string)
 		throws Exception;
 
 	public void deleteSXPBlueprint(Long sxpBlueprintId) throws Exception;
@@ -79,6 +83,11 @@ public interface SXPBlueprintResource {
 	public SXPBlueprint patchSXPBlueprint(
 			Long sxpBlueprintId, SXPBlueprint sxpBlueprint)
 		throws Exception;
+
+	public SXPBlueprint postSXPBlueprintCopy(Long sxpBlueprintId)
+		throws Exception;
+
+	public Response getSXPBlueprintExport(Long sxpBlueprintId) throws Exception;
 
 	public default void setContextAcceptLanguage(
 		AcceptLanguage contextAcceptLanguage) {

@@ -324,7 +324,7 @@ public abstract class BaseNavigationMenuResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putNavigationMenuPermission",
+					ActionKeys.PERMISSIONS, "putNavigationMenuPermissionsPage",
 					resourceName, resourceId)
 			).build(),
 			resourceId, resourceName, roleNames);
@@ -353,7 +353,7 @@ public abstract class BaseNavigationMenuResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putNavigationMenuPermission(
+			putNavigationMenuPermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("navigationMenuId")
@@ -387,7 +387,7 @@ public abstract class BaseNavigationMenuResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putNavigationMenuPermission",
+					ActionKeys.PERMISSIONS, "putNavigationMenuPermissionsPage",
 					resourceName, resourceId)
 			).build(),
 			resourceId, resourceName, null);
@@ -577,8 +577,8 @@ public abstract class BaseNavigationMenuResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putSiteNavigationMenuPermission",
-					portletName, siteId)
+					ActionKeys.PERMISSIONS,
+					"putSiteNavigationMenuPermissionsPage", portletName, siteId)
 			).build(),
 			siteId, portletName, roleNames);
 	}
@@ -606,7 +606,7 @@ public abstract class BaseNavigationMenuResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putSiteNavigationMenuPermission(
+			putSiteNavigationMenuPermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteId")
@@ -637,8 +637,8 @@ public abstract class BaseNavigationMenuResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putSiteNavigationMenuPermission",
-					portletName, siteId)
+					ActionKeys.PERMISSIONS,
+					"putSiteNavigationMenuPermissionsPage", portletName, siteId)
 			).build(),
 			siteId, portletName, null);
 	}
@@ -886,9 +886,7 @@ public abstract class BaseNavigationMenuResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), entityModel);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid filter " + filterString, exception);
-			}
+			_log.error("Invalid filter " + filterString, exception);
 		}
 
 		return null;

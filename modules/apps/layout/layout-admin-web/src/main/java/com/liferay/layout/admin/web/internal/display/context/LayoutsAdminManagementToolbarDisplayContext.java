@@ -131,7 +131,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 
 		return CreationMenuBuilder.addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowPublicPages() &&
+				_layoutsAdminDisplayContext.isShowPublicLayouts() &&
 				_layoutsAdminDisplayContext.isShowAddChildPageAction(
 					selLayout) &&
 				(!_layoutsAdminDisplayContext.isPrivateLayout() ||
@@ -147,7 +147,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			}
 		).addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowPublicPages() &&
+				_layoutsAdminDisplayContext.isShowPublicLayouts() &&
 				_layoutsAdminDisplayContext.isShowAddChildPageAction(
 					selLayout) &&
 				(!_layoutsAdminDisplayContext.isPrivateLayout() ||
@@ -161,7 +161,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			}
 		).addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowPrivatePages() &&
+				_layoutsAdminDisplayContext.isShowUserPrivateLayouts() &&
 				((_layoutsAdminDisplayContext.isShowAddChildPageAction(
 					selLayout) &&
 				  _layoutsAdminDisplayContext.isPrivateLayout()) ||
@@ -177,7 +177,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			}
 		).addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowPrivatePages() &&
+				_layoutsAdminDisplayContext.isShowUserPrivateLayouts() &&
 				(_layoutsAdminDisplayContext.isPrivateLayout() ||
 				 _layoutsAdminDisplayContext.isFirstColumn() ||
 				 !_layoutsAdminDisplayContext.hasLayouts()),
@@ -297,7 +297,12 @@ public class LayoutsAdminManagementToolbarDisplayContext
 				httpServletRequest, "private-collection-page");
 		}
 
-		return LanguageUtil.get(httpServletRequest, "public-collection-page");
+		if (_layoutsAdminDisplayContext.isPrivateLayoutsEnabled()) {
+			return LanguageUtil.get(
+				httpServletRequest, "public-collection-page");
+		}
+
+		return LanguageUtil.get(httpServletRequest, "collection-page");
 	}
 
 	private String _getLabel(boolean privateLayout) {
@@ -318,7 +323,11 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			return LanguageUtil.get(httpServletRequest, "private-page");
 		}
 
-		return LanguageUtil.get(httpServletRequest, "public-page");
+		if (_layoutsAdminDisplayContext.isPrivateLayoutsEnabled()) {
+			return LanguageUtil.get(httpServletRequest, "public-page");
+		}
+
+		return LanguageUtil.get(httpServletRequest, "page");
 	}
 
 	private boolean _isSiteTemplate() {

@@ -198,7 +198,7 @@ public abstract class BaseSitePageResourceImpl
 	)
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public Page<SitePage> getSiteSitePageFriendlyUrlPathExperiencesPage(
+	public Page<SitePage> getSiteSitePagesExperiencesPage(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("siteId")
@@ -515,9 +515,7 @@ public abstract class BaseSitePageResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), entityModel);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid filter " + filterString, exception);
-			}
+			_log.error("Invalid filter " + filterString, exception);
 		}
 
 		return null;

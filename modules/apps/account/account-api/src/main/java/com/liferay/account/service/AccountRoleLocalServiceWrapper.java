@@ -27,6 +27,10 @@ public class AccountRoleLocalServiceWrapper
 	implements AccountRoleLocalService,
 			   ServiceWrapper<AccountRoleLocalService> {
 
+	public AccountRoleLocalServiceWrapper() {
+		this(null);
+	}
+
 	public AccountRoleLocalServiceWrapper(
 		AccountRoleLocalService accountRoleLocalService) {
 
@@ -149,7 +153,9 @@ public class AccountRoleLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteAccountRolesByCompanyId(long companyId) {
+	public void deleteAccountRolesByCompanyId(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
 		_accountRoleLocalService.deleteAccountRolesByCompanyId(companyId);
 	}
 
@@ -402,6 +408,15 @@ public class AccountRoleLocalServiceWrapper
 		return _accountRoleLocalService.searchAccountRoles(
 			companyId, accountEntryIds, keywords, params, start, end,
 			orderByComparator);
+	}
+
+	@Override
+	public void setUserAccountRoles(
+			long accountEntryId, long[] accountRoleIds, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_accountRoleLocalService.setUserAccountRoles(
+			accountEntryId, accountRoleIds, userId);
 	}
 
 	@Override

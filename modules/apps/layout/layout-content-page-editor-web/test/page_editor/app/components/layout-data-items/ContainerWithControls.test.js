@@ -31,6 +31,16 @@ jest.mock(
 	'../../../../../src/main/resources/META-INF/resources/page_editor/app/config',
 	() => ({
 		config: {
+			commonStyles: [
+				{
+					styles: [
+						{
+							defaultValue: 'left',
+							name: 'textAlign',
+						},
+					],
+				},
+			],
 			frontendTokens: {},
 		},
 	})
@@ -73,6 +83,7 @@ const renderContainer = ({
 					})}
 				>
 					<AutoSelect />
+
 					<ContainerWithControls
 						item={container}
 						layoutData={layoutData}

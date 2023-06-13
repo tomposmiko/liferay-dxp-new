@@ -1,29 +1,32 @@
-<definition default="dragAndDropToObject">
-	<command name="dragAndDrop">
-		<execute selenium="dragAndDrop" />
-	</command>
+@default = "dragAndDropToObject"
+definition {
 
-	<command name="dragAndDropToObject">
-		<execute argument1="${locator1}" selenium="waitForVisible" />
+	function dragAndDrop {
+		selenium.dragAndDrop();
+	}
 
-		<execute argument1="${locator1}" selenium="mouseOver" />
+	function dragAndDropToObject {
+		selenium.waitForVisible("${locator1}");
 
-		<execute argument1="${locator1}" argument2="${value1}" selenium="waitForPartialText" />
+		selenium.mouseOver("${locator1}");
 
-		<execute argument1="${locator2}" selenium="waitForVisible" />
+		selenium.waitForPartialText("${locator1}", "${value1}");
 
-		<execute argument1="${locator2}" selenium="mouseOver" />
+		selenium.waitForVisible("${locator2}");
 
-		<execute argument1="${locator1}" argument2="${locator2}" selenium="dragAndDropToObject" />
-	</command>
+		selenium.mouseOver("${locator2}");
 
-	<command name="dragAndDropToObjectNotVisible">
-		<execute argument1="${locator1}" selenium="waitForVisible" />
+		selenium.dragAndDropToObject("${locator1}", "${locator2}");
+	}
 
-		<execute argument1="${locator1}" selenium="mouseOver" />
+	function dragAndDropToObjectNotVisible {
+		selenium.waitForVisible("${locator1}");
 
-		<execute argument1="${locator1}" argument2="${value1}" selenium="waitForText" />
+		selenium.mouseOver("${locator1}");
 
-		<execute argument1="${locator1}" argument2="${locator2}" selenium="dragAndDropToObject" />
-	</command>
-</definition>
+		selenium.waitForText("${locator1}", "${value1}");
+
+		selenium.dragAndDropToObject("${locator1}", "${locator2}");
+	}
+
+}

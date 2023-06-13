@@ -100,6 +100,18 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public SXPBlueprint createSXPBlueprintValidate(
+			@GraphQLName("string") String string)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_sxpBlueprintResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			sxpBlueprintResource ->
+				sxpBlueprintResource.postSXPBlueprintValidate(string));
+	}
+
+	@GraphQLField
 	public boolean deleteSXPBlueprint(
 			@GraphQLName("sxpBlueprintId") Long sxpBlueprintId)
 		throws Exception {
@@ -142,6 +154,18 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public SXPBlueprint createSXPBlueprintCopy(
+			@GraphQLName("sxpBlueprintId") Long sxpBlueprintId)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_sxpBlueprintResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			sxpBlueprintResource -> sxpBlueprintResource.postSXPBlueprintCopy(
+				sxpBlueprintId));
+	}
+
+	@GraphQLField
 	public SXPElement createSXPElement(
 			@GraphQLName("sxpElement") SXPElement sxpElement)
 		throws Exception {
@@ -165,6 +189,18 @@ public class Mutation {
 			this::_populateResourceContext,
 			sxpElementResource -> sxpElementResource.postSXPElementBatch(
 				sxpElement, callbackURL, object));
+	}
+
+	@GraphQLField
+	public SXPElement createSXPElementValidate(
+			@GraphQLName("string") String string)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_sxpElementResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			sxpElementResource -> sxpElementResource.postSXPElementValidate(
+				string));
 	}
 
 	@GraphQLField
@@ -209,18 +245,30 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public SXPElement createSXPElementCopy(
+			@GraphQLName("sxpElementId") Long sxpElementId)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_sxpElementResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			sxpElementResource -> sxpElementResource.postSXPElementCopy(
+				sxpElementId));
+	}
+
+	@GraphQLField
 	public SearchResponse createSearch(
 			@GraphQLName("query") String query,
-			@GraphQLName("sxpBlueprint") String sxpBlueprint,
 			@GraphQLName("pageSize") int pageSize,
-			@GraphQLName("page") int page)
+			@GraphQLName("page") int page,
+			@GraphQLName("sxpBlueprint") SXPBlueprint sxpBlueprint)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_searchResponseResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			searchResponseResource -> searchResponseResource.postSearch(
-				query, sxpBlueprint, Pagination.of(page, pageSize)));
+				query, Pagination.of(page, pageSize), sxpBlueprint));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R

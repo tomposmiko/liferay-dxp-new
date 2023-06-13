@@ -18,6 +18,8 @@ import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluator;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormTemplateContextFactory;
+import com.liferay.dynamic.data.mapping.form.renderer.internal.configuration.FFDateFieldTypeValidationConfigurationActivator;
+import com.liferay.dynamic.data.mapping.form.renderer.internal.helper.DDMFormTemplateContextFactoryHelper;
 import com.liferay.dynamic.data.mapping.form.validation.DDMValidation;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
@@ -220,6 +222,9 @@ public class DDMFormTemplateContextFactoryImpl
 				ddmFormRenderingContext.getHttpServletRequest(), "currentPage",
 				"1"));
 		templateContext.put(
+			"dateFieldTypeValidationEnabled",
+			_ffDateFieldTypeValidationConfigurationActivator.enabled());
+		templateContext.put(
 			"ddmStructureLayoutId",
 			ddmFormRenderingContext.getDDMStructureLayoutId());
 
@@ -279,6 +284,11 @@ public class DDMFormTemplateContextFactoryImpl
 
 		templateContext.put("showCancelButton", showCancelButton);
 
+		templateContext.put(
+			"showPartialResultsToRespondents",
+			GetterUtil.getBoolean(
+				(Boolean)ddmFormRenderingContext.getProperty(
+					"showPartialResultsToRespondents")));
 		templateContext.put(
 			"showRequiredFieldsWarning",
 			ddmFormRenderingContext.isShowRequiredFieldsWarning());
@@ -485,6 +495,10 @@ public class DDMFormTemplateContextFactoryImpl
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
+
+	@Reference
+	private FFDateFieldTypeValidationConfigurationActivator
+		_ffDateFieldTypeValidationConfigurationActivator;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

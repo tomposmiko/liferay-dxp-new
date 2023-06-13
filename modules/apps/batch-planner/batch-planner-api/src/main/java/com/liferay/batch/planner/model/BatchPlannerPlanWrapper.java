@@ -55,6 +55,7 @@ public class BatchPlannerPlanWrapper
 		attributes.put("externalURL", getExternalURL());
 		attributes.put("internalClassName", getInternalClassName());
 		attributes.put("name", getName());
+		attributes.put("taskItemDelegateName", getTaskItemDelegateName());
 		attributes.put("template", isTemplate());
 
 		return attributes;
@@ -140,6 +141,13 @@ public class BatchPlannerPlanWrapper
 			setName(name);
 		}
 
+		String taskItemDelegateName = (String)attributes.get(
+			"taskItemDelegateName");
+
+		if (taskItemDelegateName != null) {
+			setTaskItemDelegateName(taskItemDelegateName);
+		}
+
 		Boolean template = (Boolean)attributes.get("template");
 
 		if (template != null) {
@@ -167,6 +175,18 @@ public class BatchPlannerPlanWrapper
 		return model.getActive();
 	}
 
+	@Override
+	public BatchPlannerLog getBatchPlannerLog()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getBatchPlannerLog();
+	}
+
+	@Override
+	public java.util.List<BatchPlannerMapping> getBatchPlannerMappings() {
+		return model.getBatchPlannerMappings();
+	}
+
 	/**
 	 * Returns the batch planner plan ID of this batch planner plan.
 	 *
@@ -175,6 +195,18 @@ public class BatchPlannerPlanWrapper
 	@Override
 	public long getBatchPlannerPlanId() {
 		return model.getBatchPlannerPlanId();
+	}
+
+	@Override
+	public java.util.List<BatchPlannerPolicy> getBatchPlannerPolicies() {
+		return model.getBatchPlannerPolicies();
+	}
+
+	@Override
+	public BatchPlannerPolicy getBatchPlannerPolicy(String name)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getBatchPlannerPolicy(name);
 	}
 
 	/**
@@ -275,6 +307,16 @@ public class BatchPlannerPlanWrapper
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
+	}
+
+	/**
+	 * Returns the task item delegate name of this batch planner plan.
+	 *
+	 * @return the task item delegate name of this batch planner plan
+	 */
+	@Override
+	public String getTaskItemDelegateName() {
+		return model.getTaskItemDelegateName();
 	}
 
 	/**
@@ -470,6 +512,16 @@ public class BatchPlannerPlanWrapper
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	 * Sets the task item delegate name of this batch planner plan.
+	 *
+	 * @param taskItemDelegateName the task item delegate name of this batch planner plan
+	 */
+	@Override
+	public void setTaskItemDelegateName(String taskItemDelegateName) {
+		model.setTaskItemDelegateName(taskItemDelegateName);
 	}
 
 	/**

@@ -5,18 +5,19 @@ const {REACT_APP_LIFERAY_API = window.location.origin} = process.env;
 /**
  * @returns {string} Liferay Authentication Token
  */
-export const getLiferayAuthenticationToken = () => {
+export function getLiferayAuthenticationToken() {
 	try {
 		// eslint-disable-next-line no-undef
 		const token = Liferay.authToken;
 
 		return token;
-	} catch (error) {
+	}
+	catch (error) {
 		console.warn('Not able to find Liferay auth token\n', error);
 
 		return '';
 	}
-};
+}
 
 const baseFetch = async (url, {body, method = 'GET'} = {}) => {
 	const liferayAPIUrl = new URL(`${REACT_APP_LIFERAY_API}/${url}`);

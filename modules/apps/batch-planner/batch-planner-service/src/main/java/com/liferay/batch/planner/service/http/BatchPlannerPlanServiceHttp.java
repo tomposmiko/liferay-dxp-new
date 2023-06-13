@@ -55,7 +55,8 @@ public class BatchPlannerPlanServiceHttp {
 			addBatchPlannerPlan(
 				HttpPrincipal httpPrincipal, boolean export,
 				String externalType, String externalURL,
-				String internalClassName, String name, boolean template)
+				String internalClassName, String name,
+				String taskItemDelegateName, boolean template)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -65,7 +66,7 @@ public class BatchPlannerPlanServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, export, externalType, externalURL, internalClassName,
-				name, template);
+				name, taskItemDelegateName, template);
 
 			Object returnObj = null;
 
@@ -259,7 +260,7 @@ public class BatchPlannerPlanServiceHttp {
 
 	public static java.util.List
 		<com.liferay.batch.planner.model.BatchPlannerPlan> getBatchPlannerPlans(
-			HttpPrincipal httpPrincipal, long companyId, boolean export,
+			HttpPrincipal httpPrincipal, long companyId, boolean template,
 			int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
 				<com.liferay.batch.planner.model.BatchPlannerPlan>
@@ -271,7 +272,7 @@ public class BatchPlannerPlanServiceHttp {
 				_getBatchPlannerPlansParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, export, start, end, orderByComparator);
+				methodKey, companyId, template, start, end, orderByComparator);
 
 			Object returnObj = null;
 
@@ -399,7 +400,7 @@ public class BatchPlannerPlanServiceHttp {
 	}
 
 	public static int getBatchPlannerPlansCount(
-		HttpPrincipal httpPrincipal, long companyId, boolean export) {
+		HttpPrincipal httpPrincipal, long companyId, boolean template) {
 
 		try {
 			MethodKey methodKey = new MethodKey(
@@ -407,7 +408,7 @@ public class BatchPlannerPlanServiceHttp {
 				_getBatchPlannerPlansCountParameterTypes9);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, export);
+				methodKey, companyId, template);
 
 			Object returnObj = null;
 
@@ -511,7 +512,7 @@ public class BatchPlannerPlanServiceHttp {
 	private static final Class<?>[] _addBatchPlannerPlanParameterTypes0 =
 		new Class[] {
 			boolean.class, String.class, String.class, String.class,
-			String.class, boolean.class
+			String.class, String.class, boolean.class
 		};
 	private static final Class<?>[] _deleteBatchPlannerPlanParameterTypes1 =
 		new Class[] {long.class};

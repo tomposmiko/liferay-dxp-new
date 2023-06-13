@@ -53,7 +53,6 @@ const items = [
 		taskCount: 1,
 	},
 ];
-const data = {items, totalCount: items.length};
 const processStepsData = {
 	items: [
 		{
@@ -99,15 +98,19 @@ describe('The performance by assignee card component should', () => {
 		afterEach(cleanup);
 
 		beforeEach(async () => {
-			const clientMock = {
-				post: jest.fn().mockResolvedValue({data}),
-				request: jest.fn().mockResolvedValue({data: processStepsData}),
-			};
+			fetch
+				.mockResolvedValueOnce({
+					json: () =>
+						Promise.resolve({items, totalCount: items.length}),
+					ok: true,
+				})
+				.mockResolvedValueOnce({
+					json: () => Promise.resolve(processStepsData),
+					ok: true,
+				});
 
 			const wrapper = ({children}) => (
-				<MockRouter client={clientMock} query={query}>
-					{children}
-				</MockRouter>
+				<MockRouter query={query}>{children}</MockRouter>
 			);
 
 			const renderResult = render(
@@ -150,17 +153,18 @@ describe('The performance by assignee card component should', () => {
 
 	describe('Be rendered without results', () => {
 		beforeAll(async () => {
-			const clientMock = {
-				post: jest
-					.fn()
-					.mockResolvedValue({data: {items: [], totalCount: 0}}),
-				request: jest.fn().mockResolvedValue({data: processStepsData}),
-			};
+			fetch
+				.mockResolvedValueOnce({
+					json: () => Promise.resolve({items: [], totalCount: 0}),
+					ok: true,
+				})
+				.mockResolvedValueOnce({
+					json: () => Promise.resolve(processStepsData),
+					ok: true,
+				});
 
 			const wrapper = ({children}) => (
-				<MockRouter client={clientMock} query={query}>
-					{children}
-				</MockRouter>
+				<MockRouter query={query}>{children}</MockRouter>
 			);
 
 			render(<PerformanceByAssigneeCard routeParams={{processId}} />, {

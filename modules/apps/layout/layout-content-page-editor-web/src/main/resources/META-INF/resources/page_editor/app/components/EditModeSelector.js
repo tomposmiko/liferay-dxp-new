@@ -39,6 +39,7 @@ export default function EditModeSelector() {
 			active={active}
 			alignmentPosition={Align.BottomLeft}
 			menuElementAttrs={{
+				className: 'page-editor__edit-mode-dropdown-menu',
 				containerProps: {
 					className: 'cadmin',
 				},
@@ -67,6 +68,7 @@ export default function EditModeSelector() {
 				>
 					{EDIT_MODES.pageDesign}
 				</ClayDropDown.Item>
+
 				<ClayDropDown.Item
 					onClick={() => {
 						setActive(false);

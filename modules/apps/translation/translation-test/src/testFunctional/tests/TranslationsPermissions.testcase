@@ -3,7 +3,7 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Translation Management";
+	property testray.main.component.name = "Translations Management";
 
 	setUp {
 		TestCase.setUpPortalInstance();
@@ -24,8 +24,8 @@ definition {
 
 	@description = "This ensures that the user can not translate a web content to an unavailable language."
 	@priority = "4"
-	@refactorneeded
-	test TranslateWCToUnavailableLanguage {
+	@refactordone
+	test CanTranslateWCToUnavailableLanguage {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
 		JSONWebcontent.addWebContent(
@@ -83,15 +83,15 @@ definition {
 
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
-		Translations.gotoTranslate(webContentTitle = "WC WebContent Title");
-
-		Alert.viewInfoMessageSpecific(infoMessage = "You do not have permissions to translate to any of the available languages.");
+		Translations.viewTranslationOptions(
+			noOptions = "true",
+			webContentTitle = "WC WebContent Title");
 	}
 
 	@description = "This ensures that the user can not translate a web content without any languages permissions."
 	@priority = "4"
-	@refactorneeded
-	test TranslateWCWithoutLanguagesPermissions {
+	@refactordone
+	test CanTranslateWCWithoutLanguagesPermissions {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
 		JSONWebcontent.addWebContent(
@@ -146,15 +146,15 @@ definition {
 
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
-		Translations.gotoTranslate(webContentTitle = "WC WebContent Title");
-
-		Alert.viewInfoMessageSpecific(infoMessage = "You do not have permissions to translate to any of the available languages.");
+		Translations.viewTranslationOptions(
+			noOptions = "true",
+			webContentTitle = "WC WebContent Title");
 	}
 
 	@description = "This ensures that the user can translate a Web content to the language she has permissions."
 	@priority = "5"
-	@refactorneeded
-	test TranslateWCWithSpecificLanguagesPermissions {
+	@refactordone
+	test CanTranslateWCWithSpecificLanguagesPermissions {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
 		JSONWebcontent.addWebContent(

@@ -27,6 +27,10 @@ public class SXPBlueprintLocalServiceWrapper
 	implements ServiceWrapper<SXPBlueprintLocalService>,
 			   SXPBlueprintLocalService {
 
+	public SXPBlueprintLocalServiceWrapper() {
+		this(null);
+	}
+
 	public SXPBlueprintLocalServiceWrapper(
 		SXPBlueprintLocalService sxpBlueprintLocalService) {
 
@@ -86,6 +90,13 @@ public class SXPBlueprintLocalServiceWrapper
 		long sxpBlueprintId) {
 
 		return _sxpBlueprintLocalService.createSXPBlueprint(sxpBlueprintId);
+	}
+
+	@Override
+	public void deleteCompanySXPBlueprints(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_sxpBlueprintLocalService.deleteCompanySXPBlueprints(companyId);
 	}
 
 	/**

@@ -1,23 +1,26 @@
-<definition default="paste">
-	<command name="ckEditorPaste">
-		<execute argument1="//a[contains(@class,'cke_button__unlink') and contains(@class,'cke_button_disabled')]" selenium="waitForVisible" />
+@default = "paste"
+definition {
 
-		<execute selenium="selectFrame" />
+	function ckEditorPaste {
+		selenium.waitForVisible("//a[contains(@class,'cke_button__unlink') and contains(@class,'cke_button_disabled')]");
 
-		<execute argument1="//html/body" selenium="waitForVisible" />
+		selenium.selectFrame();
 
-		<execute argument1="//html/body" selenium="mouseOver" />
+		selenium.waitForVisible("//html/body");
 
-		<execute argument1="//html/body" selenium="paste" />
+		selenium.mouseOver("//html/body");
 
-		<execute argument1="relative=parent" selenium="selectFrame" />
-	</command>
+		selenium.paste("//html/body");
 
-	<command name="paste">
-		<execute selenium="waitForVisible" />
+		selenium.selectFrame("relative=parent");
+	}
 
-		<execute selenium="mouseOver" />
+	function paste {
+		selenium.waitForVisible();
 
-		<execute selenium="paste" />
-	</command>
-</definition>
+		selenium.mouseOver();
+
+		selenium.paste();
+	}
+
+}

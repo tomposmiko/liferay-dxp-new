@@ -192,6 +192,10 @@ public interface PropsKeys {
 	public static final String AUTH_LOGIN_PORTLET_NAME =
 		"auth.login.portlet.name";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
 	public static final String AUTH_LOGIN_PROMPT_ENABLED =
 		"auth.login.prompt.enabled";
 
@@ -255,34 +259,17 @@ public interface PropsKeys {
 	public static final String AUTO_DEPLOY_CUSTOM_PORTLET_XML =
 		"auto.deploy.custom.portlet.xml";
 
-	public static final String AUTO_DEPLOY_DEFAULT_DEST_DIR =
-		"auto.deploy.default.dest.dir";
-
 	public static final String AUTO_DEPLOY_DEPLOY_DIR =
 		"auto.deploy.deploy.dir";
-
-	public static final String AUTO_DEPLOY_DEST_DIR = "auto.deploy.dest.dir";
 
 	public static final String AUTO_DEPLOY_ENABLED = "auto.deploy.enabled";
 
 	public static final String AUTO_DEPLOY_INTERVAL = "auto.deploy.interval";
 
-	public static final String AUTO_DEPLOY_JBOSS_PREFIX =
-		"auto.deploy.jboss.prefix";
-
 	public static final String AUTO_DEPLOY_LISTENERS = "auto.deploy.listeners";
 
 	public static final String AUTO_DEPLOY_TOMCAT_CONF_DIR =
 		"auto.deploy.tomcat.conf.dir";
-
-	public static final String AUTO_DEPLOY_TOMCAT_DEST_DIR =
-		"auto.deploy.tomcat.dest.dir";
-
-	public static final String AUTO_DEPLOY_TOMCAT_LIB_DIR =
-		"auto.deploy.tomcat.lib.dir";
-
-	public static final String AUTO_DEPLOY_UNPACK_WAR =
-		"auto.deploy.unpack.war";
 
 	public static final String
 		AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_INSTALL_OPTIONS =
@@ -304,9 +291,6 @@ public interface PropsKeys {
 
 	public static final String AUTO_DEPLOY_WEBSPHERE_WSADMIN_PROPERTIES_FILE =
 		"auto.deploy.websphere.wsadmin.properties.file.name";
-
-	public static final String AUTO_DEPLOY_WILDFLY_PREFIX =
-		"auto.deploy.wildfly.prefix";
 
 	public static final String AUTO_LOGIN_HOOKS = "auto.login.hooks";
 
@@ -1313,13 +1297,6 @@ public interface PropsKeys {
 
 	public static final String HOT_DEPLOY_LISTENERS = "hot.deploy.listeners";
 
-	public static final String HOT_UNDEPLOY_ENABLED = "hot.undeploy.enabled";
-
-	public static final String HOT_UNDEPLOY_INTERVAL = "hot.undeploy.interval";
-
-	public static final String HOT_UNDEPLOY_ON_REDEPLOY =
-		"hot.undeploy.on.redeploy";
-
 	public static final String HTTP_HEADER_VERSION_VERBOSITY =
 		"http.header.version.verbosity";
 
@@ -1495,9 +1472,6 @@ public interface PropsKeys {
 
 	public static final String INVOKER_FILTER_URI_MAX_LENGTH =
 		"invoker.filter.uri.max.length";
-
-	public static final String JAVADOC_MANAGER_ENABLED =
-		"javadoc.manager.enabled";
 
 	public static final String JAVASCRIPT_BAREBONE_ENABLED =
 		"javascript.barebone.enabled";
@@ -1785,6 +1759,10 @@ public interface PropsKeys {
 
 	public static final String LIFERAY_HOME = "liferay.home";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String LIFERAY_LIB_GLOBAL_DIR =
 		"liferay.lib.global.dir";
 
@@ -2465,20 +2443,6 @@ public interface PropsKeys {
 
 	public static final String PHONE_NUMBER_FORMAT_USA_REGEXP =
 		"phone.number.format.usa.regexp";
-
-	public static final String PLUGIN_NOTIFICATIONS_ENABLED =
-		"plugin.notifications.enabled";
-
-	public static final String PLUGIN_NOTIFICATIONS_PACKAGES_IGNORED =
-		"plugin.notifications.packages.ignored";
-
-	public static final String PLUGIN_REPOSITORIES_TRUSTED =
-		"plugin.repositories.trusted";
-
-	public static final String PLUGIN_REPOSITORIES_UNTRUSTED =
-		"plugin.repositories.untrusted";
-
-	public static final String PLUGIN_TYPES = "plugin.types";
 
 	public static final String POLLER_NOTIFICATIONS_TIMEOUT =
 		"poller.notifications.timeout";
@@ -3651,22 +3615,13 @@ public interface PropsKeys {
 	public static final String XML_VALIDATION_ENABLED =
 		"xml.validation.enabled";
 
-	public static final String XUGGLER_ENABLED = "xuggler.enabled";
-
-	public static final String XUGGLER_FFPRESET = "xuggler.ffpreset.";
-
-	public static final String XUGGLER_JAR_FILE = "xuggler.jar.file";
-
-	public static final String XUGGLER_JAR_NAME = "xuggler.jar.name";
-
-	public static final String XUGGLER_JAR_OPTIONS = "xuggler.jar.options";
-
-	public static final String XUGGLER_JAR_URL = "xuggler.jar.url";
-
 	public static final String YUI_COMPRESSOR_CSS_LINE_BREAK =
 		"yui.compressor.css.line.break";
 
 	public static final String ZIP_FILE_NAME_ENCODING =
 		"zip.file.name.encoding";
+
+	public static final String ZIP_FILE_WRITER_EXPORT_BUFFER_SIZE =
+		"zip.file.writer.export.buffer.size";
 
 }

@@ -33,18 +33,6 @@ export const BUILDER_INITIAL_STATE = {
 	fieldTypes: [],
 	formInstanceId: 0,
 	functionsMetadata: {},
-	initialSuccessPageSettings: {
-		body: {
-			[themeDisplay.getDefaultLanguageId()]: Liferay.Language.get(
-				'your-information-was-successfully-received-thank-you-for-filling-out-the-form'
-			),
-		},
-		title: {
-			[themeDisplay.getDefaultLanguageId()]: Liferay.Language.get(
-				'thank-you'
-			),
-		},
-	},
 	objectFields: [],
 	paginationMode: 'multi-pages',
 	rules: [],
@@ -106,17 +94,16 @@ const normalizePages = (pages) => {
 	);
 };
 
-export const initState = (
+export function initState(
 	{
-		initialSuccessPageSettings,
 		pages: initialPages,
 		paginationMode: initialPaginationMode,
 		rules: initialRules,
-		successPageSettings: initialSuccessPage,
+		successPageSettings: initialSuccessPageSettings,
 		...otherProps
 	},
 	{view}
-) => {
+) {
 	const pages = initialPages.length
 		? normalizePages(initialPages)
 		: INITIAL_PAGES;
@@ -135,20 +122,24 @@ export const initState = (
 		view === 'fieldSets' ? 'single-page' : initialPaginationMode;
 
 	const successPageSettings = {
-		body:
-			initialSuccessPage?.body === 'string'
-				? {
-						[themeDisplay.getDefaultLanguageId()]: initialSuccessPage.body,
-				  }
-				: initialSuccessPageSettings.body,
+		body: initialSuccessPageSettings?.body
+			? initialSuccessPageSettings?.body
+			: {
+					[themeDisplay.getDefaultLanguageId()]: Liferay.Language.get(
+						'your-information-was-successfully-received-thank-you-for-filling-out-the-form'
+					),
+			  },
 		enabled:
-			view === 'fieldSets' ? false : initialSuccessPage?.enabled ?? true,
-		title:
-			initialSuccessPage?.title === 'string'
-				? {
-						[themeDisplay.getDefaultLanguageId()]: initialSuccessPage.title,
-				  }
-				: initialSuccessPageSettings.title,
+			view === 'fieldSets'
+				? false
+				: initialSuccessPageSettings?.enabled ?? true,
+		title: initialSuccessPageSettings?.title
+			? initialSuccessPageSettings?.title
+			: {
+					[themeDisplay.getDefaultLanguageId()]: Liferay.Language.get(
+						'thank-you'
+					),
+			  },
 	};
 
 	return {
@@ -191,4 +182,4 @@ export const initState = (
 		successPageSettings,
 		...otherProps,
 	};
-};
+}

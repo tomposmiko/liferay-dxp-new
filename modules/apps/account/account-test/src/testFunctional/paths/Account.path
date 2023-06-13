@@ -21,6 +21,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SELECT_ACCOUNT_ENTRY_CHECKMARK</td>
+	<td>//div[contains(@class,'table')]//tr[contains(.,'${key_entryName}')]//*[*[name()='svg'][contains(@class,'check')]]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -132,6 +137,11 @@
 <tr>
 	<td>VALID_DOMAINS_DOMAIN_NAME</td>
 	<td>//tr[contains(.,'${key_domainName}')]/td[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>VALID_DOMAINS_EMPTY_INFO_MESSAGE</td>
+	<td>//p[normalize-space(text())='This account does not have a valid domain.']</td>
 	<td></td>
 </tr>
 <tr>

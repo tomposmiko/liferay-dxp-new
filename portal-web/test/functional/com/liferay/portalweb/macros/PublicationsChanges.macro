@@ -14,10 +14,17 @@ definition {
 			locator1 = "PublicationsChanges#COMMENT_ACTIONS");
 	}
 
-	macro changeDisplayStyle {
-		Click(locator1 = "PublicationsChanges#CURRENT_DISPLAY_STYLE");
+	macro assertPublicationsCommentsCRUDPermissions {
+		PublicationsChanges.openCommentsSidebar();
 
-		MenuItem.click(menuItem = StringUtil.upperCaseFirstLetter("${displayStyle}"));
+		PublicationsChanges.addComment(commentValue = "Good to Publish");
+
+		PublicationsChanges.editComment(
+			commentValue = "Good to Publish",
+			commentValueEdit = "It is not ready to Publish",
+			userName = "Test Test");
+
+		PublicationsChanges.deleteComment(commentValue = "It is not ready to Publish");
 	}
 
 	macro deleteComment {
@@ -37,14 +44,54 @@ definition {
 		AssertTextNotPresent(value1 = "${commentValue}");
 	}
 
+	macro discardChanges {
+		if (isSet(changeOrder)) {
+			var changeOrder = "${changeOrder}";
+		}
+		else {
+			var changeOrder = "1";
+		}
+
+		if ("${conflictingChanges}" == "true") {
+			Click(
+				key_entryTitle = "${entryTitle}",
+				locator1 = "Publications#CONFLICTING_CHANGES_DISCARD_ELLIPSIS");
+
+			MenuItem.click(menuItem = "Discard Change");
+		}
+		else {
+			var key_changeCategory = "${changeCategory}";
+			var key_changeTitle = "${changeTitle}";
+
+			Click(locator1 = "PublicationsChanges#PUBLICATIONS_CHANGE_TITLE");
+
+			Click(locator1 = "PublicationsChanges#PUBLICATIONS_CHANGE_ELLIPSIS");
+
+			MenuItem.click(menuItem = "Discard");
+		}
+
+		AssertElementPresent(locator1 = "Publications#DISCARDED_CHANGES_TITLE");
+
+		var key_changeCategory = "${changeCategory}";
+		var key_changeTitle = "${changeTitle}";
+
+		while (IsElementNotPresent(locator1 = "PublicationsChanges#CONTEXT_CHANGE_TITLE")) {
+			Click(locator1 = "Pagination#NEXT_LINK");
+		}
+
+		Click(
+			key_text = "Discard",
+			locator1 = "Button#ANY");
+
+		Alert.viewSuccessMessage();
+	}
+
 	macro editComment {
 		Click.mouseOverClick(
 			key_commentValue = "${commentValue}",
 			locator1 = "PublicationsChanges#COMMENT_ACTIONS");
 
 		MenuItem.click(menuItem = "Edit");
-
-		Pause(locator1 = "500");
 
 		Type.clickAtType(
 			key_userName = "${userName}",
@@ -110,53 +157,77 @@ definition {
 		}
 	}
 
-	macro viewChangesResultNotPresent {
-		var key_changeCategory = "${changeCategory}";
-		var key_changeTitle = "${changeTitle}";
-
-		if (isSet(changeOrder)) {
-			var changeOrder = "${changeOrder}";
+	macro viewChangeDiff {
+		if ("${entryDeletedInProduction}" == "true") {
+			AssertTextEquals(
+				key_displayItem = "Split View",
+				locator1 = "Publications#CURRENT_DIFF_DISPLAY_ITEM",
+				value1 = "Split View");
 		}
 		else {
-			var changeOrder = "1";
-		}
-
-		AssertElementNotPresent(
-			locator1 = "PublicationsChanges#PUBLICATIONS_CHANGE_TITLE",
-			value1 = "${changeTitle}");
-	}
-
-	macro viewChangesResultsOrder {
-		var changeOrder = "0";
-
-		for (var changeTitle : list "${changesList}") {
-			var changeOrder = ${changeOrder} + 1;
-
-			var key_changeCategory = "${changeCategory}";
-			var key_changeTitle = "${changeTitle}";
-
 			AssertTextEquals(
-				changeOrder = "${changeOrder}",
-				locator1 = "PublicationsChanges#PUBLICATIONS_CHANGE_TITLE",
-				value1 = "${changeTitle}");
+				key_displayItem = "Unified View",
+				locator1 = "Publications#CURRENT_DIFF_DISPLAY_ITEM",
+				value1 = "Unified View");
+		}
+
+		var key_columnName = "${columnName}";
+
+		if (isSet(diffAddedValue)) {
+			AssertTextEquals.assertPartialText(
+				locator1 = "Publications#DIFF_ADDED_VALUE",
+				value1 = "${diffAddedValue}");
+		}
+
+		if (isSet(diffRemovedValue)) {
+			AssertTextEquals.assertPartialText(
+				locator1 = "Publications#DIFF_REMOVED_VALUE",
+				value1 = "${diffRemovedValue}");
+		}
+
+		Publications.changeDiffDisplayItem(displayItem = "Production");
+
+		if ("${entryDeletedInProduction}" == "true") {
+			Alert.viewErrorMessage(errorMessage = "This item is missing or is deleted.");
+		}
+		else {
+			AssertTextEquals(
+				key_displayItem = "Production",
+				locator1 = "Publications#CURRENT_DIFF_DISPLAY_ITEM",
+				value1 = "Production");
+
+			if (isSet(columnValueInProduction)) {
+				var key_columnValueInProduction = "${columnValueInProduction}";
+
+				AssertTextEquals.assertPartialText(
+					locator1 = "Publications#COLUMN_VALUE_IN_PRODUCTION",
+					value1 = "${columnValueInProduction}");
+			}
+		}
+
+		Publications.changeDiffDisplayItem(displayItem = "Publication");
+
+		if (isSet(columnValueInPublication)) {
+			var key_columnValueInPublication = "${columnValueInPublication}";
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "Publications#COLUMN_VALUE_IN_PUBLICATION",
+				value1 = "${columnValueInPublication}");
 		}
 	}
 
-	macro viewChangesViaChangesStyle {
+	macro viewChanges {
 		if ("${publishedPublication}" == "true") {
 			Click(
 				key_publicationName = "${publicationName}",
 				locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
 		}
-		else {
-			PublicationsChanges.changeDisplayStyle(displayStyle = "Changes");
-		}
+
+		WaitForElementPresent(locator1 = "PublicationsChanges#CHANGE_HEADER");
 
 		if ("${showAllItems}" == "true") {
 			Check.checkToggleSwitch(locator1 = "PublicationsChanges#SHOW_ALL_ITEMS_TOGGLE_SWITCH");
 		}
-
-		Pause(locator1 = "3000");
 
 		var key_changeCategory = "${changeCategory}";
 		var key_changeUser = "${changeUser}";
@@ -188,39 +259,46 @@ definition {
 			value1 = "${changeType}");
 	}
 
-	macro viewChangesViaContextStyle {
-		PublicationsChanges.changeDisplayStyle(displayStyle = "Context");
-
-		Pause(locator1 = "3000");
-
-		if ("${showAllItems}" == "true") {
-			Check.checkToggleSwitch(locator1 = "PublicationsChanges#SHOW_ALL_ITEMS_TOGGLE_SWITCH");
-		}
-
+	macro viewChangesResultNotPresent {
 		var key_changeCategory = "${changeCategory}";
-		var key_changeDescription = "${changeDescription}";
 		var key_changeTitle = "${changeTitle}";
 
-		Click.javaScriptClick(locator1 = "PublicationsChanges#CONTEXT_CHANGE_CATEGORY_RADIO");
+		if (isSet(changeOrder)) {
+			var changeOrder = "${changeOrder}";
+		}
+		else {
+			var changeOrder = "1";
+		}
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "PublicationsChanges#CONTEXT_CHANGE_TITLE",
+		AssertElementNotPresent(
+			locator1 = "PublicationsChanges#PUBLICATIONS_CHANGE_TITLE",
 			value1 = "${changeTitle}");
+	}
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "PublicationsChanges#CONTEXT_CHANGE_DESCRIPTION",
-			value1 = "${changeDescription}");
+	macro viewChangesResultsOrder {
+		var changeOrder = "0";
+
+		for (var changeTitle : list "${changesList}") {
+			var changeOrder = ${changeOrder} + 1;
+			var key_changeCategory = "${changeCategory}";
+			var key_changeTitle = "${changeTitle}";
+
+			AssertTextEquals(
+				changeOrder = "${changeOrder}",
+				locator1 = "PublicationsChanges#PUBLICATIONS_CHANGE_TITLE",
+				value1 = "${changeTitle}");
+		}
 	}
 
 	macro viewDDLRecordChangeDiff {
-		if (IsElementNotPresent(locator1 = "Publications#CURRENT_DIFF_DISPLAY_ITEM", key_displayItem = "Unified View")) {
+		if (IsElementNotPresent(key_displayItem = "Unified View", locator1 = "Publications#CURRENT_DIFF_DISPLAY_ITEM")) {
 			Publications.changeDiffDisplayItem(displayItem = "Unified View");
 		}
 
 		var key_fieldName = "${fieldName}";
 
 		if (isSet(diffAddedValue)) {
-			key_diffAddedValue = "${diffAddedValue}";
+			var key_diffAddedValue = "${diffAddedValue}";
 
 			AssertElementPresent(
 				locator1 = "PublicationsChanges#DDL_RECORD_DIFF_ADDED_VALUE",
@@ -235,7 +313,7 @@ definition {
 			value1 = "Production");
 
 		if (isSet(fieldValueInProduction)) {
-			key_fieldValueInProduction = "${fieldValueInProduction}";
+			var key_fieldValueInProduction = "${fieldValueInProduction}";
 
 			AssertElementPresent(
 				locator1 = "PublicationsChanges#FIELD_VALUE_IN_PRODUCTION",
@@ -250,7 +328,7 @@ definition {
 			value1 = "${publicationName}");
 
 		if (isSet(fieldValueInPublication)) {
-			key_fieldValueInPublication = "${fieldValueInPublication}";
+			var key_fieldValueInPublication = "${fieldValueInPublication}";
 
 			AssertElementPresent(
 				locator1 = "PublicationsChanges#FIELD_VALUE_IN_PUBLICATION",

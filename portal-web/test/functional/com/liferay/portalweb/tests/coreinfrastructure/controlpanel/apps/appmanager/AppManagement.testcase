@@ -10,7 +10,7 @@ definition {
 	}
 
 	tearDown {
-		Page.tearDownCP();
+		PagesAdmin.tearDownCP();
 	}
 
 	@description = "This test asserts that apps in App Management do not display in non default instances"
@@ -486,7 +486,7 @@ definition {
 	@priority = "5"
 	test CanDeactivateAndActivateTranslation {
 		property test.name.skip.portal.instance = "AppManagement#CanDeactivateAndActivateTranslation";
-		property testray.main.component.name = "Translation Management";
+		property testray.main.component.name = "Translations Management";
 
 		ApplicationsMenu.gotoPortlet(
 			category = "System",
@@ -584,9 +584,7 @@ definition {
 
 		AssertElementPresent(locator1 = "TextInput#FILE");
 
-		UploadFileWithCustomPath.uploadArchiveFile(
-			fileName = "title.zip",
-			filePath = "enduser/wem/fragment");
+		UploadDependencyFile.uploadArchiveFile(fileName = "title.zip");
 
 		Button.clickInstall();
 

@@ -34,7 +34,7 @@ PortletURL portletURL = cpInstanceCommercePriceEntryDisplayContext.getPortletURL
 </aui:form>
 
 <div id="<portlet:namespace />entriesContainer">
-	<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
+	<aui:form action="<%= portletURL %>" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 		<aui:input name="deleteCommercePriceEntryIds" type="hidden" />
@@ -49,7 +49,7 @@ PortletURL portletURL = cpInstanceCommercePriceEntryDisplayContext.getPortletURL
 			%>'
 			creationMenu="<%= cpInstanceCommercePriceEntryDisplayContext.getCreationMenu() %>"
 			dataProviderKey="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_INSTANCE_PRICE_ENTRIES %>"
-			formId="fm"
+			formName="fm"
 			id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_INSTANCE_PRICE_ENTRIES %>"
 			itemsPerPage="<%= 10 %>"
 			namespace="<%= liferayPortletResponse.getNamespace() %>"

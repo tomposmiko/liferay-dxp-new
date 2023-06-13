@@ -22,7 +22,10 @@ import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFacto
 import com.liferay.content.dashboard.web.internal.item.selector.criteria.content.dashboard.type.criterion.ContentDashboardItemSubtypeItemSelectorCriterion;
 import com.liferay.content.dashboard.web.internal.item.type.ContentDashboardItemSubtype;
 import com.liferay.content.dashboard.web.internal.item.type.ContentDashboardItemSubtypeFactory;
+import com.liferay.content.dashboard.web.internal.util.ContentDashboardGroupUtil;
 import com.liferay.content.dashboard.web.internal.util.ContentDashboardSearchClassNameUtil;
+import com.liferay.document.library.kernel.model.DLFileEntryType;
+import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.info.item.InfoItemClassDetails;
 import com.liferay.info.item.InfoItemFormVariation;
 import com.liferay.info.item.InfoItemReference;
@@ -39,11 +42,14 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -164,17 +170,6 @@ public class ContentDashboardItemSubtypeItemSelectorView
 		).toArray();
 	}
 
-	private String _getGroupName(Group group, Locale locale) {
-		try {
-			return group.getDescriptiveName(locale);
-		}
-		catch (PortalException portalException) {
-			_log.error(portalException, portalException);
-
-			return group.getName(locale);
-		}
-	}
-
 	private String _getIcon(String className) {
 		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
@@ -209,7 +204,7 @@ public class ContentDashboardItemSubtypeItemSelectorView
 					locale, "x-group-x",
 					new String[] {
 						labelInfoLocalizedValue.getValue(locale),
-						_getGroupName(group, locale)
+						ContentDashboardGroupUtil.getGroupName(group, locale)
 					});
 			}
 		).orElseGet(
@@ -242,9 +237,6 @@ public class ContentDashboardItemSubtypeItemSelectorView
 
 		JSONArray itemSubtypesJSONArray = JSONFactoryUtil.createJSONArray();
 
-		InfoLocalizedValue<String> infoItemClassDetailsLabelInfoLocalizedValue =
-			infoItemClassDetails.getLabelInfoLocalizedValue();
-
 		for (InfoItemFormVariation infoItemFormVariation :
 				infoItemFormVariations) {
 
@@ -252,6 +244,25 @@ public class ContentDashboardItemSubtypeItemSelectorView
 				ContentDashboardItemSubtype contentDashboardItemSubtype =
 					contentDashboardItemSubtypeFactory.create(
 						Long.valueOf(infoItemFormVariation.getKey()));
+
+				Company company = _companyLocalService.getCompany(
+					themeDisplay.getCompanyId());
+
+				DLFileEntryType googleDocsDLFileEntryType =
+					_dlFileEntryTypeLocalService.fetchFileEntryType(
+						company.getGroupId(), "GOOGLE_DOCS");
+
+				if (googleDocsDLFileEntryType != null) {
+					String fileEntryTypeIdString = String.valueOf(
+						googleDocsDLFileEntryType.getFileEntryTypeId());
+
+					if (StringUtil.equalsIgnoreCase(
+							fileEntryTypeIdString,
+							infoItemFormVariation.getKey())) {
+
+						continue;
+					}
+				}
 
 				InfoItemReference infoItemReference =
 					contentDashboardItemSubtype.getInfoItemReference();
@@ -284,8 +295,14 @@ public class ContentDashboardItemSubtypeItemSelectorView
 				"itemSubtypes", itemSubtypesJSONArray
 			).put(
 				"label",
-				infoItemClassDetailsLabelInfoLocalizedValue.getValue(
-					themeDisplay.getLocale())
+				() -> {
+					InfoLocalizedValue<String>
+						infoItemClassDetailsLabelInfoLocalizedValue =
+							infoItemClassDetails.getLabelInfoLocalizedValue();
+
+					return infoItemClassDetailsLabelInfoLocalizedValue.getValue(
+						themeDisplay.getLocale());
+				}
 			));
 	}
 
@@ -297,8 +314,14 @@ public class ContentDashboardItemSubtypeItemSelectorView
 			new UUIDItemSelectorReturnType());
 
 	@Reference
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
 	private ContentDashboardItemFactoryTracker
 		_contentDashboardItemFactoryTracker;
+
+	@Reference
+	private DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

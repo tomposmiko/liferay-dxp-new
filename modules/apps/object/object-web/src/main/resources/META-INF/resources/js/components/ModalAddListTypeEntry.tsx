@@ -59,7 +59,7 @@ const ModalAddListTypeEntry: React.FC<IProps> = ({
 				name_i18n,
 			}),
 			headers: new Headers({
-				Accept: 'application/json',
+				'Accept': 'application/json',
 				'Content-Type': 'application/json',
 			}),
 			method: 'POST',
@@ -108,6 +108,7 @@ const ModalAddListTypeEntry: React.FC<IProps> = ({
 				<ClayModal.Header>
 					{Liferay.Language.get('new-item')}
 				</ClayModal.Header>
+
 				<ClayModal.Body>
 					{error && (
 						<ClayAlert displayType="danger">{error}</ClayAlert>
@@ -147,6 +148,7 @@ const ModalAddListTypeEntry: React.FC<IProps> = ({
 						}
 					/>
 				</ClayModal.Body>
+
 				<ClayModal.Footer
 					last={
 						<ClayButton.Group key={1} spaced>
@@ -184,8 +186,8 @@ type TLocale = {
 };
 
 type TInitialValues = {
-	name_i18n: TTranslations;
 	key?: string;
+	name_i18n: TTranslations;
 };
 
 const ModalWithProvider: React.FC<IProps> = ({apiURL}) => {

@@ -17,8 +17,10 @@ import ClayIcon from '@clayui/icon';
 import {useIsMounted} from '@liferay/frontend-js-react-web';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useContext, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 
+import ServiceProvider from '../../ServiceProvider/index';
+import {debouncePromise} from '../../utilities/debounce';
 import {PRODUCT_REMOVED_FROM_CART} from '../../utilities/eventsDefinitions';
 import Price from '../price/Price';
 import QuantitySelector from '../quantity_selector/QuantitySelector';
@@ -30,53 +32,72 @@ import {
 	REMOVAL_ERRORS_TIMEOUT,
 	REMOVAL_TIMEOUT,
 } from './util/constants';
-import {parseOptions} from './util/index';
+import {generateProductPageURL, parseOptions} from './util/index';
 
-function CartItem({item: cartItem}) {
-	const {
-		adaptiveMediaImageHTMLTag,
-		cartItems: childItems,
-		errorMessages,
-		id: cartItemId,
-		name,
-		options: rawOptions,
-		price,
-		quantity,
-		settings,
-		sku,
-		skuId,
-	} = cartItem;
+const CartResource = ServiceProvider.DeliveryCartAPI('v1');
+
+const deboncedUpdateItemQuantity = debouncePromise(
+	(cartItemId, quantity) =>
+		CartResource.updateItemById(cartItemId, {
+			quantity,
+		}),
+	300
+);
+
+function CartItem({
+	adaptiveMediaImageHTMLTag,
+	cartItems: childItems,
+	errorMessages,
+	id: cartItemId,
+	name,
+	options: rawOptions,
+	price,
+	productURLs,
+	quantity: cartItemQuantity,
+	settings,
+	sku,
+	skuId,
+}) {
+	const [itemState, setItemState] = useState(INITIAL_ITEM_STATE);
+	const [selectorQuantity, setSelectorQuantity] = useState(cartItemQuantity);
+	const isMounted = useIsMounted();
+	const options = parseOptions(rawOptions);
+
+	useEffect(() => {
+		setSelectorQuantity(cartItemQuantity);
+	}, [cartItemQuantity]);
 
 	const {
-		CartResource,
+		actionURLs,
 		cartState,
 		displayDiscountLevels,
 		setIsUpdating,
-		spritemap,
 		updateCartModel,
 	} = useContext(MiniCartContext);
 
-	const isMounted = useIsMounted();
+	const productPageUrl = generateProductPageURL(
+		actionURLs.siteDefaultURL,
+		productURLs,
+		actionURLs.productURLSeparator
+	);
 
-	const {id: orderId} = cartState;
-	const [itemState, setItemState] = useState(INITIAL_ITEM_STATE);
+	const showErrors = useCallback(() => {
+		if (isMounted()) {
+			setItemState({
+				...INITIAL_ITEM_STATE,
+				isShowingErrors: true,
+				removalTimeoutRef: setTimeout(() => {
+					if (isMounted()) {
+						setItemState(INITIAL_ITEM_STATE);
+					}
+				}, REMOVAL_ERRORS_TIMEOUT),
+			});
+		}
+	}, [isMounted]);
 
-	const options = parseOptions(rawOptions);
+	const cancelRemoveItem = (event) => {
+		event.stopPropagation();
 
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const showErrors = () => {
-		setItemState({
-			...INITIAL_ITEM_STATE,
-			isShowingErrors: true,
-			removalTimeoutRef: setTimeout(() => {
-				if (isMounted()) {
-					setItemState(INITIAL_ITEM_STATE);
-				}
-			}, REMOVAL_ERRORS_TIMEOUT),
-		});
-	};
-
-	const cancelRemoveItem = () => {
 		clearTimeout(itemState.removalTimeoutRef);
 
 		setItemState({
@@ -92,11 +113,17 @@ function CartItem({item: cartItem}) {
 		});
 	};
 
-	const removeItem = () => {
+	const removeItem = (event) => {
+		event.stopPropagation();
+
 		setItemState({
 			...INITIAL_ITEM_STATE,
 			isGettingRemoved: true,
 			removalTimeoutRef: setTimeout(() => {
+				if (!isMounted()) {
+					return;
+				}
+
 				setIsUpdating(true);
 
 				setItemState({
@@ -110,7 +137,7 @@ function CartItem({item: cartItem}) {
 									return;
 								}
 
-								updateCartModel({id: orderId});
+								updateCartModel({order: {id: cartState.id}});
 
 								Liferay.fire(PRODUCT_REMOVED_FROM_CART, {
 									skuId,
@@ -137,59 +164,55 @@ function CartItem({item: cartItem}) {
 
 	return (
 		<div
-			className={classnames({
+			className={classnames('mini-cart-item', {
 				'is-removed': isRemoved,
-				'mini-cart-item': true,
 			})}
 		>
-			{!!adaptiveMediaImageHTMLTag && (
-				<div
-					className="mini-cart-item-thumbnail"
-					dangerouslySetInnerHTML={{
-						__html: adaptiveMediaImageHTMLTag,
-					}}
-				/>
-			)}
+			<a className="mini-cart-item-anchor" href={productPageUrl}>
+				{!!adaptiveMediaImageHTMLTag && (
+					<div
+						className="mini-cart-item-thumbnail"
+						dangerouslySetInnerHTML={{
+							__html: adaptiveMediaImageHTMLTag,
+						}}
+					/>
+				)}
 
-			<div
-				className={classnames({
-					'mini-cart-item-info': true,
-					options: !!options,
-				})}
-			>
-				<ItemInfoView
-					childItems={childItems}
-					name={name}
-					options={options}
-					sku={sku}
-				/>
-			</div>
+				<div
+					className={classnames('mini-cart-item-info ml-3', {
+						options: !!options,
+					})}
+				>
+					<ItemInfoView
+						childItems={childItems}
+						name={name}
+						options={options}
+						sku={sku}
+					/>
+				</div>
+			</a>
 
 			<div className="mini-cart-item-quantity">
 				<QuantitySelector
-					onUpdate={(freshQuantity) => {
-						if (freshQuantity && freshQuantity !== quantity) {
-							setIsUpdating(true);
+					onUpdate={(newQuantity) => {
+						setSelectorQuantity(newQuantity);
+						setIsUpdating(true);
 
-							CartResource.updateItemById(cartItemId, {
-								...cartItem,
-								quantity: freshQuantity,
+						deboncedUpdateItemQuantity(cartItemId, newQuantity)
+							.then(() => {
+								if (isMounted()) {
+									setIsUpdating(false);
+									updateCartModel({
+										order: {id: cartState.id},
+									});
+								}
 							})
-								.then(() => {
-									if (isMounted()) {
-										updateCartModel({id: orderId});
-									}
-								})
-								.catch(showErrors)
-								.finally(() => {
-									if (isMounted()) {
-										setIsUpdating(false);
-									}
-								});
-						}
+							.catch((...errors) => {
+								setIsUpdating(false);
+								showErrors(...errors);
+							});
 					}}
-					quantity={quantity}
-					spritemap={spritemap}
+					quantity={selectorQuantity}
 					{...settings}
 				/>
 			</div>
@@ -208,19 +231,13 @@ function CartItem({item: cartItem}) {
 					onClick={removeItem}
 					type="button"
 				>
-					<ClayIcon
-						spritemap={spritemap}
-						symbol="times-circle-full"
-					/>
+					<ClayIcon symbol="times-circle-full" />
 				</button>
 			</div>
 
 			{(errorMessages || isShowingErrors) && (
 				<div className="mini-cart-item-errors">
-					<ClayIcon
-						spritemap={spritemap}
-						symbol="exclamation-circle"
-					/>
+					<ClayIcon symbol="exclamation-circle" />
 
 					<span>
 						{Liferay.Language.get('an-unexpected-error-occurred')}
@@ -230,16 +247,16 @@ function CartItem({item: cartItem}) {
 
 			<div
 				className={classnames({
-					active: isGettingRemoved,
-					canceled: isRemovalCanceled,
+					'active': isGettingRemoved,
+					'canceled': isRemovalCanceled,
 					'mini-cart-item-removing': true,
 				})}
 			>
 				<span>{Liferay.Language.get('the-item-has-been-removed')}</span>
+
 				<span>
 					<ClayButton
 						displayType="link"
-						href="#"
 						onClick={cancelRemoveItem}
 						small
 						type="button"

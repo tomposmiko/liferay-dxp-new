@@ -1,12 +1,15 @@
 import React from 'react';
-import {EMAIL_REGEX} from '~/common/utils/patterns';
-
 import {ControlledInput} from '.';
 
-export const EmailControlledInput = ({rules, ...props}) => {
+import {EMAIL_REGEX} from '../../../../utils/patterns';
+
+export function EmailControlledInput({rules, ...props}) {
 	return (
 		<ControlledInput
 			{...props}
+			inputProps={{
+				className: 'd-flex mb-5 mr-0',
+			}}
 			rules={{
 				pattern: {
 					message: 'Must be a valid email address.',
@@ -16,4 +19,4 @@ export const EmailControlledInput = ({rules, ...props}) => {
 			}}
 		/>
 	);
-};
+}

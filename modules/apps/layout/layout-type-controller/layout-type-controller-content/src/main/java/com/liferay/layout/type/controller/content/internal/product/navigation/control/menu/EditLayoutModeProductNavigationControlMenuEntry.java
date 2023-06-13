@@ -14,6 +14,7 @@
 
 package com.liferay.layout.type.controller.content.internal.product.navigation.control.menu;
 
+import com.liferay.exportimport.kernel.staging.LayoutStaging;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.security.permission.resource.LayoutContentModelResourcePermission;
@@ -24,6 +25,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -91,59 +93,49 @@ public class EditLayoutModeProductNavigationControlMenuEntry
 				WebKeys.THEME_DISPLAY);
 
 		try {
-			String redirect = themeDisplay.getURLCurrent();
-
 			Layout layout = themeDisplay.getLayout();
 
-			long publishedLayoutPlid = layout.getPlid();
-
 			if (layout.isDraftLayout()) {
-				publishedLayoutPlid = layout.getClassPK();
-
-				redirect = _portal.getLayoutFullURL(
-					_layoutLocalService.getLayout(publishedLayoutPlid),
+				String layoutFullURL = _portal.getLayoutFullURL(
+					_layoutLocalService.getLayout(layout.getClassPK()),
 					themeDisplay);
-			}
-			else {
-				Layout draftLayout = layout.fetchDraftLayout();
 
-				if (draftLayout == null) {
-					UnicodeProperties unicodeProperties =
-						layout.getTypeSettingsProperties();
-
-					unicodeProperties.put("published", "true");
-
-					ServiceContext serviceContext =
-						ServiceContextFactory.getInstance(httpServletRequest);
-
-					draftLayout = _layoutLocalService.addLayout(
-						layout.getUserId(), layout.getGroupId(),
-						layout.isPrivateLayout(), layout.getParentLayoutId(),
-						_portal.getClassNameId(Layout.class), layout.getPlid(),
-						layout.getNameMap(), layout.getTitleMap(),
-						layout.getDescriptionMap(), layout.getKeywordsMap(),
-						layout.getRobotsMap(), layout.getType(),
-						unicodeProperties.toString(), true, true,
-						Collections.emptyMap(), layout.getMasterLayoutPlid(),
-						serviceContext);
-
-					draftLayout = _layoutCopyHelper.copyLayout(
-						layout, draftLayout);
-
-					_layoutLocalService.updateStatus(
-						draftLayout.getUserId(), draftLayout.getPlid(),
-						WorkflowConstants.STATUS_APPROVED, serviceContext);
-				}
-
-				redirect = _portal.getLayoutFullURL(draftLayout, themeDisplay);
+				return _getRedirect(
+					httpServletRequest, layoutFullURL, layout, themeDisplay);
 			}
 
-			redirect = _http.setParameter(
-				redirect, "p_l_back_url",
-				_portal.getLayoutFullURL(
-					themeDisplay.getLayout(), themeDisplay));
+			Layout draftLayout = layout.fetchDraftLayout();
 
-			return _http.setParameter(redirect, "p_l_mode", Constants.EDIT);
+			if (draftLayout == null) {
+				UnicodeProperties unicodeProperties =
+					layout.getTypeSettingsProperties();
+
+				ServiceContext serviceContext =
+					ServiceContextFactory.getInstance(httpServletRequest);
+
+				draftLayout = _layoutLocalService.addLayout(
+					layout.getUserId(), layout.getGroupId(),
+					layout.isPrivateLayout(), layout.getParentLayoutId(),
+					_portal.getClassNameId(Layout.class), layout.getPlid(),
+					layout.getNameMap(), layout.getTitleMap(),
+					layout.getDescriptionMap(), layout.getKeywordsMap(),
+					layout.getRobotsMap(), layout.getType(),
+					unicodeProperties.toString(), true, true,
+					Collections.emptyMap(), layout.getMasterLayoutPlid(),
+					serviceContext);
+
+				draftLayout = _layoutCopyHelper.copyLayout(layout, draftLayout);
+
+				_layoutLocalService.updateStatus(
+					draftLayout.getUserId(), draftLayout.getPlid(),
+					WorkflowConstants.STATUS_APPROVED, serviceContext);
+			}
+
+			String layoutFullURL = _portal.getLayoutFullURL(
+				draftLayout, themeDisplay);
+
+			return _getRedirect(
+				httpServletRequest, layoutFullURL, layout, themeDisplay);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
@@ -177,6 +169,15 @@ public class EditLayoutModeProductNavigationControlMenuEntry
 			return false;
 		}
 
+		Layout layout = themeDisplay.getLayout();
+
+		LayoutRevision layoutRevision = _layoutStaging.getLayoutRevision(
+			layout);
+
+		if ((layoutRevision != null) && layoutRevision.isIncomplete()) {
+			return false;
+		}
+
 		LayoutTypePortlet layoutTypePortlet =
 			themeDisplay.getLayoutTypePortlet();
 
@@ -191,14 +192,9 @@ public class EditLayoutModeProductNavigationControlMenuEntry
 			ContentPageEditorWebKeys.CLASS_NAME);
 
 		if (Objects.equals(
-				className, LayoutPageTemplateEntry.class.getName())) {
+				className, LayoutPageTemplateEntry.class.getName()) ||
+			!layout.isTypeContent() || !SitesUtil.isLayoutUpdateable(layout)) {
 
-			return false;
-		}
-
-		Layout layout = themeDisplay.getLayout();
-
-		if (!layout.isTypeContent() || !SitesUtil.isLayoutUpdateable(layout)) {
 			return false;
 		}
 
@@ -222,6 +218,28 @@ public class EditLayoutModeProductNavigationControlMenuEntry
 		return false;
 	}
 
+	private String _getRedirect(
+			HttpServletRequest httpServletRequest, String fullLayoutURL,
+			Layout layout, ThemeDisplay themeDisplay)
+		throws PortalException {
+
+		String redirect = _http.setParameter(
+			fullLayoutURL, "p_l_back_url",
+			_portal.getLayoutFullURL(layout, themeDisplay));
+
+		redirect = _http.setParameter(redirect, "p_l_mode", Constants.EDIT);
+
+		long segmentsExperienceId = ParamUtil.getLong(
+			httpServletRequest, "segmentsExperienceId", -1);
+
+		if (segmentsExperienceId != -1) {
+			redirect = _http.setParameter(
+				redirect, "segmentsExperienceId", segmentsExperienceId);
+		}
+
+		return redirect;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditLayoutModeProductNavigationControlMenuEntry.class);
 
@@ -236,6 +254,9 @@ public class EditLayoutModeProductNavigationControlMenuEntry
 
 	@Reference
 	private LayoutPermission _layoutPermission;
+
+	@Reference
+	private LayoutStaging _layoutStaging;
 
 	@Reference
 	private LayoutContentModelResourcePermission _modelResourcePermission;

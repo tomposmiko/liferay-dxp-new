@@ -1,18 +1,19 @@
-import React from 'react';
-import {useLegalEntity} from '~/routes/get-a-quote/hooks/useLegalEntity';
+import {ClaySelect} from '@clayui/form';
 
+import React from 'react';
 import {ControlledSelect} from '.';
+
+import {useLegalEntity} from '../../../../../routes/get-a-quote/hooks/useLegalEntity';
 
 export function LegalEntityControlledSelect({...props}) {
 	const {entities} = useLegalEntity();
 
 	return (
 		<ControlledSelect {...props}>
-			<option hidden>Select</option>
+			<ClaySelect.Option hidden label="Select" />
+
 			{entities.map(({name}) => (
-				<option key={name} value={name}>
-					{name}
-				</option>
+				<ClaySelect.Option key={name} label={name} value={name} />
 			))}
 		</ControlledSelect>
 	);

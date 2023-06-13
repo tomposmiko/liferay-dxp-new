@@ -1,5 +1,40 @@
 definition {
 
+	macro addBoldContentonRichText {
+		Click(locator1 = "DataEngineRenderer#TOOLBAR_BOLD_BUTTON");
+	}
+
+	macro addSourceContentonRichText {
+		Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON");
+
+		Type.typeCodeMirrorEditorNoError(
+			locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
+			value1 = "${content}");
+	}
+
+	macro assertBoldContentonRichText {
+		AssertElementPresent(locator1 = "DataEngineRenderer#TOOLBAR_BOLD_BUTTON_ON");
+	}
+
+	macro assertContent {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		AssertTextEquals(
+			key_fieldLabel = "${linkToPageFieldLabel}",
+			key_index = "${index}",
+			locator1 = "DataEngineRenderer#SELECTOR_INPUT_INDEXED",
+			value1 = "${linkToPageContent}");
+	}
+
+	macro assertContentInLinktoPageField {
+		DERenderer.assertContent(
+			index = "${index}",
+			linkToPageContent = "${linkToPageContent}",
+			linkToPageFieldLabel = "${linkToPageFieldLabel}");
+	}
+
 	macro assertDataInColorField {
 		if (!(isSet(index))) {
 			var index = "1";
@@ -94,6 +129,18 @@ definition {
 			value1 = "${value}");
 	}
 
+	macro assertDataInRichTextField {
+		DERenderer.selectCKEditorByIndex(
+			fieldLabel = "${fieldLabel}",
+			index = "${index}");
+
+		AssertTextEquals(
+			locator1 = "CKEditor#BODY",
+			value1 = "${content}");
+
+		SelectFrame(value1 = "relative=top");
+	}
+
 	macro assertDataInSelectFromListField {
 		if (!(isSet(index))) {
 			var index = "1";
@@ -171,6 +218,13 @@ definition {
 			locator1 = "DataEngineRenderer#IMAGE_PICKER_PREVIEW_INDEXED");
 	}
 
+	macro assertLinktoPageIsClear {
+		DERenderer.assertContent(
+			index = "${index}",
+			linkToPageContent = "",
+			linkToPageFieldLabel = "${linkToPageFieldLabel}");
+	}
+
 	macro assertMultipleSelectionOptionIsUnchecked {
 		if (!(isSet(fieldIndex))) {
 			var fieldIndex = "1";
@@ -188,28 +242,23 @@ definition {
 			optionIndex = "${optionIndex}");
 	}
 
-	macro assertUploadNotPresent {
-		if (!(isSet(index))) {
-			var index = "1";
-		}
+	macro assertUploadData {
+		AssertElementPresent(
+			key_fileName = "${fileName}",
+			locator1 = "DataEngineRenderer#UPLOAD_FIELD_VALUE");
+	}
 
-		AssertElementNotPresent(
-			key_fieldLabel = "${fieldLabel}",
-			key_index = "${index}",
-			locator1 = "DataEngineRenderer#SELECTOR_INPUT_INDEXED",
-			value1 = "${webContentUpload}");
+	macro assertUploadDataIsEmpty {
+		AssertElementPresent(
+			key_fileName = "",
+			locator1 = "DataEngineRenderer#UPLOAD_FIELD_VALUE");
 	}
 
 	macro assertWebContentNotPresent {
-		if (!(isSet(index))) {
-			var index = "1";
-		}
-
 		AssertElementNotPresent(
+			key_contentName = "${contentName}",
 			key_fieldLabel = "${fieldLabel}",
-			key_index = "${index}",
-			locator1 = "DataEngineRenderer#SELECTOR_INPUT_INDEXED",
-			value1 = "${contentName}");
+			locator1 = "DataEngineRenderer#SELECTOR_INPUT_BY_CONTENT_NAME");
 	}
 
 	macro clearDataOnField {
@@ -222,6 +271,18 @@ definition {
 			key_buttonName = "Clear",
 			key_fieldLabel = "${fieldLabel}",
 			locator1 = "DataEngineRenderer#FIELD_BUTTON_INDEXED");
+	}
+
+	macro clickCollapseFieldsGroup {
+		Click(locator1 = "Form#COLLAPSE_BUTTON");
+	}
+
+	macro clickOnPreviewSourceContent {
+		Click(locator1 = "CKEditor#TOOLBAR_PREVIEW_BUTTON");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "CKEditor#SOURCE_CODE_DIALOG",
+			value1 = "${content}");
 	}
 
 	macro inputDataInColorField {
@@ -364,6 +425,31 @@ definition {
 		}
 	}
 
+	macro inputDataInLinkToPageField {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		WaitForLiferayEvent.initializeLiferayEventLog();
+
+		Click(
+			key_fieldLabel = "${linkToPageFieldLabel}",
+			key_index = "${index}",
+			key_text = "Select",
+			locator1 = "DataEngineRenderer#BUTTON_LABEL_INDEXED");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		Portlet.expandTree();
+
+		AssertClick.assertPartialTextClickAt(
+			key_nodeName = "${linkToPageContent}",
+			locator1 = "Treeview#NODE_UNSELECTED",
+			value1 = "${linkToPageContent}");
+
+		SelectFrameTop();
+	}
+
 	macro inputDataInMultipleSelectionField {
 		if (!(isSet(fieldIndex))) {
 			var fieldIndex = "1";
@@ -391,6 +477,18 @@ definition {
 			key_fieldLabel = "${fieldLabel}",
 			locator1 = "DataEngineRenderer#TEXT_INPUT_INDEXED",
 			value1 = "${value}");
+	}
+
+	macro inputDataInRichTextField {
+		DERenderer.selectCKEditorByIndex(
+			fieldLabel = "${fieldLabel}",
+			index = "${index}");
+
+		Type(
+			locator1 = "CKEditor#BODY",
+			value1 = "${content}");
+
+		SelectFrame(value1 = "relative=top");
 	}
 
 	macro inputDataInSelectFromListField {
@@ -520,6 +618,17 @@ definition {
 			index = "${index}",
 			key_fieldLabel = "${fieldLabel}",
 			locator1 = "DataEngineRenderer#REPEATABLE_FIELD_DELETE_BUTTON_INDEXED");
+	}
+
+	macro selectCKEditorByIndex {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		SelectFrame.selectFrameNoLoading(
+			index = "${index}",
+			key_fieldLabel = "${fieldLabel}",
+			locator1 = "CKEditor#ANY_BODY_FIELD_IFRAME_WEB_CONTENT_ARTICLE");
 	}
 
 }

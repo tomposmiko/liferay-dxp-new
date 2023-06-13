@@ -45,8 +45,6 @@ definition {
 
 			Click(locator1 = "DocumentsAndMediaDocumentTypes#SIDEBAR_BACK");
 
-			Click(locator1 = "DocumentsAndMediaDocumentTypes#SIDEBAR_DELETE");
-
 			var rowNum = ${rowNum} + 1;
 		}
 
@@ -277,13 +275,7 @@ definition {
 	}
 
 	macro tearDownCP {
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Documents and Media");
-
-		DMNavigator.gotoDocumentType();
+		DMNavigator.openDocumentTypesAdmin(siteURLKey = "guest");
 
 		DMDocumentType.selectDocumentTypeFrame();
 
@@ -324,6 +316,7 @@ definition {
 		AssertElementNotPresent(
 			key_dmDocumentTypeName = "Google Drive Shortcut",
 			locator1 = "DocumentsAndMediaDocumentTypes#DOCUMENT_TYPES_TABLE_NAME");
+
 		AssertElementNotPresent(
 			key_dmDocumentTypeName = "External Video Shortcut",
 			locator1 = "DocumentsAndMediaDocumentTypes#DOCUMENT_TYPES_TABLE_NAME");

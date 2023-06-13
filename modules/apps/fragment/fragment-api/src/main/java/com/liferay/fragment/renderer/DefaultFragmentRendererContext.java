@@ -16,8 +16,12 @@ package com.liferay.fragment.renderer;
 
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -39,6 +43,31 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 	@Override
 	public Optional<Map<String, Object>> getFieldValuesOptional() {
 		return Optional.ofNullable(_fieldValues);
+	}
+
+	@Override
+	public String getFragmentElementId() {
+		StringBundler sb = new StringBundler(8);
+
+		sb.append("fragment-");
+		sb.append(_fragmentEntryLink.getFragmentEntryId());
+		sb.append("-");
+		sb.append(_fragmentEntryLink.getNamespace());
+
+		if (!ListUtil.isEmpty(_collectionStyledLayoutStructureItemIds)) {
+			sb.append("-");
+			sb.append(
+				ListUtil.toString(
+					_collectionStyledLayoutStructureItemIds, StringPool.BLANK,
+					StringPool.DASH));
+		}
+
+		if (_collectionElementIndex > -1) {
+			sb.append("-");
+			sb.append(_collectionElementIndex);
+		}
+
+		return sb.toString();
 	}
 
 	@Override
@@ -77,13 +106,24 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 	}
 
 	@Override
-	public long[] getSegmentsExperienceIds() {
-		return _segmentsExperienceIds;
+	public long[] getSegmentsEntryIds() {
+		return _segmentsSegmentsEntryIds;
 	}
 
 	@Override
 	public boolean isUseCachedContent() {
 		return _useCachedContent;
+	}
+
+	public void setCollectionElementIndex(int collectionElementIndex) {
+		_collectionElementIndex = collectionElementIndex;
+	}
+
+	public void setCollectionStyledLayoutStructureItemIds(
+		List<String> collectionStyledLayoutStructureItemIds) {
+
+		_collectionStyledLayoutStructureItemIds =
+			collectionStyledLayoutStructureItemIds;
 	}
 
 	public void setDisplayObject(Object object) {
@@ -118,14 +158,16 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 		_previewVersion = previewVersion;
 	}
 
-	public void setSegmentsExperienceIds(long[] segmentsExperienceIds) {
-		_segmentsExperienceIds = segmentsExperienceIds;
+	public void setSegmentsEntryIds(long[] segmentsSegmentsEntryIds) {
+		_segmentsSegmentsEntryIds = segmentsSegmentsEntryIds;
 	}
 
 	public void setUseCachedContent(boolean useCachedContent) {
 		_useCachedContent = useCachedContent;
 	}
 
+	private int _collectionElementIndex = -1;
+	private List<String> _collectionStyledLayoutStructureItemIds;
 	private Object _displayObject;
 	private Map<String, Object> _fieldValues;
 	private final FragmentEntryLink _fragmentEntryLink;
@@ -135,7 +177,7 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 	private long _previewClassPK;
 	private int _previewType;
 	private String _previewVersion;
-	private long[] _segmentsExperienceIds = new long[0];
+	private long[] _segmentsSegmentsEntryIds = new long[0];
 	private boolean _useCachedContent = true;
 
 }

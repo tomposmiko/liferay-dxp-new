@@ -46,6 +46,7 @@ definition {
 
 	@description = "This is a test for LPS-125191. The image resolution is applied to directly selected image in fragment with background image editable field in display page template."
 	@priority = "5"
+	@uitest
 	test ViewAutoImageResolutionForBackgroundImageDirectlySelectedInBannerCenter {
 		property portal.acceptance = "true";
 
@@ -79,6 +80,7 @@ definition {
 
 		task ("Take down the Width and File Size of image resolution in Desktop viewport") {
 			var fileSizeDesktop = PageEditor.getFileSizeOfSelectedImageResolution();
+
 			var width = PageEditor.getWidthOfSelectedImageResolution();
 		}
 
@@ -108,6 +110,7 @@ definition {
 
 		task ("Take down the Width and File Size of image resolution in Tablet viewport") {
 			var fileSizeTablet = PageEditor.getFileSizeOfSelectedImageResolution();
+
 			var width = PageEditor.getWidthOfSelectedImageResolution();
 		}
 
@@ -165,9 +168,7 @@ definition {
 		}
 
 		task ("Assert the mapping image is shown in Preview modal") {
-			AssertVisible(
-				key_imageName = "high_resolution_photo.jpg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "high_resolution_photo.jpg");
 		}
 
 		task ("Assert the orignal image is selected automatically") {
@@ -192,9 +193,7 @@ definition {
 		}
 
 		task ("Assert the mapping image is shown in Preview modal") {
-			AssertVisible(
-				key_imageName = "high_resolution_photo.jpg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "high_resolution_photo.jpg");
 		}
 
 		task ("Assert the Preview-1000x0 is selected automatically") {
@@ -207,6 +206,7 @@ definition {
 
 	@description = "This is a test for LPS-125191. The image resolution is applied to directly selected background image in Container with padding settings in display page template."
 	@priority = "5"
+	@uitest
 	test ViewAutoImageResolutionForBackgroundImageDirectlySelectedInContainer {
 		property portal.acceptance = "true";
 
@@ -244,6 +244,7 @@ definition {
 
 		task ("Take down the Width and File Size of image resolution in Desktop viewport") {
 			var fileSizeDesktop = PageEditor.getFileSizeOfSelectedImageResolution();
+
 			var width = PageEditor.getWidthOfSelectedImageResolution();
 		}
 
@@ -273,6 +274,7 @@ definition {
 
 		task ("Take down the Width and File Size of image resolution in Portrait Phone viewport") {
 			var fileSizePortraitPhone = PageEditor.getFileSizeOfSelectedImageResolution();
+
 			var width = PageEditor.getWidthOfSelectedImageResolution();
 		}
 
@@ -330,9 +332,7 @@ definition {
 		}
 
 		task ("Assert the mapping image is shown in Preview modal") {
-			AssertVisible(
-				key_imageName = "high_resolution_photo.jpg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "high_resolution_photo.jpg");
 		}
 
 		task ("Assert the orignal image is selected automatically") {
@@ -357,9 +357,7 @@ definition {
 		}
 
 		task ("Assert the mapping image is shown in Preview modal") {
-			AssertVisible(
-				key_imageName = "high_resolution_photo.jpg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "high_resolution_photo.jpg");
 		}
 
 		task ("Assert the Preview-1000x0 is selected automatically") {
@@ -372,6 +370,7 @@ definition {
 
 	@description = "This is a test for LPS-125191. The image resolution is applied to directly selected image in fragment with image editable field in display page template."
 	@priority = "5"
+	@uitest
 	test ViewAutoImageResolutionForImageDirectlySelectedInCard {
 		property portal.acceptance = "true";
 
@@ -407,6 +406,7 @@ definition {
 
 		task ("Take down the Width and File Size of image resolution in Desktop viewport") {
 			var fileSizeDesktop = PageEditor.getFileSizeOfSelectedImageResolution();
+
 			var width = PageEditor.getWidthOfSelectedImageResolution();
 		}
 
@@ -437,6 +437,7 @@ definition {
 
 		task ("Take down the Width and File Size of image resolution in Landscape Phone viewport") {
 			var fileSizeLandscapePhone = PageEditor.getFileSizeOfSelectedImageResolution();
+
 			var width = PageEditor.getWidthOfSelectedImageResolution();
 		}
 
@@ -537,6 +538,7 @@ definition {
 
 	@description = "This is a test for LPS-125191. The image resolution is applied to mapping background image of a fragment with editable field in display page template."
 	@priority = "5"
+	@uitest
 	test ViewAutoImageResolutionForMappingBackgroundImageInBannerCenter {
 		property portal.acceptance = "true";
 
@@ -621,9 +623,7 @@ definition {
 		}
 
 		task ("Assert the mapping image is shown in Preview modal") {
-			AssertVisible(
-				key_imageName = "high_resolution_photo.jpg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "high_resolution_photo.jpg");
 		}
 
 		task ("Assert the orignal image is selected automatically") {
@@ -648,9 +648,7 @@ definition {
 		}
 
 		task ("Assert the mapping image is shown in Preview modal") {
-			AssertVisible(
-				key_imageName = "high_resolution_photo.jpg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "high_resolution_photo.jpg");
 		}
 
 		task ("Assert the Preview-1000x0 is selected automatically") {
@@ -663,6 +661,7 @@ definition {
 
 	@description = "This is a test for LPS-125191. The image resolution is applied to mapping background image of the Container with padding settings."
 	@priority = "5"
+	@uitest
 	test ViewAutoImageResolutionForMappingBackgroundImageInContainer {
 		property portal.acceptance = "true";
 
@@ -748,9 +747,7 @@ definition {
 		}
 
 		task ("Assert the mapping image is shown in Preview modal") {
-			AssertVisible(
-				key_imageName = "high_resolution_photo.jpg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "high_resolution_photo.jpg");
 		}
 
 		task ("Assert the orignal image is selected automatically") {
@@ -775,9 +772,7 @@ definition {
 		}
 
 		task ("Assert the mapping image is shown in Preview modal") {
-			AssertVisible(
-				key_imageName = "high_resolution_photo.jpg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "high_resolution_photo.jpg");
 		}
 
 		task ("Assert the Preview-1000x0 is selected automatically") {
@@ -790,6 +785,7 @@ definition {
 
 	@description = "This is a test for LPS-125191. The image resolution is applied to mapping image of a fragment with editable field in display page template."
 	@priority = "5"
+	@uitest
 	test ViewAutoImageResolutionForMappingImageInCard {
 		property portal.acceptance = "true";
 

@@ -27,6 +27,10 @@ public class CommerceChannelLocalServiceWrapper
 	implements CommerceChannelLocalService,
 			   ServiceWrapper<CommerceChannelLocalService> {
 
+	public CommerceChannelLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CommerceChannelLocalServiceWrapper(
 		CommerceChannelLocalService commerceChannelLocalService) {
 
@@ -65,6 +69,23 @@ public class CommerceChannelLocalServiceWrapper
 
 		return _commerceChannelLocalService.addCommerceChannel(
 			externalReferenceCode, siteGroupId, name, type,
+			typeSettingsUnicodeProperties, commerceCurrencyCode,
+			serviceContext);
+	}
+
+	@Override
+	public com.liferay.commerce.product.model.CommerceChannel
+			addOrUpdateCommerceChannel(
+				long userId, String externalReferenceCode, long siteGroupId,
+				String name, String type,
+				com.liferay.portal.kernel.util.UnicodeProperties
+					typeSettingsUnicodeProperties,
+				String commerceCurrencyCode,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _commerceChannelLocalService.addOrUpdateCommerceChannel(
+			userId, externalReferenceCode, siteGroupId, name, type,
 			typeSettingsUnicodeProperties, commerceCurrencyCode,
 			serviceContext);
 	}

@@ -110,14 +110,19 @@ public class FriendlyURLEntryLocalServiceImpl
 		Map<String, String> existingUrlTitleMap = _getURLTitleMap(
 			friendlyURLEntryMapping);
 
-		if (_containsAllURLTitles(existingUrlTitleMap, urlTitleMap)) {
-			return friendlyURLEntryPersistence.fetchByPrimaryKey(
+		FriendlyURLEntry friendlyURLEntry =
+			friendlyURLEntryPersistence.fetchByPrimaryKey(
 				friendlyURLEntryMapping.getFriendlyURLEntryId());
+
+		if ((friendlyURLEntry != null) &&
+			_containsAllURLTitles(existingUrlTitleMap, urlTitleMap)) {
+
+			return friendlyURLEntry;
 		}
 
 		long friendlyURLEntryId = counterLocalService.increment();
 
-		FriendlyURLEntry friendlyURLEntry = friendlyURLEntryPersistence.create(
+		friendlyURLEntry = friendlyURLEntryPersistence.create(
 			friendlyURLEntryId);
 
 		friendlyURLEntry.setUuid(serviceContext.getUuid());
@@ -387,7 +392,9 @@ public class FriendlyURLEntryLocalServiceImpl
 		long groupId, long classNameId, long classPK, String urlTitle,
 		String languageId) {
 
-		urlTitle = urlTitle.replaceAll("^/+", StringPool.BLANK);
+		if (urlTitle.startsWith(StringPool.SLASH)) {
+			urlTitle = urlTitle.replaceAll("^/+", StringPool.SLASH);
+		}
 
 		String normalizedUrlTitle =
 			FriendlyURLNormalizerUtil.normalizeWithEncoding(urlTitle);

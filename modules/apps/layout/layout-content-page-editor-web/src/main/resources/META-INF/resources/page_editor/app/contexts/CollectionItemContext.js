@@ -133,6 +133,7 @@ const useGetContent = (fragmentEntryLink, languageId, segmentsExperienceId) => {
 			})
 		) {
 			FragmentService.renderFragmentEntryLinkContent({
+				collectionItemIndex,
 				fragmentEntryLinkId,
 				itemClassName,
 				itemClassPK,
@@ -151,6 +152,7 @@ const useGetContent = (fragmentEntryLink, languageId, segmentsExperienceId) => {
 		}
 	}, [
 		collectionContentId,
+		collectionItemIndex,
 		dispatch,
 		editableValues,
 		fieldSets,
@@ -251,6 +253,7 @@ const useGetFieldValue = () => {
 				return InfoItemService.getInfoItemFieldValue({
 					...displayPagePreviewItem.data,
 					fieldId: editable.mappedField,
+					languageId: editable.languageId,
 					onNetworkStatus: () => {},
 				}).then((response) => {
 					if (!response || !Object.keys(response).length) {
@@ -296,6 +299,7 @@ const useRenderFragmentContent = () => {
 			return FragmentService.renderFragmentEntryLinkContent({
 				collectionItemClassName,
 				collectionItemClassPK,
+				collectionItemIndex,
 				fragmentEntryLinkId,
 				onNetworkStatus,
 				segmentsExperienceId,

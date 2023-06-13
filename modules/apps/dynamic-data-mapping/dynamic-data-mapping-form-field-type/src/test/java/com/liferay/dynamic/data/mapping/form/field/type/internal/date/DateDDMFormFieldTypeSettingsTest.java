@@ -151,6 +151,7 @@ public class DateDDMFormFieldTypeSettingsTest
 					"repeatable", "validation")));
 	}
 
+	@Override
 	protected void setUpJSONFactoryUtil() {
 		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
@@ -164,6 +165,7 @@ public class DateDDMFormFieldTypeSettingsTest
 		languageUtil.setLanguage(PowerMockito.mock(Language.class));
 	}
 
+	@Override
 	protected void setUpPortalUtil() {
 		PortalUtil portalUtil = new PortalUtil();
 

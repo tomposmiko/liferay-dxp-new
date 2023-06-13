@@ -1,4 +1,4 @@
-import '~/types';
+import '../../../types';
 
 import {LiferayAdapt} from './adapter';
 import LiferayFetchAPI, {
@@ -86,7 +86,8 @@ const getLiferaySiteName = () => {
 		const {pathname} = new URL(Liferay.ThemeDisplay.getCanonicalURL());
 		const pathSplit = pathname.split('/').filter(Boolean);
 		siteName = `/${pathSplit.slice(0, pathSplit.length - 1).join('/')}`;
-	} catch (error) {
+	}
+	catch (error) {
 		console.warn('Not able to find Liferay PathName\n', error);
 	}
 

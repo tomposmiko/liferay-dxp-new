@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -49,7 +50,7 @@ import com.liferay.portal.workflow.constants.WorkflowDefinitionConstants;
 import com.liferay.portal.workflow.constants.WorkflowPortletKeys;
 import com.liferay.portal.workflow.constants.WorkflowWebKeys;
 import com.liferay.portal.workflow.exception.IncompleteWorkflowInstancesException;
-import com.liferay.portal.workflow.web.internal.display.context.util.WorkflowDefinitionRequestHelper;
+import com.liferay.portal.workflow.web.internal.display.context.helper.WorkflowDefinitionRequestHelper;
 import com.liferay.portal.workflow.web.internal.search.WorkflowDefinitionSearch;
 import com.liferay.portal.workflow.web.internal.search.WorkflowDefinitionSearchTerms;
 import com.liferay.portal.workflow.web.internal.util.WorkflowDefinitionPortletUtil;
@@ -152,9 +153,7 @@ public class WorkflowDefinitionDisplayContext {
 		List<WorkflowDefinition> workflowDefinitions = getWorkflowDefinitions(
 			workflowDefinition.getName());
 
-		WorkflowDefinition firstWorkflowDefinition = workflowDefinitions.get(0);
-
-		return getUserName(firstWorkflowDefinition);
+		return getUserName(workflowDefinitions.get(0));
 	}
 
 	public String getDescription(WorkflowDefinition workflowDefinition) {
@@ -210,13 +209,9 @@ public class WorkflowDefinitionDisplayContext {
 				dropdownGroupItem.setDropdownItems(
 					DropdownItemListBuilder.add(
 						_getOrderByDropdownItem(
-							"last-modified",
-							_getCurrentOrder(httpServletRequest),
-							httpServletRequest)
+							httpServletRequest, "last-modified")
 					).add(
-						_getOrderByDropdownItem(
-							"title", _getCurrentOrder(httpServletRequest),
-							httpServletRequest)
+						_getOrderByDropdownItem(httpServletRequest, "title")
 					).build());
 
 				dropdownGroupItem.setLabel(
@@ -261,8 +256,7 @@ public class WorkflowDefinitionDisplayContext {
 				workflowDefinitionLinks.get(0);
 
 			return new Object[] {
-				getLocalizedAssetName(workflowDefinitionLink.getClassName()),
-				getConfigureAssignementLink()
+				getLocalizedAssetName(workflowDefinitionLink.getClassName())
 			};
 		}
 		else if (workflowDefinitionLinks.size() == 2) {
@@ -273,13 +267,10 @@ public class WorkflowDefinitionDisplayContext {
 
 			return new Object[] {
 				getLocalizedAssetName(workflowDefinitionLink1.getClassName()),
-				getLocalizedAssetName(workflowDefinitionLink2.getClassName()),
-				getConfigureAssignementLink()
+				getLocalizedAssetName(workflowDefinitionLink2.getClassName())
 			};
 		}
 		else {
-			int moreAssets = workflowDefinitionLinks.size() - 2;
-
 			WorkflowDefinitionLink workflowDefinitionLink1 =
 				workflowDefinitionLinks.get(0);
 			WorkflowDefinitionLink workflowDefinitionLink2 =
@@ -288,7 +279,7 @@ public class WorkflowDefinitionDisplayContext {
 			return new Object[] {
 				getLocalizedAssetName(workflowDefinitionLink1.getClassName()),
 				getLocalizedAssetName(workflowDefinitionLink2.getClassName()),
-				moreAssets, getConfigureAssignementLink()
+				workflowDefinitionLinks.size() - 2
 			};
 		}
 	}
@@ -317,13 +308,13 @@ public class WorkflowDefinitionDisplayContext {
 			return StringPool.BLANK;
 		}
 		else if (workflowDefinitionLinks.size() == 1) {
-			return "workflow-is-in-use.-remove-its-assignment-to-x-x";
+			return "workflow-is-in-use.-remove-its-assignment-to-x";
 		}
 		else if (workflowDefinitionLinks.size() == 2) {
-			return "workflow-is-in-use.-remove-its-assignments-to-x-and-x-x";
+			return "workflow-is-in-use.-remove-its-assignment-to-x-and-x";
 		}
 
-		return "workflow-is-in-use.-remove-its-assignment-to-x-x-and-x-more-x";
+		return "workflow-is-in-use.-remove-its-assignment-to-x-x-and-x-more";
 	}
 
 	public Date getModifiedDate(WorkflowDefinition workflowDefinition) {
@@ -335,15 +326,29 @@ public class WorkflowDefinitionDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		return ParamUtil.getString(
-			_workflowDefinitionRequestHelper.getRequest(), "orderByCol",
-			"last-modified");
+		if (Validator.isNotNull(_orderByCol)) {
+			return _orderByCol;
+		}
+
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_workflowDefinitionRequestHelper.getRequest(),
+			WorkflowPortletKeys.CONTROL_PANEL_WORKFLOW,
+			"definition-order-by-col", "last-modified");
+
+		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		return ParamUtil.getString(
-			_workflowDefinitionRequestHelper.getRequest(), "orderByType",
-			"asc");
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
+		}
+
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_workflowDefinitionRequestHelper.getRequest(),
+			WorkflowPortletKeys.CONTROL_PANEL_WORKFLOW,
+			"definition-link-order-by-type", "asc");
+
+		return _orderByType;
 	}
 
 	public SearchContainer<WorkflowDefinition> getSearch(
@@ -433,12 +438,13 @@ public class WorkflowDefinitionDisplayContext {
 				return null;
 			}
 		).setParameter(
+			"orderByCol",
+			ParamUtil.getString(
+				httpServletRequest, "orderByCol", "last-modified")
+		).setParameter(
 			"orderByType",
 			() -> {
-				String orderByType = ParamUtil.getString(
-					httpServletRequest, "orderByType", "asc");
-
-				if (Objects.equals(orderByType, "asc")) {
+				if (Objects.equals(getOrderByType(), "asc")) {
 					return "desc";
 				}
 
@@ -605,14 +611,12 @@ public class WorkflowDefinitionDisplayContext {
 	protected OrderByComparator<WorkflowDefinition>
 		getWorkflowDefinitionOrderByComparator() {
 
-		String orderByCol = ParamUtil.getString(
-			_workflowDefinitionRequestHelper.getRequest(), "orderByCol",
-			"name");
-
 		return WorkflowDefinitionPortletUtil.
 			getWorkflowDefitionOrderByComparator(
-				orderByCol, getOrderByType(),
-				_workflowDefinitionRequestHelper.getLocale());
+				ParamUtil.getString(
+					_workflowDefinitionRequestHelper.getRequest(), "orderByCol",
+					"name"),
+				getOrderByType(), _workflowDefinitionRequestHelper.getLocale());
 	}
 
 	protected PortletURL getWorkflowInstancesPortletURL() {
@@ -641,10 +645,6 @@ public class WorkflowDefinitionDisplayContext {
 			httpServletRequest, "definitionsNavigation", "all");
 	}
 
-	private String _getCurrentOrder(HttpServletRequest httpServletRequest) {
-		return ParamUtil.getString(httpServletRequest, "orderByCol", "title");
-	}
-
 	private UnsafeConsumer<DropdownItem, Exception>
 		_getFilterNavigationDropdownItem(
 			String navigation, String currentNavigation,
@@ -666,12 +666,12 @@ public class WorkflowDefinitionDisplayContext {
 	}
 
 	private UnsafeConsumer<DropdownItem, Exception> _getOrderByDropdownItem(
-		String orderByCol, String currentOrder,
-		HttpServletRequest httpServletRequest) {
+		HttpServletRequest httpServletRequest, String orderByCol) {
 
 		return dropdownItem -> {
-			dropdownItem.setActive(Objects.equals(currentOrder, orderByCol));
-			dropdownItem.setHref(_getPortletURL(httpServletRequest));
+			dropdownItem.setActive(Objects.equals(getOrderByCol(), orderByCol));
+			dropdownItem.setHref(
+				_getPortletURL(httpServletRequest), "orderByCol", orderByCol);
 			dropdownItem.setLabel(
 				LanguageUtil.get(
 					_workflowDefinitionRequestHelper.getRequest(), orderByCol));
@@ -715,6 +715,8 @@ public class WorkflowDefinitionDisplayContext {
 		"<a class='alert-link' href='[$RENDER_URL$]'>[$MESSAGE$]</a>";
 
 	private boolean _companyAdministratorCanPublish;
+	private String _orderByCol;
+	private String _orderByType;
 	private final ResourceBundleLoader _resourceBundleLoader;
 	private final UserLocalService _userLocalService;
 	private final WorkflowDefinitionRequestHelper

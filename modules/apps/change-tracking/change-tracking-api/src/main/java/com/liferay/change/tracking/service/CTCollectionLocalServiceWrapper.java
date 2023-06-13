@@ -27,6 +27,10 @@ public class CTCollectionLocalServiceWrapper
 	implements CTCollectionLocalService,
 			   ServiceWrapper<CTCollectionLocalService> {
 
+	public CTCollectionLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CTCollectionLocalServiceWrapper(
 		CTCollectionLocalService ctCollectionLocalService) {
 
@@ -325,6 +329,14 @@ public class CTCollectionLocalServiceWrapper
 	@Override
 	public int getCTCollectionsCount() {
 		return _ctCollectionLocalService.getCTCollectionsCount();
+	}
+
+	@Override
+	public java.util.List
+		<com.liferay.change.tracking.mapping.CTMappingTableInfo>
+			getCTMappingTableInfos(long ctCollectionId) {
+
+		return _ctCollectionLocalService.getCTMappingTableInfos(ctCollectionId);
 	}
 
 	@Override

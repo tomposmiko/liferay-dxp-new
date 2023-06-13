@@ -16,16 +16,21 @@ package com.liferay.layout.page.template.service.impl;
 
 import com.liferay.layout.page.template.constants.LayoutPageTemplateActionKeys;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
+import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionLocalService;
 import com.liferay.layout.page.template.service.base.LayoutPageTemplateEntryServiceBaseImpl;
+import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
 import com.liferay.portal.kernel.dao.orm.WildcardMode;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -161,6 +166,46 @@ public class LayoutPageTemplateEntryServiceImpl
 	}
 
 	@Override
+	public LayoutPageTemplateEntry createLayoutPageTemplateEntryFromLayout(
+			long segmentsExperienceId, Layout sourceLayout, String name,
+			long targetLayoutPageTemplateCollectionId,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		if (!sourceLayout.isTypeContent()) {
+			throw new UnsupportedOperationException();
+		}
+
+		_portletResourcePermission.check(
+			getPermissionChecker(), sourceLayout.getGroupId(),
+			LayoutPageTemplateActionKeys.ADD_LAYOUT_PAGE_TEMPLATE_ENTRY);
+
+		LayoutPageTemplateCollection targetLayoutPageTemplateCollection =
+			_layoutPageTemplateCollectionLocalService.
+				getLayoutPageTemplateCollection(
+					targetLayoutPageTemplateCollectionId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			layoutPageTemplateEntryLocalService.addLayoutPageTemplateEntry(
+				getUserId(), sourceLayout.getGroupId(),
+				targetLayoutPageTemplateCollection.
+					getLayoutPageTemplateCollectionId(),
+				0, 0, name, LayoutPageTemplateEntryTypeConstants.TYPE_BASIC, 0,
+				false, 0, 0, sourceLayout.getMasterLayoutPlid(),
+				WorkflowConstants.STATUS_DRAFT, serviceContext);
+
+		Layout layout = _layoutLocalService.getLayout(
+			layoutPageTemplateEntry.getPlid());
+
+		Layout draftLayout = layout.fetchDraftLayout();
+
+		_layoutCopyHelper.copyLayout(
+			segmentsExperienceId, sourceLayout, draftLayout);
+
+		return layoutPageTemplateEntry;
+	}
+
+	@Override
 	public void deleteLayoutPageTemplateEntries(
 			long[] layoutPageTemplateEntryIds)
 		throws PortalException {
@@ -235,13 +280,8 @@ public class LayoutPageTemplateEntryServiceImpl
 		long groupId, int type, int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
 
-		if (status == WorkflowConstants.STATUS_ANY) {
-			return layoutPageTemplateEntryPersistence.filterFindByG_T(
-				groupId, type, start, end, orderByComparator);
-		}
-
-		return layoutPageTemplateEntryPersistence.filterFindByG_T_S(
-			groupId, type, status, start, end, orderByComparator);
+		return getLayoutPageTemplateEntries(
+			groupId, new int[] {type}, status, start, end, orderByComparator);
 	}
 
 	@Override
@@ -250,7 +290,30 @@ public class LayoutPageTemplateEntryServiceImpl
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
 
 		return getLayoutPageTemplateEntries(
-			groupId, type, WorkflowConstants.STATUS_ANY, start, end,
+			groupId, new int[] {type}, start, end, orderByComparator);
+	}
+
+	@Override
+	public List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
+		long groupId, int[] types, int status, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return layoutPageTemplateEntryPersistence.filterFindByG_T(
+				groupId, types, start, end, orderByComparator);
+		}
+
+		return layoutPageTemplateEntryPersistence.filterFindByG_T_S(
+			groupId, types, status, start, end, orderByComparator);
+	}
+
+	@Override
+	public List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
+		long groupId, int[] types, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return getLayoutPageTemplateEntries(
+			groupId, types, WorkflowConstants.STATUS_ANY, start, end,
 			orderByComparator);
 	}
 
@@ -427,16 +490,9 @@ public class LayoutPageTemplateEntryServiceImpl
 		long groupId, String name, int type, int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
 
-		if (status == WorkflowConstants.STATUS_ANY) {
-			return layoutPageTemplateEntryPersistence.filterFindByG_T_LikeN(
-				groupId,
-				_customSQL.keywords(name, false, WildcardMode.SURROUND)[0],
-				type, start, end, orderByComparator);
-		}
-
-		return layoutPageTemplateEntryPersistence.filterFindByG_T_LikeN_S(
-			groupId, _customSQL.keywords(name, false, WildcardMode.SURROUND)[0],
-			type, status, start, end, orderByComparator);
+		return getLayoutPageTemplateEntries(
+			groupId, name, new int[] {type}, status, start, end,
+			orderByComparator);
 	}
 
 	@Override
@@ -445,7 +501,33 @@ public class LayoutPageTemplateEntryServiceImpl
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
 
 		return getLayoutPageTemplateEntries(
-			groupId, name, type, WorkflowConstants.STATUS_ANY, start, end,
+			groupId, name, new int[] {type}, start, end, orderByComparator);
+	}
+
+	@Override
+	public List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
+		long groupId, String name, int[] types, int status, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return layoutPageTemplateEntryPersistence.filterFindByG_T_LikeN(
+				groupId,
+				_customSQL.keywords(name, false, WildcardMode.SURROUND)[0],
+				types, start, end, orderByComparator);
+		}
+
+		return layoutPageTemplateEntryPersistence.filterFindByG_T_LikeN_S(
+			groupId, _customSQL.keywords(name, false, WildcardMode.SURROUND)[0],
+			types, status, start, end, orderByComparator);
+	}
+
+	@Override
+	public List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
+		long groupId, String name, int[] types, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return getLayoutPageTemplateEntries(
+			groupId, name, types, WorkflowConstants.STATUS_ANY, start, end,
 			orderByComparator);
 	}
 
@@ -462,20 +544,34 @@ public class LayoutPageTemplateEntryServiceImpl
 	@Override
 	public int getLayoutPageTemplateEntriesCount(long groupId, int type) {
 		return getLayoutPageTemplateEntriesCount(
-			groupId, type, WorkflowConstants.STATUS_ANY);
+			groupId, new int[] {type}, WorkflowConstants.STATUS_ANY);
 	}
 
 	@Override
 	public int getLayoutPageTemplateEntriesCount(
 		long groupId, int type, int status) {
 
+		return getLayoutPageTemplateEntriesCount(
+			groupId, new int[] {type}, status);
+	}
+
+	@Override
+	public int getLayoutPageTemplateEntriesCount(long groupId, int[] types) {
+		return getLayoutPageTemplateEntriesCount(
+			groupId, types, WorkflowConstants.STATUS_ANY);
+	}
+
+	@Override
+	public int getLayoutPageTemplateEntriesCount(
+		long groupId, int[] types, int status) {
+
 		if (status == WorkflowConstants.STATUS_ANY) {
 			return layoutPageTemplateEntryPersistence.filterCountByG_T(
-				groupId, type);
+				groupId, types);
 		}
 
 		return layoutPageTemplateEntryPersistence.filterCountByG_T_S(
-			groupId, type, status);
+			groupId, types, status);
 	}
 
 	@Override
@@ -582,23 +678,39 @@ public class LayoutPageTemplateEntryServiceImpl
 		long groupId, String name, int type) {
 
 		return getLayoutPageTemplateEntriesCount(
-			groupId, name, type, WorkflowConstants.STATUS_ANY);
+			groupId, name, new int[] {type});
 	}
 
 	@Override
 	public int getLayoutPageTemplateEntriesCount(
 		long groupId, String name, int type, int status) {
 
+		return getLayoutPageTemplateEntriesCount(
+			groupId, name, new int[] {type}, status);
+	}
+
+	@Override
+	public int getLayoutPageTemplateEntriesCount(
+		long groupId, String name, int[] types) {
+
+		return getLayoutPageTemplateEntriesCount(
+			groupId, name, types, WorkflowConstants.STATUS_ANY);
+	}
+
+	@Override
+	public int getLayoutPageTemplateEntriesCount(
+		long groupId, String name, int[] types, int status) {
+
 		if (status == WorkflowConstants.STATUS_ANY) {
 			return layoutPageTemplateEntryPersistence.filterCountByG_T_LikeN(
 				groupId,
 				_customSQL.keywords(name, false, WildcardMode.SURROUND)[0],
-				type);
+				types);
 		}
 
 		return layoutPageTemplateEntryPersistence.filterCountByG_T_LikeN_S(
 			groupId, _customSQL.keywords(name, false, WildcardMode.SURROUND)[0],
-			type, status);
+			types, status);
 	}
 
 	@Override
@@ -622,6 +734,38 @@ public class LayoutPageTemplateEntryServiceImpl
 			getPermissionChecker(), layoutPageTemplateEntry, ActionKeys.VIEW);
 
 		return layoutPageTemplateEntry;
+	}
+
+	@Override
+	public LayoutPageTemplateEntry moveLayoutPageTemplateEntry(
+			long layoutPageTemplateEntryId,
+			long targetLayoutPageTemplateCollectionId)
+		throws PortalException {
+
+		_layoutPageTemplateEntryModelResourcePermission.check(
+			getPermissionChecker(), layoutPageTemplateEntryId,
+			ActionKeys.UPDATE);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			layoutPageTemplateEntryLocalService.getLayoutPageTemplateEntry(
+				layoutPageTemplateEntryId);
+
+		if (layoutPageTemplateEntry.getLayoutPageTemplateCollectionId() ==
+				targetLayoutPageTemplateCollectionId) {
+
+			return layoutPageTemplateEntry;
+		}
+
+		LayoutPageTemplateCollection layoutPageTemplateCollection =
+			_layoutPageTemplateCollectionLocalService.
+				getLayoutPageTemplateCollection(
+					targetLayoutPageTemplateCollectionId);
+
+		layoutPageTemplateEntry.setLayoutPageTemplateCollectionId(
+			layoutPageTemplateCollection.getLayoutPageTemplateCollectionId());
+
+		return layoutPageTemplateEntryLocalService.
+			updateLayoutPageTemplateEntry(layoutPageTemplateEntry);
 	}
 
 	@Override
@@ -711,6 +855,16 @@ public class LayoutPageTemplateEntryServiceImpl
 
 	@Reference
 	private CustomSQL _customSQL;
+
+	@Reference
+	private LayoutCopyHelper _layoutCopyHelper;
+
+	@Reference
+	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private LayoutPageTemplateCollectionLocalService
+		_layoutPageTemplateCollectionLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.layout.page.template.model.LayoutPageTemplateEntry)"

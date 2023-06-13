@@ -28,12 +28,12 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.search.experiences.exception.SXPElementElementDefinitionJSONException;
-import com.liferay.search.experiences.exception.SXPElementReadOnlyException;
 import com.liferay.search.experiences.exception.SXPElementTitleException;
 import com.liferay.search.experiences.model.SXPElement;
 import com.liferay.search.experiences.service.base.SXPElementLocalServiceBaseImpl;
 import com.liferay.search.experiences.validator.SXPElementValidator;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
+	enabled = false,
 	property = "model.class.name=com.liferay.search.experiences.model.SXPElement",
 	service = AopService.class
 )
@@ -85,6 +86,18 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 	}
 
 	@Override
+	public void deleteCompanySXPElements(long companyId)
+		throws PortalException {
+
+		List<SXPElement> sxpElements = sxpElementPersistence.findByCompanyId(
+			companyId);
+
+		for (SXPElement sxpElement : sxpElements) {
+			sxpElementLocalService.deleteSXPElement(sxpElement);
+		}
+	}
+
+	@Override
 	public SXPElement deleteSXPElement(long sxpElementId)
 		throws PortalException {
 
@@ -100,18 +113,17 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 	public SXPElement deleteSXPElement(SXPElement sxpElement)
 		throws PortalException {
 
-		// TODO Who can and delete create read only search experiences elements?
-
-		if (sxpElement.isReadOnly()) {
-			throw new SXPElementReadOnlyException();
-		}
-
 		sxpElement = sxpElementPersistence.remove(sxpElement);
 
 		_resourceLocalService.deleteResource(
 			sxpElement, ResourceConstants.SCOPE_INDIVIDUAL);
 
 		return sxpElement;
+	}
+
+	@Override
+	public List<SXPElement> getSXPElements(long companyId, boolean readOnly) {
+		return sxpElementPersistence.findByC_R(companyId, readOnly);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)

@@ -1,10 +1,10 @@
 import ClayIcon from '@clayui/icon';
+import ClayLabel from '@clayui/label';
 import classNames from 'classnames';
 import React from 'react';
-import {useCustomEvent} from '~/common/hooks/useCustomEvent';
+import {useCustomEvent} from '../../../hooks/useCustomEvent';
 
-export const MoreInfoButton = ({callback, event, selected, value}) => {
-	// eslint-disable-next-line no-unused-vars
+export function MoreInfoButton({callback, event, selected, value}) {
 	const [dispatchEvent] = useCustomEvent(event);
 
 	const updateState = () => {
@@ -16,15 +16,26 @@ export const MoreInfoButton = ({callback, event, selected, value}) => {
 	};
 
 	return (
-		<button
-			className={classNames('btn badge more-info', {
-				open: selected,
+		<ClayLabel
+			className={classNames('btn-more-info rounded-sm', {
+				'label-inverse-primary': selected,
+				'label-tonal-primary': !selected,
 			})}
 			onClick={updateState}
-			type="button"
 		>
-			More Info
-			<ClayIcon symbol="question-circle-full" />
-		</button>
+			<div className="align-items-center d-flex">
+				<span className="text-paragraph-sm">More Info</span>
+
+				<span className="inline-item inline-item-after">
+					<ClayIcon
+						symbol={
+							selected
+								? 'question-circle-full'
+								: 'question-circle'
+						}
+					/>
+				</span>
+			</div>
+		</ClayLabel>
 	);
-};
+}

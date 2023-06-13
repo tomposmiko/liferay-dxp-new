@@ -53,6 +53,7 @@ export interface Config {
 
 	changeMasterLayoutURL: string;
 	changeStyleBookEntryURL: string;
+	createLayoutPageTemplateEntryURL: string;
 	collectionSelectorURL: string;
 
 	commonStyles: Array<{
@@ -122,11 +123,13 @@ export interface Config {
 	getInfoItemFieldValueURL: string;
 	getInfoItemMappingFieldsURL: string;
 	getLayoutFriendlyURL: string;
+	getLayoutPageTemplateCollectionsURL: string;
 	getPageContentsURL: string;
 	getWidgetsURL: string;
 	imageSelectorURL: string;
 	infoItemPreviewSelectorURL: string;
 	infoItemSelectorURL: string;
+	isPrivateLayoutsEnabled: boolean;
 	layoutConversionWarningMessages: string[] | null;
 	layoutItemSelectorURL: String;
 	layoutType: LayoutTypes[keyof LayoutTypes];
@@ -178,7 +181,6 @@ export interface Config {
 		styleBookEntryId: string;
 	}>;
 	themeColorCssClasses: string[];
-	tokenOptimizationEnabled: boolean;
 	toolbarId: string;
 
 	toolbarPlugins: Array<{

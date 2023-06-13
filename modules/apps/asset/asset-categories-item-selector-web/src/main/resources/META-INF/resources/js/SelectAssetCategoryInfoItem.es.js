@@ -39,7 +39,13 @@ function visit(nodes, callback) {
 	});
 }
 
-function SelectAssetCategory({itemSelectedEventName, namespace, nodes}) {
+function SelectAssetCategory({
+	categoriesMultipleSelectionEnabled,
+	itemSelectedEventName,
+	multiSelection,
+	namespace,
+	nodes,
+}) {
 	const flattenedNodes = useMemo(() => {
 		if (nodes.length === 1 && nodes[0].vocabulary && nodes[0].id !== '0') {
 			return nodes[0].children;
@@ -49,24 +55,33 @@ function SelectAssetCategory({itemSelectedEventName, namespace, nodes}) {
 	}, [nodes]);
 
 	const [filterQuery, setFilterQuery] = useState('');
+	const [selectedItemsCount, setSelectedItemsCount] = useState(0);
 
 	const handleSelectionChange = (selectedNodeIds) => {
+		if (categoriesMultipleSelectionEnabled && multiSelection) {
+			setSelectedItemsCount(selectedNodeIds.size);
+		}
+
 		if (!selectedNodeIds.size) {
 			return;
 		}
 
-		let data;
+		let data = [];
 
 		visit(nodes, (node) => {
 			if (selectedNodeIds.has(node.id)) {
-				data = {
+				data.push({
 					className: node.className,
 					classNameId: node.classNameId,
 					classPK: node.id,
 					title: node.name,
-				};
+				});
 			}
 		});
+
+		if (!multiSelection) {
+			data = data[0];
+		}
 
 		Liferay.Util.getOpener().Liferay.fire(itemSelectedEventName, {
 			data,
@@ -76,7 +91,7 @@ function SelectAssetCategory({itemSelectedEventName, namespace, nodes}) {
 	return (
 		<div className="select-category">
 			<form
-				className="select-category-filter"
+				className="mb-0 select-category-filter"
 				onSubmit={(event) => event.preventDefault()}
 				role="search"
 			>
@@ -100,23 +115,47 @@ function SelectAssetCategory({itemSelectedEventName, namespace, nodes}) {
 				</ClayLayout.ContainerFluid>
 			</form>
 
+			{selectedItemsCount ? (
+				<ClayLayout.Container
+					className="category-tree-count-feedback"
+					containerElement="section"
+					fluid
+				>
+					<div className="container p-0">
+						<p className="m-0">
+							{selectedItemsCount > 1
+								? `${selectedItemsCount} ${Liferay.Language.get(
+										'items-selected'
+								  )}`
+								: `${selectedItemsCount} ${Liferay.Language.get(
+										'item-selected'
+								  )}`}
+						</p>
+					</div>
+				</ClayLayout.Container>
+			) : null}
+
 			<form name={`${namespace}selectCategoryFm`}>
 				<ClayLayout.ContainerFluid containerElement="fieldset">
 					<div
-						className="category-tree"
+						className="category-tree mt-3"
 						id={`${namespace}categoryContainer`}
 					>
 						{flattenedNodes.length > 0 ? (
 							<Treeview
 								NodeComponent={Treeview.Card}
 								filter={getFilter(filterQuery)}
-								multiSelection={false}
+								multiSelection={
+									categoriesMultipleSelectionEnabled &&
+									multiSelection
+								}
 								nodes={flattenedNodes}
 								onSelectedNodesChange={handleSelectionChange}
 							/>
 						) : (
 							<div className="border-0 pt-0 sheet taglib-empty-result-message">
 								<div className="taglib-empty-result-message-header"></div>
+
 								<div className="sheet-text text-center">
 									{Liferay.Language.get(
 										'no-categories-were-found'

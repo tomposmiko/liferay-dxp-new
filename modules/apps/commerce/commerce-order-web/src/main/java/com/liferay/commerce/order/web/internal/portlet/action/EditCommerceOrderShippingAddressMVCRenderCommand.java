@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.order.web.internal.portlet.action;
 
+import com.liferay.commerce.configuration.CommerceOrderItemDecimalQuantityConfiguration;
 import com.liferay.commerce.constants.CommercePortletKeys;
 import com.liferay.commerce.exception.NoSuchOrderException;
 import com.liferay.commerce.notification.service.CommerceNotificationQueueEntryLocalService;
@@ -21,28 +22,35 @@ import com.liferay.commerce.order.engine.CommerceOrderEngine;
 import com.liferay.commerce.order.status.CommerceOrderStatusRegistry;
 import com.liferay.commerce.order.web.internal.display.context.CommerceOrderEditDisplayContext;
 import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelLocalService;
+import com.liferay.commerce.product.service.CPMeasurementUnitService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceOrderNoteService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.service.CommerceOrderTypeService;
 import com.liferay.commerce.service.CommerceShipmentService;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.Map;
+
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
 @Component(
+	configurationPid = "com.liferay.commerce.configuration.CommerceOrderItemDecimalQuantityConfiguration",
 	enabled = false,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_ORDER,
@@ -63,11 +71,14 @@ public class EditCommerceOrderShippingAddressMVCRenderCommand
 				new CommerceOrderEditDisplayContext(
 					_commerceChannelLocalService,
 					_commerceNotificationQueueEntryLocalService,
-					_commerceOrderEngine, _commerceOrderItemService,
-					_commerceOrderNoteService, _commerceOrderService,
-					_commerceOrderStatusRegistry, _commerceOrderTypeService,
+					_commerceOrderEngine,
+					_commerceOrderItemDecimalQuantityConfiguration,
+					_commerceOrderItemService, _commerceOrderNoteService,
+					_commerceOrderService, _commerceOrderStatusRegistry,
+					_commerceOrderTypeService,
 					_commercePaymentMethodGroupRelLocalService,
-					_commerceShipmentService, renderRequest);
+					_commerceShipmentService, _cpMeasurementUnitService,
+					renderRequest);
 
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_DISPLAY_CONTEXT,
@@ -88,6 +99,15 @@ public class EditCommerceOrderShippingAddressMVCRenderCommand
 		return "/commerce_order/edit_shipping_address.jsp";
 	}
 
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		_commerceOrderItemDecimalQuantityConfiguration =
+			ConfigurableUtil.createConfigurable(
+				CommerceOrderItemDecimalQuantityConfiguration.class,
+				properties);
+	}
+
 	@Reference
 	private CommerceChannelLocalService _commerceChannelLocalService;
 
@@ -97,6 +117,9 @@ public class EditCommerceOrderShippingAddressMVCRenderCommand
 
 	@Reference
 	private CommerceOrderEngine _commerceOrderEngine;
+
+	private volatile CommerceOrderItemDecimalQuantityConfiguration
+		_commerceOrderItemDecimalQuantityConfiguration;
 
 	@Reference
 	private CommerceOrderItemService _commerceOrderItemService;
@@ -119,5 +142,8 @@ public class EditCommerceOrderShippingAddressMVCRenderCommand
 
 	@Reference
 	private CommerceShipmentService _commerceShipmentService;
+
+	@Reference
+	private CPMeasurementUnitService _cpMeasurementUnitService;
 
 }

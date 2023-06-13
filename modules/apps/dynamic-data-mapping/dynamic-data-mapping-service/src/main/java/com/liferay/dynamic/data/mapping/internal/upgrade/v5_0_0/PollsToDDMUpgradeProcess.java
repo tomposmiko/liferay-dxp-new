@@ -141,22 +141,13 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 		runSQL("delete from PollsQuestion");
 	}
 
-	protected JSONObject getDataJSONObject(DDMFormField ddmFormField) {
-		JSONObject valuesJSONObject = JSONFactoryUtil.createJSONObject();
-
-		DDMFormFieldOptions ddmFormFieldOptions =
-			ddmFormField.getDDMFormFieldOptions();
-
-		for (String optionValue : ddmFormFieldOptions.getOptionsValues()) {
-			valuesJSONObject.put(optionValue, 0);
-		}
-
+	protected JSONObject getDataJSONObject(String ddmFormFieldName) {
 		return JSONUtil.put(
-			ddmFormField.getName(),
+			ddmFormFieldName,
 			JSONUtil.put(
 				"type", DDMFormFieldTypeConstants.RADIO
 			).put(
-				"values", valuesJSONObject
+				"values", JSONFactoryUtil.createJSONObject()
 			)
 		).put(
 			"totalItems", 0
@@ -314,7 +305,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 	private void _addDDMFormInstance(
 			long formInstanceId, long groupId, long companyId, long userId,
 			String userName, Timestamp createDate, Timestamp modifiedDate,
-			long structureId, String name, String description,
+			long structureId, String name, String description, String settings,
 			Timestamp expirationDate, Timestamp lastPublishDate)
 		throws Exception {
 
@@ -343,8 +334,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 				12, DDMFormInstanceConstants.VERSION_DEFAULT);
 			preparedStatement.setString(13, name);
 			preparedStatement.setString(14, description);
-			preparedStatement.setString(
-				15, getSerializedSettingsDDMFormValues());
+			preparedStatement.setString(15, settings);
 			preparedStatement.setTimestamp(16, expirationDate);
 			preparedStatement.setTimestamp(17, lastPublishDate);
 
@@ -461,7 +451,8 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 	private void _addDDMFormInstanceVersion(
 			long groupId, long companyId, long userId, String userName,
 			Timestamp createDate, long formInstanceId, long structureVersionId,
-			String name, String description, Timestamp statusDate)
+			String name, String description, String settings,
+			Timestamp statusDate)
 		throws Exception {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -484,7 +475,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 			preparedStatement.setLong(8, structureVersionId);
 			preparedStatement.setString(9, name);
 			preparedStatement.setString(10, description);
-			preparedStatement.setString(11, StringPool.BLANK);
+			preparedStatement.setString(11, settings);
 			preparedStatement.setString(
 				12, DDMFormInstanceConstants.VERSION_DEFAULT);
 			preparedStatement.setInt(13, WorkflowConstants.STATUS_APPROVED);
@@ -884,18 +875,20 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 			structureVersionId, name, description,
 			getDDMFormLayoutDefinition(ddmFormField));
 
+		String settings = getSerializedSettingsDDMFormValues();
+
 		_addDDMFormInstance(
 			questionId, groupId, companyId, userId, userName, createDate,
-			modifiedDate, structureId, name, description, expirationDate,
-			lastPublishDate);
+			modifiedDate, structureId, name, description, settings,
+			expirationDate, lastPublishDate);
 
 		_upgradeResourcePermission(questionId);
 
 		_addDDMFormInstanceVersion(
 			groupId, companyId, userId, userName, createDate, questionId,
-			structureVersionId, name, description, lastPublishDate);
+			structureVersionId, name, description, settings, lastPublishDate);
 
-		JSONObject dataJSONObject = getDataJSONObject(ddmFormField);
+		JSONObject dataJSONObject = getDataJSONObject(ddmFormField.getName());
 
 		_upgradePollsVotes(
 			dataJSONObject, ddmFormFieldOptionsValues, ddmFormField.getName(),

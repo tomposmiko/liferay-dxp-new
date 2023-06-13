@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.petra.function.UnsafeTriConsumer;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -41,9 +42,11 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
+import com.liferay.search.experiences.rest.client.dto.v1_0.Field;
 import com.liferay.search.experiences.rest.client.dto.v1_0.SXPElement;
 import com.liferay.search.experiences.rest.client.http.HttpInvoker;
 import com.liferay.search.experiences.rest.client.pagination.Page;
@@ -57,6 +60,8 @@ import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +73,9 @@ import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -182,6 +189,7 @@ public abstract class BaseSXPElementResourceTestCase {
 
 		sxpElement.setDescription(regex);
 		sxpElement.setTitle(regex);
+		sxpElement.setUserName(regex);
 
 		String json = SXPElementSerDes.toJSON(sxpElement);
 
@@ -191,12 +199,13 @@ public abstract class BaseSXPElementResourceTestCase {
 
 		Assert.assertEquals(regex, sxpElement.getDescription());
 		Assert.assertEquals(regex, sxpElement.getTitle());
+		Assert.assertEquals(regex, sxpElement.getUserName());
 	}
 
 	@Test
 	public void testGetSXPElementsPage() throws Exception {
 		Page<SXPElement> page = sxpElementResource.getSXPElementsPage(
-			null, Pagination.of(1, 10));
+			null, null, Pagination.of(1, 10), null);
 
 		long totalCount = page.getTotalCount();
 
@@ -207,7 +216,7 @@ public abstract class BaseSXPElementResourceTestCase {
 			randomSXPElement());
 
 		page = sxpElementResource.getSXPElementsPage(
-			null, Pagination.of(1, 10));
+			null, null, Pagination.of(1, 10), null);
 
 		Assert.assertEquals(totalCount + 2, page.getTotalCount());
 
@@ -221,9 +230,64 @@ public abstract class BaseSXPElementResourceTestCase {
 	}
 
 	@Test
+	public void testGetSXPElementsPageWithFilterDateTimeEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.DATE_TIME);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		SXPElement sxpElement1 = randomSXPElement();
+
+		sxpElement1 = testGetSXPElementsPage_addSXPElement(sxpElement1);
+
+		for (EntityField entityField : entityFields) {
+			Page<SXPElement> page = sxpElementResource.getSXPElementsPage(
+				null, getFilterString(entityField, "between", sxpElement1),
+				Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(sxpElement1),
+				(List<SXPElement>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSXPElementsPageWithFilterStringEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.STRING);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		SXPElement sxpElement1 = testGetSXPElementsPage_addSXPElement(
+			randomSXPElement());
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		SXPElement sxpElement2 = testGetSXPElementsPage_addSXPElement(
+			randomSXPElement());
+
+		for (EntityField entityField : entityFields) {
+			Page<SXPElement> page = sxpElementResource.getSXPElementsPage(
+				null, getFilterString(entityField, "eq", sxpElement1),
+				Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(sxpElement1),
+				(List<SXPElement>)page.getItems());
+		}
+	}
+
+	@Test
 	public void testGetSXPElementsPageWithPagination() throws Exception {
 		Page<SXPElement> totalPage = sxpElementResource.getSXPElementsPage(
-			null, null);
+			null, null, null, null);
 
 		int totalCount = GetterUtil.getInteger(totalPage.getTotalCount());
 
@@ -237,7 +301,7 @@ public abstract class BaseSXPElementResourceTestCase {
 			randomSXPElement());
 
 		Page<SXPElement> page1 = sxpElementResource.getSXPElementsPage(
-			null, Pagination.of(1, totalCount + 2));
+			null, null, Pagination.of(1, totalCount + 2), null);
 
 		List<SXPElement> sxpElements1 = (List<SXPElement>)page1.getItems();
 
@@ -245,7 +309,7 @@ public abstract class BaseSXPElementResourceTestCase {
 			sxpElements1.toString(), totalCount + 2, sxpElements1.size());
 
 		Page<SXPElement> page2 = sxpElementResource.getSXPElementsPage(
-			null, Pagination.of(2, totalCount + 2));
+			null, null, Pagination.of(2, totalCount + 2), null);
 
 		Assert.assertEquals(totalCount + 3, page2.getTotalCount());
 
@@ -254,11 +318,125 @@ public abstract class BaseSXPElementResourceTestCase {
 		Assert.assertEquals(sxpElements2.toString(), 1, sxpElements2.size());
 
 		Page<SXPElement> page3 = sxpElementResource.getSXPElementsPage(
-			null, Pagination.of(1, totalCount + 3));
+			null, null, Pagination.of(1, totalCount + 3), null);
 
 		assertContains(sxpElement1, (List<SXPElement>)page3.getItems());
 		assertContains(sxpElement2, (List<SXPElement>)page3.getItems());
 		assertContains(sxpElement3, (List<SXPElement>)page3.getItems());
+	}
+
+	@Test
+	public void testGetSXPElementsPageWithSortDateTime() throws Exception {
+		testGetSXPElementsPageWithSort(
+			EntityField.Type.DATE_TIME,
+			(entityField, sxpElement1, sxpElement2) -> {
+				BeanUtils.setProperty(
+					sxpElement1, entityField.getName(),
+					DateUtils.addMinutes(new Date(), -2));
+			});
+	}
+
+	@Test
+	public void testGetSXPElementsPageWithSortInteger() throws Exception {
+		testGetSXPElementsPageWithSort(
+			EntityField.Type.INTEGER,
+			(entityField, sxpElement1, sxpElement2) -> {
+				BeanUtils.setProperty(sxpElement1, entityField.getName(), 0);
+				BeanUtils.setProperty(sxpElement2, entityField.getName(), 1);
+			});
+	}
+
+	@Test
+	public void testGetSXPElementsPageWithSortString() throws Exception {
+		testGetSXPElementsPageWithSort(
+			EntityField.Type.STRING,
+			(entityField, sxpElement1, sxpElement2) -> {
+				Class<?> clazz = sxpElement1.getClass();
+
+				String entityFieldName = entityField.getName();
+
+				java.lang.reflect.Method method = clazz.getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.isAssignableFrom(Map.class)) {
+					BeanUtils.setProperty(
+						sxpElement1, entityFieldName,
+						Collections.singletonMap("Aaa", "Aaa"));
+					BeanUtils.setProperty(
+						sxpElement2, entityFieldName,
+						Collections.singletonMap("Bbb", "Bbb"));
+				}
+				else if (entityFieldName.contains("email")) {
+					BeanUtils.setProperty(
+						sxpElement1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()) +
+									"@liferay.com");
+					BeanUtils.setProperty(
+						sxpElement2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()) +
+									"@liferay.com");
+				}
+				else {
+					BeanUtils.setProperty(
+						sxpElement1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanUtils.setProperty(
+						sxpElement2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+			});
+	}
+
+	protected void testGetSXPElementsPageWithSort(
+			EntityField.Type type,
+			UnsafeTriConsumer<EntityField, SXPElement, SXPElement, Exception>
+				unsafeTriConsumer)
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(type);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		SXPElement sxpElement1 = randomSXPElement();
+		SXPElement sxpElement2 = randomSXPElement();
+
+		for (EntityField entityField : entityFields) {
+			unsafeTriConsumer.accept(entityField, sxpElement1, sxpElement2);
+		}
+
+		sxpElement1 = testGetSXPElementsPage_addSXPElement(sxpElement1);
+
+		sxpElement2 = testGetSXPElementsPage_addSXPElement(sxpElement2);
+
+		for (EntityField entityField : entityFields) {
+			Page<SXPElement> ascPage = sxpElementResource.getSXPElementsPage(
+				null, null, Pagination.of(1, 2),
+				entityField.getName() + ":asc");
+
+			assertEquals(
+				Arrays.asList(sxpElement1, sxpElement2),
+				(List<SXPElement>)ascPage.getItems());
+
+			Page<SXPElement> descPage = sxpElementResource.getSXPElementsPage(
+				null, null, Pagination.of(1, 2),
+				entityField.getName() + ":desc");
+
+			assertEquals(
+				Arrays.asList(sxpElement2, sxpElement1),
+				(List<SXPElement>)descPage.getItems());
+		}
 	}
 
 	protected SXPElement testGetSXPElementsPage_addSXPElement(
@@ -281,6 +459,25 @@ public abstract class BaseSXPElementResourceTestCase {
 	}
 
 	protected SXPElement testPostSXPElement_addSXPElement(SXPElement sxpElement)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPostSXPElementValidate() throws Exception {
+		SXPElement randomSXPElement = randomSXPElement();
+
+		SXPElement postSXPElement = testPostSXPElementValidate_addSXPElement(
+			randomSXPElement);
+
+		assertEquals(randomSXPElement, postSXPElement);
+		assertValid(postSXPElement);
+	}
+
+	protected SXPElement testPostSXPElementValidate_addSXPElement(
+			SXPElement sxpElement)
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -425,6 +622,33 @@ public abstract class BaseSXPElementResourceTestCase {
 			"This method needs to be implemented");
 	}
 
+	@Test
+	public void testPostSXPElementCopy() throws Exception {
+		SXPElement randomSXPElement = randomSXPElement();
+
+		SXPElement postSXPElement = testPostSXPElementCopy_addSXPElement(
+			randomSXPElement);
+
+		assertEquals(randomSXPElement, postSXPElement);
+		assertValid(postSXPElement);
+	}
+
+	protected SXPElement testPostSXPElementCopy_addSXPElement(
+			SXPElement sxpElement)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGetSXPElementExport() throws Exception {
+		Assert.assertTrue(false);
+	}
+
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
+
 	protected SXPElement testGraphQLSXPElement_addSXPElement()
 		throws Exception {
 
@@ -509,6 +733,14 @@ public abstract class BaseSXPElementResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
+			if (Objects.equals("createDate", additionalAssertFieldName)) {
+				if (sxpElement.getCreateDate() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("description", additionalAssertFieldName)) {
 				if (sxpElement.getDescription() == null) {
 					valid = false;
@@ -517,8 +749,74 @@ public abstract class BaseSXPElementResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("description_i18n", additionalAssertFieldName)) {
+				if (sxpElement.getDescription_i18n() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"elementDefinition", additionalAssertFieldName)) {
+
+				if (sxpElement.getElementDefinition() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("hidden", additionalAssertFieldName)) {
+				if (sxpElement.getHidden() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("modifiedDate", additionalAssertFieldName)) {
+				if (sxpElement.getModifiedDate() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("readOnly", additionalAssertFieldName)) {
+				if (sxpElement.getReadOnly() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("title", additionalAssertFieldName)) {
 				if (sxpElement.getTitle() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
+				if (sxpElement.getTitle_i18n() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("type", additionalAssertFieldName)) {
+				if (sxpElement.getType() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("userName", additionalAssertFieldName)) {
+				if (sxpElement.getUserName() == null) {
 					valid = false;
 				}
 
@@ -616,10 +914,55 @@ public abstract class BaseSXPElementResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
+			if (Objects.equals("createDate", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpElement1.getCreateDate(),
+						sxpElement2.getCreateDate())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("description", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						sxpElement1.getDescription(),
 						sxpElement2.getDescription())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("description_i18n", additionalAssertFieldName)) {
+				if (!equals(
+						(Map)sxpElement1.getDescription_i18n(),
+						(Map)sxpElement2.getDescription_i18n())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"elementDefinition", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						sxpElement1.getElementDefinition(),
+						sxpElement2.getElementDefinition())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("hidden", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpElement1.getHidden(), sxpElement2.getHidden())) {
 
 					return false;
 				}
@@ -637,9 +980,61 @@ public abstract class BaseSXPElementResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("modifiedDate", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpElement1.getModifiedDate(),
+						sxpElement2.getModifiedDate())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("readOnly", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpElement1.getReadOnly(), sxpElement2.getReadOnly())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("title", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						sxpElement1.getTitle(), sxpElement2.getTitle())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
+				if (!equals(
+						(Map)sxpElement1.getTitle_i18n(),
+						(Map)sxpElement2.getTitle_i18n())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("type", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpElement1.getType(), sxpElement2.getType())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("userName", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpElement1.getUserName(), sxpElement2.getUserName())) {
 
 					return false;
 				}
@@ -744,6 +1139,37 @@ public abstract class BaseSXPElementResourceTestCase {
 		sb.append(operator);
 		sb.append(" ");
 
+		if (entityFieldName.equals("createDate")) {
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(sxpElement.getCreateDate(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(sxpElement.getCreateDate(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(sxpElement.getCreateDate()));
+			}
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("description")) {
 			sb.append("'");
 			sb.append(String.valueOf(sxpElement.getDescription()));
@@ -752,7 +1178,59 @@ public abstract class BaseSXPElementResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("description_i18n")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("elementDefinition")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("hidden")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("id")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("modifiedDate")) {
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							sxpElement.getModifiedDate(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(sxpElement.getModifiedDate(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(sxpElement.getModifiedDate()));
+			}
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("readOnly")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
@@ -760,6 +1238,24 @@ public abstract class BaseSXPElementResourceTestCase {
 		if (entityFieldName.equals("title")) {
 			sb.append("'");
 			sb.append(String.valueOf(sxpElement.getTitle()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("title_i18n")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("type")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("userName")) {
+			sb.append("'");
+			sb.append(String.valueOf(sxpElement.getUserName()));
 			sb.append("'");
 
 			return sb.toString();
@@ -809,10 +1305,17 @@ public abstract class BaseSXPElementResourceTestCase {
 	protected SXPElement randomSXPElement() throws Exception {
 		return new SXPElement() {
 			{
+				createDate = RandomTestUtil.nextDate();
 				description = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
+				hidden = RandomTestUtil.randomBoolean();
 				id = RandomTestUtil.randomLong();
+				modifiedDate = RandomTestUtil.nextDate();
+				readOnly = RandomTestUtil.randomBoolean();
 				title = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				type = RandomTestUtil.randomInt();
+				userName = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 			}
 		};
 	}

@@ -13,8 +13,7 @@
  */
 
 import ClayTable from '@clayui/table';
-import DateRenderer from 'frontend-taglib-clay/data_set_display/data_renderers/DateRenderer';
-import StatusRenderer from 'frontend-taglib-clay/data_set_display/data_renderers/StatusRenderer';
+import {DateTimeRenderer, StatusRenderer} from '@liferay/frontend-data-set-web';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -28,14 +27,17 @@ function OrdersTable({orders, selectOrderURL}) {
 					<ClayTable.Cell headingCell>
 						{Liferay.Language.get('order-number')}
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingCell>
 						{Liferay.Language.get('status')}
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingCell>
 						{Liferay.Language.get('last-modified')}
 					</ClayTable.Cell>
 				</ClayTable.Row>
 			</ClayTable.Head>
+
 			<ClayTable.Body>
 				{orders.map((order) => (
 					<ClayTable.Row key={order.id}>
@@ -44,11 +46,13 @@ function OrdersTable({orders, selectOrderURL}) {
 								{order.id}
 							</a>
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>
 							<StatusRenderer value={order.orderStatusInfo} />
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>
-							<DateRenderer value={order.modifiedDate} />
+							<DateTimeRenderer value={order.modifiedDate} />
 						</ClayTable.Cell>
 					</ClayTable.Row>
 				))}

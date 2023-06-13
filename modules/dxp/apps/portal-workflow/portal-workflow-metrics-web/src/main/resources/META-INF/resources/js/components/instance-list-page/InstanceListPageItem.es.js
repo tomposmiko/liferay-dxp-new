@@ -9,6 +9,8 @@
  * distribution rights of the Software.
  */
 
+/* eslint-disable @liferay/empty-line-between-elements */
+
 import {ClayCheckbox} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
@@ -193,7 +195,6 @@ function Item({totalCount, ...instance}) {
 
 function QuickActionMenu({disabled, instance, setShowInstanceTrackerModal}) {
 	const {openModal, setSingleTransition} = useContext(ModalContext);
-	const {workflowInstanceTrackerEnabled} = useContext(AppContext);
 	const {setSelectedItems} = useContext(InstanceListContext);
 	const {transitions = [], taskNames = []} = instance;
 
@@ -209,24 +210,18 @@ function QuickActionMenu({disabled, instance, setShowInstanceTrackerModal}) {
 		onClick: () => handleClick('bulkUpdateDueDate', 'updateDueDate'),
 	};
 
-	let kebabItems = [
+	const kebabItems = [
 		{
 			icon: 'change',
 			label: Liferay.Language.get('reassign-task'),
 			onClick: () => handleClick('bulkReassign', 'singleReassign'),
 		},
 		updateDueDateItem,
+		{
+			label: Liferay.Language.get('track-workflow'),
+			onClick: setShowInstanceTrackerModal,
+		},
 	];
-
-	if (workflowInstanceTrackerEnabled) {
-		kebabItems = [
-			...kebabItems,
-			{
-				label: Liferay.Language.get('track-workflow'),
-				onClick: setShowInstanceTrackerModal,
-			},
-		];
-	}
 
 	if (transitions.length > 0) {
 		const transitionItems = [
@@ -291,7 +286,8 @@ function DueDateSLAResults({slaResults, slaStatusIconInfo}) {
 
 		let format = '';
 
-		const sameYear = dateOverdue.split('-')[0] == new Date().getFullYear();
+		const sameYear =
+			dateOverdue.split('-')[0] === new Date().getFullYear().toString();
 
 		if (sameYear) {
 			format = fullDatetime
@@ -362,6 +358,7 @@ function DueDateSLAResults({slaResults, slaStatusIconInfo}) {
 							onMouseOver={() => showPopover()}
 						>
 							<span className="due-date-badge"></span>
+
 							{slaResultDateOverdue}
 						</div>
 					}
@@ -369,9 +366,9 @@ function DueDateSLAResults({slaResults, slaStatusIconInfo}) {
 					{instanceSlaResults.map((slaResult) => (
 						<div key={`critical-sla-${slaResult.id}`}>
 							<div>{slaResult.name}:</div>
+
 							<div className={slaResult.textClass}>
-								{slaResult.datetimeOverdueFormatted} (
-								{slaResult.durationText} {slaResult.onTimeText})
+								{`${slaResult.datetimeOverdueFormatted} (${slaResult.durationText} ${slaResult.onTimeText})`}
 							</div>
 						</div>
 					))}

@@ -28,7 +28,7 @@ definition {
 
 			ServerAdministration.tearDownMailServerSettings();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 		}
 	}
 
@@ -78,7 +78,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Reports Page");
+		PagesAdmin.addPublicPage(pageName = "Reports Page");
 
 		Navigator.gotoPage(pageName = "Reports Page");
 
@@ -251,14 +251,14 @@ definition {
 		ReportsAdmin.addReportEntry(
 			emailNotificationsAddress = "test@liferay.com",
 			emailRecipientAddress = "test@liferay.com",
-			reportFormat = "csv",
+			reportFormat = "CSV",
 			reportsDefinitionName = "Reports Definition Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Reports Page");
+		PagesAdmin.addPublicPage(pageName = "Reports Page");
 
 		Navigator.gotoPage(pageName = "Reports Page");
 

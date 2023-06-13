@@ -1,5 +1,8 @@
-<definition default="sikuliClick">
-	<command name="sikuliClick">
-		<execute selenium="sikuliClick" />
-	</command>
-</definition>
+@default = "sikuliClick"
+definition {
+
+	function sikuliClick {
+		selenium.sikuliClick();
+	}
+
+}

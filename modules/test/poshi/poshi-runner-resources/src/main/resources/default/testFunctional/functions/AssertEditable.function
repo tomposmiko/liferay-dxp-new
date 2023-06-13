@@ -1,7 +1,10 @@
-<definition default="assertEditable">
-	<command name="assertEditable">
-		<execute selenium="waitForVisible" />
+@default = "assertEditable"
+definition {
 
-		<execute selenium="assertEditable" />
-	</command>
-</definition>
+	function assertEditable {
+		selenium.waitForVisible();
+
+		selenium.assertEditable();
+	}
+
+}

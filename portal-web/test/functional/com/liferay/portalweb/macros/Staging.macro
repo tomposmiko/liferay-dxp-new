@@ -665,7 +665,7 @@ definition {
 			locator1 = "Staging#STAGING_MENU_ENABLE_PAGE_BUTTON",
 			value1 = "Enable in ${sitePagesVariationName}");
 
-		Page.view(
+		PagesAdmin.viewPageItemPresent(
 			pageName = "${pageName}",
 			privacy = "${privacy}");
 	}
@@ -697,7 +697,7 @@ definition {
 			AssertElementPresent(locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON");
 		}
 
-		if ((IsElementPresent(locator1 = "Staging#STAGING_MENU_READY_FOR_PUBLICATION")) && (!(isSet(pleaseDoNotMarkAsReady)))) {
+		if ((IsElementPresent(locator1 = "Staging#STAGING_MENU_READY_FOR_PUBLICATION")) && !(isSet(pleaseDoNotMarkAsReady))) {
 			Check.toggleSwitch(locator1 = "Staging#STAGING_MENU_READY_FOR_PUBLICATION");
 		}
 
@@ -967,7 +967,7 @@ definition {
 	}
 
 	macro publishViaSAP {
-		if (IsElementPresent(locator1 = "Icon#ROW_VERTICAL_ELLIPSIS", key_rowEntry = "${entry}")) {
+		if (IsElementPresent(key_rowEntry = "${entry}", locator1 = "Icon#ROW_VERTICAL_ELLIPSIS")) {
 			Click(
 				key_rowEntry = "${entry}",
 				locator1 = "Icon#ROW_VERTICAL_ELLIPSIS");
@@ -1044,6 +1044,30 @@ definition {
 			parentGroupName = "${parentGroupName}",
 			remoteGroupId = "${remoteGroupId}",
 			remotePort = "${remotePort}");
+	}
+
+	macro runGroovyScript {
+		ServerAdministration.openServerAdmin();
+
+		var script = TestCase.getFileContent(fileName = "create-400-web-content-articles.groovy");
+
+		Navigator.gotoNavItem(navItem = "Script");
+
+		Select(
+			locator1 = "ServerAdministrationScript#LANGUAGE_SELECT",
+			value1 = "Groovy");
+
+		Type(
+			locator1 = "ServerAdministrationScript#SCRIPT_TEXT",
+			value1 = "${script}");
+
+		AssertClick(
+			locator1 = "ServerAdministrationScript#EXECUTE_BUTTON",
+			value1 = "Execute");
+
+		while (IsElementNotPresent(locator1 = "Message#SUCCESS_DISMISSIBLE")) {
+			Pause(locator1 = "4000");
+		}
 	}
 
 	macro saveLocalStagingConfiguration {
@@ -1144,42 +1168,6 @@ definition {
 		AssertTextEquals.assertPartialText(
 			locator1 = "StagingPublishToLive#PUBLISH_TEMPLATES_TABLE_NAME",
 			value1 = "${searchTerm}");
-	}
-
-	macro setContentDateRange {
-		if (IsElementPresent(locator1 = "Staging#STAGING_MENU_READY_FOR_PUBLICATION")) {
-			Check.toggleSwitch(locator1 = "Staging#STAGING_MENU_READY_FOR_PUBLICATION");
-		}
-
-		Click(locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON");
-
-		SelectFrame(locator1 = "IFrame#MODAL_BODY");
-
-		AssertClick.assertPartialTextClickAt(
-			locator1 = "StagingPublishToLive#SWITCH_TO_ADVANCED_PUBLICATION",
-			value1 = "Switch to Advanced Publish Process");
-
-		ScrollWebElementIntoView(locator1 = "Staging#STAGING_PUBLICATION_PERMISSION");
-
-		Click(locator1 = "Radio#CHOOSE_CONTENT_DATE_RANGE_CHANGE");
-
-		var key_contentDateRange = "DateRange";
-
-		Type(
-			locator1 = "Select#DATE_RANGE_START_DATE",
-			value1 = "${dateRangeStartDate}");
-
-		Type(
-			locator1 = "Select#DATE_RANGE_END_DATE",
-			value1 = "${dateRangeEndDate}");
-
-		Click(locator1 = "Select#DATE_RANGE_END_DATE");
-
-		Click.mouseDownMouseUp(locator1 = "Link#REFRESH_COUNTS");
-
-		ScrollWebElementIntoView(locator1 = "Staging#STAGING_PUBLICATION_PERMISSION");
-
-		takeScreenshot();
 	}
 
 	macro setStartDateTomorrow {
@@ -1324,6 +1312,10 @@ definition {
 		AssertTextEquals(
 			locator1 = "Staging#PAGE_VARIATION",
 			value1 = "${pageVariationName}");
+	}
+
+	macro viewPortletDefaultMessageInRemoteLive {
+		Alert.viewInfoMessageSpecific(infoMessage = "This application is not visible to users yet");
 	}
 
 	macro viewProcessResult {

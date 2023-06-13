@@ -124,6 +124,19 @@ public class LayoutPageTemplateEntryServiceUtil {
 			serviceContext);
 	}
 
+	public static LayoutPageTemplateEntry
+			createLayoutPageTemplateEntryFromLayout(
+				long segmentsExperienceId,
+				com.liferay.portal.kernel.model.Layout sourceLayout,
+				String name, long targetLayoutPageTemplateCollectionId,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws Exception {
+
+		return getService().createLayoutPageTemplateEntryFromLayout(
+			segmentsExperienceId, sourceLayout, name,
+			targetLayoutPageTemplateCollectionId, serviceContext);
+	}
+
 	public static void deleteLayoutPageTemplateEntries(
 			long[] layoutPageTemplateEntryIds)
 		throws PortalException {
@@ -184,6 +197,22 @@ public class LayoutPageTemplateEntryServiceUtil {
 
 		return getService().getLayoutPageTemplateEntries(
 			groupId, type, start, end, orderByComparator);
+	}
+
+	public static List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
+		long groupId, int[] types, int status, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return getService().getLayoutPageTemplateEntries(
+			groupId, types, status, start, end, orderByComparator);
+	}
+
+	public static List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
+		long groupId, int[] types, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return getService().getLayoutPageTemplateEntries(
+			groupId, types, start, end, orderByComparator);
 	}
 
 	public static List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
@@ -317,6 +346,22 @@ public class LayoutPageTemplateEntryServiceUtil {
 			groupId, name, type, start, end, orderByComparator);
 	}
 
+	public static List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
+		long groupId, String name, int[] types, int status, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return getService().getLayoutPageTemplateEntries(
+			groupId, name, types, status, start, end, orderByComparator);
+	}
+
+	public static List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
+		long groupId, String name, int[] types, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return getService().getLayoutPageTemplateEntries(
+			groupId, name, types, start, end, orderByComparator);
+	}
+
 	public static List<LayoutPageTemplateEntry>
 		getLayoutPageTemplateEntriesByType(
 			long groupId, long layoutPageTemplateCollectionId, int type,
@@ -339,6 +384,19 @@ public class LayoutPageTemplateEntryServiceUtil {
 
 		return getService().getLayoutPageTemplateEntriesCount(
 			groupId, type, status);
+	}
+
+	public static int getLayoutPageTemplateEntriesCount(
+		long groupId, int[] types) {
+
+		return getService().getLayoutPageTemplateEntriesCount(groupId, types);
+	}
+
+	public static int getLayoutPageTemplateEntriesCount(
+		long groupId, int[] types, int status) {
+
+		return getService().getLayoutPageTemplateEntriesCount(
+			groupId, types, status);
 	}
 
 	public static int getLayoutPageTemplateEntriesCount(
@@ -415,6 +473,20 @@ public class LayoutPageTemplateEntryServiceUtil {
 			groupId, name, type, status);
 	}
 
+	public static int getLayoutPageTemplateEntriesCount(
+		long groupId, String name, int[] types) {
+
+		return getService().getLayoutPageTemplateEntriesCount(
+			groupId, name, types);
+	}
+
+	public static int getLayoutPageTemplateEntriesCount(
+		long groupId, String name, int[] types, int status) {
+
+		return getService().getLayoutPageTemplateEntriesCount(
+			groupId, name, types, status);
+	}
+
 	public static int getLayoutPageTemplateEntriesCountByType(
 		long groupId, long layoutPageTemplateCollectionId, int type) {
 
@@ -437,6 +509,15 @@ public class LayoutPageTemplateEntryServiceUtil {
 	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
+	}
+
+	public static LayoutPageTemplateEntry moveLayoutPageTemplateEntry(
+			long layoutPageTemplateEntryId,
+			long targetLayoutPageTemplateCollectionId)
+		throws PortalException {
+
+		return getService().moveLayoutPageTemplateEntry(
+			layoutPageTemplateEntryId, targetLayoutPageTemplateCollectionId);
 	}
 
 	public static LayoutPageTemplateEntry updateLayoutPageTemplateEntry(

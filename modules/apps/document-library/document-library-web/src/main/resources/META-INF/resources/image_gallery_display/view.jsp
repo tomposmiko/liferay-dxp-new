@@ -21,6 +21,24 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 Folder folder = (Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
 
+IGRequestHelper igRequestHelper = new IGRequestHelper(request);
+
+DLPortletInstanceSettings dlPortletInstanceSettings = igRequestHelper.getDLPortletInstanceSettings();
+
+long rootFolderId = dlPortletInstanceSettings.getRootFolderId();
+
+if (rootFolderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+	try {
+		Folder rootFolder = DLAppLocalServiceUtil.getFolder(rootFolderId);
+
+		if (rootFolder.getGroupId() != scopeGroupId) {
+			rootFolderId = DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
+		}
+	}
+	catch (NoSuchFolderException nsfe) {
+	}
+}
+
 long folderId = BeanParamUtil.getLong(folder, request, "folderId", rootFolderId);
 
 boolean defaultFolderView = false;
@@ -38,10 +56,15 @@ if (defaultFolderView) {
 	}
 }
 
-long repositoryId = scopeGroupId;
+long repositoryId = dlPortletInstanceSettings.getSelectedRepositoryId();
 
-if (folder != null) {
-	repositoryId = folder.getRepositoryId();
+if (repositoryId == 0) {
+	if (folder != null) {
+		repositoryId = folder.getRepositoryId();
+	}
+	else {
+		repositoryId = scopeGroupId;
+	}
 }
 
 int status = WorkflowConstants.STATUS_APPROVED;
@@ -53,6 +76,9 @@ if (permissionChecker.isContentReviewer(user.getCompanyId(), scopeGroupId)) {
 Map<String, Object> contextObjects = HashMapBuilder.<String, Object>put(
 	"dlPortletInstanceSettings", dlPortletInstanceSettings
 ).build();
+
+String displayStyle = portletPreferences.getValue("displayStyle", StringPool.BLANK);
+long displayStyleGroupId = GetterUtil.getLong(portletPreferences.getValue("displayStyleGroupId", null), themeDisplay.getScopeGroupId());
 
 String[] mediaGalleryMimeTypes = dlPortletInstanceSettings.getMimeTypes();
 %>

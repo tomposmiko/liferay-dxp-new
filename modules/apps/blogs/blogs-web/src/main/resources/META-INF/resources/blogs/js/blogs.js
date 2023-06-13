@@ -15,7 +15,7 @@
 import {State} from '@liferay/frontend-js-state-web';
 import {
 	STR_NULL_IMAGE_FILE_ENTRY_ID,
-	imageSelectorCoverImageAtom,
+	imageSelectorImageAtom,
 } from 'item-selector-taglib';
 
 const CSS_INVISIBLE = 'invisible';
@@ -135,8 +135,12 @@ export default class Blogs {
 		);
 
 		this._imageSelectorCoverImageSubscription = State.subscribe(
-			imageSelectorCoverImageAtom,
-			(data) => this._updateCaption(data)
+			imageSelectorImageAtom,
+			({paramName, ...data}) => {
+				if (paramName === 'coverImageFileEntry') {
+					this._updateCaption(data);
+				}
+			}
 		);
 
 		const publishButton = this._getElementById('publishButton');
@@ -315,9 +319,9 @@ export default class Blogs {
 			captionNode.classList.add(CSS_INVISIBLE);
 		}
 
-		window[`${this._config.namespace}coverImageCaptionEditor`].setHTML(
-			STR_BLANK
-		);
+		CKEDITOR.instances[
+			`${this._config.namespace}coverImageCaptionEditor`
+		].setData(STR_BLANK);
 	}
 
 	_saveEntry(draft, ajax) {
@@ -327,9 +331,10 @@ export default class Blogs {
 
 		const content = window[`${namespace}contentEditor`].getHTML();
 
-		const coverImageCaption = window[
+		const coverImageCaption = CKEDITOR.instances[
 			`${namespace}coverImageCaptionEditor`
-		].getHTML();
+		].getData();
+
 		const subtitle = this._getElementById('subtitle').value;
 		const title = this._getElementById('title').value;
 
@@ -534,7 +539,7 @@ export default class Blogs {
 
 		const finalContentImages = this._getContentImages(finalContent);
 
-		if (originalContentImages.length != finalContentImages.length) {
+		if (originalContentImages.length !== finalContentImages.length) {
 			return;
 		}
 

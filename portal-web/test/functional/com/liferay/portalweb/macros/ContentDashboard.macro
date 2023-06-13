@@ -13,7 +13,7 @@ definition {
 	}
 
 	macro editAsset {
-		Click(locator1 = "ContentDashboard#WEB_CONTENT_MENU_DROPDOWN_BUTTON");
+		Click(locator1 = "ContentDashboard#ASSET_MENU_DROPDOWN_BUTTON");
 
 		Click(locator1 = "ContentDashboard#EDIT_OPTION");
 
@@ -74,6 +74,8 @@ definition {
 			value1 = "Select");
 
 		SelectFrame(value1 = "relative=top");
+
+		WaitForElementPresent(locator1 = "ContentDashboard#ASSET_MENU_DROPDOWN_BUTTON");
 	}
 
 	macro filterByAuthorList {
@@ -112,9 +114,13 @@ definition {
 			value1 = "Select");
 
 		SelectFrame(value1 = "relative=top");
+
+		WaitForElementPresent(locator1 = "ContentDashboard#ASSET_MENU_DROPDOWN_BUTTON");
 	}
 
 	macro filterByAuthorMe {
+		WaitForElementPresent(locator1 = "ContentDashboard#ASSET_MENU_DROPDOWN_BUTTON");
+
 		if (IsElementPresent(locator1 = "ContentDashboard#FILTER_AND_ORDER_DROPDOWN")) {
 			AssertClickNoError(
 				locator1 = "ContentDashboard#FILTER_AND_ORDER_DROPDOWN",
@@ -162,6 +168,8 @@ definition {
 			value1 = "Select");
 
 		SelectFrame(value1 = "relative=top");
+
+		WaitForElementPresent(locator1 = "ContentDashboard#ASSET_MENU_DROPDOWN_BUTTON");
 	}
 
 	macro filterByCategory {
@@ -194,6 +202,62 @@ definition {
 			value1 = "Select");
 
 		SelectFrame(value1 = "relative=top");
+
+		WaitForElementPresent(locator1 = "ContentDashboard#ASSET_MENU_DROPDOWN_BUTTON");
+	}
+
+	macro filterByExtension {
+		if (IsElementPresent(locator1 = "ContentDashboard#FILTER_AND_ORDER_DROPDOWN")) {
+			AssertClickNoError(
+				locator1 = "ContentDashboard#FILTER_AND_ORDER_DROPDOWN",
+				value1 = "Filter and Order");
+		}
+
+		var key_filterOption = "${filterOption}";
+
+		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		if ("${extensionName}" != "") {
+			Click(locator1 = "ContentDashboard#FILTER_EXTENSION_ELEMENT");
+
+			SelectFrame(value1 = "relative=top");
+
+			AssertClickNoError(
+				locator1 = "Button#SELECT",
+				value1 = "Select");
+
+			SelectFrame(value1 = "relative=top");
+
+			WaitForElementPresent(locator1 = "ContentDashboard#ASSET_MENU_DROPDOWN_BUTTON");
+		}
+	}
+
+	macro filterByMimeParent {
+		if (IsElementPresent(locator1 = "ContentDashboard#FILTER_AND_ORDER_DROPDOWN")) {
+			AssertClickNoError(
+				locator1 = "ContentDashboard#FILTER_AND_ORDER_DROPDOWN",
+				value1 = "Filter and Order");
+		}
+
+		var key_filterOption = "${filterOption}";
+
+		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		Click(locator1 = "ContentDashboard#FILTER_PARENT_EXTENSION");
+
+		SelectFrame(value1 = "relative=top");
+
+		AssertClickNoError(
+			locator1 = "Button#SELECT",
+			value1 = "Select");
+
+		SelectFrame(value1 = "relative=top");
+
+		WaitForElementPresent(locator1 = "ContentDashboard#ASSET_MENU_DROPDOWN_BUTTON");
 	}
 
 	macro filterBySiteGlobal {
@@ -301,6 +365,8 @@ definition {
 			value1 = "Select");
 
 		SelectFrame(value1 = "relative=top");
+
+		WaitForElementPresent(locator1 = "ContentDashboard#ASSET_MENU_DROPDOWN_BUTTON");
 	}
 
 	macro filterByType {
@@ -335,6 +401,17 @@ definition {
 
 	macro flipAxesButtonClick {
 		Click(locator1 = "ContentDashboard#FLIP_AXES_BUTTON");
+	}
+
+	macro goToContentDashboard {
+		ApplicationsMenu.gotoPortlet(
+			category = "Content",
+			panel = "Applications",
+			portlet = "Content Dashboard");
+
+		WaitForPageLoad();
+
+		WaitForElementPresent(locator1 = "ContentDashboard#CONTENT_CHART_SVG");
 	}
 
 	macro moveToPage {
@@ -379,7 +456,7 @@ definition {
 	}
 
 	macro openInfoPanelByDropdownMenu {
-		Click(locator1 = "ContentDashboard#WEB_CONTENT_MENU_DROPDOWN_BUTTON");
+		Click(locator1 = "ContentDashboard#ASSET_MENU_DROPDOWN_BUTTON");
 
 		Click(locator1 = "ContentDashboard#INFO_OPTION");
 	}
@@ -420,26 +497,23 @@ definition {
 			value1 = "\ENTER");
 	}
 
-	macro selectListofCategoriesForAudienceAndStage {
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+	macro setUpGlobalCategories {
+		var audienceCategory = JSONCategory.addCategory(
+			groupName = "Global",
+			title = "Audience 1",
+			vocabularyName = "Audience");
 
-		for (var count : list "1,2,3") {
-			WebContentNavigator.gotoEditCP(webContentTitle = "Webcontent Title ${count}");
+		var stageCategory = JSONCategory.addCategory(
+			groupName = "Global",
+			title = "Stage 1",
+			vocabularyName = "Stage");
 
-			for (var count : list "1,2,3") {
-				WebContent.selectCategory(
-					categoryName = "S ${count}",
-					vocabularyName = "Audience");
-			}
+		static var audienceId1 = "${audienceCategory}";
+		static var stageId1 = "${stageCategory}";
 
-			for (var count : list "1,2,3") {
-				WebContent.selectCategory(
-					categoryName = "test ${count}",
-					vocabularyName = "Stage");
-			}
+		return "${audienceId1}";
 
-			PortletEntry.publish();
-		}
+		return "${stageId1}";
 	}
 
 	macro setVocabularyInUseSecondPosition {

@@ -1,10 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {WarningBadge} from '~/common/components/fragments/Badges/Warning';
-import {EMAIL_REGEX} from '~/common/utils/patterns';
+import ClayButton from '@clayui/button';
+import {ClayInput} from '@clayui/form';
+import classNames from 'classnames';
+import React, {useContext, useEffect, useState} from 'react';
+import {WarningBadge} from '../../../../../common/components/fragments/Badges/Warning';
+import {EMAIL_REGEX} from '../../../../../common/utils/patterns';
+import {
+	ACTIONS,
+	SelectedQuoteContext,
+} from '../../../context/SelectedQuoteContextProvider';
 import {
 	SendAccountRequest,
 	validadePassword,
-} from '~/routes/selected-quote/utils/CreateAccount';
+} from '../../../utils/CreateAccount';
 import {ListRules} from '../CreateAnAccount/ListRules';
 import {
 	CHECK_VALUE,
@@ -19,12 +26,14 @@ const _isEmailValid = (email) => {
 	return regex.test(email);
 };
 
-export const CreateAnAccount = ({setExpanded, setStepChecked}) => {
+export function CreateAnAccount() {
+	const [, dispatch] = useContext(SelectedQuoteContext);
 	const [alert, setAlert] = useState(NATURAL_VALUE);
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [objValidate, setObjValidate] = useState(INITIAL_VALIDATION);
+	const [passwordLabel, setPasswordLabel] = useState('Create a Password');
 
 	useEffect(() => {
 		setAlert(NATURAL_VALUE);
@@ -32,14 +41,33 @@ export const CreateAnAccount = ({setExpanded, setStepChecked}) => {
 
 	const onCreateAccount = () => {
 		if (isMatchingAllRules) {
-			const response = SendAccountRequest(email, password);
+			SendAccountRequest(email, password).then((response) => {
+				dispatch({
+					payload: {
+						panelKey: 'uploadDocuments',
+						value: true,
+					},
+					type: ACTIONS.SET_EXPANDED,
+				});
 
-			if (response === CHECK_VALUE) {
-				setExpanded('uploadDocuments');
-				setStepChecked('createAnAccount', true);
-			}
+				dispatch({
+					payload: {
+						panelKey: 'createAnAccount',
+						value: false,
+					},
+					type: ACTIONS.SET_EXPANDED,
+				});
 
-			setAlert(response);
+				dispatch({
+					payload: {
+						panelKey: 'createAnAccount',
+						value: true,
+					},
+					type: ACTIONS.SET_STEP_CHECKED,
+				});
+
+				dispatch({payload: response.id, type: ACTIONS.SET_ACCOUNT_ID});
+			});
 		}
 	};
 
@@ -58,39 +86,50 @@ export const CreateAnAccount = ({setExpanded, setStepChecked}) => {
 	const matchAllRules = isMatchingAllRules();
 
 	return (
-		<div id="ca">
-			<div className="ca-sub-title">
+		<div className="create-account mb-5 ml-5 mr-0 mt-6">
+			<h5 className="font-weight-bolder mb-5 mx-0">
 				Create a Raylife account to continue. This will be used to login
 				to your dashboard.
-			</div>
+			</h5>
 
-			<div className="ca-width-div">
-				<div id="ca-content-input">
-					<input
-						className="ca-input"
-						id="ca-input-email"
+			<div className="create-account__form">
+				<div className="create-account__form__content-input filled form-condensed form-group mb-1 mt-4">
+					<ClayInput
+						className="bg-neutral-0 email"
 						onChange={(event) => {
 							setEmail(event.target.value);
 						}}
 						placeholder="sam.jones@gmail.com"
 						required
 						type="text"
+						value={email}
 					/>
 
-					<label className="ca-label">Email</label>
+					<label>Email</label>
 				</div>
 
 				<div>
 					{email && !isEmailValid && (
 						<WarningBadge>
-							Must be a valid email address.
+							Please enter a valid email address.
 						</WarningBadge>
 					)}
 				</div>
 
-				<div id="ca-content-input">
-					<input
-						className="ca-input"
+				<div
+					className={classNames(
+						'create-account__form__content-input form-condensed form-group mt-4',
+						{
+							filled: password,
+						}
+					)}
+				>
+					<ClayInput
+						onBlur={() => {
+							if (!password) {
+								setPasswordLabel('Create a Password');
+							}
+						}}
 						onChange={(event) => {
 							setPassword(event.target.value);
 							setObjValidate(
@@ -100,46 +139,54 @@ export const CreateAnAccount = ({setExpanded, setStepChecked}) => {
 								)
 							);
 						}}
-						placeholder="Create a Password"
+						onFocus={() => setPasswordLabel('Password')}
 						required
 						type="password"
+						value={password}
 					/>
 
-					<label className="ca-label">Password</label>
+					<label>{passwordLabel}</label>
 				</div>
 
-				<div id="ca-content-input">
-					<input
-						className="ca-input"
+				<div
+					className={classNames(
+						'create-account__form__content-input form-condensed form-group mt-4',
+						{
+							filled: confirmPassword,
+						}
+					)}
+				>
+					<ClayInput
 						onChange={(event) => {
 							setConfirmPassword(event.target.value);
 							setObjValidate(
 								validadePassword(event.target.value, password)
 							);
 						}}
-						placeholder="Re-enter Password"
 						required
 						type="password"
+						value={confirmPassword}
 					/>
 
-					<label className="ca-label">Re-enter Password</label>
+					<label>Re-enter Password</label>
 				</div>
 
 				<ListRules objValidate={objValidate} />
 			</div>
 
-			<div className="ca-align-right">
-				<button
-					className="btn ca-btn"
+			<div className="d-flex justify-content-end">
+				<ClayButton
+					className="mb-0 mt-8 mx-0"
 					disabled={!matchAllRules}
+					displayType="primary"
 					onClick={onCreateAccount}
 				>
 					CREATE ACCOUNT
-				</button>
+				</ClayButton>
 			</div>
 
 			{email && alert === UNCHECKED_VALUE && (
-				<div className="ca-alert-create">
+				<div className="create-account__alert-create">
 					<WarningBadge>
 						Unable to create your account. Please try again
 					</WarningBadge>
@@ -147,4 +194,4 @@ export const CreateAnAccount = ({setExpanded, setStepChecked}) => {
 			)}
 		</div>
 	);
-};
+}

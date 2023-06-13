@@ -109,7 +109,7 @@
 </tr>
 <tr>
 	<td>ICON_DOCUMENT_SHARED</td>
-	<td>//li[contains(@data-title,'${key_dmDocumentTitle}')]//*[*[name()='svg'][contains(@class,'lexicon-icon-users')]]</td>
+	<td>xpath=(//li | //tr)[contains(@data-title,'${key_dmDocumentTitle}')]//*[*[name()='svg'][contains(@class,'lexicon-icon-users')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -172,6 +172,11 @@
 <tr>
 	<td>DESCRIPTIVE_LIST_DOCUMENT_TITLE</td>
 	<td>//li[contains(@data-title,'${key_dmDocumentTitle}')]//a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_DOCUMENT_TITLE</td>
+	<td>//li[@data-title='${key_dmDocumentTitle}']//a</td>
 	<td></td>
 </tr>
 <tr>

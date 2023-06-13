@@ -36,14 +36,17 @@ const getInfoFields = (infoFieldSetEntries = []) => {
 	const targetFields = {};
 
 	infoFieldSetEntries.forEach(({fields}) => {
-		fields.forEach(({id, sourceContent, targetContent}) => {
-			sourceFields[id] = sourceContent;
+		fields.forEach(({id: idSet, sourceContent, targetContent}) => {
+			sourceContent.forEach((content, index) => {
+				const id = `${idSet}${index}`;
 
-			targetFields[id] = {
-				content: targetContent,
-				message: '',
-				status: '',
-			};
+				sourceFields[id] = content;
+				targetFields[id] = {
+					content: targetContent[index],
+					message: '',
+					status: '',
+				};
+			});
 		});
 	});
 
@@ -288,6 +291,7 @@ const Translate = ({
 				name={`${portletNamespace}workflowAction`}
 				type="hidden"
 			/>
+
 			{Object.entries(additionalFields).map(([name, value]) => (
 				<input
 					defaultValue={value}
@@ -324,6 +328,7 @@ const Translate = ({
 					) : (
 						<>
 							<TranslateHeader
+								autoTranslateEnabled={autoTranslateEnabled}
 								sourceLanguageIdTitle={sourceLanguageIdTitle}
 								targetLanguageIdTitle={targetLanguageIdTitle}
 							/>
@@ -369,9 +374,11 @@ Translate.propTypes = {
 					id: PropTypes.string.isRequired,
 					label: PropTypes.string.isRequired,
 					multiline: PropTypes.bool,
-					sourceContent: PropTypes.string.isRequired,
+					sourceContent: PropTypes.arrayOf(PropTypes.string)
+						.isRequired,
 					sourceContentDir: PropTypes.string.isRequired,
-					targetContent: PropTypes.string,
+					targetContent: PropTypes.arrayOf(PropTypes.string)
+						.isRequired,
 					targetContentDir: PropTypes.string,
 				})
 			),

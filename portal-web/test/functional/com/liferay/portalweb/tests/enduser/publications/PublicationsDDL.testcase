@@ -20,11 +20,6 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			ApplicationsMenu.gotoPortlet(
-				category = "Publications",
-				panel = "Applications",
-				portlet = "Publications");
-
 			Publications.disablePublications();
 		}
 	}
@@ -34,7 +29,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLDataDefinition.addCP(
@@ -51,7 +46,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLList.addCP(
@@ -63,7 +58,7 @@ definition {
 		DDLDataDefinition.save();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLRecord.addCP(
@@ -88,7 +83,7 @@ definition {
 			groupName = "Guest");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLRecord.deleteCP(
@@ -98,7 +93,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLList.deleteCP(ddlListName = "List Name");
@@ -106,21 +101,21 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLDataDefinition.deleteCP(ddlDataDefinitionName = "Data Definition");
 
-		Publications.gotoReviewChanges(publicationName = "Publication Name");
+		PublicationsNavigator.gotoReviewChanges(publicationName = "Publication Name");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Mapping Structure",
 			changeSite = "Guest",
 			changeTitle = "Data Definition",
 			changeType = "Deleted",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Asset",
 			changeSite = "Guest",
 			changeTitle = "New Data Definition for List: List Name",
@@ -128,31 +123,26 @@ definition {
 			changeUser = "Test Test",
 			showAllItems = "true");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Lists Record",
 			changeSite = "Guest",
 			changeTitle = "${changeTitle}",
 			changeType = "Deleted",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Lists Record Set",
 			changeSite = "Guest",
 			changeTitle = "List Name",
 			changeType = "Deleted",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Mapping Structure",
 			changeSite = "Guest",
 			changeTitle = "Data Definition",
 			changeType = "Deleted",
 			changeUser = "Test Test");
-
-		PublicationsChanges.viewChangesViaContextStyle(
-			changeCategory = "Dynamic Data Lists Record",
-			changeDescription = "Test Test deleted a Dynamic Data Lists Record in Guest",
-			changeTitle = "${changeTitle}");
 
 		JSONPublications.publishPublication(publicationName = "Publication Name");
 
@@ -161,7 +151,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		LexiconEntry.viewNoEntry(rowEntry = "List Name");
@@ -176,7 +166,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLDataDefinition.addCP(
@@ -193,7 +183,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLList.addCP(
@@ -210,7 +200,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Dynamic Data Lists Display Page");
+		PagesAdmin.addPublicPage(pageName = "Dynamic Data Lists Display Page");
 
 		Navigator.gotoPage(pageName = "Dynamic Data Lists Display Page");
 
@@ -250,9 +240,9 @@ definition {
 			locator1 = "//div[@class='portlet-body']",
 			value1 = "Text");
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Mapping Template",
 			changeSite = "Guest",
 			changeTitle = "Display Template Name",
@@ -275,7 +265,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLDataDefinition.addCP(
@@ -292,7 +282,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLList.addCP(
@@ -304,7 +294,7 @@ definition {
 		DDLDataDefinition.save();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLRecord.addCP(
@@ -325,7 +315,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLDataDefinition.viewCP(
@@ -342,7 +332,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLRecord.editCP(
@@ -364,7 +354,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLList.editCP(
@@ -372,12 +362,19 @@ definition {
 			ddlListName = "List Name",
 			ddlListNameEdit = "List Name Edit");
 
-		Publications.gotoReviewChanges(publicationName = "Publication Name");
+		PublicationsNavigator.gotoReviewChanges(publicationName = "Publication Name");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Mapping Structure",
 			changeSite = "Guest",
 			changeTitle = "Data Definition",
+			changeType = "Modified",
+			changeUser = "Test Test");
+
+		PublicationsChanges.viewChanges(
+			changeCategory = "Dynamic Data Lists Record Set",
+			changeSite = "Guest",
+			changeTitle = "List Name Edit",
 			changeType = "Modified",
 			changeUser = "Test Test");
 
@@ -385,19 +382,14 @@ definition {
 			ddlListName = "List Name Edit",
 			groupName = "Guest");
 
-		PublicationsChanges.viewChangesViaContextStyle(
-			changeCategory = "Dynamic Data Lists Record",
-			changeDescription = "Test Test modified a Dynamic Data Lists Record in Guest",
-			changeTitle = "${changeTitle}");
-
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Lists Record",
 			changeSite = "Guest",
 			changeTitle = "${changeTitle}",
 			changeType = "Modified",
 			changeUser = "Test Test");
 
-		Publications.gotoViewChangeDiff(
+		PublicationsNavigator.gotoViewChangeDiff(
 			changeCategory = "Dynamic Data Lists Record",
 			changeTitle = "${changeTitle}");
 
@@ -414,20 +406,6 @@ definition {
 			fieldValueInPublication = "3/30/21",
 			publicationName = "Publication Name");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
-			changeCategory = "Dynamic Data Lists Record Set",
-			changeSite = "Guest",
-			changeTitle = "List Name Edit",
-			changeType = "Modified",
-			changeUser = "Test Test");
-
-		PublicationsChanges.viewChangesViaChangesStyle(
-			changeCategory = "Dynamic Data Mapping Structure",
-			changeSite = "Guest",
-			changeTitle = "Data Definition",
-			changeType = "Modified",
-			changeUser = "Test Test");
-
 		JSONPublications.publishPublication(publicationName = "Publication Name");
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name");
@@ -435,7 +413,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLNavigator.gotoListRecords(ddlListName = "List Name Edit");
@@ -455,7 +433,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLDataDefinition.addCP(
@@ -472,7 +450,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLList.addCP(
@@ -489,7 +467,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Dynamic Data Lists Display Page");
+		PagesAdmin.addPublicPage(pageName = "Dynamic Data Lists Display Page");
 
 		Navigator.gotoPage(pageName = "Dynamic Data Lists Display Page");
 
@@ -530,9 +508,9 @@ definition {
 
 		DDLRecord.viewFieldFormTemplateSpecific(field = "Separator");
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Mapping Template",
 			changeSite = "Guest",
 			changeTitle = "Form Template Name",
@@ -559,7 +537,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLDataDefinition.addCP(
@@ -576,7 +554,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLList.addCP(
@@ -588,7 +566,7 @@ definition {
 		DDLDataDefinition.save();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLRecord.addCP(
@@ -602,18 +580,18 @@ definition {
 
 		PortletEntry.publish();
 
-		Publications.gotoReviewChanges(
-			gotoManagePublications = "true",
+		PublicationsNavigator.gotoReviewChanges(
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Mapping Structure",
 			changeSite = "Guest",
 			changeTitle = "Data Definition",
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Asset",
 			changeOrder = "2",
 			changeSite = "Guest",
@@ -626,26 +604,21 @@ definition {
 			ddlListName = "List Name",
 			groupName = "Guest");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Lists Record",
 			changeSite = "Guest",
 			changeTitle = "${changeTitle}",
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaContextStyle(
-			changeCategory = "Dynamic Data Lists Record",
-			changeDescription = "Test Test added a Dynamic Data Lists Record in Guest",
-			changeTitle = "${changeTitle}");
-
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Lists Record Set",
 			changeSite = "Guest",
 			changeTitle = "List Name",
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Mapping Structure",
 			changeSite = "Guest",
 			changeTitle = "Data Definition",
@@ -659,7 +632,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLNavigator.gotoListRecords(ddlListName = "List Name");
@@ -675,7 +648,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLDataDefinition.addCP(
@@ -692,7 +665,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLList.addCP(
@@ -704,7 +677,7 @@ definition {
 		DDLDataDefinition.save();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLRecord.addCP(
@@ -725,7 +698,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLRecord.editCP(
@@ -745,7 +718,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLRecord.editCP(
@@ -762,15 +735,15 @@ definition {
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name 2");
 
-		Publications.gotoPublish(
-			gotoManagePublications = "true",
+		PublicationsNavigator.gotoPublish(
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name 1");
 
 		var changeTitle = JSONDDL.getRecordId(
 			ddlListName = "List Name",
 			groupName = "Guest");
 
-		Publications.discardChanges(
+		PublicationsChanges.discardChanges(
 			changeCategory = "Dynamic Data Lists Record",
 			changeTitle = "${changeTitle}",
 			conflictingChanges = "true",
@@ -783,7 +756,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLNavigator.gotoListRecords(ddlListName = "List Name");

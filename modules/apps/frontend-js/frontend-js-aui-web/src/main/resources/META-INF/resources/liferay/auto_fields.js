@@ -15,6 +15,7 @@
 AUI.add(
 	'liferay-auto-fields',
 	(A) => {
+		// eslint-disable-next-line @liferay/aui/no-object
 		var AObject = A.Object;
 		var Lang = A.Lang;
 
@@ -102,16 +103,16 @@ AUI.add(
 						var type = item.getAttribute('type');
 
 						if (
-							type == 'text' ||
-							type == 'password' ||
-							tag == 'textarea'
+							type === 'text' ||
+							type === 'password' ||
+							tag === 'textarea'
 						) {
 							item.val('');
 						}
-						else if (type == 'checkbox' || type == 'radio') {
+						else if (type === 'checkbox' || type === 'radio') {
 							item.attr('checked', false);
 						}
-						else if (tag == 'select') {
+						else if (tag === 'select') {
 							var selectedIndex = 0;
 
 							if (item.getAttribute('showEmptyOption')) {
@@ -152,7 +153,7 @@ AUI.add(
 					var formValidator = instance._getFormValidator(node);
 
 					var paletteIsCloned =
-						clone.one("[id$='PaletteBoundingBox']") != null;
+						clone.one("[id$='PaletteBoundingBox']") !== null;
 
 					var inputsLocalized = node.all('.language-value');
 
@@ -219,7 +220,7 @@ AUI.add(
 								guid + '$2'
 							);
 
-							if (inputType == 'radio') {
+							if (inputType === 'radio') {
 								oldName = item.attr('id');
 
 								item.attr('checked', '');
@@ -227,9 +228,9 @@ AUI.add(
 								item.attr('id', newName);
 							}
 							else if (
-								inputNodeName == 'button' ||
-								inputNodeName == 'div' ||
-								inputNodeName == 'span'
+								inputNodeName === 'button' ||
+								inputNodeName === 'div' ||
+								inputNodeName === 'span'
 							) {
 								if (oldName) {
 									item.attr('id', newName);

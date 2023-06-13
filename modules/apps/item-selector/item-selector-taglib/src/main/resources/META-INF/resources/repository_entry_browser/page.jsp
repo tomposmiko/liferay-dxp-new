@@ -387,6 +387,7 @@ SearchContainer<?> searchContainer = new SearchContainer(renderRequest, itemSele
 									data.put("metadata", itemMedatadaJSONObject.toString());
 									data.put("returnType", ItemSelectorRepositoryEntryBrowserUtil.getItemSelectorReturnTypeClassName(itemSelectorReturnTypeResolver, existingFileEntryReturnType));
 									data.put("title", title);
+									data.put("type", repositoryEntryBrowserDisplayContext.getType(latestFileVersion));
 									data.put("url", DLURLHelperUtil.getPreviewURL(fileEntry, latestFileVersion, themeDisplay, StringPool.BLANK));
 									data.put("value", ItemSelectorRepositoryEntryBrowserUtil.getValue(itemSelectorReturnTypeResolver, existingFileEntryReturnType, fileEntry, themeDisplay));
 									%>
@@ -395,10 +396,10 @@ SearchContainer<?> searchContainer = new SearchContainer(renderRequest, itemSele
 										<c:choose>
 											<c:when test="<%= Validator.isNull(thumbnailSrc) %>">
 												<liferay-frontend:icon-vertical-card
-													actionJsp="/repository_entry_browser/action_button_preview.jsp"
+													actionJsp='<%= repositoryEntryBrowserDisplayContext.isPreviewable(latestFileVersion) ? "/repository_entry_browser/action_button_preview.jsp" : StringPool.BLANK %>'
 													actionJspServletContext="<%= application %>"
 													cardCssClass="card-interactive"
-													cssClass="file-card form-check form-check-card item-preview"
+													cssClass='<%= (repositoryEntryBrowserDisplayContext.isPreviewable(latestFileVersion) ? "item-preview-editable" : StringPool.BLANK) + " item-preview file-card form-check form-check-card" %>'
 													data="<%= data %>"
 													icon="documents-and-media"
 													title="<%= title %>"
@@ -425,10 +426,10 @@ SearchContainer<?> searchContainer = new SearchContainer(renderRequest, itemSele
 											</c:when>
 											<c:otherwise>
 												<liferay-frontend:vertical-card
-													actionJsp="/repository_entry_browser/action_button_preview.jsp"
+													actionJsp='<%= repositoryEntryBrowserDisplayContext.isPreviewable(latestFileVersion) ? "/repository_entry_browser/action_button_preview.jsp" : StringPool.BLANK %>'
 													actionJspServletContext="<%= application %>"
 													cardCssClass="card-interactive"
-													cssClass="form-check form-check-card image-card item-preview"
+													cssClass='<%= (repositoryEntryBrowserDisplayContext.isPreviewable(latestFileVersion) ? "item-preview-editable" : StringPool.BLANK) + " item-preview form-check form-check-card image-card" %>'
 													data="<%= data %>"
 													imageUrl="<%= thumbnailSrc %>"
 													title="<%= title %>"

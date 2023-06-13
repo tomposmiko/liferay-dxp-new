@@ -61,7 +61,7 @@ public class OpenWeatherMapSXPParameterContributor
 		}
 
 		String ipAddress = (String)searchContext.getAttribute(
-			"search.experiences.ipaddress");
+			"search.experiences.ip.address");
 
 		if (Validator.isNull(ipAddress)) {
 			return;
@@ -122,7 +122,7 @@ public class OpenWeatherMapSXPParameterContributor
 				IntegerSXPParameter.class, "weather-condition-id",
 				"openweathermap.weather_id"),
 			new SXPParameterContributorDefinition(
-				StringSXPParameter.class, "weather-condition-name}",
+				StringSXPParameter.class, "weather-condition-name",
 				"openweathermap.weather_name"));
 	}
 

@@ -19,6 +19,8 @@ import com.liferay.search.experiences.rest.client.serdes.v1_0.SXPBlueprintSerDes
 
 import java.io.Serializable;
 
+import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -55,6 +57,27 @@ public class SXPBlueprint implements Cloneable, Serializable {
 
 	protected Configuration configuration;
 
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public void setCreateDate(
+		UnsafeSupplier<Date, Exception> createDateUnsafeSupplier) {
+
+		try {
+			createDate = createDateUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Date createDate;
+
 	public String getDescription() {
 		return description;
 	}
@@ -76,6 +99,50 @@ public class SXPBlueprint implements Cloneable, Serializable {
 
 	protected String description;
 
+	public Map<String, String> getDescription_i18n() {
+		return description_i18n;
+	}
+
+	public void setDescription_i18n(Map<String, String> description_i18n) {
+		this.description_i18n = description_i18n;
+	}
+
+	public void setDescription_i18n(
+		UnsafeSupplier<Map<String, String>, Exception>
+			description_i18nUnsafeSupplier) {
+
+		try {
+			description_i18n = description_i18nUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Map<String, String> description_i18n;
+
+	public ElementInstance[] getElementInstances() {
+		return elementInstances;
+	}
+
+	public void setElementInstances(ElementInstance[] elementInstances) {
+		this.elementInstances = elementInstances;
+	}
+
+	public void setElementInstances(
+		UnsafeSupplier<ElementInstance[], Exception>
+			elementInstancesUnsafeSupplier) {
+
+		try {
+			elementInstances = elementInstancesUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected ElementInstance[] elementInstances;
+
 	public Long getId() {
 		return id;
 	}
@@ -94,6 +161,27 @@ public class SXPBlueprint implements Cloneable, Serializable {
 	}
 
 	protected Long id;
+
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+
+	public void setModifiedDate(
+		UnsafeSupplier<Date, Exception> modifiedDateUnsafeSupplier) {
+
+		try {
+			modifiedDate = modifiedDateUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Date modifiedDate;
 
 	public String getTitle() {
 		return title;
@@ -115,6 +203,49 @@ public class SXPBlueprint implements Cloneable, Serializable {
 	}
 
 	protected String title;
+
+	public Map<String, String> getTitle_i18n() {
+		return title_i18n;
+	}
+
+	public void setTitle_i18n(Map<String, String> title_i18n) {
+		this.title_i18n = title_i18n;
+	}
+
+	public void setTitle_i18n(
+		UnsafeSupplier<Map<String, String>, Exception>
+			title_i18nUnsafeSupplier) {
+
+		try {
+			title_i18n = title_i18nUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Map<String, String> title_i18n;
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public void setUserName(
+		UnsafeSupplier<String, Exception> userNameUnsafeSupplier) {
+
+		try {
+			userName = userNameUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String userName;
 
 	@Override
 	public SXPBlueprint clone() throws CloneNotSupportedException {

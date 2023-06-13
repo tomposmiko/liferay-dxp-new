@@ -81,6 +81,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ANY_SECONDARY</td>
+	<td>//*[not(self::div)][contains(@class,'btn-secondary')][normalize-space()='${key_text}'][not(contains(@class,'navbar'))]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ANY_TITLE</td>
 	<td>//button[@title='${key_title}']</td>
 	<td></td>
@@ -88,6 +93,11 @@
 <tr>
 	<td>ANY_TITLE_DISABLED</td>
 	<td>//button[@title='${key_title}' and @disabled]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_WITH_ARIA_LABEL</td>
+	<td>//button[@aria-label='${ariaLabel}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -291,11 +301,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>DELETE_LAYOUT_LOGO</td>
-	<td>//button[contains(@class,'delete-logo')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>DELETE_ROW_N</td>
 	<td>xpath=(//button[contains(@class,'delete-row')])[${key_rowIndexNumber}]</td>
 	<td></td>
@@ -368,11 +373,6 @@
 <tr>
 	<td>EXECUTE</td>
 	<td>//button[contains(.,'Execute')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>EXECUTE_ACTION</td>
-	<td>//li[contains(.,'${key_actionsDescription}')]//button[contains(.,'Execute')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -783,6 +783,11 @@
 <tr>
 	<td>SELECT_MOBILE_DEVICE_RULES</td>
 	<td>//div[@class='btn-toolbar']/button[contains(.,'Select')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TRANSLATIONS_DONE</td>
+	<td>//a[contains(@class,'btn-sm btn-primary') and text()='Done']</td>
 	<td></td>
 </tr>
 <tr>

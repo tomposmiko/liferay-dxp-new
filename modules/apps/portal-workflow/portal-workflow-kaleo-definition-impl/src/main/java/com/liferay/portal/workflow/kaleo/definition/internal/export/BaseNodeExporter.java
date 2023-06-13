@@ -14,6 +14,8 @@
 
 package com.liferay.portal.workflow.kaleo.definition.internal.export;
 
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.workflow.kaleo.definition.Action;
@@ -43,6 +45,7 @@ import com.liferay.portal.workflow.kaleo.definition.UserRecipient;
 import com.liferay.portal.workflow.kaleo.definition.export.NodeExporter;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,6 +80,7 @@ public abstract class BaseNodeExporter implements NodeExporter {
 		}
 
 		exportAdditionalNodeElements(node, nodeElement);
+		exportLabelsElement(nodeElement, node.getLabelMap());
 		exportTransitionsElement(node, nodeElement);
 	}
 
@@ -234,6 +238,24 @@ public abstract class BaseNodeExporter implements NodeExporter {
 					userAssignment.getEmailAddress(),
 					userAssignment.getScreenName());
 			}
+		}
+	}
+
+	protected void exportLabelsElement(
+		Element element, Map<Locale, String> labelMap) {
+
+		if (MapUtil.isEmpty(labelMap)) {
+			return;
+		}
+
+		Element labelsElement = element.addElement("labels");
+
+		for (Map.Entry<Locale, String> entry : labelMap.entrySet()) {
+			Element labelElement = labelsElement.addElement("label");
+
+			labelElement.addAttribute(
+				"language-id", LocaleUtil.toLanguageId(entry.getKey()));
+			labelElement.addText(entry.getValue());
 		}
 	}
 
@@ -435,6 +457,8 @@ public abstract class BaseNodeExporter implements NodeExporter {
 			Node targetNode = outgoingTransition.getTargetNode();
 
 			addTextElement(transition, "target", targetNode.getName());
+
+			exportLabelsElement(transition, outgoingTransition.getLabelMap());
 		}
 	}
 

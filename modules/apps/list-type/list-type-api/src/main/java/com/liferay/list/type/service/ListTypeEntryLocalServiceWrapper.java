@@ -27,6 +27,10 @@ public class ListTypeEntryLocalServiceWrapper
 	implements ListTypeEntryLocalService,
 			   ServiceWrapper<ListTypeEntryLocalService> {
 
+	public ListTypeEntryLocalServiceWrapper() {
+		this(null);
+	}
+
 	public ListTypeEntryLocalServiceWrapper(
 		ListTypeEntryLocalService listTypeEntryLocalService) {
 
@@ -239,6 +243,14 @@ public class ListTypeEntryLocalServiceWrapper
 		long listTypeEntryId) {
 
 		return _listTypeEntryLocalService.fetchListTypeEntry(listTypeEntryId);
+	}
+
+	@Override
+	public com.liferay.list.type.model.ListTypeEntry fetchListTypeEntry(
+		long listTypeDefinitionId, String key) {
+
+		return _listTypeEntryLocalService.fetchListTypeEntry(
+			listTypeDefinitionId, key);
 	}
 
 	/**

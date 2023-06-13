@@ -3,7 +3,7 @@
 exports[`Field DocumentLibrary has a helptext 1`] = `
 <div>
   <div
-    aria-labelledby="uploadField"
+    aria-labelledby="uploadField_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
     tabindex="0"
@@ -43,7 +43,6 @@ exports[`Field DocumentLibrary has a helptext 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
         name="uploadField"
         type="hidden"
         value="{}"
@@ -72,7 +71,7 @@ exports[`Field DocumentLibrary has a helptext 1`] = `
     </span>
     <span
       class="sr-only"
-      id="uploadField"
+      id="uploadField_fieldDetails"
     >
       Type something
       <br />
@@ -89,6 +88,7 @@ exports[`Field DocumentLibrary has a label 1`] = `
     data-field-name="uploadField"
   >
     <label
+      aria-labelledby="uploadField_fieldDetails"
       class="ddm-label"
       for="uploadField"
       tabindex="0"
@@ -130,7 +130,6 @@ exports[`Field DocumentLibrary has a label 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
         name="uploadField"
         type="hidden"
         value="{}"
@@ -153,7 +152,7 @@ exports[`Field DocumentLibrary has a label 1`] = `
     </span>
     <span
       class="sr-only"
-      id="uploadField"
+      id="uploadField_fieldDetails"
     >
        you-need-to-be-signed-in-to-edit-this-field
     </span>
@@ -164,7 +163,7 @@ exports[`Field DocumentLibrary has a label 1`] = `
 exports[`Field DocumentLibrary has a placeholder 1`] = `
 <div>
   <div
-    aria-labelledby="uploadField"
+    aria-labelledby="uploadField_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
     tabindex="0"
@@ -204,7 +203,6 @@ exports[`Field DocumentLibrary has a placeholder 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
         name="uploadField"
         placeholder="Placeholder"
         type="hidden"
@@ -228,7 +226,7 @@ exports[`Field DocumentLibrary has a placeholder 1`] = `
     </span>
     <span
       class="sr-only"
-      id="uploadField"
+      id="uploadField_fieldDetails"
     >
        you-need-to-be-signed-in-to-edit-this-field
     </span>
@@ -239,7 +237,7 @@ exports[`Field DocumentLibrary has a placeholder 1`] = `
 exports[`Field DocumentLibrary has a spritemap 1`] = `
 <div>
   <div
-    aria-labelledby="uploadField"
+    aria-labelledby="uploadField_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
     tabindex="0"
@@ -279,7 +277,6 @@ exports[`Field DocumentLibrary has a spritemap 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
         name="uploadField"
         type="hidden"
         value="{}"
@@ -302,7 +299,7 @@ exports[`Field DocumentLibrary has a spritemap 1`] = `
     </span>
     <span
       class="sr-only"
-      id="uploadField"
+      id="uploadField_fieldDetails"
     >
        you-need-to-be-signed-in-to-edit-this-field
     </span>
@@ -313,7 +310,7 @@ exports[`Field DocumentLibrary has a spritemap 1`] = `
 exports[`Field DocumentLibrary has a value 1`] = `
 <div>
   <div
-    aria-labelledby="uploadField"
+    aria-labelledby="uploadField_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
     tabindex="0"
@@ -353,7 +350,6 @@ exports[`Field DocumentLibrary has a value 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
         name="uploadField"
         type="hidden"
         value="{\\"id\\":\\"123\\"}"
@@ -376,7 +372,7 @@ exports[`Field DocumentLibrary has a value 1`] = `
     </span>
     <span
       class="sr-only"
-      id="uploadField"
+      id="uploadField_fieldDetails"
     >
        you-need-to-be-signed-in-to-edit-this-field
     </span>
@@ -387,7 +383,7 @@ exports[`Field DocumentLibrary has a value 1`] = `
 exports[`Field DocumentLibrary has an id 1`] = `
 <div>
   <div
-    aria-labelledby="ID"
+    aria-labelledby="ID_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
     tabindex="0"
@@ -427,7 +423,6 @@ exports[`Field DocumentLibrary has an id 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
         id="ID"
         name="uploadField"
         type="hidden"
@@ -451,7 +446,7 @@ exports[`Field DocumentLibrary has an id 1`] = `
     </span>
     <span
       class="sr-only"
-      id="ID"
+      id="ID_fieldDetails"
     >
        you-need-to-be-signed-in-to-edit-this-field
     </span>
@@ -462,7 +457,7 @@ exports[`Field DocumentLibrary has an id 1`] = `
 exports[`Field DocumentLibrary is not readOnly 1`] = `
 <div>
   <div
-    aria-labelledby="uploadField"
+    aria-labelledby="uploadField_fieldDetails"
     class="form-group hide"
     data-field-name="uploadField"
     tabindex="0"
@@ -500,7 +495,6 @@ exports[`Field DocumentLibrary is not readOnly 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
         name="uploadField"
         type="hidden"
         value="{}"
@@ -519,7 +513,7 @@ exports[`Field DocumentLibrary is not readOnly 1`] = `
 exports[`Field DocumentLibrary is not required 1`] = `
 <div>
   <div
-    aria-labelledby="uploadField"
+    aria-labelledby="uploadField_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
     tabindex="0"
@@ -559,7 +553,6 @@ exports[`Field DocumentLibrary is not required 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
         name="uploadField"
         type="hidden"
         value="{}"
@@ -582,7 +575,7 @@ exports[`Field DocumentLibrary is not required 1`] = `
     </span>
     <span
       class="sr-only"
-      id="uploadField"
+      id="uploadField_fieldDetails"
     >
        you-need-to-be-signed-in-to-edit-this-field
     </span>
@@ -597,6 +590,7 @@ exports[`Field DocumentLibrary renders Label if showLabel is true 1`] = `
     data-field-name="uploadField"
   >
     <label
+      aria-labelledby="uploadField_fieldDetails"
       class="ddm-label"
       for="uploadField"
       tabindex="0"
@@ -638,7 +632,6 @@ exports[`Field DocumentLibrary renders Label if showLabel is true 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
         name="uploadField"
         type="hidden"
         value="{}"
@@ -661,7 +654,7 @@ exports[`Field DocumentLibrary renders Label if showLabel is true 1`] = `
     </span>
     <span
       class="sr-only"
-      id="uploadField"
+      id="uploadField_fieldDetails"
     >
        you-need-to-be-signed-in-to-edit-this-field
     </span>

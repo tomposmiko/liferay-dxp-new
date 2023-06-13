@@ -20,6 +20,7 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRelTabl
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureRelImpl;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureRelModelImpl;
 import com.liferay.layout.page.template.service.persistence.LayoutPageTemplateStructureRelPersistence;
+import com.liferay.layout.page.template.service.persistence.LayoutPageTemplateStructureRelUtil;
 import com.liferay.layout.page.template.service.persistence.impl.constants.LayoutPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -51,6 +52,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3790,6 +3792,11 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 		ctStrictColumnNames.add("layoutPageTemplateStructureId");
 		ctStrictColumnNames.add("segmentsExperienceId");
 		ctMergeColumnNames.add("data_");
+		ctStrictColumnNames.add("lastPublishDate");
+		ctStrictColumnNames.add("status");
+		ctStrictColumnNames.add("statusByUserId");
+		ctStrictColumnNames.add("statusByUserName");
+		ctStrictColumnNames.add("statusDate");
 
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
@@ -3934,12 +3941,34 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 				"layoutPageTemplateStructureId", "segmentsExperienceId"
 			},
 			false);
+
+		_setLayoutPageTemplateStructureRelUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
+		_setLayoutPageTemplateStructureRelUtilPersistence(null);
+
 		entityCache.removeCache(
 			LayoutPageTemplateStructureRelImpl.class.getName());
+	}
+
+	private void _setLayoutPageTemplateStructureRelUtilPersistence(
+		LayoutPageTemplateStructureRelPersistence
+			layoutPageTemplateStructureRelPersistence) {
+
+		try {
+			Field field =
+				LayoutPageTemplateStructureRelUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutPageTemplateStructureRelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@Override

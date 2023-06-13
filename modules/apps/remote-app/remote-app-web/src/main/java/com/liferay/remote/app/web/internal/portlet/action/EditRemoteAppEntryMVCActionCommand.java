@@ -89,6 +89,9 @@ public class EditRemoteAppEntryMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	private void _add(ActionRequest actionRequest) throws PortalException {
+		String description = ParamUtil.getString(actionRequest, "description");
+		String friendlyURLMapping = ParamUtil.getString(
+			actionRequest, "friendlyURLMapping");
 		boolean instanceable = ParamUtil.getBoolean(
 			actionRequest, "instanceable");
 		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
@@ -96,6 +99,8 @@ public class EditRemoteAppEntryMVCActionCommand extends BaseMVCActionCommand {
 		String portletCategoryName = ParamUtil.getString(
 			actionRequest, "portletCategoryName");
 		String properties = ParamUtil.getString(actionRequest, "properties");
+		String sourceCodeURL = ParamUtil.getString(
+			actionRequest, "sourceCodeURL");
 		String type = ParamUtil.getString(actionRequest, "type");
 
 		if (type.equals(RemoteAppConstants.TYPE_CUSTOM_ELEMENT)) {
@@ -110,12 +115,14 @@ public class EditRemoteAppEntryMVCActionCommand extends BaseMVCActionCommand {
 					ParamUtil.getStringValues(
 						actionRequest, "customElementURLs"),
 					StringPool.NEW_LINE),
-				instanceable, nameMap, portletCategoryName, properties);
+				description, friendlyURLMapping, instanceable, nameMap,
+				portletCategoryName, properties, sourceCodeURL);
 		}
 		else if (type.equals(RemoteAppConstants.TYPE_IFRAME)) {
 			_remoteAppEntryService.addIFrameRemoteAppEntry(
+				description, friendlyURLMapping,
 				ParamUtil.getString(actionRequest, "iFrameURL"), instanceable,
-				nameMap, portletCategoryName, properties);
+				nameMap, portletCategoryName, properties, sourceCodeURL);
 		}
 	}
 
@@ -135,11 +142,16 @@ public class EditRemoteAppEntryMVCActionCommand extends BaseMVCActionCommand {
 	private void _update(ActionRequest actionRequest) throws PortalException {
 		RemoteAppEntry remoteAppEntry = _getRemoteAppEntry(actionRequest);
 
+		String description = ParamUtil.getString(actionRequest, "description");
+		String friendlyURLMapping = ParamUtil.getString(
+			actionRequest, "friendlyURLMapping");
 		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
 		String portletCategoryName = ParamUtil.getString(
 			actionRequest, "portletCategoryName");
 		String properties = ParamUtil.getString(actionRequest, "properties");
+		String sourceCodeURL = ParamUtil.getString(
+			actionRequest, "sourceCodeURL");
 
 		if (Objects.equals(
 				remoteAppEntry.getType(),
@@ -157,15 +169,17 @@ public class EditRemoteAppEntryMVCActionCommand extends BaseMVCActionCommand {
 					ParamUtil.getStringValues(
 						actionRequest, "customElementURLs"),
 					StringPool.NEW_LINE),
-				nameMap, portletCategoryName, properties);
+				description, friendlyURLMapping, nameMap, portletCategoryName,
+				properties, sourceCodeURL);
 		}
 		else if (Objects.equals(
 					remoteAppEntry.getType(), RemoteAppConstants.TYPE_IFRAME)) {
 
 			_remoteAppEntryService.updateIFrameRemoteAppEntry(
-				remoteAppEntry.getRemoteAppEntryId(),
+				remoteAppEntry.getRemoteAppEntryId(), description,
+				friendlyURLMapping,
 				ParamUtil.getString(actionRequest, "iFrameURL"), nameMap,
-				portletCategoryName, properties);
+				portletCategoryName, properties, sourceCodeURL);
 		}
 	}
 

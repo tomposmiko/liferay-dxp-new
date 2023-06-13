@@ -32,7 +32,7 @@ definition {
 		Click.clickNoMouseOver(locator1 = "Button#LOCALIZATION_GENERIC");
 
 		Click(
-			key_locale = StringUtil.replace("${locale}", "-", "_"),
+			key_locale = "${locale}",
 			locator1 = "Translation#LOCALIZATION_NAME");
 	}
 
@@ -103,13 +103,13 @@ definition {
 	}
 
 	macro viewNoTags {
-		for (var customMetaTag : list "${customMetaTagsList}" ) {
+		for (var customMetaTag : list "${customMetaTagsList}") {
 			AssertHTMLSourceTextNotPresent(value1 = "${customMetaTag}");
 		}
 	}
 
 	macro viewTags {
-		for (var customMetaTag : list "${customMetaTagsList}" ) {
+		for (var customMetaTag : list "${customMetaTagsList}") {
 			AssertHTMLSourceTextPresent(value1 = "${customMetaTag}");
 		}
 	}

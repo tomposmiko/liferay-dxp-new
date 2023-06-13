@@ -181,17 +181,9 @@ definition {
 		AssertElementPresent(locator1 = "Button#SELECT_FILE");
 
 		if ("${uploadFrom}" == "dependencies") {
-			if (isSet(filePath)) {
-				UploadFileWithCustomPath.uploadArchiveFile(
-					compressedFile = "${compressedFile}",
-					fileName = "${larFileName}",
-					filePath = "${filePath}");
-			}
-			else {
-				UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
-					locator1 = "TextInput#FILE",
-					value1 = "${larFileName}");
-			}
+			UploadDependencyFile.uploadArchiveFile(
+				compressedFile = "${compressedFile}",
+				fileName = "${larFileName}");
 		}
 		else {
 			UploadTempFile.uploadTempFileHiddenNoMouseOver(
@@ -296,17 +288,9 @@ definition {
 		AssertElementPresent(locator1 = "Button#SELECT_FILE");
 
 		if ("${uploadFrom}" == "dependencies") {
-			if (isSet(filePath)) {
-				UploadFileWithCustomPath.uploadArchiveFile(
-					compressedFile = "${compressedFile}",
-					fileName = "${larFileName}",
-					filePath = "${filePath}");
-			}
-			else {
-				UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
-					locator1 = "TextInput#FILE",
-					value1 = "${larFileName}");
-			}
+			UploadDependencyFile.uploadArchiveFile(
+				compressedFile = "${compressedFile}",
+				fileName = "${larFileName}");
 		}
 		else {
 			UploadTempFile.uploadTempFileHiddenNoMouseOver(
@@ -314,7 +298,7 @@ definition {
 				value1 = "${larFileName}");
 		}
 
-		if ((isSet(importValidationMissingItem)) || (isSet(importCampaignValidationError)) || (isSet(importCampaignValidationError))) {
+		if (isSet(importValidationMissingItem) || isSet(importCampaignValidationError) || isSet(importCampaignValidationError)) {
 			while ((IsElementNotPresent(locator1 = "SitePagesImport#VALIDATION_ERROR_MESSAGE")) && (IsElementNotPresent(locator1 = "ExportImport#CURRENT_AND_PREVIOUS_STATUS_1"))) {
 				Pause(locator1 = "1000");
 			}
@@ -514,6 +498,7 @@ definition {
 		else {
 			LAR.openExportAdmin(siteScopeName = "${siteScopeName}");
 		}
+
 		Click(locator1 = "SitePagesExport#CUSTOM_EXPORT_BUTTON");
 
 		if ("${privateLayout}" == "true") {
@@ -582,7 +567,6 @@ definition {
 			cannotImport = "${cannotImport}",
 			compressedFile = "${compressedFile}",
 			failureExpected = "${failureExpected}",
-			filePath = "${filePath}",
 			importDeletions = "${importDeletions}",
 			importPermissions = "${importPermissions}",
 			importSchemaVersionMismatching = "${importSchemaVersionMismatching}",
@@ -614,13 +598,12 @@ definition {
 
 		LAR._selectImportFileSite(
 			compressedFile = "${compressedFile}",
-			filePath = "${filePath}",
 			importCampaignValidationError = "${importCampaignValidationError}",
 			importValidationMissingItem = "${importValidationMissingItem}",
 			larFileName = "${larFileName}",
 			uploadFrom = "${uploadFrom}");
 
-		if (!((isSet(importValidationMissingItem)) || (isSet(importFail)))) {
+		if (!(isSet(importValidationMissingItem) || isSet(importFail))) {
 			LAR._importSite(
 				checkContentNameList = "${checkContentNameList}",
 				contentDeletion = "${contentDeletion}",
@@ -653,9 +636,10 @@ definition {
 
 	macro isExistedFolder {
 		var tempDir = PropsUtil.get("output.dir.name");
-
 		var folderName = "${folderName}";
+
 		var companyId = JSONCompany.getCompanyId();
+
 		var folderExists = FileUtil.exists("${tempDir}/company/${companyId}/${folderName}");
 
 		if ("${folderExists}" == "true") {
@@ -674,6 +658,7 @@ definition {
 
 	macro openDepotExportAdmin {
 		var baseURL = "${baseURL}";
+
 		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
 
 		if (contains("${baseURL}", "{baseURL}")) {
@@ -685,6 +670,7 @@ definition {
 
 	macro openDepotImportAdmin {
 		var baseURL = "${baseURL}";
+
 		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
 
 		if (contains("${baseURL}", "{baseURL}")) {

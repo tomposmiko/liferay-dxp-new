@@ -47,20 +47,20 @@ const routeParams = {
 	sort: 'overdueInstanceCount%3Adesc',
 };
 
+fetch.mockImplementation(async () => ({
+	json: async () => ({items, totalCount: items.length + 1}),
+	ok: true,
+	text: async () => ({items, totalCount: items.length + 1}),
+}));
+
 describe('The instance list card should', () => {
-	const clientMock = {
-		get: jest
-			.fn()
-			.mockResolvedValue({data: {items, totalCount: items.length + 1}}),
-		request: jest
-			.fn()
-			.mockResolvedValue({data: {items, totalCount: items.length + 1}}),
-	};
-	let container, findByText, getByText;
+	let container;
+	let findByText;
+	let getByText;
 
 	beforeAll(async () => {
 		const renderResult = render(
-			<MockRouter client={clientMock}>
+			<MockRouter>
 				<InstanceListPage routeParams={routeParams} />
 			</MockRouter>,
 			{wrapper: ToasterProvider}
@@ -93,10 +93,10 @@ describe('The instance list card should', () => {
 			'.table-first-element-group'
 		);
 
-		const instanceCheckbox1 = firstTableElements[0].querySelector(
+		const instanceCheckbox1 = firstTableElements[0]?.querySelector(
 			'input.custom-control-input'
 		);
-		const instanceCheckbox2 = firstTableElements[1].querySelector(
+		const instanceCheckbox2 = firstTableElements[1]?.querySelector(
 			'input.custom-control-input'
 		);
 
@@ -136,10 +136,10 @@ describe('The instance list card should', () => {
 			'.table-first-element-group'
 		);
 
-		const instanceCheckbox1 = firstTableElements[0].querySelector(
+		const instanceCheckbox1 = firstTableElements[0]?.querySelector(
 			'input.custom-control-input'
 		);
-		const instanceCheckbox2 = firstTableElements[1].querySelector(
+		const instanceCheckbox2 = firstTableElements[1]?.querySelector(
 			'input.custom-control-input'
 		);
 

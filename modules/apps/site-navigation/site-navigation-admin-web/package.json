@@ -1,9 +1,9 @@
 {
 	"dependencies": {
-		"@clayui/button": "3.37.0",
-		"@clayui/drop-down": "3.37.0",
-		"@clayui/icon": "3.37.0",
-		"@clayui/layout": "3.37.0",
+		"@clayui/button": "3.40.0",
+		"@clayui/drop-down": "3.41.0",
+		"@clayui/icon": "3.40.0",
+		"@clayui/layout": "3.40.0",
 		"frontend-js-web": "*",
 		"metal-state": "2.16.8",
 		"prop-types": "15.7.2",
@@ -15,5 +15,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "4.0.12"
+	"version": "4.0.23"
 }

@@ -1,59 +1,50 @@
-<definition default="clickAt">
-	<command name="clickAt">
-		<execute selenium="waitForVisible" />
+@default = "clickAt"
+definition {
 
-		<execute selenium="mouseOver" />
+	function clickAt {
+		selenium.waitForVisible();
 
-		<if>
-			<condition selenium="isChecked" />
-			<then>
-				<execute selenium="clickAt" />
-			</then>
-		</if>
+		selenium.mouseOver();
 
-		<execute function="AssertNotChecked#assertNotChecked" />
-	</command>
+		if (selenium.isChecked()) {
+			selenium.clickAt();
+		}
 
-	<command name="uncheckNoError">
-		<execute selenium="waitForVisible" />
+		AssertNotChecked.assertNotChecked();
+	}
 
-		<execute selenium="mouseOver" />
+	function uncheckNoError {
+		selenium.waitForVisible();
 
-		<if>
-			<condition selenium="isChecked" />
-			<then>
-				<execute selenium="clickAt" />
-			</then>
-		</if>
+		selenium.mouseOver();
 
-		<execute function="AssertNotChecked#assertNotChecked" />
-	</command>
+		if (selenium.isChecked()) {
+			selenium.clickAt();
+		}
 
-	<command name="uncheckToggleSwitch">
-		<execute selenium="waitForElementPresent" />
+		AssertNotChecked.assertNotChecked();
+	}
 
-		<execute selenium="mouseOver" />
+	function uncheckToggleSwitch {
+		selenium.waitForElementPresent();
 
-		<if>
-			<condition selenium="isChecked" />
-			<then>
-				<execute selenium="clickAt" />
-			</then>
-		</if>
+		selenium.mouseOver();
 
-		<execute function="AssertNotChecked#assertNotCheckedToggleSwitch" />
-	</command>
+		if (selenium.isChecked()) {
+			selenium.clickAt();
+		}
 
-	<command name="uncheckToggleSwitchNoErrorNoAssert">
-		<execute selenium="waitForElementPresent" />
+		AssertNotChecked.assertNotCheckedToggleSwitch();
+	}
 
-		<execute selenium="mouseOver" />
+	function uncheckToggleSwitchNoErrorNoAssert {
+		selenium.waitForElementPresent();
 
-		<if>
-			<condition selenium="isChecked" />
-			<then>
-				<execute selenium="clickAt" />
-			</then>
-		</if>
-	</command>
-</definition>
+		selenium.mouseOver();
+
+		if (selenium.isChecked()) {
+			selenium.clickAt();
+		}
+	}
+
+}

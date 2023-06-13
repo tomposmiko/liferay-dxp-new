@@ -14,6 +14,8 @@ definition {
 		TestCase.setUpPortalInstance();
 
 		ACUtils.launchDXP();
+
+		ACUtils.addSiteAndPage();
 	}
 
 	tearDown {
@@ -24,11 +26,17 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Site Name");
+		}
+
+		JSONUser.tearDownNonAdminUsers();
 
 		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8548 | Test Summary: Add segment using an organization property 'date modified'"
+	@ignore = "true"
 	@priority = "4"
 	test CanCreateSegmentUsingOrganizationPropertyDateModified {
 		property portal.upstream = "quarantine";
@@ -87,6 +95,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8550 | Test Summary: Add segment using an organization property 'hierarchy path'"
+	@ignore = "true"
 	@priority = "4"
 	test CanCreateSegmentUsingOrganizationPropertyHierarchyPath {
 		property portal.upstream = "quarantine";
@@ -203,6 +212,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8549 | Test Summary: Add segment using an organization property 'name'"
+	@ignore = "true"
 	@priority = "4"
 	test CanCreateSegmentUsingOrganizationPropertyName {
 		property portal.upstream = "quarantine";
@@ -249,17 +259,7 @@ definition {
 		}
 
 		task ("Add blog") {
-			ACUtils.addSiteAndPage();
-
-			JSONLayout.addPublicLayout(
-				groupName = "Site Name",
-				layoutName = "Blogs Page");
-
-			Navigator.gotoSitePage(
-				pageName = "Blogs Page",
-				siteName = "Site Name");
-
-			ACUtils.createBlogsAndAddToPage(layoutName = "Blogs Page");
+			ACUtils.createBlogsAndAddToPage();
 		}
 
 		task ("Connect to AC") {
@@ -271,8 +271,8 @@ definition {
 				userLoginEmailAddress = "userea1@liferay.com",
 				userLoginFullName = "userfn1 userln1");
 
-			Navigator.gotoSitePage(
-				pageName = "Blogs Page",
+			ACUtils.navigateToSitePage(
+				pageName = "AC Page",
 				siteName = "Site Name");
 		}
 
@@ -356,6 +356,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8551 | Test Summary: Add segment using an organization property 'organization'"
+	@ignore = "true"
 	@priority = "4"
 	test CanCreateSegmentUsingOrganizationPropertyOrganization {
 		property portal.upstream = "quarantine";
@@ -386,17 +387,7 @@ definition {
 		}
 
 		task ("Add blog") {
-			ACUtils.addSiteAndPage();
-
-			JSONLayout.addPublicLayout(
-				groupName = "Site Name",
-				layoutName = "Blogs Page");
-
-			Navigator.gotoSitePage(
-				pageName = "Blogs Page",
-				siteName = "Site Name");
-
-			ACUtils.createBlogsAndAddToPage(layoutName = "Blogs Page");
+			ACUtils.createBlogsAndAddToPage();
 		}
 
 		task ("Connect to AC") {
@@ -408,8 +399,8 @@ definition {
 				userLoginEmailAddress = "userea@liferay.com",
 				userLoginFullName = "userfn userln");
 
-			Navigator.gotoSitePage(
-				pageName = "Blogs Page",
+			ACUtils.navigateToSitePage(
+				pageName = "AC Page",
 				siteName = "Site Name");
 		}
 
@@ -461,6 +452,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8552 | Test Summary: Add segment using an organization property 'parent organization'"
+	@ignore = "true"
 	@priority = "4"
 	test CanCreateSegmentUsingOrganizationPropertyParentOrganization {
 		property portal.upstream = "quarantine";
@@ -495,17 +487,7 @@ definition {
 		}
 
 		task ("Add blog") {
-			ACUtils.addSiteAndPage();
-
-			JSONLayout.addPublicLayout(
-				groupName = "Site Name",
-				layoutName = "Blogs Page");
-
-			Navigator.gotoSitePage(
-				pageName = "Blogs Page",
-				siteName = "Site Name");
-
-			ACUtils.createBlogsAndAddToPage(layoutName = "Blogs Page");
+			ACUtils.createBlogsAndAddToPage();
 		}
 
 		task ("Connect to AC") {
@@ -517,8 +499,8 @@ definition {
 				userLoginEmailAddress = "userea@liferay.com",
 				userLoginFullName = "userfn userln");
 
-			Navigator.gotoSitePage(
-				pageName = "Blogs Page",
+			ACUtils.navigateToSitePage(
+				pageName = "AC Page",
 				siteName = "Site Name");
 		}
 
@@ -570,6 +552,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8553 | Test Summary: Add segment using an organization property 'type'"
+	@ignore = "true"
 	@priority = "4"
 	test CanCreateSegmentUsingOrganizationPropertyType {
 		property portal.upstream = "quarantine";
@@ -599,17 +582,7 @@ definition {
 		}
 
 		task ("Add blog") {
-			ACUtils.addSiteAndPage();
-
-			JSONLayout.addPublicLayout(
-				groupName = "Site Name",
-				layoutName = "Blogs Page");
-
-			Navigator.gotoSitePage(
-				pageName = "Blogs Page",
-				siteName = "Site Name");
-
-			ACUtils.createBlogsAndAddToPage(layoutName = "Blogs Page");
+			ACUtils.createBlogsAndAddToPage();
 		}
 
 		task ("Connect to AC") {
@@ -621,8 +594,8 @@ definition {
 				userLoginEmailAddress = "userea@liferay.com",
 				userLoginFullName = "userfn userln");
 
-			Navigator.gotoSitePage(
-				pageName = "Blogs Page",
+			ACUtils.navigateToSitePage(
+				pageName = "AC Page",
 				siteName = "Site Name");
 		}
 

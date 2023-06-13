@@ -1,16 +1,26 @@
-import {useContext, useEffect, useState} from 'react';
-import {WarningBadge} from '~/common/components/fragments/Badges/Warning';
-
-import {ApplicationPropertiesContext} from '~/common/context/ApplicationPropertiesProvider';
-import {smoothScroll} from '~/common/utils/scroll';
-
+import ClayButton from '@clayui/button';
+import ClayIcon from '@clayui/icon';
+import {useContext, useState} from 'react';
+import {WarningBadge} from '../../../../../common/components/fragments/Badges/Warning';
+import {ApplicationPropertiesContext} from '../../../../../common/context/ApplicationPropertiesProvider';
+import {getItem} from '../../../../../common/services/liferay/storage';
+import {smoothScroll} from '../../../../../common/utils/scroll';
+import {
+	ACTIONS,
+	SelectedQuoteContext,
+} from '../../../context/SelectedQuoteContextProvider';
+import {getChannel} from '../../../services/Channel';
 import {
 	createDocumentInFolder,
 	createFolderIfNotExist,
 	createRootFolders,
 } from '../../../services/DocumentsAndMedia';
+import {createOrder} from '../../../services/Order';
+import {getSku} from '../../../services/Product';
 
 import UploadFiles from './UploadFiles';
+
+import {sectionsHasError} from './utils/upload';
 
 const dropAreaProps = {
 	heightContainer: '120px',
@@ -18,50 +28,25 @@ const dropAreaProps = {
 	widthContainer: '100%',
 };
 
-const UploadDocuments = ({setExpanded, setSection, setStepChecked}) => {
+const UploadDocuments = () => {
 	const properties = useContext(ApplicationPropertiesContext);
+	const [{accountId, product, sections}, dispatch] = useContext(
+		SelectedQuoteContext
+	);
 	const [loading, setLoading] = useState(false);
 
-	const [sections, setSections] = useState([
-		{
-			error: false,
-			errorMessage: 'Please upload a copy of your business license.',
-			files: [],
-			required: true,
-			sectionId: null,
-			subtitle: 'Upload a copy of your business license',
-			title: 'Business License',
-			type: 'document',
-		},
-		{
-			error: false,
-			files: [],
-			required: false,
-			sectionId: null,
-			subtitle: 'Upload a copy of your additional documents.',
-			title: 'Additional Documents',
-			type: 'document',
-		},
-		{
-			error: false,
-			errorMessage: 'Please upload 4 photos of your building interior',
-			files: [],
-			required: true,
-			sectionId: null,
-			subtitle: 'Upload 4 photos of your building interior',
-			title: 'Building Interior Photos',
-			type: 'image',
-		},
-	]);
+	const setSections = (newSections) => {
+		dispatch({
+			payload: newSections,
+			type: ACTIONS.SET_SECTIONS,
+		});
+	};
 
 	const onSetError = (_section, value) => {
-		setSections((sections) =>
+		setSections(
 			sections.map((section) => {
 				if (section.title === _section.title) {
-					return {
-						...section,
-						error: value,
-					};
+					section.error = value;
 				}
 
 				return section;
@@ -70,13 +55,10 @@ const UploadDocuments = ({setExpanded, setSection, setStepChecked}) => {
 	};
 
 	const onSetFiles = (_section, files) => {
-		setSections((sections) =>
+		setSections(
 			sections.map((section) => {
 				if (section.title === _section.title) {
-					return {
-						...section,
-						files,
-					};
+					section.files = files;
 				}
 
 				return section;
@@ -85,20 +67,53 @@ const UploadDocuments = ({setExpanded, setSection, setStepChecked}) => {
 	};
 
 	const setFilePropertyValue = (id, key, value) => {
-		setSections((sections) =>
+		setSections(
 			sections.map((section) => ({
 				...section,
 				files: section.files.map((fileEntry) => {
 					if (fileEntry.id === id) {
 						fileEntry[key] = value;
-
-						return fileEntry;
 					}
 
 					return fileEntry;
 				}),
 			}))
 		);
+	};
+
+	const getChannelId = async () => {
+		const {
+			data: {items},
+		} = await getChannel();
+
+		return items[0].id;
+	};
+
+	const getSkuId = async () => {
+		const {
+			basics: {productQuote},
+		} = JSON.parse(getItem('raylife-application-form'));
+
+		const {
+			data: {items},
+		} = await getSku(productQuote);
+
+		return items[0].id;
+	};
+
+	const _createOrder = async () => {
+		const [channelId, skuId] = await Promise.all([
+			getChannelId(),
+			getSkuId(),
+		]);
+
+		const order = await createOrder(accountId, channelId, skuId, product);
+
+		const {
+			data: {id},
+		} = order;
+
+		dispatch({payload: id, type: ACTIONS.SET_ORDER_ID});
 	};
 
 	const onClickConfirmUpload = async () => {
@@ -116,7 +131,6 @@ const UploadDocuments = ({setExpanded, setSection, setStepChecked}) => {
 				section.title,
 				true
 			);
-
 			if (section.required && section.files.length === 0) {
 				onSetError(section, true);
 
@@ -143,42 +157,66 @@ const UploadDocuments = ({setExpanded, setSection, setStepChecked}) => {
 					);
 
 					setFilePropertyValue(fileEntry.id, 'documentId', data.id);
-				} catch (error) {
+				}
+				catch (error) {
 					console.error(error);
 				}
 			}
 		}
 
+		await _createOrder();
+
 		setLoading(false);
-		setExpanded('selectPaymentMethod');
-		setExpanded('uploadDocuments');
-		setStepChecked('uploadDocuments', true);
+
+		if (!sectionsHasError(sections)) {
+			dispatch({
+				payload: {panelKey: 'selectPaymentMethod', value: true},
+				type: ACTIONS.SET_EXPANDED,
+			});
+			dispatch({
+				payload: {panelKey: 'uploadDocuments', value: false},
+				type: ACTIONS.SET_EXPANDED,
+			});
+			dispatch({
+				payload: {panelKey: 'uploadDocuments', value: true},
+				type: ACTIONS.SET_STEP_CHECKED,
+			});
+		}
+
 		smoothScroll();
 	};
 
-	useEffect(() => {
-		setSection(sections);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [sections]);
-
 	return (
-		<div className="upload-container">
+		<div className="d-flex flex-column flex-wrap upload-container">
 			{sections.map((section, index) => (
-				<div className="upload-section" key={index}>
-					<div className="header">
-						<h3 className="title">
+				<section
+					className="c-pl-4 c-pr-0 c-pt-6 upload-section"
+					key={index}
+				>
+					<header className="c-mb-3 header">
+						<h5 className="c-mb-1 font-weight-bolder h5 upload-title">
 							{section.title}
+
 							{section.required ? (
-								<span className="required">*</span>
+								<span className="reference-mark">
+									<ClayIcon
+										className="text-warning upload-asterisk"
+										symbol="asterisk"
+									/>
+								</span>
 							) : (
-								<span className="optional">(optional)</span>
+								<span className="text-neutral-8">
+									{` (optional)`}
+								</span>
 							)}
-						</h3>
+						</h5>
 
-						<span className="subtitle">{section.subtitle}</span>
-					</div>
+						<span className="font-weight-normal text-neutral-8 text-paragraph">
+							{section.subtitle}
+						</span>
+					</header>
 
-					<div className="upload-content">
+					<div className="d-flex flex-column upload-content">
 						<UploadFiles
 							dropAreaProps={{
 								...dropAreaProps,
@@ -191,7 +229,7 @@ const UploadDocuments = ({setExpanded, setSection, setStepChecked}) => {
 					</div>
 
 					{section.error && (
-						<div className="upload-alert">
+						<div className="c-mt-3 upload-alert">
 							<WarningBadge>
 								<div className="alert-content">
 									<div className="alert-description">
@@ -201,16 +239,18 @@ const UploadDocuments = ({setExpanded, setSection, setStepChecked}) => {
 							</WarningBadge>
 						</div>
 					)}
-				</div>
+				</section>
 			))}
-			<div className="upload-footer">
-				<button
-					className="btn btn-lg btn-primary"
+
+			<div className="d-flex justify-content-end mt-6">
+				<ClayButton
+					className="font-weight-bolder rounded-sm text-neutral-0 text-paragraph"
 					disabled={loading}
+					displayType="primary"
 					onClick={onClickConfirmUpload}
 				>
 					CONFIRM UPLOADS
-				</button>
+				</ClayButton>
 			</div>
 		</div>
 	);

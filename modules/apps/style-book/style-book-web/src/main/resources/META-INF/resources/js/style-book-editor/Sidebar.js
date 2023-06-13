@@ -42,6 +42,7 @@ export default function Sidebar() {
 	return (
 		<div className="style-book-editor__sidebar" ref={sidebarRef}>
 			{!config.templatesPreviewEnabled && <OldToolbar />}
+
 			<div className="style-book-editor__sidebar-content">
 				<ThemeInformation />
 
@@ -63,14 +64,20 @@ function ThemeInformation() {
 	return (
 		<div className="pb-3">
 			<p className="small text-secondary">
-				{Liferay.Language.get(
-					'this-token-definition-belongs-to-the-theme-set-for-public-pages'
-				)}
+				{config.showPrivateLayouts
+					? Liferay.Language.get(
+							'this-token-definition-belongs-to-the-theme-set-for-public-pages'
+					  )
+					: Liferay.Language.get(
+							'this-token-definition-belongs-to-the-theme-set-for-pages'
+					  )}
 			</p>
+
 			<p className="mb-0 small">
 				<span className="font-weight-semi-bold">
 					{`${Liferay.Language.get('theme')}: `}
 				</span>
+
 				{config.themeName}
 			</p>
 		</div>

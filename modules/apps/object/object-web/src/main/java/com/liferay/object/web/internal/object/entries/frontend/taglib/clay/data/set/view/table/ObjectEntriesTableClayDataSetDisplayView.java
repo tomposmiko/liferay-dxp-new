@@ -19,12 +19,15 @@ import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchema;
 import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaBuilder;
 import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaBuilderFactory;
 import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaField;
+import com.liferay.frontend.taglib.clay.data.set.view.table.ClobClayTableSchemaField;
+import com.liferay.frontend.taglib.clay.data.set.view.table.DateClayTableSchemaField;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
-import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -36,29 +39,73 @@ public class ObjectEntriesTableClayDataSetDisplayView
 
 	public ObjectEntriesTableClayDataSetDisplayView(
 		ClayTableSchemaBuilderFactory clayTableSchemaBuilderFactory,
-		ObjectDefinition objectDefinition, List<ObjectField> objectFields) {
+		ObjectDefinition objectDefinition,
+		ObjectFieldLocalService objectFieldLocalService) {
 
+		_clayTableSchemaBuilderFactory = clayTableSchemaBuilderFactory;
+		_objectDefinition = objectDefinition;
+		_objectFieldLocalService = objectFieldLocalService;
+	}
+
+	@Override
+	public ClayTableSchema getClayTableSchema(Locale locale) {
 		ClayTableSchemaBuilder clayTableSchemaBuilder =
-			clayTableSchemaBuilderFactory.create();
+			_clayTableSchemaBuilderFactory.create();
 
 		ClayTableSchemaField idClayTableSchemaField =
 			clayTableSchemaBuilder.addClayTableSchemaField("id", "id");
 
 		idClayTableSchemaField.setContentRenderer("actionLink");
 
+		List<ObjectField> objectFields =
+			_objectFieldLocalService.getObjectFields(
+				_objectDefinition.getObjectDefinitionId());
+
 		for (ObjectField objectField : objectFields) {
 			if (Validator.isNotNull(objectField.getRelationshipType())) {
 				continue;
 			}
 
-			ClayTableSchemaField clayTableSchemaField =
-				clayTableSchemaBuilder.addClayTableSchemaField(
-					objectField.getName(),
-					objectField.getLabel(LocaleUtil.getSiteDefault(), true));
+			String fieldName = objectField.getName();
 
-			if (Objects.equals(objectField.getType(), "Boolean")) {
-				clayTableSchemaField.setContentRenderer("boolean");
+			if (objectField.getListTypeDefinitionId() > 0) {
+				fieldName = fieldName + ".name";
 			}
+
+			ClayTableSchemaField clayTableSchemaField = null;
+
+			if (Objects.equals(objectField.getType(), "Clob")) {
+				ClobClayTableSchemaField clobTypeClayTableSchemaField =
+					clayTableSchemaBuilder.addClayTableSchemaField(
+						ClobClayTableSchemaField.class, fieldName,
+						objectField.getLabel(locale, true));
+
+				clobTypeClayTableSchemaField.setTruncate(true);
+
+				clayTableSchemaField = clobTypeClayTableSchemaField;
+			}
+			else if (Objects.equals(objectField.getType(), "Date")) {
+				DateClayTableSchemaField dateClayTableSchemaField =
+					clayTableSchemaBuilder.addClayTableSchemaField(
+						DateClayTableSchemaField.class, fieldName,
+						objectField.getLabel(locale, true));
+
+				dateClayTableSchemaField.setFormat("short");
+
+				clayTableSchemaField = dateClayTableSchemaField;
+			}
+			else {
+				clayTableSchemaField =
+					clayTableSchemaBuilder.addClayTableSchemaField(
+						fieldName, objectField.getLabel(locale, true));
+
+				if (Objects.equals(objectField.getType(), "Boolean")) {
+					clayTableSchemaField.setContentRenderer("boolean");
+				}
+			}
+
+			clayTableSchemaBuilder.addClayTableSchemaField(
+				clayTableSchemaField);
 
 			if (!Objects.equals(objectField.getType(), "Blob") &&
 				objectField.isIndexed()) {
@@ -75,14 +122,11 @@ public class ObjectEntriesTableClayDataSetDisplayView
 		clayTableSchemaBuilder.addClayTableSchemaField(
 			"creator.name", "author");
 
-		_clayTableSchema = clayTableSchemaBuilder.build();
+		return clayTableSchemaBuilder.build();
 	}
 
-	@Override
-	public ClayTableSchema getClayTableSchema() {
-		return _clayTableSchema;
-	}
-
-	private final ClayTableSchema _clayTableSchema;
+	private final ClayTableSchemaBuilderFactory _clayTableSchemaBuilderFactory;
+	private final ObjectDefinition _objectDefinition;
+	private final ObjectFieldLocalService _objectFieldLocalService;
 
 }

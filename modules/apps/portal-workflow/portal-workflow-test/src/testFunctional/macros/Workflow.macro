@@ -233,8 +233,8 @@ definition {
 
 	macro assignBlogEntriesToUsers {
 		var iterator = "1";
-		var numberOfBlogInstances = MathUtil.sum("${numberOfBlogInstances}", "1");
-		var numberOfUsers = MathUtil.sum("${numberOfUsers}", "1");
+		var numberOfBlogInstances = ${numberOfBlogInstances} + 1;
+		var numberOfUsers = ${numberOfUsers} + 1;
 		var userCount = "1";
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
@@ -252,8 +252,8 @@ definition {
 				assigneeName = "${userCount}user (${userCount}user user${userCount})",
 				workflowTask = "Review");
 
-			var iterator = MathUtil.sum("${iterator}", "1");
-			var userCount = MathUtil.sum("${userCount}", "1");
+			var iterator = ${iterator} + 1;
+			var userCount = ${userCount} + 1;
 		}
 	}
 
@@ -284,10 +284,10 @@ definition {
 	}
 
 	macro assignTaskToUser {
-		key_assetTitle = "${assetTitle}";
-		key_assetType = "${assetType}";
-		key_assigneeName = "${assigneeName}";
-		key_workflowTask = "${workflowTask}";
+		var key_assetTitle = "${assetTitle}";
+		var key_assetType = "${assetType}";
+		var key_assigneeName = "${assigneeName}";
+		var key_workflowTask = "${workflowTask}";
 
 		Workflow.viewPendingTasks(
 			workflowAssetTitle = "${assetTitle}",
@@ -415,6 +415,8 @@ definition {
 
 	macro configureWorkflow {
 		var key_workflowResourceValue = "${workflowResourceValue}";
+
+		Search.searchCP(searchTerm = "${workflowResourceValue}");
 
 		AssertClick.pauseAssertTextClickAt(
 			key_rowEntry = "${workflowResourceValue}",
@@ -683,6 +685,14 @@ definition {
 		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_portal_workflow_web_internal_portlet_SiteAdministrationWorkflowPortlet");
 	}
 
+	macro openWorkflowListView {
+		Navigator.openSpecificURL(url = "/group/control_panel/manage?p_p_id=com_liferay_portal_workflow_web_portlet_ControlPanelWorkflowPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_portal_workflow_web_portlet_ControlPanelWorkflowPortlet_tab=workflows");
+	}
+
+	macro openWorkflowProcessBuilderConfiguration {
+		Navigator.openSpecificURL(url = "/group/control_panel/manage?p_p_id=com_liferay_portal_workflow_web_portlet_ControlPanelWorkflowPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_portal_workflow_web_portlet_ControlPanelWorkflowPortlet_tab=configuration");
+	}
+
 	macro permissionsWorkflowDefinition {
 		var key_workflowDefinitionTitle = "${workflowDefinitionTitle}";
 
@@ -891,7 +901,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -1068,27 +1078,7 @@ definition {
 			KaleoDesigner.viewSourceXMLTab();
 		}
 
-		var projectDir = PropsUtil.get("project.dir");
-
-		if (isSet(workflowDefinitionFilePath)) {
-			UploadFile(
-				locator1 = "TextInput#FILE",
-				value1 = "${projectDir}/modules/${workflowDefinitionFilePath}/src/testFunctional/tests/dependencies/${workflowDefinitionFile}");
-		}
-		else {
-			var fileExists = FileUtil.exists("${projectDir}/modules/dxp/apps/portal-workflow/portal-workflow-metrics-test/src/testFunctional/tests/dependencies/${workflowDefinitionFile}");
-
-			if ("${fileExists}" == "true") {
-				UploadFile(
-					locator1 = "TextInput#FILE",
-					value1 = "${projectDir}/modules/dxp/apps/portal-workflow/portal-workflow-metrics-test/src/testFunctional/tests/dependencies/${workflowDefinitionFile}");
-			}
-			else {
-				UploadFile(
-					locator1 = "TextInput#FILE",
-					value1 = "${projectDir}/modules/apps/portal-workflow/portal-workflow-test/src/testFunctional/tests/dependencies/${workflowDefinitionFile}");
-			}
-		}
+		UploadDependencyFile.uploadFile(fileName = "${workflowDefinitionFile}");
 
 		Alert.viewSuccessMessageText(successMessage = "Definition imported successfully.");
 
@@ -1380,6 +1370,12 @@ definition {
 		AssertElementNotPresent(locator1 = "MyWorkflowTasks#ASSIGNED_TO_MY_ROLES_TABLE_ASSET_TITLE_DUPLICATE");
 	}
 
+	macro viewNotPresentWorkflowStatus {
+		AssertElementNotPresent(
+			key_status = "${statusNotPresent}",
+			locator1 = "CommerceEntry#WORKFLOW_STATUS");
+	}
+
 	macro viewPendingTasks {
 		Workflow._gotoPendingFilter();
 
@@ -1539,7 +1535,9 @@ definition {
 
 		while (IsElementNotPresent(locator1 = "MyWorkflowTasks#ASSIGNED_TO_MY_ROLES_TABLE_LAST_ACTIVITY_DATE") && (maxIterations = "10")) {
 			Navigator.gotoNavTab(navTab = "Assigned to Me");
+
 			Navigator.gotoNavTab(navTab = "Assigned to My Roles");
+
 			Pause(locator1 = "1000");
 		}
 
@@ -1621,6 +1619,13 @@ definition {
 		Click(locator1 = "WorkflowDefinition#DEFINITION_TABLE_SPECIFIC_DEFINITION_ELLIPSIS");
 
 		MenuItem.clickNoError(menuItem = "View");
+	}
+
+	macro viewWorkflowStatus {
+		AssertTextEquals(
+			key_status = "${status}",
+			locator1 = "CommerceEntry#WORKFLOW_STATUS",
+			value1 = "${status}");
 	}
 
 	macro webContentGoToAddCP {

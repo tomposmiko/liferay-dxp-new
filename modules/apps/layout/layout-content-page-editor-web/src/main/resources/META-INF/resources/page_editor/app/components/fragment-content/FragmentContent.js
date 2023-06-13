@@ -34,6 +34,7 @@ import selectLanguageId from '../../selectors/selectLanguageId';
 import selectSegmentsExperienceId from '../../selectors/selectSegmentsExperienceId';
 import resolveEditableConfig from '../../utils/editable-value/resolveEditableConfig';
 import resolveEditableValue from '../../utils/editable-value/resolveEditableValue';
+import {getCommonStyleByName} from '../../utils/getCommonStyleByName';
 import {getFrontendTokenValue} from '../../utils/getFrontendTokenValue';
 import {getResponsiveConfig} from '../../utils/getResponsiveConfig';
 import {isValidSpacingOption} from '../../utils/isValidSpacingOption';
@@ -122,6 +123,10 @@ const FragmentContent = ({
 		}
 	}, [fragmentEntryLinkError]);
 
+	const isBeingEdited = editables.some((editable) =>
+		isProcessorEnabled(toControlsId(editable.itemId))
+	);
+
 	/**
 	 * fragmentElement keeps a copy of the fragment real HTML,
 	 * we perform editableValues replacements over this copy
@@ -133,10 +138,6 @@ const FragmentContent = ({
 	 */
 	useEffect(() => {
 		let fragmentElement = document.createElement('div');
-
-		const isBeingEdited = editables.some((editable) =>
-			isProcessorEnabled(toControlsId(editable.itemId))
-		);
 
 		if (!isBeingEdited) {
 			fragmentElement.innerHTML = defaultContent;
@@ -183,11 +184,11 @@ const FragmentContent = ({
 	}, [
 		defaultContent,
 		dispatch,
-		editables,
 		editableValues,
 		fragmentEntryLink,
 		fragmentEntryLinkId,
 		getFieldValue,
+		isBeingEdited,
 		isMounted,
 		isProcessorEnabled,
 		languageId,
@@ -278,6 +279,9 @@ const FragmentContent = ({
 		}
 	}
 
+	const textAlignDefaultValue = getCommonStyleByName('textAlign')
+		.defaultValue;
+
 	return (
 		<>
 			<FragmentContentInteractionsFilter
@@ -319,7 +323,7 @@ const FragmentContent = ({
 								? textAlign.startsWith('text-')
 									? textAlign
 									: `text-${textAlign}`
-								: '']: textAlign,
+								: `text-${textAlignDefaultValue}`]: textAlignDefaultValue,
 						}
 					)}
 					contentRef={elementRef}
@@ -331,6 +335,7 @@ const FragmentContent = ({
 					onRender={withinTopper ? onRender : () => {}}
 					style={style}
 				/>
+
 				{backgroundImageValue.mediaQueries ? (
 					<style>{backgroundImageValue.mediaQueries}</style>
 				) : null}

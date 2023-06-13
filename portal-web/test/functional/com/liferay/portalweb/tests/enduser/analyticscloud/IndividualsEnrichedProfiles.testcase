@@ -36,7 +36,6 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
-
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
@@ -47,6 +46,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8911 | Test Summary: Enriched profiles increases by 1 when an anonymous individual converted to a known individual"
 	@priority = "5"
 	test IncreaseByOneWhenAnonymousIndividualConvertedToKnownIndividual {
+		property portal.acceptance = "true";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}
@@ -62,7 +63,7 @@ definition {
 		}
 
 		task ("Close Sessions") {
-			ACUtils.closeAllSessions();
+			ACUtils.closeAllSessionsAndWait();
 		}
 
 		task ("Switch to new property in AC") {
@@ -105,7 +106,7 @@ definition {
 		}
 
 		task ("Close Sessions") {
-			ACUtils.closeAllSessions();
+			ACUtils.closeAllSessionsAndWait();
 		}
 
 		task ("Switch to new property in AC") {

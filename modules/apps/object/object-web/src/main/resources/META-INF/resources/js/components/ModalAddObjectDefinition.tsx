@@ -19,6 +19,7 @@ import ClayModal, {ClayModalProvider, useModal} from '@clayui/modal';
 import React, {useEffect, useState} from 'react';
 
 import useForm from '../hooks/useForm';
+import {ERRORS} from '../utils/errors';
 import {
 	firstLetterUppercase,
 	removeAllSpecialCharacters,
@@ -30,7 +31,7 @@ declare global {
 }
 
 const headers = new Headers({
-	Accept: 'application/json',
+	'Accept': 'application/json',
 	'Content-Type': 'application/json',
 });
 
@@ -84,11 +85,13 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 			window.location.reload();
 		}
 		else {
-			const {
-				title = Liferay.Language.get('an-error-occurred'),
-			} = await response.json();
+			const {type} = await response.json();
+			const isMapped = Object.prototype.hasOwnProperty.call(ERRORS, type);
+			const errorMessage = isMapped
+				? ERRORS[type]
+				: Liferay.Language.get('an-error-occurred');
 
-			setError(title);
+			setError(errorMessage);
 		}
 	};
 
@@ -98,11 +101,9 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 		if (!values.label) {
 			errors.label = Liferay.Language.get('required');
 		}
-
 		if (!(values.name ?? values.label)) {
 			errors.name = Liferay.Language.get('required');
 		}
-
 		if (!values.pluralLabel) {
 			errors.pluralLabel = Liferay.Language.get('required');
 		}
@@ -158,6 +159,7 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 						value={values.name ?? normalizeName(values.label)}
 					/>
 				</ClayModal.Body>
+
 				<ClayModal.Footer
 					last={
 						<ClayButton.Group key={1} spaced>

@@ -32,11 +32,9 @@ definition {
 		task ("Add public page") {
 			Navigator.openURL();
 
-			ProductMenu.gotoPortlet(
-				category = "Site Builder",
-				portlet = "Pages");
-
-			SitePages.addPublicPage(pageName = "Session Page");
+			JSONLayout.addPublicLayout(
+				groupName = "Guest",
+				layoutName = "Session Page");
 		}
 
 		task ("Assert expired session error message and user sign in not present ") {
@@ -99,10 +97,8 @@ definition {
 			Navigator.openURL();
 
 			Pause(locator1 = "120000");
+
 			User.viewSessionNotExpired(sigin = "False");
-
-			//AssertElementNotPresent(locator1 = "Home#ERROR_MESSAGE_EXPIRED_SESSION");
-
 		}
 
 		task ("Refresh and assert welcome message") {
@@ -112,9 +108,7 @@ definition {
 		}
 
 		task ("Logout and login") {
-			User.logoutPG();
-
-			User.loginPG();
+			User.logoutAndLoginPG();
 		}
 
 		task ("Open portal, assert session expired message and user sign in not present") {

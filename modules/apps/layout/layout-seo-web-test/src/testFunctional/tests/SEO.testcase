@@ -1,6 +1,7 @@
 @component-name = "portal-collaboration"
 definition {
 
+	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "SEO";
@@ -49,6 +50,20 @@ definition {
 
 		OpenGraph.viewDefaultMappedField(portlet = "SEO");
 
+		OpenGraph.mapEditableTextToField(
+			field = "Description",
+			mappedField = "description",
+			mappedFieldName = "Description",
+			mappedFieldText = "Description is ",
+			textType = "TextArea");
+
+		Button.clickSave();
+
+		OpenGraph.viewMappedField(
+			mappedField = "description",
+			mappedFieldValue = "Description is Description: ${description:Description}",
+			textType = "TextArea");
+
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "test-site-name");
 
 		Blogs.addWithCustomAbstract(
@@ -70,7 +85,7 @@ definition {
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/b/blogs-entry-title");
 
-		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''Blogs Entry Title - Test Site Name - ${siteName},content="Custom Abstract"''');
+		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''Blogs Entry Title - Test Site Name - ${siteName},content="Description is Description: Custom Abstract"''');
 	}
 
 	@description = "This test ensures that user can map the document with SEO meta tags for display pages."
@@ -117,11 +132,11 @@ definition {
 
 		OpenGraph.viewMappedField(
 			mappedField = "title",
-			mappedFieldValue = "HTML Title is File Name: ${fileName} Author Name: ${authorName}");
+			mappedFieldValue = "HTML Title is File Name: ${fileName:File Name}Author Name: ${authorName:Author Name}");
 
 		OpenGraph.viewMappedField(
 			mappedField = "description",
-			mappedFieldValue = "Description is MIME Type: ${mimeType} Version: ${version}",
+			mappedFieldValue = "Description is MIME Type: ${mimeType:MIME Type}Version: ${version:Version}",
 			textType = "TextArea");
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
@@ -141,16 +156,20 @@ definition {
 		var dmFileEntryID = JSONDocument.getFileEntryId(
 			dmDocumentTitle = "Document_1.jpg",
 			groupName = "Test Site Name");
+
 		var portalURL = PropsUtil.get("portal.url");
-		var siteID = JSONGroupAPI._getGroupIdByName(groupName = "Test Site Name", site = "true");
+
+		var siteID = JSONGroupAPI._getGroupIdByName(
+			groupName = "Test Site Name",
+			site = "true");
 
 		Navigator.openSpecificURL(url = "${portalURL}/c/portal/logout");
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/d/${dmFileEntryID}");
 
-		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''HTML Title is File Name: Document_1.jpg Author Name: Test Test - Test Site Name - ${siteName}''');
+		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''HTML Title is File Name: Document_1.jpgAuthor Name: Test Test - Test Site Name - ${siteName}''');
 
-		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''Description is MIME Type: image/jpeg Version: 1.0''');
+		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''Description is MIME Type: image/jpegVersion: 1.0''');
 	}
 
 	@description = "This test ensures that user can map the web content with SEO meta tags for display pages."
@@ -197,11 +216,11 @@ definition {
 
 		OpenGraph.viewMappedField(
 			mappedField = "title",
-			mappedFieldValue = "HTML Title is Author Name: ${authorName}");
+			mappedFieldValue = "HTML Title is Author Name: ${authorName:Author Name}");
 
 		OpenGraph.viewMappedField(
 			mappedField = "description",
-			mappedFieldValue = "Description is Content: ${Content}",
+			mappedFieldValue = "Description is Content: ${content:Content}",
 			textType = "TextArea");
 
 		JSONWebcontent.addWebContent(

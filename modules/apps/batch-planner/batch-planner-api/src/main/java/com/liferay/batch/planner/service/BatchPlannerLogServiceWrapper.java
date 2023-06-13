@@ -26,6 +26,10 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class BatchPlannerLogServiceWrapper
 	implements BatchPlannerLogService, ServiceWrapper<BatchPlannerLogService> {
 
+	public BatchPlannerLogServiceWrapper() {
+		this(null);
+	}
+
 	public BatchPlannerLogServiceWrapper(
 		BatchPlannerLogService batchPlannerLogService) {
 
@@ -50,6 +54,14 @@ public class BatchPlannerLogServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _batchPlannerLogService.deleteBatchPlannerLog(batchPlannerLogId);
+	}
+
+	@Override
+	public com.liferay.batch.planner.model.BatchPlannerLog getBatchPlannerLog(
+			long batchPlannerLogId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _batchPlannerLogService.getBatchPlannerLog(batchPlannerLogId);
 	}
 
 	@Override

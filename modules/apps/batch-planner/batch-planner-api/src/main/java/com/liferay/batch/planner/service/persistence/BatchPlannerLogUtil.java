@@ -25,10 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
-
 /**
  * The persistence utility for the batch planner log service. This utility wraps <code>com.liferay.batch.planner.service.persistence.impl.BatchPlannerLogPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -358,153 +354,141 @@ public class BatchPlannerLogUtil {
 	}
 
 	/**
-	 * Returns the batch planner log where batchPlannerPlanId = &#63; and batchEngineExportTaskERC = &#63; or throws a <code>NoSuchLogException</code> if it could not be found.
+	 * Returns the batch planner log where batchEngineExportTaskERC = &#63; or throws a <code>NoSuchLogException</code> if it could not be found.
 	 *
-	 * @param batchPlannerPlanId the batch planner plan ID
 	 * @param batchEngineExportTaskERC the batch engine export task erc
 	 * @return the matching batch planner log
 	 * @throws NoSuchLogException if a matching batch planner log could not be found
 	 */
-	public static BatchPlannerLog findByBPPI_BEETERC(
-			long batchPlannerPlanId, String batchEngineExportTaskERC)
+	public static BatchPlannerLog findByBatchEngineExportTaskERC(
+			String batchEngineExportTaskERC)
 		throws com.liferay.batch.planner.exception.NoSuchLogException {
 
-		return getPersistence().findByBPPI_BEETERC(
-			batchPlannerPlanId, batchEngineExportTaskERC);
+		return getPersistence().findByBatchEngineExportTaskERC(
+			batchEngineExportTaskERC);
 	}
 
 	/**
-	 * Returns the batch planner log where batchPlannerPlanId = &#63; and batchEngineExportTaskERC = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the batch planner log where batchEngineExportTaskERC = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param batchPlannerPlanId the batch planner plan ID
 	 * @param batchEngineExportTaskERC the batch engine export task erc
 	 * @return the matching batch planner log, or <code>null</code> if a matching batch planner log could not be found
 	 */
-	public static BatchPlannerLog fetchByBPPI_BEETERC(
-		long batchPlannerPlanId, String batchEngineExportTaskERC) {
+	public static BatchPlannerLog fetchByBatchEngineExportTaskERC(
+		String batchEngineExportTaskERC) {
 
-		return getPersistence().fetchByBPPI_BEETERC(
-			batchPlannerPlanId, batchEngineExportTaskERC);
+		return getPersistence().fetchByBatchEngineExportTaskERC(
+			batchEngineExportTaskERC);
 	}
 
 	/**
-	 * Returns the batch planner log where batchPlannerPlanId = &#63; and batchEngineExportTaskERC = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the batch planner log where batchEngineExportTaskERC = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param batchPlannerPlanId the batch planner plan ID
 	 * @param batchEngineExportTaskERC the batch engine export task erc
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching batch planner log, or <code>null</code> if a matching batch planner log could not be found
 	 */
-	public static BatchPlannerLog fetchByBPPI_BEETERC(
-		long batchPlannerPlanId, String batchEngineExportTaskERC,
-		boolean useFinderCache) {
+	public static BatchPlannerLog fetchByBatchEngineExportTaskERC(
+		String batchEngineExportTaskERC, boolean useFinderCache) {
 
-		return getPersistence().fetchByBPPI_BEETERC(
-			batchPlannerPlanId, batchEngineExportTaskERC, useFinderCache);
+		return getPersistence().fetchByBatchEngineExportTaskERC(
+			batchEngineExportTaskERC, useFinderCache);
 	}
 
 	/**
-	 * Removes the batch planner log where batchPlannerPlanId = &#63; and batchEngineExportTaskERC = &#63; from the database.
+	 * Removes the batch planner log where batchEngineExportTaskERC = &#63; from the database.
 	 *
-	 * @param batchPlannerPlanId the batch planner plan ID
 	 * @param batchEngineExportTaskERC the batch engine export task erc
 	 * @return the batch planner log that was removed
 	 */
-	public static BatchPlannerLog removeByBPPI_BEETERC(
-			long batchPlannerPlanId, String batchEngineExportTaskERC)
+	public static BatchPlannerLog removeByBatchEngineExportTaskERC(
+			String batchEngineExportTaskERC)
 		throws com.liferay.batch.planner.exception.NoSuchLogException {
 
-		return getPersistence().removeByBPPI_BEETERC(
-			batchPlannerPlanId, batchEngineExportTaskERC);
+		return getPersistence().removeByBatchEngineExportTaskERC(
+			batchEngineExportTaskERC);
 	}
 
 	/**
-	 * Returns the number of batch planner logs where batchPlannerPlanId = &#63; and batchEngineExportTaskERC = &#63;.
+	 * Returns the number of batch planner logs where batchEngineExportTaskERC = &#63;.
 	 *
-	 * @param batchPlannerPlanId the batch planner plan ID
 	 * @param batchEngineExportTaskERC the batch engine export task erc
 	 * @return the number of matching batch planner logs
 	 */
-	public static int countByBPPI_BEETERC(
-		long batchPlannerPlanId, String batchEngineExportTaskERC) {
+	public static int countByBatchEngineExportTaskERC(
+		String batchEngineExportTaskERC) {
 
-		return getPersistence().countByBPPI_BEETERC(
-			batchPlannerPlanId, batchEngineExportTaskERC);
+		return getPersistence().countByBatchEngineExportTaskERC(
+			batchEngineExportTaskERC);
 	}
 
 	/**
-	 * Returns the batch planner log where batchPlannerPlanId = &#63; and batchEngineImportTaskERC = &#63; or throws a <code>NoSuchLogException</code> if it could not be found.
+	 * Returns the batch planner log where batchEngineImportTaskERC = &#63; or throws a <code>NoSuchLogException</code> if it could not be found.
 	 *
-	 * @param batchPlannerPlanId the batch planner plan ID
 	 * @param batchEngineImportTaskERC the batch engine import task erc
 	 * @return the matching batch planner log
 	 * @throws NoSuchLogException if a matching batch planner log could not be found
 	 */
-	public static BatchPlannerLog findByBPPI_BEITERC(
-			long batchPlannerPlanId, String batchEngineImportTaskERC)
+	public static BatchPlannerLog findByBatchEngineImportTaskERC(
+			String batchEngineImportTaskERC)
 		throws com.liferay.batch.planner.exception.NoSuchLogException {
 
-		return getPersistence().findByBPPI_BEITERC(
-			batchPlannerPlanId, batchEngineImportTaskERC);
+		return getPersistence().findByBatchEngineImportTaskERC(
+			batchEngineImportTaskERC);
 	}
 
 	/**
-	 * Returns the batch planner log where batchPlannerPlanId = &#63; and batchEngineImportTaskERC = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the batch planner log where batchEngineImportTaskERC = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param batchPlannerPlanId the batch planner plan ID
 	 * @param batchEngineImportTaskERC the batch engine import task erc
 	 * @return the matching batch planner log, or <code>null</code> if a matching batch planner log could not be found
 	 */
-	public static BatchPlannerLog fetchByBPPI_BEITERC(
-		long batchPlannerPlanId, String batchEngineImportTaskERC) {
+	public static BatchPlannerLog fetchByBatchEngineImportTaskERC(
+		String batchEngineImportTaskERC) {
 
-		return getPersistence().fetchByBPPI_BEITERC(
-			batchPlannerPlanId, batchEngineImportTaskERC);
+		return getPersistence().fetchByBatchEngineImportTaskERC(
+			batchEngineImportTaskERC);
 	}
 
 	/**
-	 * Returns the batch planner log where batchPlannerPlanId = &#63; and batchEngineImportTaskERC = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the batch planner log where batchEngineImportTaskERC = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param batchPlannerPlanId the batch planner plan ID
 	 * @param batchEngineImportTaskERC the batch engine import task erc
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching batch planner log, or <code>null</code> if a matching batch planner log could not be found
 	 */
-	public static BatchPlannerLog fetchByBPPI_BEITERC(
-		long batchPlannerPlanId, String batchEngineImportTaskERC,
-		boolean useFinderCache) {
+	public static BatchPlannerLog fetchByBatchEngineImportTaskERC(
+		String batchEngineImportTaskERC, boolean useFinderCache) {
 
-		return getPersistence().fetchByBPPI_BEITERC(
-			batchPlannerPlanId, batchEngineImportTaskERC, useFinderCache);
+		return getPersistence().fetchByBatchEngineImportTaskERC(
+			batchEngineImportTaskERC, useFinderCache);
 	}
 
 	/**
-	 * Removes the batch planner log where batchPlannerPlanId = &#63; and batchEngineImportTaskERC = &#63; from the database.
+	 * Removes the batch planner log where batchEngineImportTaskERC = &#63; from the database.
 	 *
-	 * @param batchPlannerPlanId the batch planner plan ID
 	 * @param batchEngineImportTaskERC the batch engine import task erc
 	 * @return the batch planner log that was removed
 	 */
-	public static BatchPlannerLog removeByBPPI_BEITERC(
-			long batchPlannerPlanId, String batchEngineImportTaskERC)
+	public static BatchPlannerLog removeByBatchEngineImportTaskERC(
+			String batchEngineImportTaskERC)
 		throws com.liferay.batch.planner.exception.NoSuchLogException {
 
-		return getPersistence().removeByBPPI_BEITERC(
-			batchPlannerPlanId, batchEngineImportTaskERC);
+		return getPersistence().removeByBatchEngineImportTaskERC(
+			batchEngineImportTaskERC);
 	}
 
 	/**
-	 * Returns the number of batch planner logs where batchPlannerPlanId = &#63; and batchEngineImportTaskERC = &#63;.
+	 * Returns the number of batch planner logs where batchEngineImportTaskERC = &#63;.
 	 *
-	 * @param batchPlannerPlanId the batch planner plan ID
 	 * @param batchEngineImportTaskERC the batch engine import task erc
 	 * @return the number of matching batch planner logs
 	 */
-	public static int countByBPPI_BEITERC(
-		long batchPlannerPlanId, String batchEngineImportTaskERC) {
+	public static int countByBatchEngineImportTaskERC(
+		String batchEngineImportTaskERC) {
 
-		return getPersistence().countByBPPI_BEITERC(
-			batchPlannerPlanId, batchEngineImportTaskERC);
+		return getPersistence().countByBatchEngineImportTaskERC(
+			batchEngineImportTaskERC);
 	}
 
 	/**
@@ -732,27 +716,9 @@ public class BatchPlannerLogUtil {
 	}
 
 	public static BatchPlannerLogPersistence getPersistence() {
-		return _serviceTracker.getService();
+		return _persistence;
 	}
 
-	private static ServiceTracker
-		<BatchPlannerLogPersistence, BatchPlannerLogPersistence>
-			_serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			BatchPlannerLogPersistence.class);
-
-		ServiceTracker<BatchPlannerLogPersistence, BatchPlannerLogPersistence>
-			serviceTracker =
-				new ServiceTracker
-					<BatchPlannerLogPersistence, BatchPlannerLogPersistence>(
-						bundle.getBundleContext(),
-						BatchPlannerLogPersistence.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile BatchPlannerLogPersistence _persistence;
 
 }

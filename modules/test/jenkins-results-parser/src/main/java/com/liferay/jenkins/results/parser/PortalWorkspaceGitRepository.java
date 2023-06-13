@@ -119,13 +119,26 @@ public class PortalWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 			return;
 		}
 
-		try {
-			AntUtil.callTarget(
-				getDirectory(), "build.xml", "setup-profile-dxp");
-		}
-		catch (AntException antException) {
-			throw new RuntimeException(antException);
-		}
+		Retryable<Object> setupProfileDXPRetryable = new Retryable<Object>(
+			true, _SETUP_PROFILE_DXP_RETRY_COUNT,
+			_SETUP_PROFILE_DXP_RETRY_DELAY, true) {
+
+			@Override
+			public Object execute() {
+				try {
+					AntUtil.callTarget(
+						getDirectory(), "build.xml", "setup-profile-dxp");
+				}
+				catch (AntException antException) {
+					throw new RuntimeException(antException);
+				}
+
+				return null;
+			}
+
+		};
+
+		setupProfileDXPRetryable.executeWithRetries();
 	}
 
 	public void setUpTCKHome() {
@@ -252,5 +265,9 @@ public class PortalWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 					"test.", System.getenv("HOSTNAME"), ".properties")),
 			_getPortalTestProperties(), true);
 	}
+
+	private static final int _SETUP_PROFILE_DXP_RETRY_COUNT = 2;
+
+	private static final int _SETUP_PROFILE_DXP_RETRY_DELAY = 5;
 
 }

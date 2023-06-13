@@ -27,6 +27,10 @@ public class RemoteAppEntryLocalServiceWrapper
 	implements RemoteAppEntryLocalService,
 			   ServiceWrapper<RemoteAppEntryLocalService> {
 
+	public RemoteAppEntryLocalServiceWrapper() {
+		this(null);
+	}
+
 	public RemoteAppEntryLocalServiceWrapper(
 		RemoteAppEntryLocalService remoteAppEntryLocalService) {
 
@@ -38,27 +42,30 @@ public class RemoteAppEntryLocalServiceWrapper
 			addCustomElementRemoteAppEntry(
 				long userId, String customElementCSSURLs,
 				String customElementHTMLElementName, String customElementURLs,
+				String description, String friendlyURLMapping,
 				boolean instanceable,
 				java.util.Map<java.util.Locale, String> nameMap,
-				String portletCategoryName, String properties)
+				String portletCategoryName, String properties,
+				String sourceCodeURL)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _remoteAppEntryLocalService.addCustomElementRemoteAppEntry(
 			userId, customElementCSSURLs, customElementHTMLElementName,
-			customElementURLs, instanceable, nameMap, portletCategoryName,
-			properties);
+			customElementURLs, description, friendlyURLMapping, instanceable,
+			nameMap, portletCategoryName, properties, sourceCodeURL);
 	}
 
 	@Override
 	public com.liferay.remote.app.model.RemoteAppEntry addIFrameRemoteAppEntry(
-			long userId, String iFrameURL, boolean instanceable,
+			long userId, String description, String friendlyURLMapping,
+			String iFrameURL, boolean instanceable,
 			java.util.Map<java.util.Locale, String> nameMap,
-			String portletCategoryName, String properties)
+			String portletCategoryName, String properties, String sourceCodeURL)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _remoteAppEntryLocalService.addIFrameRemoteAppEntry(
-			userId, iFrameURL, instanceable, nameMap, portletCategoryName,
-			properties);
+			userId, description, friendlyURLMapping, iFrameURL, instanceable,
+			nameMap, portletCategoryName, properties, sourceCodeURL);
 	}
 
 	/**
@@ -420,27 +427,32 @@ public class RemoteAppEntryLocalServiceWrapper
 			updateCustomElementRemoteAppEntry(
 				long remoteAppEntryId, String customElementCSSURLs,
 				String customElementHTMLElementName, String customElementURLs,
+				String description, String friendlyURLMapping,
 				java.util.Map<java.util.Locale, String> nameMap,
-				String portletCategoryName, String properties)
+				String portletCategoryName, String properties,
+				String sourceCodeURL)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _remoteAppEntryLocalService.updateCustomElementRemoteAppEntry(
 			remoteAppEntryId, customElementCSSURLs,
-			customElementHTMLElementName, customElementURLs, nameMap,
-			portletCategoryName, properties);
+			customElementHTMLElementName, customElementURLs, description,
+			friendlyURLMapping, nameMap, portletCategoryName, properties,
+			sourceCodeURL);
 	}
 
 	@Override
 	public com.liferay.remote.app.model.RemoteAppEntry
 			updateIFrameRemoteAppEntry(
-				long remoteAppEntryId, String iFrameURL,
+				long remoteAppEntryId, String description,
+				String friendlyURLMapping, String iFrameURL,
 				java.util.Map<java.util.Locale, String> nameMap,
-				String portletCategoryName, String properties)
+				String portletCategoryName, String properties,
+				String sourceCodeURL)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _remoteAppEntryLocalService.updateIFrameRemoteAppEntry(
-			remoteAppEntryId, iFrameURL, nameMap, portletCategoryName,
-			properties);
+			remoteAppEntryId, description, friendlyURLMapping, iFrameURL,
+			nameMap, portletCategoryName, properties, sourceCodeURL);
 	}
 
 	/**
@@ -458,6 +470,15 @@ public class RemoteAppEntryLocalServiceWrapper
 		com.liferay.remote.app.model.RemoteAppEntry remoteAppEntry) {
 
 		return _remoteAppEntryLocalService.updateRemoteAppEntry(remoteAppEntry);
+	}
+
+	@Override
+	public com.liferay.remote.app.model.RemoteAppEntry updateStatus(
+			long userId, long remoteAppEntryId, int status)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _remoteAppEntryLocalService.updateStatus(
+			userId, remoteAppEntryId, status);
 	}
 
 	@Override

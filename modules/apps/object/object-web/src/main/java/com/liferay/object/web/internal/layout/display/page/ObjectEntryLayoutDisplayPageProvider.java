@@ -50,7 +50,7 @@ public class ObjectEntryLayoutDisplayPageProvider
 			InfoItemReference infoItemReference) {
 
 		try {
-			ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
+			ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
 				infoItemReference.getClassPK());
 
 			if ((objectEntry == null) || objectEntry.isDraft()) {
@@ -80,7 +80,7 @@ public class ObjectEntryLayoutDisplayPageProvider
 
 	@Override
 	public String getURLSeparator() {
-		return "/o/";
+		return "/l/";
 	}
 
 	private final ObjectDefinition _objectDefinition;

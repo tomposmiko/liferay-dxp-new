@@ -134,7 +134,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.togglePrivacy(privacy = "Public Pages");
+		PagesAdmin.togglePrivacy(privacy = "Public Pages");
 
 		Page.viewNoDeletePagesAssociatedWithSiteTemplate(
 			page = "Site Child Page Name",
@@ -158,11 +158,11 @@ definition {
 
 		Page.viewNoPG(pageName = "Site Child Page Name");
 
-		Page.viewNoPage(
+		PagesAdmin.viewPageItemNotPresent(
 			pageName = "Site Page Name",
 			privacy = "Public Pages");
 
-		Page.viewNoPage(
+		PagesAdmin.viewPageItemNotPresent(
 			pageName = "Site Child Page Name",
 			privacy = "Public Pages");
 
@@ -186,7 +186,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Permissions",
 			pageName = "Home");
 
@@ -218,7 +218,6 @@ definition {
 
 		LAR.importPortlet(
 			compressedFile = "true",
-			filePath = "enduser/sitetemplates/usecase",
 			importSchemaVersionMismatching = "true",
 			larFileName = "class-site-template-7.0.lar",
 			uploadFrom = "dependencies");
@@ -470,6 +469,7 @@ definition {
 		property test.name.skip.portal.instance = "SitetemplatesUsecase#SiteTemplatePageLinkInWebContentRedirectCorrectly";
 
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		SiteTemplates.addCP(siteTemplateName = "Template Site");
@@ -490,10 +490,11 @@ definition {
 			siteTemplateName = "Template Site");
 
 		var page2URL = Navigator.getCurrentURL();
+
 		var entryExternalURL = StringUtil.replace("${page2URL}", "http://", "");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContentNavigator.gotoAddCP();
@@ -564,7 +565,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "1");
 
@@ -580,7 +581,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "2");
 
@@ -596,7 +597,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Hello");
 
@@ -631,12 +632,9 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		Page.viewPagesOrder(
+		PagesAdmin.viewPagesOrder(
 			depth = "2",
-			pageName1 = "Home",
-			pageName2 = "1",
-			pageName3 = "2",
-			pageName4 = "Hello");
+			pageNameList = "Home,1,2,Hello");
 	}
 
 	@description = "This is a use case for LPS-107677."

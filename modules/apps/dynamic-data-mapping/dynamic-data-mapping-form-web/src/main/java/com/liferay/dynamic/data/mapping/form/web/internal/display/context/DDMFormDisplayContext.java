@@ -20,6 +20,7 @@ import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.form.web.internal.configuration.DDMFormWebConfiguration;
+import com.liferay.dynamic.data.mapping.form.web.internal.configuration.activator.FFSubmissionsSettingsConfigurationActivator;
 import com.liferay.dynamic.data.mapping.form.web.internal.display.context.util.DDMFormGuestUploadFieldUtil;
 import com.liferay.dynamic.data.mapping.form.web.internal.display.context.util.DDMFormInstanceStagingUtil;
 import com.liferay.dynamic.data.mapping.form.web.internal.security.permission.resource.DDMFormInstancePermission;
@@ -37,8 +38,9 @@ import com.liferay.dynamic.data.mapping.model.DDMFormLayoutRow;
 import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
@@ -77,6 +79,8 @@ import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -93,6 +97,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -111,7 +116,7 @@ public class DDMFormDisplayContext {
 	public DDMFormDisplayContext(
 		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker,
 		DDMFormInstanceLocalService ddmFormInstanceLocalService,
-		DDMFormInstanceRecordLocalService ddmFormInstanceRecordLocalService,
+		DDMFormInstanceRecordService ddmFormInstanceRecordService,
 		DDMFormInstanceRecordVersionLocalService
 			ddmFormInstanceRecordVersionLocalService,
 		DDMFormInstanceService ddmFormInstanceService,
@@ -121,6 +126,8 @@ public class DDMFormDisplayContext {
 		DDMFormValuesMerger ddmFormValuesMerger,
 		DDMFormWebConfiguration ddmFormWebConfiguration,
 		DDMStorageAdapterTracker ddmStorageAdapterTracker,
+		FFSubmissionsSettingsConfigurationActivator
+			ffSubmissionsSettingsConfigurationActivator,
 		GroupLocalService groupLocalService, JSONFactory jsonFactory,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
@@ -131,7 +138,7 @@ public class DDMFormDisplayContext {
 
 		_ddmFormFieldTypeServicesTracker = ddmFormFieldTypeServicesTracker;
 		_ddmFormInstanceLocalService = ddmFormInstanceLocalService;
-		_ddmFormInstanceRecordLocalService = ddmFormInstanceRecordLocalService;
+		_ddmFormInstanceRecordService = ddmFormInstanceRecordService;
 		_ddmFormInstanceRecordVersionLocalService =
 			ddmFormInstanceRecordVersionLocalService;
 		_ddmFormInstanceService = ddmFormInstanceService;
@@ -142,6 +149,8 @@ public class DDMFormDisplayContext {
 		_ddmFormValuesMerger = ddmFormValuesMerger;
 		_ddmFormWebConfiguration = ddmFormWebConfiguration;
 		_ddmStorageAdapterTracker = ddmStorageAdapterTracker;
+		_ffSubmissionsSettingsConfigurationActivator =
+			ffSubmissionsSettingsConfigurationActivator;
 		_groupLocalService = groupLocalService;
 		_jsonFactory = jsonFactory;
 		_objectFieldLocalService = objectFieldLocalService;
@@ -287,8 +296,14 @@ public class DDMFormDisplayContext {
 		ddmFormRenderingContext.setShowSubmitButton(isShowSubmitButton());
 		ddmFormRenderingContext.setSubmitLabel(getSubmitLabel());
 
-		return _ddmFormRenderer.getDDMFormTemplateContext(
-			ddmForm, ddmFormLayout, ddmFormRenderingContext);
+		return HashMapBuilder.<String, Object>put(
+			"ffShowPartialResultsEnabled",
+			_ffSubmissionsSettingsConfigurationActivator.
+				showPartialResultsEnabled()
+		).putAll(
+			_ddmFormRenderer.getDDMFormTemplateContext(
+				ddmForm, ddmFormLayout, ddmFormRenderingContext)
+		).build();
 	}
 
 	public DDMFormSuccessPageSettings getDDMFormSuccessPageSettings()
@@ -366,9 +381,16 @@ public class DDMFormDisplayContext {
 			return _ddmFormInstanceRecord;
 		}
 
-		_ddmFormInstanceRecord =
-			_ddmFormInstanceRecordLocalService.fetchDDMFormInstanceRecord(
-				getFormInstanceRecordId());
+		try {
+			_ddmFormInstanceRecord =
+				_ddmFormInstanceRecordService.getFormInstanceRecord(
+					getFormInstanceRecordId());
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException, portalException);
+			}
+		}
 
 		return _ddmFormInstanceRecord;
 	}
@@ -439,6 +461,32 @@ public class DDMFormDisplayContext {
 		return LanguageUtil.get(resourceBundle, "submit-form");
 	}
 
+	public String getSuccessPageDescription(Locale locale)
+		throws PortalException {
+
+		DDMFormSuccessPageSettings ddmFormSuccessPageSettings =
+			getDDMFormSuccessPageSettings();
+
+		LocalizedValue body = ddmFormSuccessPageSettings.getBody();
+
+		return HtmlUtil.escape(
+			GetterUtil.getString(
+				body.getString(locale),
+				body.getString(body.getDefaultLocale())));
+	}
+
+	public String getSuccessPageTitle(Locale locale) throws PortalException {
+		DDMFormSuccessPageSettings ddmFormSuccessPageSettings =
+			getDDMFormSuccessPageSettings();
+
+		LocalizedValue title = ddmFormSuccessPageSettings.getTitle();
+
+		return HtmlUtil.escape(
+			GetterUtil.getString(
+				title.getString(locale),
+				title.getString(title.getDefaultLocale())));
+	}
+
 	public boolean hasAddFormInstanceRecordPermission() throws PortalException {
 		if (_hasAddFormInstanceRecordPermission != null) {
 			return _hasAddFormInstanceRecordPermission;
@@ -458,6 +506,32 @@ public class DDMFormDisplayContext {
 		}
 
 		return _hasAddFormInstanceRecordPermission;
+	}
+
+	public boolean hasSubmittedAnEntry() throws PortalException {
+		if (isDefaultUser() || !isLimitToOneSubmissionPerUserEnabled()) {
+			return false;
+		}
+
+		List<DDMFormInstanceRecordVersion> ddmFormInstanceRecordVersions =
+			_ddmFormInstanceRecordVersionLocalService.
+				getFormInstanceRecordVersions(getUserId(), getFormInstanceId());
+
+		Stream<DDMFormInstanceRecordVersion> stream =
+			ddmFormInstanceRecordVersions.stream();
+
+		Optional<DDMFormInstanceRecordVersion>
+			ddmFormInstanceRecordVersionOptional = stream.filter(
+				ddmFormInstanceRecordVersion ->
+					ddmFormInstanceRecordVersion.getStatus() !=
+						WorkflowConstants.STATUS_DRAFT
+			).findFirst();
+
+		if (ddmFormInstanceRecordVersionOptional.isPresent()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean hasValidStorageType(DDMFormInstance ddmFormInstance) {
@@ -522,6 +596,16 @@ public class DDMFormDisplayContext {
 		return _autosaveEnabled;
 	}
 
+	public boolean isExpirationDateEnabled() {
+		return _ffSubmissionsSettingsConfigurationActivator.
+			expirationDateEnabled();
+	}
+
+	public boolean isFFShowPartialResultsEnabled() {
+		return _ffSubmissionsSettingsConfigurationActivator.
+			showPartialResultsEnabled();
+	}
+
 	public boolean isFormAvailable() throws PortalException {
 		if (isPreview()) {
 			return true;
@@ -583,6 +667,32 @@ public class DDMFormDisplayContext {
 		}
 
 		return ParamUtil.getBoolean(_renderRequest, "shared");
+	}
+
+	public boolean isLimitToOneSubmissionPerUserEnabled()
+		throws PortalException {
+
+		DDMFormInstance ddmFormInstance = getFormInstance();
+
+		if (ddmFormInstance == null) {
+			return false;
+		}
+
+		DDMFormInstanceSettings ddmFormInstanceSettings =
+			ddmFormInstance.getSettingsModel();
+
+		return ddmFormInstanceSettings.limitToOneSubmissionPerUser();
+	}
+
+	public boolean isLoggedUser() {
+		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		if (themeDisplay.isSignedIn()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean isPreview() throws PortalException {
@@ -667,6 +777,19 @@ public class DDMFormDisplayContext {
 		return _showConfigurationIcon;
 	}
 
+	public boolean isShowPartialResultsToRespondents() throws PortalException {
+		DDMFormInstance ddmFormInstance = getFormInstance();
+
+		if (ddmFormInstance == null) {
+			return false;
+		}
+
+		DDMFormInstanceSettings ddmFormInstanceSettings =
+			ddmFormInstance.getSettingsModel();
+
+		return ddmFormInstanceSettings.showPartialResultsToRespondents();
+	}
+
 	public boolean isShowSubmitButton() {
 		return !ParamUtil.getBoolean(_renderRequest, "preview");
 	}
@@ -703,10 +826,15 @@ public class DDMFormDisplayContext {
 	}
 
 	protected DDMFormRenderingContext createDDMFormRenderingContext(
-		DDMForm ddmForm) {
+			DDMForm ddmForm)
+		throws PortalException {
 
 		DDMFormRenderingContext ddmFormRenderingContext =
 			new DDMFormRenderingContext();
+
+		ddmFormRenderingContext.addProperty(
+			"showPartialResultsToRespondents",
+			isShowPartialResultsToRespondents());
 
 		String redirectURL = ParamUtil.getString(_renderRequest, "redirect");
 
@@ -1035,8 +1163,7 @@ public class DDMFormDisplayContext {
 	private final DDMFormInstanceLocalService _ddmFormInstanceLocalService;
 	private DDMFormInstanceRecord _ddmFormInstanceRecord;
 	private long _ddmFormInstanceRecordId;
-	private final DDMFormInstanceRecordLocalService
-		_ddmFormInstanceRecordLocalService;
+	private final DDMFormInstanceRecordService _ddmFormInstanceRecordService;
 	private final DDMFormInstanceRecordVersionLocalService
 		_ddmFormInstanceRecordVersionLocalService;
 	private final DDMFormInstanceService _ddmFormInstanceService;
@@ -1047,6 +1174,8 @@ public class DDMFormDisplayContext {
 	private final DDMFormValuesMerger _ddmFormValuesMerger;
 	private final DDMFormWebConfiguration _ddmFormWebConfiguration;
 	private final DDMStorageAdapterTracker _ddmStorageAdapterTracker;
+	private final FFSubmissionsSettingsConfigurationActivator
+		_ffSubmissionsSettingsConfigurationActivator;
 	private final GroupLocalService _groupLocalService;
 	private Boolean _hasAddFormInstanceRecordPermission;
 	private Boolean _hasViewPermission;

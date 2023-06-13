@@ -38,6 +38,7 @@ definition {
 
 	@description = "This is a test case for LPS-80625. The fragment importer should not allow non-zip files to be imported."
 	@priority = "5"
+	@uitest
 	test CannotImportNonZip {
 		property portal.acceptance = "true";
 
@@ -240,6 +241,7 @@ definition {
 
 	@description = "Fragment collections can be exported and imported."
 	@priority = "5"
+	@uitest
 	test ExportImportCollectionViewFragment {
 		property portal.acceptance = "true";
 
@@ -307,6 +309,7 @@ definition {
 
 	@description = "This is a test case for LPS-101255. The composition of fragments can be saved in an existing collection."
 	@priority = "5"
+	@uitest
 	test ExportImportFragmentCompositionWithCustomConfigurations {
 		property portal.acceptance = "true";
 
@@ -400,10 +403,9 @@ definition {
 		}
 
 		task ("View the background image of Container") {
-			AssertVisible(
-				key_fragmentName = "Container",
-				key_imageName = "Document_1.jpg",
-				locator1 = "Fragment#FRAGMENT_CONTENT_BACKGROUND_IMAGE");
+			PageEditor.viewFragment(fragmentName = "Container");
+
+			ContentPages.viewFragmentBackgroundImage(image = "Document_1.jpg");
 		}
 
 		task ("View the styles of Heading") {
@@ -537,6 +539,7 @@ definition {
 
 	@description = "This is a test for LPS-101255. The edited inline contents will be reset to default value when save a composition of fragments without Save Inline Content."
 	@priority = "5"
+	@uitest
 	test ExportImportFragmentCompositionWithInlineContent {
 		property portal.acceptance = "true";
 
@@ -596,9 +599,9 @@ definition {
 
 		task ("Edit the inline text of HTML") {
 			PageEditor.editFragmentHTML(
-				editableId = "element-html",
 				fileName = "fragment_freemarker_basic.html",
-				fragmentName = "HTML");
+				fragmentName = "HTML",
+				id = "element-html");
 		}
 
 		task ("Save the fragment composition as fragment with inline content") {
@@ -906,6 +909,7 @@ definition {
 
 	@description = "This is a test for LPS-101255. The edited inline contents will be reset to default value when save a composition of fragments without Save Inline Content."
 	@priority = "5"
+	@uitest
 	test ExportImportFragmentCompositionWithoutInlineContent {
 		property portal.acceptance = "true";
 
@@ -965,9 +969,9 @@ definition {
 
 		task ("Edit the inline text of HTML") {
 			PageEditor.editFragmentHTML(
-				editableId = "element-html",
 				fileName = "fragment_freemarker_basic.html",
-				fragmentName = "HTML");
+				fragmentName = "HTML",
+				id = "element-html");
 		}
 
 		task ("Save the fragment composition as fragment without inline content") {
@@ -1353,6 +1357,7 @@ definition {
 
 		task ("Add a new fragment in each collection") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "checkbox_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "checkbox_configuration.json");
 
 			JSONFragment.addSection(
@@ -1364,6 +1369,7 @@ definition {
 				name = "Checkbox Fragment Example");
 
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "colorPalette_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "colorPalette_configuration.json");
 
 			JSONFragment.addSection(
@@ -1375,6 +1381,7 @@ definition {
 				name = "ColorPalette Fragment Example");
 
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "text_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "placeholder_configuration.json");
 
 			JSONFragment.addSection(
@@ -1476,15 +1483,14 @@ definition {
 
 	@description = "This is a testcase for LPS-96113. All fragments in dependencies should validate successfully."
 	@priority = "5"
+	@uitest
 	test ValidateDependenciesFragments {
 		property portal.acceptance = "true";
 
 		task ("Import a fragment collection") {
 			FragmentsAdminNavigator.gotoImportCollection();
 
-			UploadFileWithCustomPath.uploadArchiveFile(
-				fileName = "fragment-collection.zip",
-				filePath = "enduser/wem/fragment");
+			UploadDependencyFile.uploadArchiveFile(fileName = "fragment-collection.zip");
 
 			SelectFrameTop();
 
@@ -1589,6 +1595,7 @@ definition {
 
 		task ("Edit inline text of the fifth tabs") {
 			PageEditor.editFragmentText(
+				className = "tabs",
 				fragmentName = "Tabs (Copy)",
 				id = "title5",
 				text = "Test");
@@ -1596,6 +1603,7 @@ definition {
 
 		task ("View the inline text of the fifth tabs") {
 			PageEditor.viewFragmentEditableText(
+				className = "tabs",
 				editableText = "Test",
 				fragmentName = "Tabs (Copy)",
 				id = "title5");
@@ -1619,6 +1627,7 @@ definition {
 
 		task ("View the inline text of the fifth tabs") {
 			PageEditor.viewFragmentEditableText(
+				className = "tabs",
 				editableText = "Test",
 				fragmentName = "Tabs (Copy)",
 				id = "title5");

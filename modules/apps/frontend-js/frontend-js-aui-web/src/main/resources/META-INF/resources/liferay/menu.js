@@ -171,7 +171,7 @@ AUI.add(
 					var direction =
 						(directionMatch && directionMatch[1]) || AUTO;
 
-					if (direction != 'down') {
+					if (direction !== 'down') {
 						var overlayHorizontal =
 							mapAlignHorizontalOverlay[direction] ||
 							defaultOverlayHorizontalAlign;
@@ -225,6 +225,7 @@ AUI.add(
 						},
 						constrain: true,
 						hideClass: false,
+						modal: Util.isPhone() || Util.isTablet(),
 						preventOverlap: true,
 						zIndex: Liferay.zIndex.MENU,
 					}).render();
@@ -382,26 +383,20 @@ AUI.add(
 
 					var listNode = menu.one('ul');
 
+					overlay.show();
+
 					var listNodeHeight = listNode.get('offsetHeight');
 					var listNodeWidth = listNode.get('offsetWidth');
-
-					var modalMask = false;
 
 					align.points = instance._getAlignPoints(cssClass);
 
 					menu.addClass('lfr-icon-menu-open');
 
-					if (Util.isPhone() || Util.isTablet()) {
-						overlay.hide();
-
-						modalMask = true;
-					}
-
 					overlay.setAttrs({
 						align,
 						centered: false,
 						height: listNodeHeight,
-						modal: modalMask,
+						modal: Util.isPhone() || Util.isTablet(),
 						width: listNodeWidth,
 					});
 
@@ -412,8 +407,6 @@ AUI.add(
 							focusManager.focus(0);
 						}
 					}
-
-					overlay.show();
 
 					if (cssClass.indexOf(CSS_EXTENDED) > -1) {
 						trigger.addClass(CSS_BTN_PRIMARY);
@@ -450,7 +443,7 @@ AUI.add(
 
 				trigger.attr({
 					'aria-haspopup': true,
-					role: 'button',
+					'role': 'button',
 				});
 
 				listNode.setAttribute('aria-labelledby', trigger.guid());
@@ -634,7 +627,7 @@ AUI.add(
 				var activeTrigger = menuInstance._activeTrigger;
 
 				if (activeTrigger) {
-					if (activeTrigger != trigger) {
+					if (activeTrigger !== trigger) {
 						activeTrigger.removeClass(CSS_BTN_PRIMARY);
 
 						activeTrigger.get(PARENT_NODE).removeClass(CSS_OPEN);

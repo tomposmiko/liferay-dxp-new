@@ -14,6 +14,7 @@
 
 package com.liferay.change.tracking.web.internal.display.context;
 
+import com.liferay.change.tracking.constants.CTActionKeys;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTCollectionTable;
 import com.liferay.change.tracking.model.CTProcess;
@@ -22,6 +23,7 @@ import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTProcessService;
 import com.liferay.change.tracking.service.CTSchemaVersionLocalService;
 import com.liferay.change.tracking.web.internal.constants.CTWebConstants;
+import com.liferay.change.tracking.web.internal.security.permission.resource.CTPermission;
 import com.liferay.change.tracking.web.internal.util.PublicationsPortletURLUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
@@ -167,10 +169,6 @@ public class ViewHistoryDisplayContext extends BasePublicationsDisplayContext {
 
 			Date publishedDate = ctProcess.getCreateDate();
 
-			String timeDescription = _language.getTimeDescription(
-				_themeDisplay.getLocale(),
-				System.currentTimeMillis() - publishedDate.getTime(), true);
-
 			ResourceURL statusURL = _renderResponse.createResourceURL();
 
 			statusURL.setResourceID("/change_tracking/get_publication_status");
@@ -187,6 +185,11 @@ public class ViewHistoryDisplayContext extends BasePublicationsDisplayContext {
 					"expired",
 					!_ctSchemaVersionLocalService.isLatestCTSchemaVersion(
 						ctCollection.getSchemaVersionId())
+				).put(
+					"hasRevertPermission",
+					CTPermission.contains(
+						_themeDisplay.getPermissionChecker(),
+						CTActionKeys.ADD_PUBLICATION)
 				).put(
 					"hasViewPermission",
 					_ctCollectionModelResourcePermission.contains(
@@ -215,9 +218,17 @@ public class ViewHistoryDisplayContext extends BasePublicationsDisplayContext {
 					"statusURL", statusURL.toString()
 				).put(
 					"timeDescription",
-					_language.format(
-						_themeDisplay.getLocale(), "x-ago",
-						new String[] {timeDescription}, false)
+					() -> {
+						String timeDescription = _language.getTimeDescription(
+							_themeDisplay.getLocale(),
+							System.currentTimeMillis() -
+								publishedDate.getTime(),
+							true);
+
+						return _language.format(
+							_themeDisplay.getLocale(), "x-ago",
+							new String[] {timeDescription}, false);
+					}
 				).put(
 					"userId", ctProcess.getUserId()
 				).put(

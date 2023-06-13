@@ -12,22 +12,22 @@
  * details.
  */
 
-import './FieldBase.scss';
-
 import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
 import ClayPopover from '@clayui/popover';
 import classNames from 'classnames';
 import {
+	EVENT_TYPES as CORE_EVENT_TYPES,
 	Layout,
 	getRepeatedIndex,
 	useForm,
 	useFormState,
 } from 'data-engine-js-components-web';
-import {EVENT_TYPES as CORE_EVENT_TYPES} from 'data-engine-js-components-web/js/core/actions/eventTypes.es';
 import moment from 'moment/min/moment-with-locales';
 import React, {useMemo, useState} from 'react';
+
+import './FieldBase.scss';
 
 const convertInputValue = (fieldType, locale, value) => {
 	if (fieldType === 'date') {
@@ -201,8 +201,12 @@ function FieldBase({
 		tip,
 	});
 
-	const fieldDetailsId = id || name;
+	let fieldDetailsId = id ?? name;
 
+	fieldDetailsId = fieldDetailsId + '_fieldDetails';
+
+	const accessibleProps =
+		accessible && fieldDetails ? {'aria-labelledby': fieldDetailsId} : null;
 	const hiddenTranslations = useMemo(() => {
 		const array = [];
 
@@ -240,7 +244,7 @@ function FieldBase({
 			aria-labelledby={!renderLabel ? fieldDetailsId : null}
 			className={classNames('form-group', {
 				'has-error': hasError,
-				hide: !visible,
+				'hide': !visible,
 			})}
 			data-field-name={name}
 			onClick={onClick}
@@ -303,7 +307,7 @@ function FieldBase({
 					{showLegend ? (
 						<fieldset>
 							<legend
-								aria-labelledby={fieldDetailsId}
+								{...accessibleProps}
 								className="lfr-ddm-legend"
 								tabIndex="0"
 							>
@@ -318,16 +322,18 @@ function FieldBase({
 									/>
 								)}
 							</legend>
+
 							{children}
 						</fieldset>
 					) : (
 						<>
 							<label
+								{...accessibleProps}
 								className={classNames({
 									'ddm-empty': !showLabel && !required,
 									'ddm-label': showLabel || required,
 								})}
-								htmlFor={fieldDetailsId}
+								htmlFor={id ?? name}
 								tabIndex="0"
 							>
 								{showLabel && label && (

@@ -1,22 +1,23 @@
 import React, {useEffect} from 'react';
 import {useFormContext} from 'react-hook-form';
-import {NumberControlledInput} from '~/common/components/connectors/Controlled/Input/Number';
-import {CurrencyControlledInput} from '~/common/components/connectors/Controlled/Input/WithMask/Currency';
-import {FEINControlledInput} from '~/common/components/connectors/Controlled/Input/WithMask/FEIN';
-import {YearControlledInput} from '~/common/components/connectors/Controlled/Input/WithMask/Year';
-import {ControlledSwitch} from '~/common/components/connectors/Controlled/Switch';
-import {CardFormActionsWithSave} from '~/common/components/fragments/Card/FormActionsWithSave';
-import {TIP_EVENT} from '~/common/utils/events';
-import useFormActions from '~/routes/get-a-quote/hooks/useFormActions';
-import {useStepWizard} from '~/routes/get-a-quote/hooks/useStepWizard';
-import {useTriggerContext} from '~/routes/get-a-quote/hooks/useTriggerContext';
-import {AVAILABLE_STEPS} from '~/routes/get-a-quote/utils/constants';
+import {NumberControlledInput} from '../../../../../common/components/connectors/Controlled/Input/Number';
+import {CurrencyControlledInput} from '../../../../../common/components/connectors/Controlled/Input/WithMask/Currency';
+import {FEINControlledInput} from '../../../../../common/components/connectors/Controlled/Input/WithMask/FEIN';
+import {YearControlledInput} from '../../../../../common/components/connectors/Controlled/Input/WithMask/Year';
+import {ControlledSwitch} from '../../../../../common/components/connectors/Controlled/Switch';
+import {CardFormActionsWithSave} from '../../../../../common/components/fragments/Card/FormActionsWithSave';
+import FormCard from '../../../../../common/components/fragments/Card/FormCard';
+import {TIP_EVENT} from '../../../../../common/utils/events';
+import useFormActions from '../../../hooks/useFormActions';
+import {useStepWizard} from '../../../hooks/useStepWizard';
+import {useTriggerContext} from '../../../hooks/useTriggerContext';
+import {AVAILABLE_STEPS} from '../../../utils/constants';
 
 const setFormPath = (value) => `employees.${value}`;
 
 const hasFein = (value) => value === 'true';
 
-export const FormEmployees = ({form}) => {
+export function FormEmployees({form}) {
 	const {selectedStep} = useStepWizard();
 	const {
 		control,
@@ -47,7 +48,7 @@ export const FormEmployees = ({form}) => {
 	const {isSelected, updateState} = useTriggerContext();
 
 	return (
-		<div className="card">
+		<FormCard>
 			<div className="card-content">
 				<ControlledSwitch
 					control={control}
@@ -156,6 +157,6 @@ export const FormEmployees = ({form}) => {
 				onPrevious={onPrevious}
 				onSave={onSave}
 			/>
-		</div>
+		</FormCard>
 	);
-};
+}

@@ -45,8 +45,10 @@ import com.liferay.portal.search.indexer.IndexerQueryBuilder;
 import com.liferay.portal.search.indexer.IndexerSearcher;
 import com.liferay.portal.search.indexer.IndexerSummaryBuilder;
 import com.liferay.portal.search.indexer.IndexerWriter;
-import com.liferay.portal.search.internal.expando.ExpandoQueryContributorHelper;
-import com.liferay.portal.search.internal.searcher.IndexSearcherHelper;
+import com.liferay.portal.search.internal.expando.helper.ExpandoQueryContributorHelper;
+import com.liferay.portal.search.internal.indexer.helper.AddSearchKeywordsQueryContributorHelper;
+import com.liferay.portal.search.internal.indexer.helper.PreFilterContributorHelper;
+import com.liferay.portal.search.internal.searcher.helper.IndexSearcherHelper;
 import com.liferay.portal.search.permission.SearchPermissionDocumentContributor;
 import com.liferay.portal.search.permission.SearchPermissionIndexWriter;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
@@ -380,19 +382,16 @@ public class ModelSearchConfiguratorServiceTrackerCustomizer
 		ModelSearchConfiguratorServiceTrackerCustomizer.class);
 
 	private BundleContext _bundleContext;
-	private ServiceTrackerList<DocumentContributor<?>, DocumentContributor<?>>
-		_documentContributors;
+	private ServiceTrackerList<DocumentContributor<?>> _documentContributors;
 	private ServiceTrackerMap<String, ModelResourcePermission<?>>
 		_modelResourcePermissionServiceTrackerMap;
 
 	@Reference(target = ModuleServiceLifecycle.PORTLETS_INITIALIZED)
 	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
-	private ServiceTrackerList<QueryConfigContributor, QueryConfigContributor>
-		_queryConfigContributors;
-	private ServiceTrackerList
-		<SearchContextContributor, SearchContextContributor>
-			_searchContextContributors;
+	private ServiceTrackerList<QueryConfigContributor> _queryConfigContributors;
+	private ServiceTrackerList<SearchContextContributor>
+		_searchContextContributors;
 	private final Map<String, ServiceRegistrationHolder>
 		_serviceRegistrationHolders = new Hashtable<>();
 	private ServiceTracker

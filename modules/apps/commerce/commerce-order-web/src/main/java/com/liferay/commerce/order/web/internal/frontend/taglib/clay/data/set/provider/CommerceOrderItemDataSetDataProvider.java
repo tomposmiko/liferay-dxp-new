@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.order.web.internal.frontend.taglib.clay.data.set.provider;
 
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
 import com.liferay.commerce.currency.model.CommerceMoney;
 import com.liferay.commerce.frontend.model.ImageField;
 import com.liferay.commerce.model.CommerceOrder;
@@ -31,6 +32,7 @@ import com.liferay.commerce.product.util.CPSubscriptionType;
 import com.liferay.commerce.product.util.CPSubscriptionTypeRegistry;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceSubscriptionEntryLocalService;
+import com.liferay.commerce.util.CommerceOrderItemQuantityFormatter;
 import com.liferay.frontend.taglib.clay.data.Filter;
 import com.liferay.frontend.taglib.clay.data.Pagination;
 import com.liferay.frontend.taglib.clay.data.set.provider.ClayDataSetDataProvider;
@@ -163,7 +165,8 @@ public class CommerceOrderItemDataSetDataProvider
 
 		CPDefinition cpDefinition = cpInstance.getCPDefinition();
 
-		return cpDefinition.getDefaultImageThumbnailSrc();
+		return cpDefinition.getDefaultImageThumbnailSrc(
+			CommerceAccountConstants.ACCOUNT_ID_ADMIN);
 	}
 
 	private List<OrderItem> _getOrderItems(
@@ -175,15 +178,15 @@ public class CommerceOrderItemDataSetDataProvider
 			return Collections.emptyList();
 		}
 
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		Locale locale = themeDisplay.getLocale();
+
 		List<OrderItem> orderItems = new ArrayList<>();
 
 		for (CommerceOrderItem commerceOrderItem : commerceOrderItems) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			Locale locale = themeDisplay.getLocale();
-
 			Format dateTimeFormat = FastDateFormatFactoryUtil.getDate(
 				locale, themeDisplay.getTimeZone());
 
@@ -210,6 +213,8 @@ public class CommerceOrderItemDataSetDataProvider
 				new OrderItem(
 					commerceOrderItem.getDeliveryGroup(),
 					_getDiscount(commerceOrderItemPrice, locale),
+					_commerceOrderItemQuantityFormatter.format(
+						commerceOrderItem, locale),
 					new ImageField(
 						name, "rounded", "lg", _getImage(commerceOrderItem)),
 					name, stringJoiner.toString(),
@@ -218,7 +223,6 @@ public class CommerceOrderItemDataSetDataProvider
 					_getChildOrderItems(commerceOrderItem, httpServletRequest),
 					commerceOrderItem.getParentCommerceOrderItemId(),
 					_getPrice(commerceOrderItemPrice, locale),
-					commerceOrderItem.getQuantity(),
 					_getRequestedDeliveryDateTime(
 						dateTimeFormat,
 						commerceOrderItem.getRequestedDeliveryDate()),
@@ -435,6 +439,10 @@ public class CommerceOrderItemDataSetDataProvider
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceOrderItemDataSetDataProvider.class);
+
+	@Reference
+	private CommerceOrderItemQuantityFormatter
+		_commerceOrderItemQuantityFormatter;
 
 	@Reference
 	private CommerceOrderItemService _commerceOrderItemService;

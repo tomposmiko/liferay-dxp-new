@@ -16,6 +16,8 @@ package com.liferay.object.web.internal.info.item.renderer;
 
 import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
 import com.liferay.info.item.renderer.InfoItemRenderer;
+import com.liferay.list.type.model.ListTypeEntry;
+import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -25,14 +27,20 @@ import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
+
+import java.text.Format;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -53,6 +61,7 @@ public class ObjectEntryRowInfoItemRenderer
 
 	public ObjectEntryRowInfoItemRenderer(
 		AssetDisplayPageFriendlyURLProvider assetDisplayPageFriendlyURLProvider,
+		ListTypeEntryLocalService listTypeEntryLocalService,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectFieldLocalService objectFieldLocalService,
@@ -60,6 +69,7 @@ public class ObjectEntryRowInfoItemRenderer
 
 		_assetDisplayPageFriendlyURLProvider =
 			assetDisplayPageFriendlyURLProvider;
+		_listTypeEntryLocalService = listTypeEntryLocalService;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
 		_objectFieldLocalService = objectFieldLocalService;
@@ -103,6 +113,9 @@ public class ObjectEntryRowInfoItemRenderer
 	private Map<String, Serializable> _getValues(ObjectEntry objectEntry)
 		throws PortalException {
 
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
 		Map<String, Serializable> values = _objectEntryLocalService.getValues(
 			objectEntry);
 
@@ -128,10 +141,33 @@ public class ObjectEntryRowInfoItemRenderer
 			Collectors.toMap(
 				Map.Entry::getKey,
 				entry -> {
+					if (entry.getValue() == null) {
+						return StringPool.BLANK;
+					}
+
 					ObjectField objectField = objectFieldsMap.get(
 						entry.getKey());
 
-					if (Validator.isNull(objectField.getRelationshipType())) {
+					if (objectField.getListTypeDefinitionId() != 0) {
+						ListTypeEntry listTypeEntry =
+							_listTypeEntryLocalService.fetchListTypeEntry(
+								objectField.getListTypeDefinitionId(),
+								(String)entry.getValue());
+
+						return listTypeEntry.getName(
+							serviceContext.getLocale());
+					}
+					else if (Validator.isNull(
+								objectField.getRelationshipType())) {
+
+						if (Objects.equals(objectField.getType(), "Date")) {
+							Format dateFormat =
+								FastDateFormatFactoryUtil.getDate(
+									serviceContext.getLocale());
+
+							return dateFormat.format(entry.getValue());
+						}
+
 						return Optional.ofNullable(
 							entry.getValue()
 						).orElse(
@@ -160,6 +196,7 @@ public class ObjectEntryRowInfoItemRenderer
 
 	private final AssetDisplayPageFriendlyURLProvider
 		_assetDisplayPageFriendlyURLProvider;
+	private final ListTypeEntryLocalService _listTypeEntryLocalService;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectFieldLocalService _objectFieldLocalService;

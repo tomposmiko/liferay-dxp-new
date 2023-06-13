@@ -66,14 +66,15 @@ public class BatchPlannerPlanServiceSoap {
 	public static com.liferay.batch.planner.model.BatchPlannerPlanSoap
 			addBatchPlannerPlan(
 				boolean export, String externalType, String externalURL,
-				String internalClassName, String name, boolean template)
+				String internalClassName, String name,
+				String taskItemDelegateName, boolean template)
 		throws RemoteException {
 
 		try {
 			com.liferay.batch.planner.model.BatchPlannerPlan returnValue =
 				BatchPlannerPlanServiceUtil.addBatchPlannerPlan(
 					export, externalType, externalURL, internalClassName, name,
-					template);
+					taskItemDelegateName, template);
 
 			return com.liferay.batch.planner.model.BatchPlannerPlanSoap.
 				toSoapModel(returnValue);
@@ -168,7 +169,7 @@ public class BatchPlannerPlanServiceSoap {
 
 	public static com.liferay.batch.planner.model.BatchPlannerPlanSoap[]
 			getBatchPlannerPlans(
-				long companyId, boolean export, int start, int end,
+				long companyId, boolean template, int start, int end,
 				com.liferay.portal.kernel.util.OrderByComparator
 					<com.liferay.batch.planner.model.BatchPlannerPlan>
 						orderByComparator)
@@ -177,7 +178,7 @@ public class BatchPlannerPlanServiceSoap {
 		try {
 			java.util.List<com.liferay.batch.planner.model.BatchPlannerPlan>
 				returnValue = BatchPlannerPlanServiceUtil.getBatchPlannerPlans(
-					companyId, export, start, end, orderByComparator);
+					companyId, template, start, end, orderByComparator);
 
 			return com.liferay.batch.planner.model.BatchPlannerPlanSoap.
 				toSoapModels(returnValue);
@@ -248,13 +249,14 @@ public class BatchPlannerPlanServiceSoap {
 		}
 	}
 
-	public static int getBatchPlannerPlansCount(long companyId, boolean export)
+	public static int getBatchPlannerPlansCount(
+			long companyId, boolean template)
 		throws RemoteException {
 
 		try {
 			int returnValue =
 				BatchPlannerPlanServiceUtil.getBatchPlannerPlansCount(
-					companyId, export);
+					companyId, template);
 
 			return returnValue;
 		}

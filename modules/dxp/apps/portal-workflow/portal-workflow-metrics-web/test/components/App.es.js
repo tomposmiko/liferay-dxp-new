@@ -12,9 +12,10 @@
 import {act, fireEvent, render} from '@testing-library/react';
 import React from 'react';
 
-import App from '../../src/main/resources/META-INF/resources/js/components/App.es';
-
 import '@testing-library/jest-dom/extend-expect';
+
+import App from '../../src/main/resources/META-INF/resources/js/components/App.es';
+import FetchMock, {fetchMockResponse} from '../mock/fetch.es';
 
 const processItems = [
 	{
@@ -37,34 +38,28 @@ const pending = {
 	untrackedInstanceCount: 0,
 };
 
-const jestEmpty = jest
-	.fn()
-	.mockResolvedValue({data: {items: [], totalCount: 0}});
-
-const client = {
-	get: jest
-		.fn()
-		.mockResolvedValueOnce({data: {items: [], totalCount: 0}})
-		.mockResolvedValueOnce({data: {items: [], totalCount: 0}})
-		.mockResolvedValueOnce({
-			data: {
-				items: processItems,
-				totalCount: processItems.length,
-			},
-		})
-		.mockResolvedValueOnce({data: {items: [], totalCount: 0}})
-		.mockResolvedValueOnce({data: pending})
-		.mockResolvedValue({data: {items: [], totalCount: 0}}),
-	post: jestEmpty,
-	request: jestEmpty,
-};
+const fetchMock = new FetchMock({
+	GET: {
+		'/o/portal-workflow-metrics/v1.0/processes/metrics': fetchMockResponse({
+			items: processItems,
+			totalCount: processItems.length,
+		}),
+		// eslint-disable-next-line sort-keys
+		'/o/portal-workflow-metrics/v1.0/indexes': fetchMockResponse({
+			items: [],
+			totalCount: 0,
+		}),
+		'/o/portal-workflow-metrics/v1.0/processes/1234/metrics': fetchMockResponse(
+			pending
+		),
+		'default': fetchMockResponse({items: [], totalCount: 0}),
+	},
+});
 
 const mockProps = {
-	client,
 	companyId: 12345,
 	defaultDelta: 20,
 	deltaValues: [5, 10, 20, 30, 50, 75],
-	getClient: jest.fn(() => client),
 	isAmPm: false,
 	maxPages: 15,
 	portletNamespace: '_workflow_',
@@ -72,7 +67,9 @@ const mockProps = {
 };
 
 describe('The App component should', () => {
-	let container, findByText, getByText;
+	let container;
+	let findByText;
+	let getByText;
 
 	beforeAll(async () => {
 		const header = document.createElement('div');
@@ -91,6 +88,14 @@ describe('The App component should', () => {
 		await act(async () => {
 			jest.runAllTimers();
 		});
+	});
+
+	beforeEach(() => {
+		fetchMock.mock();
+	});
+
+	afterEach(() => {
+		fetchMock.reset();
 	});
 
 	it('Navigate to settings indexes page', async () => {

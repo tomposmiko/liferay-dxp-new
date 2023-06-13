@@ -15,34 +15,45 @@ definition {
 
 		AssertLocation.assertPartialLocation(value1 = "${portalURL}/web/guest");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Search");
-
-		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+		SearchAdministration.executeReindex();
 	}
 
 	@priority = "5"
-	@refactorneeded
-	test ViewSharedAssetsArchive72101 {
+	@refactordone
+	test CanViewSharedAssetsArchive72101 {
 		property data.archive.type = "data-archive-asset-sharing";
 		property portal.version = "7.2.10.1";
 
 		Upgrade.viewSharedDocument(dmDocumentTitle = "DM Document Title 1");
 
 		Upgrade.viewSharedBlog();
+
+		Upgrade.revokeAndUpdateSharedEntry(
+			blogsEntryTitleUpdate = "Blogs Entry Title Can Update",
+			blogsEntryTitleView = "Blogs Entry Title",
+			dmDocumentTitleUpdate = "DM Document Title Can Update",
+			dmDocumentTitleView = "DM Document Title 1");
+
+		Upgrade.viewNoShareOptionAfterDisabled();
 	}
 
 	@priority = "5"
-	@refactorneeded
-	test ViewSharedAssetsArchive73101 {
+	@refactordone
+	test CanViewSharedAssetsArchive73101 {
 		property data.archive.type = "data-archive-asset-sharing";
 		property portal.version = "7.3.10.1";
 
 		Upgrade.viewSharedDocument(dmDocumentTitle = "DM Document Title 1");
 
 		Upgrade.viewSharedBlog();
+
+		Upgrade.revokeAndUpdateSharedEntry(
+			blogsEntryTitleUpdate = "Blogs Entry Title Can Update",
+			blogsEntryTitleView = "Blogs Entry Title",
+			dmDocumentTitleUpdate = "DM Document Title Can Update",
+			dmDocumentTitleView = "DM Document Title 1");
+
+		Upgrade.viewNoShareOptionAfterDisabled();
 	}
 
 }

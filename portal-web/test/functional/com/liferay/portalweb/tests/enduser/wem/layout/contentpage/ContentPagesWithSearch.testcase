@@ -13,12 +13,7 @@ definition {
 		}
 
 		task ("Execute Reindex all search indexes") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Configuration",
-				panel = "Control Panel",
-				portlet = "Search");
-
-			SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+			SearchAdministration.executeReindex();
 		}
 
 		task ("Add a new site") {
@@ -211,7 +206,6 @@ definition {
 	<div class="static-text">This is static text.</div>
 </div>
 			''';
-
 			var htmlSnippet = StringUtil.regexReplaceAll("${htmlSnippet}", "${newLine}", "");
 
 			JSONFragment.addSection(
@@ -354,9 +348,9 @@ definition {
 		}
 
 		task ("Associate a category to page") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-			SitePages.gotoPageMenuItem(
+			PagesAdmin.gotoPageEllipsisMenuItem(
 				menuItem = "Configure",
 				pageName = "Test Content Page Name");
 
@@ -453,12 +447,7 @@ definition {
 		}
 
 		task ("Execute Reindex all search indexes") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Configuration",
-				panel = "Control Panel",
-				portlet = "Search");
-
-			SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+			SearchAdministration.executeReindex();
 		}
 
 		task ("Navigate to the search page") {

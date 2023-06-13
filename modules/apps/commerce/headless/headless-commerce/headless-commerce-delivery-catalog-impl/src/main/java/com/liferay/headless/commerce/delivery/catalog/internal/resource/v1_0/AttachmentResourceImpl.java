@@ -39,9 +39,6 @@ import com.liferay.portal.vulcan.fields.NestedFieldSupport;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -74,9 +71,11 @@ public class AttachmentResourceImpl
 		}
 
 		return _getAttachmentPage(
-			_commerceChannelLocalService.getCommerceChannel(channelId),
-			cpDefinition, accountId, CPAttachmentFileEntryConstants.TYPE_OTHER,
-			pagination);
+			cpDefinition,
+			_getAccountId(
+				accountId,
+				_commerceChannelLocalService.getCommerceChannel(channelId)),
+			CPAttachmentFileEntryConstants.TYPE_OTHER, pagination);
 	}
 
 	@NestedField(parentClass = Product.class, value = "images")
@@ -95,19 +94,19 @@ public class AttachmentResourceImpl
 		}
 
 		return _getAttachmentPage(
-			_commerceChannelLocalService.getCommerceChannel(channelId),
-			cpDefinition, accountId, CPAttachmentFileEntryConstants.TYPE_IMAGE,
-			pagination);
+			cpDefinition,
+			_getAccountId(
+				accountId,
+				_commerceChannelLocalService.getCommerceChannel(channelId)),
+			CPAttachmentFileEntryConstants.TYPE_IMAGE, pagination);
 	}
 
-	private Long _getAccountId(
-			Long accountId, long commerceChannelGroupId,
-			CPAttachmentFileEntry cpAttachmentFileEntry)
+	private Long _getAccountId(Long accountId, CommerceChannel commerceChannel)
 		throws Exception {
 
 		int countUserCommerceAccounts =
 			_commerceAccountHelper.countUserCommerceAccounts(
-				cpAttachmentFileEntry.getUserId(), commerceChannelGroupId);
+				contextUser.getUserId(), commerceChannel.getGroupId());
 
 		if (countUserCommerceAccounts > 1) {
 			if (accountId == null) {
@@ -117,12 +116,12 @@ public class AttachmentResourceImpl
 		else {
 			long[] commerceAccountIds =
 				_commerceAccountHelper.getUserCommerceAccountIds(
-					cpAttachmentFileEntry.getUserId(), commerceChannelGroupId);
+					contextUser.getUserId(), commerceChannel.getGroupId());
 
 			if (commerceAccountIds.length == 0) {
 				CommerceAccount commerceAccount =
 					_commerceAccountLocalService.getGuestCommerceAccount(
-						cpAttachmentFileEntry.getCompanyId());
+						contextCompany.getCompanyId());
 
 				commerceAccountIds = new long[] {
 					commerceAccount.getCommerceAccountId()
@@ -136,51 +135,36 @@ public class AttachmentResourceImpl
 	}
 
 	private Page<Attachment> _getAttachmentPage(
-			CommerceChannel commerceChannel, CPDefinition cpDefinition,
-			long accountId, int type, Pagination pagination)
+			CPDefinition cpDefinition, long accountId, int type,
+			Pagination pagination)
 		throws Exception {
 
-		List<CPAttachmentFileEntry> cpAttachmentFileEntries =
-			_cpAttachmentFileEntryLocalService.getCPAttachmentFileEntries(
-				_classNameLocalService.getClassNameId(
-					cpDefinition.getModelClass()),
-				cpDefinition.getCPDefinitionId(), type,
-				WorkflowConstants.STATUS_APPROVED,
-				pagination.getStartPosition(), pagination.getEndPosition());
-
-		int totalItems =
+		return Page.of(
+			transform(
+				_cpAttachmentFileEntryLocalService.getCPAttachmentFileEntries(
+					_classNameLocalService.getClassNameId(
+						cpDefinition.getModelClass()),
+					cpDefinition.getCPDefinitionId(), type,
+					WorkflowConstants.STATUS_APPROVED,
+					pagination.getStartPosition(), pagination.getEndPosition()),
+				cpAttachmentFileEntry -> _toAttachment(
+					accountId, cpAttachmentFileEntry)),
+			pagination,
 			_cpAttachmentFileEntryLocalService.getCPAttachmentFileEntriesCount(
 				_classNameLocalService.getClassNameId(
 					cpDefinition.getModelClass()),
 				cpDefinition.getCPDefinitionId(), type,
-				WorkflowConstants.STATUS_APPROVED);
-
-		return Page.of(
-			_toAttachments(cpAttachmentFileEntries, commerceChannel, accountId),
-			pagination, totalItems);
+				WorkflowConstants.STATUS_APPROVED));
 	}
 
-	private List<Attachment> _toAttachments(
-			List<CPAttachmentFileEntry> cpAttachmentFileEntries,
-			CommerceChannel commerceChannel, Long accountId)
+	private Attachment _toAttachment(
+			long accountId, CPAttachmentFileEntry cpAttachmentFileEntry)
 		throws Exception {
 
-		List<Attachment> attachments = new ArrayList<>();
-
-		for (CPAttachmentFileEntry cpAttachmentFileEntry :
-				cpAttachmentFileEntries) {
-
-			attachments.add(
-				_attachmentDTOConverter.toDTO(
-					new AttachmentDTOConverterContext(
-						cpAttachmentFileEntry.getCPAttachmentFileEntryId(),
-						contextAcceptLanguage.getPreferredLocale(),
-						_getAccountId(
-							accountId, commerceChannel.getGroupId(),
-							cpAttachmentFileEntry))));
-		}
-
-		return attachments;
+		return _attachmentDTOConverter.toDTO(
+			new AttachmentDTOConverterContext(
+				cpAttachmentFileEntry.getCPAttachmentFileEntryId(),
+				contextAcceptLanguage.getPreferredLocale(), accountId));
 	}
 
 	@Reference

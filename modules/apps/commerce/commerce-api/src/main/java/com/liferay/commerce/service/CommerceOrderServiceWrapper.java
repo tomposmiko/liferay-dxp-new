@@ -26,6 +26,10 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CommerceOrderServiceWrapper
 	implements CommerceOrderService, ServiceWrapper<CommerceOrderService> {
 
+	public CommerceOrderServiceWrapper() {
+		this(null);
+	}
+
 	public CommerceOrderServiceWrapper(
 		CommerceOrderService commerceOrderService) {
 
@@ -326,6 +330,26 @@ public class CommerceOrderServiceWrapper
 
 		return _commerceOrderService.getPlacedCommerceOrdersCount(
 			groupId, commerceAccountId, keywords);
+	}
+
+	@Override
+	public java.util.List<com.liferay.commerce.model.CommerceOrder>
+			getUserCommerceOrders(
+				long companyId, long groupId, String keywords, int start,
+				int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _commerceOrderService.getUserCommerceOrders(
+			companyId, groupId, keywords, start, end);
+	}
+
+	@Override
+	public long getUserCommerceOrdersCount(
+			long companyId, long groupId, String keywords)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _commerceOrderService.getUserCommerceOrdersCount(
+			companyId, groupId, keywords);
 	}
 
 	@Override

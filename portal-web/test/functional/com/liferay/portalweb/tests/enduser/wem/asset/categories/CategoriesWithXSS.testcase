@@ -65,9 +65,7 @@ definition {
 		var structureName = '''<script>alert(456)</script>''';
 
 		task ("Add a document type with XSS name") {
-			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
-
-			DMNavigator.gotoDocumentType();
+			DMNavigator.openDocumentTypesAdmin(siteURLKey = "test-site-name");
 
 			DMDocumentType.add(
 				dmDocumentTypeFieldNames = "Text",
@@ -167,9 +165,9 @@ definition {
 		}
 
 		task ("Select the category in page configuration") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-			SitePages.gotoPageMenuItem(
+			PagesAdmin.gotoPageEllipsisMenuItem(
 				menuItem = "Configure",
 				pageName = "Test Page Name");
 

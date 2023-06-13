@@ -182,9 +182,8 @@ definition {
 				pageName = "Content Page Name",
 				siteName = "Test Site Name");
 
-			var screenWidth	= selenium.getElementWidth("//body");
-
-			var containerWidth	= selenium.getElementWidth("//div[contains(@class,'container')][contains(@class,'pb-4')][contains(@class,'pt-2')]");
+			var screenWidth = selenium.getElementWidth("//body");
+			var containerWidth = selenium.getElementWidth("//div[contains(@class,'container')][contains(@class,'pb-4')][contains(@class,'pt-2')]");
 
 			TestUtils.assertNotEquals(
 				actual = "${containerWidth}",
@@ -338,7 +337,7 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-106776, LPS-111657 and LPS-120693. Configure the Flex Row and Fluid Container styles."
+	@description = "This is a use case for LPS-106776, LPS-111657 and LPS-120693. Configure the Flex Row and Fluid Container styles."
 	@priority = "5"
 	test ConfigureFlexRowAndFluidContainerStyles {
 		property portal.acceptance = "true";
@@ -563,10 +562,10 @@ definition {
 				locator1 = "ControlMenu#HEADING",
 				value1 = "Display Page Name");
 
-			AssertVisible(
-				key_assetContent = "Web Content Content",
-				key_assetTitle = "Web Content Title",
-				locator1 = "PageEditor#ASSET_CONTENT");
+			ContentPages.viewFragmentText(
+				assetType = "journal",
+				fragmentName = "Display Page Content",
+				text = "Web Content Content");
 		}
 	}
 
@@ -817,15 +816,13 @@ definition {
 		}
 
 		task ("Assert the mapped image is shown in background image field") {
-			AssertVisible(
-				key_imageName = "Document_2.jpeg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "Document_2.jpeg");
 
 			PageEditor.clickPublish();
 		}
 
 		task ("Add a content page based on content page template") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				collectionName = "Page Template Collection",
@@ -834,9 +831,7 @@ definition {
 		}
 
 		task ("Assert the mapped image is shown in background image field in edit mode") {
-			AssertVisible(
-				key_imageName = "Document_2.jpeg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "Document_2.jpeg");
 
 			PageEditor.clickPublish();
 		}
@@ -846,9 +841,7 @@ definition {
 				pageName = "Test Page Name",
 				siteName = "Test Site Name");
 
-			AssertVisible(
-				key_imageName = "Document_2.jpeg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "Document_2.jpeg");
 		}
 	}
 
@@ -926,13 +919,11 @@ definition {
 		}
 
 		task ("Assert mapped image is shown in display page template") {
-			AssertVisible(
-				key_imageName = "Document_2.jpeg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "Document_2.jpeg");
 		}
 	}
 
-	@description = "This is a test for LPS-107285. When the Container fragment is duplicated, the configuration of it and its components should also be duplicated."
+	@description = "This is a test for LPS-107285 and LPS-106776. When the Container fragment is duplicated, the configuration of it and its components should also be duplicated."
 	@priority = "4"
 	test ViewConfigurationDuplicatedInDuplicatedContainerWithHeading {
 		task ("Add a Container to page") {

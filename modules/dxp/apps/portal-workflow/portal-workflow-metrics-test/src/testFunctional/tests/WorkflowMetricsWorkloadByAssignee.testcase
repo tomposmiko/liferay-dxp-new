@@ -88,9 +88,7 @@ definition {
 
 		AssertElementPresent(locator1 = "UsersAndOrganizationsEditUser#UPLOAD_IMAGE_SELECT");
 
-		UploadFileWithCustomPath.uploadFile(
-			fileName = "これは写真です.jpg",
-			filePath = "enduser/documentmanagement/documentsadministration");
+		UploadDependencyFile.uploadFile(fileName = "これは写真です.jpg");
 
 		Pause(locator1 = "3000");
 
@@ -107,7 +105,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -511,7 +509,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -559,7 +557,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 

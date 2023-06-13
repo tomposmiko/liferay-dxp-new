@@ -25,18 +25,20 @@ interface INumericInputMaskValue {
 interface IProps {
 	append?: string;
 	appendType?: 'prefix' | 'suffix';
+	decimalPlaces: number;
 	decimalSymbol: DecimalSymbol[];
 	decimalSymbols: ISelectProps<DecimalSymbol>[];
 	defaultLanguageId: Locale;
 	editingLanguageId: Locale;
+	ffDecimalPlacesSettingsEnabled: boolean;
+	onBlur: FocusEventHandler<HTMLInputElement>;
+	onChange: FieldChangeEventHandler;
+	onFocus: FocusEventHandler<HTMLInputElement>;
 	readOnly: boolean;
 	thousandsSeparator?: ThousandsSeparator[];
 	thousandsSeparators: ISelectProps<ThousandsSeparator>[];
 	value: INumericInputMaskValue;
 	visible: boolean;
-	onBlur: FocusEventHandler<HTMLInputElement>;
-	onChange: FieldChangeEventHandler;
-	onFocus: FocusEventHandler<HTMLInputElement>;
 }
 export interface ISymbols {
 	decimalSymbol: DecimalSymbol;

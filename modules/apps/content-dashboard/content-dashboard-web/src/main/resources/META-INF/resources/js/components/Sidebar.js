@@ -34,10 +34,11 @@ const SidebarHeader = ({title}) => {
 	return (
 		<section className="sidebar-header">
 			<ClayLayout.ContentRow className="sidebar-section">
-				<ClayLayout.ContentCol expand>
-					<h2 className="font-weight-bold mb-0 pr-2 small">
-						{title}
-					</h2>
+				<ClayLayout.ContentCol
+					className="justify-content-center"
+					expand
+				>
+					<p className="font-weight-bold mb-0 pr-2">{title}</p>
 				</ClayLayout.ContentCol>
 
 				<ClayLayout.ContentCol>
@@ -80,10 +81,12 @@ const Sidebar = ({children, onClose = noop, open = true}) => {
 	}, [isOpen]);
 
 	return (
-		<div className="content-dashboard sidebar sidebar-light sidebar-sm">
-			<SidebarContext.Provider value={{onClose}}>
-				{children}
-			</SidebarContext.Provider>
+		<div className="cadmin">
+			<div className="content-dashboard sidebar sidebar-light sidebar-sm">
+				<SidebarContext.Provider value={{onClose}}>
+					{children}
+				</SidebarContext.Provider>
+			</div>
 		</div>
 	);
 };

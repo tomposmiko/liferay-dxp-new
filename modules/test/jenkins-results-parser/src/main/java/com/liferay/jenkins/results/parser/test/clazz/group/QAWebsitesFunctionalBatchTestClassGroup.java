@@ -60,6 +60,7 @@ public class QAWebsitesFunctionalBatchTestClassGroup
 		super(batchName, qaWebsitesGitRepositoryJob);
 	}
 
+	@Override
 	protected String getDefaultTestBatchRunPropertyQuery(
 		File testBaseDir, String testSuiteName) {
 
@@ -108,8 +109,6 @@ public class QAWebsitesFunctionalBatchTestClassGroup
 			Properties properties = JenkinsResultsParserUtil.getProperties(
 				new File(testBaseDir.getParentFile(), "test.properties"),
 				new File(testBaseDir, "test.properties"));
-
-			properties.setProperty("ignore.errors.util.classes", "true");
 
 			if (!JenkinsResultsParserUtil.isNullOrEmpty(testBaseDirPath)) {
 				properties.setProperty("test.base.dir.name", testBaseDirPath);

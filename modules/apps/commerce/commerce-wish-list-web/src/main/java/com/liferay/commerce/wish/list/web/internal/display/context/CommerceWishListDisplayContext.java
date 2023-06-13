@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.wish.list.web.internal.display.context;
 
-import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.model.CommerceMoney;
@@ -24,6 +23,7 @@ import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
 import com.liferay.commerce.product.util.CPInstanceHelper;
+import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.commerce.wish.list.constants.CommerceWishListActionKeys;
 import com.liferay.commerce.wish.list.constants.CommerceWishListPortletKeys;
 import com.liferay.commerce.wish.list.model.CommerceWishList;
@@ -32,7 +32,7 @@ import com.liferay.commerce.wish.list.service.CommerceWishListItemService;
 import com.liferay.commerce.wish.list.service.CommerceWishListService;
 import com.liferay.commerce.wish.list.util.CommerceWishListHttpHelper;
 import com.liferay.commerce.wish.list.util.comparator.CommerceWishListNameComparator;
-import com.liferay.commerce.wish.list.web.internal.display.context.util.CommerceWishListRequestHelper;
+import com.liferay.commerce.wish.list.web.internal.display.context.helper.CommerceWishListRequestHelper;
 import com.liferay.commerce.wish.list.web.internal.util.CommerceWishListPortletUtil;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
@@ -90,12 +90,8 @@ public class CommerceWishListDisplayContext {
 	}
 
 	public long getCommerceAccountId() throws PortalException {
-		CommerceContext commerceContext =
-			_commerceWishListRequestHelper.getCommerceContext();
-
-		CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
-
-		return commerceAccount.getCommerceAccountId();
+		return CommerceUtil.getCommerceAccountId(
+			_commerceWishListRequestHelper.getCommerceContext());
 	}
 
 	public long getCommerceChannelId() throws PortalException {

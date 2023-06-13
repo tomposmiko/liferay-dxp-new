@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
@@ -84,7 +85,9 @@ public abstract class BaseCheck extends AbstractCheck {
 
 	@Override
 	public void visitToken(DetailAST detailAST) {
-		if (!isAttributeValue(SourceFormatterCheckUtil.ENABLED_KEY, true)) {
+		if (!_isFilteredCheck() &&
+			!isAttributeValue(SourceFormatterCheckUtil.ENABLED_KEY, true)) {
+
 			return;
 		}
 
@@ -499,6 +502,32 @@ public abstract class BaseCheck extends AbstractCheck {
 		return methodNameDetailAST.getText();
 	}
 
+	protected String getPackageName(DetailAST detailAST) {
+		DetailAST rootDetailAST = detailAST;
+
+		while (true) {
+			if (rootDetailAST.getParent() != null) {
+				rootDetailAST = rootDetailAST.getParent();
+			}
+			else if (rootDetailAST.getPreviousSibling() != null) {
+				rootDetailAST = rootDetailAST.getPreviousSibling();
+			}
+			else {
+				break;
+			}
+		}
+
+		if (rootDetailAST.getType() != TokenTypes.PACKAGE_DEF) {
+			return StringPool.BLANK;
+		}
+
+		DetailAST dotDetailAST = rootDetailAST.findFirstToken(TokenTypes.DOT);
+
+		FullIdent fullIdent = FullIdent.createFullIdent(dotDetailAST);
+
+		return fullIdent.getText();
+	}
+
 	protected List<DetailAST> getParameterDefs(DetailAST detailAST) {
 		if ((detailAST.getType() != TokenTypes.CTOR_DEF) &&
 			(detailAST.getType() != TokenTypes.METHOD_DEF)) {
@@ -612,6 +641,13 @@ public abstract class BaseCheck extends AbstractCheck {
 	protected String getTypeName(
 		DetailAST detailAST, boolean includeTypeArguments) {
 
+		return getTypeName(detailAST, includeTypeArguments, true, false);
+	}
+
+	protected String getTypeName(
+		DetailAST detailAST, boolean includeTypeArguments,
+		boolean includeArrayDimension, boolean fullyQualifiedName) {
+
 		if (detailAST == null) {
 			return StringPool.BLANK;
 		}
@@ -638,14 +674,27 @@ public abstract class BaseCheck extends AbstractCheck {
 			childDetailAST = childDetailAST.getFirstChild();
 		}
 
-		StringBundler sb = new StringBundler(1 + arrayDimension);
+		StringBundler sb = new StringBundler();
 
 		FullIdent typeIdent = FullIdent.createFullIdent(childDetailAST);
 
+		if (fullyQualifiedName) {
+			String packageName = JavaSourceUtil.getPackageName(
+				typeIdent.getText(), getPackageName(detailAST),
+				getImportNames(detailAST));
+
+			if (Validator.isNotNull(packageName)) {
+				sb.append(packageName);
+				sb.append(".");
+			}
+		}
+
 		sb.append(typeIdent.getText());
 
-		for (int i = 0; i < arrayDimension; i++) {
-			sb.append("[]");
+		if (includeArrayDimension) {
+			for (int i = 0; i < arrayDimension; i++) {
+				sb.append("[]");
+			}
 		}
 
 		if (!includeTypeArguments) {
@@ -672,7 +721,10 @@ public abstract class BaseCheck extends AbstractCheck {
 			typeArgumentsDetailAST, false, TokenTypes.TYPE_ARGUMENT);
 
 		for (DetailAST typeArgumentDetailAST : typeArgumentDetailASTList) {
-			sb.append(getTypeName(typeArgumentDetailAST, true));
+			sb.append(
+				getTypeName(
+					typeArgumentDetailAST, includeTypeArguments,
+					includeArrayDimension, fullyQualifiedName));
 			sb.append(StringPool.COMMA_AND_SPACE);
 		}
 
@@ -973,9 +1025,39 @@ public abstract class BaseCheck extends AbstractCheck {
 		DetailAST detailAST, String variableName,
 		boolean includeTypeArguments) {
 
-		return getTypeName(
-			getVariableTypeDetailAST(detailAST, variableName),
-			includeTypeArguments);
+		return getVariableTypeName(
+			detailAST, variableName, includeTypeArguments, true, false);
+	}
+
+	protected String getVariableTypeName(
+		DetailAST detailAST, String variableName, boolean includeTypeArguments,
+		boolean includeArrayDimension, boolean fullyQualifiedName) {
+
+		DetailAST variableTypeDetailAST = getVariableTypeDetailAST(
+			detailAST, variableName);
+
+		if (variableTypeDetailAST != null) {
+			return getTypeName(
+				getVariableTypeDetailAST(detailAST, variableName),
+				includeTypeArguments, includeArrayDimension,
+				fullyQualifiedName);
+		}
+
+		if (!variableName.matches("[A-Z]\\w+")) {
+			return StringPool.BLANK;
+		}
+
+		if (fullyQualifiedName) {
+			String packageName = JavaSourceUtil.getPackageName(
+				variableName, getPackageName(detailAST),
+				getImportNames(detailAST));
+
+			if (Validator.isNotNull(packageName)) {
+				return StringBundler.concat(packageName, ".", variableName);
+			}
+		}
+
+		return variableName;
 	}
 
 	protected boolean hasParentWithTokenType(
@@ -1533,6 +1615,17 @@ public abstract class BaseCheck extends AbstractCheck {
 		}
 
 		return false;
+	}
+
+	private boolean _isFilteredCheck() {
+		List<String> filteredCheckNames = ListUtil.fromString(
+			getAttributeValue(
+				CheckstyleUtil.FILTER_CHECK_NAMES_KEY, StringPool.BLANK),
+			StringPool.COMMA);
+
+		Class<?> clazz = getClass();
+
+		return filteredCheckNames.contains(clazz.getSimpleName());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(BaseCheck.class);

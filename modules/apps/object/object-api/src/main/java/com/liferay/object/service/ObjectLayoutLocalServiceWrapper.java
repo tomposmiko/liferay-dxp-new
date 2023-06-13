@@ -27,6 +27,10 @@ public class ObjectLayoutLocalServiceWrapper
 	implements ObjectLayoutLocalService,
 			   ServiceWrapper<ObjectLayoutLocalService> {
 
+	public ObjectLayoutLocalServiceWrapper() {
+		this(null);
+	}
+
 	public ObjectLayoutLocalServiceWrapper(
 		ObjectLayoutLocalService objectLayoutLocalService) {
 
@@ -341,6 +345,13 @@ public class ObjectLayoutLocalServiceWrapper
 		getObjectLayouts(int start, int end) {
 
 		return _objectLayoutLocalService.getObjectLayouts(start, end);
+	}
+
+	@Override
+	public java.util.List<com.liferay.object.model.ObjectLayout>
+		getObjectLayouts(long objectDefinitionId) {
+
+		return _objectLayoutLocalService.getObjectLayouts(objectDefinitionId);
 	}
 
 	@Override

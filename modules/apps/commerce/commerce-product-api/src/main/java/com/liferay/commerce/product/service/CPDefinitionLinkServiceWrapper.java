@@ -27,6 +27,10 @@ public class CPDefinitionLinkServiceWrapper
 	implements CPDefinitionLinkService,
 			   ServiceWrapper<CPDefinitionLinkService> {
 
+	public CPDefinitionLinkServiceWrapper() {
+		this(null);
+	}
+
 	public CPDefinitionLinkServiceWrapper(
 		CPDefinitionLinkService cpDefinitionLinkService) {
 
@@ -59,6 +63,16 @@ public class CPDefinitionLinkServiceWrapper
 
 		return _cpDefinitionLinkService.fetchCPDefinitionLink(
 			cpDefinitionLinkId);
+	}
+
+	@Override
+	public com.liferay.commerce.product.model.CPDefinitionLink
+			fetchCPDefinitionLink(
+				long cpDefinitionId, long cProductId, String type)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _cpDefinitionLinkService.fetchCPDefinitionLink(
+			cpDefinitionId, cProductId, type);
 	}
 
 	@Override

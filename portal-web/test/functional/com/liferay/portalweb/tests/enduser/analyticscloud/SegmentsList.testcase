@@ -71,7 +71,6 @@ definition {
 	@priority = "5"
 	test CanSearchForSegment {
 		var usernameList = "ac,userea";
-
 		var emailList = "ac@liferay.com,userea@liferay.com";
 
 		task ("Get site assigned property name") {
@@ -147,7 +146,7 @@ definition {
 			userLoginEmailAddress = "userea@liferay.com",
 			userLoginFullName = "userfn userln");
 
-		Navigator.gotoSitePage(
+		ACUtils.navigateToSitePage(
 			pageName = "AC Page",
 			siteName = "Site Name");
 
@@ -191,8 +190,9 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8578 | Test Summary: Order the Segment List By Membership"
 	@priority = "4"
 	test OrderSegmentListByMembership {
-		var usernameList = "user1,user2,user3";
+		property portal.upstream = "quarantine";
 
+		var usernameList = "user1,user2,user3";
 		var emailList = "user1@liferay.com,user2@liferay.com,user3@liferay.com";
 
 		task ("Get site assigned property name") {
@@ -297,6 +297,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8460 | Test Summary: Order the Segment List By Name"
 	@priority = "4"
 	test OrderSegmentListByName {
+		property portal.upstream = "quarantine";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}

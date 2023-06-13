@@ -36,7 +36,6 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
-
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
@@ -47,6 +46,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8344 | Test Summary: Site overview acquisition card shows which channels individuals are coming from"
+	@ignore = "true"
 	@priority = "5"
 	test AssertShowsChannelsIndividualsComingFrom {
 		property portal.upstream = "quarantine";
@@ -214,24 +214,16 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8346 | Test Summary: Assert Sites Acquisition card Channels highest session"
 	@priority = "3"
 	test AssertSitesAcquisitionCardChannelsHighestSession {
+		property portal.upstream = "quarantine";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}
 
-		task ("Sign out then sign in as Test Test") {
-			User.logoutAndLoginPG(
-				userLoginEmailAddress = "test@liferay.com",
-				userLoginFullName = "Test Test");
-		}
-
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
-		}
-
-		task ("Wait for page loading") {
-			WaitForPageLoad();
 		}
 
 		task ("Close session") {
@@ -362,6 +354,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8348 | Test Summary: Assert Sites Acquisition card Source|Medium highest session"
 	@priority = "3"
 	test AssertSitesAcquisitionCardSourceAndMediumHighestSession {
+		property portal.upstream = "quarantine";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}

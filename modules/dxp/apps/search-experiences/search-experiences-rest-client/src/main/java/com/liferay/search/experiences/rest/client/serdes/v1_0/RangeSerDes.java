@@ -74,11 +74,14 @@ public class RangeSerDes {
 
 			sb.append("\"gt\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(range.getGt()));
-
-			sb.append("\"");
+			if (range.getGt() instanceof String) {
+				sb.append("\"");
+				sb.append((String)range.getGt());
+				sb.append("\"");
+			}
+			else {
+				sb.append(range.getGt());
+			}
 		}
 
 		if (range.getGte() != null) {
@@ -88,11 +91,14 @@ public class RangeSerDes {
 
 			sb.append("\"gte\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(range.getGte()));
-
-			sb.append("\"");
+			if (range.getGte() instanceof String) {
+				sb.append("\"");
+				sb.append((String)range.getGte());
+				sb.append("\"");
+			}
+			else {
+				sb.append(range.getGte());
+			}
 		}
 
 		if (range.getLt() != null) {
@@ -102,11 +108,14 @@ public class RangeSerDes {
 
 			sb.append("\"lt\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(range.getLt()));
-
-			sb.append("\"");
+			if (range.getLt() instanceof String) {
+				sb.append("\"");
+				sb.append((String)range.getLt());
+				sb.append("\"");
+			}
+			else {
+				sb.append(range.getLt());
+			}
 		}
 
 		if (range.getLte() != null) {
@@ -116,11 +125,14 @@ public class RangeSerDes {
 
 			sb.append("\"lte\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(range.getLte()));
-
-			sb.append("\"");
+			if (range.getLte() instanceof String) {
+				sb.append("\"");
+				sb.append((String)range.getLte());
+				sb.append("\"");
+			}
+			else {
+				sb.append(range.getLte());
+			}
 		}
 
 		if (range.getParameterName() != null) {
@@ -135,6 +147,47 @@ public class RangeSerDes {
 			sb.append(_escape(range.getParameterName()));
 
 			sb.append("\"");
+		}
+
+		if (range.getValue() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"value\": ");
+
+			if (range.getValue() instanceof String) {
+				sb.append("\"");
+				sb.append((String)range.getValue());
+				sb.append("\"");
+			}
+			else {
+				sb.append(range.getValue());
+			}
+		}
+
+		if (range.getValues() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"values\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < range.getValues().length; i++) {
+				sb.append("\"");
+
+				sb.append(_escape(range.getValues()[i]));
+
+				sb.append("\"");
+
+				if ((i + 1) < range.getValues().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		sb.append("}");
@@ -197,6 +250,20 @@ public class RangeSerDes {
 			map.put("parameterName", String.valueOf(range.getParameterName()));
 		}
 
+		if (range.getValue() == null) {
+			map.put("value", null);
+		}
+		else {
+			map.put("value", String.valueOf(range.getValue()));
+		}
+
+		if (range.getValues() == null) {
+			map.put("values", null);
+		}
+		else {
+			map.put("values", String.valueOf(range.getValues()));
+		}
+
 		return map;
 	}
 
@@ -245,6 +312,16 @@ public class RangeSerDes {
 			else if (Objects.equals(jsonParserFieldName, "parameterName")) {
 				if (jsonParserFieldValue != null) {
 					range.setParameterName((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "value")) {
+				if (jsonParserFieldValue != null) {
+					range.setValue((Object)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "values")) {
+				if (jsonParserFieldValue != null) {
+					range.setValues((Object[])jsonParserFieldValue);
 				}
 			}
 		}

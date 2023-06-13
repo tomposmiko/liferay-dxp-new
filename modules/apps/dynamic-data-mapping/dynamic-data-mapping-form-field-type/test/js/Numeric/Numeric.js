@@ -415,6 +415,7 @@ describe('Field Numeric', () => {
 			const {container} = render(
 				<Numeric
 					dataType="double"
+					decimalPlaces="2"
 					inputMask
 					name="numericField"
 					symbols={{decimalSymbol: ','}}
@@ -424,6 +425,28 @@ describe('Field Numeric', () => {
 			const input = container.querySelector('input');
 
 			expect(input).toHaveAttribute('placeholder', '0,00');
+		});
+
+		it('allows user to input only the decimal quantity defined by decimal places field', () => {
+			const onChange = jest.fn();
+			const {container} = render(
+				<Numeric
+					dataType="double"
+					decimalPlaces={3}
+					inputMask
+					name="numericField"
+					onChange={onChange}
+					symbols={{decimalSymbol: ','}}
+				/>
+			);
+
+			const input = container.querySelector('input');
+
+			userEvent.type(input, '1,2345678');
+
+			expect(onChange).toHaveBeenLastCalledWith({
+				target: {value: '1,234'},
+			});
 		});
 
 		/**
@@ -448,6 +471,54 @@ describe('Field Numeric', () => {
 			userEvent.type(input, 'a# @e');
 
 			expect(onChange).not.toHaveBeenCalled();
+		});
+
+		/**
+		 * LPS-141862
+		 */
+
+		it('does not allow typing zeroes not followed by decimal symbol', () => {
+			const onChange = jest.fn();
+			const {container} = render(
+				<Numeric
+					dataType="double"
+					decimalPlaces={3}
+					inputMask
+					name="numericField"
+					onChange={onChange}
+					symbols={{decimalSymbol: ','}}
+				/>
+			);
+
+			const input = container.querySelector('input');
+
+			userEvent.type(input, '0083,5');
+
+			expect(onChange).toHaveBeenLastCalledWith({
+				target: {value: '83,5'},
+			});
+		});
+
+		it('does not allow typing sequence of zeroes', () => {
+			const onChange = jest.fn();
+			const {container} = render(
+				<Numeric
+					dataType="double"
+					decimalPlaces={3}
+					inputMask
+					name="numericField"
+					onChange={onChange}
+					symbols={{decimalSymbol: ','}}
+				/>
+			);
+
+			const input = container.querySelector('input');
+
+			userEvent.type(input, '00,083');
+
+			expect(onChange).toHaveBeenLastCalledWith({
+				target: {value: '0,083'},
+			});
 		});
 	});
 });

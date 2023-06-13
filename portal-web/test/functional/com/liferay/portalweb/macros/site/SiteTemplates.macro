@@ -23,7 +23,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addChildPage(
+		PagesAdmin.addChildPage(
 			childPageName = "${siteChildPageName}",
 			parentPageName = "${pageName}");
 	}
@@ -191,12 +191,12 @@ definition {
 			portlet = "Pages");
 
 		if (isSet(hasChildren)) {
-			SitePages.deletePage(
+			PagesAdmin.deletePage(
 				hasChildren = "true",
 				pageName = "${pageName}");
 		}
 		else {
-			SitePages.deletePage(pageName = "${pageName}");
+			PagesAdmin.deletePage(pageName = "${pageName}");
 		}
 	}
 
@@ -331,12 +331,13 @@ definition {
 	macro getPageModificationDate {
 		Variables.assertDefined(parameterList = "${groupName},${pageNameFilter}");
 
-		var groupId = JSONGroupAPI._getGroupIdByName(groupName = "${groupName}", site = "true");
+		var groupId = JSONGroupAPI._getGroupIdByName(
+			groupName = "${groupName}",
+			site = "true");
 
 		var mysqlStatement = "SELECT modifiedDate FROM Layout WHERE name LIKE '${pageNameFilter}' AND groupId = '${groupId}' AND hidden_ = 0;";
 
-		var sqlResults = SQL.executeMySQLStatement(
-			mysqlStatement = "${mysqlStatement}");
+		var sqlResults = SQL.executeMySQLStatement(mysqlStatement = "${mysqlStatement}");
 
 		echo("## * SQL Query Result is: ${sqlResults}");
 
@@ -356,6 +357,7 @@ definition {
 		Pause(locator1 = "1000");
 
 		var currentURL = Navigator.getCurrentURL();
+
 		var siteTemplateURL = StringUtil.extractFirst("${currentURL}", "/~/");
 		var siteTemplateID = StringUtil.extractLast("${siteTemplateURL}", "/");
 
@@ -400,6 +402,12 @@ definition {
 		SelectWindow(locator1 = "Home - ${siteTemplateName} - ${siteName}");
 	}
 
+	macro openSiteTemplateInEditMode {
+		var templateID = SiteTemplates.getSiteTemplateID(siteTemplateName = "${siteTemplateName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/${templateID}?p_l_mode=edit");
+	}
+
 	macro resetPageChanges {
 		WaitForElementPresent(locator1 = "ControlMenu#INFO");
 
@@ -419,10 +427,10 @@ definition {
 				locator1 = "Home#PORTLET_BORDERLESS");
 		}
 		else {
-			var key_portletTitleName = "${portletName}";
-
 			AssertTextEquals(
-				locator1 = "Home#PAGE_COLUMN_PORTLET_COLUMN_${columnNumberTo}_PORTLET_TITLE",
+				key_pageColumnNumber = "${columnNumberTo}",
+				key_portletName = "${portletName}",
+				locator1 = "Portlet#PORTLET_TITLE_INSIDE_PAGE_COLUMN",
 				value1 = "${portletName}");
 		}
 
@@ -525,10 +533,10 @@ definition {
 			locator1 = "Button#RESET_CHANGES",
 			value1 = "Reset Changes");
 
-		var key_portletTitleName = "${portletName}";
-
 		AssertTextEquals(
-			locator1 = "Home#PAGE_COLUMN_PORTLET_COLUMN_${columnNumberFrom}_PORTLET_TITLE",
+			key_pageColumnNumber = "${columnNumberFrom}",
+			key_portletName = "${portletName}",
+			locator1 = "Portlet#PORTLET_TITLE_INSIDE_PAGE_COLUMN",
 			value1 = "${portletName}");
 	}
 

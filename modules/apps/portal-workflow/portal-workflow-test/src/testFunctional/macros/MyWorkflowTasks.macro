@@ -54,7 +54,7 @@ definition {
 		var futureDay = ${displayDateDay} + 1;
 		var futureMonth = ${displayDateMonth} + 1;
 		var futureYear = ${currentYear} + 1;
-		timePeriod = "${key_timePeriod}";
+		var timePeriod = "${key_timePeriod}";
 
 		Workflow.viewTaskAssignedToMyRoles(
 			ddlDataDefinitionName = "${ddlDataDefinitionName}",
@@ -127,6 +127,28 @@ definition {
 			key_rowPosition = "${rowPosition}",
 			key_title = "${title}",
 			locator1 = "MyWorkflowTasks#MY_WORKFLOW_TASK_ITEM_POSITION");
+	}
+
+	macro viewTaskAssignedAndAssertTextsPresent {
+		var elements = "Assigned to,State,Create Date,Due Date";
+
+		for (var list : list "${elements}") {
+			AssertElementPresent(
+				key_resultBarMessage = "${list}",
+				locator1 = "MyWorkflowTasks#MY_WORKFLOW_TASKS_SEARCH_RESULT_BAR");
+		}
+
+		AssertElementPresent(
+			key_resultBarMessage = "${titleMessageBoard}",
+			locator1 = "MyWorkflowTasks#MY_WORKFLOW_TASKS_SEARCH_RESULT_BAR");
+
+		AssertElementPresent(locator1 = "MyWorkflowTasks#SUMMARY_TEXT_CONTENT");
+
+		AssertElementPresent(
+			key_resultBarMessage = "${nameAuthor}",
+			locator1 = "MyWorkflowTasks#MY_WORKFLOW_TASKS_SEARCH_RESULT_BAR");
+
+		AssertElementPresent(locator1 = "IFrame#IFRAME");
 	}
 
 }

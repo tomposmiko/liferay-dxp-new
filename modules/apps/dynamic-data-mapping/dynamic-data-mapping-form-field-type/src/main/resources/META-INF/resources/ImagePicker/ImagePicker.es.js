@@ -29,9 +29,11 @@ const ImagePicker = ({
 	itemSelectorURL,
 	message,
 	name,
+	onBlur,
 	onClearClick,
 	onDescriptionChange,
 	onFieldChanged,
+	onFocus,
 	portletNamespace,
 	readOnly,
 }) => {
@@ -86,7 +88,10 @@ const ImagePicker = ({
 	const handleItemSelectorTriggerClick = (event) => {
 		event.preventDefault();
 
+		onFocus(event);
+
 		Liferay.Util.openSelectionModal({
+			onClose: () => onBlur(event),
 			onSelect: handleFieldChanged,
 			selectEventName: `${portletNamespace}selectDocumentLibrary`,
 			title: Liferay.Util.sub(
@@ -109,6 +114,7 @@ const ImagePicker = ({
 					type="hidden"
 					value={JSON.stringify(imageValues)}
 				/>
+
 				<ClayInput.Group>
 					<ClayInput.GroupItem className="d-none d-sm-block" prepend>
 						<ClayInput
@@ -172,6 +178,7 @@ const ImagePicker = ({
 					size="full-screen"
 				>
 					<ClayModal.Header />
+
 					<ClayModal.Body>
 						<img
 							alt={imageValues.description}
@@ -180,6 +187,7 @@ const ImagePicker = ({
 							src={imageValues.url}
 							style={{cursor: 'zoom-out', maxHeight: '95%'}}
 						/>
+
 						<p
 							className="font-weight-light text-center"
 							style={{color: '#FFFFFF'}}
@@ -241,7 +249,9 @@ const Main = ({
 	itemSelectorURL,
 	message,
 	name,
+	onBlur,
 	onChange,
+	onFocus,
 	portletNamespace,
 	readOnly,
 	valid,
@@ -298,11 +308,13 @@ const Main = ({
 				itemSelectorURL={itemSelectorURL}
 				message={message}
 				name={name}
+				onBlur={onBlur}
 				onClearClick={({event, ...data}) => onChange(event, data)}
 				onDescriptionChange={({event, ...data}) =>
 					onChange(event, data)
 				}
 				onFieldChanged={({event, ...data}) => onChange(event, data)}
+				onFocus={onFocus}
 				portletNamespace={portletNamespace}
 				readOnly={isSignedIn ? readOnly : true}
 			/>

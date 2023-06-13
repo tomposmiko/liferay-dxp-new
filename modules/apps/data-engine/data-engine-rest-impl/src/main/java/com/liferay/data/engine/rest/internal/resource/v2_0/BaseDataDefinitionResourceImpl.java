@@ -516,7 +516,7 @@ public abstract class BaseDataDefinitionResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putDataDefinitionPermission",
+					ActionKeys.PERMISSIONS, "putDataDefinitionPermissionsPage",
 					resourceName, resourceId)
 			).build(),
 			resourceId, resourceName, roleNames);
@@ -545,7 +545,7 @@ public abstract class BaseDataDefinitionResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putDataDefinitionPermission(
+			putDataDefinitionPermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("dataDefinitionId")
@@ -579,7 +579,7 @@ public abstract class BaseDataDefinitionResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putDataDefinitionPermission",
+					ActionKeys.PERMISSIONS, "putDataDefinitionPermissionsPage",
 					resourceName, resourceId)
 			).build(),
 			resourceId, resourceName, null);
@@ -966,9 +966,7 @@ public abstract class BaseDataDefinitionResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), entityModel);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid filter " + filterString, exception);
-			}
+			_log.error("Invalid filter " + filterString, exception);
 		}
 
 		return null;

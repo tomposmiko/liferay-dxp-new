@@ -20,11 +20,6 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			ApplicationsMenu.gotoPortlet(
-				category = "Publications",
-				panel = "Applications",
-				portlet = "Publications");
-
 			Publications.disablePublications();
 		}
 	}
@@ -39,9 +34,9 @@ definition {
 
 		JSONPublications.selectPublication(publicationName = "Publication Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "guest");
+		PagesAdmin.openPagesAdmin(siteURLKey = "guest");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Page");
 
@@ -49,46 +44,37 @@ definition {
 
 		PortletEntry.save();
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Tag",
 			changeSite = "Guest",
 			changeTitle = "tag name",
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		Navigator.openURL();
+		PagesAdmin.openPagesAdmin(siteURLKey = "guest");
 
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
+		PagesAdmin.deletePage(pageName = "Test Page");
 
-		SitePages.deletePage(pageName = "Test Page");
-
-		Navigator.openURL();
+		PagesAdmin.openPagesAdmin(siteURLKey = "guest");
 
 		Page.viewNoPG(pageName = "Test Page");
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Page",
 			changeSite = "Guest",
 			changeTitle = "Test Page",
 			changeType = "Deleted",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaContextStyle(
-			changeCategory = "Page",
-			changeDescription = "Test Test deleted a Page in Guest",
-			changeTitle = "Test Page");
-
 		JSONPublications.publishPublication(publicationName = "Publication Name");
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name");
 
-		Navigator.openURL();
+		Navigator.openSiteURL(siteName = "Guest");
 
 		Page.viewNoPG(pageName = "Test Page");
 	}
@@ -112,6 +98,7 @@ definition {
 		FragmentsAdmin.addFragment(fragmentName = "Fragment Name");
 
 		var fragmentHTML = '''<lfr-widget-asset-list>''';
+
 		var htmlSnippet = '''<lfr-''';
 
 		FragmentsEditor.autocompleteFragmentHTML(
@@ -126,11 +113,7 @@ definition {
 			groupName = "Guest",
 			title = "WC WebContent Title");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
+		PagesAdmin.openPagesAdmin(siteURLKey = "guest");
 
 		ContentPages.addPrivatePage(pageName = "Test Page");
 
@@ -229,21 +212,19 @@ definition {
 
 		JSONPublications.publishPublication(publicationName = "Publication Name 2");
 
-		Navigator.openURL();
-
 		Publications.viewPublicationPublished(publicationName = "Publication Name 2");
 
-		Publications.gotoPublish(
-			gotoManagePublications = "true",
+		PublicationsNavigator.gotoPublish(
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name 1");
 
-		Publications.discardChanges(
+		PublicationsChanges.discardChanges(
 			changeCategory = "com.liferay.layout.page.template.model.LayoutPageTemplateStructure",
 			changeTitle = "com.liferay.layout.page.template.model.LayoutPageTemplateStructure",
 			conflictingChanges = "true",
 			entryTitle = "com.liferay.layout.page.template.model.LayoutPageTemplateStructure");
 
-		Publications.discardChanges(
+		PublicationsChanges.discardChanges(
 			changeCategory = "com.liferay.portal.kernel.model.PortletPreferenceValue",
 			changeTitle = "com.liferay.portal.kernel.model.PortletPreferenceValue",
 			conflictingChanges = "true",
@@ -265,9 +246,9 @@ definition {
 
 		JSONPublications.selectPublication(publicationName = "Publication Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "guest");
+		PagesAdmin.openPagesAdmin(siteURLKey = "guest");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Page");
 
@@ -287,9 +268,9 @@ definition {
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "guest");
+		PagesAdmin.openPagesAdmin(siteURLKey = "guest");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Page");
 
@@ -297,18 +278,13 @@ definition {
 			key_friendlyURL = "/test-page-edited",
 			locator1 = "SitePages#FRIENDLY_URL");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
-
-		Navigator.gotoNavTab(navTab = "History");
+		PublicationsNavigator.openPublicationsHistory();
 
 		Publications.revertPublication(publicationName = "Publication Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "guest");
+		PagesAdmin.openPagesAdmin(siteURLKey = "guest");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Page");
 

@@ -30,7 +30,10 @@ CProduct cProduct = commerceWishListItem.getCProduct();
 <c:choose>
 	<c:when test="<%= cpInstance != null %>">
 		<commerce-ui:add-to-cart
+			alignment="left"
 			CPInstanceId="<%= cpInstance.getCPInstanceId() %>"
+			inline="<%= true %>"
+			size="md"
 		/>
 	</c:when>
 	<c:otherwise>

@@ -23,7 +23,6 @@ definition {
 
 		if (isSet(databaseName)) {
 			var originalDatabaseName = PropsUtil.get("database.mysql.schema");
-
 			var jdbcURL = StringUtil.replace("${jdbcURL}", "${originalDatabaseName}", "${databaseName}");
 		}
 
@@ -93,6 +92,8 @@ definition {
 
 		AssertElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE");
 
+		Click(locator1 = "Button#DONE");
+
 		User.viewLoggedInPG();
 	}
 
@@ -150,6 +151,12 @@ definition {
 
 		AssertElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE");
 
+		var testRunEnvironment = PropsUtil.get("test.run.environment");
+
+		if ("${testRunEnvironment}" == "EE") {
+			Click(locator1 = "Button#DONE");
+		}
+
 		User.viewLoggedInPG();
 	}
 
@@ -182,7 +189,7 @@ definition {
 	}
 
 	macro viewConfigurationSavedPG {
-		if ((isSet(localization)) && ("${localization}" == "ES")) {
+		if (isSet(localization) && ("${localization}" == "ES")) {
 			Alert.viewSuccessMessageText(successMessage = "La configuración fue guardada con éxito.");
 
 			AssertTextEquals.assertPartialText(
@@ -317,12 +324,7 @@ definition {
 
 		AssertConsoleTextPresent(value1 = "Finished adding data");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Search");
-
-		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+		SearchAdministration.executeReindex();
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",

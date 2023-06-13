@@ -565,20 +565,21 @@ public abstract class BaseContentStructureResourceTestCase {
 	}
 
 	@Test
-	public void testPutAssetLibraryContentStructurePermission()
+	public void testPutAssetLibraryContentStructurePermissionsPage()
 		throws Exception {
 
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		ContentStructure contentStructure =
-			testPutAssetLibraryContentStructurePermission_addContentStructure();
+			testPutAssetLibraryContentStructurePermissionsPage_addContentStructure();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			contentStructureResource.
-				putAssetLibraryContentStructurePermissionHttpResponse(
+				putAssetLibraryContentStructurePermissionsPageHttpResponse(
 					testDepotEntry.getDepotEntryId(),
 					new Permission[] {
 						new Permission() {
@@ -592,7 +593,7 @@ public abstract class BaseContentStructureResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			contentStructureResource.
-				putAssetLibraryContentStructurePermissionHttpResponse(
+				putAssetLibraryContentStructurePermissionsPageHttpResponse(
 					testDepotEntry.getDepotEntryId(),
 					new Permission[] {
 						new Permission() {
@@ -605,7 +606,7 @@ public abstract class BaseContentStructureResourceTestCase {
 	}
 
 	protected ContentStructure
-			testPutAssetLibraryContentStructurePermission_addContentStructure()
+			testPutAssetLibraryContentStructurePermissionsPage_addContentStructure()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -699,43 +700,46 @@ public abstract class BaseContentStructureResourceTestCase {
 	}
 
 	@Test
-	public void testPutContentStructurePermission() throws Exception {
+	public void testPutContentStructurePermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		ContentStructure contentStructure =
-			testPutContentStructurePermission_addContentStructure();
+			testPutContentStructurePermissionsPage_addContentStructure();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
-			contentStructureResource.putContentStructurePermissionHttpResponse(
-				contentStructure.getId(),
-				new Permission[] {
-					new Permission() {
-						{
-							setActionIds(new String[] {"VIEW"});
-							setRoleName(role.getName());
+			contentStructureResource.
+				putContentStructurePermissionsPageHttpResponse(
+					contentStructure.getId(),
+					new Permission[] {
+						new Permission() {
+							{
+								setActionIds(new String[] {"VIEW"});
+								setRoleName(role.getName());
+							}
 						}
-					}
-				}));
+					}));
 
 		assertHttpResponseStatusCode(
 			404,
-			contentStructureResource.putContentStructurePermissionHttpResponse(
-				0L,
-				new Permission[] {
-					new Permission() {
-						{
-							setActionIds(new String[] {"-"});
-							setRoleName("-");
+			contentStructureResource.
+				putContentStructurePermissionsPageHttpResponse(
+					0L,
+					new Permission[] {
+						new Permission() {
+							{
+								setActionIds(new String[] {"-"});
+								setRoleName("-");
+							}
 						}
-					}
-				}));
+					}));
 	}
 
 	protected ContentStructure
-			testPutContentStructurePermission_addContentStructure()
+			testPutContentStructurePermissionsPage_addContentStructure()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -1119,18 +1123,19 @@ public abstract class BaseContentStructureResourceTestCase {
 	}
 
 	@Test
-	public void testPutSiteContentStructurePermission() throws Exception {
+	public void testPutSiteContentStructurePermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		ContentStructure contentStructure =
-			testPutSiteContentStructurePermission_addContentStructure();
+			testPutSiteContentStructurePermissionsPage_addContentStructure();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			contentStructureResource.
-				putSiteContentStructurePermissionHttpResponse(
+				putSiteContentStructurePermissionsPageHttpResponse(
 					contentStructure.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1144,7 +1149,7 @@ public abstract class BaseContentStructureResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			contentStructureResource.
-				putSiteContentStructurePermissionHttpResponse(
+				putSiteContentStructurePermissionsPageHttpResponse(
 					contentStructure.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1157,7 +1162,7 @@ public abstract class BaseContentStructureResourceTestCase {
 	}
 
 	protected ContentStructure
-			testPutSiteContentStructurePermission_addContentStructure()
+			testPutSiteContentStructurePermissionsPage_addContentStructure()
 		throws Exception {
 
 		throw new UnsupportedOperationException(

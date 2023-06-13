@@ -267,6 +267,7 @@ export default function fragmentEntryLinksReducer(
 					...fragmentEntryLinks[action.fragmentEntryLinkId],
 					configuration: action.fragmentEntryLink.configuration,
 					content: action.fragmentEntryLink.content,
+					editableTypes: action.fragmentEntryLink.editableTypes,
 					editableValues: action.fragmentEntryLink.editableValues,
 				},
 			};
@@ -277,7 +278,10 @@ export default function fragmentEntryLinksReducer(
 
 			let collectionContent = fragmentEntryLink.collectionContent || {};
 
-			if (action.collectionContentId != null) {
+			if (
+				action.collectionContentId !== null &&
+				action.collectionContentId !== undefined
+			) {
 				collectionContent = {...collectionContent};
 
 				collectionContent[action.collectionContentId] = action.content;

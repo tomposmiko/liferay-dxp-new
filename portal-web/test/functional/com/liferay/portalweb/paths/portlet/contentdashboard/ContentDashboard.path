@@ -11,6 +11,11 @@
 
 <tbody>
 <tr>
+	<td>ASSET_MENU_DROPDOWN_BUTTON</td>
+	<td>//button[contains(@class, 'dropdown-toggle') and contains(@class, 'btn-unstyled') and contains(@class, 'btn-monospaced') and contains(@class, 'component-action')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>AUDIENCE_LIST_DASHBOARD</td>
 	<td>//span[contains(@class,'label-secondary') and contains (.,'${value}')]</td>
 	<td></td>
@@ -27,12 +32,12 @@
 </tr>
 <tr>
 	<td>AUDIT_GRAPH_CONFIGURATION_LEFT_ARROW_BUTTON</td>
-	<td>//button[contains(@class, 'move-left')]</td>
+	<td>//button[contains(@class, 'transfer-button-rtl')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AUDIT_GRAPH_CONFIGURATION_RIGHT_ARROW_BUTTON</td>
-	<td>//button[contains(@class, 'move-right')]</td>
+	<td>//button[contains(@class, 'transfer-button-ltr')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -42,22 +47,22 @@
 </tr>
 <tr>
 	<td>AUDIT_GRAPH_CONFIGURATION_VOCABULARY_IN_USE</td>
-	<td>//div[contains(@class, 'form-group')]/label[contains(text(), 'In Use')]/../select/option[contains(text(), '${vocabularyName}')]</td>
+	<td>//select[contains(@id, 'currentAssetVocabularyIds')] //option[contains(text(), '${vocabularyName}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AUDIT_GRAPH_CONFIGURATION_VOCABULARY_AVAILABLE</td>
-	<td>//div[contains(@class, 'form-group')]/label[contains(text(), 'Available')]/../select/option[contains(text(), '${vocabularyName}')]</td>
+	<td>//select[contains(@id, 'availableAssetVocabularyIds')] //option[contains(text(), '${vocabularyName}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AUDIT_GRAPH_CONFIGURATION_UP_ARROW_BUTTON</td>
-	<td>//button[contains(@class, 'reorder-up')]</td>
+	<td>//button[contains(@class, 'reorder-button-up')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AUDIT_GRAPH_CONFIGURATION_DOWN_ARROW_BUTTON</td>
-	<td>//button[contains(@class, 'reorder-down')]</td>
+	<td>//button[contains(@class, 'reorder-button-down')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -130,6 +135,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONTENT_CHART_SVG</td>
+	<td>//*[@class = 'recharts-surface']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DELETE_SECOND_FILTER_SELECTED</td>
 	<td>//*[contains(@class, 'tbar-item-expand')]//*[contains(@class, 'close')]</td>
 	<td></td>
@@ -155,8 +165,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EXPORT_XLS_BUTTON</td>
+	<td>//*[contains(@class, 'download-spreadsheet-button')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FILTER_AND_ORDER_DROPDOWN</td>
 	<td>//*[contains(@class, 'dropdown-toggle') and contains(@class, 'nav-link') and contains(@class, 'btn-unstyled')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_BY_EXTENSION_EMPTY</td>
+	<td>//*[contains(@class, 'sheet-text') and contains(@class, 'text-center') and contains(text(), '${noResultMessage}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -167,6 +187,16 @@
 <tr>
 	<td>FILTER_CATEGORY_NAME</td>
 	<td>//*[contains(@class,'label') and contains(text(),'Category:${categoryName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_EXTENSION_ELEMENT</td>
+	<td>//*[contains(@class, 'card-body')]//*[contains(@class, 'text-truncate') and contains (text(), '${extensionName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_PARENT_EXTENSION</td>
+	<td>//*[contains(@class, 'card-body')]//*[contains(@class, 'text-truncate') and contains (text(), '${parentExtension}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -241,7 +271,12 @@
 </tr>
 <tr>
 	<td>PANEL_INFO_VIEW</td>
-	<td>//*[contains(@title,'View')]</td>
+	<td>//*[contains(@class,'link-outline-secondary')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REORDER_ACTIVE_BUTTON</td>
+	<td>//div[contains(@class, 'reorder-order-buttons')] //button[not(@disabled)]</td>
 	<td></td>
 </tr>
 <tr>
@@ -305,8 +340,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>WEB_CONTENT_MENU_DROPDOWN_BUTTON</td>
-	<td>//button[contains(@class, 'dropdown-toggle') and contains(@class, 'btn-unstyled') and contains(@class, 'btn-monospaced') and contains(@class, 'component-action')]</td>
+	<td>X_AXIS_CATEGORIES_NAME</td>
+	<td>(//*[contains(@class, 'xAxis')] //*[contains(@class,'recharts-text')]/*)[${categoryIndex}]</td>
 	<td></td>
 </tr>
 <tr>

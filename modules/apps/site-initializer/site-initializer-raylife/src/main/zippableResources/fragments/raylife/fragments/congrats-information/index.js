@@ -14,11 +14,14 @@
 
 const applicationId = localStorage.getItem('raylife-application-id');
 const productId = localStorage.getItem('raylife-product-id');
-const businessType = JSON.parse(localStorage.getItem('raylife-product'));
+const raylifeApplicationForm = JSON.parse(
+	localStorage.getItem('raylife-application-form')
+);
 
-const fetchHeadless = async (url) => {
+const fetchHeadless = async (url, options) => {
 	// eslint-disable-next-line @liferay/portal/no-global-fetch
 	const response = await fetch(`${window.location.origin}/${url}`, {
+		...options,
 		headers: {
 			'Content-Type': 'application/json',
 			'x-csrf-token': Liferay.authToken,
@@ -28,6 +31,46 @@ const fetchHeadless = async (url) => {
 	const data = await response.json();
 
 	return data;
+};
+
+const sendDigitalSignaturePolicy = async ({email, firstName, lastName}) => {
+	await fetchHeadless(
+		`o/digital-signature-rest/v1.0/sites/${themeDisplay.getSiteGroupId()}/ds-envelopes`,
+		{
+			body: JSON.stringify({
+				dsDocument: [
+					{
+						fileEntryExternalReferenceCode: 'RAY001',
+						fileExtension: 'pdf',
+						id: '123',
+						name: 'RaylifePolicy.pdf',
+					},
+				],
+				dsRecipient: [
+					{
+						emailAddress: email,
+						id: '123',
+						name: `${firstName} ${lastName}`,
+						status: 'sent',
+					},
+				],
+				emailBlurb:
+					'Thank you for purchasing Raylife Insurance for your business.  Please sign your policy document using DocuSign to complete your transaction and officially bind your policy.',
+				emailSubject: 'Please Sign Your Raylife Policy Document',
+				name: 'Raylife Insurance',
+				senderEmailAddress: email,
+				status: 'sent',
+			}),
+			method: 'POST',
+		}
+	);
+};
+
+const updateObjectPolicySent = async () => {
+	await fetchHeadless(`o/c/raylifeapplications/${applicationId}`, {
+		body: JSON.stringify({policySent: true}),
+		method: 'PATCH',
+	});
 };
 
 const setValueToElement = (element, value) => {
@@ -45,7 +88,7 @@ const formatValue = (value) => {
 		return JSON.parse(value);
 	}
 
-	return `$${currencyIntl.format(value)}`;
+	return `$${currencyIntl.format(value || 0)}`;
 };
 
 const buildList = (items = []) => {
@@ -61,14 +104,14 @@ const buildList = (items = []) => {
 						?.currentSrc;
 
 			return `<tr>
-			<td>
-				<img alt="icon" src="${imageSrc}" />
-				${title}
-			</td>
-			<td class="text-right">${
-				typeof formattedValue === 'string' ? formattedValue : ''
-			}</td>
-			</tr>`;
+			  <td class="d-flex">
+				  <img alt="icon" src="${imageSrc}" />
+				  <span class="ml-1">${title}</span>
+			  </td>
+			  <td class="text-right">${
+					typeof formattedValue === 'string' ? formattedValue : ''
+				}</td>
+			  </tr>`;
 		})
 		.join('');
 };
@@ -79,14 +122,17 @@ const main = async () => {
 		fetchHeadless(`o/c/quotecomparisons/${productId}`),
 	]);
 
-	const quoteDate = new Date(application.dateCreated);
+	const quoteDate = application.dateCreated
+		? new Date(application.dateCreated)
+		: new Date();
+
 	const quoteDateNextYear = new Date(
 		new Date(quoteDate).setFullYear(quoteDate.getFullYear() + 1)
 	);
 
 	setValueToElement(
 		fragmentElement.querySelector('#congrats-info-title'),
-		businessType.productName
+		raylifeApplicationForm?.basics?.productQuoteName
 	);
 	setValueToElement(
 		fragmentElement.querySelector('#congrats-info-policy'),
@@ -94,7 +140,7 @@ const main = async () => {
 	);
 	setValueToElement(
 		fragmentElement.querySelector('#congrats-price'),
-		`$${quoteComparison.price}`
+		`$${Number(quoteComparison.price || 0).toLocaleString('en-US')}`
 	);
 	setValueToElement(
 		fragmentElement.querySelector('#congrats-info-date'),
@@ -112,7 +158,7 @@ const main = async () => {
 		},
 		{
 			title: 'Business Personal Property',
-			value: quoteComparison.businessPersonalProperty,
+			value: quoteComparison.businessPersonalProperty || false,
 		},
 		{
 			title: 'Product Recall or Replacement',
@@ -123,6 +169,11 @@ const main = async () => {
 			value: quoteComparison.moneyAndSecurities || false,
 		},
 	]);
+
+	if (!application.policySent) {
+		sendDigitalSignaturePolicy(application);
+		updateObjectPolicySent();
+	}
 };
 
 main();

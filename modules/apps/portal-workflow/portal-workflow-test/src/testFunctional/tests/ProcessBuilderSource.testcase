@@ -180,7 +180,12 @@ definition {
 
 		Button.clickPublish();
 
-		Alert.viewErrorMessage(errorMessage = "Please name your workflow before publishing.");
+		if (IsElementPresent(locator1 = "ProcessBuilderSource#SOURCE_WAPPER")) {
+			Alert.viewErrorMessage(errorMessage = "Please add a workflow title before publishing.");
+		}
+		else {
+			Alert.viewErrorMessage(errorMessage = "Please name your workflow before publishing.");
+		}
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -195,26 +200,23 @@ definition {
 	@description = "Verify that the user can not unpublish a Workflow is in use and system displays an error message"
 	@priority = "4"
 	test CanNotUnpublishWorkflowInUse {
-		ApplicationsMenu.gotoPortlet(
-			category = "Workflow",
-			panel = "Applications",
-			portlet = "Process Builder");
-
-		Navigator.gotoNavItem(navItem = "Configuration");
+		Workflow.openWorkflowProcessBuilderConfiguration();
 
 		Workflow.configureWorkflow(
 			workflowDefinition = "Single Approver",
 			workflowResourceValue = "Blogs Entry");
 
-		Navigator.gotoNavItem(navItem = "Workflows");
+		Workflow.openWorkflowListView();
 
-		Click(
-			key_workflowDefinitionTitle = "Single Approver",
-			locator1 = "WorkflowDefinition#DEFINITION_TABLE_SPECIFIC_DEFINITION_ELLIPSIS");
+		Workflow.gotoAssetViaTableTitle(workflowAssetTitle = "Single Approver");
+
+		Click(locator1 = "Icon#SVG_ELLIPSIS");
 
 		MenuItem.clickNoError(menuItem = "Unpublish");
 
 		Alert.viewErrorMessage(errorMessage = "Workflow is in use. Remove its assignment to this asset: Blogs Entry.");
+
+		Navigator.gotoBack();
 
 		Workflow.viewDefinitionPublished(workflowDefinitionTitle = "Single Approver");
 	}
@@ -557,15 +559,9 @@ definition {
 			panel = "Applications",
 			portlet = "Process Builder");
 
-		Click(
-			key_workflowDefinitionTitle = "Single Approver",
-			locator1 = "WorkflowDefinition#DEFINITION_TABLE_SPECIFIC_DEFINITION_ELLIPSIS");
+		Workflow.gotoEditWorkflowDefinition(workflowDefinitionTitle = "Single Approver");
 
-		MenuItem.clickNoError(menuItem = "Edit");
-
-		KaleoDesigner.deleteNode(nodeNodeLabel = "update");
-
-		Click(locator1 = "Button#UPDATE");
+		Workflow.updateDefinition(workflowDefinitionTitle = "Single Approver Updated");
 
 		Click(locator1 = "Icon#INFO");
 
@@ -619,6 +615,8 @@ definition {
 	@description = "Verify that the time format in Details tab is following the system language"
 	@priority = "3"
 	test TimeFormatFollowsSystemLanguageInDetails {
+		property portal.upstream = "quarantine";
+
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
 			panel = "Applications",
@@ -675,6 +673,8 @@ definition {
 	@description = "Verify that the time format in Revision History tab is following the system language"
 	@priority = "4"
 	test TimeFormatFollowsSystemLanguageInRevision {
+		property portal.upstream = "quarantine";
+
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
 			panel = "Applications",

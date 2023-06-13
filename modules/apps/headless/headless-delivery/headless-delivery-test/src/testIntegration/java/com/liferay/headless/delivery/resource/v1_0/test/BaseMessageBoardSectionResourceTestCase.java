@@ -424,18 +424,19 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 	}
 
 	@Test
-	public void testPutMessageBoardSectionPermission() throws Exception {
+	public void testPutMessageBoardSectionPermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		MessageBoardSection messageBoardSection =
-			testPutMessageBoardSectionPermission_addMessageBoardSection();
+			testPutMessageBoardSectionPermissionsPage_addMessageBoardSection();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			messageBoardSectionResource.
-				putMessageBoardSectionPermissionHttpResponse(
+				putMessageBoardSectionPermissionsPageHttpResponse(
 					messageBoardSection.getId(),
 					new Permission[] {
 						new Permission() {
@@ -449,7 +450,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			messageBoardSectionResource.
-				putMessageBoardSectionPermissionHttpResponse(
+				putMessageBoardSectionPermissionsPageHttpResponse(
 					0L,
 					new Permission[] {
 						new Permission() {
@@ -462,7 +463,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 	}
 
 	protected MessageBoardSection
-			testPutMessageBoardSectionPermission_addMessageBoardSection()
+			testPutMessageBoardSectionPermissionsPage_addMessageBoardSection()
 		throws Exception {
 
 		return messageBoardSectionResource.postSiteMessageBoardSection(
@@ -1331,18 +1332,21 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 	}
 
 	@Test
-	public void testPutSiteMessageBoardSectionPermission() throws Exception {
+	public void testPutSiteMessageBoardSectionPermissionsPage()
+		throws Exception {
+
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		MessageBoardSection messageBoardSection =
-			testPutSiteMessageBoardSectionPermission_addMessageBoardSection();
+			testPutSiteMessageBoardSectionPermissionsPage_addMessageBoardSection();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			messageBoardSectionResource.
-				putSiteMessageBoardSectionPermissionHttpResponse(
+				putSiteMessageBoardSectionPermissionsPageHttpResponse(
 					messageBoardSection.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1356,7 +1360,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			messageBoardSectionResource.
-				putSiteMessageBoardSectionPermissionHttpResponse(
+				putSiteMessageBoardSectionPermissionsPageHttpResponse(
 					messageBoardSection.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1369,7 +1373,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 	}
 
 	protected MessageBoardSection
-			testPutSiteMessageBoardSectionPermission_addMessageBoardSection()
+			testPutSiteMessageBoardSectionPermissionsPage_addMessageBoardSection()
 		throws Exception {
 
 		return messageBoardSectionResource.postSiteMessageBoardSection(

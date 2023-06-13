@@ -723,6 +723,16 @@ public abstract class BaseProductResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"productConfiguration", additionalAssertFieldName)) {
+
+				if (product.getProductConfiguration() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("productId", additionalAssertFieldName)) {
 				if (product.getProductId() == null) {
 					valid = false;
@@ -799,6 +809,14 @@ public abstract class BaseProductResourceTestCase {
 
 			if (Objects.equals("urlImage", additionalAssertFieldName)) {
 				if (product.getUrlImage() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("urls", additionalAssertFieldName)) {
+				if (product.getUrls() == null) {
 					valid = false;
 				}
 
@@ -1030,6 +1048,19 @@ public abstract class BaseProductResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"productConfiguration", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						product1.getProductConfiguration(),
+						product2.getProductConfiguration())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("productId", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						product1.getProductId(), product2.getProductId())) {
@@ -1130,6 +1161,14 @@ public abstract class BaseProductResourceTestCase {
 				if (!Objects.deepEquals(
 						product1.getUrlImage(), product2.getUrlImage())) {
 
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("urls", additionalAssertFieldName)) {
+				if (!equals((Map)product1.getUrls(), (Map)product2.getUrls())) {
 					return false;
 				}
 
@@ -1365,6 +1404,11 @@ public abstract class BaseProductResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("productConfiguration")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("productId")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1425,6 +1469,11 @@ public abstract class BaseProductResourceTestCase {
 			sb.append("'");
 
 			return sb.toString();
+		}
+
+		if (entityFieldName.equals("urls")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		throw new IllegalArgumentException(

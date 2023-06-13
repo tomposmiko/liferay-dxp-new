@@ -17,21 +17,21 @@ import ClayLink from '@clayui/link';
 import {Context as ModalContext} from '@clayui/modal';
 import classNames from 'classnames';
 import {
+	EVENT_TYPES as CORE_EVENT_TYPES,
 	Pages,
+	PagesVisitor,
+	addObjectFields,
+	updateObjectFields,
 	useConfig,
 	useForm,
 	useFormState,
 } from 'data-engine-js-components-web';
-import {EVENT_TYPES as CORE_EVENT_TYPES} from 'data-engine-js-components-web/js/core/actions/eventTypes.es';
-import {
-	addObjectFields,
-	updateObjectFields,
-} from 'data-engine-js-components-web/js/utils/objectFields';
 import {DragLayer, MultiPanelSidebar} from 'data-engine-taglib';
 import React, {
 	useCallback,
 	useContext,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from 'react';
@@ -50,7 +50,7 @@ import {createFormURL} from '../util/form.es';
 import {submitEmailContent} from '../util/submitEmailContent.es';
 import ErrorList from './ErrorList';
 
-export const FormBuilder = () => {
+export function FormBuilder() {
 	const {
 		autocompleteUserURL,
 		portletNamespace,
@@ -78,6 +78,25 @@ export const FormBuilder = () => {
 
 	const [errorList, setErrorList] = useState([]);
 
+	const formSettingsPages = useMemo(() => {
+		if (!formSettingsContext) {
+			return [];
+		}
+
+		const pagesVisitor = new PagesVisitor(formSettingsContext.pages);
+
+		return pagesVisitor.mapFields((field) => {
+			if (field.valid) {
+				return field;
+			}
+
+			return {
+				...field,
+				displayErrors: true,
+			};
+		});
+	}, [formSettingsContext]);
+
 	const [{onClose}, modalDispatch] = useContext(ModalContext);
 
 	const [{sidebarOpen, sidebarPanelId}, setSidebarState] = useState({
@@ -89,7 +108,7 @@ export const FormBuilder = () => {
 
 	const dispatch = useForm();
 
-	const emailContent = useRef({
+	const emailContentRef = useRef({
 		addresses: [],
 		message: Liferay.Util.sub(
 			Liferay.Language.get('please-fill-out-this-form-x'),
@@ -312,6 +331,12 @@ export const FormBuilder = () => {
 		(event) => {
 			event.preventDefault();
 
+			const publishButton = document.querySelector(
+				'.lfr-ddm-publish-button'
+			);
+
+			publishButton.disabled = true;
+
 			subtmitForm(document.getElementById(`${portletNamespace}editForm`));
 		},
 		[portletNamespace, subtmitForm]
@@ -326,7 +351,7 @@ export const FormBuilder = () => {
 					body: (
 						<ShareFormModalBody
 							autocompleteUserURL={autocompleteUserURL}
-							emailContent={emailContent}
+							emailContent={emailContentRef}
 							localizedName={localizedName}
 							url={url}
 						/>
@@ -341,11 +366,12 @@ export const FormBuilder = () => {
 							>
 								{Liferay.Language.get('cancel')}
 							</ClayButton>
+
 							<ClayButton
 								displayType="primary"
 								onClick={() => {
 									submitEmailContent({
-										...emailContent.current,
+										...emailContentRef.current,
 										portletNamespace,
 										shareFormInstanceURL,
 									});
@@ -411,6 +437,7 @@ export const FormBuilder = () => {
 							)}
 						>
 							<DragLayer />
+
 							<Pages
 								editable={true}
 								fieldActions={[
@@ -478,6 +505,7 @@ export const FormBuilder = () => {
 						>
 							{Liferay.Language.get('Save')}
 						</ClayButton>
+
 						<ClayLink button displayType="link" href={redirectURL}>
 							{Liferay.Language.get('cancel')}
 						</ClayLink>
@@ -491,8 +519,9 @@ export const FormBuilder = () => {
 					setVisibleFormSettings(false);
 					updateObjectFields(dispatch);
 				}}
+				pages={formSettingsPages}
 				visibleFormSettings={visibleFormSettings}
 			/>
 		</>
 	);
-};
+}

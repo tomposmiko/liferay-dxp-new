@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
@@ -224,14 +225,24 @@ public class SegmentsExperimentDisplayContext {
 		String layoutFullURL = PortalUtil.getLayoutFullURL(
 			draftLayout, _themeDisplay);
 
+		String layoutURL = _portal.getLayoutURL(_themeDisplay);
+
+		long segmentsExperienceId = _getSegmentsExperienceId();
+
+		if (segmentsExperienceId != -1) {
+			layoutURL = HttpUtil.setParameter(
+				layoutURL, "segmentsExperienceId", segmentsExperienceId);
+		}
+
 		layoutFullURL = HttpUtil.setParameter(
-			layoutFullURL, "redirect", layoutFullURL);
+			layoutFullURL, "p_l_back_url", layoutURL);
 
 		layoutFullURL = HttpUtil.setParameter(
 			layoutFullURL, "p_l_mode", Constants.EDIT);
+		layoutFullURL = HttpUtil.setParameter(
+			layoutFullURL, "redirect", layoutFullURL);
 
-		return HttpUtil.setParameter(
-			layoutFullURL, "p_l_back_url", _portal.getLayoutURL(_themeDisplay));
+		return layoutFullURL;
 	}
 
 	private String _getEditSegmentsVariantURL() {
@@ -475,15 +486,26 @@ public class SegmentsExperimentDisplayContext {
 			return _segmentsExperienceId;
 		}
 
-		LongStream longStream = Arrays.stream(
-			GetterUtil.getLongValues(
-				_httpServletRequest.getAttribute(
-					SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS)));
+		HttpServletRequest originalHttpServletRequest =
+			_portal.getOriginalServletRequest(_httpServletRequest);
 
-		_segmentsExperienceId = longStream.findFirst(
-		).orElse(
-			SegmentsExperienceConstants.ID_DEFAULT
-		);
+		long selectedSegmentsExperienceId = ParamUtil.getLong(
+			originalHttpServletRequest, "segmentsExperienceId", -1);
+
+		if (selectedSegmentsExperienceId != -1) {
+			_segmentsExperienceId = selectedSegmentsExperienceId;
+		}
+		else {
+			LongStream longStream = Arrays.stream(
+				GetterUtil.getLongValues(
+					_httpServletRequest.getAttribute(
+						SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS)));
+
+			_segmentsExperienceId = longStream.findFirst(
+			).orElse(
+				SegmentsExperienceConstants.ID_DEFAULT
+			);
+		}
 
 		return _segmentsExperienceId;
 	}

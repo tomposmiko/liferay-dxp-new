@@ -132,11 +132,14 @@ public class SourceChecksUtil {
 			else {
 				if (javaClass == null) {
 					try {
-						anonymousClasses =
-							JavaClassParser.parseAnonymousClasses(
-								sourceChecksResult.getContent());
 						javaClass = JavaClassParser.parseJavaClass(
 							fileName, sourceChecksResult.getContent());
+
+						anonymousClasses =
+							JavaClassParser.parseAnonymousClasses(
+								sourceChecksResult.getContent(),
+								javaClass.getPackageName(),
+								javaClass.getImportNames());
 					}
 					catch (ParseException parseException) {
 						sourceChecksResult.addSourceFormatterMessage(
@@ -213,7 +216,9 @@ public class SourceChecksUtil {
 
 		attributesJSONObject = SourceFormatterCheckUtil.addPropertiesAttributes(
 			attributesJSONObject, propertiesMap,
-			SourceFormatterUtil.GIT_LIFERAY_PORTAL_BRANCH);
+			SourceFormatterUtil.GIT_LIFERAY_PORTAL_BRANCH,
+			SourceFormatterUtil.UPGRADE_FROM_VERSION,
+			SourceFormatterUtil.UPGRADE_TO_VERSION);
 
 		return SourceFormatterCheckUtil.addPropertiesAttributes(
 			attributesJSONObject, propertiesMap, CheckType.SOURCE_CHECK,
@@ -245,14 +250,17 @@ public class SourceChecksUtil {
 		for (SourceCheckConfiguration sourceCheckConfiguration :
 				sourceCheckConfigurations) {
 
+			String sourceCheckCategory = SourceFormatterUtil.getSimpleName(
+				sourceCheckConfiguration.getCategory());
 			String sourceCheckName = SourceFormatterUtil.getSimpleName(
 				sourceCheckConfiguration.getName());
 
-			if ((!filterCheckCategoryNames.isEmpty() ||
-				 !filterCheckNames.isEmpty()) &&
-				!filterCheckCategoryNames.contains(
-					sourceCheckConfiguration.getCategory()) &&
-				!filterCheckNames.contains(sourceCheckName)) {
+			if ((sourceCheckCategory.startsWith("Upgrade") &&
+				 !filterCheckCategoryNames.contains(sourceCheckCategory)) ||
+				((!filterCheckCategoryNames.isEmpty() ||
+				  !filterCheckNames.isEmpty()) &&
+				 !filterCheckCategoryNames.contains(sourceCheckCategory) &&
+				 !filterCheckNames.contains(sourceCheckName))) {
 
 				continue;
 			}

@@ -58,7 +58,7 @@ public interface TaxonomyCategoryResource {
 		return FactoryHolder.factory.create();
 	}
 
-	public Page<TaxonomyCategory> getTaxonomyCategoryRankedPage(
+	public Page<TaxonomyCategory> getTaxonomyCategoriesRankedPage(
 			Long siteId, Pagination pagination)
 		throws Exception;
 
@@ -98,7 +98,7 @@ public interface TaxonomyCategoryResource {
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putTaxonomyCategoryPermission(
+			putTaxonomyCategoryPermissionsPage(
 				String taxonomyCategoryId,
 				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
@@ -114,6 +114,21 @@ public interface TaxonomyCategoryResource {
 
 	public Response postTaxonomyVocabularyTaxonomyCategoryBatch(
 			Long taxonomyVocabularyId, String callbackURL, Object object)
+		throws Exception;
+
+	public void deleteTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
+			Long taxonomyVocabularyId, String externalReferenceCode)
+		throws Exception;
+
+	public TaxonomyCategory
+			getTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
+				Long taxonomyVocabularyId, String externalReferenceCode)
+		throws Exception;
+
+	public TaxonomyCategory
+			putTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
+				Long taxonomyVocabularyId, String externalReferenceCode,
+				TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

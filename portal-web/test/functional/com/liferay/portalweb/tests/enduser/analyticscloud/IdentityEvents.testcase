@@ -36,7 +36,6 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
-
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
@@ -53,7 +52,9 @@ definition {
 			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}
 
-		task ("Close sessions") {
+		task ("Sign out and Close sessions") {
+			UserBar.signOut();
+
 			ACUtils.closeAllSessions();
 		}
 
@@ -129,7 +130,7 @@ definition {
 		}
 
 		task ("Navigate to the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}

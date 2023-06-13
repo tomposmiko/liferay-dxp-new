@@ -77,7 +77,7 @@
 </tr>
 <tr>
 	<td>NAME_FIELD</td>
-	<td>//div[contains(@class,'ddm-form-basic-info')]//textarea[contains(@id, 'nameEditor')]</td>
+	<td>//div[contains(@class,'ddm-form-basic-info')]//div//div[contains(@class,'form-group')]//textarea[contains(@id, 'nameEditor')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -307,22 +307,17 @@
 <!--PUBLISH-->
 <tr>
 	<td>PUBLISH_FORM_DESCRIPTION_FIELD</td>
-	<td>//div[contains(@class,'ddm-form-basic-info')]//p[contains(text(), '${key_formDescription}')]</td>
+	<td>//span[contains(@class,'lfr-ddm__default-page-header-description') and contains(., '${key_formDescription}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PUBLISH_FORM_NAME_FIELD</td>
-	<td>//h1[contains(@class,'form-name') and contains(.,'${key_formName}')]</td>
+	<td>//h1[contains(@class,'lfr-ddm__default-page-header-title') and contains(.,'${key_formName}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PUBLISH_FORM_PUBLIC_URL</td>
 	<td>//div[contains(@class,'share-form-modal-item-link')]//input[@class='form-control' and @type='text']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PUBLISH_URL_FORM_PAGE</td>
-	<td>//div[contains(@class,'ddm-form-basic-info')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -548,15 +543,41 @@
 	<td></td>
 	<td></td>
 </tr>
+<!--DATA_PROVIDER_INPUT_PARAMETER-->
+<tr>
+	<td>DATA_PROVIDER_INPUT_PARAMETER_LABEL_FIELD</td>
+	<td>//div[contains(@data-field-name,'inputParameters')]//input[@type='text' and contains(@name,'inputParameters') and contains(@placeholder,'label')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_PROVIDER_INPUT_PARAMETER_NAME_FIELD</td>
+	<td>//div[contains(@data-field-name,'inputParameters')]//input[@type='text' and contains(@name,'inputParameters') and contains(@placeholder,'parameter')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_PROVIDER_INPUT_PARAMETER_TYPE_FIELD</td>
+	<td>//div[contains(@data-field-name,'inputParameters')]//div[contains(@data-field-name,'inputParameterType')]//div[contains(@class,'form-builder-select-field')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_PROVIDER_INPUT_PARAMETER_TYPE_FIELD_OPTIONS_LIST</td>
+	<td>//div[contains(@class,'dropdown-menu') and contains(@class,'show')]//li[contains(.,'${key_inputParameterType}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--DATA_PROVIDER_OUTPUT_PARAMETER-->
 <tr>
 	<td>DATA_PROVIDER_OUTPUT_PARAMETER_PATH_FIELD_2</td>
-	<td>xpath=(//input[contains(@class,'ddm-field-text') and contains(@id,'outputParameterPath')])[2]</td>
+	<td>//div[@data-field-name='outputParameters'][2]//div[@data-field-name='outputParameterPath']//input[contains(@class,'ddm-field-text')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DATA_PROVIDER_OUTPUT_PARAMETER_LABEL_FIELD_2</td>
-	<td>xpath=(//input[contains(@class,'ddm-field-text') and contains(@id,'outputParameterName')])[2]</td>
+	<td>//div[@data-field-name='outputParameters'][2]//div[@data-field-name='outputParameterName']//input[contains(@class,'ddm-field-text')]</td>
 	<td></td>
 </tr>
 <tr>

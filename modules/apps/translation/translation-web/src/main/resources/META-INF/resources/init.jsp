@@ -42,11 +42,13 @@ page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %><%@
 page import="com.liferay.translation.exception.XLIFFFileException" %><%@
 page import="com.liferay.translation.web.internal.display.context.ExportTranslationDisplayContext" %><%@
 page import="com.liferay.translation.web.internal.display.context.ImportTranslationDisplayContext" %><%@
+page import="com.liferay.translation.web.internal.display.context.ImportTranslationResultsDisplayContext" %><%@
 page import="com.liferay.translation.web.internal.display.context.TranslateDisplayContext" %><%@
 page import="com.liferay.translation.web.internal.display.context.ViewDisplayContext" %><%@
 page import="com.liferay.translation.web.internal.display.context.ViewTranslationDisplayContext" %>
 
-<%@ page import="java.util.List" %><%@
+<%@ page import="java.util.Iterator" %><%@
+page import="java.util.List" %><%@
 page import="java.util.Locale" %><%@
 page import="java.util.Map" %>
 

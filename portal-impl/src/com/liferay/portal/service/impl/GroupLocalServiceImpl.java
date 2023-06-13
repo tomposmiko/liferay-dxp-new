@@ -4357,22 +4357,30 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 			// Join by Users_Orgs
 
-			long[] organizationIds =
-				_userPersistence.getOrganizationPrimaryKeys(userId);
+			List<Organization> organizations =
+				_userPersistence.getOrganizations(userId);
 
-			for (long organizationId : organizationIds) {
+			for (Organization organization : organizations) {
 				for (Group group : groups) {
-					if (organizationId == group.getClassPK()) {
+					long classPK = group.getClassPK();
+
+					if (organization.getOrganizationId() == classPK) {
 						joinedGroups.add(group);
 					}
+					else if (!PropsValues.ORGANIZATIONS_MEMBERSHIP_STRICT) {
+						String treePath = organization.getTreePath();
+
+						if (treePath.contains(String.valueOf(classPK))) {
+							joinedGroups.add(group);
+						}
+					}
 				}
-			}
 
-			// Join by Groups_Orgs and Users_Orgs
+				// Join by Groups_Orgs and Users_Orgs
 
-			for (long organizationId : organizationIds) {
 				joinedGroups.addAll(
-					_organizationPersistence.getGroups(organizationId));
+					_organizationPersistence.getGroups(
+						organization.getOrganizationId()));
 			}
 
 			// Join by Groups_UserGroups and Users_UserGroups
@@ -5167,6 +5175,24 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				RemoteExportException remoteExportException =
 					new RemoteExportException(
 						RemoteExportException.INVALID_GROUP);
+
+				remoteExportException.setGroupId(remoteGroupId);
+
+				throw remoteExportException;
+			}
+
+			// Ensure that local staging is not enabled in the remote group
+
+			boolean remoteStaged = GetterUtil.getBoolean(
+				remoteGroup.getTypeSettingsProperty("staged"));
+			boolean remoteStagedRemotely = GetterUtil.getBoolean(
+				remoteGroup.getTypeSettingsProperty("stagedRemotely"));
+
+			if (remoteStaged && !remoteStagedRemotely) {
+				RemoteExportException remoteExportException =
+					new RemoteExportException(
+						RemoteExportException.INVALID_STATE,
+						"Local staging is already enabled in remote group");
 
 				remoteExportException.setGroupId(remoteGroupId);
 

@@ -50,7 +50,6 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
-
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 
@@ -63,8 +62,9 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8483 | Test Summary: Add members from different pages"
 	@priority = "3"
 	test CanAddMembersFromDifferentPages {
-		var usernameList = "user1,user2,user3,user4,user5";
+		property portal.upstream = "quarantine";
 
+		var usernameList = "user1,user2,user3,user4,user5";
 		var emailList = "userea@liferay.com,user1@liferay.com,user2@liferay.com,user3@liferay.com,user4@liferay.com,user5@liferay.com";
 
 		task ("Add 5 more new users") {
@@ -174,7 +174,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -230,7 +230,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 
@@ -273,6 +273,9 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8478 | Test Summary: Create a Dynamic Individuals Segment By Date"
 	@priority = "4"
 	test CanCreateDynamicIndividualsSegmentByDate {
+		property portal.upstream = "quarantine";
+		property test.name.skip.portal.instance = "SegmentsCreation#CanCreateDynamicIndividualsSegmentByDate";
+
 		var fullNameList = "userfn userln,user1 user1";
 
 		task ("Add one more user with a given birth date") {
@@ -368,8 +371,9 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8481 | Test Summary: Create a Dynamic Individuals Segment with a criteria that uses a boolean and a does not contain"
 	@priority = "4"
 	test CanCreateDynamicSegmentWithIndividualCriteriaUsesBooleanAndDoesNotContain {
-		var usernameList = "user1,user2,user3";
+		property test.name.skip.portal.instance = "SegmentsCreation#CanCreateDynamicSegmentWithIndividualCriteriaUsesBooleanAndDoesNotContain";
 
+		var usernameList = "user1,user2,user3";
 		var emailList = "user1@liferay.com,user2@liferay.com,user3@liferay.com";
 
 		task ("Add three more new users") {
@@ -486,10 +490,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8480 | Test Summary: Create a Dynamic Individuals Segment with a criteria that uses is known and is not"
 	@priority = "4"
 	test CanCreateDynamicSegmentWithIndividualCriteriaUsesIsKnownAndIsNot {
+		property test.name.skip.portal.instance = "SegmentsCreation#CanCreateDynamicSegmentWithIndividualCriteriaUsesIsKnownAndIsNot";
+
 		var usernameList = "user1,user2,user3";
-
 		var emailList = "user1@liferay.com,user2@liferay.com,user3@liferay.com";
-
 		var membershipList = "user1 user1,user3 user3";
 
 		task ("Add three more new users") {
@@ -616,7 +620,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -670,7 +674,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -715,10 +719,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8482 | Test Summary: Create a nested criteria"
 	@priority = "3"
 	test CanCreateNestedCriteria {
+		property test.name.skip.portal.instance = "SegmentsCreation#CanCreateNestedCriteria";
+
 		var usernameList = "userea,user1,test";
-
 		var emailList = "userea@liferay.com,user1@liferay.com,test@liferay.com";
-
 		var fullNameList = "userfn userln,Test Test,user1 user1";
 
 		task ("Add one more user with a given birth date") {
@@ -867,10 +871,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-7962 | Test Summary: Create a segment that contains anonymous individuals"
 	@priority = "5"
 	test CanCreateSegmentWithAnonymousIndividuals {
+		property portal.upstream = "quarantine";
+
 		var usernameList = "ac,liferay,dxp";
-
 		var emailList = "ac@liferay.com,liferay@liferay.com,dxp@liferay.com";
-
 		var nameList = "ac ac,liferay liferay,dxp dxp";
 
 		task ("Get site assigned property name") {
@@ -946,17 +950,27 @@ definition {
 		task ("Switch tab to membership and check the membership list") {
 			ACNavigation.switchTab(tabName = "Membership");
 
-			ACUtils.viewNameList(nameList = "${nameList}");
+			ACUtils.viewNoResultsMessage(noResultMessage = "There are no items found.");
+		}
+
+		task ("Edit the segment") {
+			ACNavigation.goToSegments();
+
+			ACSegments.editSegment(segmentName = "Dynamic Segment Test");
+		}
+
+		task ("View preview number") {
+			ACSegments.viewPreviewNumber(previewNumber = "3");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8479 | Test Summary: Create a Segment with a Number Property"
 	@priority = "4"
 	test CanCreateSegmentWithNumberProperty {
+		property portal.upstream = "quarantine";
+
 		var usernameList = "user1,user2,user3";
-
 		var emailList = "user1@liferay.com,user2@liferay.com,user3@liferay.com";
-
 		var membershipList = "user1 user1,user3 user3";
 
 		task ("Add three more new users") {
@@ -1073,7 +1087,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -1184,10 +1198,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8471 | Test Summary: Paginate Segment Profile in Membership List"
 	@priority = "3"
 	test CanPaginateSegmentProfileInMembershipList {
+		property portal.upstream = "quarantine";
+
 		var usernameList = "user1,user2,user3,user4,user5";
-
 		var emailList = "userea@liferay.com,user1@liferay.com,user2@liferay.com,user3@liferay.com,user4@liferay.com,user5@liferay.com";
-
 		var nameList = "userfn userln,user1 user1,user2 user2,user3 user3,user4 user4";
 
 		task ("Add 5 more new users") {
@@ -1258,11 +1272,13 @@ definition {
 			ACNavigation.switchTab(tabName = "Membership");
 		}
 
+		task ("View all users are shown in current page") {
+			ACUtils.viewNameList(nameList = "${nameList},user5 user5");
+		}
+
 		task ("Select the 5 Items in Pagination") {
 			ACUtils.changePagination(itemsPerPage = "5");
 		}
-
-		ScrollWebElementIntoView(locator1 = "ACSegments#SEGMENT_MEMBERS_TABLE");
 
 		task ("View only 5 users are shown in page 1") {
 			ACUtils.viewNameList(nameList = "${nameList}");
@@ -1285,8 +1301,8 @@ definition {
 	@priority = "3"
 	test CanPaginateStaticSegmentAddMembers {
 		var usernameList = "user1,user2,user3,user4,user5";
-
 		var emailList = "userea@liferay.com,user1@liferay.com,user2@liferay.com,user3@liferay.com,user4@liferay.com,user5@liferay.com";
+		var nameList = "user1 user1,user2 user2,user3 user3,user4 user4,user5 user5";
 
 		task ("Add 5 more new users") {
 			for (var name : list "${usernameList}") {
@@ -1337,9 +1353,7 @@ definition {
 		}
 
 		task ("View all users are shown in current page") {
-			for (var username : list "user1 user1,user2 user2,user3 user3,user4 user4,user5 user5,userfn userln") {
-				ACUtils.viewNameList(nameList = "${username}");
-			}
+			ACUtils.viewNameList(nameList = "${nameList},userfn userln");
 		}
 
 		task ("Select the 5 items in Add Members modal") {
@@ -1347,9 +1361,7 @@ definition {
 		}
 
 		task ("View only 5 users are shown in current page") {
-			for (var username : list "user1 user1,user2 user2,user3 user3,user4 user4,user5 user5") {
-				ACUtils.viewNameList(nameList = "${username}");
-			}
+			ACUtils.viewNameList(nameList = "${nameList}");
 
 			AssertElementNotPresent(
 				key_TableMember = "userfn userln",
@@ -1369,7 +1381,6 @@ definition {
 	@priority = "3"
 	test CanPreviewDynamicSegmentMembers {
 		var emailList = "userea@liferay.com,user1@liferay.com";
-
 		var usernameList = "userfn userln,user1 user1";
 
 		task ("Add one more user with a jobTitle") {
@@ -1457,6 +1468,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8473 | Test Summary: Filter the Segment 'Add Members' Modal"
 	@priority = "3"
 	test CanSearchUserInAddMembersModal {
+		property portal.upstream = "quarantine";
+
 		var emailList = "userea@liferay.com,user1@liferay.com";
 
 		task ("Add one more user with a given birth date") {
@@ -1539,7 +1552,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -1553,9 +1566,8 @@ definition {
 		Click(locator1 = "ACSegments#CREATE_SEGMENT_BUTTON");
 
 		for (var segmentType : list "Dynamic Segment,Static Segment") {
-			getFirst = StringUtil.extractFirst("${segmentType}"," ");
-
-			getFirst = StringUtil.upperCase("${getFirst}");
+			var getFirst = StringUtil.extractFirst("${segmentType}", " ");
+			var getFirst = StringUtil.upperCase("${getFirst}");
 
 			AssertTextEquals(
 				key_SegmentType = "${getFirst}",
@@ -1592,7 +1604,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}

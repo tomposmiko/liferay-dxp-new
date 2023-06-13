@@ -49,7 +49,6 @@ definition {
 				locator1 = "DDMEditTemplate#CODE_MIRROR_EDITOR_CONTENT",
 				value1 = "${templateScript}");
 		}
-
 		else if (isSet(fieldNameList)) {
 			for (var fieldName : list "${fieldNameList}") {
 				AssertClick(
@@ -59,14 +58,10 @@ definition {
 					value1 = "${fieldName}");
 			}
 		}
-
 		else {
 			Click(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
 
-			var testBaseDirName = PropsUtil.get("test.base.dir.name");
-			var testDependenciesDirName = PropsUtil.get("test.dependencies.dir.name");
-			var filePath = "${testBaseDirName}tests/enduser/wem/applicationdisplaytemplate/${testDependenciesDirName}/${adtFile}";
-			var filePath = FileUtil.fixFilePath("${filePath}");
+			var filePath = TestCase.getDependenciesDirPath(fileName = "${adtFile}");
 
 			UploadFile(
 				inputFieldId = "importScript",
@@ -99,10 +94,7 @@ definition {
 		if (isSet(adtFile)) {
 			Click(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
 
-			var testBaseDirName = PropsUtil.get("test.base.dir.name");
-			var testDependenciesDirName = PropsUtil.get("test.dependencies.dir.name");
-			var filePath = "${testBaseDirName}tests/enduser/wem/applicationdisplaytemplate/${testDependenciesDirName}/${adtFile}";
-			var filePath = FileUtil.fixFilePath("${filePath}");
+			var filePath = TestCase.getDependenciesDirPath(fileName = "${adtFile}");
 
 			UploadFile(
 				inputFieldId = "importScript",

@@ -69,7 +69,7 @@ public class AccountEntryUserRelServiceSoap {
 				long accountEntryId, long creatorUserId, String screenName,
 				String emailAddress, String locale, String firstName,
 				String middleName, String lastName, long prefixId,
-				long suffixId)
+				long suffixId, String jobTitle)
 		throws RemoteException {
 
 		try {
@@ -77,7 +77,7 @@ public class AccountEntryUserRelServiceSoap {
 				AccountEntryUserRelServiceUtil.addAccountEntryUserRel(
 					accountEntryId, creatorUserId, screenName, emailAddress,
 					LocaleUtil.fromLanguageId(locale), firstName, middleName,
-					lastName, prefixId, suffixId);
+					lastName, prefixId, suffixId, jobTitle);
 
 			return com.liferay.account.model.AccountEntryUserRelSoap.
 				toSoapModel(returnValue);
@@ -113,6 +113,46 @@ public class AccountEntryUserRelServiceSoap {
 		}
 	}
 
+	public static void addAccountEntryUserRels(
+			long accountEntryId, long[] accountUserIds)
+		throws RemoteException {
+
+		try {
+			AccountEntryUserRelServiceUtil.addAccountEntryUserRels(
+				accountEntryId, accountUserIds);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.account.model.AccountEntryUserRelSoap
+			addPersonTypeAccountEntryUserRel(
+				long accountEntryId, long creatorUserId, String screenName,
+				String emailAddress, String locale, String firstName,
+				String middleName, String lastName, long prefixId,
+				long suffixId, String jobTitle)
+		throws RemoteException {
+
+		try {
+			com.liferay.account.model.AccountEntryUserRel returnValue =
+				AccountEntryUserRelServiceUtil.addPersonTypeAccountEntryUserRel(
+					accountEntryId, creatorUserId, screenName, emailAddress,
+					LocaleUtil.fromLanguageId(locale), firstName, middleName,
+					lastName, prefixId, suffixId, jobTitle);
+
+			return com.liferay.account.model.AccountEntryUserRelSoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
 	public static void deleteAccountEntryUserRelByEmailAddress(
 			long accountEntryId, String emailAddress)
 		throws RemoteException {
@@ -121,6 +161,36 @@ public class AccountEntryUserRelServiceSoap {
 			AccountEntryUserRelServiceUtil.
 				deleteAccountEntryUserRelByEmailAddress(
 					accountEntryId, emailAddress);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static void deleteAccountEntryUserRels(
+			long accountEntryId, long[] accountUserIds)
+		throws RemoteException {
+
+		try {
+			AccountEntryUserRelServiceUtil.deleteAccountEntryUserRels(
+				accountEntryId, accountUserIds);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static void setPersonTypeAccountEntryUser(
+			long accountEntryId, long userId)
+		throws RemoteException {
+
+		try {
+			AccountEntryUserRelServiceUtil.setPersonTypeAccountEntryUser(
+				accountEntryId, userId);
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);

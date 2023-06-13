@@ -13,6 +13,7 @@ AUI.add(
 	'liferay-kaleo-designer-xml-definition-serializer',
 	(A) => {
 		var AArray = A.Array;
+		// eslint-disable-next-line @liferay/aui/no-object
 		var AObject = A.Object;
 		var Lang = A.Lang;
 
@@ -36,7 +37,7 @@ AUI.add(
 		var serializeDefinition = function (xmlNamespace, metadata, json) {
 			var description = metadata.description;
 			var name = metadata.name;
-			var version = metadata.version;
+			var version = parseInt(metadata.version, 10);
 
 			var buffer = [];
 
@@ -261,7 +262,10 @@ AUI.add(
 								XMLUtil.create('name', roleName)
 							);
 
-							if (dataAssignments.autoCreate[index] != null) {
+							if (
+								dataAssignments.autoCreate[index] !== null &&
+								dataAssignments.autoCreate[index] !== undefined
+							) {
 								buffer.push(
 									XMLUtil.create(
 										'autoCreate',

@@ -18,7 +18,7 @@ import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSet
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
-import com.liferay.object.web.internal.display.context.util.ObjectRequestHelper;
+import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -83,7 +83,7 @@ public class ObjectDefinitionsLayoutsDisplayContext {
 	public CreationMenu getCreationMenu() throws PortalException {
 		CreationMenu creationMenu = new CreationMenu();
 
-		if (!_hasAddObjectLayoutPermission()) {
+		if (!hasUpdateObjectDefinitionPermission()) {
 			return creationMenu;
 		}
 
@@ -119,7 +119,9 @@ public class ObjectDefinitionsLayoutsDisplayContext {
 			_objectRequestHelper.getLiferayPortletResponse());
 	}
 
-	private boolean _hasAddObjectLayoutPermission() throws PortalException {
+	public boolean hasUpdateObjectDefinitionPermission()
+		throws PortalException {
+
 		return _objectDefinitionModelResourcePermission.contains(
 			_objectRequestHelper.getPermissionChecker(),
 			getObjectDefinitionId(), ActionKeys.UPDATE);

@@ -52,6 +52,7 @@ definition {
 
 		task ("Assert the fragment editor has autocomplete for lfr-editable tags") {
 			var fragmentHTML = '''<lfr-editable id="" type="image">''';
+
 			var htmlSnippet = '''<lfr-''';
 
 			FragmentsEditor.autocompleteFragmentHTML(
@@ -62,6 +63,7 @@ definition {
 
 		task ("Assert the fragment editor has autocomplete for lfr-widget tags") {
 			var fragmentHTML = '''<lfr-widget-asset-list>''';
+
 			var htmlSnippet = '''<lfr-''';
 
 			FragmentsEditor.autocompleteFragmentHTML(
@@ -72,6 +74,7 @@ definition {
 
 		task ("Assert the fragment editor has autocomplete for variables") {
 			var fragmentHTML = '''${portalUtil''';
+
 			var htmlSnippet = '''${''';
 
 			FragmentsEditor.autocompleteFragmentHTML(
@@ -82,6 +85,7 @@ definition {
 
 		task ("Assert the fragment editor has autocomplete for variables") {
 			var fragmentHTML = '''[@liferay_editor''';
+
 			var htmlSnippet = '''[@''';
 
 			FragmentsEditor.autocompleteFragmentHTML(
@@ -145,6 +149,7 @@ definition {
 				item = "Edit");
 
 			var htmlSnippet = '''[resources:''';
+
 			var fragmentHTML = '''[resources:Document_1.jpg''';
 
 			FragmentsEditor.typeHtmlEditor(content = "");
@@ -196,6 +201,7 @@ definition {
 
 	@description = "This is a test for LPS-114145. The changes are saved automatically in fragment editor before publishing."
 	@priority = "5"
+	@uitest
 	test ViewDraftAutoSaved {
 		property portal.acceptance = "true";
 
@@ -214,9 +220,11 @@ definition {
 				entry = "Fragment Name",
 				item = "Edit");
 
+			var htmlContent = '''<div class="fragment_1">Fragment Name</div>''';
+
 			AssertTextEquals.assertPartialText(
 				locator1 = "FragmentEditor#HTML_EDITOR_CONTENT",
-				value1 = '''<div class="fragment_1">Fragment Name</div>''');
+				value1 = "${htmlContent}");
 		}
 	}
 
@@ -250,9 +258,11 @@ definition {
 				entry = "Fragment Name",
 				item = "Edit");
 
+			var htmlContent = '''<div class="fragment_1">New Fragment Name</div>''';
+
 			AssertTextEquals.assertPartialText(
 				locator1 = "FragmentEditor#HTML_EDITOR_CONTENT",
-				value1 = '''<div class="fragment_1">New Fragment Name</div>''');
+				value1 = "${htmlContent}");
 		}
 	}
 

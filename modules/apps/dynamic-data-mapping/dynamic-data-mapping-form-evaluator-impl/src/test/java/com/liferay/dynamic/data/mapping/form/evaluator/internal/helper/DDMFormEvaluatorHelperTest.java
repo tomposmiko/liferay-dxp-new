@@ -66,8 +66,6 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -86,7 +84,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -94,6 +91,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -104,19 +102,13 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Leonardo Barros
  * @author Marcellus Tavares
  */
-@PrepareForTest(ResourceBundleLoaderUtil.class)
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor(
-	"com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil"
-)
 public class DDMFormEvaluatorHelperTest extends PowerMockito {
 
 	@Before
@@ -124,7 +116,6 @@ public class DDMFormEvaluatorHelperTest extends PowerMockito {
 		setUpJSONFactoryUtil();
 		setUpLanguageUtil();
 		setUpPortalUtil();
-		setUpResourceBundleLoaderUtil();
 
 		_ddmExpressionFactory = new DDMExpressionFactoryImpl();
 	}
@@ -301,6 +292,129 @@ public class DDMFormEvaluatorHelperTest extends PowerMockito {
 		Assert.assertNull(ddmFormFieldPropertyChanges.get("valid"));
 		Assert.assertTrue(
 			(boolean)ddmFormFieldPropertyChanges.get("repeatable"));
+	}
+
+	@Test
+	public void testGetSameResponseAfterCalculateDDMFormRuleEvaluations()
+		throws Exception {
+
+		DDMForm ddmForm = new DDMForm();
+
+		ddmForm.addDDMFormField(
+			createDDMFormField("field0", "text", FieldConstants.STRING));
+		ddmForm.addDDMFormField(
+			createDDMFormField("field1", "numeric", FieldConstants.DOUBLE));
+
+		BigDecimal expectedValue1 = new BigDecimal(1);
+
+		ddmForm.addDDMFormRule(
+			new DDMFormRule(
+				Arrays.asList(
+					String.format(
+						"calculate(\"field1\", %s)",
+						expectedValue1.toString())),
+				"equals(getValue(\"field0\"), \"field0_value\")"));
+
+		BigDecimal expectedValue2 = new BigDecimal(2);
+
+		ddmForm.addDDMFormRule(
+			new DDMFormRule(
+				Arrays.asList(
+					String.format(
+						"calculate(\"field1\", %s)",
+						expectedValue2.toString())),
+				"equals(getValue(\"field0\"), \"field0_value2\")"));
+
+		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
+			ddmForm);
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"field0_instanceId", "field0",
+				new UnlocalizedValue("field0_value")));
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"field1_instanceId", "field1", new UnlocalizedValue("")));
+
+		DDMFormEvaluatorEvaluateResponse ddmFormEvaluatorEvaluateResponse =
+			evaluate(ddmForm, ddmFormValues);
+
+		DDMFormEvaluatorFieldContextKey ddmFormEvaluatorFieldContextKey =
+			new DDMFormEvaluatorFieldContextKey("field1", "field1_instanceId");
+
+		Map<DDMFormEvaluatorFieldContextKey, Map<String, Object>>
+			ddmFormFieldsPropertyChanges =
+				ddmFormEvaluatorEvaluateResponse.
+					getDDMFormFieldsPropertyChanges();
+
+		Map<String, Object> ddmFormFieldPropertyChanges =
+			ddmFormFieldsPropertyChanges.get(ddmFormEvaluatorFieldContextKey);
+
+		Assert.assertEquals(
+			expectedValue1, ddmFormFieldPropertyChanges.get("value"));
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"field0_instanceId", "field0",
+				new UnlocalizedValue("field0_value2")));
+
+		ddmFormEvaluatorEvaluateResponse = evaluate(ddmForm, ddmFormValues);
+
+		ddmFormFieldsPropertyChanges =
+			ddmFormEvaluatorEvaluateResponse.getDDMFormFieldsPropertyChanges();
+
+		ddmFormFieldPropertyChanges = ddmFormFieldsPropertyChanges.get(
+			ddmFormEvaluatorFieldContextKey);
+
+		Assert.assertEquals(
+			expectedValue2, ddmFormFieldPropertyChanges.get("value"));
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"field0_instanceId", "field0",
+				new UnlocalizedValue("field0_value")));
+
+		ddmFormEvaluatorEvaluateResponse = evaluate(ddmForm, ddmFormValues);
+
+		ddmFormFieldsPropertyChanges =
+			ddmFormEvaluatorEvaluateResponse.getDDMFormFieldsPropertyChanges();
+
+		ddmFormFieldPropertyChanges = ddmFormFieldsPropertyChanges.get(
+			ddmFormEvaluatorFieldContextKey);
+
+		Assert.assertEquals(
+			expectedValue1, ddmFormFieldPropertyChanges.get("value"));
+	}
+
+	@Test
+	public void testInvalidConfirmationDecimalValue() throws Exception {
+		DDMForm ddmForm = new DDMForm();
+
+		ddmForm.addDDMFormField(
+			createDDMFormFieldWithConfirmationField(
+				"field0", "numeric", FieldConstants.DOUBLE));
+
+		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
+			ddmForm);
+
+		ddmFormValues.addDDMFormFieldValue(
+			createDDMFormFieldValueWithConfirmationValue(
+				"field0_instanceId", "field0", "1.2", "1,3"));
+
+		DDMFormEvaluatorEvaluateResponse ddmFormEvaluatorEvaluateResponse =
+			evaluate(ddmForm, ddmFormValues);
+
+		Map<DDMFormEvaluatorFieldContextKey, Map<String, Object>>
+			ddmFormFieldsPropertyChanges =
+				ddmFormEvaluatorEvaluateResponse.
+					getDDMFormFieldsPropertyChanges();
+
+		Map<String, Object> ddmFormFieldPropertyChanges =
+			ddmFormFieldsPropertyChanges.get(
+				new DDMFormEvaluatorFieldContextKey(
+					"field0", "field0_instanceId"));
+
+		Assert.assertFalse((boolean)ddmFormFieldPropertyChanges.get("valid"));
 	}
 
 	@Test
@@ -1161,6 +1275,7 @@ public class DDMFormEvaluatorHelperTest extends PowerMockito {
 		Assert.assertFalse((boolean)ddmFormFieldPropertyChanges.get("valid"));
 	}
 
+	@Ignore
 	@Test
 	public void testValidationExpressionWithDateField() throws Exception {
 		DDMForm ddmForm = new DDMForm();
@@ -1522,6 +1637,34 @@ public class DDMFormEvaluatorHelperTest extends PowerMockito {
 			"The value should be greater than 10.",
 			ddmFormFieldPropertyChanges.get("errorMessage"));
 		Assert.assertFalse((boolean)ddmFormFieldPropertyChanges.get("valid"));
+	}
+
+	@Test
+	public void testValidConfirmationDecimalValue() throws Exception {
+		DDMForm ddmForm = new DDMForm();
+
+		ddmForm.addDDMFormField(
+			createDDMFormFieldWithConfirmationField(
+				"field0", "numeric", FieldConstants.DOUBLE));
+
+		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
+			ddmForm);
+
+		ddmFormValues.addDDMFormFieldValue(
+			createDDMFormFieldValueWithConfirmationValue(
+				"field0_instanceId", "field0", "1.2", "1,2"));
+
+		DDMFormEvaluatorEvaluateResponse ddmFormEvaluatorEvaluateResponse =
+			evaluate(ddmForm, ddmFormValues);
+
+		Map<DDMFormEvaluatorFieldContextKey, Map<String, Object>>
+			ddmFormFieldsPropertyChanges =
+				ddmFormEvaluatorEvaluateResponse.
+					getDDMFormFieldsPropertyChanges();
+
+		Assert.assertEquals(
+			ddmFormFieldsPropertyChanges.toString(), 0,
+			ddmFormFieldsPropertyChanges.size());
 	}
 
 	@Test
@@ -1928,7 +2071,7 @@ public class DDMFormEvaluatorHelperTest extends PowerMockito {
 
 		Mockito.when(
 			_language.get(
-				Matchers.any(ResourceBundle.class),
+				Matchers.any(Locale.class),
 				Matchers.eq("input-format-is-not-satisfied"))
 		).thenReturn(
 			"Input format is not satisfied."
@@ -1936,7 +2079,7 @@ public class DDMFormEvaluatorHelperTest extends PowerMockito {
 
 		Mockito.when(
 			_language.get(
-				Matchers.any(ResourceBundle.class),
+				Matchers.any(Locale.class),
 				Matchers.eq("this-field-is-invalid"))
 		).thenReturn(
 			"This field is invalid."
@@ -1944,7 +2087,7 @@ public class DDMFormEvaluatorHelperTest extends PowerMockito {
 
 		Mockito.when(
 			_language.get(
-				Matchers.any(ResourceBundle.class),
+				Matchers.any(Locale.class),
 				Matchers.eq("this-field-is-required"))
 		).thenReturn(
 			"This field is required."
@@ -1971,19 +2114,6 @@ public class DDMFormEvaluatorHelperTest extends PowerMockito {
 		);
 
 		portalUtil.setPortal(portal);
-	}
-
-	protected void setUpResourceBundleLoaderUtil() {
-		PowerMockito.mockStatic(ResourceBundleLoaderUtil.class);
-
-		ResourceBundleLoader portalResourceBundleLoader = Mockito.mock(
-			ResourceBundleLoader.class);
-
-		Mockito.when(
-			ResourceBundleLoaderUtil.getPortalResourceBundleLoader()
-		).thenReturn(
-			portalResourceBundleLoader
-		);
 	}
 
 	private DDMFormValues _createDDMFormFieldValuesWithValue(

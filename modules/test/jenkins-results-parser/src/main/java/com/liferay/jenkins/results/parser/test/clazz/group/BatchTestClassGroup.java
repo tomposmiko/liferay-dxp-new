@@ -22,6 +22,7 @@ import com.liferay.jenkins.results.parser.Job;
 import com.liferay.jenkins.results.parser.PortalGitWorkingDirectory;
 import com.liferay.jenkins.results.parser.PortalTestClassJob;
 import com.liferay.jenkins.results.parser.TestSuiteJob;
+import com.liferay.jenkins.results.parser.test.clazz.TestClass;
 
 import java.io.File;
 
@@ -80,17 +81,41 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 
 		Matcher jobNameMatcher = _jobNamePattern.matcher(topLevelJobName);
 
+		String batchJobSuffix = "-batch";
+
+		String slaveLabel = getSlaveLabel();
+
+		if (slaveLabel.contains("win")) {
+			batchJobSuffix = "-windows-batch";
+		}
+
 		if (jobNameMatcher.find()) {
 			return JenkinsResultsParserUtil.combine(
-				jobNameMatcher.group("jobBaseName"), "-batch",
+				jobNameMatcher.group("jobBaseName"), batchJobSuffix,
 				jobNameMatcher.group("jobVariant"));
 		}
 
-		return topLevelJobName + "-batch";
+		return topLevelJobName + batchJobSuffix;
 	}
 
 	public String getBatchName() {
 		return batchName;
+	}
+
+	public String getCohortName() {
+		String cohortName = getFirstPropertyValue("test.batch.cohort.name");
+
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(cohortName)) {
+			return cohortName;
+		}
+
+		cohortName = JenkinsResultsParserUtil.getCohortName();
+
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(cohortName)) {
+			return cohortName;
+		}
+
+		return "test-1";
 	}
 
 	@Override
@@ -161,27 +186,6 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 		}
 
 		return sb.toString();
-	}
-
-	public static class BatchTestClass extends BaseTestClass {
-
-		protected static BatchTestClass getInstance(
-			String batchName,
-			PortalGitWorkingDirectory portalGitWorkingDirectory) {
-
-			File testClassFile = new File(
-				portalGitWorkingDirectory.getWorkingDirectory(),
-				"build-test-batch.xml");
-
-			return new BatchTestClass(batchName, testClassFile);
-		}
-
-		protected BatchTestClass(String batchName, File testClassFile) {
-			super(testClassFile);
-
-			addTestClassMethod(batchName);
-		}
-
 	}
 
 	protected BatchTestClassGroup(

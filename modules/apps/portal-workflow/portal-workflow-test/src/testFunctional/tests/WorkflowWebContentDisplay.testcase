@@ -17,7 +17,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -28,7 +28,7 @@ definition {
 			panel = "Site Administration",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Web Content Display Page");
+		PagesAdmin.addPublicPage(pageName = "Web Content Display Page");
 
 		Navigator.gotoPage(pageName = "Web Content Display Page");
 
@@ -44,7 +44,7 @@ definition {
 		else {
 			WebContent.tearDownCP();
 
-			Page.tearDownPG();
+			PagesAdmin.tearDownCP();
 
 			Workflow.tearDownPortalWorkflow();
 

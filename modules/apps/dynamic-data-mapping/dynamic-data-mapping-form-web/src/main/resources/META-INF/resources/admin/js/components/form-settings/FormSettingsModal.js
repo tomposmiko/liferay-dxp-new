@@ -14,8 +14,12 @@
 
 import ClayButton from '@clayui/button';
 import ClayModal, {useModal} from '@clayui/modal';
-import {useConfig, useForm, useFormState} from 'data-engine-js-components-web';
-import {EVENT_TYPES as CORE_EVENT_TYPES} from 'data-engine-js-components-web/js/core/actions/eventTypes.es';
+import {
+	EVENT_TYPES as CORE_EVENT_TYPES,
+	useConfig,
+	useForm,
+	useFormState,
+} from 'data-engine-js-components-web';
 import React, {useEffect} from 'react';
 
 const FormSettingsModal = ({
@@ -48,7 +52,7 @@ const FormSettingsModal = ({
 	}, [dispatch, prevPagesRef, serializedSettingsContext]);
 
 	const {observer, onClose} = useModal({
-		onClose: () => {
+		onClose: async () => {
 			if (undoPagesRef.current) {
 				dispatch({
 					payload: prevPagesRef.current,
@@ -60,7 +64,35 @@ const FormSettingsModal = ({
 				});
 			}
 			else {
-				serializedSettingsContext.value = JSON.stringify({pages});
+				serializedSettingsContext.value = JSON.stringify({
+					pages,
+				});
+			}
+
+			const settingsDDMForm = await Liferay.componentReady(
+				'formSettingsAPI'
+			);
+
+			const showPartialResultsToRespondents = settingsDDMForm.reactComponentRef.current
+				.getFields()
+				.find(
+					({fieldName}) =>
+						fieldName === 'showPartialResultsToRespondents'
+				)?.value;
+
+			const alertElement = document.querySelector(
+				'.lfr-ddm__show-partial-results-alert'
+			);
+
+			if (showPartialResultsToRespondents) {
+				alertElement.classList.remove(
+					'lfr-ddm__show-partial-results-alert--hidden'
+				);
+			}
+			else {
+				alertElement.classList.add(
+					'lfr-ddm__show-partial-results-alert--hidden'
+				);
 			}
 
 			undoPagesRef.current = true;
@@ -79,7 +111,9 @@ const FormSettingsModal = ({
 					<ClayModal.Header>
 						{Liferay.Language.get('settings')}
 					</ClayModal.Header>
+
 					<ClayModal.Body>{children}</ClayModal.Body>
+
 					<ClayModal.Footer
 						last={
 							<ClayButton.Group key={1} spaced>
@@ -93,6 +127,7 @@ const FormSettingsModal = ({
 								>
 									{Liferay.Language.get('cancel')}
 								</ClayButton>
+
 								<ClayButton
 									displayType="primary"
 									onClick={() => {

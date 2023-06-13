@@ -58,7 +58,7 @@ definition {
 
 		AssertElementNotPresent(locator1 = "Button#BACK");
 
-		Depot.viewGeneralLanguageOptions(currentLanguageList = "es_ES");
+		Depot.viewGeneralLanguageOptions(currentLanguageList = "es-ES");
 
 		AssertElementPresent(
 			key_unnamedTitle = "Repositorio sin nombre",
@@ -99,11 +99,7 @@ definition {
 
 		Button.click(button = "Save");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
-
-		DepotNavigator.gotoGeneral(depotName = "Test Depot Name");
+		DepotNavigator.openDepotSettingsGeneral(depotName = "Test Depot Name");
 
 		Pause(locator1 = "3000");
 
@@ -236,11 +232,7 @@ definition {
 
 		Button.click(button = "Save");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
-
-		DepotNavigator.gotoGeneral(depotName = "Test Depot Name");
+		DepotNavigator.openDepotSettingsGeneral(depotName = "Test Depot Name");
 
 		Pause(locator1 = "3000");
 

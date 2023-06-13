@@ -84,7 +84,7 @@ long commercePriceModifierId = commercePriceListDisplayContext.getCommercePriceM
 					fieldName: ['title', 'LANG'],
 				},
 			],
-			spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
+			spritemap: '<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
 			titleLabel:
 				'<%= LanguageUtil.get(request, "add-existing-product-group") %>',
 		});
@@ -97,7 +97,7 @@ long commercePriceModifierId = commercePriceListDisplayContext.getCommercePriceM
 		<clay:headless-data-set-display
 			apiURL="<%= commercePriceListDisplayContext.getPriceModifierPricingClassesApiUrl() %>"
 			clayDataSetActionDropdownItems="<%= commercePriceListDisplayContext.getPriceModifierPricingClassClayDataSetActionDropdownItems() %>"
-			formId="fm"
+			formName="fm"
 			id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_MODIFIER_PRICING_CLASSES %>"
 			itemsPerPage="<%= 10 %>"
 			namespace="<%= liferayPortletResponse.getNamespace() %>"

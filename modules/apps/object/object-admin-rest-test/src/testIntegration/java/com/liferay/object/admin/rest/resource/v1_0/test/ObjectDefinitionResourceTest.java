@@ -42,6 +42,7 @@ public class ObjectDefinitionResourceTest
 	extends BaseObjectDefinitionResourceTestCase {
 
 	@After
+	@Override
 	public void tearDown() throws Exception {
 		super.tearDown();
 
@@ -140,6 +141,7 @@ public class ObjectDefinitionResourceTest
 				}
 			});
 		objectDefinition.setScope(ObjectDefinitionConstants.SCOPE_COMPANY);
+		objectDefinition.setTitleObjectFieldId(Long.valueOf(0));
 
 		return objectDefinition;
 	}

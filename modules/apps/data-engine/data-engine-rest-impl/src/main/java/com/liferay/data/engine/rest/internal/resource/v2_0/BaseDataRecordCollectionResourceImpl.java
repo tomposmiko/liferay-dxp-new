@@ -520,8 +520,9 @@ public abstract class BaseDataRecordCollectionResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putDataRecordCollectionPermission",
-					resourceName, resourceId)
+					ActionKeys.PERMISSIONS,
+					"putDataRecordCollectionPermissionsPage", resourceName,
+					resourceId)
 			).build(),
 			resourceId, resourceName, roleNames);
 	}
@@ -553,7 +554,7 @@ public abstract class BaseDataRecordCollectionResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putDataRecordCollectionPermission(
+			putDataRecordCollectionPermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("dataRecordCollectionId")
@@ -589,8 +590,9 @@ public abstract class BaseDataRecordCollectionResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putDataRecordCollectionPermission",
-					resourceName, resourceId)
+					ActionKeys.PERMISSIONS,
+					"putDataRecordCollectionPermissionsPage", resourceName,
+					resourceId)
 			).build(),
 			resourceId, resourceName, null);
 	}
@@ -919,9 +921,7 @@ public abstract class BaseDataRecordCollectionResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), entityModel);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid filter " + filterString, exception);
-			}
+			_log.error("Invalid filter " + filterString, exception);
 		}
 
 		return null;

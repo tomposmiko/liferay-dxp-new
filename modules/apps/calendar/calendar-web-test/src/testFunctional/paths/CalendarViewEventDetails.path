@@ -41,6 +41,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CALENDAR_COMMENT_DEFAULT_MESSAGE</td>
+	<td>//label[contains(text(),'Type your comment here.')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EVENT_DESCRIPTION</td>
+	<td>//p[contains(text(),'${key_eventDescription}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>

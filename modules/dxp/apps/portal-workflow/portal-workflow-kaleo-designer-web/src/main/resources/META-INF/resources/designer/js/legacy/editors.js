@@ -13,7 +13,6 @@ AUI.add(
 	'liferay-kaleo-designer-editors',
 	(A) => {
 		var AArray = A.Array;
-		var AObject = A.Object;
 		var getClassName = A.getClassName;
 		var Lang = A.Lang;
 		var Template = A.Template;
@@ -339,7 +338,7 @@ AUI.add(
 								item2.set(
 									'checked',
 									A.DataType.Boolean.parse(
-										value || typeof value == 'boolean'
+										value || typeof value === 'boolean'
 											? value
 											: true
 									)
@@ -559,6 +558,7 @@ AUI.add(
 				);
 
 				if (!editorForm) {
+					// eslint-disable-next-line @liferay/aui/no-merge
 					config = A.merge(
 						{
 							builder: instance.get('builder'),
@@ -579,6 +579,7 @@ AUI.add(
 			showEditorForm(editorFormClass, container, value, config) {
 				var instance = this;
 
+				// eslint-disable-next-line @liferay/aui/no-merge
 				config = A.merge(
 					{
 						render: container,
@@ -656,6 +657,7 @@ AUI.add(
 
 				strings: {
 					valueFn() {
+						// eslint-disable-next-line @liferay/aui/no-merge
 						return A.merge(KaleoDesignerStrings, {
 							assignmentTypeLabel:
 								KaleoDesignerStrings.assignmentType,
@@ -1236,6 +1238,7 @@ AUI.add(
 
 				strings: {
 					valueFn() {
+						// eslint-disable-next-line @liferay/aui/no-merge
 						return A.merge(KaleoDesignerStrings, {
 							assignmentTypeLabel:
 								KaleoDesignerStrings.recipientType,
@@ -1572,7 +1575,8 @@ AUI.add(
 
 					var value = recipients[index];
 
-					if (value && AObject.isEmpty(value)) {
+					// eslint-disable-next-line @liferay/aui/no-object
+					if (value && A.Object.isEmpty(value)) {
 						value.assignmentType = 'taskAssignees';
 						value.receptionType = ['to'];
 						value.taskAssignees = [''];
@@ -1712,6 +1716,7 @@ AUI.add(
 
 					instance.set('recipients', localRecipients);
 
+					// eslint-disable-next-line @liferay/aui/no-merge
 					return A.merge(
 						NotificationsEditorForm.superclass.getValue.apply(
 							this,
@@ -1892,6 +1897,7 @@ AUI.add(
 
 			instance.set('recipients', localRecipients);
 
+			// eslint-disable-next-line @liferay/aui/no-merge
 			return A.merge(
 				NotificationsEditorForm.superclass.getValue.apply(
 					this,

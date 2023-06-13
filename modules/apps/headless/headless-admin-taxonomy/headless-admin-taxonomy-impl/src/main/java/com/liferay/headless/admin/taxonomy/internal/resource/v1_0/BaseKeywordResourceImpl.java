@@ -267,8 +267,9 @@ public abstract class BaseKeywordResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putAssetLibraryKeywordPermission",
-					portletName, assetLibraryId)
+					ActionKeys.PERMISSIONS,
+					"putAssetLibraryKeywordPermissionsPage", portletName,
+					assetLibraryId)
 			).build(),
 			assetLibraryId, portletName, roleNames);
 	}
@@ -294,7 +295,7 @@ public abstract class BaseKeywordResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putAssetLibraryKeywordPermission(
+			putAssetLibraryKeywordPermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("assetLibraryId")
@@ -326,8 +327,9 @@ public abstract class BaseKeywordResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putAssetLibraryKeywordPermission",
-					portletName, assetLibraryId)
+					ActionKeys.PERMISSIONS,
+					"putAssetLibraryKeywordPermissionsPage", portletName,
+					assetLibraryId)
 			).build(),
 			assetLibraryId, portletName, null);
 	}
@@ -816,7 +818,7 @@ public abstract class BaseKeywordResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putSiteKeywordPermission",
+					ActionKeys.PERMISSIONS, "putSiteKeywordPermissionsPage",
 					portletName, siteId)
 			).build(),
 			siteId, portletName, roleNames);
@@ -843,7 +845,7 @@ public abstract class BaseKeywordResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putSiteKeywordPermission(
+			putSiteKeywordPermissionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteId")
@@ -874,7 +876,7 @@ public abstract class BaseKeywordResourceImpl
 			).put(
 				"replace",
 				addAction(
-					ActionKeys.PERMISSIONS, "putSiteKeywordPermission",
+					ActionKeys.PERMISSIONS, "putSiteKeywordPermissionsPage",
 					portletName, siteId)
 			).build(),
 			siteId, portletName, null);
@@ -1131,9 +1133,7 @@ public abstract class BaseKeywordResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), entityModel);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid filter " + filterString, exception);
-			}
+			_log.error("Invalid filter " + filterString, exception);
 		}
 
 		return null;

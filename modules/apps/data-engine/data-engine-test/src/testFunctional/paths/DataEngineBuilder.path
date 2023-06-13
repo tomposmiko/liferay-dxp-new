@@ -32,7 +32,12 @@
 </tr>
 <tr>
 	<td>FIELD_LABEL_INDEXED</td>
-	<td>xpath=(//label[normalize-space(text())='${key_fieldLabel}'] | //legend[normalize-space(text())='${key_fieldLabel}'])[${index}]</td>
+	<td>xpath=(//label[not(contains(@class,'sr-only'))][normalize-space(text())='${key_fieldLabel}'] | //legend[normalize-space(text())='${key_fieldLabel}'])[${index}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FIELD_NAME_INDEXED</td>
+	<td>xpath=(//span[contains(@class,'actions-label') and contains (text(),'${key_fieldName}')])[${index}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -98,6 +103,11 @@
 <tr>
 	<td>OPTION_REMOVE_BUTTON_INDEXED</td>
 	<td>xpath=(//div[contains(@class,'ddm-option-entry')]//button[contains(@class,'close')])[${index}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>OPTION_SELECTED</td>
+	<td>//input[contains(@class,'custom-control-input') and contains(@value,'${key_optionValue}')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -1,6 +1,12 @@
 definition {
 
 	macro addCSVDataSource {
+		var n = "1";
+
+		if (!(isSet(index))) {
+			var index = "2";
+		}
+
 		ACSettings.goToDataSources();
 
 		Button.click(button = "Add Data Source");
@@ -9,16 +15,23 @@ definition {
 			key_sourceType = "CSV File",
 			locator1 = "ACSettings#DXP_DATA_SOURCE_CHOOSE_OPTION");
 
+		UploadDependencyFile.uploadFile(fileName = "${sourceFileName}");
+
+		WaitForVisible(locator1 = "ACSettings#FILE_UPLOAD_SUCCESS_ICON");
+
 		Type(
 			key_text = "Name Data Source",
 			locator1 = "TextInput#ANY",
 			value1 = "${dataSourceName}");
 
-		UploadFileWithCustomPath.uploadFile(
-			fileName = "${sourceFileName}",
-			filePath = "enduser/analyticscloud");
+		while (IsElementPresent(key_text = "Next", locator1 = "Button#ANY_DISABLED")) {
+			Type(
+				key_text = "Name Data Source",
+				locator1 = "TextInput#ANY",
+				value1 = "${dataSourceName} ${n}");
 
-		WaitForVisible(locator1 = "ACSettings#FILE_UPLOAD_SUCCESS_ICON");
+			var n = ${n} + 1;
+		}
 
 		WaitForElementPresent(
 			key_text = "Next",
@@ -27,41 +40,42 @@ definition {
 		Button.clickNext();
 
 		if (isSet(selectAnalyticsCloudField)) {
-			Button.click(button = "Select Analytics Cloud Field");
+			if (IsElementNotPresent(key_FieldName = "${fieldName}", key_index = "${index}", locator1 = "ACSettings#DATA_SOURCE_FIELD_NAME")) {
+				Button.click(button = "Select Analytics Cloud Field");
 
-			if (isSet(newField)) {
-				Button.click(button = "New Field");
+				if (isSet(newField)) {
+					Button.click(button = "New Field");
 
-				Type(
-					key_text = "New Field Name",
-					locator1 = "TextInput#ANY",
-					value1 = "${fieldName}");
+					Type(
+						key_text = "New Field Name",
+						locator1 = "TextInput#ANY",
+						value1 = "${fieldName}");
 
-				Button.click(button = "Select");
+					Button.click(button = "Select");
 
-				MenuItem.click(menuItem = "${fieldType}");
+					MenuItem.click(menuItem = "${fieldType}");
 
-				WaitForElementNotPresent(
-					key_text = "Create",
-					locator1 = "Button#ANY_DISABLED");
+					WaitForElementNotPresent(
+						key_text = "Create",
+						locator1 = "Button#ANY_DISABLED");
 
-				Button.click(button = "Create");
-			}
-			else {
-				if (isSet(fieldNameList)) {
-					for (var item : list "${fieldNameList}") {
-						ACUtils.searchBar(searchItem = "${item}");
-
-						MenuItem.click(menuItem = "${item}");
-
-						if (IsElementPresent(key_text = "Select Analytics Cloud Field",
-								locator1 = "Button#ANY")) {
-							Button.click(button = "Select Analytics Cloud Field");
-						}
-					}
+					Button.click(button = "Create");
 				}
 				else {
-					MenuItem.click(menuItem = "${fieldName}");
+					if (isSet(fieldNameList)) {
+						for (var item : list "${fieldNameList}") {
+							ACUtils.searchBar(searchItem = "${item}");
+
+							MenuItem.click(menuItem = "${item}");
+
+							if (IsElementPresent(key_text = "Select Analytics Cloud Field", locator1 = "Button#ANY")) {
+								Button.click(button = "Select Analytics Cloud Field");
+							}
+						}
+					}
+					else {
+						MenuItem.click(menuItem = "${fieldName}");
+					}
 				}
 			}
 		}
@@ -226,7 +240,7 @@ definition {
 
 	@summary = "Asserts the individuals usage value \
 	@param individualUsageValue"
-	macro assertIndividualsUsage() {
+	macro assertIndividualsUsage {
 		AssertTextEquals(
 			locator1 = "ACSettings#INDIVIDUALS_USAGE_METRIC",
 			value1 = "${individualUsageValue}");
@@ -281,7 +295,7 @@ definition {
 
 	@summary = "Asserts the page views usage value \
 	@param pageViewsUsageValue"
-	macro assertPageViewsUsage() {
+	macro assertPageViewsUsage {
 		AssertTextEquals(
 			locator1 = "ACSettings#PAGE_VIEWS_USAGE_METRIC",
 			value1 = "${pageViewsUsageValue}");
@@ -345,7 +359,7 @@ definition {
 	}
 
 	@summary = "Asserts the users shown in list"
-	macro assertUserList() {
+	macro assertUserList {
 		AssertTextEquals(
 			locator1 = "ACSettings#USER_LIST",
 			value1 = "${userName}");
@@ -474,7 +488,7 @@ definition {
 
 		Click(locator1 = "ACDataControlAndPrivacy#SELECT_USER");
 
-		var email = selenium.getText(locator1 = "ACDataControlAndPrivacy#SELECTED_USER");
+		var email = selenium.getText("ACDataControlAndPrivacy#SELECTED_USER");
 
 		Button.clickSave();
 
@@ -493,6 +507,8 @@ definition {
 
 		while (IsElementPresent(locator1 = "ACSettings#ITEM_TABLE")) {
 			ACSettings.deleteDataSource();
+
+			Refresh();
 		}
 	}
 
@@ -510,8 +526,8 @@ definition {
 	macro deleteAllPendingUsers {
 		ACSettings.goToUserManagement();
 
-		while (IsElementPresent(locator1= "ACSettings#VIEW_STATUS_PENDING")) {
-			if (IsElementPresent(locator1= "ACSettings#VIEW_STATUS_PENDING")) {
+		while (IsElementPresent(locator1 = "ACSettings#VIEW_STATUS_PENDING")) {
+			if (IsElementPresent(locator1 = "ACSettings#VIEW_STATUS_PENDING")) {
 				Click(locator1 = "ACSettings#DELETE_USER");
 
 				Click(locator1 = "ACSettings#CONTINUE_BUTTON");
@@ -557,7 +573,6 @@ definition {
 
 			ACNavigation.openItem(itemName = "${dataSourceName}");
 		}
-
 		else {
 			Click(locator1 = "ACSettings#ITEM_TABLE");
 		}
@@ -591,7 +606,6 @@ definition {
 
 			Click(locator1 = "ACSettings#DELETE_BUTTON_DATA_SOURCE");
 		}
-
 		else {
 			var dataSourceName = selenium.getText("//h3");
 
@@ -764,8 +778,16 @@ definition {
 		return "${percentage}";
 	}
 
+	macro goToAccounts {
+		ACSettings.goToDefinitionsOptions(definitionsOptions = "accounts");
+	}
+
 	macro goToApis {
 		ACSettings.goToSettingsNavigation(settingsNavigation = "apis");
+	}
+
+	macro goToBehaviors {
+		ACSettings.goToDefinitionsOptions(definitionsOptions = "behaviors");
 	}
 
 	macro goToDataControlAndPrivacy {
@@ -780,8 +802,34 @@ definition {
 		ACSettings.goToSettingsNavigation(settingsNavigation = "definitions");
 	}
 
+	macro goToDefinitionsOptions {
+		var key_DefinitionsOptions = "${definitionsOptions}";
+
+		Click(locator1 = "ACSettings#DEFINITIONS_OPTIONS");
+	}
+
+	macro goToEventAttributes {
+		ACSettings.goToDefinitionsOptions(definitionsOptions = "event-attributes");
+	}
+
+	macro goToEvents {
+		ACSettings.goToDefinitionsOptions(definitionsOptions = "events");
+	}
+
+	macro goToIndividuals {
+		ACSettings.goToDefinitionsOptions(definitionsOptions = "individual");
+	}
+
+	macro goToInterests {
+		ACSettings.goToDefinitionsOptions(definitionsOptions = "interest");
+	}
+
 	macro goToProperties {
 		ACSettings.goToSettingsNavigation(settingsNavigation = "properties");
+	}
+
+	macro goToSearch {
+		ACSettings.goToDefinitionsOptions(definitionsOptions = "search");
 	}
 
 	macro goToSettingsNavigation {
@@ -856,9 +904,7 @@ definition {
 	}
 
 	macro viewPropertyListDefaultMessage {
-		AssertElementPresent(
-			key_text = "No Properties Found",
-			locator1 = "FormViewBuilder#ENTRIES_TITLE_CONTENT");
+		AssertElementPresent(locator1 = "ACSettings#NO_PROPERTIES_FOUND");
 
 		AssertElementPresent(locator1 = "ACSettings#PROPERTIES_DEFAULT_SECONDARY_DESCRIPTION");
 	}

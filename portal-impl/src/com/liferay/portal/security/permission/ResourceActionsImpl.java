@@ -571,6 +571,7 @@ public class ResourceActionsImpl implements ResourceActions {
 		return false;
 	}
 
+	@Override
 	public void populateModelResources(
 			ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -594,6 +595,7 @@ public class ResourceActionsImpl implements ResourceActions {
 		}
 	}
 
+	@Override
 	public void populateModelResources(Document document)
 		throws ResourceActionsException {
 
@@ -619,6 +621,7 @@ public class ResourceActionsImpl implements ResourceActions {
 		}
 	}
 
+	@Override
 	public void populatePortletResource(
 			Portlet portlet, ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -645,6 +648,7 @@ public class ResourceActionsImpl implements ResourceActions {
 			_getPortletResourceActions(portletResourceName, portlet));
 	}
 
+	@Override
 	public void populatePortletResources(
 			ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -1506,11 +1510,10 @@ public class ResourceActionsImpl implements ResourceActions {
 
 	private static class ResourceBundleLoaderListHolder {
 
-		private static final ServiceTrackerList
-			<ResourceBundleLoader, ResourceBundleLoader>
-				_resourceBundleLoaders = ServiceTrackerListFactory.open(
-					SystemBundleUtil.getBundleContext(),
-					ResourceBundleLoader.class);
+		private static final ServiceTrackerList<ResourceBundleLoader>
+			_resourceBundleLoaders = ServiceTrackerListFactory.open(
+				SystemBundleUtil.getBundleContext(),
+				ResourceBundleLoader.class);
 
 	}
 

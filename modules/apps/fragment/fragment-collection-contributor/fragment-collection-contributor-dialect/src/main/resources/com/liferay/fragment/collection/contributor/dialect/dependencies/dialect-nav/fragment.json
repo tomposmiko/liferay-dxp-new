@@ -1,7 +1,6 @@
 {
 	"fragmentEntryKey": "dialect-nav",
-	"icon": "button",
+	"icon": "sites",
 	"name": "dialect-nav",
-	"thumbnail": "dialect-nav.png",
 	"type": "component"
 }

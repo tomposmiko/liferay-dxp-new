@@ -15,6 +15,7 @@
 package com.liferay.marketplace.service.impl;
 
 import com.liferay.document.library.kernel.exception.NoSuchFileException;
+import com.liferay.document.library.kernel.store.DLStoreRequest;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.marketplace.exception.AppPropertiesException;
 import com.liferay.marketplace.exception.AppTitleException;
@@ -28,7 +29,6 @@ import com.liferay.marketplace.util.comparator.AppTitleComparator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
-import com.liferay.portal.kernel.deploy.DeployManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -46,10 +46,13 @@ import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.plugin.PluginPackageUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
+import java.nio.file.Files;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -154,10 +157,9 @@ public class AppLocalServiceImpl extends AppLocalServiceBaseImpl {
 
 		// Deployed apps
 
-		List<PluginPackage> pluginPackages =
-			DeployManagerUtil.getInstalledPluginPackages();
+		for (PluginPackage pluginPackage :
+				PluginPackageUtil.getInstalledPluginPackages()) {
 
-		for (PluginPackage pluginPackage : pluginPackages) {
 			List<Module> modules = modulePersistence.findByContextName(
 				pluginPackage.getContext());
 
@@ -307,19 +309,6 @@ public class AppLocalServiceImpl extends AppLocalServiceBaseImpl {
 			if (module.isBundle()) {
 				BundleManagerUtil.uninstallBundle(
 					module.getBundleSymbolicName(), module.getBundleVersion());
-
-				continue;
-			}
-
-			if (hasDependentApp(module)) {
-				continue;
-			}
-
-			try {
-				DeployManagerUtil.undeploy(module.getContextName());
-			}
-			catch (Exception exception) {
-				_log.error(exception, exception);
 			}
 		}
 	}
@@ -395,16 +384,23 @@ public class AppLocalServiceImpl extends AppLocalServiceBaseImpl {
 				DLStoreUtil.deleteFile(
 					app.getCompanyId(), CompanyConstants.SYSTEM,
 					app.getFilePath());
+
+				DLStoreUtil.addFile(
+					DLStoreRequest.builder(
+						app.getCompanyId(), CompanyConstants.SYSTEM,
+						app.getFilePath()
+					).className(
+						this
+					).size(
+						Files.size(file.toPath())
+					).build(),
+					file);
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(exception, exception);
 				}
 			}
-
-			DLStoreUtil.addFile(
-				app.getCompanyId(), CompanyConstants.SYSTEM, app.getFilePath(),
-				false, file);
 		}
 
 		clearInstalledAppsCache();
@@ -464,25 +460,6 @@ public class AppLocalServiceImpl extends AppLocalServiceBaseImpl {
 
 			return null;
 		}
-	}
-
-	protected boolean hasDependentApp(Module module) throws PortalException {
-		List<Module> modules = modulePersistence.findByContextName(
-			module.getContextName());
-
-		for (Module curModule : modules) {
-			if (curModule.getAppId() == module.getAppId()) {
-				continue;
-			}
-
-			App app = appPersistence.findByPrimaryKey(curModule.getAppId());
-
-			if (app.isInstalled()) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	protected void validate(String title, String version)

@@ -93,7 +93,7 @@ boolean hasPermission = commercePricingClassCPDefinitionDisplayContext.hasPermis
 							fieldName: ['catalog', 'name'],
 						},
 					],
-					spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
+					spritemap: '<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
 					titleLabel: '<%= LanguageUtil.get(request, "add-existing-product") %>',
 				});
 			</aui:script>
@@ -111,7 +111,7 @@ boolean hasPermission = commercePricingClassCPDefinitionDisplayContext.hasPermis
 						).build()
 					%>'
 					dataProviderKey="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICING_CLASSES_PRODUCT_DEFINITIONS %>"
-					formId="fm"
+					formName="fm"
 					id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICING_CLASSES_PRODUCT_DEFINITIONS %>"
 					itemsPerPage="<%= 10 %>"
 					namespace="<%= liferayPortletResponse.getNamespace() %>"

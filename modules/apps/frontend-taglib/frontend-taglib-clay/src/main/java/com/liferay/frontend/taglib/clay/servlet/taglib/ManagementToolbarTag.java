@@ -173,6 +173,7 @@ public class ManagementToolbarTag extends BaseContainerTag {
 		return _managementToolbarDisplayContext;
 	}
 
+	@Override
 	public String getNamespace() {
 		if (_namespace != null) {
 			return _namespace;
@@ -464,6 +465,7 @@ public class ManagementToolbarTag extends BaseContainerTag {
 		_managementToolbarDisplayContext = managementToolbarDisplayContext;
 	}
 
+	@Override
 	public void setNamespace(String namespace) {
 		_namespace = namespace;
 	}
@@ -908,7 +910,7 @@ public class ManagementToolbarTag extends BaseContainerTag {
 
 			if (searchActionURL != null) {
 				jspWriter.write(" action=\"");
-				jspWriter.write(searchActionURL);
+				jspWriter.write(HtmlUtil.escapeAttribute(searchActionURL));
 				jspWriter.write("\"");
 			}
 
@@ -1102,7 +1104,7 @@ public class ManagementToolbarTag extends BaseContainerTag {
 			LinkTag linkTag = new LinkTag();
 
 			linkTag.setCssClass("component-link tbar-link");
-			linkTag.setHref(getClearResultsURL());
+			linkTag.setHref(HtmlUtil.escapeAttribute(getClearResultsURL()));
 			linkTag.setLabel(LanguageUtil.get(resourceBundle, "clear"));
 
 			linkTag.doTag(pageContext);

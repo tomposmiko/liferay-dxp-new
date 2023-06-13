@@ -1,21 +1,26 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {useContext, useEffect} from 'react';
 import {useFormContext, useWatch} from 'react-hook-form';
-import {useCustomEvent} from '~/common/hooks/useCustomEvent';
-import {STORAGE_KEYS, Storage} from '~/common/services/liferay/storage';
-import {calculatePercentage, countCompletedFields} from '~/common/utils';
-import {TIP_EVENT} from '~/common/utils/events';
+import {useCustomEvent} from '../../../common/hooks/useCustomEvent';
+import {STORAGE_KEYS, Storage} from '../../../common/services/liferay/storage';
+import {calculatePercentage, countCompletedFields} from '../../../common/utils';
+import {TIP_EVENT} from '../../../common/utils/events';
 
 import {AppContext} from '../context/AppContext';
 import {setSelectedStep} from '../context/actions';
 import {businessTotalFields} from '../utils/businessFields';
 import {AVAILABLE_STEPS, TOTAL_OF_FIELD} from '../utils/constants';
 import {propertyTotalFields} from '../utils/propertyFields';
+import {getLoadedContentFlag} from '../utils/util';
 
-export const useStepWizard = () => {
+export function useStepWizard() {
 	const form = useWatch();
 	const [dispatchEvent] = useCustomEvent(TIP_EVENT);
 	const {dispatch, state} = useContext(AppContext);
+	const {applicationId, backToEdit} = getLoadedContentFlag();
+
+	const loadInitialData = applicationId || backToEdit;
+
 	const {
 		control: {_fields},
 	} = useFormContext();
@@ -31,50 +36,47 @@ export const useStepWizard = () => {
 	}, [state.selectedStep.section]);
 
 	useEffect(() => {
-		calculateAllSteps();
-	}, []);
+		if (loadInitialData) {
+			calculateAllSteps();
+		}
+	}, [loadInitialData]);
 
 	const calculateAllSteps = () => {
-		if (
-			Storage.getItem(STORAGE_KEYS.BACK_TO_EDIT) &&
-			JSON.parse(Storage.getItem(STORAGE_KEYS.BACK_TO_EDIT))
-		) {
-			const stepName = Object.keys(form)[
-				Object.keys(form).length - 1
-			].toLowerCase();
+		const stepName = Object.keys(form)[
+			Object.keys(form).length - 1
+		]?.toLowerCase();
 
-			switch (stepName) {
-				case AVAILABLE_STEPS.BUSINESS.section:
-					setAllPercentages({
-						basics: 100,
-						business: 100,
-					});
-					break;
-				case AVAILABLE_STEPS.EMPLOYEES.section:
-					setAllPercentages({
-						basics: 100,
-						business: 100,
-						employees: 100,
-					});
-					break;
-				case AVAILABLE_STEPS.PROPERTY.section:
-					setAllPercentages({
-						basics: 100,
-						business: 100,
-						employees: 100,
-						property: 100,
-					});
-					break;
-				default:
-					break;
-			}
+		switch (stepName) {
+			case AVAILABLE_STEPS.BUSINESS.section:
+				setAllPercentages({
+					basics: 100,
+					business: 100,
+				});
+				break;
+			case AVAILABLE_STEPS.EMPLOYEES.section:
+				setAllPercentages({
+					basics: 100,
+					business: 100,
+					employees: 100,
+				});
+				break;
+			case AVAILABLE_STEPS.PROPERTY.section:
+				setAllPercentages({
+					basics: 100,
+					business: 100,
+					employees: 100,
+					property: 100,
+				});
+				break;
+			default:
+				break;
 		}
 	};
 
 	const _updateStepPercentage = () => {
 		switch (state.selectedStep.section) {
 			case AVAILABLE_STEPS.BASICS_BUSINESS_TYPE.section:
-				if (Storage.getItem(STORAGE_KEYS.BACK_TO_EDIT)) {
+				if (loadInitialData) {
 					if (
 						state.selectedStep.subsection ===
 						AVAILABLE_STEPS.BASICS_BUSINESS_INFORMATION.subsection
@@ -97,7 +99,8 @@ export const useStepWizard = () => {
 							state.selectedStep.percentage.basics,
 							AVAILABLE_STEPS.BASICS_BUSINESS_TYPE.section
 						);
-					} else {
+					}
+					else {
 						if (form?.basics?.businessCategoryId) {
 							return setPercentage(
 								100,
@@ -200,4 +203,4 @@ export const useStepWizard = () => {
 		setPercentage,
 		setSection,
 	};
-};
+}

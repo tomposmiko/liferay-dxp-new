@@ -63,6 +63,7 @@ JSPJavaParserCheck | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Performs JavaParser
 JSPLineBreakCheck | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds missing and unnecessary line breaks in `.jsp` lines. |
 JSPStylingCheck | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Applies rules to enforce consisteny in code style. |
 JSPVarNameCheck | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks that values of attribute `var` follow naming conventions. |
+JSPVariableOrderCheck | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks if variable names are in alphabetical order. |
 JSPWhitespaceCheck | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds missing and unnecessary whitespace in `.jsp` files. |
 JSStylingCheck | .js or .jsx | Applies rules to enforce consisteny in code style. |
 JSWhitespaceCheck | .js or .jsx | Finds missing and unnecessary whitespace in `.js` files. |
@@ -91,6 +92,7 @@ JavaTermStylingCheck | .java | Applies rules to enforce consisteny in code style
 [ListUtilCheck](checks/list_util_check.markdown#listutilcheck) | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks for utilization of class `ListUtil`. |
 LiteralStringEqualsCheck | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds cases where `Objects.equals` should be used. |
 [LogMessageCheck](checks/message_check.markdown#messagecheck) | .java | Validates messages that are passed to `log.*` calls. |
+MarkdownEmptyLinesCheck | .markdown or .md | Finds missing and unnecessary empty lines. |
 MarkdownFileExtensionCheck | .markdown or .md | Finds `markdown` files with `.md` extension (use `.markdown`). |
 MarkdownStylingCheck | .markdown or .md | Applies rules to enforce consisteny in code style. |
 MarkdownWhitespaceCheck | .markdown or .md | Finds missing and unnecessary whitespace in `.markdown` files. |
@@ -113,13 +115,7 @@ OperatorOperandCheck | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Verifies t
 OperatorOrderCheck | .java | Verifies that when an operator has a literal string or a number as one of the operands, it is always on the right hand side. |
 [OperatorWrapCheck](https://checkstyle.sourceforge.io/config_whitespace.html#OperatorWrap) | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks the policy on how to wrap lines on operators. |
 PlusStatementCheck | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Performs several checks to statements where `+` is used for concatenation. |
-PoshiAnnotationsOrderCheck | .function, .macro or .testcase | Checks the order of annotations. |
-PoshiCommandsOrderCheck | .function, .macro or .testcase | Checks the order of poshi commands. |
-PoshiEmptyLinesCheck | .function, .macro or .testcase | Finds missing and unnecessary empty lines. |
-PoshiIndentationCheck | .function, .macro or .testcase | Finds incorrect indentation in poshi files. |
-PoshiParametersOrderCheck | .function, .macro or .testcase | Checks the order of parameters in `.function` and `.macro` files. |
 PoshiStylingCheck | .function, .macro or .testcase | Applies rules to enforce consisteny in code style. |
-PoshiWhitespaceCheck | .function, .macro or .testcase | Finds missing and unnecessary whitespace in poshi files. |
 PropertiesCommentsCheck | .eslintignore, .prettierignore or .properties | Validates comments in `.properties` files. |
 PropertiesDefinitionKeysCheck | .eslintignore, .prettierignore or .properties | Sorts definition keys in `liferay-plugin-package.properties` file. |
 PropertiesDependenciesFileCheck | .eslintignore, .prettierignore or .properties | Sorts the properties in `dependencies.properties` file. |

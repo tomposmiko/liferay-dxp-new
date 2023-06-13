@@ -82,9 +82,7 @@ definition {
 			key_orderAuthor = "Test Account",
 			locator1 = "CommerceAccelerators#ORDERS_ENTRY_VIEW_BUTTON");
 
-		ClickNoError(
-			key_text = "jbfs",
-			locator1 = "Icon#SVG_ELLIPSIS_BY_ID");
+		ClickNoError(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
 
 		MenuItem.clickNoError(menuItem = "Delete");
 
@@ -213,7 +211,7 @@ definition {
 	@description = "COMMERCE-6383. As a buyer, I want to be able to Reorder the Placed Order by clicking on 'Reorder' button"
 	@priority = "3"
 	test ReorderFromPlacedOrdersDetailsPage {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		// TODO Review
 
@@ -530,7 +528,7 @@ definition {
 	@description = "COMMERCE-6382. As a buyer, I want to be able to see the list of shipments for an order item by clicking on 'Shipments'"
 	@priority = "3"
 	test ViewListOfShipmentsInPlacedOrdersDetailsPage {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		// TODO Review
 
@@ -591,9 +589,11 @@ definition {
 			key_orderAuthor = "Test Account",
 			locator1 = "CommerceAccelerators#ORDERS_ENTRY_VIEW_BUTTON");
 
-		Click(
-			key_text = "Shipments",
-			locator1 = "Button#ANY");
+		ClickNoError(
+			key_entryName = "U-Joint",
+			locator1 = "CommerceEntry#ENTRY_NAME_BODY_VERTICAL_ELLIPSIS");
+
+		CommerceEntry.clickNoError(menuItem = "Shipments");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
@@ -602,8 +602,8 @@ definition {
 			locator1 = "Header#H2_TITLE");
 
 		for (var currentRow : list "status;Delivered,carrier;Test Carrier,tracking-number;Test Tracking Number") {
-			var currentColumn = StringUtil.extractFirst("${currentRow}",";");
-			var currentValue = StringUtil.extractLast("${currentRow}",";");
+			var currentColumn = StringUtil.extractFirst("${currentRow}", ";");
+			var currentValue = StringUtil.extractLast("${currentRow}", ";");
 
 			AssertTextEquals(
 				key_columnName = "${currentColumn}",

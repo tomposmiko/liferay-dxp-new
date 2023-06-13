@@ -83,17 +83,19 @@ const timeRangeData = {
 };
 
 describe('The completion velocity card component should', () => {
-	let getAllByText, getByText;
+	let getAllByText;
+	let getByText;
 
 	beforeAll(async () => {
 		jsonSessionStorage.set('timeRanges', timeRangeData);
 
-		const clientMock = {
-			get: jest.fn().mockResolvedValue({data}),
-		};
+		fetch.mockResolvedValueOnce({
+			json: () => Promise.resolve(data),
+			ok: true,
+		});
 
 		const renderResult = render(
-			<MockRouter client={clientMock} query={query}>
+			<MockRouter query={query}>
 				<CompletionVelocityCard routeParams={{processId}} />
 			</MockRouter>
 		);

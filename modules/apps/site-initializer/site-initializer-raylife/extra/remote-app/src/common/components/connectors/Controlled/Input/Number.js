@@ -2,14 +2,15 @@ import React from 'react';
 
 import {ControlledInput} from '.';
 
-export const NumberControlledInput = ({...props}) => {
+export function NumberControlledInput({...props}) {
 	return (
 		<ControlledInput
 			{...props}
 			inputProps={{
+				className: 'mb-5',
 				onWheel: (event) => event.target.blur(),
 				type: 'number',
 			}}
 		/>
 	);
-};
+}

@@ -25,10 +25,12 @@ export const InputWithMask = React.forwardRef(
 						{renderActions}
 					</Label>
 				)}
+
 				<ReactInputMask
 					{...props}
 					allowNegative={allowNegative}
-					className="input"
+					className="form-control input w-100"
+					id={name}
 					name={name}
 					ref={ref}
 					required={required}

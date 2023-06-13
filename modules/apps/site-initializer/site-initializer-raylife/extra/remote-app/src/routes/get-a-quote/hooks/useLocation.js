@@ -1,8 +1,8 @@
 import {useEffect, useState} from 'react';
-import {GoogleMapsService} from '~/common/services/google-maps';
-import {MockService} from '~/common/services/mock';
+import {GoogleMapsService} from '../../../common/services/google-maps';
+import {MockService} from '../../../common/services/mock';
 
-export const useLocation = () => {
+export function useLocation() {
 	const [data, setData] = useState();
 	const [error, setError] = useState();
 
@@ -14,7 +14,8 @@ export const useLocation = () => {
 		try {
 			const response = await MockService.getUSStates();
 			setData(response);
-		} catch (error) {
+		}
+		catch (error) {
 			console.warn(error);
 			setError(error);
 		}
@@ -32,7 +33,8 @@ export const useLocation = () => {
 				);
 				callback(address);
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			console.warn(error);
 		}
 	};
@@ -43,4 +45,4 @@ export const useLocation = () => {
 		setAutoComplete,
 		states: data || [],
 	};
-};
+}

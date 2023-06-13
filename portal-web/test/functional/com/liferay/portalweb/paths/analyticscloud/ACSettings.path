@@ -37,6 +37,11 @@
 	<td>//*[contains(@class, 'btn-link') and contains(@href,'${key_SettingsNavigation}')]</td>
 	<td></td>
 </tr>
+<tr>
+	<td>DEFINITIONS_OPTIONS</td>
+	<td>//a[contains(@href,'${key_DefinitionsOptions}')]</td>
+	<td></td>
+</tr>
 <!-- SETTINGS TOOLBAR -->
 <tr>
 	<td>DELETE_FROM_TOOLBAR</td>
@@ -103,6 +108,16 @@
 <tr>
 	<td>TOKEN_INPUT_FIELD</td>
 	<td>//input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MODAL_SCREEN</td>
+	<td>//div[contains(@class,'onboarding-base-screen-root')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CLOSE_ONBOARDING_MODAL</td>
+	<td>//button[contains(@class,'close')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -384,6 +399,12 @@
 <tr>
 	<td>VIEW_STATUS_PENDING</td>
 	<td>//span[text()='Pending']</td>
+	<td></td>
+</tr>
+<!-- CONFIGURE CSV -->
+<tr>
+	<td>DATA_SOURCE_FIELD_NAME</td>
+	<td>xpath=(//button[contains(@class,'show-caret') and contains(.,'${key_FieldName}')])[${key_index}]</td>
 	<td></td>
 </tr>
 </tbody>

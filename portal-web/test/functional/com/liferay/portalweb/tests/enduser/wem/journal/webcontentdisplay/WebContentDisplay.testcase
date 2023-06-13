@@ -437,69 +437,79 @@ definition {
 	@description = "Add a web content article with a custom DDM structure and template and display it in the web content display widget."
 	@priority = "5"
 	test AddWithStructure {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 		property testray.component.names = "Web Content Display,Training";
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		task ("Add a web content structure with a single line Text field and a multiple lines Text field") {
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
-		NavItem.gotoStructures();
+			NavItem.gotoStructures();
 
-		WebContentStructures.addCP(structureName = "WC Structure Name");
+			WebContentStructures.addCP(structureName = "WC Structure Name");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Text",
-			fieldName = "Text");
+			DataEngine.addField(
+				fieldFieldLabel = "Text",
+				fieldName = "Text");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Text Box",
-			fieldLocation = "2",
-			fieldName = "Text",
-			fieldType = "Multiple Lines");
+			DataEngine.addField(
+				fieldFieldLabel = "Text Box",
+				fieldLocation = "2",
+				fieldName = "Text",
+				fieldType = "Multiple Lines");
 
-		WebContentStructures.saveCP(structureName = "WC Structure Name");
+			WebContentStructures.saveCP();
+		}
 
-		NavItem.gotoTemplates();
+		task ("Add a template for new structure") {
+			NavItem.gotoTemplates();
 
-		WebContentTemplates.addCP(
-			structureName = "WC Structure Name",
-			templateFile = "wc_template.ftl",
-			templateName = "WC Template Name");
+			WebContentTemplates.addCP(
+				structureName = "WC Structure Name",
+				templateFile = "wc_template.ftl",
+				templateName = "WC Template Name");
+		}
 
-		Navigator.gotoSitePage(
-			pageName = "Web Content Display Page",
-			siteName = "Test Site Name");
+		task ("Add a web content based on new structure via Web Content Display") {
+			Navigator.gotoSitePage(
+				pageName = "Web Content Display Page",
+				siteName = "Test Site Name");
 
-		var content = '''Hello World
+			var content = '''Hello World
 Welcome to Liferay Community Edition Portal 7.4.0 CE GA1''';
 
-		WebContent.addStructuredPGViaWCD(
-			fieldLabelList = "Text,Text Box",
-			structureName = "WC Structure Name",
-			text = "WC WebContent Text",
-			textBox = "${content}",
-			webContentTitle = "WC WebContent Title");
+			WebContent.addStructuredPGViaWCD(
+				fieldLabelList = "Text,Text Box",
+				structureName = "WC Structure Name",
+				text = "WC WebContent Text",
+				textBox = "${content}",
+				webContentTitle = "WC WebContent Title");
+		}
 
-		AssertTextEquals(
-			locator1 = "//div[contains(@class,journal-content-article)]//h1[contains(@class,'text')]",
-			value1 = "WC WebContent Text");
+		task ("View the displayed content in Web Content Display") {
+			AssertTextEquals(
+				locator1 = "//div[contains(@class,journal-content-article)]//h1[contains(@class,'text')]",
+				value1 = "WC WebContent Text");
 
-		var actual = TestUtils.getElementTextContent(element = "//div[contains(@class,journal-content-article)]//h2[contains(@class,'text-box')]");
+			AssertTextEquals(
+				locator1 = "//div[contains(@class,journal-content-article)]//h2[contains(@class,'text-box')]",
+				value1 = "Hello World Welcome to Liferay Community Edition Portal 7.4.0 CE GA1");
+		}
 
-		TestUtils.assertEquals(
-			actual = "${actual}",
-			expected = "${content}");
+		task ("View defined contents in web content editor") {
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContent.viewWithStructureCP(
+				webContentText = "WC WebContent Text",
+				webContentTitle = "WC WebContent Title");
 
-		WebContent.viewWithStructureCP(
-			webContentText = "WC WebContent Text",
-			webContentTitle = "WC WebContent Title");
+			takeScreenshot();
 
-		WebContent.viewWithStructureCP(
-			fieldType = "Multiple Lines",
-			predefinedValue = "true",
-			webContentText = "${content}",
-			webContentTextFieldLabel = "Text Box");
+			WebContent.viewWithStructureCP(
+				fieldType = "Multiple Lines",
+				predefinedValue = "true",
+				webContentText = "${content}",
+				webContentTextFieldLabel = "Text Box");
+		}
 	}
 
 	@priority = "4"
@@ -534,17 +544,66 @@ Welcome to Liferay Community Edition Portal 7.4.0 CE GA1''';
 			webContentTitle = "WC WebContent Title");
 	}
 
+	@description = "This is a test for LPS-83798. Validate File system can't access using Journal/DDM templates."
+	@priority = "5"
+	test AssertNoFileSystemAccessViaJournalTemplates {
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Name");
+
+		DataEngine.addField(
+			fieldFieldLabel = "Text",
+			fieldName = "Text");
+
+		WebContentStructures.saveCP(structureName = "WC Structure Name");
+
+		NavItem.gotoTemplates();
+
+		var os = OSDetector.isWindows();
+
+		if ("${os}" == "true") {
+			var templateScript = '''
+${httpUtil.URLtoString(request.getAttribute("CTX").getResource(".").toURI().create("file:///C:/boot.ini").toURL())}
+''';
+		}
+		else {
+			var templateScript = '''
+${httpUtil.URLtoString(request.getAttribute("CTX").getResource(".").toURI().create("file:///etc/hosts").toURL())}
+''';
+		}
+
+		WebContentTemplates.addCP(
+			structureName = "WC Structure Name",
+			templateName = "WC Template Name",
+			templateScript = "${templateScript}");
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
+
+		WebContent.addWithStructureCP(webContentTitle = "WC WebContent Title");
+
+		PortletEntry.publish();
+
+		Navigator.gotoSitePage(
+			pageName = "Web Content Display Page",
+			siteName = "Test Site Name");
+
+		WebContentDisplayPortlet.selectWebContent(webContentTitle = "WC WebContent Title");
+
+		IFrame.closeFrame();
+
+		AssertTextPresent(value1 = "An error occurred while processing the template.");
+	}
+
 	@priority = "4"
 	test ChangeTemplate {
 		property test.name.skip.portal.instance = "WebContentDisplay#ChangeTemplate";
 		property testray.component.names = "Web Content Display";
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Search");
-
-		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+		SearchAdministration.executeReindex();
 
 		WebContentTemplates.openWebContentTemplatesAdmin(siteURLKey = "test-site-name");
 
@@ -985,6 +1044,111 @@ Welcome to Liferay Community Edition Portal 7.4.0 CE GA1''';
 		Portlet.addPG(portletName = "Web Content Display");
 	}
 
+	@description = "This is a test for LPS-64814. Validate remote code execution via untrusted Java Deserialization in templates cannot cause out of memory errors."
+	@priority = "5"
+	test ValidateRemoteCodeViaTemplatesCannotCauseOutOfMemoryErrors {
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Name");
+
+		DataEngine.addField(
+			fieldFieldLabel = "Text",
+			fieldName = "Text");
+
+		WebContentStructures.saveCP(structureName = "WC Structure Name");
+
+		NavItem.gotoTemplates();
+
+		var templateScript = '''
+${company.setKey("rO0ABXVyABNbTGphdmEubGFuZy5PYmplY3Q7kM5YnxBzKWwCAAB4cH////c=")}
+
+${company.getKeyObj()}
+''';
+
+		WebContentTemplates.addCP(
+			structureName = "WC Structure Name",
+			templateName = "WC Template Name",
+			templateScript = "${templateScript}");
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
+
+		WebContent.addWithStructureCP(webContentTitle = "WC WebContent Title");
+
+		PortletEntry.publish();
+
+		Navigator.gotoSitePage(
+			pageName = "Web Content Display Page",
+			siteName = "Test Site Name");
+
+		WebContentDisplayPortlet.selectWebContent(webContentTitle = "WC WebContent Title");
+
+		IFrame.closeFrame();
+
+		Portlet.viewTitle(portletName = "WC WebContent Title");
+
+		AssertConsoleTextNotPresent(value1 = "java.lang.OutOfMemoryError");
+	}
+
+	@description = "This is a test for LPS-58698. Validate remote code execution can't privilege escalation in templates."
+	@priority = "5"
+	test ValidateTemplateRCEReturnsNoRuntimeClasses {
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Name");
+
+		DataEngine.addField(
+			fieldFieldLabel = "Text",
+			fieldName = "Text");
+
+		WebContentStructures.saveCP(structureName = "WC Structure Name");
+
+		NavItem.gotoTemplates();
+
+		var templateScript = '''
+${objectUtil("com.liferay.portal.service.UserLocalServiceUtil").getService()}<br />
+${utilLocator.findUtil("com.liferay.portal.service.UserLocalService")}<br />
+${staticUtil["com.liferay.portal.service.UserLocalServiceUtil"].getService()}<br />
+
+${staticUtil["java.lang.Runtime"].getRuntime()}
+
+<#assign velocityBeanHandler = expandoRowLocalService.getInvocationHandler(expandoRowLocalService)>
+<#assign getRuntime=velocityBeanHandler.getClassLoader().loadClass("java.lang.Runtime").getMethod("getRuntime", null)>
+<#assign runtimeInstance=velocityBeanHandler.invoke(null, getRuntime, null)>
+${runtimeInstance}
+''';
+
+		WebContentTemplates.addCP(
+			structureName = "WC Structure Name",
+			templateName = "WC Template Name",
+			templateScript = "${templateScript}");
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
+
+		WebContent.addWithStructureCP(webContentTitle = "WC WebContent Title");
+
+		PortletEntry.publish();
+
+		Navigator.gotoSitePage(
+			pageName = "Web Content Display Page",
+			siteName = "Test Site Name");
+
+		WebContentDisplayPortlet.selectWebContent(webContentTitle = "WC WebContent Title");
+
+		IFrame.closeFrame();
+
+		AssertTextPresent(value1 = "An error occurred while processing the template.");
+
+		AssertTextNotPresent(value1 = "java.lang.Runtime@");
+	}
+
 	@priority = "4"
 	test ViewAllFileTypesEnabled {
 		property test.name.skip.portal.instance = "WebContentDisplay#ViewAllFileTypesEnabled";
@@ -1027,7 +1191,7 @@ Welcome to Liferay Community Edition Portal 7.4.0 CE GA1''';
 			portletName = "Web Content Display",
 			portletOption = "Configuration");
 
-		WebContentDisplayPortlet.configureSetupPG(userToolNameList = "DOC,ODT,PDF,TXT");
+		WebContentDisplayPortlet.configureSetupPG(userToolNameList = "Download as DOC,Download as ODT,Download as PDF,Download as TXT");
 
 		WebContentDisplayPortlet.saveConfiguration();
 

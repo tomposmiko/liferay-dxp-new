@@ -20,11 +20,6 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			ApplicationsMenu.gotoPortlet(
-				category = "Publications",
-				panel = "Applications",
-				portlet = "Publications");
-
 			Publications.disablePublications();
 		}
 	}
@@ -65,23 +60,23 @@ definition {
 
 		CalendarEvent.view(eventTitle = "Publication Calendar Event Title");
 
-		Publications.gotoReviewChanges(publicationName = "Publication Name");
+		PublicationsNavigator.gotoReviewChanges(publicationName = "Publication Name");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Calendar",
 			changeSite = "Site Name",
 			changeTitle = "Site Name",
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Calendar Event",
 			changeSite = "Site Name",
 			changeTitle = "Publication Calendar Event Title",
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Calendar Resource",
 			changeSite = "Site Name",
 			changeTitle = "Site Name",
@@ -134,9 +129,9 @@ definition {
 
 		IFrame.closeFrame();
 
-		Publications.gotoReviewChanges(publicationName = "Publication Name");
+		PublicationsNavigator.gotoReviewChanges(publicationName = "Publication Name");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Calendar Event",
 			changeSite = "Guest",
 			changeTitle = "Publication Calendar Event Title Edit",
@@ -157,9 +152,9 @@ definition {
 			assetName = "Publication Calendar Event Title",
 			assetType = "Calendar Event");
 
-		Publications.gotoReviewChanges(publicationName = "Publication Name 2");
+		PublicationsNavigator.gotoReviewChanges(publicationName = "Publication Name 2");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Calendar Event",
 			changeSite = "Guest",
 			changeTitle = "Publication Calendar Event Title",
@@ -170,17 +165,17 @@ definition {
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name 2");
 
-		Publications.gotoPublish(
-			gotoManagePublications = "true",
+		PublicationsNavigator.gotoPublish(
+			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name");
 
 		Publications.viewNeedsManualResolution(
 			entryTitle = "Publication Calendar Event Title Edit",
 			warningMessage = "Deletion Modification Conflict: Modification conflicts with a deletion.");
 
-		Publications.gotoViewChangeDiffInConflictingPublications(entryTitle = "Publication Calendar Event Title Edit");
+		PublicationsNavigator.gotoViewChangeDiffInConflictingPublications(entryTitle = "Publication Calendar Event Title Edit");
 
-		Publications.viewChangeDiff(
+		PublicationsChanges.viewChangeDiff(
 			columnName = "Title",
 			columnValueInPublication = "Publication Calendar Event Title Edit",
 			entryDeletedInProduction = "true",
@@ -190,7 +185,7 @@ definition {
 
 		Pause(locator1 = "3000");
 
-		Publications.discardChanges(
+		PublicationsChanges.discardChanges(
 			changeCategory = "Asset",
 			changeTitle = "Publication Calendar Event Title Edit",
 			conflictingChanges = "true",

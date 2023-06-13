@@ -77,7 +77,7 @@ public interface TaxonomyVocabularyResource {
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putAssetLibraryTaxonomyVocabularyPermission(
+			putAssetLibraryTaxonomyVocabularyPermissionsPage(
 				Long assetLibraryId,
 				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
@@ -114,7 +114,7 @@ public interface TaxonomyVocabularyResource {
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putSiteTaxonomyVocabularyPermission(
+			putSiteTaxonomyVocabularyPermissionsPage(
 				Long siteId,
 				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
@@ -147,7 +147,7 @@ public interface TaxonomyVocabularyResource {
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putTaxonomyVocabularyPermission(
+			putTaxonomyVocabularyPermissionsPage(
 				Long taxonomyVocabularyId,
 				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;

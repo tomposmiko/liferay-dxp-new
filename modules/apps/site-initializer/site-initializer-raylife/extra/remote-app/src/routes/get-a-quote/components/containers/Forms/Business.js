@@ -1,25 +1,26 @@
 import React, {useEffect} from 'react';
 import {useFormContext} from 'react-hook-form';
-import {NumberControlledInput} from '~/common/components/connectors/Controlled/Input/Number';
-import {PercentageControlledInput} from '~/common/components/connectors/Controlled/Input/WithMask/Percentage';
-import {LegalEntityControlledSelect} from '~/common/components/connectors/Controlled/Select/LegalEntity';
-import {ControlledSwitch} from '~/common/components/connectors/Controlled/Switch';
-import {CardFormActionsWithSave} from '~/common/components/fragments/Card/FormActionsWithSave';
-import {TIP_EVENT} from '~/common/utils/events';
-import {PERCENTAGE_REGEX_MAX_100} from '~/common/utils/patterns';
-import useFormActions from '~/routes/get-a-quote/hooks/useFormActions';
-import {useStepWizard} from '~/routes/get-a-quote/hooks/useStepWizard';
-import {useTriggerContext} from '~/routes/get-a-quote/hooks/useTriggerContext';
+import {NumberControlledInput} from '../../../../../common/components/connectors/Controlled/Input/Number';
+import {PercentageControlledInput} from '../../../../../common/components/connectors/Controlled/Input/WithMask/Percentage';
+import {LegalEntityControlledSelect} from '../../../../../common/components/connectors/Controlled/Select/LegalEntity';
+import {ControlledSwitch} from '../../../../../common/components/connectors/Controlled/Switch';
+import {CardFormActionsWithSave} from '../../../../../common/components/fragments/Card/FormActionsWithSave';
+import FormCard from '../../../../../common/components/fragments/Card/FormCard';
+import {TIP_EVENT} from '../../../../../common/utils/events';
+import {PERCENTAGE_REGEX_MAX_100} from '../../../../../common/utils/patterns';
+import useFormActions from '../../../hooks/useFormActions';
+import {useStepWizard} from '../../../hooks/useStepWizard';
+import {useTriggerContext} from '../../../hooks/useTriggerContext';
 import {
 	validateOverallSales,
 	validateOwnBrandLabel,
 	validatePercentSales,
-} from '~/routes/get-a-quote/utils/businessFields';
-import {AVAILABLE_STEPS} from '~/routes/get-a-quote/utils/constants';
+} from '../../../utils/businessFields';
+import {AVAILABLE_STEPS} from '../../../utils/constants';
 
 const setFormPath = (value) => `business.${value}`;
 
-export const FormBusiness = ({form}) => {
+export function FormBusiness({form}) {
 	const {
 		control,
 		formState: {isValid},
@@ -49,7 +50,7 @@ export const FormBusiness = ({form}) => {
 	const {isSelected, updateState} = useTriggerContext();
 
 	return (
-		<div className="card">
+		<FormCard>
 			<div className="card-content">
 				<NumberControlledInput
 					control={control}
@@ -69,7 +70,7 @@ export const FormBusiness = ({form}) => {
 					name={setFormPath('yearsOfExperience')}
 					rules={{
 						min: {
-							message: 'Must be equal or grater than 0.',
+							message: 'Must be equal or greater than 0.',
 							value: 0,
 						},
 						required: 'This field is required',
@@ -92,12 +93,14 @@ export const FormBusiness = ({form}) => {
 
 				<LegalEntityControlledSelect
 					control={control}
+					inputProps={{className: 'mb-5'}}
 					label="Legal Entity"
 					name={setFormPath('legalEntity')}
 					rules={{
 						required: 'This field is required.',
 					}}
 				/>
+
 				{validatePercentSales(form?.basics?.properties?.naics) && (
 					<PercentageControlledInput
 						control={control}
@@ -127,6 +130,7 @@ export const FormBusiness = ({form}) => {
 						}}
 					/>
 				)}
+
 				{validateOwnBrandLabel(form?.basics?.properties?.naics) && (
 					<ControlledSwitch
 						control={control}
@@ -135,6 +139,7 @@ export const FormBusiness = ({form}) => {
 						rules={{required: true}}
 					/>
 				)}
+
 				{validateOverallSales(form?.basics?.properties?.segment) && (
 					<PercentageControlledInput
 						control={control}
@@ -157,6 +162,6 @@ export const FormBusiness = ({form}) => {
 				onPrevious={onPrevious}
 				onSave={onSave}
 			/>
-		</div>
+		</FormCard>
 	);
-};
+}

@@ -1122,6 +1122,16 @@
 		<tag-class>com.liferay.taglib.ui.InputFieldTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
+			<name>activeLanguageIds</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>adminMode</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<name>autoComplete</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -1357,7 +1367,7 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<description>Sets the maximum number of items on the left box. The default value is <![CDATA[<code>null</code>]]> that represents unlimited items.</description>
+			<description>Sets the maximum number of items for the left box. The default value <![CDATA[<code>null</code>]]> represents an unlimited number of items.</description>
 			<name>leftBoxMaxItems</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -1396,7 +1406,7 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<description>Sets the maximum number of items on the right box. The default value is <![CDATA[<code>null</code>]]> that represents unlimited items.</description>
+			<description>Sets the maximum number of items for the right box. The default value <![CDATA[<code>null</code>]]> represents an unlimited number of items.</description>
 			<name>rightBoxMaxItems</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -3283,6 +3293,7 @@
 		</attribute>
 	</tag>
 	<tag>
+		<description>Deprecated as of 7.4.0, with no direct replacement.</description>
 		<name>toggle-value</name>
 		<tag-class>com.liferay.taglib.ui.ToggleValueTag</tag-class>
 		<body-content>JSP</body-content>

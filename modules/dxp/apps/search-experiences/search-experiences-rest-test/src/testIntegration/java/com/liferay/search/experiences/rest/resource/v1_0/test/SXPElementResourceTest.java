@@ -15,14 +15,131 @@
 package com.liferay.search.experiences.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.search.experiences.rest.client.dto.v1_0.SXPElement;
 
+import java.util.Collections;
+
+import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Brian Wing Shun Chan
  */
-@Ignore
 @RunWith(Arquillian.class)
 public class SXPElementResourceTest extends BaseSXPElementResourceTestCase {
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLGetSXPElement() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLGetSXPElementNotFound() throws Exception {
+	}
+
+	@Override
+	@Test
+	public void testPostSXPElement() throws Exception {
+		super.testPostSXPElement();
+
+		// Missing i18n
+
+		SXPElement sxpElement = SXPElement.toDTO(
+			JSONUtil.put(
+				"description", RandomTestUtil.randomString()
+			).put(
+				"title", RandomTestUtil.randomString()
+			).toJSONString());
+
+		SXPElement postSXPElement = testPostSXPElement_addSXPElement(
+			sxpElement);
+
+		sxpElement.setCreateDate(postSXPElement.getCreateDate());
+		sxpElement.setId(postSXPElement.getId());
+		sxpElement.setModifiedDate(postSXPElement.getModifiedDate());
+		sxpElement.setUserName(postSXPElement.getUserName());
+
+		sxpElement.setReadOnly(false);
+		sxpElement.setType(0);
+
+		Assert.assertEquals(sxpElement.toString(), postSXPElement.toString());
+
+		assertValid(postSXPElement);
+	}
+
+	@Override
+	@Test
+	public void testPostSXPElementValidate() throws Exception {
+		sxpElementResource.postSXPElementValidate("{}");
+	}
+
+	@Override
+	protected SXPElement randomSXPElement() throws Exception {
+		SXPElement sxpElement = super.randomSXPElement();
+
+		sxpElement.setTitle_i18n(
+			Collections.singletonMap("en_US", sxpElement.getTitle()));
+
+		sxpElement.setDescription_i18n(
+			Collections.singletonMap("en_US", sxpElement.getDescription()));
+
+		return sxpElement;
+	}
+
+	@Override
+	protected SXPElement testDeleteSXPElement_addSXPElement() throws Exception {
+		return _addSXPElement(randomSXPElement());
+	}
+
+	@Override
+	protected SXPElement testGetSXPElement_addSXPElement() throws Exception {
+		return _addSXPElement(randomSXPElement());
+	}
+
+	@Override
+	protected SXPElement testGetSXPElementsPage_addSXPElement(
+			SXPElement sxpElement)
+		throws Exception {
+
+		return _addSXPElement(sxpElement);
+	}
+
+	@Override
+	protected SXPElement testGraphQLSXPElement_addSXPElement()
+		throws Exception {
+
+		return _addSXPElement(randomSXPElement());
+	}
+
+	@Override
+	protected SXPElement testPatchSXPElement_addSXPElement() throws Exception {
+		return _addSXPElement(randomSXPElement());
+	}
+
+	@Override
+	protected SXPElement testPostSXPElement_addSXPElement(SXPElement sxpElement)
+		throws Exception {
+
+		return _addSXPElement(sxpElement);
+	}
+
+	@Override
+	protected SXPElement testPostSXPElementCopy_addSXPElement(
+			SXPElement sxpElement)
+		throws Exception {
+
+		return _addSXPElement(sxpElement);
+	}
+
+	private SXPElement _addSXPElement(SXPElement sxpElement) throws Exception {
+		return sxpElementResource.postSXPElement(sxpElement);
+	}
+
 }

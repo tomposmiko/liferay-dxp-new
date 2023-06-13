@@ -27,6 +27,8 @@ import Input from '../../form/Input';
 import LayoutContext, {TYPES as EVENT_TYPES} from '../context';
 import {TObjectRelationship} from '../types';
 
+import './ModalAddObjectLayoutTab.scss';
+
 type TTabTypes = {
 	[key: string]: {
 		active: boolean;
@@ -69,10 +71,10 @@ interface ITabTypeProps extends React.HTMLAttributes<HTMLElement> {
 	description: string;
 	disabled?: boolean;
 	disabledMessage?: string;
-	type: string;
 	label: string;
 	onChangeType: (type: string) => void;
 	selected: string;
+	type: string;
 }
 
 const TabType: React.FC<ITabTypeProps> = ({
@@ -85,8 +87,8 @@ const TabType: React.FC<ITabTypeProps> = ({
 }) => {
 	const tabProps = {
 		'data-tooltip-align': 'top',
-		onClick: () => {},
-		title: Liferay.Language.get(
+		'onClick': () => {},
+		'title': Liferay.Language.get(
 			'the-first-tab-in-the-layout-cannot-be-a-relationship-tab'
 		),
 	};
@@ -103,6 +105,7 @@ const TabType: React.FC<ITabTypeProps> = ({
 				{...(disabled && tabProps)}
 			>
 				<h4 className="layout-tab__tab-types__title">{label}</h4>
+
 				<span className="tab__tab-types__description">
 					{description}
 				</span>
@@ -184,6 +187,7 @@ const ModalAddObjectLayoutTab: React.FC<IModalAddObjectLayoutTabProps> = ({
 				<ClayModal.Header>
 					{Liferay.Language.get('add-tab')}
 				</ClayModal.Header>
+
 				<ClayModal.Body>
 					<Input
 						error={errors.name}
@@ -194,6 +198,7 @@ const ModalAddObjectLayoutTab: React.FC<IModalAddObjectLayoutTabProps> = ({
 						required
 						value={values.name}
 					/>
+
 					<ClayForm.Group>
 						<label className="mb-2">
 							{Liferay.Language.get('type')}
@@ -218,6 +223,7 @@ const ModalAddObjectLayoutTab: React.FC<IModalAddObjectLayoutTabProps> = ({
 							);
 						})}
 					</ClayForm.Group>
+
 					{selectedType === TYPES.RELATIONSHIPS && (
 						<AutoComplete
 							contentRight={
@@ -259,9 +265,13 @@ const ModalAddObjectLayoutTab: React.FC<IModalAddObjectLayoutTabProps> = ({
 									<div>
 										{label[defaultLanguageId] ?? name}
 									</div>
-									<div>
+
+									<div className="object-web-relationship-item-label">
 										<ClayLabel displayType="secondary">
-											{type}
+											{type.replace(
+												/([a-z])([A-Z])/g,
+												'$1 $2'
+											)}
 										</ClayLabel>
 									</div>
 								</div>
@@ -269,6 +279,7 @@ const ModalAddObjectLayoutTab: React.FC<IModalAddObjectLayoutTabProps> = ({
 						</AutoComplete>
 					)}
 				</ClayModal.Body>
+
 				<ClayModal.Footer
 					last={
 						<ClayButton.Group spaced>
@@ -278,6 +289,7 @@ const ModalAddObjectLayoutTab: React.FC<IModalAddObjectLayoutTabProps> = ({
 							>
 								{Liferay.Language.get('cancel')}
 							</ClayButton>
+
 							<ClayButton type="submit">
 								{Liferay.Language.get('save')}
 							</ClayButton>

@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import '~/types';
+import '../../types';
 import {Loader} from '@googlemaps/js-api-loader';
 
 /**
@@ -14,7 +14,8 @@ const setup = (GOOGLE_API) => {
 		});
 
 		googleMapsLoader.load();
-	} catch (error) {
+	}
+	catch (error) {
 		console.warn(error);
 	}
 };

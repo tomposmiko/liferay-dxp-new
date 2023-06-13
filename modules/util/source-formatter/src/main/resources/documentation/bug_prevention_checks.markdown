@@ -26,7 +26,7 @@ CQLKeywordCheck | .cql | Checks that Cassandra keywords are upper case. |
 CompatClassImportsCheck | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks that classes are imported from `compat` modules, when possible. |
 ConsumerTypeAnnotationCheck | .java | Performs several checks on classes with @ConsumerType annotation. |
 DTOEnumCreationCheck | .java | Checks the creation of DTO enum. |
-DeprecatedUsageCheck | .java | Finds calls to deprecated classes or methods. |
+DeprecatedAPICheck | .java | Finds calls to deprecated classes, constructors, fields or methods. |
 EmptyConstructorCheck | .java | Finds unnecessary empty constructors. |
 FactoryCheck | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds cases where `*Factory` should be used when creating new instances of an object. |
 FilterStringWhitespaceCheck | .java | Finds missing and unnecessary whitespace in the value of the filter string in `ServiceTrackerFactory.open` or `WaiterUtil.waitForFilter`. |
@@ -85,6 +85,7 @@ JavaLogClassNameCheck | .java | Checks the name of the class that is passed in `
 [JavaLogLevelCheck](checks/java_log_level_check.markdown#javaloglevelcheck) | .java | Checks that the correct log messages are printed. |
 JavaMapBuilderGenericsCheck | .java | Finds missing or unnecessary generics on `*MapBuilder.put` calls. |
 [JavaMetaAnnotationsCheck](checks/java_meta_annotations_check.markdown#javametaannotationscheck) | .java | Checks for correct use of attributes `description` and `name` in annotation `@aQute.bnd.annotation.metatype.Meta`. |
+JavaMissingOverrideCheck | .java | Finds missing @Override annotations. |
 JavaMissingXMLPublicIdsCheck | .java | Finds missing public IDs for check XML files. |
 JavaModifiedServiceMethodCheck | .java | Finds missing empty lines before `removedService` or `addingService` calls. |
 [JavaModuleComponentCheck](checks/java_module_component_check.markdown#javamodulecomponentcheck) | .java | Checks for use of `@Component` in `-api` or `-spi` modules. |
@@ -97,7 +98,6 @@ JavaModuleServiceReferenceCheck | .java | Finds cases where `@BeanReference` ann
 [JavaModuleTestCheck](checks/java_module_test_check.markdown#javamoduletestcheck) | .java | Checks package names in tests. |
 [JavaOSGiReferenceCheck](checks/java_osgi_reference_check.markdown#javaosgireferencecheck) | .java | Performs several checks on classes with `@Component` annotation. |
 [JavaPackagePathCheck](checks/java_package_path_check.markdown#javapackagepathcheck) | .java | Checks that the package name matches the file location. |
-JavaParameterAnnotationsCheck | .java | Performs several checks on parameters with annotations. |
 [JavaProcessCallableCheck](checks/java_process_callable_check.markdown#javaprocesscallablecheck) | .java | Checks that a class implementing `ProcessCallable` assigns a `serialVersionUID`. |
 JavaProviderTypeAnnotationCheck | .java | Performs several checks on classes with `@ProviderType` annotation. |
 JavaRedundantConstructorCheck | .java | Finds unnecessary empty constructor. |
@@ -117,6 +117,7 @@ JavaSystemExceptionCheck | .java | Finds unnecessary SystemExceptions. |
 JavaTaglibMethodCheck | .java | Checks that a `*Tag` class has a `set*` and `get*` or `is*` method for each attribute. |
 JavaTransactionBoundaryCheck | .java | Finds direct `add*` or `get*` calls in `*ServiceImpl` (those should use the `*service` global variable instead). |
 [JavaUnsafeCastingCheck](checks/java_unsafe_casting_check.markdown#javaunsafecastingcheck) | .java | Checks for potential ClassCastException. |
+[JavaUpgradeAlterCheck](checks/java_upgrade_alter_check.markdown#javaupgradealtercheck) | .java | Performs several checks on `alter` calls in Upgrade classes. |
 [JavaUpgradeClassCheck](checks/java_upgrade_class_check.markdown#javaupgradeclasscheck) | .java | Performs several checks on Upgrade classes. |
 JavaUpgradeConnectionCheck | .java | Finds cases where `DataAccess.getConnection` is used (instead of using the availabe global variable `connection`). |
 [JavaUpgradeIndexCheck](checks/java_upgrade_index_check.markdown#javaupgradeindexcheck) | .java | Finds cases where the service builder indexes are updated manually in Upgrade classes. This is not needed because Liferay takes care of it. |
@@ -131,13 +132,13 @@ LogParametersCheck | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Validates th
 [MissingDeprecatedCheck](https://checkstyle.sourceforge.io/config_annotation.html#MissingDeprecated) | .java | Verifies that the annotation @Deprecated and the Javadoc tag @deprecated are both present when either of them is present. |
 MissingDiamondOperatorCheck | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks for missing diamond operator for types that require diamond operator. |
 MissingModifierCheck | .java | Verifies that a method or global variable has a modifier specified. |
-MissingOverrideCheck | .java | Verifies that a method that overrides a method in a superclass has the @Override annotation. |
 NestedFieldAnnotationCheck | .java | Verifies that `NestedFieldSupport.class` is used in `service` property of `Component` annotation |
 NewFileCheck | | Finds new files in directories that should not have added files. |
 [NullAssertionInIfStatementCheck](checks/null_assertion_in_if_statement_check.markdown#nullassertioninifstatementcheck) | .java | Verifies that null check should always be first in if-statement. |
 PackageinfoBNDExportPackageCheck | packageinfo | Finds legacy `packageinfo` files. |
 PersistenceCallCheck | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds illegal persistence calls across component boundaries. |
 [PersistenceUpdateCheck](checks/persistence_update_check.markdown#persistenceupdatecheck) | .java | Checks that there are no stale references in service code from persistence updates. |
+PoshiDependenciesFileLocationCheck | .function, .macro or .testcase | Checks that dependencies files are located in the correct directory. |
 PrimitiveWrapperInstantiationCheck | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds cases where `new Type` is used for primitive types (use `Type.valueOf` instead). |
 PrincipalExceptionCheck | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds calls to `PrincipalException.class.getName()` (use `PrincipalException.getNestedClasses()` instead). |
 PropertiesArchivedModulesCheck | .eslintignore, .prettierignore or .properties | Finds `test.batch.class.names.includes` property value pointing to archived modules in `test.properties`. |
@@ -159,6 +160,7 @@ ReferenceAnnotationCheck | .java | Performs several checks on classes with @Refe
 [SQLLongNamesCheck](checks/sql_long_names_check.markdown#sqllongnamescheck) | .sql | Checks for table and column names that exceed 30 characters. |
 SelfReferenceCheck | .java | Finds cases of unnecessary reference to its own class. |
 [StaticBlockCheck](checks/static_block_check.markdown#staticblockcheck) | .java | Performs several checks on static blocks. |
+SystemEventCheck | .java | Finds missing or redundant usage of @SystemEvent for delete events. |
 TLDTypeCheck | .tld | Ensures the fully qualified name is used for types in `.tld` file. |
 TestClassMissingLiferayUnitTestRuleCheck | .java | Finds missing LiferayUnitTestRule. |
 TransactionalTestRuleCheck | .java | Finds usage of `TransactionalTestRule` in `*StagedModelDataHandlerTest`. |

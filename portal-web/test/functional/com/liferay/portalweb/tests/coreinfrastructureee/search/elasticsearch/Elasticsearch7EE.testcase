@@ -24,7 +24,7 @@ definition {
 
 			DMDocument.tearDownCP();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 		}
 	}
 
@@ -45,9 +45,7 @@ definition {
 			panel = "Control Panel",
 			portlet = "Server Administration");
 
-		var script = TestCase.getFileContent(
-			fileName = "blogs-ltr-subset.groovy",
-			filePath = "coreinfrastructureee/search/elasticsearch");
+		var script = TestCase.getFileContent(fileName = "blogs-ltr-subset.groovy");
 
 		ServerAdministration.executeScript(
 			language = "Groovy",
@@ -62,10 +60,8 @@ definition {
 
 		while ("${iterator}" != "21" && (maxIterations = "20")) {
 			var assetEntryTitle = selenium.getText("//div[contains(@id,'SearchResultsPortlet')]//li[${iterator}]/div//a");
-
 			var assetEntryTitleListNoLTR = StringUtil.add("${assetEntryTitleListNoLTR}", "${assetEntryTitle}");
-
-			var iterator = MathUtil.sum("${iterator}", "1");
+			var iterator = ${iterator} + 1;
 		}
 
 		ApplicationsMenu.gotoPortlet(
@@ -95,10 +91,8 @@ definition {
 
 		while ("${iterator}" != "21" && (maxIterations = "20")) {
 			var assetEntryTitle = selenium.getText("//div[contains(@id,'SearchResultsPortlet')]//li[${iterator}]/div//a");
-
 			var assetEntryTitleListLTR = StringUtil.add("${assetEntryTitleListLTR}", "${assetEntryTitle}");
-
-			var iterator = MathUtil.sum("${iterator}", "1");
+			var iterator = ${iterator} + 1;
 		}
 
 		if ("${assetEntryTitleListNoLTR}" != "${assetEntryTitleListLTR}") {
@@ -129,7 +123,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		MessageboardsThread.addCP(
@@ -139,7 +133,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Documents and Media");
 
 		DMDocument.addCP(
@@ -277,11 +271,11 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(
+		PagesAdmin.addPublicPage(
 			pageName = "Elasticsearch Monitoring Page",
 			sitePageType = "Widget Page");
 
-		SitePages.configurePage(
+		PagesAdmin.configurePage(
 			columnName = "1 Column",
 			pageName = "Elasticsearch Monitoring Page",
 			privacy = "Public Pages",
@@ -324,11 +318,11 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(
+		PagesAdmin.addPublicPage(
 			pageName = "Elasticsearch Monitoring Page",
 			sitePageType = "Widget Page");
 
-		SitePages.configurePage(
+		PagesAdmin.configurePage(
 			columnName = "1 Column",
 			pageName = "Elasticsearch Monitoring Page",
 			privacy = "Public Pages",

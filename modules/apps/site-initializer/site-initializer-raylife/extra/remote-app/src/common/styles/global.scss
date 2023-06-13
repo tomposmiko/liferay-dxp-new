@@ -22,7 +22,7 @@
 
 :root {
 	background-color: $background;
-	color: $neutral-default;
+	color: $color-action-neutral-default;
 	font-family: $font-family;
 }
 
@@ -33,6 +33,14 @@
 fieldset {
 	border: none;
 	outline: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+	transition: all 5000s ease-in-out 0s;
+	transition-property: background-color, color;
 }
 
 svg {

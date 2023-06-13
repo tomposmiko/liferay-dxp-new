@@ -1,10 +1,19 @@
+import classNames from 'classnames';
 import React from 'react';
 
-export const Label = ({children, label, name, required = false}) => {
+export function Label({children, label, name, required = false}) {
 	return (
 		<label htmlFor={name}>
-			<span className={`${required && 'required'}`}>{label}</span>
+			<h6
+				className={classNames(
+					`align-items-center d-flex font-weight-bolder`,
+					{required}
+				)}
+			>
+				{label}
+			</h6>
+
 			{children}
 		</label>
 	);
-};
+}

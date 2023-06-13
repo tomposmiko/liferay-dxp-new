@@ -29,7 +29,7 @@ FormInstancePermissionCheckerHelper formInstancePermissionCheckerHelper = ddmFor
 <clay:container-fluid
 	id='<%= liferayPortletResponse.getNamespace() + "formContainer" %>'
 >
-	<aui:form action="<%= portletURL.toString() %>" method="post" name="searchContainerForm">
+	<aui:form action="<%= portletURL %>" method="post" name="searchContainerForm">
 		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 		<aui:input name="deleteFormInstanceIds" type="hidden" />
 
@@ -134,6 +134,28 @@ FormInstancePermissionCheckerHelper formInstancePermissionCheckerHelper = ddmFor
 									name="description"
 									value="<%= HtmlUtil.escape(formInstance.getDescription(locale)) %>"
 								/>
+
+								<c:if test="<%= ddmFormAdminDisplayContext.isExpirationDateEnabled() %>">
+									<liferay-ui:search-container-column-text
+										cssClass="text-nowrap"
+										name="status"
+									>
+										<c:choose>
+											<c:when test="<%= !DDMFormInstanceExpirationStatusUtil.isFormExpired(formInstance, timeZone) %>">
+												<clay:label
+													displayType="success"
+													label="available"
+												/>
+											</c:when>
+											<c:otherwise>
+												<clay:label
+													displayType="danger"
+													label="expired"
+												/>
+											</c:otherwise>
+										</c:choose>
+									</liferay-ui:search-container-column-text>
+								</c:if>
 
 								<liferay-ui:search-container-column-date
 									cssClass="table-cell-expand-smaller"

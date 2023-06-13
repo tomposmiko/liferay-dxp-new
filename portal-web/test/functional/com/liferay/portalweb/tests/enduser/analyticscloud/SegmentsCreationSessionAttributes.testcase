@@ -44,6 +44,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9204 | Test Summary: Add segment using a session property 'Device'"
+	@ignore = "true"
 	@priority = "4"
 	test CanCreateSessionAttributeUsingDevice {
 		property portal.upstream = "quarantine";
@@ -56,7 +57,7 @@ definition {
 		}
 
 		task ("Launch DXP and visit the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -120,27 +121,15 @@ definition {
 		}
 	}
 
-	@description = "Feature ID: Legacy | Automation ID: LRAC-9206 | Test Summary: Add segment using a session property 'Language'"
-	@ignore = "true"
-	@priority = "4"
-	test CanCreateSessionAttributeUsingLanguage {
-
-		// TODO LRAC-9206 CanCreateSessionAttributeUsingLanguage pending implementation
-
-	}
-
-	@description = "Feature ID: Legacy | Automation ID: LRAC-9207 | Test Summary: Add segment using a session property 'Last Sign In Date'"
-	@ignore = "true"
-	@priority = "4"
-	test CanCreateSessionAttributeUsingLastSignInDate {
-
-		// TODO LRAC-9207 CanCreateSessionAttributeUsingLastSignInDate pending implementation
-
-	}
-
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9208 | Test Summary: Add segment using a session property 'Referrer URL'"
+	@ignore = "true"
 	@priority = "4"
 	test CanCreateSessionAttributeUsingReferrerURL {
+		property portal.upstream = "quarantine";
+
+		// AC Refactor: timing issue for Referrer URL with page sync
+		// AC Refactor ticket: LRAC-9272
+
 		var usernameList = "ac,liferay";
 
 		task ("Connect the DXP to Analytics Cloud") {
@@ -162,9 +151,7 @@ definition {
 		}
 
 		task ("Add pages") {
-			JSONLayout.addPublicLayout(
-				groupName = "Site Name",
-				layoutName = "AC Page 2");
+			ACUtils.addPage(layoutName = "AC Page 2");
 		}
 
 		task ("Sign in with the new user") {
@@ -236,24 +223,6 @@ definition {
 
 			ACUtils.viewNameList(nameList = "ac ac");
 		}
-	}
-
-	@description = "Feature ID: Legacy | Automation ID: LRAC-9209 | Test Summary: Add segment using a session property 'Request Parameters'"
-	@ignore = "true"
-	@priority = "4"
-	test CanCreateSessionAttributeUsingRequestParameters {
-
-		// TODO LRAC-9209 CanCreateSessionAttributeUsingRequestParameters pending implementation
-
-	}
-
-	@description = "Feature ID: Legacy | Automation ID: LRAC-9210 | Test Summary: Add segment using a session property 'Signed In'"
-	@ignore = "true"
-	@priority = "4"
-	test CanCreateSessionAttributeUsingSignedIn {
-
-		// TODO LRAC-9210 CanCreateSessionAttributeUsingSignedIn pending implementation
-
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9211 | Test Summary: Add segment using a session property 'URL'"
@@ -340,15 +309,6 @@ definition {
 
 			ACSegments.assertMember(memberName = "ac ac");
 		}
-	}
-
-	@description = "Feature ID: Legacy | Automation ID: LRAC-9212 | Test Summary: Create a Segment of Session in a Topic"
-	@ignore = "true"
-	@priority = "4"
-	test CreateSegmentSessionInATopic {
-
-		// TODO LRAC-9212 CreateSegmentSessionInATopic pending implementation
-
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9213 | Test Summary: Show 'duplicate' and 'delete' options in a list for every segment criteria"

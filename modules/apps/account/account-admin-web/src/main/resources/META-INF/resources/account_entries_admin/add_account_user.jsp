@@ -128,6 +128,16 @@ renderResponse.setTitle(LanguageUtil.format(request, "add-new-user-to-x", accoun
 							tempImageFileName="0"
 						/>
 					</div>
+
+					<aui:input
+						label="job-title"
+						maxlength='<%=
+							ModelHintsUtil.getMaxLength(Contact.class.getName(), "jobTitle")
+						%>'
+						name="jobTitle"
+						type="text"
+					>
+					</aui:input>
 				</clay:col>
 			</clay:row>
 		</clay:sheet-section>
@@ -140,7 +150,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "add-new-user-to-x", accoun
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 
-<c:if test="<%= !Objects.equals(accountEntryDisplay.getType(), AccountConstants.ACCOUNT_ENTRY_TYPE_PERSON) && (accountEntryDisplay.isValidateUserEmailAddress(themeDisplay) || Validator.isNotNull(AccountUserDisplay.getBlockedDomains(themeDisplay.getCompanyId()))) %>">
+<c:if test="<%= !Objects.equals(accountEntryDisplay.getType(), AccountConstants.ACCOUNT_ENTRY_TYPE_PERSON) && (accountEntryDisplay.isValidateUserEmailAddress(themeDisplay.getCompanyId()) || Validator.isNotNull(AccountUserDisplay.getBlockedDomains(themeDisplay.getCompanyId()))) %>">
 
 	<%
 	Map<String, Object> context = HashMapBuilder.<String, Object>put(
@@ -151,7 +161,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "add-new-user-to-x", accoun
 		context.put("blockedDomains", AccountUserDisplay.getBlockedDomains(themeDisplay.getCompanyId()));
 	}
 
-	if (accountEntryDisplay.isValidateUserEmailAddress(themeDisplay)) {
+	if (accountEntryDisplay.isValidateUserEmailAddress(themeDisplay.getCompanyId())) {
 		context.put("validDomains", StringUtil.merge(accountEntryDisplay.getDomains(), StringPool.COMMA));
 
 		PortletURL viewValidDomainsURL = PortletURLBuilder.createRenderURL(

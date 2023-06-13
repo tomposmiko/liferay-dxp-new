@@ -49,6 +49,8 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeProcess;
+import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
+import com.liferay.portal.kernel.upgrade.MVCCVersionUpgradeProcess;
 import com.liferay.portal.kernel.uuid.PortalUUID;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
@@ -200,6 +202,34 @@ public class CommerceProductUpgradeStepRegistrator
 			new com.liferay.commerce.product.internal.upgrade.v3_4_0.
 				CommerceChannelUpgradeProcess(
 					_accountEntryGroupSettings, _configurationProvider));
+
+		registry.register(
+			"3.4.0", "3.5.0",
+			new MVCCVersionUpgradeProcess() {
+
+				@Override
+				protected String[] getModuleTableNames() {
+					return new String[] {
+						"CPAttachmentFileEntry", "CPDSpecificationOptionValue",
+						"CPDefinition", "CPDefinitionLink",
+						"CPDefinitionLocalization", "CPDefinitionOptionRel",
+						"CPDefinitionOptionValueRel", "CPDisplayLayout",
+						"CPInstance", "CPInstanceOptionValueRel",
+						"CPMeasurementUnit", "CPOption", "CPOptionCategory",
+						"CPOptionValue", "CPSpecificationOption",
+						"CPTaxCategory", "CProduct", "CommerceCatalog",
+						"CommerceChannel", "CommerceChannelRel"
+					};
+				}
+
+			});
+
+		registry.register("3.5.0", "3.5.1", new DummyUpgradeStep());
+
+		registry.register(
+			"3.5.1", "3.6.0",
+			new com.liferay.commerce.product.internal.upgrade.v3_6_0.
+				CPInstanceUpgradeProcess());
 
 		if (_log.isInfoEnabled()) {
 			_log.info("Commerce product upgrade step registrator finished");

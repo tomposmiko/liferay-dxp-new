@@ -15,15 +15,13 @@
 package com.liferay.site.navigation.admin.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -42,11 +40,10 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.navigation.admin.constants.SiteNavigationAdminPortletKeys;
+import com.liferay.site.navigation.admin.web.internal.configuration.FFSiteNavigationAdminConfigurationUtil;
 import com.liferay.site.navigation.admin.web.internal.security.permission.resource.SiteNavigationMenuPermission;
 import com.liferay.site.navigation.admin.web.internal.util.SiteNavigationMenuPortletUtil;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
-import com.liferay.site.navigation.model.SiteNavigationMenuItem;
-import com.liferay.site.navigation.service.SiteNavigationMenuItemLocalServiceUtil;
 import com.liferay.site.navigation.service.SiteNavigationMenuLocalService;
 import com.liferay.site.navigation.service.SiteNavigationMenuService;
 import com.liferay.site.navigation.type.DefaultSiteNavigationMenuItemTypeContext;
@@ -56,8 +53,11 @@ import com.liferay.site.navigation.type.SiteNavigationMenuItemTypeRegistry;
 import com.liferay.staging.StagingGroupHelper;
 import com.liferay.staging.StagingGroupHelperUtil;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -97,25 +97,30 @@ public class SiteNavigationAdminDisplayContext {
 			new DefaultSiteNavigationMenuItemTypeContext(
 				themeDisplay.getScopeGroup());
 
-		return new DropdownItemList() {
-			{
-				for (SiteNavigationMenuItemType siteNavigationMenuItemType :
-						_siteNavigationMenuItemTypeRegistry.
-							getSiteNavigationMenuItemTypes()) {
+		List<SiteNavigationMenuItemType> siteNavigationMenuItemTypes =
+			_siteNavigationMenuItemTypeRegistry.
+				getSiteNavigationMenuItemTypes();
 
-					if (!siteNavigationMenuItemType.isAvailable(
-							siteNavigationMenuItemTypeContext)) {
+		Stream<SiteNavigationMenuItemType> stream =
+			siteNavigationMenuItemTypes.stream();
 
-						continue;
-					}
-
-					add(
-						dropdownItem -> _applyDropdownItem(
-							dropdownItem, siteNavigationMenuItemType,
-							themeDisplay));
-				}
-			}
-		};
+		return DropdownItemListBuilder.addAll(
+			stream.filter(
+				siteNavigationMenuItemType ->
+					siteNavigationMenuItemType.isAvailable(
+						siteNavigationMenuItemTypeContext)
+			).sorted(
+				Comparator.comparing(
+					siteNavigationMenuItemType ->
+						siteNavigationMenuItemType.getLabel(
+							themeDisplay.getLocale()))
+			).map(
+				siteNavigationMenuItemType -> _getDropdownItem(
+					siteNavigationMenuItemType, themeDisplay)
+			).collect(
+				Collectors.toList()
+			)
+		).build();
 	}
 
 	public String getDisplayStyle() {
@@ -253,9 +258,17 @@ public class SiteNavigationAdminDisplayContext {
 	}
 
 	public Map<String, Object> getSiteNavigationContext() throws Exception {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
 		return HashMapBuilder.<String, Object>put(
 			"addSiteNavigationMenuItemOptions",
 			getAddSiteNavigationMenuItemDropdownItems()
+		).put(
+			"categoriesMultipleSelectionEnabled",
+			FFSiteNavigationAdminConfigurationUtil.
+				categoriesMultipleSelectionEnabled()
 		).put(
 			"deleteSiteNavigationMenuItemURL",
 			() -> PortletURLBuilder.createActionURL(
@@ -293,20 +306,16 @@ public class SiteNavigationAdminDisplayContext {
 		).put(
 			"id", _liferayPortletResponse.getNamespace() + "sidebar"
 		).put(
-			"languageId",
-			() -> {
-				ThemeDisplay themeDisplay =
-					(ThemeDisplay)_httpServletRequest.getAttribute(
-						WebKeys.THEME_DISPLAY);
-
-				return themeDisplay.getLanguageId();
-			}
+			"languageId", themeDisplay.getLanguageId()
 		).put(
 			"redirect", PortalUtil.getCurrentURL(_liferayPortletRequest)
 		).put(
 			"siteNavigationMenuId", getSiteNavigationMenuId()
 		).put(
-			"siteNavigationMenuItems", _getSiteNavigationMenuItemsJSONArray(0)
+			"siteNavigationMenuItems",
+			SiteNavigationMenuPortletUtil.getSiteNavigationMenuItemsJSONArray(
+				0, getSiteNavigationMenuId(),
+				_siteNavigationMenuItemTypeRegistry, themeDisplay)
 		).put(
 			"siteNavigationMenuName", getSiteNavigationMenuName()
 		).build();
@@ -387,42 +396,6 @@ public class SiteNavigationAdminDisplayContext {
 		return _updatePermission;
 	}
 
-	private void _applyDropdownItem(
-		DropdownItem dropdownItem,
-		SiteNavigationMenuItemType siteNavigationMenuItemType,
-		ThemeDisplay themeDisplay) {
-
-		dropdownItem.setData(
-			HashMapBuilder.<String, Object>put(
-				"addItemURL",
-				() -> {
-					if (!siteNavigationMenuItemType.isItemSelector()) {
-						return null;
-					}
-
-					RenderRequest renderRequest =
-						(RenderRequest)_httpServletRequest.getAttribute(
-							JavaConstants.JAVAX_PORTLET_REQUEST);
-					RenderResponse renderResponse =
-						(RenderResponse)_httpServletRequest.getAttribute(
-							JavaConstants.JAVAX_PORTLET_RESPONSE);
-
-					PortletURL addURL = siteNavigationMenuItemType.getAddURL(
-						renderRequest, renderResponse);
-
-					return addURL.toString();
-				}
-			).put(
-				"href", _getAddURL(siteNavigationMenuItemType)
-			).put(
-				"itemSelector", siteNavigationMenuItemType.isItemSelector()
-			).put(
-				"siteNavigationMenuId", getSiteNavigationMenuId()
-			).build());
-		dropdownItem.setLabel(
-			siteNavigationMenuItemType.getLabel(themeDisplay.getLocale()));
-	}
-
 	private String _getAddURL(
 		SiteNavigationMenuItemType siteNavigationMenuItemType) {
 
@@ -477,52 +450,45 @@ public class SiteNavigationAdminDisplayContext {
 		return addURL.toString();
 	}
 
-	private JSONArray _getSiteNavigationMenuItemsJSONArray(
-		long parentSiteNavigationMenuItemId) {
+	private DropdownItem _getDropdownItem(
+		SiteNavigationMenuItemType siteNavigationMenuItemType,
+		ThemeDisplay themeDisplay) {
 
-		List<SiteNavigationMenuItem> siteNavigationMenuItems =
-			SiteNavigationMenuItemLocalServiceUtil.getSiteNavigationMenuItems(
-				getSiteNavigationMenuId(), parentSiteNavigationMenuItemId);
+		return DropdownItemBuilder.setData(
+			HashMapBuilder.<String, Object>put(
+				"addItemURL",
+				() -> {
+					if (!siteNavigationMenuItemType.isItemSelector()) {
+						return null;
+					}
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+					RenderRequest renderRequest =
+						(RenderRequest)_httpServletRequest.getAttribute(
+							JavaConstants.JAVAX_PORTLET_REQUEST);
+					RenderResponse renderResponse =
+						(RenderResponse)_httpServletRequest.getAttribute(
+							JavaConstants.JAVAX_PORTLET_RESPONSE);
 
-		JSONArray siteNavigationMenuItemsJSONArray =
-			JSONFactoryUtil.createJSONArray();
+					PortletURL addURL = siteNavigationMenuItemType.getAddURL(
+						renderRequest, renderResponse);
 
-		for (SiteNavigationMenuItem siteNavigationMenuItem :
-				siteNavigationMenuItems) {
-
-			long siteNavigationMenuItemId =
-				siteNavigationMenuItem.getSiteNavigationMenuItemId();
-			SiteNavigationMenuItemType siteNavigationMenuItemType =
-				_siteNavigationMenuItemTypeRegistry.
-					getSiteNavigationMenuItemType(
-						siteNavigationMenuItem.getType());
-
-			siteNavigationMenuItemsJSONArray.put(
-				JSONUtil.put(
-					"children",
-					_getSiteNavigationMenuItemsJSONArray(
-						siteNavigationMenuItemId)
-				).put(
-					"parentSiteNavigationMenuItemId",
-					parentSiteNavigationMenuItemId
-				).put(
-					"siteNavigationMenuItemId", siteNavigationMenuItemId
-				).put(
-					"title",
-					siteNavigationMenuItemType.getTitle(
-						siteNavigationMenuItem, themeDisplay.getLocale())
-				).put(
-					"type",
-					siteNavigationMenuItemType.getSubtitle(
-						siteNavigationMenuItem, themeDisplay.getLocale())
-				));
-		}
-
-		return siteNavigationMenuItemsJSONArray;
+					return addURL.toString();
+				}
+			).put(
+				"addTitle",
+				siteNavigationMenuItemType.getAddTitle(themeDisplay.getLocale())
+			).put(
+				"href", _getAddURL(siteNavigationMenuItemType)
+			).put(
+				"itemSelector", siteNavigationMenuItemType.isItemSelector()
+			).put(
+				"multiSelection", siteNavigationMenuItemType.isMultiSelection()
+			).put(
+				"siteNavigationMenuId", getSiteNavigationMenuId()
+			).build()
+		).setLabel(
+			siteNavigationMenuItemType.getLabel(themeDisplay.getLocale())
+		).build();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

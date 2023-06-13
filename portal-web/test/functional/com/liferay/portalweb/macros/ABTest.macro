@@ -94,7 +94,7 @@ definition {
 
 	macro deleteVariant {
 		if (!(isSet(key_index))) {
-			key_index = "1";
+			var key_index = "1";
 		}
 
 		Click(locator1 = "ABTest#VARIANT_DROPDOWN");
@@ -122,7 +122,7 @@ definition {
 
 	macro editVariantName {
 		if (!(isSet(key_index))) {
-			key_index = "1";
+			var key_index = "1";
 		}
 
 		Click(locator1 = "ABTest#VARIANT_DROPDOWN");
@@ -142,6 +142,12 @@ definition {
 		}
 	}
 
+	macro openABTestPanel {
+		if (IsNotVisible(locator1 = "ABTest#AB_TEST_SIDE_BAR")) {
+			Click(locator1 = "ABTest#AB_TEST_BUTTON");
+		}
+	}
+
 	macro runTest {
 		Click(locator1 = "ABTest#REVIEW_AND_RUN_TEST_BUTTON");
 
@@ -153,7 +159,13 @@ definition {
 	}
 
 	macro selectElementID {
-		Click(locator1 = "ABTest#SELECT_CLICKABLE_ELEMENT_BUTTON");
+		if (!(isSet(key_index))) {
+			var key_index = "1";
+		}
+
+		Click(
+			key_value = "Select Clickable Element",
+			locator1 = "ABTest#SECONDARY_BUTTON");
 
 		Click(locator1 = "ABTest#SELECT_CLICKABLE_ELEMENT");
 
@@ -170,6 +182,25 @@ definition {
 		AssertTextEquals(
 			locator1 = "ABTest#LABEL_ITEM_STATUS",
 			value1 = "${status}");
+	}
+
+	macro takeElementID {
+		if (!(isSet(key_index))) {
+			var key_index = "1";
+		}
+
+		Click(
+			key_value = "Select Clickable Element",
+			locator1 = "ABTest#SECONDARY_BUTTON");
+
+		Click(locator1 = "ABTest#SELECT_CLICKABLE_ELEMENT");
+
+		var idelement = selenium.getAttribute(locator1 = "//div//div[contains(@class,'text-truncate')]@title");
+		var idelement = StringUtil.substring("${idelement}", "1", "19");
+
+		Click(locator1 = "ABTest#X_BUTTON_TARGET_ID_ELEMENT");
+
+		return "${idelement}";
 	}
 
 	macro terminateTest {
@@ -209,8 +240,8 @@ definition {
 
 			AssertElementPresent(
 				key_index = "${index}",
-				locator1 = "ABTest#VARIANT_NAME",
-				name = "${variantNames}");
+				key_name = "${variantNames}",
+				locator1 = "ABTest#VALUES_IN_LIST");
 		}
 	}
 

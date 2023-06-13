@@ -610,20 +610,21 @@ public abstract class BaseStructuredContentResourceTestCase {
 	}
 
 	@Test
-	public void testPutAssetLibraryStructuredContentPermission()
+	public void testPutAssetLibraryStructuredContentPermissionsPage()
 		throws Exception {
 
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		StructuredContent structuredContent =
-			testPutAssetLibraryStructuredContentPermission_addStructuredContent();
+			testPutAssetLibraryStructuredContentPermissionsPage_addStructuredContent();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			structuredContentResource.
-				putAssetLibraryStructuredContentPermissionHttpResponse(
+				putAssetLibraryStructuredContentPermissionsPageHttpResponse(
 					testDepotEntry.getDepotEntryId(),
 					new Permission[] {
 						new Permission() {
@@ -637,7 +638,7 @@ public abstract class BaseStructuredContentResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			structuredContentResource.
-				putAssetLibraryStructuredContentPermissionHttpResponse(
+				putAssetLibraryStructuredContentPermissionsPageHttpResponse(
 					testDepotEntry.getDepotEntryId(),
 					new Permission[] {
 						new Permission() {
@@ -650,7 +651,7 @@ public abstract class BaseStructuredContentResourceTestCase {
 	}
 
 	protected StructuredContent
-			testPutAssetLibraryStructuredContentPermission_addStructuredContent()
+			testPutAssetLibraryStructuredContentPermissionsPage_addStructuredContent()
 		throws Exception {
 
 		return structuredContentResource.postAssetLibraryStructuredContent(
@@ -1770,18 +1771,19 @@ public abstract class BaseStructuredContentResourceTestCase {
 	}
 
 	@Test
-	public void testPutSiteStructuredContentPermission() throws Exception {
+	public void testPutSiteStructuredContentPermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		StructuredContent structuredContent =
-			testPutSiteStructuredContentPermission_addStructuredContent();
+			testPutSiteStructuredContentPermissionsPage_addStructuredContent();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			structuredContentResource.
-				putSiteStructuredContentPermissionHttpResponse(
+				putSiteStructuredContentPermissionsPageHttpResponse(
 					structuredContent.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1795,7 +1797,7 @@ public abstract class BaseStructuredContentResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			structuredContentResource.
-				putSiteStructuredContentPermissionHttpResponse(
+				putSiteStructuredContentPermissionsPageHttpResponse(
 					structuredContent.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1808,7 +1810,7 @@ public abstract class BaseStructuredContentResourceTestCase {
 	}
 
 	protected StructuredContent
-			testPutSiteStructuredContentPermission_addStructuredContent()
+			testPutSiteStructuredContentPermissionsPage_addStructuredContent()
 		throws Exception {
 
 		return structuredContentResource.postSiteStructuredContent(
@@ -2442,18 +2444,19 @@ public abstract class BaseStructuredContentResourceTestCase {
 	}
 
 	@Test
-	public void testPutStructuredContentPermission() throws Exception {
+	public void testPutStructuredContentPermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		StructuredContent structuredContent =
-			testPutStructuredContentPermission_addStructuredContent();
+			testPutStructuredContentPermissionsPage_addStructuredContent();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			structuredContentResource.
-				putStructuredContentPermissionHttpResponse(
+				putStructuredContentPermissionsPageHttpResponse(
 					structuredContent.getId(),
 					new Permission[] {
 						new Permission() {
@@ -2467,7 +2470,7 @@ public abstract class BaseStructuredContentResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			structuredContentResource.
-				putStructuredContentPermissionHttpResponse(
+				putStructuredContentPermissionsPageHttpResponse(
 					0L,
 					new Permission[] {
 						new Permission() {
@@ -2480,7 +2483,7 @@ public abstract class BaseStructuredContentResourceTestCase {
 	}
 
 	protected StructuredContent
-			testPutStructuredContentPermission_addStructuredContent()
+			testPutStructuredContentPermissionsPage_addStructuredContent()
 		throws Exception {
 
 		return structuredContentResource.postSiteStructuredContent(
@@ -2495,7 +2498,7 @@ public abstract class BaseStructuredContentResourceTestCase {
 	}
 
 	@Test
-	public void testGetStructuredContentRenderedContentTemplate()
+	public void testGetStructuredContentRenderedContentContentTemplate()
 		throws Exception {
 
 		Assert.assertTrue(false);

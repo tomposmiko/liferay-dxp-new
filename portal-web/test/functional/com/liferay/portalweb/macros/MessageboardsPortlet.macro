@@ -51,6 +51,18 @@ definition {
 			AssertChecked(locator1 = "MessageBoardsAdminConfiguration#MESSAGE_ADDED_EMAIL_ENABLED_CHECKBOX");
 		}
 
+		if (isSet(bodyContent)) {
+			SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
+
+			Type(
+				locator1 = "CKEditor#BODY",
+				value1 = "${bodyContent}");
+
+			SelectFrame(value1 = "relative=top");
+
+			SelectFrame(locator1 = "IFrame#MODAL_BODY");
+		}
+
 		PortletEntry.save();
 	}
 
@@ -58,7 +70,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		Click(locator1 = "Portlet#OPTIONS_ICON");
@@ -82,6 +94,27 @@ definition {
 				locator1 = "TextInput#EMAIL_FROM_ADDRESS",
 				value1 = "${emailFromAddress}");
 		}
+
+		PortletEntry.save();
+	}
+
+	macro configureMessageFormat {
+		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "${siteURLKey}");
+
+		Click(locator1 = "Portlet#OPTIONS_ICON");
+
+		MenuItem.click(menuItem = "Configuration");
+
+		SelectFrame(locator1 = "IFrame#CONFIGURATION");
+
+		Select(
+			locator1 = "MessageBoardsThread#THREAD_FORMAT_SELECT",
+			value1 = "${messageFormat}");
+
+		AssertSelectedLabel(
+			locator1 = "Select#SELECT_ID",
+			selectFieldId = "messageFormat",
+			value1 = "${messageFormat}");
 
 		PortletEntry.save();
 	}
@@ -137,7 +170,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		Click(locator1 = "Portlet#OPTIONS_ICON");
@@ -167,7 +200,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		Click(locator1 = "Portlet#OPTIONS_ICON");
@@ -197,10 +230,7 @@ definition {
 	}
 
 	macro viewBannedUserCP {
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Message Boards",
-			site = "${site}");
+		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "${siteURLKey}");
 
 		AssertClick(
 			locator1 = "MessageBoards#NAVIGATION_BANNED_USERS",
@@ -216,7 +246,26 @@ definition {
 			locator1 = "MessageBoardsBannedUsers#BANNED_USERS_TABLE_BANNED_BY",
 			value1 = "Test Test");
 
-		AssertVisible(locator1 = "MessageBoardsBannedUsers#BANNED_USERS_TABLE_UNBAN_DATE");
+		if (isSet(disableAutoExpire)) {
+			var unbanDate = DateUtil.getFormattedCurrentDate("MM/d/yy");
+
+			echo("## * unbanDate: ${unbanDate}");
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "MessageBoardsBannedUsers#BANNED_USERS_TABLE_UNBAN_DATE",
+				value1 = "${unbanDate}");
+
+			Pause(locator1 = "60000");
+
+			MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "${siteURLKey}");
+
+			AssertClick(
+				locator1 = "MessageBoards#NAVIGATION_BANNED_USERS",
+				value1 = "Banned Users");
+		}
+		else {
+			AssertVisible(locator1 = "MessageBoardsBannedUsers#BANNED_USERS_TABLE_UNBAN_DATE");
+		}
 
 		LexiconEntry.openEntryMenu(rowEntry = "${userScreenName}");
 
@@ -226,6 +275,8 @@ definition {
 			locator1 = "MessageBoardsBannedUsers#BANNED_USERS_TABLE_BANNED_USER",
 			value1 = "${userScreenName}");
 
+		ProductMenuHelper.openProductMenu();
+
 		var key_siteName = "${userScreenName}";
 
 		AssertTextEquals.assertPartialText(
@@ -234,11 +285,7 @@ definition {
 	}
 
 	macro viewDefaultEmailFromCP {
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Message Boards");
+		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "${siteURLKey}");
 
 		Click(locator1 = "Portlet#OPTIONS_ICON");
 

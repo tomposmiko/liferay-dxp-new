@@ -28,6 +28,10 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class LayoutLocalServiceWrapper
 	implements LayoutLocalService, ServiceWrapper<LayoutLocalService> {
 
+	public LayoutLocalServiceWrapper() {
+		this(null);
+	}
+
 	public LayoutLocalServiceWrapper(LayoutLocalService layoutLocalService) {
 		_layoutLocalService = layoutLocalService;
 	}
@@ -1467,6 +1471,21 @@ public class LayoutLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutLocalService.getPersistedModel(primaryKeyObj);
+	}
+
+	@Override
+	public java.util.List<Layout> getPublishedLayouts(
+		long groupId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<Layout>
+			orderByComparator) {
+
+		return _layoutLocalService.getPublishedLayouts(
+			groupId, start, end, orderByComparator);
+	}
+
+	@Override
+	public int getPublishedLayoutsCount(long groupId) {
+		return _layoutLocalService.getPublishedLayoutsCount(groupId);
 	}
 
 	@Override

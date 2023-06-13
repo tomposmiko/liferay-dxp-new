@@ -104,7 +104,7 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Add a content page that uses the page template") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
 			ContentPages.addPage(
 				collectionName = "Page Template Collection",
@@ -123,17 +123,17 @@ definition {
 		}
 
 		task ("View the Heading fragment in view mode") {
-			AssertTextEquals(
-				key_fragmentName = "heading",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "Heading Example");
+			ContentPages.viewFragmentText(
+				fragmentName = "heading",
+				id = "element-text",
+				text = "Heading Example");
 		}
 
 		task ("View the Paragraph fragment in view mode") {
-			AssertTextEquals(
-				key_fragmentName = "paragraph",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
+			ContentPages.viewFragmentText(
+				fragmentName = "paragraph",
+				id = "element-text",
+				text = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
 		}
 
 		task ("View the no resource shown in the live site") {
@@ -157,17 +157,17 @@ definition {
 		}
 
 		task ("View the Heading fragment") {
-			AssertTextEquals(
-				key_fragmentName = "heading",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "Heading Example");
+			ContentPages.viewFragmentText(
+				fragmentName = "heading",
+				id = "element-text",
+				text = "Heading Example");
 		}
 
 		task ("View the Paragraph fragment") {
-			AssertTextEquals(
-				key_fragmentName = "paragraph",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
+			ContentPages.viewFragmentText(
+				fragmentName = "paragraph",
+				id = "element-text",
+				text = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
 		}
 	}
 
@@ -175,7 +175,7 @@ definition {
 	@priority = "4"
 	test UndoChangesOfContentPageTemplateInStagingSite {
 		task ("View Undo button is disabled when no changes") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
 			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name-staging");
 
@@ -217,16 +217,17 @@ definition {
 				locator1 = "Icon#ANY");
 
 			AssertCssValue(
-				key_fragmentName = "Button",
+				fragmentName = "button",
+				index = "1",
 				locator1 = "Fragment#FRAGMENT_BODY",
 				locator2 = "text-align",
-				value1 = "start");
+				value1 = "left");
 
 			Click(
 				key_text = "undo",
 				locator1 = "Icon#ANY");
 
-			PageEditor.viewNoFragment(fragmentName = "Button");
+			PageEditor.viewFragmentNotPresent(fragmentName = "Button");
 		}
 
 		task ("View Undo button is disabled when back to original state") {

@@ -1,25 +1,28 @@
-<definition default="keyPress">
-	<command name="keyDown">
-		<execute selenium="mouseOver" />
+@default = "keyPress"
+definition {
 
-		<execute selenium="keyDown" />
-	</command>
+	function keyDown {
+		selenium.mouseOver();
 
-	<command name="keyPress">
-		<execute selenium="mouseOver" />
+		selenium.keyDown();
+	}
 
-		<execute selenium="keyPress" />
-	</command>
+	function keyPress {
+		selenium.mouseOver();
 
-	<command name="keyPressNoError">
-		<execute selenium="mouseOver" />
+		selenium.keyPress();
+	}
 
-		<execute selenium="keyPress" />
-	</command>
+	function keyPressNoError {
+		selenium.mouseOver();
 
-	<command name="keyUp">
-		<execute selenium="mouseOver" />
+		selenium.keyPress();
+	}
 
-		<execute selenium="keyUp" />
-	</command>
-</definition>
+	function keyUp {
+		selenium.mouseOver();
+
+		selenium.keyUp();
+	}
+
+}

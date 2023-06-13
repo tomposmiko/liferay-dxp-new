@@ -12,12 +12,13 @@
  * details.
  */
 
-import {useConfig, useFormState} from 'data-engine-js-components-web';
-import {getFields} from 'data-engine-js-components-web/js/utils/fields.es';
 import {
+	getFields,
 	getObjectFieldName,
 	getSelectedValue,
-} from 'data-engine-js-components-web/js/utils/objectFields';
+	useConfig,
+	useFormState,
+} from 'data-engine-js-components-web';
 import {useCallback} from 'react';
 
 const getUnmappedFormFields = (formFields) => {
@@ -48,7 +49,7 @@ const getUnmappedRequiredObjectFields = (formFields, objectFields) => {
  * This hook is used to validate the Forms when the
  * storage type object is selected in the Forms settings
  */
-export const useValidateFormWithObjects = () => {
+export function useValidateFormWithObjects() {
 	const {portletNamespace} = useConfig();
 	const {objectFields, pages} = useFormState();
 
@@ -102,4 +103,4 @@ export const useValidateFormWithObjects = () => {
 		},
 		[objectFields, pages, portletNamespace]
 	);
-};
+}

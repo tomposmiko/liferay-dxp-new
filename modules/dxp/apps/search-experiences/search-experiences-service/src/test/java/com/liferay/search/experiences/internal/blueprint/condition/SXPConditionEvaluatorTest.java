@@ -14,7 +14,6 @@
 
 package com.liferay.search.experiences.internal.blueprint.condition;
 
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -70,12 +69,11 @@ public class SXPConditionEvaluatorTest {
 					"allConditions",
 					JSONUtil.putAll(
 						JSONUtil.put(
-							"exists",
-							JSONUtil.put("parameterName", "${integer}")),
+							"exists", JSONUtil.put("parameterName", "integer")),
 						JSONUtil.put(
 							"equals",
 							JSONUtil.put(
-								"parameterName", "${integer}"
+								"parameterName", "integer"
 							).put(
 								"value", 1
 							))))));
@@ -85,12 +83,11 @@ public class SXPConditionEvaluatorTest {
 					"allConditions",
 					JSONUtil.putAll(
 						JSONUtil.put(
-							"exists",
-							JSONUtil.put("parameterName", "${integer}")),
+							"exists", JSONUtil.put("parameterName", "integer")),
 						JSONUtil.put(
 							"equals",
 							JSONUtil.put(
-								"parameterName", "${integer}"
+								"parameterName", "integer"
 							).put(
 								"value", 2
 							))))));
@@ -108,14 +105,14 @@ public class SXPConditionEvaluatorTest {
 						JSONUtil.put(
 							"equals",
 							JSONUtil.put(
-								"parameterName", "${integer}"
+								"parameterName", "integer"
 							).put(
 								"value", 1
 							)),
 						JSONUtil.put(
 							"equals",
 							JSONUtil.put(
-								"parameterName", "${integer}"
+								"parameterName", "integer"
 							).put(
 								"value", 3
 							))))));
@@ -127,14 +124,14 @@ public class SXPConditionEvaluatorTest {
 						JSONUtil.put(
 							"equals",
 							JSONUtil.put(
-								"parameterName", "${integer}"
+								"parameterName", "integer"
 							).put(
 								"value", 1
 							)),
 						JSONUtil.put(
 							"equals",
 							JSONUtil.put(
-								"parameterName", "${integer}"
+								"parameterName", "integer"
 							).put(
 								"value", 2
 							))))));
@@ -150,6 +147,14 @@ public class SXPConditionEvaluatorTest {
 			_evaluate(
 				_getConditionJSONObject(
 					"contains", "long_array", _consumeValue(1L))));
+		Assert.assertTrue(
+			_evaluate(
+				_getConditionJSONObject(
+					"contains", "string", _consumeValue("ne"))));
+		Assert.assertTrue(
+			_evaluate(
+				_getConditionJSONObject(
+					"contains", "string", _consumeValues("two", "one"))));
 		Assert.assertTrue(
 			_evaluate(
 				_getConditionJSONObject(
@@ -211,15 +216,7 @@ public class SXPConditionEvaluatorTest {
 
 		Assert.assertFalse(_evaluate());
 
-		_setSXPParameters(new StringSXPParameter(parameterName, false, null));
-
-		Assert.assertFalse(_evaluate());
-
 		_setSXPParameters(new StringSXPParameter(parameterName, true, null));
-
-		Assert.assertFalse(_evaluate());
-
-		exists.setParameterName(_toTemplateVariable(parameterName));
 
 		Assert.assertTrue(_evaluate());
 	}
@@ -311,7 +308,7 @@ public class SXPConditionEvaluatorTest {
 								JSONUtil.put(
 									"equals",
 									JSONUtil.put(
-										"parameterName", "${integer}"
+										"parameterName", "integer"
 									).put(
 										"value", 1
 									)),
@@ -320,19 +317,19 @@ public class SXPConditionEvaluatorTest {
 									JSONUtil.put(
 										"gt", 1.0D
 									).put(
-										"parameterName", "${double}"
+										"parameterName", "double"
 									)),
 								JSONUtil.put(
 									"range",
 									JSONUtil.put(
 										"lte", 2.0F
 									).put(
-										"parameterName", "${float}"
+										"parameterName", "float"
 									)))),
 						JSONUtil.put(
 							"equals",
 							JSONUtil.put(
-								"parameterName", "${long}"
+								"parameterName", "long"
 							).put(
 								"value", 1
 							))))));
@@ -347,7 +344,7 @@ public class SXPConditionEvaluatorTest {
 								JSONUtil.put(
 									"equals",
 									JSONUtil.put(
-										"parameterName", "${integer}"
+										"parameterName", "integer"
 									).put(
 										"value", 1
 									)),
@@ -356,19 +353,19 @@ public class SXPConditionEvaluatorTest {
 									JSONUtil.put(
 										"gt", 0.0D
 									).put(
-										"parameterName", "${double}"
+										"parameterName", "double"
 									)),
 								JSONUtil.put(
 									"range",
 									JSONUtil.put(
 										"lte", 1.0F
 									).put(
-										"parameterName", "${float}"
+										"parameterName", "float"
 									)))),
 						JSONUtil.put(
 							"equals",
 							JSONUtil.put(
-								"parameterName", "${long}"
+								"parameterName", "long"
 							).put(
 								"value", 1
 							))))));
@@ -387,7 +384,7 @@ public class SXPConditionEvaluatorTest {
 								JSONUtil.put(
 									"equals",
 									JSONUtil.put(
-										"parameterName", "${integer}"
+										"parameterName", "integer"
 									).put(
 										"value", 0
 									)),
@@ -396,19 +393,19 @@ public class SXPConditionEvaluatorTest {
 									JSONUtil.put(
 										"gt", 2.0D
 									).put(
-										"parameterName", "${double}"
+										"parameterName", "double"
 									)),
 								JSONUtil.put(
 									"range",
 									JSONUtil.put(
 										"lte", 0.0F
 									).put(
-										"parameterName", "${float}"
+										"parameterName", "float"
 									)))),
 						JSONUtil.put(
 							"equals",
 							JSONUtil.put(
-								"parameterName", "${long}"
+								"parameterName", "long"
 							).put(
 								"value", 0L
 							))))));
@@ -423,7 +420,7 @@ public class SXPConditionEvaluatorTest {
 								JSONUtil.put(
 									"equals",
 									JSONUtil.put(
-										"parameterName", "${integer}"
+										"parameterName", "integer"
 									).put(
 										"value", 0
 									)),
@@ -432,19 +429,19 @@ public class SXPConditionEvaluatorTest {
 									JSONUtil.put(
 										"gt", 1.0D
 									).put(
-										"parameterName", "${double}"
+										"parameterName", "double"
 									)),
 								JSONUtil.put(
 									"range",
 									JSONUtil.put(
 										"lte", 1.0F
 									).put(
-										"parameterName", "${float}"
+										"parameterName", "float"
 									)))),
 						JSONUtil.put(
 							"equals",
 							JSONUtil.put(
-								"parameterName", "${long}"
+								"parameterName", "long"
 							).put(
 								"value", 0
 							))))));
@@ -462,6 +459,17 @@ public class SXPConditionEvaluatorTest {
 				_getNotJSONObject(
 					_getConditionJSONObject(
 						"contains", "long_array", _consumeValue(4L)))));
+		Assert.assertTrue(
+			_evaluate(
+				_getNotJSONObject(
+					_getConditionJSONObject(
+						"contains", "string", _consumeValue("no")))));
+		Assert.assertTrue(
+			_evaluate(
+				_getNotJSONObject(
+					_getConditionJSONObject(
+						"contains", "string",
+						_consumeValues("two", "three")))));
 		Assert.assertTrue(
 			_evaluate(
 				_getNotJSONObject(
@@ -617,8 +625,7 @@ public class SXPConditionEvaluatorTest {
 	private JSONObject _getConditionJSONObject(
 		String key, String parameterName, Consumer<JSONObject>... consumers) {
 
-		JSONObject jsonObject = JSONUtil.put(
-			"parameterName", _toTemplateVariable(parameterName));
+		JSONObject jsonObject = JSONUtil.put("parameterName", parameterName);
 
 		for (Consumer<JSONObject> consumer : consumers) {
 			consumer.accept(jsonObject);
@@ -675,31 +682,24 @@ public class SXPConditionEvaluatorTest {
 			Date.from(instant.plus(Duration.ofDays(offset))));
 	}
 
-	private String _toTemplateVariable(String name) {
-		return StringPool.DOLLAR_AND_OPEN_CURLY_BRACE + name +
-			StringPool.CLOSE_CURLY_BRACE;
-	}
-
 	private static final Date _date = new Date();
 
 	private Condition _condition = new Condition();
 	private SXPParameterData _sxpParameterData = new SXPParameterData(
 		"test",
 		SetUtil.fromArray(
-			new SXPParameter[] {
-				new BooleanSXPParameter("boolean", true, true),
-				new DateSXPParameter("date", true, _date),
-				new DoubleSXPParameter("double", true, 1.0D),
-				new FloatSXPParameter("float", true, 1.0F),
-				new IntegerSXPParameter("integer", true, 1),
-				new IntegerArraySXPParameter(
-					"integer_array", true, new Integer[] {1, 2, 3}),
-				new LongArraySXPParameter(
-					"long_array", true, new Long[] {1L, 2L, 3L}),
-				new LongSXPParameter("long", true, 1L),
-				new StringArraySXPParameter(
-					"string_array", true, new String[] {"one", "two", "three"}),
-				new StringSXPParameter("string", true, "one")
-			}));
+			new BooleanSXPParameter("boolean", true, true),
+			new DateSXPParameter("date", true, _date),
+			new DoubleSXPParameter("double", true, 1.0D),
+			new FloatSXPParameter("float", true, 1.0F),
+			new IntegerSXPParameter("integer", true, 1),
+			new IntegerArraySXPParameter(
+				"integer_array", true, new Integer[] {1, 2, 3}),
+			new LongArraySXPParameter(
+				"long_array", true, new Long[] {1L, 2L, 3L}),
+			new LongSXPParameter("long", true, 1L),
+			new StringArraySXPParameter(
+				"string_array", true, new String[] {"one", "two", "three"}),
+			new StringSXPParameter("string", true, "one")));
 
 }

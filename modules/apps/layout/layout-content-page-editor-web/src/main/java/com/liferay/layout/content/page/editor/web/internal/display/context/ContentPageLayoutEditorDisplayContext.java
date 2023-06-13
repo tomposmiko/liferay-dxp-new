@@ -42,12 +42,12 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRel;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureRelLocalServiceUtil;
+import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -70,8 +70,11 @@ import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.constants.SegmentsPortletKeys;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.model.SegmentsExperience;
+import com.liferay.segments.model.SegmentsExperimentRel;
+import com.liferay.segments.model.SegmentsExperimentRelTable;
 import com.liferay.segments.service.SegmentsEntryServiceUtil;
 import com.liferay.segments.service.SegmentsExperienceLocalServiceUtil;
+import com.liferay.segments.service.SegmentsExperimentRelLocalServiceUtil;
 import com.liferay.staging.StagingGroupHelper;
 
 import java.util.ArrayList;
@@ -120,9 +123,8 @@ public class ContentPageLayoutEditorDisplayContext
 			fragmentEntryConfigurationParser, fragmentRendererController,
 			fragmentRendererTracker, frontendTokenDefinitionRegistry,
 			httpServletRequest, infoItemServiceTracker, itemSelector,
-			pageEditorConfiguration, portletRequest, renderResponse);
-
-		_stagingGroupHelper = stagingGroupHelper;
+			pageEditorConfiguration, portletRequest, renderResponse,
+			stagingGroupHelper);
 	}
 
 	@Override
@@ -203,17 +205,16 @@ public class ContentPageLayoutEditorDisplayContext
 			return _segmentsExperienceId;
 		}
 
-		long selectedSegmentsExperienceId = ParamUtil.getLong(
+		_segmentsExperienceId = ParamUtil.getLong(
 			PortalUtil.getOriginalServletRequest(httpServletRequest),
 			"segmentsExperienceId", -1);
 
-		if ((selectedSegmentsExperienceId != -1) &&
-			(selectedSegmentsExperienceId !=
-				SegmentsExperienceConstants.ID_DEFAULT)) {
+		if ((_segmentsExperienceId != -1) &&
+			(_segmentsExperienceId != SegmentsExperienceConstants.ID_DEFAULT)) {
 
 			_segmentsExperienceId = Optional.ofNullable(
 				SegmentsExperienceLocalServiceUtil.fetchSegmentsExperience(
-					selectedSegmentsExperienceId)
+					_segmentsExperienceId)
 			).map(
 				SegmentsExperience::getSegmentsExperienceId
 			).orElseGet(
@@ -414,31 +415,34 @@ public class ContentPageLayoutEditorDisplayContext
 	private JSONArray _getInfoCollectionProviderLinkedCollectionJSONArray(
 		InfoCollectionProvider<?> infoCollectionProvider) {
 
-		JSONObject jsonObject = JSONUtil.put(
-			"itemType", infoCollectionProvider.getCollectionItemClassName()
-		).put(
-			"key", infoCollectionProvider.getKey()
-		).put(
-			"title", infoCollectionProvider.getLabel(LocaleUtil.getDefault())
-		).put(
-			"type", InfoListProviderItemSelectorReturnType.class.getName()
-		);
-
-		if (infoCollectionProvider instanceof
-				SingleFormVariationInfoCollectionProvider) {
-
-			SingleFormVariationInfoCollectionProvider<?>
-				singleFormVariationInfoCollectionProvider =
-					(SingleFormVariationInfoCollectionProvider<?>)
-						infoCollectionProvider;
-
-			jsonObject.put(
+		return JSONUtil.put(
+			JSONUtil.put(
 				"itemSubtype",
-				singleFormVariationInfoCollectionProvider.
-					getFormVariationKey());
-		}
+				() -> {
+					if (infoCollectionProvider instanceof
+							SingleFormVariationInfoCollectionProvider) {
 
-		return JSONUtil.put(jsonObject);
+						SingleFormVariationInfoCollectionProvider<?>
+							singleFormVariationInfoCollectionProvider =
+								(SingleFormVariationInfoCollectionProvider<?>)
+									infoCollectionProvider;
+
+						return singleFormVariationInfoCollectionProvider.
+							getFormVariationKey();
+					}
+
+					return null;
+				}
+			).put(
+				"itemType", infoCollectionProvider.getCollectionItemClassName()
+			).put(
+				"key", infoCollectionProvider.getKey()
+			).put(
+				"title",
+				infoCollectionProvider.getLabel(LocaleUtil.getDefault())
+			).put(
+				"type", InfoListProviderItemSelectorReturnType.class.getName()
+			));
 	}
 
 	private List<Map<String, Object>> _getLayoutDataList() throws Exception {
@@ -598,11 +602,11 @@ public class ContentPageLayoutEditorDisplayContext
 	private long _getStagingAwareGroupId() {
 		long groupId = getGroupId();
 
-		if (_stagingGroupHelper.isStagingGroup(groupId) &&
-			!_stagingGroupHelper.isStagedPortlet(
+		if (stagingGroupHelper.isStagingGroup(groupId) &&
+			!stagingGroupHelper.isStagedPortlet(
 				groupId, SegmentsPortletKeys.SEGMENTS)) {
 
-			Group group = _stagingGroupHelper.fetchLiveGroup(groupId);
+			Group group = stagingGroupHelper.fetchLiveGroup(groupId);
 
 			if (group != null) {
 				groupId = group.getGroupId();
@@ -671,7 +675,39 @@ public class ContentPageLayoutEditorDisplayContext
 			return false;
 		}
 
-		return true;
+		SegmentsExperience segmentsExperience =
+			SegmentsExperienceLocalServiceUtil.fetchSegmentsExperience(
+				segmentsExperienceId);
+
+		if (segmentsExperience != null) {
+			List<SegmentsExperimentRel> segmentsExperimentRels =
+				SegmentsExperimentRelLocalServiceUtil.dslQuery(
+					DSLQueryFactoryUtil.select(
+						SegmentsExperimentRelTable.INSTANCE
+					).from(
+						SegmentsExperimentRelTable.INSTANCE
+					).where(
+						SegmentsExperimentRelTable.INSTANCE.
+							segmentsExperienceId.eq(
+								segmentsExperience.getSegmentsExperienceId())
+					));
+
+			if (segmentsExperimentRels.isEmpty()) {
+				return false;
+			}
+
+			SegmentsExperimentRel segmentsExperimentRel =
+				segmentsExperimentRels.get(0);
+
+			try {
+				return !segmentsExperimentRel.isControl();
+			}
+			catch (PortalException portalException) {
+				portalException.printStackTrace();
+			}
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -682,6 +718,5 @@ public class ContentPageLayoutEditorDisplayContext
 	private Long _segmentsEntryId;
 	private Long _segmentsExperienceId;
 	private Boolean _showSegmentsExperiences;
-	private final StagingGroupHelper _stagingGroupHelper;
 
 }

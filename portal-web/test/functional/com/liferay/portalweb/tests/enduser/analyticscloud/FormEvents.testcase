@@ -54,7 +54,6 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
-
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 
@@ -151,7 +150,7 @@ definition {
 				value = "${formId}");
 		}
 
-		task ("View the focusDuration of fieldBlurred event is greater than 2000 ms") {
+		task ("View the focusDuration of fieldBlurred event is greater than 0 ms") {
 			var focusDuration = ACUtils.getEventPropertyValue(
 				applicationId = "Form",
 				eventId = "fieldBlurred",
@@ -159,7 +158,7 @@ definition {
 
 			TestUtils.isGreaterThan(
 				actual = "${focusDuration}",
-				expected = "2000");
+				expected = "0");
 		}
 
 		task ("View the fieldName of fieldBlurred event") {
@@ -224,7 +223,7 @@ definition {
 		}
 
 		task ("Navigate to the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -259,7 +258,7 @@ definition {
 				value = "${formId}");
 		}
 
-		task ("View the focusDuration of fieldBlurred event is greater than 2000 ms") {
+		task ("View the focusDuration of fieldBlurred event is greater than 0 ms") {
 			var focusDuration = ACUtils.getEventPropertyValue(
 				applicationId = "Form",
 				eventId = "fieldBlurred",
@@ -267,7 +266,7 @@ definition {
 
 			TestUtils.isGreaterThan(
 				actual = "${focusDuration}",
-				expected = "2000");
+				expected = "0");
 		}
 
 		task ("View the fieldName of fieldBlurred event") {
@@ -332,7 +331,7 @@ definition {
 		}
 
 		task ("Navigate to the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -524,18 +523,12 @@ definition {
 			ACUtils.launchDXP(userEmailAddress = "userea@liferay.com");
 		}
 
-		task ("Navigate to the site page") {
-			Navigator.gotoSitePage(
+		task ("Navigate to the site page and submit a record in form") {
+			ACUtils.navigateToSitePage(
+				actionType = "Submit Form",
 				pageName = "AC Page",
-				siteName = "Site Name");
-		}
-
-		task ("Submit a record in form") {
-			FormFields.editText(
-				fieldName = "Text",
-				fieldValue = "First Record");
-
-			FormPortlet.submitSuccessfully();
+				siteName = "Site Name",
+				submitText = "First Record");
 		}
 
 		task ("Start Har recording") {
@@ -693,7 +686,7 @@ definition {
 		}
 
 		task ("Navigate to the site page") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}

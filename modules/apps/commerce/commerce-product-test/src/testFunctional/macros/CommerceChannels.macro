@@ -145,11 +145,12 @@ definition {
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
 		if ("${tabName}" == "Private+Pages") {
-			if (IsElementNotPresent(locator1 = "AppBuilderAppAdmin#APP_TAB", key_tabName = "Private+Pages")) {
+			if (IsElementNotPresent(key_tabName = "Private+Pages", locator1 = "AppBuilderAppAdmin#APP_TAB")) {
 				Click(
 					key_text = "Public Pages",
 					locator1 = "Button#ANY_WITH_SPAN");
 			}
+
 			Click(
 				key_tabName = "Private+Pages",
 				locator1 = "AppBuilderAppAdmin#APP_TAB");
@@ -164,6 +165,12 @@ definition {
 		SelectFrame.selectFrameNoLoading(locator1 = "CommerceEntry#IFRAME_SIDE_PANEL");
 
 		Button.clickSave();
+	}
+
+	macro openChannelsAdmin {
+		Navigator.openWithAppendToBaseURL(
+			baseURL = "${baseURL}",
+			urlAppend = "group/guest/~/control_panel/manage?p_p_id=com_liferay_commerce_channel_web_internal_portlet_CommerceChannelsPortlet");
 	}
 
 }

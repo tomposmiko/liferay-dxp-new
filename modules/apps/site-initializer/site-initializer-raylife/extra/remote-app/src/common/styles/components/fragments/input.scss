@@ -2,7 +2,6 @@
 	display: flex;
 	flex-direction: column;
 	position: relative;
-	width: 100%;
 
 	& > label {
 		margin-bottom: 0.5rem;
@@ -14,13 +13,13 @@
 
 	&.invalid {
 		input {
-			border-color: $error-default;
+			border-color: $color-state-error;
 		}
 	}
 }
 
 label {
-	color: $neutral-black;
+	color: $color-neutral-black;
 	display: flex;
 	font-family: $font-family;
 	font-size: 1.125rem;
@@ -29,7 +28,7 @@ label {
 	margin-right: -5px;
 
 	& .required::after {
-		color: $error-default;
+		color: $color-state-error;
 		content: '*';
 		font-size: 0.813rem;
 		position: relative;
@@ -40,57 +39,54 @@ label {
 input,
 .input {
 	background: $background;
-	border: 1px solid $neutral-default;
+	border: 1px solid $color-action-neutral-default;
 	border-radius: 0.25rem;
-	color: $neutral-black;
+	color: $color-neutral-black;
 	display: flex;
 	flex: 1;
 	font-family: $font-family;
 	font-size: 1rem;
 	font-weight: 500;
 	min-height: 3rem;
-	padding: 0 1rem;
+	padding: $spacer-0 $spacer-3;
 	transition: all ease-out 200ms;
 	width: auto;
 
 	&:focus,
 	&:hover {
-		border-color: $primary-default;
+		border-color: $color-action-primary-hover;
 	}
 
 	&:disabled {
 		cursor: not-allowed;
 		opacity: 0.5;
 	}
+}
 
+input.form-control {
 	&::placeholder {
+		color: $color-neutral-black;
+		font-weight: 500;
 		opacity: 0.4;
 	}
 }
 
+input.form-control.search {
+	min-height: 3.5rem;
+
+	&::placeholder {
+		color: var(--text-neutral-7);
+		font-size: 1.313rem;
+		font-weight: 700;
+	}
+}
+
+.input-area.zip,
+.input-area.zip > input,
+.input-area.apt > input {
+	width: 176px;
+}
+
 input.hidden {
 	display: none;
-}
-
-input.search {
-	font-size: 1.313rem;
-	font-weight: 700;
-	min-height: 3.5rem;
-	padding: 0 1.5rem;
-}
-
-select {
-	-moz-appearance: none;
-	-webkit-appearance: none;
-	appearance: none;
-}
-
-.select-icon {
-	bottom: 10px;
-	fill: $neutral-default;
-	height: 24px !important;
-	pointer-events: none;
-	position: absolute;
-	right: 12px;
-	width: 24px !important;
 }

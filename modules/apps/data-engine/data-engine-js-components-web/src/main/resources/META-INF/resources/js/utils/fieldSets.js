@@ -56,19 +56,29 @@ const addNestedFields = ({field, indexes, nestedFields, props}) => {
 	};
 };
 
-export const createFieldSet = (
+export function createFieldSet(
 	props,
 	event,
 	nestedFields,
 	rows = [{columns: [{fields: [], size: 12}]}]
-) => {
-	const {fieldTypes} = props;
-	const fieldType = fieldTypes.find((fieldType) => {
-		return fieldType.name === FIELD_TYPE_FIELDSET;
-	});
-	const fieldSetField = createField(props, {
-		...event,
-		fieldType,
+) {
+	const {
+		defaultLanguageId,
+		editingLanguageId,
+		fieldNameGenerator,
+		fieldTypes,
+		portletNamespace,
+	} = props;
+	const {skipFieldNameGeneration, useFieldName} = event;
+
+	const fieldSetField = createField({
+		defaultLanguageId,
+		editingLanguageId,
+		fieldNameGenerator,
+		fieldType: fieldTypes.find(({name}) => name === FIELD_TYPE_FIELDSET),
+		portletNamespace,
+		skipFieldNameGeneration,
+		useFieldName,
 	});
 
 	return addNestedFields({
@@ -85,4 +95,4 @@ export const createFieldSet = (
 		nestedFields,
 		props,
 	});
-};
+}

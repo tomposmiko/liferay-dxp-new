@@ -105,8 +105,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				ClayDataSetDisplayView.class,
 				new ObjectEntriesTableClayDataSetDisplayView(
 					_clayTableSchemaBuilderFactory, objectDefinition,
-					_objectFieldLocalService.getObjectFields(
-						objectDefinition.getObjectDefinitionId())),
+					_objectFieldLocalService),
 				HashMapDictionaryBuilder.put(
 					"clay.data.set.display.name",
 					objectDefinition.getPortletId()
@@ -139,8 +138,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				new ObjectEntryInfoItemFieldValuesProvider(
 					_assetDisplayPageFriendlyURLProvider,
 					_infoItemFieldReaderFieldSetProvider, _jsonFactory,
-					_objectEntryLocalService, _objectFieldLocalService,
-					_templateInfoItemFieldSetProvider, _userLocalService),
+					_listTypeEntryLocalService, _objectEntryLocalService,
+					_objectFieldLocalService, _templateInfoItemFieldSetProvider,
+					_userLocalService),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"item.class.name", objectDefinition.getClassName()
 				).build()),
@@ -171,8 +171,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				InfoItemRenderer.class,
 				new ObjectEntryRowInfoItemRenderer(
 					_assetDisplayPageFriendlyURLProvider,
-					_objectDefinitionLocalService, _objectEntryLocalService,
-					_objectFieldLocalService, _servletContext),
+					_listTypeEntryLocalService, _objectDefinitionLocalService,
+					_objectEntryLocalService, _objectFieldLocalService,
+					_servletContext),
 				HashMapDictionaryBuilder.<String, Object>put(
 					Constants.SERVICE_RANKING, 100
 				).put(
@@ -216,7 +217,14 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					"com.liferay.portlet.company",
 					objectDefinition.getCompanyId()
 				).put(
-					"com.liferay.portlet.display-category", "category.hidden"
+					"com.liferay.portlet.display-category",
+					() -> {
+						if (objectDefinition.isPortlet()) {
+							return "category.object";
+						}
+
+						return "category.hidden";
+					}
 				).put(
 					"javax.portlet.display-name",
 					objectDefinition.getPluralLabel(LocaleUtil.getSiteDefault())

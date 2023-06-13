@@ -46,21 +46,21 @@ function AssetVocabulariesCategoriesSelector({
 
 	const {refetch, resource} = useResource({
 		fetchOptions: {
-			body: new URLSearchParams({
+			'body': new URLSearchParams({
 				cmd: JSON.stringify({
 					'/assetcategory/search': {
 						'-obc': null,
-						end: 20,
+						'end': 20,
 						groupIds,
-						name: `%${inputValue.toLowerCase()}%`,
-						start: 0,
-						vocabularyIds: sourceItemsVocabularyIds,
+						'name': `%${inputValue.toLowerCase()}%`,
+						'start': 0,
+						'vocabularyIds': sourceItemsVocabularyIds,
 					},
 				}),
 				p_auth: Liferay.authToken,
 			}),
-			credentials: 'include',
-			method: 'POST',
+			'credentials': 'include',
+			'method': 'POST',
 			'x-csrf-token': Liferay.authToken,
 		},
 		link: `${window.location.origin}${themeDisplay.getPathContext()}
@@ -253,6 +253,7 @@ function AssetVocabulariesCategoriesSelector({
 							<ClayForm.FeedbackGroup>
 								<ClayForm.FeedbackItem>
 									<ClayForm.FeedbackIndicator symbol="info-circle" />
+
 									<span className="ml-2">
 										{Liferay.Language.get(
 											'this-field-is-required'

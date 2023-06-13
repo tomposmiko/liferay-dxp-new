@@ -14,6 +14,8 @@
 
 package com.liferay.journal.service.impl;
 
+import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
+import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.asset.display.page.util.AssetDisplayPageUtil;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
@@ -53,6 +55,7 @@ import com.liferay.expando.kernel.service.ExpandoRowLocalService;
 import com.liferay.expando.kernel.util.ExpandoBridgeUtil;
 import com.liferay.exportimport.kernel.exception.ExportImportContentValidationException;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.friendly.url.exception.NoSuchFriendlyURLEntryLocalizationException;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
@@ -1184,6 +1187,20 @@ public class JournalArticleLocalServiceImpl
 		updateAsset(
 			userId, newArticle, assetCategoryIds, assetTagNames,
 			assetLinkEntryIds, oldAssetEntry.getPriority());
+
+		AssetDisplayPageEntry assetDisplayPageEntry =
+			_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
+				groupId, _portal.getClassNameId(JournalArticle.class.getName()),
+				oldArticle.getResourcePrimKey());
+
+		if (assetDisplayPageEntry != null) {
+			_assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
+				userId, groupId,
+				_portal.getClassNameId(JournalArticle.class.getName()),
+				newArticle.getResourcePrimKey(),
+				assetDisplayPageEntry.getLayoutPageTemplateEntryId(),
+				assetDisplayPageEntry.getType(), serviceContext);
+		}
 
 		// Dynamic data mapping
 
@@ -5725,7 +5742,12 @@ public class JournalArticleLocalServiceImpl
 			(_classNameLocalService.getClassNameId(DDMStructure.class) !=
 				article.getClassNameId())) {
 
-			throw new ArticleFriendlyURLException();
+			Group companyGroup = _groupLocalService.getCompanyGroup(
+				article.getCompanyId());
+
+			if (article.getGroupId() != companyGroup.getGroupId()) {
+				throw new ArticleFriendlyURLException();
+			}
 		}
 
 		article.setFolderId(folderId);
@@ -6668,7 +6690,9 @@ public class JournalArticleLocalServiceImpl
 						extraDataJSONObject.toString(), 0);
 				}
 			}
-			else if (oldStatus == WorkflowConstants.STATUS_APPROVED) {
+			else if ((oldStatus == WorkflowConstants.STATUS_APPROVED) &&
+					 (status != WorkflowConstants.STATUS_IN_TRASH)) {
+
 				updatePreviousApprovedArticle(article);
 			}
 		}
@@ -8586,6 +8610,28 @@ public class JournalArticleLocalServiceImpl
 				_classNameLocalService.getClassNameId(JournalArticle.class),
 				article.getResourcePrimKey(), urlTitleMap, serviceContext);
 
+		for (Map.Entry<String, String> entry : urlTitleMap.entrySet()) {
+			if (Validator.isNull(entry.getValue())) {
+				for (FriendlyURLEntry friendlyURLEntry : friendlyURLEntries) {
+					try {
+						friendlyURLEntryLocalService.
+							deleteFriendlyURLLocalizationEntry(
+								friendlyURLEntry.getFriendlyURLEntryId(),
+								entry.getKey());
+					}
+					catch (NoSuchFriendlyURLEntryLocalizationException
+								noSuchFriendlyURLEntryLocalizationException) {
+
+						if (_log.isDebugEnabled()) {
+							_log.debug(
+								noSuchFriendlyURLEntryLocalizationException,
+								noSuchFriendlyURLEntryLocalizationException);
+						}
+					}
+				}
+			}
+		}
+
 		for (FriendlyURLEntry friendlyURLEntry : friendlyURLEntries) {
 			if (newFriendlyURLEntry.getFriendlyURLEntryId() ==
 					friendlyURLEntry.getFriendlyURLEntryId()) {
@@ -8995,12 +9041,16 @@ public class JournalArticleLocalServiceImpl
 		for (Map.Entry<Locale, String> entry : titleMap.entrySet()) {
 			String friendlyURL = friendlyURLMap.get(entry.getKey());
 
-			if (Validator.isNull(friendlyURL)) {
-				friendlyURL = titleMap.get(entry.getKey());
+			if (friendlyURL == null) {
+				continue;
+			}
 
-				if (Validator.isNull(friendlyURL)) {
-					continue;
-				}
+			if (Validator.isNull(friendlyURL)) {
+				urlTitleMap.put(
+					LanguageUtil.getLanguageId(entry.getKey()),
+					StringPool.BLANK);
+
+				continue;
 			}
 
 			String languageId = LanguageUtil.getLanguageId(entry.getKey());
@@ -9108,6 +9158,10 @@ public class JournalArticleLocalServiceImpl
 
 	@Reference
 	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Reference
+	private AssetDisplayPageEntryLocalService
+		_assetDisplayPageEntryLocalService;
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;

@@ -1,17 +1,14 @@
 import React from 'react';
-import {PHONE_REGEX} from '~/common/utils/patterns';
-
 import {ControlledInputWithMask} from '.';
 
-export const PhoneControlledInput = ({
-	rules = {},
-	inputProps = {},
-	...props
-}) => {
+import {PHONE_REGEX} from '../../../../../utils/patterns';
+
+export function PhoneControlledInput({rules = {}, inputProps = {}, ...props}) {
 	return (
 		<ControlledInputWithMask
 			{...props}
 			inputProps={{
+				className: 'd-flex mb-5 mr-0',
 				format: '(###) ###-####',
 				mask: '_',
 				...inputProps,
@@ -26,4 +23,4 @@ export const PhoneControlledInput = ({
 			}}
 		/>
 	);
-};
+}

@@ -32,7 +32,7 @@ definition {
 
 			WikiNode.tearDownCP();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 		}
 	}
 
@@ -73,7 +73,6 @@ definition {
 		WikiNavigator.openWikiAdmin(siteURLKey = "guest");
 
 		LAR.importPortlet(
-			filePath = "enduser/collaboration/wiki",
 			larFileName = "research-projects-update-node.lar",
 			mirrorWithOverwriting = "true",
 			uploadFrom = "dependencies");

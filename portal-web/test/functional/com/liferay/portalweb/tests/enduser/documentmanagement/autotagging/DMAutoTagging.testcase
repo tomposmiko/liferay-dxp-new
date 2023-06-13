@@ -24,7 +24,7 @@ definition {
 		else {
 			DMDocument.tearDownCP();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 
 			Site.tearDownCP();
 
@@ -176,8 +176,6 @@ definition {
 			groupName = "Guest",
 			mimeType = "image/jpeg",
 			sourceFileName = "Document_4.jpg");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		DMNavigator.openToEditEntryInSite(
 			dmDocumentTitle = "Auto Tagged Image",

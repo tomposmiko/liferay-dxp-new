@@ -33,6 +33,10 @@ public class PoshiScriptParserException extends Exception {
 	public static final String TRANSLATION_LOSS_MESSAGE =
 		"Poshi Script syntax is not preserved in translation";
 
+	public static void clear() {
+		_poshiScriptParserExceptions.clear();
+	}
+
 	public static void throwExceptions() throws Exception {
 		if (!_poshiScriptParserExceptions.isEmpty()) {
 			StringBuilder sb = new StringBuilder();
@@ -45,6 +49,30 @@ public class PoshiScriptParserException extends Exception {
 				sb.append(exception.getMessage());
 				sb.append("\n\n");
 			}
+
+			System.out.println(sb.toString());
+
+			throw new Exception();
+		}
+	}
+
+	public static void throwExceptions(String filePath) throws Exception {
+		if (_poshiScriptParserExceptions.isEmpty()) {
+			return;
+		}
+
+		for (PoshiScriptParserException poshiScriptParserException :
+				_poshiScriptParserExceptions) {
+
+			if (!filePath.equals(poshiScriptParserException.getFilePath())) {
+				continue;
+			}
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("\n\nPoshi parsing errors in " + filePath + "\n\n");
+			sb.append(poshiScriptParserException.getMessage());
+			sb.append("\n\n");
 
 			System.out.println(sb.toString());
 

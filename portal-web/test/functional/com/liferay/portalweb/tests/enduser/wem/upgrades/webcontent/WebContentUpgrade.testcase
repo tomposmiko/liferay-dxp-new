@@ -14,12 +14,7 @@ definition {
 
 		AssertLocation(value1 = "${portalURL}/web/guest?SM_USER=test@liferay.com");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Search");
-
-		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+		SearchAdministration.executeReindex();
 	}
 
 	@description = "This is a use case for LRQA-61632."
@@ -111,6 +106,7 @@ definition {
 					key_fieldName = "${fieldName}",
 					locator1 = "DDMField#REMOVE_REPEATED_FIELD");
 			}
+
 			Click(locator1 = "xpath=(//div[contains(@data-field-name,'CompanhiaOperadora')]/..//button[@*='Remove'])[3]");
 
 			for (var fieldName : list "Destino,DescricaoOpPar") {
@@ -155,7 +151,7 @@ definition {
 
 			var i = "1";
 
-			while (!("${i}" == "31")) {
+			while ("${i}" != "31") {
 				AssertTextEquals.assertPartialText(
 					locator1 = "//div[@class='portlet-body']/div[contains(@class,'mt-2')]",
 					value1 = "text${i}");
@@ -187,7 +183,7 @@ definition {
 
 			var i = "1";
 
-			while (!("${i}" == "31")) {
+			while ("${i}" != "31") {
 				WebContent.viewPGViaWCD(webContentContent = "text${i}");
 
 				var i = ${i} + 1;
@@ -212,7 +208,7 @@ definition {
 			NavItem.gotoStructures();
 
 			WebContentStructures.copyCP(
-				locale = "en_US",
+				locale = "en-US",
 				structureCopyLocalName = "WC Structure Copy En-US Name",
 				structureCopyName = "WC Structure Copy Name",
 				structureName = "WC Structure Name");
@@ -271,7 +267,7 @@ definition {
 
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
-			PortletEntry.changeLocale(locale = "en_US");
+			PortletEntry.changeLocale(locale = "en-US");
 
 			DataEngine.editFieldLabel(
 				fieldFieldLabel = "PaginaOrigem",
@@ -285,7 +281,7 @@ definition {
 
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
-			PortletEntry.changeLocale(locale = "en_US");
+			PortletEntry.changeLocale(locale = "en-US");
 
 			WebContent.assertFieldOnWebContent(fieldFieldLabel = "HomePage");
 
@@ -349,7 +345,7 @@ definition {
 			AssertTextEquals(
 				key_localizedLanguage = "zh-CN",
 				locator1 = "Translation#TRANSLATION_STATUS_TITLE",
-				value1 = "Untranslated");
+				value1 = "Not Translated");
 		}
 
 		task ("View Translation while Editing article") {
@@ -557,7 +553,7 @@ definition {
 
 			var i = "1";
 
-			while (!("${i}" == "121")) {
+			while ("${i}" != "121") {
 				AssertTextEquals.assertPartialText(
 					locator1 = "//div[@class='portlet-body']/div[contains(@class,'mt-2')]",
 					value1 = "text${i}");
@@ -581,7 +577,7 @@ definition {
 
 			var i = "1";
 
-			while (!("${i}" == "121")) {
+			while ("${i}" != "121") {
 				WebContent.viewPGViaWCD(webContentContent = "text${i}");
 
 				var i = ${i} + 1;
@@ -696,7 +692,7 @@ definition {
 
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
-			PortletEntry.changeLocale(locale = "en_US");
+			PortletEntry.changeLocale(locale = "en-US");
 
 			DataEngine.editFieldLabel(
 				fieldFieldLabel = "Label UF Comunicado",
@@ -714,7 +710,7 @@ definition {
 
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
-			PortletEntry.changeLocale(locale = "en_US");
+			PortletEntry.changeLocale(locale = "en-US");
 
 			WebContent.assertFieldOnWebContent(fieldFieldLabel = "Label UF Release");
 
@@ -778,7 +774,7 @@ definition {
 			AssertTextEquals(
 				key_localizedLanguage = "zh-CN",
 				locator1 = "Translation#TRANSLATION_STATUS_TITLE",
-				value1 = "Untranslated");
+				value1 = "Not Translated");
 		}
 
 		task ("View Translation while Editing article") {
@@ -921,6 +917,39 @@ definition {
 		}
 	}
 
+	@priority = "5"
+	test PublishDraftWebContentAfterUpgrade625 {
+		property data.archive.type = "data-archive-web-content-draft";
+		property database.types = "mariadb,mysql,postgresql";
+		property portal.version = "6.2.5";
+
+		Upgrade.addWCStructureAndTemplate();
+
+		Upgrade.publishWCDraft();
+	}
+
+	@priority = "5"
+	test PublishDraftWebContentAfterUpgrade621015 {
+		property data.archive.type = "data-archive-web-content-draft";
+		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
+		property portal.version = "6.2.10.15";
+
+		Upgrade.addWCStructureAndTemplate();
+
+		Upgrade.publishWCDraft();
+	}
+
+	@priority = "5"
+	test PublishDraftWebContentAfterUpgrade621021 {
+		property data.archive.type = "data-archive-web-content-draft";
+		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
+		property portal.version = "6.2.10.21";
+
+		Upgrade.addWCStructureAndTemplate();
+
+		Upgrade.publishWCDraft();
+	}
+
 	@description = "This is a test for LPS-126653. Upgrade 7.0 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
 	@priority = "5"
 	test ViewAndEditWebContentWCStructureWCTemplateWCDAndAssetPublisher704 {
@@ -1033,123 +1062,6 @@ definition {
 		Upgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher(webContentColor = "false");
 	}
 
-	@description = "This is a use case for LPS-75561."
-	@priority = "5"
-	test ViewLayoutArchive625 {
-		property data.archive.type = "data-archive-pages-administration";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "6.2.5";
-
-		Navigator.openURL();
-
-		Portlet.addPG(portletName = "Web Content Display");
-
-		AssertTextNotPresent(value1 = "There was an unexpected error. Please refresh the current page.");
-	}
-
-	@description = "This is a use case for LPS-75561."
-	@priority = "5"
-	test ViewLayoutArchive621015 {
-		property data.archive.type = "data-archive-pages-administration";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
-		property portal.version = "6.2.10.15";
-
-		Navigator.openURL();
-
-		Portlet.addPG(portletName = "Web Content Display");
-
-		AssertTextNotPresent(value1 = "There was an unexpected error. Please refresh the current page.");
-	}
-
-	@description = "This is a use case for LPS-75561."
-	@priority = "5"
-	test ViewLayoutArchive621021 {
-		property data.archive.type = "data-archive-pages-administration";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
-		property portal.version = "6.2.10.21";
-
-		Navigator.openURL();
-
-		Portlet.addPG(portletName = "Web Content Display");
-
-		AssertTextNotPresent(value1 = "There was an unexpected error. Please refresh the current page.");
-	}
-
-	@description = "This is a use case for LPS-71487."
-	@priority = "5"
-	test ViewMultiWCDArchive625 {
-		property data.archive.type = "data-archive-multi-wcd-portlet";
-		property database.types = "mysql";
-		property portal.version = "6.2.5";
-
-		Navigator.gotoPage(pageName = "Web Content Display Page");
-
-		Portlet.viewDuplicatePG(
-			portletName = "Web Content Display",
-			totalPortletCount = "3");
-	}
-
-	@description = "This is a use case for LPS-71487."
-	@priority = "5"
-	test ViewMultiWCDArchive621015 {
-		property data.archive.type = "data-archive-multi-wcd-portlet";
-		property database.types = "db2,mysql,oracle,sybase";
-		property portal.version = "6.2.10.15";
-
-		Navigator.gotoPage(pageName = "Web Content Display Page");
-
-		Portlet.viewDuplicatePG(
-			portletName = "Web Content Display",
-			totalPortletCount = "3");
-	}
-
-	@description = "This is a use case for LPS-71487."
-	@priority = "5"
-	test ViewMultiWCDArchive621021 {
-		property data.archive.type = "data-archive-multi-wcd-portlet";
-		property database.types = "db2,mysql,oracle,postgresql,sybase";
-		property portal.version = "6.2.10.21";
-
-		Navigator.gotoPage(pageName = "Web Content Display Page");
-
-		Portlet.viewDuplicatePG(
-			portletName = "Web Content Display",
-			totalPortletCount = "3");
-	}
-
-	@priority = "5"
-	test ViewWebContentArchive625 {
-		property data.archive.type = "data-archive-web-content-draft";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "6.2.5";
-
-		Upgrade.addWCStructureAndTemplate();
-
-		Upgrade.publishWCDraft();
-	}
-
-	@priority = "5"
-	test ViewWebContentArchive621015 {
-		property data.archive.type = "data-archive-web-content-draft";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
-		property portal.version = "6.2.10.15";
-
-		Upgrade.addWCStructureAndTemplate();
-
-		Upgrade.publishWCDraft();
-	}
-
-	@priority = "5"
-	test ViewWebContentArchive621021 {
-		property data.archive.type = "data-archive-web-content-draft";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
-		property portal.version = "6.2.10.21";
-
-		Upgrade.addWCStructureAndTemplate();
-
-		Upgrade.publishWCDraft();
-	}
-
 	@description = "This is a use case for LRQA-62720. View web content with all fields and value after upgrade from 6.2."
 	@priority = "4"
 	test ViewWebContentWithAllFieldsArchive621021 {
@@ -1170,7 +1082,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContentUpgrade.viewWithStructureCP(
@@ -1189,7 +1101,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContentUpgrade.viewWithStructureCP(

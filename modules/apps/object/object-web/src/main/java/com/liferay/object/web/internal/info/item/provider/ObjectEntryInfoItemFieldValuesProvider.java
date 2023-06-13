@@ -29,11 +29,14 @@ import com.liferay.info.item.field.reader.InfoItemFieldReaderFieldSetProvider;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.info.type.WebImage;
+import com.liferay.list.type.model.ListTypeEntry;
+import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.web.internal.info.item.ObjectEntryInfoItemFields;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -42,13 +45,17 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.template.info.item.provider.TemplateInfoItemFieldSetProvider;
 
 import java.io.Serializable;
 
+import java.text.Format;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -63,6 +70,7 @@ public class ObjectEntryInfoItemFieldValuesProvider
 		AssetDisplayPageFriendlyURLProvider assetDisplayPageFriendlyURLProvider,
 		InfoItemFieldReaderFieldSetProvider infoItemFieldReaderFieldSetProvider,
 		JSONFactory jsonFactory,
+		ListTypeEntryLocalService listTypeEntryLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectFieldLocalService objectFieldLocalService,
 		TemplateInfoItemFieldSetProvider templateInfoItemFieldSetProvider,
@@ -73,6 +81,7 @@ public class ObjectEntryInfoItemFieldValuesProvider
 		_infoItemFieldReaderFieldSetProvider =
 			infoItemFieldReaderFieldSetProvider;
 		_jsonFactory = jsonFactory;
+		_listTypeEntryLocalService = listTypeEntryLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
 		_objectFieldLocalService = objectFieldLocalService;
 		_templateInfoItemFieldSetProvider = templateInfoItemFieldSetProvider;
@@ -213,6 +222,18 @@ public class ObjectEntryInfoItemFieldValuesProvider
 			ObjectField objectField, Map<String, Serializable> values)
 		throws PortalException {
 
+		Object value = values.get(objectField.getName());
+
+		if ((value == null) ||
+			(Validator.isNotNull(objectField.getRelationshipType()) &&
+			 (value instanceof Long) && Objects.equals(value, 0L))) {
+
+			return StringPool.BLANK;
+		}
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
 		if (Objects.equals(
 				_getInfoFieldType(objectField), ImageInfoFieldType.INSTANCE)) {
 
@@ -225,6 +246,14 @@ public class ObjectEntryInfoItemFieldValuesProvider
 
 			return webImage;
 		}
+		else if (objectField.getListTypeDefinitionId() != 0) {
+			ListTypeEntry listTypeEntry =
+				_listTypeEntryLocalService.fetchListTypeEntry(
+					objectField.getListTypeDefinitionId(),
+					(String)values.get(objectField.getName()));
+
+			return listTypeEntry.getName(serviceContext.getLocale());
+		}
 		else if (Validator.isNotNull(objectField.getRelationshipType())) {
 			ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
 				(Long)values.get(objectField.getName()));
@@ -232,6 +261,12 @@ public class ObjectEntryInfoItemFieldValuesProvider
 			if (objectEntry != null) {
 				return objectEntry.getTitleValue();
 			}
+		}
+		else if (Objects.equals(objectField.getType(), "Date")) {
+			Format dateFormat = FastDateFormatFactoryUtil.getDate(
+				serviceContext.getLocale());
+
+			return dateFormat.format((Date)values.get(objectField.getName()));
 		}
 
 		return values.get(objectField.getName());
@@ -262,6 +297,7 @@ public class ObjectEntryInfoItemFieldValuesProvider
 	private final InfoItemFieldReaderFieldSetProvider
 		_infoItemFieldReaderFieldSetProvider;
 	private final JSONFactory _jsonFactory;
+	private final ListTypeEntryLocalService _listTypeEntryLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final TemplateInfoItemFieldSetProvider

@@ -114,6 +114,7 @@ public class InformationTemplatesEditDDMTemplateDisplayContext
 		);
 	}
 
+	@Override
 	public String getUpdateDDMTemplateURL() {
 		return PortletURLBuilder.createActionURL(
 			liferayPortletResponse
@@ -228,7 +229,7 @@ public class InformationTemplatesEditDDMTemplateDisplayContext
 		new DDMTemplateVariableCodeHandler(
 			InformationTemplatesTemplateDisplayContext.class.getClassLoader(),
 			"com/liferay/template/web/internal/portlet/template/dependencies/",
-			SetUtil.fromArray(new String[] {"boolean", "image"}));
+			SetUtil.fromArray("boolean", "image"));
 	private final ThemeDisplay _themeDisplay;
 
 }

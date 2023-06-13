@@ -12,6 +12,8 @@
  * details.
  */
 
+import '../../utils/polyfills';
+
 import '@testing-library/jest-dom/extend-expect';
 import {act, cleanup, fireEvent, render, wait} from '@testing-library/react';
 import React from 'react';
@@ -35,13 +37,14 @@ describe('MiniCart Item', () => {
 		},
 		actionURLs: {
 			orderDetailURL: 'http://order-detail.url',
+			productURLSeparator: 'p',
+			siteDefaultURL: 'http://localhost:8080/group/siteDefaultUrl',
 		},
 		cartState: {
 			id: 101,
 		},
 		displayDiscountLevels: false,
 		setIsUpdating: jest.fn(),
-		spritemap: 'someSpritemap.svg',
 		updateCartModel: jest.fn().mockReturnValue(Promise.resolve()),
 	};
 
@@ -67,6 +70,9 @@ describe('MiniCart Item', () => {
 				priceFormatted: '$ 8.00',
 				promoPrice: 8,
 				promoPriceFormatted: '$ 8.00',
+			},
+			productURLs: {
+				en_US: 'u-joint',
 			},
 			quantity: 1,
 			settings: {
@@ -177,6 +183,53 @@ describe('MiniCart Item', () => {
 			expect(MiniCartUtils.parseOptions).toHaveBeenCalledWith(
 				BASE_PROPS.item.options
 			);
+		});
+
+		it('On click redirect to product page', () => {
+			Liferay.Util = {navigate: jest.fn()};
+
+			const {getByRole} = render(
+				<MiniCartContext.Provider value={BASE_CONTEXT_MOCK}>
+					<CartItem {...BASE_PROPS} />
+				</MiniCartContext.Provider>
+			);
+
+			expect(getByRole('link').href).toBe(
+				BASE_CONTEXT_MOCK.actionURLs.siteDefaultURL +
+					'/' +
+					BASE_CONTEXT_MOCK.actionURLs.productURLSeparator +
+					'/' +
+					BASE_PROPS.item.productURLs.en_US
+			);
+		});
+
+		it('On quantitySelector click, no redirect to product page', () => {
+			const {getByRole} = render(
+				<MiniCartContext.Provider value={BASE_CONTEXT_MOCK}>
+					<CartItem {...BASE_PROPS} />
+				</MiniCartContext.Provider>
+			);
+			const mockClick = jest.fn();
+			getByRole('link').addEventListener('click', mockClick);
+
+			fireEvent.click(getByRole('textbox'));
+			fireEvent.change(getByRole('textbox'), {value: '12'});
+
+			expect(mockClick).not.toBeCalled();
+		});
+
+		it('On remove button click, no redirect to product page', () => {
+			const {getAllByRole, getByRole} = render(
+				<MiniCartContext.Provider value={BASE_CONTEXT_MOCK}>
+					<CartItem {...BASE_PROPS} />
+				</MiniCartContext.Provider>
+			);
+			const mockClick = jest.fn();
+			getByRole('link').addEventListener('click', mockClick);
+
+			fireEvent.click(getAllByRole('button')[0]);
+
+			expect(mockClick).not.toBeCalled();
 		});
 	});
 

@@ -284,6 +284,7 @@ module.framework.properties.osgi.console=11312</echo>
 
 					<gradle-execute dir="@{osgi.module.path}" forcedcacheenabled="false" task="deploy">
 						<arg value="clean" />
+						<arg value="-Pnodejs.node.env=development" />
 					</gradle-execute>
 
 					<move
@@ -320,17 +321,23 @@ module.framework.properties.osgi.console=11312</echo>
 
 			<get-operating-system-property property.name="operating.system.docker.shell.path" />
 
+			<condition else="/bin/bash" property="docker.shell.path" value="${operating.system.docker.shell.path}">
+				<isset property="operating.system.docker.shell.path" />
+			</condition>
+
 			<execute>
 				<![CDATA[
 					docker exec @{container} mkdir -p /tmp
 
 					docker cp ${script.sh.file} @{container}:/tmp/script.sh
 
-					docker exec @{container} ${operating.system.docker.shell.path} /tmp/script.sh
+					docker exec @{container} ${docker.shell.path} /tmp/script.sh
 
-					docker exec @{container} rm -f /tmp/script.sh
+					docker exec --user root @{container} rm -f /tmp/script.sh
 				]]>
 			</execute>
+
+			<delete file="${script.sh.file}" />
 		</sequential>
 	</macrodef>
 
@@ -2743,7 +2750,7 @@ include-and-override=portal-liferay-online-limit.properties</echo>
 
 	<macrodef name="prepare-portal-elasticsearch-osgi-configuration">
 		<sequential>
-			<echo file="${liferay.home}/osgi/configs/com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration.config">logExceptionsOnly=B"false"${line.separator}sidecarShutdownTimeout=L"20000"${line.separator}sidecarHttpPort="AUTO"${line.separator}sidecarJVMOptions=["-Xms256m","-Xmx512m"]</echo>
+			<echo file="${liferay.home}/osgi/configs/com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration.config">additionalConfigurations="http.host:\ _local_,_site_"${line.separator}logExceptionsOnly=B"false"${line.separator}sidecarShutdownTimeout=L"20000"${line.separator}sidecarHttpPort="AUTO"${line.separator}sidecarJVMOptions=["-Xms256m","-Xmx512m"]</echo>
 		</sequential>
 	</macrodef>
 
@@ -3709,13 +3716,20 @@ tell application "Safari" to quit
 					sb.append(cmisRepositoryType);
 
 					while (true) {
-						JSONObject jsonObject = toJSONObject(sb.toString());
+						JSONObject jsonObject = null;
+
+						try {
+							jsonObject = toJSONObject(sb.toString());
+						}
+						catch (Exception exception) {
+							System.out.println("Unable to create JSON object");
+						}
 
 						if (minutes >= 30) {
 							throw new Exception("No available CMIS servers");
 						}
 
-						if (!jsonObject.has("hostname")) {
+						if ((jsonObject == null) || !jsonObject.has("hostname")) {
 							System.out.println("Waiting for next available CMIS server: " + cmisRepositoryType);
 
 							Thread.sleep(60000);
@@ -4288,7 +4302,9 @@ go</echo>
 				<elseif>
 					<or>
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.10.6" />
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.10.7" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.2.10.5" />
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.3.10.2" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.0" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.1" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.12" />
@@ -4304,6 +4320,18 @@ go</echo>
 					</or>
 					<then>
 						<var name="app.server.tomcat.version" value="9.0.40" />
+					</then>
+				</elseif>
+				<elseif>
+					<equals arg1="@{liferay.portal.bundle}" arg2="7.3.10.3" />
+					<then>
+						<var name="app.server.tomcat.version" value="9.0.53" />
+					</then>
+				</elseif>
+				<elseif>
+					<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13" />
+					<then>
+						<var name="app.server.tomcat.version" value="9.0.56" />
 					</then>
 				</elseif>
 			</if>
@@ -4706,31 +4734,51 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			<get-browser-property property.name="browser.docker.run.options" />
 			<get-browser-property property.name="browser.host" />
 
-			<local name="browser.docker.network.run.option" />
+			<start-docker-container image="${browser.docker.image}" name="${browser.host}" options="${browser.docker.browser.options}">\
+				${browser.docker.run.options} \
+			</start-docker-container>
 
-			<condition else="" property="browser.docker.network.run.option" value="--network=${env.DOCKER_NETWORK_NAME}">
+			<echo>Waiting for ${browser.host}:4444 to load</echo>
+
+			<waitfor maxwait="300" maxwaitunit="second">
+				<socket port="4444" server="${browser.host}" />
+			</waitfor>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="start-docker-container">
+		<attribute name="image" />
+		<attribute default="" name="name" />
+		<attribute default="" name="options" />
+
+		<text name="run.options" optional="true" />
+
+		<sequential>
+			<local name="docker.network.run.option" />
+			<local name="docker.start.script" />
+
+			<condition else="" property="docker.network.run.option" value="--network=${env.DOCKER_NETWORK_NAME}">
 				<isset property="env.DOCKER_NETWORK_NAME" />
 			</condition>
 
-			<local name="docker.browser.start.script" />
+			<property name="docker.start.script" value="docker_start.sh" />
 
-			<property name="docker.browser.start.script" value="docker_browser_start.sh" />
-
-			<echo file="${docker.browser.start.script}">
+			<echo file="${docker.start.script}">
 				<![CDATA[
 					docker run \
 						--detach \
-						--hostname=${browser.host} \
+						--hostname=@{name} \
 						--interactive \
-						--name=${browser.host} \
+						--name=@{name} \
 						--tty \
+						${docker.network.run.option} \
+						@{run.options} \
 						\
-						${browser.docker.network.run.option} \
-						${browser.docker.run.options} \
+						@{image} \
 						\
-						${browser.docker.image} \
-						\
-						${browser.docker.browser.options}
+						@{options}
+
+					docker ps --filter "name=@{name}" --format "Started container [ID: '{{.ID}}', name: '{{.Names}}'] from image '{{.Image}}'"
 				]]>
 			</echo>
 
@@ -4739,25 +4787,28 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			>
 				<fileset
 					dir="."
-					includes="${docker.browser.start.script}"
+					includes="${docker.start.script}"
 				/>
 			</chmod>
 
-			<exec executable="/bin/bash" os="${os.apple},${os.unix}">
-				<arg value="${docker.browser.start.script}" />
+			<local name="docker.start.error" />
+
+			<exec errorproperty="docker.start.error" executable="/bin/bash" os="${os.apple},${os.unix}">
+				<arg value="${docker.start.script}" />
 			</exec>
 
-			<exec executable="cmd.exe" os="${os.windows}">
-				<arg value="${docker.browser.start.script}" />
+			<exec errorproperty="docker.start.error" executable="cmd.exe" os="${os.windows}">
+				<arg value="${docker.start.script}" />
 			</exec>
 
-			<delete file="${docker.browser.start.script}" />
+			<if>
+				<contains string="${docker.start.error}" substring="repository does not exist or may require 'docker login': denied: requested access to the resource is denied." />
+				<then>
+					<fail>Unable to start docker container: ${docker.start.error}</fail>
+				</then>
+			</if>
 
-			<echo>Waiting for ${browser.host}:4444 to load</echo>
-
-			<waitfor maxwait="300" maxwaitunit="second">
-				<socket port="4444" server="${browser.host}" />
-			</waitfor>
+			<delete file="${docker.start.script}" />
 		</sequential>
 	</macrodef>
 
@@ -4771,242 +4822,80 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			<property name="database.docker.database.options" value="" />
 			<property name="database.docker.run.options" value="" />
 
-			<local name="database.docker.network.run.option" />
-
-			<condition else="" property="database.docker.network.run.option" value="--network=${env.DOCKER_NETWORK_NAME}">
-				<isset property="env.DOCKER_NETWORK_NAME" />
-			</condition>
-
-			<local name="docker.start.script" />
-
-			<property name="docker.start.script" value="docker_start.sh" />
-
-			<echo file="${docker.start.script}">
-				<![CDATA[
-					docker run \
-						--detach \
-						--hostname=${database.host} \
-						--interactive \
-						--name=${database.host} \
-						--tty \
-						\
-						${database.docker.network.run.option} \
-						${database.docker.run.options} \
-						\
-						${database.docker.image} \
-						\
-						${database.docker.database.options}
-				]]>
-			</echo>
-
-			<chmod
-				perm="a+x"
-			>
-				<fileset
-					dir="."
-					includes="${docker.start.script}"
-				/>
-			</chmod>
-
-			<exec executable="/bin/bash" os="${os.apple},${os.unix}">
-				<arg value="${docker.start.script}" />
-			</exec>
-
-			<exec executable="cmd.exe" os="${os.windows}">
-				<arg value="${docker.start.script}" />
-			</exec>
-
-			<delete file="${docker.start.script}" />
+			<start-docker-container image="${database.docker.image}" name="${database.host}" options="${database.docker.database.options}">\
+				${database.docker.run.options} \
+			</start-docker-container>
 
 			<if>
-				<or>
-					<equals arg1="${database.type}" arg2="mariadb" />
-					<equals arg1="${database.type}" arg2="mysql" />
-				</or>
+				<equals arg1="${database.type}" arg2="db2" />
 				<then>
-					<property location="${project.dir}/setup.sh" name="setup.sh.file" />
-
-					<local name="database.name" />
-
-					<condition else="MariaDB" property="database.name" value="MySQL">
-						<equals arg1="${database.type}" arg2="mysql" />
-					</condition>
-
-					<get-database-property property.name="database.host" />
-					<get-database-property property.name="database.version" />
-
-					<echo file="${setup.sh.file}">
-						<![CDATA[
-							#!/bin/bash
-
-							while ! mysqladmin ping --host=${database.host} --silent
-							do
-								echo "Waiting for ${database.name} ${database.version} to be ready"
-
-								sleep 10
-							done
-						]]>
-					</echo>
-
-					<get-database-property property.name="database.host" />
-
-					<execute>
-						<![CDATA[
-							docker cp ${setup.sh.file} ${database.host}:/tmp/setup.sh
-
-							docker exec ${database.host} /bin/bash /tmp/setup.sh
-						]]>
-					</execute>
+					<property name="docker.database.wait.condition">[[ "$(/bin/su - db2inst1 -c '/opt/ibm/db2/V11.1/bin/db2 db2start')" =~ "SQL1026N" ]]</property>
 				</then>
+				<elseif>
+					<or>
+						<equals arg1="${database.type}" arg2="mariadb" />
+						<equals arg1="${database.type}" arg2="mysql" />
+					</or>
+					<then>
+						<property name="docker.database.wait.condition">mysqladmin ping --host=${database.host} --silent</property>
+					</then>
+				</elseif>
 				<elseif>
 					<equals arg1="${database.type}" arg2="oracle" />
 					<then>
-						<property location="${project.dir}/setup.sh" name="setup.sh.file" />
-
-						<get-database-property property.name="database.version" />
-
-						<echo file="${setup.sh.file}">
-							<![CDATA[
-								#!/bin/bash
-
-								sqlplus ${oracle.admin.user}/${oracle.admin.password} @/tmp/setup.sql
-
-								while [[ "$(${ORACLE_HOME}/bin/lsnrctl status | grep READY)" == "" ]]
-								do
-									echo "Waiting for Oracle ${database.version} to be ready"
-
-									sleep 10
-								done
-
-								${ORACLE_HOME}/bin/lsnrctl status
-							]]>
-						</echo>
-
-						<property location="${project.dir}/setup.sql" name="setup.sql.file" />
-
-						<echo file="${setup.sql.file}">
-							<![CDATA[
-								alter system set result_cache_max_size=24M scope=spfile;
-								alter system set sga_target=4928M scope=spfile;
-								alter system set shared_pool_reserved_size=40M scope=spfile;
-
-								quit;
-							]]>
-						</echo>
-
-						<get-database-property property.name="database.host" />
-
-						<execute>
-							<![CDATA[
-								docker cp ${setup.sh.file} ${database.host}:/tmp/setup.sh
-								docker cp ${setup.sql.file} ${database.host}:/tmp/setup.sql
-
-								docker exec ${database.host} /bin/bash /tmp/setup.sh
-							]]>
-						</execute>
+						<property name="docker.database.wait.condition">[[ "$(${ORACLE_HOME}/bin/lsnrctl status | grep READY)" != "" ]]</property>
 					</then>
 				</elseif>
 				<elseif>
 					<equals arg1="${database.type}" arg2="postgresql" />
 					<then>
-						<property location="setup.sh" name="setup.sh.file" />
-
-						<get-database-property property.name="database.version" />
-
-						<echo file="${setup.sh.file}">
-							<![CDATA[
-								#!/bin/bash
-
-								while [[ "$(pg_isready | grep 'accepting connections')" == "" ]]
-								do
-									echo "Waiting for PostgreSQL ${database.version} to be ready"
-
-									sleep 10
-								done
-
-								pg_isready
-							]]>
-						</echo>
-
-						<get-database-property property.name="database.host" />
-
-						<execute>
-							<![CDATA[
-								docker cp ${setup.sh.file} ${database.host}:/tmp/setup.sh
-
-								docker exec ${database.host} /bin/bash /tmp/setup.sh
-							]]>
-						</execute>
+						<property name="docker.database.wait.condition">[[ "$(pg_isready | grep 'accepting connections')" != "" ]]</property>
 					</then>
 				</elseif>
 				<elseif>
 					<equals arg1="${database.type}" arg2="sqlserver" />
 					<then>
-						<property location="setup.sh" name="setup.sh.file" />
-
 						<get-database-property property.name="database.password" />
 						<get-database-property property.name="database.username" />
-						<get-database-property property.name="database.version" />
 
-						<local name="test.query" />
-
-						<property name="test.query" value="select name from sys.databases" />
-
-						<echo file="${setup.sh.file}">
-							<![CDATA[
-								#!/bin/bash
-
-								until /opt/mssql-tools/bin/sqlcmd -P ${database.password} -U ${database.username} -Q "${test.query}";
-								do
-									echo "Waiting for SQL Server ${database.version} to be ready"
-
-									sleep 10
-								done
-							]]>
-						</echo>
-
-						<get-database-property property.name="database.host" />
-
-						<execute>
-							<![CDATA[
-								docker cp ${setup.sh.file} ${database.host}:/tmp/setup.sh
-
-								docker exec ${database.host} /bin/bash /tmp/setup.sh
-							]]>
-						</execute>
+						<property name="docker.database.wait.condition">/opt/mssql-tools/bin/sqlcmd -P ${database.password} -U ${database.username} -Q "select name from sys.databases" 2>/dev/null</property>
 					</then>
 				</elseif>
 				<elseif>
 					<equals arg1="${database.type}" arg2="sybase" />
 					<then>
-						<property location="setup.sh" name="setup.sh.file" />
-
-						<get-database-property property.name="database.version" />
-
-						<echo file="${setup.sh.file}">
-							<![CDATA[
-								#!/bin/bash
-
-								while ! nc -z ${database.host} 5000
-								do
-									echo "Waiting for Sybase ${database.version} to be ready"
-
-									sleep 10
-								done
-							]]>
-						</echo>
-
-						<get-database-property property.name="database.host" />
-
-						<execute>
-							<![CDATA[
-								docker cp ${setup.sh.file} ${database.host}:/tmp/setup.sh
-
-								docker exec ${database.host} /bin/bash /tmp/setup.sh
-							]]>
-						</execute>
+						<property name="docker.database.wait.condition">nc -z ${database.host} 5000</property>
 					</then>
 				</elseif>
+			</if>
+
+			<wait-for-docker-database
+				shell.condition="${docker.database.wait.condition}"
+			/>
+
+			<if>
+				<equals arg1="${database.type}" arg2="oracle" />
+				<then>
+					<property location="${project.dir}/setup.sql" name="setup.sql.file" />
+
+					<echo file="${setup.sql.file}">
+						<![CDATA[
+							alter system set result_cache_max_size=24M scope=spfile;
+							alter system set sga_target=4928M scope=spfile;
+							alter system set shared_pool_reserved_size=40M scope=spfile;
+
+							quit;
+						]]>
+					</echo>
+
+					<docker-copy dest.path="${database.host}:/tmp/setup.sql" src.path="${setup.sql.file}" />
+
+					<docker-execute container="${database.host}">
+						sqlplus ${oracle.admin.user}/${oracle.admin.password} @/tmp/setup.sql
+					</docker-execute>
+
+					<delete file="${setup.sql.file}" />
+				</then>
 			</if>
 		</sequential>
 	</macrodef>
@@ -5018,16 +4907,6 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			<get-operating-system-property property.name="operating.system.docker.run.options" />
 			<get-operating-system-property property.name="operating.system.host" />
 			<get-operating-system-property property.name="operating.system.host.alias" />
-
-			<local name="operating.system.docker.network.run.option" />
-
-			<condition else="" property="operating.system.docker.network.run.option" value="--network=${env.DOCKER_NETWORK_NAME} --network-alias=${operating.system.host.alias}">
-				<isset property="env.DOCKER_NETWORK_NAME" />
-			</condition>
-
-			<local name="docker.os.start.script" />
-
-			<property name="docker.os.start.script" value="docker_os_start.sh" />
 
 			<propertyregex
 				input="${portal.dir}"
@@ -5047,43 +4926,11 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 				</then>
 			</if>
 
-			<echo file="${docker.os.start.script}">
-				<![CDATA[
-					docker run \
-						--detach \
-						--hostname=${operating.system.host} \
-						--interactive \
-						--mount type=bind,source=${host.git.dir}/${portal.dir.name},target=${portal.dir} \
-						--name=${operating.system.host} \
-						--tty \
-						\
-						${operating.system.docker.network.run.option} \
-						${operating.system.docker.run.options} \
-						\
-						${operating.system.docker.image} \
-						\
-						${operating.system.docker.os.options}
-				]]>
-			</echo>
-
-			<chmod
-				perm="a+x"
-			>
-				<fileset
-					dir="."
-					includes="${docker.os.start.script}"
-				/>
-			</chmod>
-
-			<exec executable="/bin/bash" os="${os.apple},${os.unix}">
-				<arg value="${docker.os.start.script}" />
-			</exec>
-
-			<exec executable="cmd.exe" os="${os.windows}">
-				<arg value="${docker.os.start.script}" />
-			</exec>
-
-			<delete file="${docker.os.start.script}" />
+			<start-docker-container image="${operating.system.docker.image}" name="${operating.system.host}" options="${operating.system.docker.os.options}">\
+				--mount type=bind,source=${host.git.dir}/${portal.dir.name},target=${portal.dir} \
+				--network-alias=${operating.system.host.alias} \
+				${operating.system.docker.run.options} \
+			</start-docker-container>
 		</sequential>
 	</macrodef>
 
@@ -5319,17 +5166,32 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 		<sequential>
 			<get-browser-property property.name="browser.host" />
 
+			<stop-docker-container name="${browser.host}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="stop-docker-container">
+		<attribute name="name" />
+
+		<sequential>
+			<local name="docker.network.name" />
 			<local name="docker.stop.script" />
+
+			<condition else="" property="docker.network.name" value="${env.DOCKER_NETWORK_NAME}">
+				<isset property="env.DOCKER_NETWORK_NAME" />
+			</condition>
 
 			<property name="docker.stop.script" value="docker_stop.sh" />
 
 			<echo file="${docker.stop.script}">
 				<![CDATA[
-					docker kill ${browser.host}
+					docker ps --filter "name=@{name}" --format "Stopping container [ID: '{{.ID}}', name: '{{.Names}}']'"
 
-					docker rm -f ${browser.host}
+					docker kill @{name}
 
-					docker network disconnect -f ${env.DOCKER_NETWORK_NAME} ${browser.host} 2>/dev/null
+					docker rm -f @{name}
+
+					docker network disconnect -f ${docker.network.name} @{name} 2>/dev/null || true
 				]]>
 			</echo>
 
@@ -5342,11 +5204,13 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 				/>
 			</chmod>
 
-			<exec executable="/bin/bash" failonerror="false" os="${os.apple},${os.unix}">
+			<local name="docker.stop.error" />
+
+			<exec errorproperty="docker.stop.error" executable="/bin/bash" failonerror="false" os="${os.apple},${os.unix}">
 				<arg value="${docker.stop.script}" />
 			</exec>
 
-			<exec executable="cmd.exe" failonerror="false" os="${os.windows}">
+			<exec errorproperty="docker.stop.error" executable="cmd.exe" failonerror="false" os="${os.windows}">
 				<arg value="${docker.stop.script}" />
 			</exec>
 
@@ -5358,43 +5222,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 		<sequential>
 			<get-database-property property.name="database.host" />
 
-			<local name="docker.stop.script" />
-
-			<property name="docker.stop.script" value="docker_stop.sh" />
-
-			<echo file="${docker.stop.script}">
-				<![CDATA[
-					docker_rm_list=$(docker ps -a -q --filter="name=${env.HOSTNAME}_")
-
-					if [[ "${docker_rm_list}" != "" ]]
-					then
-						docker kill ${docker_rm_list}
-
-						docker rm -f ${docker_rm_list}
-					fi
-
-					docker network disconnect -f ${env.DOCKER_NETWORK_NAME} ${database.host} 2>/dev/null
-				]]>
-			</echo>
-
-			<chmod
-				perm="a+x"
-			>
-				<fileset
-					dir="."
-					includes="${docker.stop.script}"
-				/>
-			</chmod>
-
-			<exec executable="/bin/bash" failonerror="false" os="${os.apple},${os.unix}">
-				<arg value="${docker.stop.script}" />
-			</exec>
-
-			<exec executable="cmd.exe" failonerror="false" os="${os.windows}">
-				<arg value="${docker.stop.script}" />
-			</exec>
-
-			<delete file="${docker.stop.script}" />
+			<stop-docker-container name="${database.host}" />
 		</sequential>
 	</macrodef>
 
@@ -5402,38 +5230,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 		<sequential>
 			<get-operating-system-property property.name="operating.system.host" />
 
-			<local name="docker.stop.script" />
-
-			<property name="docker.stop.script" value="docker_stop.sh" />
-
-			<echo file="${docker.stop.script}">
-				<![CDATA[
-					docker kill ${operating.system.host}
-
-					docker rm -f ${operating.system.host}
-
-					docker network disconnect -f ${env.DOCKER_NETWORK_NAME} ${operating.system.host} 2>/dev/null
-				]]>
-			</echo>
-
-			<chmod
-				perm="a+x"
-			>
-				<fileset
-					dir="."
-					includes="${docker.stop.script}"
-				/>
-			</chmod>
-
-			<exec executable="/bin/bash" failonerror="false" os="${os.apple},${os.unix}">
-				<arg value="${docker.stop.script}" />
-			</exec>
-
-			<exec executable="cmd.exe" failonerror="false" os="${os.windows}">
-				<arg value="${docker.stop.script}" />
-			</exec>
-
-			<delete file="${docker.stop.script}" />
+			<stop-docker-container name="${operating.system.host}" />
 		</sequential>
 	</macrodef>
 
@@ -6074,6 +5871,32 @@ war.path=${app.server.portal.dir}/</echo>
 					<fail message="${timed.out.message}" />
 				</then>
 			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="wait-for-docker-database">
+		<attribute name="shell.condition" />
+
+		<sequential>
+			<property location="setup.sh" name="setup.sh.file" />
+
+			<get-database-property property.name="database.host" />
+			<get-database-property property.name="database.name" />
+			<get-database-property property.name="database.version" />
+
+			<docker-execute container="${database.host}">
+				<![CDATA[
+					#!/bin/bash
+
+					until @{shell.condition}
+
+					do
+						echo "Waiting for ${database.name} ${database.version} to be ready"
+
+						sleep 10
+					done
+				]]>
+			</docker-execute>
 		</sequential>
 	</macrodef>
 
@@ -6724,7 +6547,7 @@ go</echo>
 		<if>
 			<isset property="cluster.invoke.method" />
 			<then>
-				<echo file="${liferay.home}/osgi/configs/com.liferay.cluster.test.module.configuration.ClusterTestConfiguration.config">clusterTestCommand="${cluster.invoke.method}"</echo>
+				<echo file="${liferay.home}/osgi/configs/com.liferay.portal.cluster.multiple.sample.configuration.ClusterTestConfiguration.config">clusterTestCommand="${cluster.invoke.method}"</echo>
 			</then>
 		</if>
 	</target>
@@ -6967,20 +6790,23 @@ go</echo>
 
 	<target name="delete-dependency-file">
 		<if>
-			<isset property="liferay.dependency.wars" />
+			<isset property="liferay.dependency.war" />
 			<then>
-				<delete file="${liferay.home}/osgi/war/${liferay.dependency.wars}" />
-
-				<echo>${liferay.home}/osgi/war/${liferay.dependency.wars} </echo>
+				<delete file="${liferay.home}/osgi/war/${liferay.dependency.war}" verbose="true" />
 			</then>
 		</if>
 
 		<if>
-			<isset property="liferay.dependency.jars" />
+			<isset property="liferay.dependency.jar" />
 			<then>
-				<delete file="${liferay.home}/osgi/modules/${liferay.dependency.jars}" />
+				<delete file="${liferay.home}/osgi/modules/${liferay.dependency.jar}" verbose="true" />
+			</then>
+		</if>
 
-				<echo>${liferay.home}/osgi/modules/${liferay.dependency.jars} </echo>
+		<if>
+			<isset property="liferay.portal.dependency.jar" />
+			<then>
+				<delete file="${liferay.home}/osgi/portal/${liferay.portal.dependency.jar}" verbose="true" />
 			</then>
 		</if>
 	</target>
@@ -7190,50 +7016,50 @@ virtualHostname="localhost"
 
 		<if>
 			<not>
-				<isset property="liferay.dependency.jars" />
+				<isset property="liferay.dependency.jar" />
 			</not>
 			<then>
-				<get-testcase-property property.name="liferay.dependency.jars" />
+				<get-testcase-property property.name="liferay.dependency.jar" />
 			</then>
 		</if>
 
 		<property name="liferay.dependency.dir" value="${project.dir}/portal-web/test/functional/com/liferay/portalweb/dependencies" />
 
 		<if>
-			<isset property="liferay.dependency.jars" />
+			<isset property="liferay.dependency.jar" />
 			<then>
-				<property name="liferay.dependency.jars" value="${liferay.dependency.jars}" />
+				<property name="liferay.dependency.jar" value="${liferay.dependency.jar}" />
 
 				<if>
-					<available file="${liferay.dependency.dir}/${liferay.dependency.jars}" type="dir" />
+					<available file="${liferay.dependency.dir}/${liferay.dependency.jar}" type="dir" />
 					<then>
-						<echo>Archiving ${liferay.dependency.dir}/${liferay.dependency.jars} to ${project.dir}/tmp/${liferay.dependency.jars}.</echo>
+						<echo>Archiving ${liferay.dependency.dir}/${liferay.dependency.jar} to ${project.dir}/tmp/${liferay.dependency.jar}.</echo>
 
 						<jar
-							basedir="${liferay.dependency.dir}/${liferay.dependency.jars}"
-							destfile="${project.dir}/tmp/${liferay.dependency.jars}"
-							manifest="${liferay.dependency.dir}/${liferay.dependency.jars}/META-INF/MANIFEST.MF"
+							basedir="${liferay.dependency.dir}/${liferay.dependency.jar}"
+							destfile="${project.dir}/tmp/${liferay.dependency.jar}"
+							manifest="${liferay.dependency.dir}/${liferay.dependency.jar}/META-INF/MANIFEST.MF"
 						/>
 
-						<echo>Copying ${project.dir}/tmp/${liferay.dependency.jars} to ${deploy.dir}/${liferay.dependency.jars}.</echo>
+						<echo>Copying ${project.dir}/tmp/${liferay.dependency.jar} to ${deploy.dir}/${liferay.dependency.jar}.</echo>
 
 						<copy
-							file="${project.dir}/tmp/${liferay.dependency.jars}"
+							file="${project.dir}/tmp/${liferay.dependency.jar}"
 							todir="${deploy.dir}"
 						/>
 					</then>
 					<else>
-						<echo>Copying ${liferay.dependency.dir}/${liferay.dependency.jars} to ${deploy.dir}/${liferay.dependency.jars}.</echo>
+						<echo>Copying ${liferay.dependency.dir}/${liferay.dependency.jar} to ${deploy.dir}/${liferay.dependency.jar}.</echo>
 
 						<copy
-							file="${liferay.dependency.dir}/${liferay.dependency.jars}"
+							file="${liferay.dependency.dir}/${liferay.dependency.jar}"
 							todir="${deploy.dir}"
 						/>
 					</else>
 				</if>
 			</then>
 			<else>
-				<echo>The property "liferay.dependency.jars" is not set.</echo>
+				<echo>The property "liferay.dependency.jar" is not set.</echo>
 			</else>
 		</if>
 	</target>
@@ -7597,6 +7423,12 @@ virtualHostname="localhost"
 		</for>
 	</target>
 
+	<target name="deploy-osgi-module-to-specific-bundle">
+		<gradle-execute dir="${project.dir}/${module.base.dir}" forcedcacheenabled="false" task="deploy">
+			<arg value="-Pliferay.home=${liferayHome}" />
+		</gradle-execute>
+	</target>
+
 	<target name="deploy-osgi-modules">
 		<if>
 			<not>
@@ -7756,18 +7588,9 @@ virtualHostname="localhost"
 	</target>
 
 	<target name="execute-mysql">
-		<loadfile
-			property="mysql.statement"
-			srcfile="${mysql.input.file}"
-		/>
-
 		<get-test-app-server-lib-portal-dir />
 
-		<sql classpath="${test.app.server.lib.portal.dir}/${jdbc.mysql.driver}" driver="${database.mysql.driver}" onerror="continue" output="${mysql.output.file}" password="${database.mysql.password}" print="true" url="${database.mysql.url}" userid="${database.mysql.username}">
-			<![CDATA[
-				${mysql.statement}
-			]]>
-		</sql>
+		<sql classpath="${test.app.server.lib.portal.dir}/${jdbc.mysql.driver}" driver="${database.mysql.driver}" onerror="continue" output="${mysql.output.file}" password="${database.mysql.password}" print="true" src="${mysql.input.file}" url="${database.mysql.url}" userid="${database.mysql.username}" />
 	</target>
 
 	<target name="generate-changelog">
@@ -8655,8 +8478,6 @@ ${update.properties}</echo>
 		<echo append="true" file="portal-impl/src/portal-ext.properties">
 
 liferay.home=${liferay.home}
-
-plugin.notifications.enabled=false
 
 jdbc.default.jndi.name=
 
@@ -9624,6 +9445,7 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
 					default.portal.url=${test.url}
+					portal.hostname=${env.HOSTNAME}
 				</echo>
 			</then>
 			<elseif>
@@ -9633,12 +9455,14 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 
 					<echo append="true" file="${test.ext.properties.file}">
 						default.portal.url=${operating.system.host.alias}:8080
+						portal.hostname=${operating.system.host.alias}
 					</echo>
 				</then>
 			</elseif>
 			<else>
 				<echo append="true" file="${test.ext.properties.file}">
 					default.portal.url=http://localhost:8080
+					portal.hostname=localhost
 				</echo>
 			</else>
 		</if>
@@ -11085,7 +10909,10 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 		<lstopwatch action="start" name="prepare.bundles.${app.server.name}" />
 
 		<if>
-			<matches pattern="(file|https?)://" string="${test.build.bundle.zip.url}" />
+			<and>
+				<equals arg1="${app.server.type}" arg2="tomcat" />
+				<matches pattern="(file|https?)://" string="${test.build.bundle.zip.url}" />
+			</and>
 			<then>
 				<mkdir dir="${app.server.parent.dir}" />
 
@@ -11671,11 +11498,20 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 
 										db2 drop db lportal
 
-										db2 drop db lportal${databases.size}
-
 										db2 -f/tmp/create.sql -st
 									]]>
 								</echo>
+
+								<if>
+									<isset property="databases.size" />
+									<then>
+										<echo file="${create.sh.file.path}">
+											<![CDATA[
+												db2 drop db lportal${databases.size}
+											]]>
+										</echo>
+									</then>
+								</if>
 							</then>
 							<elseif>
 								<or>
@@ -11979,6 +11815,15 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 			dest="${liferay.home}"
 			src="${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip"
 		/>
+
+		<if>
+			<not>
+				<equals arg1="${data.archive.type}" arg2="data-archive-search-result-rankings" />
+			</not>
+			<then>
+				<delete dir="${liferay.home}/data/elasticsearch7" />
+			</then>
+		</if>
 
 		<get-testcase-property property.name="database.partition.enabled" />
 
@@ -13462,6 +13307,18 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 			</then>
 		</if>
 
+		<get-testcase-property property.name="websphere.ssl.truststore.enabled" />
+
+		<if>
+			<and>
+				<equals arg1="${app.server.type}" arg2="websphere" />
+				<equals arg1="${websphere.ssl.truststore.enabled}" arg2="true" />
+			</and>
+			<then>
+				<antcall target="setup-websphere-ssl-truststore" />
+			</then>
+		</if>
+
 		<get-testcase-property property.name="theme.file.name" />
 
 		<if>
@@ -13815,6 +13672,15 @@ url=${short.hostname}:8080</echo>
 		<setup-testable-tomcat />
 	</target>
 
+	<target name="setup-websphere-ssl-truststore">
+		<replace
+			file="${app.server.websphere.instance.dir}/config/cells/liferay-cell/nodes/liferay-node/servers/server1/server.xml"
+		>
+			<replacetoken><![CDATA[genericJvmArguments="]]></replacetoken>
+			<replacevalue expandproperties="true"><![CDATA[genericJvmArguments="-Djavax.net.ssl.trustStore=${app.server.websphere.dir}/java/8.0/jre/lib/security/cacerts -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=jks ]]></replacevalue>
+		</replace>
+	</target>
+
 	<target name="start-app-server">
 		<if>
 			<not>
@@ -13848,6 +13714,41 @@ url=${short.hostname}:8080</echo>
 		/>
 	</target>
 
+	<target name="start-docker-containers">
+		<get-database-property property.name="database.docker.image" />
+
+		<if>
+			<isset property="database.docker.image" />
+			<then>
+				<stop-docker-database />
+
+				<start-docker-database />
+			</then>
+		</if>
+
+		<get-operating-system-property property.name="operating.system.docker.image" />
+
+		<if>
+			<isset property="operating.system.docker.image" />
+			<then>
+				<stop-docker-os />
+
+				<start-docker-os />
+			</then>
+		</if>
+
+		<get-browser-property property.name="browser.docker.image" />
+
+		<if>
+			<isset property="browser.docker.image" />
+			<then>
+				<stop-docker-browser />
+
+				<start-docker-browser />
+			</then>
+		</if>
+	</target>
+
 	<target name="start-docker-database">
 		<start-docker-database />
 	</target>
@@ -13869,6 +13770,35 @@ url=${short.hostname}:8080</echo>
 		<stop-app-server
 			app.server.bundle.index="${app.server.bundle.index}"
 		/>
+	</target>
+
+	<target name="stop-docker-containers">
+		<get-database-property property.name="database.docker.image" />
+
+		<if>
+			<isset property="database.docker.image" />
+			<then>
+				<stop-docker-database />
+			</then>
+		</if>
+
+		<get-operating-system-property property.name="operating.system.docker.image" />
+
+		<if>
+			<isset property="operating.system.docker.image" />
+			<then>
+				<stop-docker-os />
+			</then>
+		</if>
+
+		<get-browser-property property.name="browser.docker.image" />
+
+		<if>
+			<isset property="browser.docker.image" />
+			<then>
+				<stop-docker-browser />
+			</then>
+		</if>
 	</target>
 
 	<target name="stop-docker-database">
@@ -13942,18 +13872,21 @@ url=${short.hostname}:8080</echo>
 	<target name="update-translation-file">
 		<var name="translation.file.type" value="xlf" />
 
-		<unzip
-			dest="${selenium.output.dir.name}"
-			src="${selenium.output.dir.name}/${translation.zip.file.name}"
-		>
-		</unzip>
-
+		<if>
+			<equals arg1="${operation}" arg2="unzip" />
+			<then>
+				<unzip
+					dest="${selenium.output.dir.name}/${translation.zip.file.name}"
+					src="${selenium.output.dir.name}/${translation.zip.file.name}.zip"
+				/>
+			</then>
+		</if>
 		<if>
 			<equals arg1="${translation.file.rename}" arg2="true" />
 			<then>
 				<move
-					file="${selenium.output.dir.name}/${translation.file.name}.${translation.file.type}"
-					tofile="${selenium.output.dir.name}/${translation.file.name}.xliff"
+					file="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.${translation.file.type}"
+					tofile="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.xliff"
 				/>
 
 				<var name="translation.file.type" value="xliff" />
@@ -13963,33 +13896,38 @@ url=${short.hostname}:8080</echo>
 		<if>
 			<equals arg1="${contentpage.translation.file}" arg2="true" />
 			<then>
+				<pathconvert property="translation.file.path">
+					<path>
+						<fileset
+							dir="${selenium.output.dir.name}/${translation.zip.file.name}"
+							includes="*${translation.file.name}.${translation.file.type}"
+						/>
+					</path>
+				</pathconvert>
 				<replace
-					file="${selenium.output.dir.name}/${translation.file.name}.${translation.file.type}"
+					file="${translation.file.path}"
 					token="${contentpage.translation.title.target.original}"
 					value="${contentpage.translation.title.target}"
 				/>
-
 				<replace
-					file="${selenium.output.dir.name}/${translation.file.name}.${translation.file.type}"
+					file="${translation.file.path}"
 					token="${contentpage.translation.fragment.target.original}"
 					value="${contentpage.translation.fragment.target}"
 				/>
 			</then>
 			<else>
 				<replace
-					file="${selenium.output.dir.name}/${translation.file.name}.${translation.file.type}"
+					file="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.${translation.file.type}"
 					token="${translation.title.target.original}"
 					value="${translation.title.target}"
 				/>
-
 				<replace
-					file="${selenium.output.dir.name}/${translation.file.name}.${translation.file.type}"
+					file="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.${translation.file.type}"
 					token="${translation.content.target.original}"
 					value="${translation.content.target}"
 				/>
-
 				<replace
-					file="${selenium.output.dir.name}/${translation.file.name}.${translation.file.type}"
+					file="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.${translation.file.type}"
 					token="${translation.description.target.original}"
 					value="${translation.description.target}"
 				/>
@@ -13999,13 +13937,49 @@ url=${short.hostname}:8080</echo>
 		<if>
 			<equals arg1="${translation.file.encoding}" arg2="utf8" />
 			<then>
+				<pathconvert property="translation.file.path">
+					<path>
+						<fileset
+							dir="${selenium.output.dir.name}/${translation.zip.file.name}"
+							includes="*${translation.file.name}.${translation.file.type}"
+						/>
+					</path>
+				</pathconvert>
+
+				<propertyregex
+					input="${translation.file.path}"
+					property="translation.utf8.file.path"
+					regexp=".xlf"
+					replace="_utf8.xlf"
+				/>
+
 				<copy
-					file="${selenium.output.dir.name}/${translation.file.name}.${translation.file.type}"
+					file="${translation.file.path}"
 					outputencoding="UTF-8"
-					tofile="${selenium.output.dir.name}/${translation.file.name}_utf8.${translation.file.type}"
+					tofile="${translation.utf8.file.path}"
 				/>
 			</then>
 		</if>
+
+		<if>
+			<equals arg1="${operation}" arg2="zip" />
+			<then>
+				<zip
+					basedir="${selenium.output.dir.name}/${translation.zip.file.name}"
+					destfile="${selenium.output.dir.name}/${translation.zip.file.name}_translated.zip"
+				/>
+			</then>
+		</if>
+	</target>
+
+	<target name="update-translation-file-id">
+		<var name="translation.file.type" value="xlf" />
+
+		<replace
+			file="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.${translation.file.type}"
+			token="${translation.entry.type}:"
+			value="${translation.entry.type}:1"
+		/>
 	</target>
 
 	<target name="upgrade-legacy-database">

@@ -85,7 +85,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.Callable;
 
 /**
  * Provides the remote service for accessing, adding, checking in/out, deleting,
@@ -1365,6 +1364,7 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	 * @return the file entry with the external reference code
 	 * @throws PortalException if a portal exception occurred
 	 */
+	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public FileEntry getFileEntryByExternalReferenceCode(
 			long groupId, String externalReferenceCode)
@@ -3463,7 +3463,7 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		throws PortalException {
 
 		Queue<Folder[]> folders = new LinkedList<>();
-		final List<FileEntry> fileEntries = new ArrayList<>();
+		List<FileEntry> fileEntries = new ArrayList<>();
 
 		Folder curSrcFolder = srcFolder;
 		Folder curDestFolder = destFolder;
@@ -3514,17 +3514,12 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		}
 
 		TransactionCommitCallbackUtil.registerCallback(
-			new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					for (FileEntry fileEntry : fileEntries) {
-						DLProcessorRegistryUtil.trigger(fileEntry, null);
-					}
-
-					return null;
+			() -> {
+				for (FileEntry fileEntry : fileEntries) {
+					DLProcessorRegistryUtil.trigger(fileEntry, null);
 				}
 
+				return null;
 			});
 	}
 

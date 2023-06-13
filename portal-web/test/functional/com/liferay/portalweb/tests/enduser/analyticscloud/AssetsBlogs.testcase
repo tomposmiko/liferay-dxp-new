@@ -38,21 +38,23 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8387 | Test Summary: Blogs asset appears on list shows pages that the blog exists on"
+	@ignore = "true"
 	@priority = "5"
 	test AssertAppearsOnListShowsPagesBlogExists {
 		property portal.upstream = "quarantine";
 
+		// AC Bug Ticket: LRAC-10060
 		// AC Refactor: It is not possible to perform the assert because this test presents timing problems.
 		// AC Refactor ticket: LRAC-9341
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		task ("View the blog") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
-
-			BlogsNavigator.gotoPG(entryTitle = "Blogs AC Title");
 		}
 
 		task ("Close sessions") {
@@ -79,6 +81,7 @@ definition {
 
 		task ("Assert appears on metric") {
 			var portalURL = PropsUtil.get("portal.url");
+
 			var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 			ACAssets.viewAssetAppearsOnMetric(
@@ -92,6 +95,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8384 | Test Summary: Assert 180 day time filter in Blogs"
+	@ignore = "true"
 	@priority = "3"
 	test AssertBlogsPageTImeFilter180Days {
 		property portal.upstream = "quarantine";
@@ -104,11 +108,11 @@ definition {
 		}
 
 		task ("View the blog") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
-
-			BlogsNavigator.gotoPG(entryTitle = "Blogs AC Title");
 		}
 
 		task ("Close DXP, launch AC and switch the propety") {
@@ -148,10 +152,14 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8374 | Test Summary: Blogs audience card shows expected amount of know and anonymous individuals"
+	@ignore = "true"
 	@priority = "5"
 	test AudienceCardShowsExpectedAmountKnowAndAnonymousIndividualsInBlogs {
-		var usernameList = "ac,liferay";
+		property portal.upstream = "quarantine";
 
+		// AC Bug Ticket: LRAC-10060
+
+		var usernameList = "ac,liferay";
 		var emailList = "ac@liferay.com,liferay@liferay.com";
 
 		for (var name : list "${usernameList}") {
@@ -205,10 +213,14 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8375 | Test Summary: Blogs audience card shows expected amount of segmented and unsegmented individuals"
+	@ignore = "true"
 	@priority = "5"
 	test AudienceCardShowsExpectedAmountSegmentedAndUnsegmentedInBlogs {
-		var usernameList = "ac,liferay";
+		property portal.upstream = "quarantine";
 
+		// AC Bug Ticket: LRAC-10060
+
+		var usernameList = "ac,liferay";
 		var emailList = "ac@liferay.com,liferay@liferay.com";
 
 		for (var name : list "${usernameList}") {
@@ -280,6 +292,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8378 | Test Summary: Blogs location card shows views by the expected location"
+	@ignore = "true"
 	@priority = "5"
 	test BlogsLocationCardShowsViewsByExpectedLocation {
 		property portal.upstream = "quarantine";
@@ -293,11 +306,11 @@ definition {
 		}
 
 		task ("View the blogs entry") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
-
-			BlogsNavigator.gotoPG(entryTitle = "Blogs AC Title");
 		}
 
 		task ("Get the ip country") {
@@ -349,16 +362,21 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8386 | Test Summary: Blogs views by technology card shows views by the expected browser"
+	@ignore = "true"
 	@priority = "5"
 	test BlogsTechnologyCardShowsViewsByExpectedBrowser {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10060
+
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		task ("View the blog") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
-
-			BlogsNavigator.gotoPG(entryTitle = "Blogs AC Title");
 		}
 
 		task ("Close sessions") {
@@ -399,18 +417,21 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8385 | Test Summary: Blogs views by technology card shows views by the expected device"
+	@ignore = "true"
 	@priority = "5"
 	test BlogsTechnologyCardShowsViewsByExpectedDevice {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10060
+
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		task ("View the blog") {
-			for (var n : list "1,2") {
-				Navigator.gotoSitePage(
-					pageName = "AC Page",
-					siteName = "Site Name");
-
-				BlogsNavigator.gotoPG(entryTitle = "Blogs AC Title");
-			}
+			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title,Blogs AC Title",
+				pageName = "AC Page",
+				siteName = "Site Name");
 		}
 
 		task ("Close sessions") {
@@ -445,23 +466,22 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8382 | Test Summary: The blogs list is searchable"
+	@ignore = "true"
 	@priority = "5"
 	test CanBlogsListSearchable {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10060
+
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		ACUtils.createBlogsAndAddToPage(entryTitle = "Test 2");
 
-		Navigator.gotoSitePage(
+		ACUtils.navigateToSitePage(
+			actionType = "View Blog",
+			documentTitleList = "Blogs AC Title,Test 2",
 			pageName = "AC Page",
 			siteName = "Site Name");
-
-		BlogsNavigator.gotoPG(entryTitle = "Blogs AC Title");
-
-		Navigator.gotoSitePage(
-			pageName = "AC Page",
-			siteName = "Site Name");
-
-		BlogsNavigator.gotoPG(entryTitle = "Test 2");
 
 		ACUtils.closeAllSessionsAndWait();
 
@@ -491,8 +511,13 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8113 | Test Summary: Assert clicking a blog in the blogs list navigates to the blogs overview page"
+	@ignore = "true"
 	@priority = "5"
 	test CanNavigatesToBlogsOverviewPage {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10060
+
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		JSONUser.addUser(
@@ -507,13 +532,11 @@ definition {
 			userLoginEmailAddress = "ac@liferay.com",
 			userLoginFullName = "ac ac");
 
-		for (var n : list "1,2,3,4") {
-			Navigator.gotoSitePage(
-				pageName = "AC Page",
-				siteName = "Site Name");
-
-			BlogsNavigator.gotoPG(entryTitle = "Blogs AC Title");
-		}
+		ACUtils.navigateToSitePage(
+			actionType = "View Blog",
+			documentTitleList = "Blogs AC Title,Blogs AC Title,Blogs AC Title,Blogs AC Title",
+			pageName = "AC Page",
+			siteName = "Site Name");
 
 		ACUtils.closeAllSessionsAndWait();
 
@@ -545,6 +568,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8383 | Test Summary: Custom Range time filter in Blogs assets page"
+	@ignore = "true"
 	@priority = "5"
 	test CanUseCustomRangeBlogsAssetsPage {
 		property portal.upstream = "quarantine";
@@ -557,11 +581,11 @@ definition {
 		}
 
 		task ("View the blog") {
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
-
-			BlogsNavigator.gotoPG(entryTitle = "Blogs AC Title");
 		}
 
 		task ("Close DXP, launch AC and switch the propety") {
@@ -605,12 +629,15 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8114 | Test Summary: Blogs known individuals list shows individuals who have viewed the blog"
+	@ignore = "true"
 	@priority = "5"
 	test KnownIndividualsListShowsIndividualsWhoHaveViewedBlog {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10060
+
 		var usernameList = "ac,dxp,liferay";
-
 		var emailList = "ac@liferay.com,dxp@liferay.com,liferay@liferay.com";
-
 		var nameList = "ac ac,liferay liferay,dxp dxp";
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
@@ -640,7 +667,7 @@ definition {
 
 		ACUtils.navigateToSitePageWithUser(
 			actionType = "View Blog",
-			documentTitle = "Blogs AC Title",
+			documentTitleList = "Blogs AC Title",
 			emailList = "userac@liferay.com",
 			pageName = "AC Page",
 			siteName = "Site Name");
@@ -677,25 +704,22 @@ definition {
 	}
 
 	@description = "View all blogs in the property in assets"
+	@ignore = "true"
 	@priority = "5"
 	test ViewAllBlogsShownInAssetList {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10060
+
 		ACUtils.createBlogsAndAddToPage(entryTitle = "Test 2");
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-		for (var n : list "1,2") {
-			Navigator.gotoSitePage(
-				pageName = "AC Page",
-				siteName = "Site Name");
-
-			BlogsNavigator.gotoPG(entryTitle = "Blogs AC Title");
-
-			Navigator.gotoSitePage(
-				pageName = "AC Page",
-				siteName = "Site Name");
-
-			BlogsNavigator.gotoPG(entryTitle = "Test 2");
-		}
+		ACUtils.navigateToSitePage(
+			actionType = "View Blog",
+			documentTitleList = "Blogs AC Title,Test 2",
+			pageName = "AC Page",
+			siteName = "Site Name");
 
 		ACUtils.closeAllSessionsAndWait();
 

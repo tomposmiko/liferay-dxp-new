@@ -1,39 +1,36 @@
+import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
+import ClayLabel from '@clayui/label';
+
 import classNames from 'classnames';
 import useDebounce from 'lodash.debounce';
 
 import React, {useCallback, useEffect, useState} from 'react';
 import {useFormContext} from 'react-hook-form';
-import {WarningBadge} from '~/common/components/fragments/Badges/Warning';
-import {SearchInput} from '~/common/components/fragments/Forms/Input/Search';
-import {useCustomEvent} from '~/common/hooks/useCustomEvent';
-import {STORAGE_KEYS, Storage} from '~/common/services/liferay/storage';
-import {calculatePercentage} from '~/common/utils';
-import {TIP_EVENT} from '~/common/utils/events';
-import {useBusinessTypes} from '~/routes/get-a-quote/hooks/useBusinessTypes';
-import {useStepWizard} from '~/routes/get-a-quote/hooks/useStepWizard';
-import {useTriggerContext} from '~/routes/get-a-quote/hooks/useTriggerContext';
-import {
-	AVAILABLE_STEPS,
-	TOTAL_OF_FIELD,
-} from '~/routes/get-a-quote/utils/constants';
+import {WarningBadge} from '../../../../../../../common/components/fragments/Badges/Warning';
+import {SearchInput} from '../../../../../../../common/components/fragments/Forms/Input/Search';
+import {useCustomEvent} from '../../../../../../../common/hooks/useCustomEvent';
+import {calculatePercentage} from '../../../../../../../common/utils';
+import {TIP_EVENT} from '../../../../../../../common/utils/events';
+import {useBusinessTypes} from '../../../../../hooks/useBusinessTypes';
+import {useStepWizard} from '../../../../../hooks/useStepWizard';
+import {useTriggerContext} from '../../../../../hooks/useTriggerContext';
+import {AVAILABLE_STEPS, TOTAL_OF_FIELD} from '../../../../../utils/constants';
+import {getLoadedContentFlag} from '../../../../../utils/util';
 
 import {BusinessTypeRadioGroup} from './RadioGroup';
 
 const MAX_LENGTH_TO_TRUNCATE = 28;
 
-export const BusinessTypeSearch = ({form, setNewSelectedProduct}) => {
-	const {
-		formState: {errors},
-		register,
-		setValue,
-	} = useFormContext();
+export function BusinessTypeSearch({form, setNewSelectedProduct}) {
+	const {register, setValue} = useFormContext();
 	const [dispatchEvent] = useCustomEvent(TIP_EVENT);
 
 	const {selectedStep, setPercentage} = useStepWizard();
 	const {businessTypes, isError, reload} = useBusinessTypes();
 	const {isSelected, updateState} = useTriggerContext();
 	const [isLoading, setIsLoading] = useState(false);
+	const {applicationId, backToEdit} = getLoadedContentFlag();
 
 	const templateName = 'i-am-unable-to-find-my-industry';
 	const selectedTrigger = isSelected(templateName);
@@ -54,10 +51,7 @@ export const BusinessTypeSearch = ({form, setNewSelectedProduct}) => {
 			}
 			await reload(searchTerm);
 			if (!searchTerm) {
-				if (
-					Storage.getItem(STORAGE_KEYS.BACK_TO_EDIT) &&
-					JSON.parse(Storage.getItem(STORAGE_KEYS.BACK_TO_EDIT))
-				) {
+				if (applicationId || backToEdit) {
 					setPercentage(
 						calculatePercentage(
 							TOTAL_OF_FIELD.BASICS - 1,
@@ -94,20 +88,29 @@ export const BusinessTypeSearch = ({form, setNewSelectedProduct}) => {
 	};
 
 	const infoPanelButton = () => (
-		<button
-			className={classNames('btn badge bottom-list', {
-				open: selectedTrigger,
+		<ClayLabel
+			className={classNames('btn-info-panel mt-3', {
+				'label-inverse-primary': selectedTrigger,
+				'label-tonal-primary': !selectedTrigger,
 			})}
 			onClick={showInfoPanel}
-			type="button"
 		>
-			I am unable to find my industry
-			{selectedTrigger ? (
-				<ClayIcon symbol="question-circle-full" />
-			) : (
-				<ClayIcon symbol="question-circle" />
-			)}
-		</button>
+			<div className="align-items-center d-flex mx-2">
+				<span className="text-paragraph-sm">
+					I am unable to find my industry
+				</span>
+
+				<span className="inline-item inline-item-after">
+					<ClayIcon
+						symbol={
+							selectedTrigger
+								? 'question-circle-full'
+								: 'question-circle'
+						}
+					/>
+				</span>
+			</div>
+		</ClayLabel>
 	);
 
 	const renderResults = () => {
@@ -116,17 +119,21 @@ export const BusinessTypeSearch = ({form, setNewSelectedProduct}) => {
 		}
 
 		if (isError) {
-			return <WarningBadge>{isError}</WarningBadge>;
-		}
-
-		if (!businessTypes.length) {
 			return (
 				<>
-					<WarningBadge>
-						There are no results for &quot;
-						{truncateSearch(form?.basics?.businessSearch)}
-						&quot;. Please try a different search.
-					</WarningBadge>
+					<WarningBadge>{isError}</WarningBadge>
+				</>
+			);
+		}
+
+		if (businessTypes.length) {
+			return (
+				<>
+					<BusinessTypeRadioGroup
+						businessTypes={businessTypes}
+						form={form}
+						setNewSelectedProduct={setNewSelectedProduct}
+					/>
 					{infoPanelButton()}
 				</>
 			);
@@ -134,11 +141,11 @@ export const BusinessTypeSearch = ({form, setNewSelectedProduct}) => {
 
 		return (
 			<>
-				<BusinessTypeRadioGroup
-					businessTypes={businessTypes}
-					form={form}
-					setNewSelectedProduct={setNewSelectedProduct}
-				/>
+				<WarningBadge>
+					There are no results for &quot;
+					{truncateSearch(form?.basics?.businessSearch)}
+					&quot;. Please try a different search.
+				</WarningBadge>
 				{infoPanelButton()}
 			</>
 		);
@@ -146,11 +153,10 @@ export const BusinessTypeSearch = ({form, setNewSelectedProduct}) => {
 
 	return (
 		<>
-			<div>
+			<div className="mb-5">
 				<SearchInput
-					className="search"
+					className="bg-neutral-1 font-weight-bold px-4 py-0 search text-neutral-10 text-paragraph-lg"
 					defaultValue=""
-					error={errors?.basics?.businessSearch}
 					label="Search for your primary industry and then select it from the list."
 					placeholder="Begin typing to show options..."
 					required
@@ -159,22 +165,22 @@ export const BusinessTypeSearch = ({form, setNewSelectedProduct}) => {
 							'Please, search for a business type in order to proceed.',
 					})}
 				>
-					<button
-						className="btn btn-primary search"
+					<ClayButton
+						className="font-weight-bolder ml-3 search text-paragraph text-small-caps"
+						displayType="primary"
 						onClick={() => {
 							onSearch(form?.basics?.businessSearch);
 						}}
-						type="button"
 					>
 						Search
-					</button>
+					</ClayButton>
 				</SearchInput>
 
 				<p className="paragraph">
-					i.e. Coffee shop, Plumber, Drop Shipping, Landscape, etc
+					i.e. Apartments, Coffee, Medical, Pet Stores, etc
 				</p>
 			</div>
 			{renderResults()}
 		</>
 	);
-};
+}

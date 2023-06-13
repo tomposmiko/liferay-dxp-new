@@ -18,10 +18,11 @@ import {
 	findObjectFieldIndex,
 	findObjectLayoutRowIndex,
 } from '../../utils/layout';
-import {BoxesVisitor, TabsVisitor} from '../../utils/visitor';
+import {BoxesVisitor} from '../../utils/visitor';
 import {TObjectField, TObjectLayout, TObjectRelationship} from './types';
 
 type TState = {
+	isViewOnly: boolean;
 	objectFields: TObjectField[];
 	objectLayout: TObjectLayout;
 	objectLayoutId: string;
@@ -311,7 +312,9 @@ const layoutReducer = (state: TState, action: TAction) => {
 			// Change object field inLayout attribute to false to be visible when add field again.
 
 			const objectFieldIds = newState.objectFields.map(({id}) => id);
-			const visitor = new TabsVisitor(newState.objectLayout);
+			const visitor = new BoxesVisitor(
+				newState.objectLayout.objectLayoutTabs[tabIndex]
+			);
 
 			visitor.mapFields((field) => {
 				if (field.objectFieldId) {
@@ -336,14 +339,15 @@ const layoutReducer = (state: TState, action: TAction) => {
 interface ILayoutContextProviderProps
 	extends React.HTMLAttributes<HTMLElement> {
 	value: {
+		isViewOnly: boolean;
 		objectLayoutId: string;
 	};
 }
 
-export const LayoutContextProvider: React.FC<ILayoutContextProviderProps> = ({
+export function LayoutContextProvider({
 	children,
 	value,
-}) => {
+}: ILayoutContextProviderProps) {
 	const [state, dispatch] = useReducer<React.Reducer<TState, TAction>>(
 		layoutReducer,
 		{
@@ -357,6 +361,6 @@ export const LayoutContextProvider: React.FC<ILayoutContextProviderProps> = ({
 			{children}
 		</LayoutContext.Provider>
 	);
-};
+}
 
 export default LayoutContext;

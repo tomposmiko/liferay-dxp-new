@@ -33,7 +33,9 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Petteri Karttunen
  */
-@Component(immediate = true, service = SXPElementValidator.class)
+@Component(
+	enabled = false, immediate = true, service = SXPElementValidator.class
+)
 public class SXPElementValidatorImpl implements SXPElementValidator {
 
 	@Override
@@ -82,9 +84,6 @@ public class SXPElementValidatorImpl implements SXPElementValidator {
 
 		if (type == 1) {
 			sb.append("{\"aggregation_element\": ");
-		}
-		else if (type == 5) {
-			sb.append("{\"facet_element\": ");
 		}
 		else if (type == 10) {
 			sb.append("{\"query_element\": ");

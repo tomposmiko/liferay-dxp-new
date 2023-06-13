@@ -28,6 +28,11 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Site Name");
+		}
+
+		JSONUser.tearDownNonAdminUsers();
 
 		ACUtils.tearDownAC();
 	}
@@ -53,7 +58,7 @@ definition {
 
 		User.logoutPG();
 
-		Navigator.gotoSitePage(
+		ACUtils.navigateToSitePage(
 			pageName = "AC Page",
 			siteName = "Site Name");
 
@@ -238,7 +243,6 @@ definition {
 					actual = "${percentage}",
 					expected = "0%");
 			}
-
 			else {
 				TestUtils.assertEquals(
 					actual = "${percentage}",
@@ -264,6 +268,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8148 | Test Summary: Individuals usage update in real time"
 	@priority = "5"
 	test IndividualsUpdatesInRealTime {
+		property portal.acceptance = "true";
+
 		ACUtils.addSiteAndPage();
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
@@ -292,11 +298,11 @@ definition {
 			userLoginEmailAddress = "userea@liferay.com",
 			userLoginFullName = "userfn userln");
 
-		Navigator.gotoSitePage(
+		ACUtils.navigateToSitePage(
 			pageName = "AC Page",
 			siteName = "Site Name");
 
-		ACUtils.closeAllSessions();
+		ACUtils.closeAllSessionsAndWait();
 
 		ACUtils.launchAC();
 
@@ -304,7 +310,7 @@ definition {
 
 		ACSettings.goToUsage();
 
-		var newIdividuals = MathUtil.sum("${currentIndividuals}", "1");
+		var newIdividuals = ${currentIndividuals} + 1;
 
 		ACSettings.assertOverviewUsage(
 			current = "${newIdividuals}",
@@ -385,7 +391,6 @@ definition {
 					actual = "${percentage}",
 					expected = "0%");
 			}
-
 			else {
 				TestUtils.assertEquals(
 					actual = "${percentage}",
@@ -428,15 +433,14 @@ definition {
 
 			var currentPageViews = ACSettings.getCurrentNumber(metricName = "Page Views");
 
-			var pageViewsNumber = StringUtil.replace("${currentPageViews}",",","");
-
+			var pageViewsNumber = StringUtil.replace("${currentPageViews}", ",", "");
 			var sumPageViews = ${pageViewsNumber} + 1;
 		}
 
 		task ("Visit the site page and close sessions") {
 			ACUtils.launchDXP();
 
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 
@@ -452,7 +456,7 @@ definition {
 
 			var currentPageViews = ACSettings.getCurrentNumber(metricName = "Page Views");
 
-			var newPageViewsNumber = StringUtil.replace("${currentPageViews}",",","");
+			var newPageViewsNumber = StringUtil.replace("${currentPageViews}", ",", "");
 		}
 
 		task ("Compare the values") {

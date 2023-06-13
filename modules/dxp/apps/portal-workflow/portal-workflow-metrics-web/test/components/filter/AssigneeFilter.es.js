@@ -23,22 +23,19 @@ const items = [
 	{id: 2, name: 'User 2'},
 ];
 
-const clientMock = {
-	request: jest
-		.fn()
-		.mockResolvedValue({data: {items, totalCount: items.length}}),
-};
-
 const wrapper = ({children}) => (
-	<MockRouter client={clientMock} query={query}>
-		{children}
-	</MockRouter>
+	<MockRouter query={query}>{children}</MockRouter>
 );
 
 describe('The assignee filter component should', () => {
 	afterEach(cleanup);
 
 	beforeEach(async () => {
+		fetch.mockResolvedValueOnce({
+			json: () => Promise.resolve({items, totalCount: items.length}),
+			ok: true,
+		});
+
 		render(<AssigneeFilter processId={12345} />, {
 			wrapper,
 		});

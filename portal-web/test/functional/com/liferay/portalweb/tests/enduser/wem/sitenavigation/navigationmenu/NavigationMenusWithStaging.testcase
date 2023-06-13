@@ -194,23 +194,19 @@ definition {
 		task ("Add the Display Page items to the navigation menu") {
 			NavigationMenusAdmin.addItem(
 				assetTitle = "Web Content Title",
-				item = "Display Page",
-				navItem = "Web Content");
+				item = "Web Content Article");
 
 			NavigationMenusAdmin.addItem(
 				assetTitle = "Blogs Entry Title",
-				item = "Display Page",
-				navItem = "Blogs");
+				item = "Blogs Entry");
 
 			NavigationMenusAdmin.addItem(
 				assetTitle = "Document Title",
-				item = "Display Page",
-				navItem = "Documents and Media");
+				item = "Document");
 
 			NavigationMenusAdmin.addItem(
 				assetTitle = "Category Name",
-				item = "Display Page",
-				navItem = "Categories");
+				item = "Category");
 		}
 
 		task ("View the Display Page items") {
@@ -275,9 +271,7 @@ definition {
 
 			ControlMenu.viewHeaderTitle(headerTitle = "Document DPT");
 
-			AssertVisible(
-				key_imageName = "Document_1.jpg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "Document_1.jpg");
 
 			Click(
 				key_pageName = "Category Name",
@@ -286,7 +280,6 @@ definition {
 			ControlMenu.viewHeaderTitle(headerTitle = "Category DPT");
 
 			ContentPages.viewFragmentText(
-				assetType = "category",
 				fragmentName = "Content Display",
 				text = "Category Name");
 		}
@@ -342,9 +335,7 @@ definition {
 				key_tab = "Live",
 				locator1 = "NavTab#ACTIVE_TAB_LINK");
 
-			AssertVisible(
-				key_imageName = "Document_1.jpg",
-				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
+			ContentPages.viewFragmentBackgroundImage(image = "Document_1.jpg");
 
 			Click(
 				key_pageName = "Category Name",
@@ -357,7 +348,6 @@ definition {
 				locator1 = "NavTab#ACTIVE_TAB_LINK");
 
 			ContentPages.viewFragmentText(
-				assetType = "category",
 				fragmentName = "Content Display",
 				text = "Category Name");
 		}
@@ -1007,11 +997,11 @@ definition {
 		}
 
 		task ("Navigate to Pages admin in the live site") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 		}
 
 		task ("Delete the third page from the live site") {
-			SitePages.deletePage(pageName = "Test Page Name 3");
+			PagesAdmin.deletePage(pageName = "Test Page Name 3");
 		}
 
 		task ("Publish to live without the third page") {
@@ -1019,7 +1009,7 @@ definition {
 
 			LexiconEntry.gotoAdd();
 
-			if (IsElementPresent(locator1 = "StagingPublishToLive#PAGES_TO_PUBLISH_CHECKBOX_CHECKED", key_entryName = "Test Page Name 3")) {
+			if (IsElementPresent(key_entryName = "Test Page Name 3", locator1 = "StagingPublishToLive#PAGES_TO_PUBLISH_CHECKBOX_CHECKED")) {
 				Click(
 					key_entryName = "Test Page Name 3",
 					locator1 = "StagingPublishToLive#PAGES_TO_PUBLISH_CHECKBOX_CHECKED");
@@ -1232,11 +1222,11 @@ definition {
 		}
 
 		task ("Navigate to pages admin in the live site") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 		}
 
 		task ("Delete the third page from the live site") {
-			SitePages.deletePage(pageName = "Test Page Name 3");
+			PagesAdmin.deletePage(pageName = "Test Page Name 3");
 		}
 
 		task ("Publish to live without the third page") {
@@ -1244,7 +1234,7 @@ definition {
 
 			LexiconEntry.gotoAdd();
 
-			if (IsElementPresent(locator1 = "StagingPublishToLive#PAGES_TO_PUBLISH_CHECKBOX_CHECKED", key_entryName = "Test Page Name 3")) {
+			if (IsElementPresent(key_entryName = "Test Page Name 3", locator1 = "StagingPublishToLive#PAGES_TO_PUBLISH_CHECKBOX_CHECKED")) {
 				Click(
 					key_entryName = "Test Page Name 3",
 					locator1 = "StagingPublishToLive#PAGES_TO_PUBLISH_CHECKBOX_CHECKED");

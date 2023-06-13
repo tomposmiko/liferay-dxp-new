@@ -1,10 +1,12 @@
 [
 	{
-		"cssURLs": "",
+		"cssURLs": [
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/main.css$]"
+		],
 		"elementURLs": [
-			"[$DOCUMENT_URL:/site-initializer/documents/remote-app/2.js$]",
-			"[$DOCUMENT_URL:/site-initializer/documents/remote-app/main.js$]",
-			"[$DOCUMENT_URL:/site-initializer/documents/remote-app/runtime-main.js$]"
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/2.js$]",
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/main.js$]",
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/runtime-main.js$]"
 		],
 		"htmlElementName": "liferay-remote-app-raylife",
 		"name_i18n": {
@@ -19,11 +21,13 @@
 		"widgetName": "com_liferay_remote_app_web_internal_portlet_RemoteAppEntryPortlet_[$REMOTE_APP_ENTRY_ID:RAYLIFE-GET-A-QUOTE$]"
 	},
 	{
-		"cssURLs": "",
+		"cssURLs": [
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/main.css$]"
+		],
 		"elementURLs": [
-			"[$DOCUMENT_URL:/site-initializer/documents/remote-app/2.js$]",
-			"[$DOCUMENT_URL:/site-initializer/documents/remote-app/main.js$]",
-			"[$DOCUMENT_URL:/site-initializer/documents/remote-app/runtime-main.js$]"
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/2.js$]",
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/main.js$]",
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/runtime-main.js$]"
 		],
 		"htmlElementName": "liferay-remote-app-raylife",
 		"name_i18n": {
@@ -37,11 +41,13 @@
 		"widgetName": "com_liferay_remote_app_web_internal_portlet_RemoteAppEntryPortlet_[$REMOTE_APP_ENTRY_ID:RAYLIFE-QUOTE-COMPARISON$]"
 	},
 	{
-		"cssURLs": "",
+		"cssURLs": [
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/main.css$]"
+		],
 		"elementURLs": [
-			"[$DOCUMENT_URL:/site-initializer/documents/remote-app/2.js$]",
-			"[$DOCUMENT_URL:/site-initializer/documents/remote-app/main.js$]",
-			"[$DOCUMENT_URL:/site-initializer/documents/remote-app/runtime-main.js$]"
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/2.js$]",
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/main.js$]",
+			"[$DOCUMENT_URL:/site-initializer/documents/company/remote-app/runtime-main.js$]"
 		],
 		"htmlElementName": "liferay-remote-app-raylife",
 		"name_i18n": {

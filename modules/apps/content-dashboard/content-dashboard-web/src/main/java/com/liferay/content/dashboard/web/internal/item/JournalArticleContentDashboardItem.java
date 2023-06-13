@@ -21,17 +21,21 @@ import com.liferay.content.dashboard.item.action.exception.ContentDashboardItemA
 import com.liferay.content.dashboard.item.action.provider.ContentDashboardItemActionProvider;
 import com.liferay.content.dashboard.web.internal.item.action.ContentDashboardItemActionProviderTracker;
 import com.liferay.content.dashboard.web.internal.item.type.ContentDashboardItemSubtype;
+import com.liferay.content.dashboard.web.internal.util.ContentDashboardGroupUtil;
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.item.InfoItemClassDetails;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -304,18 +308,23 @@ public class JournalArticleContentDashboardItem
 		return Optional.ofNullable(
 			_group
 		).map(
-			group -> {
-				try {
-					return group.getDescriptiveName(locale);
-				}
-				catch (PortalException portalException) {
-					_log.error(portalException, portalException);
-
-					return StringPool.BLANK;
-				}
-			}
+			group -> ContentDashboardGroupUtil.getGroupName(group, locale)
 		).orElse(
 			StringPool.BLANK
+		);
+	}
+
+	@Override
+	public JSONObject getSpecificInformationJSONObject(
+		String backURL, LiferayPortletResponse liferayPortletResponse,
+		Locale locale, ThemeDisplay themeDisplay) {
+
+		return JSONUtil.put(
+			"creationDate", _journalArticle.getCreateDate()
+		).put(
+			"displayDate", _journalArticle.getDisplayDate()
+		).put(
+			"languagesTranslated", _journalArticle.getAvailableLanguageIds()
 		);
 	}
 

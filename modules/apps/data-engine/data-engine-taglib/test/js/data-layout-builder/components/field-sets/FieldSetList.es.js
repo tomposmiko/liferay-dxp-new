@@ -51,11 +51,13 @@ let spySuccessToast;
 let spyErrorToast;
 let ddmFormSpy;
 
-export const FieldSetWrapper = ({children}) => (
-	<DndProvider backend={HTML5Backend}>
-		<ClayModalProvider>{children}</ClayModalProvider>
-	</DndProvider>
-);
+export function FieldSetWrapper({children}) {
+	return (
+		<DndProvider backend={HTML5Backend}>
+			<ClayModalProvider>{children}</ClayModalProvider>
+		</DndProvider>
+	);
+}
 
 describe('FieldSets', () => {
 	beforeEach(() => {
@@ -404,10 +406,6 @@ describe('FieldSets', () => {
 			...defaultState,
 			fieldSets: [fieldSet],
 		};
-
-		jest.spyOn(DataConverter, 'getDataDefinitionFieldSet').mockReturnValue({
-			fieldSet,
-		});
 
 		const {container} = render(
 			<DndProvider backend={HTML5Backend}>

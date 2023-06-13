@@ -29,6 +29,8 @@ AUI.add(
 
 		var REGEX_EMAIL = /^[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:\w(?:[\w-]*\w)?\.)+(\w(?:[\w-]*\w))$/;
 
+		var REGEX_FRIENDLY_URL_MAPPING = /[A-Za-z0-9-_]*/;
+
 		var REGEX_NUMBER = /^[+-]?(\d+)([.|,]\d+)*([eE][+-]?\d+)?$/;
 
 		var REGEX_URL = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(https?:\/\/|www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))((.*):(\d*)\/?(.*))?)/;
@@ -65,6 +67,10 @@ AUI.add(
 			return REGEX_EMAIL.test(val);
 		};
 
+		var friendlyURLMapping = function (val, _node, _ruleValue) {
+			return REGEX_FRIENDLY_URL_MAPPING.test(val);
+		};
+
 		var maxFileSize = function (_val, node, ruleValue) {
 			var nodeType = node.get('type').toLowerCase();
 
@@ -95,6 +101,7 @@ AUI.add(
 				acceptFiles,
 				customElementName,
 				email,
+				friendlyURLMapping,
 				maxFileSize,
 				number,
 				url,
@@ -126,6 +133,9 @@ AUI.add(
 				),
 				equalTo: Liferay.Language.get(
 					'please-enter-the-same-value-again'
+				),
+				friendlyURLMapping: Liferay.Language.get(
+					'please-enter-a-valid-friendly-url-mapping'
 				),
 				max: Liferay.Language.get(
 					'please-enter-a-value-less-than-or-equal-to-x'
@@ -290,12 +300,11 @@ AUI.add(
 
 						if (fieldWrapper && formTabs) {
 							var tabs = formTabs.all('.nav-item');
-							var tabsNamespace = formTabs.getAttribute(
-								'data-tabs-namespace'
-							);
+							var tabsNamespace =
+								formTabs.dataset['tabs-namespace'];
 
 							var tabNames = AArray.map(tabs._nodes, (tab) => {
-								return tab.getAttribute('data-tab-name');
+								return tab.dataset['tab-name'];
 							});
 
 							var fieldWrapperId = fieldWrapper
@@ -313,7 +322,7 @@ AUI.add(
 							Liferay.Portal.Tabs.show(
 								tabsNamespace,
 								tabNames,
-								fieldTabId.getAttribute('data-tab-name')
+								fieldTabId.dataset['tab-name']
 							);
 						}
 					}
@@ -499,7 +508,7 @@ AUI.add(
 						validatorName
 					);
 
-					if (ruleIndex == -1) {
+					if (ruleIndex === -1) {
 						fieldRules.push({
 							body: body || '',
 							custom: custom || false,
@@ -564,7 +573,7 @@ AUI.add(
 						validatorName
 					);
 
-					if (ruleIndex != -1) {
+					if (ruleIndex !== -1) {
 						var rule = fieldRules[ruleIndex];
 
 						instance.formValidator.resetField(rule.fieldName);

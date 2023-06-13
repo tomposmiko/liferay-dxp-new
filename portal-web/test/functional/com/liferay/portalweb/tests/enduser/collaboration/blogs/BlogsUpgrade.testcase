@@ -5,7 +5,7 @@ definition {
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property test.assert.warning.exceptions = "true";
-	property testray.component.names = "Document Management";
+	property testray.component.names = "Blogs";
 	property testray.main.component.name = "Upgrades Collaboration";
 
 	setUp {
@@ -15,12 +15,7 @@ definition {
 
 		AssertLocation(value1 = "${portalURL}/web/guest?SM_USER=test@liferay.com");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Search");
-
-		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+		SearchAdministration.executeReindex();
 	}
 
 	@priority = "5"

@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal Template FreeMarker
 Bundle-SymbolicName: com.liferay.portal.template.freemarker
-Bundle-Version: 7.0.13
+Bundle-Version: 7.0.17
 Import-Package:\
 	!com.sun.javadoc,\
 	!com.sun.org.apache.xml.internal.utils,\
@@ -12,6 +12,8 @@ Import-Package:\
 	!org.apache.log,\
 	!org.apache.xml.resolver.*,\
 	!org.apache.xmlbeans.*,\
+	\
+	!org.jdom.*,\
 	\
 	!org.mozilla.*,\
 	\

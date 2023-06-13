@@ -19,13 +19,15 @@ import ClayModal, {ClayModalProvider, useModal} from '@clayui/modal';
 import React, {useEffect, useState} from 'react';
 
 import useForm from '../hooks/useForm';
+import {ERRORS} from '../utils/errors';
 import {toCamelCase} from '../utils/string';
 import Input from './form/Input';
 import Select from './form/Select';
 
-const objectFieldTypes = [
+let objectFieldTypes = [
 	'BigDecimal',
 	'Boolean',
+	'Clob',
 	'Date',
 	'Double',
 	'Integer',
@@ -37,11 +39,16 @@ const objectFieldTypes = [
 const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 const headers = new Headers({
-	Accept: 'application/json',
+	'Accept': 'application/json',
 	'Content-Type': 'application/json',
 });
 
-const ModalAddObjectField: React.FC<IProps> = ({apiURL, observer, onClose}) => {
+const ModalAddObjectField: React.FC<IProps> = ({
+	apiURL,
+	ffClobObjectFieldTypeConfigurationEnabled,
+	observer,
+	onClose,
+}) => {
 	const [error, setError] = useState<string>('');
 	const [picklist, setPicklist] = useState<TPicklist[]>([]);
 	const initialValues: TInitialValues = {
@@ -51,6 +58,12 @@ const ModalAddObjectField: React.FC<IProps> = ({apiURL, observer, onClose}) => {
 		required: false,
 		type: '',
 	};
+
+	if (!ffClobObjectFieldTypeConfigurationEnabled) {
+		objectFieldTypes = objectFieldTypes.filter(
+			(fieldType) => fieldType !== 'Clob'
+		);
+	}
 
 	const onSubmit = async ({
 		label,
@@ -85,11 +98,13 @@ const ModalAddObjectField: React.FC<IProps> = ({apiURL, observer, onClose}) => {
 			window.location.reload();
 		}
 		else {
-			const {
-				title = Liferay.Language.get('an-error-occurred'),
-			} = await response.json();
+			const {type} = await response.json();
+			const isMapped = Object.prototype.hasOwnProperty.call(ERRORS, type);
+			const errorMessage = isMapped
+				? ERRORS[type]
+				: Liferay.Language.get('an-error-occurred');
 
-			setError(title);
+			setError(errorMessage);
 		}
 	};
 
@@ -245,6 +260,7 @@ const ModalAddObjectField: React.FC<IProps> = ({apiURL, observer, onClose}) => {
 
 interface IProps extends React.HTMLAttributes<HTMLElement> {
 	apiURL: string;
+	ffClobObjectFieldTypeConfigurationEnabled: boolean;
 	observer: any;
 	onClose: () => void;
 }
@@ -256,13 +272,16 @@ type TPicklist = {
 
 type TInitialValues = {
 	label: string;
-	name?: string;
-	type: string;
 	listTypeDefinitionId: number;
+	name?: string;
 	required: boolean;
+	type: string;
 };
 
-const ModalWithProvider: React.FC<IProps> = ({apiURL}) => {
+const ModalWithProvider: React.FC<IProps> = ({
+	apiURL,
+	ffClobObjectFieldTypeConfigurationEnabled,
+}) => {
 	const [visibleModal, setVisibleModal] = useState<boolean>(false);
 	const {observer, onClose} = useModal({
 		onClose: () => setVisibleModal(false),
@@ -281,6 +300,9 @@ const ModalWithProvider: React.FC<IProps> = ({apiURL}) => {
 			{visibleModal && (
 				<ModalAddObjectField
 					apiURL={apiURL}
+					ffClobObjectFieldTypeConfigurationEnabled={
+						ffClobObjectFieldTypeConfigurationEnabled
+					}
 					observer={observer}
 					onClose={onClose}
 				/>

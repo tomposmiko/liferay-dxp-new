@@ -25,6 +25,7 @@ import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
+import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLinkServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
@@ -46,7 +47,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.segments.constants.SegmentsExperienceConstants;
 
 import java.util.List;
 import java.util.Locale;
@@ -68,8 +68,20 @@ public class FragmentEntryLinkUtil {
 		throws PortalException {
 
 		FragmentEntryLink fragmentEntryLink =
-			FragmentEntryLinkServiceUtil.deleteFragmentEntryLink(
+			FragmentEntryLinkLocalServiceUtil.fetchFragmentEntryLink(
 				fragmentEntryLinkId);
+
+		if (fragmentEntryLink == null) {
+			LayoutClassedModelUsageLocalServiceUtil.
+				deleteLayoutClassedModelUsages(
+					String.valueOf(fragmentEntryLinkId),
+					PortalUtil.getClassNameId(FragmentEntryLink.class), plid);
+
+			return;
+		}
+
+		FragmentEntryLinkServiceUtil.deleteFragmentEntryLink(
+			fragmentEntryLinkId);
 
 		if (fragmentEntryLink.getFragmentEntryId() == 0) {
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
@@ -169,8 +181,6 @@ public class FragmentEntryLinkUtil {
 
 			defaultFragmentRendererContext.setMode(
 				FragmentEntryLinkConstants.EDIT);
-			defaultFragmentRendererContext.setSegmentsExperienceIds(
-				new long[] {SegmentsExperienceConstants.ID_DEFAULT});
 
 			String configuration = fragmentRendererController.getConfiguration(
 				defaultFragmentRendererContext);

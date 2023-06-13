@@ -32,8 +32,15 @@ public class MulticastServerTool {
 
 	public static void main(String[] args) {
 		try {
+			String multicastAddress = args[0];
 			int port = GetterUtil.getInteger(args[1]);
 			long interval = GetterUtil.getLong(args[2]);
+
+			String bindAddress = null;
+
+			if (args.length > 3) {
+				bindAddress = args[3];
+			}
 
 			DatagramHandler handler = new DatagramHandler() {
 
@@ -53,7 +60,7 @@ public class MulticastServerTool {
 			};
 
 			MulticastTransport transport = new MulticastTransport(
-				handler, args[0], port);
+				handler, multicastAddress, port, bindAddress);
 
 			transport.connect();
 
@@ -77,7 +84,7 @@ public class MulticastServerTool {
 
 			System.err.println(
 				"Usage: java MulticastServerTool multicastAddress port " +
-					"interval");
+					"interval bindAddress");
 
 			System.exit(1);
 		}

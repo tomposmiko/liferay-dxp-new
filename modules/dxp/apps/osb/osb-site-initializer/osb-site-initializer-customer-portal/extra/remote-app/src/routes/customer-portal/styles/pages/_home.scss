@@ -1,0 +1,11 @@
+.home-projects {
+	gap: var(--spacer-5);
+
+	&-sm {
+		gap: 1rem;
+	}
+}
+
+.project-cards-container {
+	min-width: 720px;
+}

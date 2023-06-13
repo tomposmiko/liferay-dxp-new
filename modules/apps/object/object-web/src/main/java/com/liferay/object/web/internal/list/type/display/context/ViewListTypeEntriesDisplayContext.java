@@ -18,7 +18,7 @@ import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSet
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
-import com.liferay.object.web.internal.display.context.util.ObjectRequestHelper;
+import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -85,7 +85,7 @@ public class ViewListTypeEntriesDisplayContext {
 	public CreationMenu getCreationMenu() throws PortalException {
 		CreationMenu creationMenu = new CreationMenu();
 
-		if (!_hasAddListTypeEntryPermission()) {
+		if (!hasUpdateListTypeDefinitionPermission()) {
 			return creationMenu;
 		}
 
@@ -101,6 +101,14 @@ public class ViewListTypeEntriesDisplayContext {
 		return creationMenu;
 	}
 
+	public boolean hasUpdateListTypeDefinitionPermission()
+		throws PortalException {
+
+		return _listTypeDefinitionModelResourcePermission.contains(
+			_objectRequestHelper.getPermissionChecker(),
+			_getListTypeDefinitionId(), ActionKeys.UPDATE);
+	}
+
 	private long _getListTypeDefinitionId() {
 		HttpServletRequest httpServletRequest =
 			_objectRequestHelper.getRequest();
@@ -110,12 +118,6 @@ public class ViewListTypeEntriesDisplayContext {
 				ObjectWebKeys.LIST_TYPE_DEFINITION);
 
 		return listTypeDefinition.getListTypeDefinitionId();
-	}
-
-	private boolean _hasAddListTypeEntryPermission() throws PortalException {
-		return _listTypeDefinitionModelResourcePermission.contains(
-			_objectRequestHelper.getPermissionChecker(),
-			_getListTypeDefinitionId(), ActionKeys.UPDATE);
 	}
 
 	private final ModelResourcePermission<ListTypeDefinition>

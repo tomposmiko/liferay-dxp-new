@@ -35,26 +35,29 @@ public class Configuration implements Cloneable, Serializable {
 		return ConfigurationSerDes.toDTO(json);
 	}
 
-	public Advanced getAdvanced() {
-		return advanced;
+	public AdvancedConfiguration getAdvancedConfiguration() {
+		return advancedConfiguration;
 	}
 
-	public void setAdvanced(Advanced advanced) {
-		this.advanced = advanced;
+	public void setAdvancedConfiguration(
+		AdvancedConfiguration advancedConfiguration) {
+
+		this.advancedConfiguration = advancedConfiguration;
 	}
 
-	public void setAdvanced(
-		UnsafeSupplier<Advanced, Exception> advancedUnsafeSupplier) {
+	public void setAdvancedConfiguration(
+		UnsafeSupplier<AdvancedConfiguration, Exception>
+			advancedConfigurationUnsafeSupplier) {
 
 		try {
-			advanced = advancedUnsafeSupplier.get();
+			advancedConfiguration = advancedConfigurationUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected Advanced advanced;
+	protected AdvancedConfiguration advancedConfiguration;
 
 	public AggregationConfiguration getAggregationConfiguration() {
 		return aggregationConfiguration;
@@ -81,88 +84,77 @@ public class Configuration implements Cloneable, Serializable {
 
 	protected AggregationConfiguration aggregationConfiguration;
 
-	public Facet getFacet() {
-		return facet;
+	public GeneralConfiguration getGeneralConfiguration() {
+		return generalConfiguration;
 	}
 
-	public void setFacet(Facet facet) {
-		this.facet = facet;
+	public void setGeneralConfiguration(
+		GeneralConfiguration generalConfiguration) {
+
+		this.generalConfiguration = generalConfiguration;
 	}
 
-	public void setFacet(UnsafeSupplier<Facet, Exception> facetUnsafeSupplier) {
+	public void setGeneralConfiguration(
+		UnsafeSupplier<GeneralConfiguration, Exception>
+			generalConfigurationUnsafeSupplier) {
+
 		try {
-			facet = facetUnsafeSupplier.get();
+			generalConfiguration = generalConfigurationUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected Facet facet;
+	protected GeneralConfiguration generalConfiguration;
 
-	public General getGeneral() {
-		return general;
+	public HighlightConfiguration getHighlightConfiguration() {
+		return highlightConfiguration;
 	}
 
-	public void setGeneral(General general) {
-		this.general = general;
+	public void setHighlightConfiguration(
+		HighlightConfiguration highlightConfiguration) {
+
+		this.highlightConfiguration = highlightConfiguration;
 	}
 
-	public void setGeneral(
-		UnsafeSupplier<General, Exception> generalUnsafeSupplier) {
+	public void setHighlightConfiguration(
+		UnsafeSupplier<HighlightConfiguration, Exception>
+			highlightConfigurationUnsafeSupplier) {
 
 		try {
-			general = generalUnsafeSupplier.get();
+			highlightConfiguration = highlightConfigurationUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected General general;
+	protected HighlightConfiguration highlightConfiguration;
 
-	public Highlight getHighlight() {
-		return highlight;
+	public ParameterConfiguration getParameterConfiguration() {
+		return parameterConfiguration;
 	}
 
-	public void setHighlight(Highlight highlight) {
-		this.highlight = highlight;
+	public void setParameterConfiguration(
+		ParameterConfiguration parameterConfiguration) {
+
+		this.parameterConfiguration = parameterConfiguration;
 	}
 
-	public void setHighlight(
-		UnsafeSupplier<Highlight, Exception> highlightUnsafeSupplier) {
+	public void setParameterConfiguration(
+		UnsafeSupplier<ParameterConfiguration, Exception>
+			parameterConfigurationUnsafeSupplier) {
 
 		try {
-			highlight = highlightUnsafeSupplier.get();
+			parameterConfiguration = parameterConfigurationUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected Highlight highlight;
-
-	public Map<String, Parameter> getParameters() {
-		return parameters;
-	}
-
-	public void setParameters(Map<String, Parameter> parameters) {
-		this.parameters = parameters;
-	}
-
-	public void setParameters(
-		UnsafeSupplier<Map<String, Parameter>, Exception>
-			parametersUnsafeSupplier) {
-
-		try {
-			parameters = parametersUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Map<String, Parameter> parameters;
+	protected ParameterConfiguration parameterConfiguration;
 
 	public QueryConfiguration getQueryConfiguration() {
 		return queryConfiguration;
@@ -185,6 +177,31 @@ public class Configuration implements Cloneable, Serializable {
 	}
 
 	protected QueryConfiguration queryConfiguration;
+
+	public Map<String, Object> getSearchContextAttributes() {
+		return searchContextAttributes;
+	}
+
+	public void setSearchContextAttributes(
+		Map<String, Object> searchContextAttributes) {
+
+		this.searchContextAttributes = searchContextAttributes;
+	}
+
+	public void setSearchContextAttributes(
+		UnsafeSupplier<Map<String, Object>, Exception>
+			searchContextAttributesUnsafeSupplier) {
+
+		try {
+			searchContextAttributes =
+				searchContextAttributesUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Map<String, Object> searchContextAttributes;
 
 	public SortConfiguration getSortConfiguration() {
 		return sortConfiguration;

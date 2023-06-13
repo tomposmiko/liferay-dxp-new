@@ -21,11 +21,6 @@ definition {
 		else {
 			User.firstLoginPG();
 
-			ApplicationsMenu.gotoPortlet(
-				category = "Publications",
-				panel = "Applications",
-				portlet = "Publications");
-
 			Publications.disablePublications();
 		}
 	}
@@ -60,10 +55,7 @@ definition {
 
 		JSONPublications.addPublication(publicationName = "Publication Name 1");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
+		PublicationsNavigator.openPublicationsAdmin();
 
 		Publications.inviteUsers(
 			publicationName = "Publication Name 1",
@@ -118,27 +110,13 @@ definition {
 			locator1 = "Notifications#NOTIFICATIONS_WORKFLOW_TITLE",
 			value1 = "Test Test has invited you to work on Publication Name 2 as a Editor.");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
+		PublicationsNavigator.openPublicationsAdmin();
 
-		AssertElementPresent(
-			key_publicationName = "Publication Name 1",
-			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
+		PublicationsPermissions.assertViewerPermissions(publicationName = "Publication Name 1");
 
-		Publications.assertViewerPermissions(publicationName = "Publication Name 1");
+		PublicationsNavigator.openPublicationsAdmin();
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
-
-		AssertElementPresent(
-			key_publicationName = "Publication Name 2",
-			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
-
-		Publications.assertEditorPermissions(publicationName = "Publication Name 2");
+		PublicationsPermissions.assertEditorPermissions(publicationName = "Publication Name 2");
 	}
 
 	@priority = "5"
@@ -171,10 +149,7 @@ definition {
 
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
+		PublicationsNavigator.openPublicationsAdmin();
 
 		Publications.inviteUsers(
 			publicationName = "Publication Name",
@@ -206,16 +181,9 @@ definition {
 			locator1 = "Notifications#NOTIFICATIONS_WORKFLOW_TITLE",
 			value1 = "Test Test has invited you to work on Publication Name as a Editor.");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
+		PublicationsNavigator.openPublicationsAdmin();
 
-		AssertElementPresent(
-			key_publicationName = "Publication Name",
-			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
-
-		Publications.assertEditorPermissions(publicationName = "Publication Name");
+		PublicationsPermissions.assertEditorPermissions(publicationName = "Publication Name");
 	}
 
 	@priority = "5"
@@ -255,10 +223,7 @@ definition {
 
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
+		PublicationsNavigator.openPublicationsAdmin();
 
 		Publications.inviteUsers(
 			publicationName = "Publication Name",
@@ -290,16 +255,9 @@ definition {
 			locator1 = "Notifications#NOTIFICATIONS_WORKFLOW_TITLE",
 			value1 = "Test Test has invited you to work on Publication Name as a Inviter.");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
+		PublicationsNavigator.openPublicationsAdmin();
 
-		AssertElementPresent(
-			key_publicationName = "Publication Name",
-			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
-
-		Publications.assertInviterPermissions(publicationName = "Publication Name");
+		PublicationsPermissions.assertInviterPermissions(publicationName = "Publication Name");
 	}
 
 	@priority = "5"
@@ -337,10 +295,7 @@ definition {
 
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
+		PublicationsNavigator.openPublicationsAdmin();
 
 		Publications.inviteUsers(
 			publicationName = "Publication Name",
@@ -372,16 +327,9 @@ definition {
 			locator1 = "Notifications#NOTIFICATIONS_WORKFLOW_TITLE",
 			value1 = "Test Test has invited you to work on Publication Name as a Publisher.");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
+		PublicationsNavigator.openPublicationsAdmin();
 
-		AssertElementPresent(
-			key_publicationName = "Publication Name",
-			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
-
-		Publications.assertPublisherPermissions(publicationName = "Publication Name");
+		PublicationsPermissions.assertPublisherPermissions(publicationName = "Publication Name");
 	}
 
 	@priority = "5"
@@ -410,10 +358,7 @@ definition {
 
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
+		PublicationsNavigator.openPublicationsAdmin();
 
 		Publications.inviteUsers(
 			publicationName = "Publication Name",
@@ -445,16 +390,9 @@ definition {
 			locator1 = "Notifications#NOTIFICATIONS_WORKFLOW_TITLE",
 			value1 = "Test Test has invited you to work on Publication Name as a Viewer.");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Publications",
-			panel = "Applications",
-			portlet = "Publications");
+		PublicationsNavigator.openPublicationsAdmin();
 
-		AssertElementPresent(
-			key_publicationName = "Publication Name",
-			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
-
-		Publications.assertViewerPermissions(publicationName = "Publication Name");
+		PublicationsPermissions.assertViewerPermissions(publicationName = "Publication Name");
 	}
 
 }

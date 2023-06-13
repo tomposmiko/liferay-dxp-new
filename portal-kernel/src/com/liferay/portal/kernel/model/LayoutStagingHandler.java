@@ -251,7 +251,7 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 			serviceContext, "explicitCreation");
 
 		if (!explicitCreation) {
-			LayoutRevisionLocalServiceUtil.updateStatus(
+			layoutRevision = LayoutRevisionLocalServiceUtil.updateStatus(
 				serviceContext.getUserId(),
 				layoutRevision.getLayoutRevisionId(),
 				WorkflowConstants.STATUS_INCOMPLETE, serviceContext);
@@ -298,8 +298,8 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 			"getColorScheme", "getColorSchemeId", "getCss", "getCssText",
 			"getDescription", "getGroupId", "getHTMLTitle", "getIconImage",
 			"getIconImageId", "getKeywords", "getLayoutSet", "getModifiedDate",
-			"getName", "getRobots", "getTarget", "getTheme", "getThemeId",
-			"getThemeSetting", "getTitle", "getTypeSettings",
+			"getName", "getNameMap", "getRobots", "getTarget", "getTheme",
+			"getThemeId", "getThemeSetting", "getTitle", "getTypeSettings",
 			"getTypeSettingsProperties", "getTypeSettingsProperty",
 			"isContentDisplayPage", "isCustomizable", "isEscapedModel",
 			"isIconImage", "isInheritLookAndFeel", "setColorSchemeId", "setCss",

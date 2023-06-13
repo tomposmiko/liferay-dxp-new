@@ -27,6 +27,10 @@ public class ObjectActionLocalServiceWrapper
 	implements ObjectActionLocalService,
 			   ServiceWrapper<ObjectActionLocalService> {
 
+	public ObjectActionLocalServiceWrapper() {
+		this(null);
+	}
+
 	public ObjectActionLocalServiceWrapper(
 		ObjectActionLocalService objectActionLocalService) {
 
@@ -330,6 +334,13 @@ public class ObjectActionLocalServiceWrapper
 		getObjectActions(int start, int end) {
 
 		return _objectActionLocalService.getObjectActions(start, end);
+	}
+
+	@Override
+	public java.util.List<com.liferay.object.model.ObjectAction>
+		getObjectActions(long objectDefinitionId) {
+
+		return _objectActionLocalService.getObjectActions(objectDefinitionId);
 	}
 
 	@Override

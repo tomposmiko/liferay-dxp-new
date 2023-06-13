@@ -1,5 +1,8 @@
-<definition default="sikuliRightMouseUp">
-	<command name="sikuliRightMouseUp">
-		<execute selenium="sikuliRightMouseUp" />
-	</command>
-</definition>
+@default = "sikuliRightMouseUp"
+definition {
+
+	function sikuliRightMouseUp {
+		selenium.sikuliRightMouseUp();
+	}
+
+}

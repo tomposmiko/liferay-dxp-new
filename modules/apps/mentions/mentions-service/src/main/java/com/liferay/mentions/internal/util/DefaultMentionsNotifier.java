@@ -23,10 +23,17 @@ import com.liferay.mentions.util.MentionsNotifier;
 import com.liferay.mentions.util.MentionsUserFinder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.permission.LayoutPermission;
+import com.liferay.portal.kernel.service.permission.PortletPermission;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -114,6 +121,26 @@ public class DefaultMentionsNotifier implements MentionsNotifier {
 				continue;
 			}
 
+			ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
+
+			if (themeDisplay != null) {
+				Layout layout = themeDisplay.getLayout();
+
+				if (layout != null) {
+					PermissionChecker permissionChecker =
+						_permissionCheckerFactory.create(mentionedUser);
+
+					if (!_layoutPermission.contains(
+							permissionChecker, layout, true, ActionKeys.VIEW) ||
+						!_portletPermission.contains(
+							permissionChecker, layout, themeDisplay.getPpid(),
+							ActionKeys.VIEW)) {
+
+						continue;
+					}
+				}
+			}
+
 			subscriptionSender.addRuntimeSubscribers(
 				mentionedUser.getEmailAddress(), mentionedUser.getFullName());
 		}
@@ -185,11 +212,20 @@ public class DefaultMentionsNotifier implements MentionsNotifier {
 		_userLocalService = userLocalService;
 	}
 
+	@Reference
+	private LayoutPermission _layoutPermission;
+
 	private MentionsMatcherRegistry _mentionsMatcherRegistry;
 	private MentionsUserFinder _mentionsUserFinder;
 
 	@Reference
+	private PermissionCheckerFactory _permissionCheckerFactory;
+
+	@Reference
 	private Portal _portal;
+
+	@Reference
+	private PortletPermission _portletPermission;
 
 	private UserLocalService _userLocalService;
 

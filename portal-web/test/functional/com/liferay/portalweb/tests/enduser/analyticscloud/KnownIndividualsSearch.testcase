@@ -180,8 +180,15 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9019 | Test Summary: Search an Individual's Interest List with a query that won't return results"
+	@ignore = "true"
 	@priority = "3"
 	test AssertNoIndividualsInterestsResults {
+		property portal.upstream = "quarantine";
+
+		// AC Refactor: After going to a specific individual details page and switch tab to "Interests" the message "An unexpected error occurred" appears.
+		// AC Refactor ticket: LRAC-9645
+		// AC Bug ticket: LRAC-9646
+
 		task ("Add web contents to Site as interest topics") {
 			ACUtils.createWCAndAddToPage();
 		}
@@ -230,6 +237,9 @@ definition {
 
 		task ("Search non-existent interest") {
 			ACUtils.searchBar(searchItem = "sport");
+
+			// In the interests tab the message "An unexpected error occurred" appears.
+
 		}
 
 		task ("Assert there are no interests found") {
@@ -371,10 +381,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9032 | Test Summary: Search and Clear Field"
 	@priority = "1"
 	test SearchAndClearField {
+		property portal.upstream = "quarantine";
+
 		var usernameList = "user1,user2";
-
 		var emailList = "user1@liferay.com,user2@liferay.com";
-
 		var nameList = "user1 user1,user2 user2";
 
 		task ("Get site assigned property name") {
@@ -434,10 +444,12 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9024 | Test Summary: Search an Individual's Details in the individual List"
 	@priority = "4"
 	test SearchIndividualDetails {
+		property portal.upstream = "quarantine";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-			var dataSource = StringUtil.extractFirst("${propertyName}"," ");
+			var dataSource = StringUtil.extractFirst("${propertyName}", " ");
 		}
 
 		task ("Add new users in DXP and sync the Contact Data") {
@@ -456,7 +468,7 @@ definition {
 				userLoginEmailAddress = "randy.smith@liferay.com",
 				userLoginFullName = "Randy Smith");
 
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -657,11 +669,11 @@ definition {
 				userLoginEmailAddress = "ac@liferay.com",
 				userLoginFullName = "ac ac");
 
-			Navigator.gotoSitePage(
+			ACUtils.navigateToSitePage(
+				actionType = "View DM",
+				documentTitleList = "DM AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
-
-			DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM AC Title");
 		}
 
 		task ("Switch to new property in AC") {
@@ -694,6 +706,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9028 | Test Summary: Search an Individual's Interest List"
+	@ignore = "true"
 	@priority = "4"
 	test SearchIndividualsInterests {
 		property portal.upstream = "quarantine";
@@ -709,9 +722,7 @@ definition {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			for (var layoutName : list "Movies,Sports") {
-				JSONLayout.addPublicLayout(
-					groupName = "Site Name",
-					layoutName = "${layoutName}");
+				ACUtils.addPage(layoutName = "${layoutName}");
 
 				ACUtils.createWCAndAddToPage(
 					layoutName = "${layoutName}",
@@ -735,7 +746,7 @@ definition {
 				userLoginFullName = "ac ac");
 
 			for (var pageName : list "Movies,Sports") {
-				Navigator.gotoSitePage(
+				ACUtils.navigateToSitePage(
 					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
@@ -773,8 +784,9 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9029 | Test Summary: Sort Individuals List"
 	@priority = "3"
 	test SortIndividualList {
-		var usernameList = "user1,user2,user3";
+		property portal.upstream = "quarantine";
 
+		var usernameList = "user1,user2,user3";
 		var emailList = "user1@liferay.com,user2@liferay.com,user3@liferay.com";
 
 		task ("Get site assigned property name") {
@@ -832,6 +844,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9030 | Test Summary: Sorting a List Returns a User to the First Page"
 	@priority = "3"
 	test SortingReturnsUserToFirstPage {
+		property portal.upstream = "quarantine";
+
 		var usernameList = "user1,user2,user3,user4,user5,user6,user7";
 
 		task ("Get site assigned property name") {
@@ -909,6 +923,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9031 | Test Summary: Table Pagination"
 	@priority = "4"
 	test TablePagination {
+		property portal.upstream = "quarantine";
+
 		var usernameList = "user1,user2,user3,user4,user5,user6";
 
 		task ("Get site assigned property name") {

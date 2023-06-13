@@ -21,13 +21,22 @@ definition {
 			locator1 = "TextInput#SUBJECT",
 			value1 = "${threadSubject}");
 
-		SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
+		if (isSet(displayTextWithLink)) {
+			CKEditor.addTextWithLink(
+				displayText = "${displayText}",
+				dmDocumentTitle = "${dmDocumentTitle}",
+				fieldLabel = "${fieldLabel}",
+				pageName = "${pageName}");
+		}
+		else {
+			SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
 
-		Type(
-			locator1 = "CKEditor#BODY",
-			value1 = "${threadBody}");
+			Type(
+				locator1 = "CKEditor#BODY",
+				value1 = "${threadBody}");
 
-		SelectFrame(value1 = "relative=top");
+			SelectFrame(value1 = "relative=top");
+		}
 
 		if (isSet(categoryName)) {
 			Panel.expandPanel(panel = "Categorization");
@@ -115,20 +124,30 @@ definition {
 		if (isSet(source)) {
 			Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON");
 
-			Type(
-				locator1 = "CKEditor#BODY_FIELD_SOURCE_ON_2",
-				value1 = "${threadBody}");
-		}
-		else {
-			if ("${bold}" == "true") {
-				FormFields.toggleCKEditorContentStyle(optionTool = "Bold");
+			if (IsVisible(locator1 = "CKEditor#BODY_FIELD_SOURCE_ON_2")) {
+				Type(
+					locator1 = "CKEditor#BODY_FIELD_SOURCE_ON_2",
+					value1 = "${threadBody}");
 			}
 
+			if (IsElementPresent(locator1 = "CKEditor#BODY_FIELD_SOURCE_ON")) {
+				Type.typeCodeMirrorEditorNoError(
+					locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
+					value1 = "${threadBody}");
+			}
+		}
+		else {
 			SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
 
 			Type(
 				locator1 = "CKEditor#BODY",
 				value1 = "${threadBody}");
+
+			if ("${bold}" == "true") {
+				SelectFrame();
+
+				FormFields.toggleCKEditorContentStyle(optionTool = "Bold");
+			}
 		}
 
 		SelectFrame(value1 = "relative=top");
@@ -147,6 +166,19 @@ definition {
 			Panel.expandPanel(panel = "Categorization");
 
 			AssetCategorization.addTag(tagName = "${tagName}");
+		}
+
+		if (isSet(priority)) {
+			Panel.expandPanel(panel = "More Settings");
+
+			Select(
+				locator1 = "MessageBoardsThread#THREAD_PRIORITY_SELECT",
+				value1 = "${priority}");
+
+			AssertSelectedLabel(
+				locator1 = "Select#SELECT_ID",
+				selectFieldId = "priority",
+				value1 = "${priority}");
 		}
 
 		if (isSet(mbAttachmentFileList)) {
@@ -258,9 +290,11 @@ definition {
 	}
 
 	macro addPGWithPermissions {
-		AssertClick(
-			locator1 = "Button#NEW_THREAD",
-			value1 = "New Thread");
+		if (!(isSet(skipNavigation))) {
+			AssertClick(
+				locator1 = "Button#NEW_THREAD",
+				value1 = "New Thread");
+		}
 
 		Type(
 			locator1 = "TextInput#SUBJECT",
@@ -336,12 +370,20 @@ definition {
 	}
 
 	macro assertDownloadedFileNameFromTempFolder {
-		var downloadedFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "${attachmentFileName}.jpg");
+		if (isSet(exportedFileName)) {
+			var downloadedFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "${exportedFileName}.lar");
+		}
+		else {
+			var downloadedFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "${attachmentFileName}.jpg");
+		}
 
 		echo("## downloadedFileName: ${downloadedFileName}");
 
 		if (contains("${downloadedFileName}", "${attachmentFileName}")) {
 			echo("This is a correct file.");
+		}
+		else if (contains("${downloadedFileName}", "${exportedFileName}")) {
+			echo("This is a downloaded lar file.");
 		}
 		else {
 			fail("FAIL!");
@@ -481,8 +523,6 @@ definition {
 
 			SelectFrameTop();
 		}
-
-		PortletEntry.publish();
 	}
 
 	macro editPG {
@@ -625,6 +665,28 @@ definition {
 		MenuItem.click(menuItem = "Edit");
 
 		PortletEntry.publish();
+	}
+
+	macro flagThread {
+		Click(locator1 = "ReportContent#FLAG_LINK");
+
+		AssertElementPresent.assertVisible(locator1 = "ReportContent#FLAG_MODAL");
+
+		Select(
+			locator1 = "ReportContent#REASON_SELECT",
+			value1 = "${flagReason}");
+
+		SelectFrame(locator1 = "ItemSelector#ITEM_SELECTOR_MODAL_FOOTER");
+
+		AssertClick(
+			locator1 = "ReportContent#REPORT_BUTTON",
+			value1 = "Report");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "ReportContent#SUCCESS_MESSAGE",
+			value1 = "Although we cannot disclose our final decision, we do review every report and appreciate your effort to make sure ${siteName} is a safe environment for everyone.");
+
+		Click(locator1 = "Button#CLOSE");
 	}
 
 	macro gotoCP {
@@ -790,8 +852,8 @@ definition {
 		if (isSet(layoutName)) {
 			if (isSet(categoryName)) {
 				var categoryId = JSONMBMessage.getCategoryIdByName(
-					groupName = "${groupName}",
-					categoryName = "${categoryName}");
+					categoryName = "${categoryName}",
+					groupName = "${groupName}");
 
 				Open(locator1 = "${baseURL}/web/${siteURLKey}/${layoutName}?p_p_id=com_liferay_message_boards_web_portlet_MBPortlet&_com_liferay_message_boards_web_portlet_MBPortlet_mvcRenderCommandName=%2Fmessage_boards%2Fedit_message&_com_liferay_message_boards_web_portlet_MBPortlet_redirect=http%3A%2F%2F${baseURL}%3A8080%2Fweb%2F${siteURLKey}%2F${layoutName}%2F-%2Fmessage_boards%2Fcategory%2F${categoryId}&_com_liferay_message_boards_web_portlet_MBPortlet_mbCategoryId=${categoryId}");
 			}
@@ -861,12 +923,10 @@ definition {
 			value1 = "${threadReplyBody}");
 
 		SelectFrame.selectFrameTop();
+	}
 
-		PortletEntry.publish();
-
-		if ("${markAsAnswer}" == "true") {
-			MessageboardsThread.markAsAnswerCP(threadReplyBody = "${threadReplyBody}");
-		}
+	macro replyNotPresent {
+		AssertElementNotPresent(locator1 = "Button#REPLY");
 	}
 
 	macro replyPG {
@@ -1089,7 +1149,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		if (IsElementPresent.isVisible(locator1 = "MessageBoards#THREAD_TABLE_ALL_CHECKBOX")) {
@@ -1105,6 +1165,20 @@ definition {
 		JSONRecycleBin.emptyRecycleBin();
 	}
 
+	macro unbanUser {
+		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "${siteURLKey}");
+
+		AssertClick(
+			locator1 = "MessageBoards#NAVIGATION_BANNED_USERS",
+			value1 = "Banned Users");
+
+		LexiconEntry.openEntryMenu(rowEntry = "${userScreenName}");
+
+		MenuItem.click(menuItem = "Unban This User");
+
+		Alert.viewSuccessMessage();
+	}
+
 	macro unlockPG {
 		MessageboardsThread.openToThread(
 			groupName = "${groupName}",
@@ -1117,6 +1191,19 @@ definition {
 		MenuItem.click(menuItem = "Unlock");
 
 		Alert.viewSuccessMessage();
+	}
+
+	macro updateCheckInterval {
+		var baseURL = PropsUtil.get("portal.url");
+
+		Open(locator1 = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet&_com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet_factoryPid=com.liferay.message.boards.configuration.MBConfiguration&_com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet_mvcRenderCommandName=%2Fconfiguration_admin%2Fedit_configuration");
+
+		Type(
+			key_text = "Expire Ban Job Interval",
+			locator1 = "TextInput#ANY",
+			value1 = "${fieldValue}");
+
+		SystemSettings.saveConfiguration();
 	}
 
 	macro viewAnonymousPostingCheckboxCP {
@@ -1160,6 +1247,12 @@ definition {
 			key_threadBody = "${threadBody}",
 			locator1 = "MessageBoardsThread#THREAD_BODY",
 			value1 = "${threadBody}");
+	}
+
+	macro viewBannedUserAuthenticationMessage {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Message#ERROR_DISMISSIBLE",
+			value1 = "You have been banned by the moderator.");
 	}
 
 	macro viewBBCodeNoXSS {
@@ -1309,6 +1402,24 @@ definition {
 			value1 = "Draft");
 	}
 
+	macro viewLinkedEntry {
+		Click(
+			key_text = "${linkedEntry}",
+			locator1 = "Link#ANY");
+
+		if (isSet(imageFileName)) {
+			AssertElementPresent(
+				key_imageSourceURL = "${imageFileName}",
+				locator1 = "DocumentsAndMediaDocument#DOCUMENT_VIEWPORT_PREVIEW");
+		}
+
+		if (isSet(pageName)) {
+			AssertVisible(
+				key_pageName = "${pageName}",
+				locator1 = "Home#PAGE_ACTIVE");
+		}
+	}
+
 	macro viewLockedPG {
 		var key_threadStatus = "Locked";
 		var key_threadSubject = "${threadSubject}";
@@ -1409,6 +1520,12 @@ definition {
 		AssertElementNotPresent(locator1 = "Checkbox#ANONYMOUS");
 	}
 
+	macro viewNoBannedUsers {
+		AssertTextEquals.assertText(
+			locator1 = "Message#EMPTY_INFO",
+			value1 = "There are no banned users.");
+	}
+
 	macro viewNoPG {
 		var key_repliesCount = "0";
 		var key_threadSubject = "${threadSubject}";
@@ -1479,7 +1596,6 @@ definition {
 				locator1 = "MessageBoardsThread#THREAD_BODY_BOLD",
 				value1 = "${threadBody}");
 		}
-
 		else {
 			AssertTextEquals(
 				locator1 = "MessageBoardsThread#THREAD_BODY",
@@ -1895,7 +2011,6 @@ definition {
 
 			MenuItem.viewNotPresent(menuItem = "Unsubscribe");
 		}
-
 		else {
 			Click(locator1 = "MessageBoards#VERTICAL_ELLIPSIS");
 

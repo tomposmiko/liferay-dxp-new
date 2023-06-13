@@ -36,8 +36,10 @@ definition {
 	}
 
 	@description = "This is a test for LPS-134599. The fragmentElementId variable will have the same value with the id of wrapping div in a fragment on page."
-	@priority = "4"
+	@priority = "5"
 	test AddFragmentWithFreemarkerVariableToContentPage {
+		property portal.acceptance = "true";
+
 		task ("Add a fragment collection") {
 			JSONFragment.addFragmentCollection(
 				groupName = "Test Site Name",
@@ -131,6 +133,8 @@ definition {
 	@description = "This is a test for LPS-125985. The Page Creater can configure configuration template of widget in page editor."
 	@priority = "5"
 	test ConfigureConfigurationTemplateOfAssetPublisherInPageEditor {
+		property portal.acceptance = "true";
+
 		task ("Add a web content") {
 			JSONWebcontent.addWebContent(
 				content = "Web Content Content",
@@ -297,11 +301,11 @@ definition {
 				key_text = "Publish",
 				locator1 = "Button#ANY_ENABLED");
 
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			WaitForPageLoad();
 
-			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+			PagesAdmin.openPageEllipsisMenu(pageName = "Test Content Page Name");
 
 			MenuItem.viewNotPresent(menuItem = "Discard Draft");
 		}
@@ -317,7 +321,7 @@ definition {
 		}
 
 		task ("Discard the draft") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			PageEditor.clickDiscardDraft(pageName = "Test Content Page Name");
 		}
@@ -327,9 +331,7 @@ definition {
 				pageName = "Test Content Page Name",
 				siteName = "Test Site Name");
 
-			AssertElementNotPresent(
-				key_fragmentName = "Heading",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.viewFragmentNotPresent(fragmentName = "Heading");
 		}
 
 		task ("Assert the Discard Draft button is not shown but Publish button still is enabled") {
@@ -337,11 +339,11 @@ definition {
 				key_text = "Publish",
 				locator1 = "Button#ANY_ENABLED");
 
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			WaitForPageLoad();
 
-			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+			PagesAdmin.openPageEllipsisMenu(pageName = "Test Content Page Name");
 
 			MenuItem.viewNotPresent(menuItem = "Discard Draft");
 		}
@@ -361,11 +363,11 @@ definition {
 				key_text = "Publish",
 				locator1 = "Button#ANY_ENABLED");
 
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			WaitForPageLoad();
 
-			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+			PagesAdmin.openPageEllipsisMenu(pageName = "Test Content Page Name");
 
 			MenuItem.viewPresent(menuItem = "Discard Draft");
 		}
@@ -389,11 +391,11 @@ definition {
 				key_text = "Publish",
 				locator1 = "Button#ANY_ENABLED");
 
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			WaitForPageLoad();
 
-			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+			PagesAdmin.openPageEllipsisMenu(pageName = "Test Content Page Name");
 
 			MenuItem.viewNotPresent(menuItem = "Discard Draft");
 		}
@@ -414,11 +416,11 @@ definition {
 				key_text = "Publish",
 				locator1 = "Button#ANY_ENABLED");
 
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			WaitForPageLoad();
 
-			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+			PagesAdmin.openPageEllipsisMenu(pageName = "Test Content Page Name");
 
 			MenuItem.viewPresent(menuItem = "Discard Draft");
 		}
@@ -447,11 +449,11 @@ definition {
 				key_text = "Publish",
 				locator1 = "Button#ANY_ENABLED");
 
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			WaitForPageLoad();
 
-			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+			PagesAdmin.openPageEllipsisMenu(pageName = "Test Content Page Name");
 
 			MenuItem.viewNotPresent(menuItem = "Discard Draft");
 		}
@@ -472,11 +474,11 @@ definition {
 				key_text = "Publish",
 				locator1 = "Button#ANY_ENABLED");
 
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			WaitForPageLoad();
 
-			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+			PagesAdmin.openPageEllipsisMenu(pageName = "Test Content Page Name");
 
 			MenuItem.viewPresent(menuItem = "Discard Draft");
 		}
@@ -494,9 +496,7 @@ definition {
 				pageName = "Test Content Page Name",
 				siteName = "Test Site Name");
 
-			AssertElementNotPresent(
-				key_fragmentName = "Paragraph",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.viewFragmentNotPresent(fragmentName = "Paragraph");
 		}
 
 		task ("Assert the Discard Draft button is not shown but Publish button still is enabled") {
@@ -504,17 +504,17 @@ definition {
 				key_text = "Publish",
 				locator1 = "Button#ANY_ENABLED");
 
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			WaitForPageLoad();
 
-			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+			PagesAdmin.openPageEllipsisMenu(pageName = "Test Content Page Name");
 
 			MenuItem.viewNotPresent(menuItem = "Discard Draft");
 		}
 	}
 
-	@description = "This is a test for LPS-134844. Fragments can be hidden and shown."
+	@description = "This is a test for LPS-134844 and LPS-106776. Fragments can be hidden and shown. Could add widget to react page editor."
 	@priority = "5"
 	@uitest
 	test FragmentsCanBeHiddenAndShown {
@@ -527,6 +527,7 @@ definition {
 
 			PageEditor.addWidget(portletName = "Blogs");
 		}
+
 		task ("Add fragments to page") {
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -547,9 +548,11 @@ definition {
 		task ("Hide Blogs from topper options") {
 			PageEditor.hideFragmentViaHeader(fragmentName = "Blogs");
 		}
+
 		task ("Hide Button fragment from fragment options") {
 			PageEditor.hideFragmentViaPageStyles(fragmentName = "Button");
 		}
+
 		task ("Hide Heading fragment from the sidebar fragment tree") {
 			PageEditor.hideFragmentViaPageStructure(fragmentName = "Heading");
 		}
@@ -565,20 +568,22 @@ definition {
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No entries were found.");
 
-			AssertTextNotPresent(
-				key_fragmentName = "heading",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "Heading Example");
+			AssertNotVisible(
+				fragmentName = "heading",
+				id = "element-text",
+				index = "1",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
 
-			AssertTextNotPresent(
-				key_fragmentName = "button",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "Go Somewhere");
+			AssertNotVisible(
+				fragmentName = "button",
+				id = "link",
+				index = "1",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
 
-			AssertTextEquals.assertPartialText(
-				key_fragmentName = "html",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "HTML Example");
+			ContentPages.viewFragmentText(
+				fragmentName = "html",
+				id = "element-html",
+				text = "HTML Example A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
 		}
 
 		task ("Publish and enter view mode") {
@@ -598,20 +603,22 @@ definition {
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No entries were found.");
 
-			AssertTextNotPresent(
-				key_fragmentName = "heading",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "Heading Example");
+			AssertNotVisible(
+				fragmentName = "heading",
+				id = "element-text",
+				index = "1",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
 
-			AssertTextNotPresent(
-				key_fragmentName = "button",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "Go Somewhere");
+			AssertNotVisible(
+				fragmentName = "button",
+				id = "link",
+				index = "1",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
 
-			AssertTextEquals.assertPartialText(
-				key_fragmentName = "html",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "HTML Example");
+			ContentPages.viewFragmentText(
+				fragmentName = "html",
+				id = "element-html",
+				text = "HTML Example A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
 		}
 
 		task ("Edit the page") {
@@ -619,12 +626,15 @@ definition {
 				pageName = "Test Content Page Name",
 				siteName = "Test Site Name");
 		}
+
 		task ("Unhide Blogs from the sidebar fragment tree") {
 			PageEditor.unhideFragmentViaPageStructure(fragmentName = "Blogs");
 		}
+
 		task ("Unhide Heading from fragment options") {
 			PageEditor.unhideFragmentViaPageStyles(fragmentName = "Heading");
 		}
+
 		task ("Unhide Button from sidebar fragment tree") {
 			PageEditor.unhideFragmentViaPageStructure(fragmentName = "Button");
 		}
@@ -646,20 +656,20 @@ definition {
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No entries were found.");
 
-			AssertTextEquals.assertPartialText(
-				key_fragmentName = "heading",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "Heading Example");
+			ContentPages.viewFragmentText(
+				fragmentName = "heading",
+				id = "element-text",
+				text = "Heading Example");
 
-			AssertTextEquals.assertPartialText(
-				key_fragmentName = "button",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "Go Somewhere");
+			ContentPages.viewFragmentText(
+				fragmentName = "button",
+				id = "link",
+				text = "Go Somewhere");
 
-			AssertTextEquals.assertPartialText(
-				key_fragmentName = "html",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "HTML Example");
+			ContentPages.viewFragmentText(
+				fragmentName = "html",
+				id = "element-html",
+				text = "HTML Example A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
 		}
 	}
 
@@ -701,6 +711,7 @@ definition {
 
 		task ("Hide Blogs and HTML") {
 			PageEditor.hideFragmentViaPageStructure(fragmentName = "Blogs");
+
 			PageEditor.hideFragmentViaPageStructure(fragmentName = "HTML");
 		}
 
@@ -709,11 +720,9 @@ definition {
 		}
 
 		task ("Assert no fragment or widget is shown") {
-			PageEditor.viewNoFragment(fragmentName = "Container");
-			PageEditor.viewNoFragment(fragmentName = "Blogs");
-			PageEditor.viewNoFragment(fragmentName = "HTML");
-			PageEditor.viewNoFragment(fragmentName = "Button");
-			PageEditor.viewNoFragment(fragmentName = "Heading");
+			for (var fragmentName : list "Container,Blogs,HTML,Button,Heading") {
+				PageEditor.viewFragmentNotPresent(fragmentName = "${fragmentName}");
+			}
 		}
 
 		task ("From the sidebar fragment tree, show HTML and Button") {
@@ -723,11 +732,9 @@ definition {
 		}
 
 		task ("Assert no fragment or widget is shown") {
-			PageEditor.viewNoFragment(fragmentName = "Container");
-			PageEditor.viewNoFragment(fragmentName = "Blogs");
-			PageEditor.viewNoFragment(fragmentName = "HTML");
-			PageEditor.viewNoFragment(fragmentName = "Button");
-			PageEditor.viewNoFragment(fragmentName = "Heading");
+			for (var fragmentName : list "Container,Blogs,HTML,Button,Heading") {
+				PageEditor.viewFragmentNotPresent(fragmentName = "${fragmentName}");
+			}
 		}
 
 		task ("Unhide the container") {
@@ -739,20 +746,21 @@ definition {
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No entries were found.");
 
-			AssertTextNotPresent(
-				key_fragmentName = "button",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "Go Somewhere");
+			AssertNotVisible(
+				fragmentName = "button",
+				id = "link",
+				index = "1",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
 
-			AssertTextEquals.assertPartialText(
-				key_fragmentName = "heading",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "Heading Example");
+			PageEditor.viewFragmentEditableText(
+				editableText = "Heading Example",
+				fragmentName = "Heading",
+				id = "element-text");
 
-			AssertTextEquals.assertPartialText(
-				key_fragmentName = "html",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "HTML Example");
+			PageEditor.viewFragmentEditableText(
+				editableText = "HTML Example A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.",
+				fragmentName = "HTML",
+				id = "element-html");
 		}
 
 		task ("Add fragment and check it's shown") {
@@ -763,10 +771,10 @@ definition {
 				navTab = "Fragments",
 				targetElementName = "Blogs");
 
-			AssertTextEquals.assertPartialText(
-				key_fragmentName = "paragraph",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
-				value1 = "A paragraph is a self-contained unit of a discourse");
+			PageEditor.viewFragmentEditableText(
+				editableText = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.",
+				fragmentName = "Paragraph",
+				id = "element-text");
 		}
 	}
 
@@ -791,49 +799,35 @@ definition {
 		}
 
 		task ("Assert only header of Heading shown when Heading selected") {
-			if (IsNotVisible(key_fragmentName = "Heading", locator1 = "Fragment#FRAGMENT_HEADER")) {
-				Click.clickNoWaitForVisible(
-					key_fragmentName = "Heading",
-					locator1 = "Fragment#FRAGMENT_HEADER");
-			}
+			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Heading");
 
-			AssertVisible(
-				key_fragmentName = "Heading",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.clickConfigurableField(fragmentName = "Heading");
 
-			AssertNotVisible(
-				key_fragmentName = "Asset Publisher",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.viewFragmentHeaderVisible(fragmentName = "Heading");
+
+			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Asset Publisher");
 
 			MouseOver.mouseOverInvisible(
 				key_fragmentName = "Asset Publisher",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+				key_index = "1",
+				locator1 = "Fragment#FRAGMENT_HEADER_ANY");
 
-			AssertNotVisible(
-				key_fragmentName = "Asset Publisher",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Asset Publisher");
 		}
 
 		task ("Assert only header of Asset Publisher shown when Asset Publisher selected") {
-			Click.clickNoWaitForVisible(
-				key_fragmentName = "Asset Publisher",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.clickConfigurableField(fragmentName = "Asset Publisher");
 
-			AssertVisible(
-				key_fragmentName = "Asset Publisher",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.viewFragmentHeaderVisible(fragmentName = "Asset Publisher");
 
-			AssertNotVisible(
-				key_fragmentName = "Heading",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Heading");
 
 			MouseOver.mouseOverInvisible(
 				key_fragmentName = "Heading",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+				key_index = "1",
+				locator1 = "Fragment#FRAGMENT_HEADER_ANY");
 
-			AssertNotVisible(
-				key_fragmentName = "Heading",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Heading");
 		}
 	}
 
@@ -888,12 +882,13 @@ definition {
 				fragmentName = "Heading",
 				index = "1");
 		}
+
 		task ("Publish page template") {
 			PageEditor.clickPublish();
 		}
 
 		task ("Add a page based on content page template") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				collectionName = "Page Template Collection",
@@ -902,17 +897,17 @@ definition {
 		}
 
 		task ("Assert Heading Example 1 is not shown") {
-			AssertTextNotPresent(
-				key_fragmentName = "heading",
-				key_index = "1",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT_INDEX",
-				value1 = "Heading Example 1");
+			AssertNotVisible(
+				fragmentName = "heading",
+				id = "element-text",
+				index = "1",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
 
-			AssertTextEquals(
-				key_fragmentName = "heading",
-				key_index = "2",
-				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT_INDEX",
-				value1 = "Heading Example 2");
+			ContentPages.viewFragmentText(
+				fragmentName = "heading",
+				id = "element-text",
+				position = "2",
+				text = "Heading Example 2");
 		}
 
 		task ("Show Heading Example 1") {
@@ -924,21 +919,21 @@ definition {
 		task ("Open the Preview modal") {
 			PageEditor.openPreviewMode();
 
-			SelectFrame(locator1 = "IFrame#MODAL_BODY");
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 		}
 
 		task ("Assert both Heading Example 1 and Heading Example 2 are shown") {
 			for (var n : list "1,2") {
-				AssertTextEquals(
-					key_fragmentName = "heading",
-					key_index = "${n}",
-					locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT_INDEX",
-					value1 = "Heading Example ${n}");
+				ContentPages.viewFragmentText(
+					fragmentName = "heading",
+					id = "element-text",
+					position = "${n}",
+					text = "Heading Example ${n}");
 			}
 		}
 	}
 
-	@description = "This is a test for LPS-106778. Reorganize fragments in page editor."
+	@description = "This is a use case for LPS-106776. Reorganize fragments in page editor."
 	@priority = "5"
 	@uitest
 	test ReorganizeFragmentsInPageEditor {
@@ -985,11 +980,12 @@ definition {
 			PageEditor.clickConfigurableField(fragmentName = "Button");
 
 			DragAndDrop.javaScriptDragAndDropToUp(
+				fragmentName = "heading",
 				id = "element-text",
+				index = "1",
 				key_dragFragmentName = "Button",
-				key_fragmentName = "Heading",
 				locator1 = "Fragment#FRAGMENT_HEADER_DRAG_HANDLER",
-				locator2 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD",
+				locator2 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
 				value1 = "");
 
 			PageEditor.waitForAutoSave();
@@ -1062,7 +1058,7 @@ definition {
 				panel = "Control Panel",
 				portlet = "Server Administration");
 
-			ServerAdministration.executeServerResourcesActions(actionsDescription = "Clean Up Orphaned Theme Portlet Preferences");
+			ServerAdministration.executeServerResourcesActions(actionsDescription = "Clean up orphaned theme portlet preferences.");
 		}
 
 		task ("View web content displayed at Title List in Asset Publisher at view mode") {
@@ -1167,7 +1163,7 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-130083. View the ellipsis button on the topper of fragment when the fragment is inside a nested Grid."
+	@description = "This is a test for LPS-130083 and LPS-106776. View the ellipsis button on the topper of fragment when the fragment is inside a nested Grid."
 	@priority = "4"
 	@uitest
 	test ViewEllipsisButtonOnTheTopperOfFragmentInsideNestedGrid {
@@ -1261,11 +1257,10 @@ definition {
 		task ("Assert Header of Card is shown over body when doesn't reach the management toolbar") {
 			ScrollWebElementIntoView(
 				key_fragmentName = "Card",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+				key_index = "1",
+				locator1 = "Fragment#FRAGMENT_HEADER_ANY");
 
-			Click.clickNoWaitForVisible(
-				key_fragmentName = "Card",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.clickConfigurableField(fragmentName = "Card");
 
 			AssertElementNotPresent(
 				key_fragmentName = "Card",
@@ -1275,7 +1270,8 @@ definition {
 		task ("Assert Header of Card moves inside body when reach the management toolbar") {
 			ScrollWebElementIntoView(
 				key_fragmentName = "Image",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+				key_index = "1",
+				locator1 = "Fragment#FRAGMENT_HEADER_ANY");
 
 			AssertElementPresent(
 				key_fragmentName = "Card",
@@ -1310,11 +1306,10 @@ definition {
 		task ("Assert Header of Blogs is shown over body when doesn't reach the management toolbar") {
 			ScrollWebElementIntoView(
 				key_fragmentName = "Blogs",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+				key_index = "1",
+				locator1 = "Fragment#FRAGMENT_HEADER_ANY");
 
-			Click.clickNoWaitForVisible(
-				key_fragmentName = "Blogs",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+			PageEditor.clickConfigurableField(fragmentName = "Blogs");
 
 			AssertElementNotPresent(
 				key_fragmentName = "Blogs",
@@ -1324,7 +1319,8 @@ definition {
 		task ("Assert Header of Blogs moves inside body when reach the management toolbar") {
 			ScrollWebElementIntoView(
 				key_fragmentName = "My Sites",
-				locator1 = "Fragment#FRAGMENT_HEADER");
+				key_index = "1",
+				locator1 = "Fragment#FRAGMENT_HEADER_ANY");
 
 			AssertElementPresent(
 				key_fragmentName = "Blogs",
@@ -1393,7 +1389,7 @@ definition {
 		}
 
 		task ("Add a page based on content page template") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				collectionName = "Page Template Collection",
@@ -1508,7 +1504,7 @@ definition {
 		}
 
 		task ("Assert the Asset Publisher is invisible to Guest") {
-			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			User.logoutPG();
 

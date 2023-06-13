@@ -301,6 +301,7 @@ public abstract class BaseDB implements DB {
 		return _SUPPORTS_UPDATE_WITH_INNER_JOIN;
 	}
 
+	@Override
 	public void process(UnsafeConsumer<Long, Exception> unsafeConsumer)
 		throws Exception {
 
@@ -781,6 +782,10 @@ public abstract class BaseDB implements DB {
 
 	protected abstract String[] getTemplate();
 
+	protected String limitColumnLength(String column, int length) {
+		return StringBundler.concat(column, "\\(", length, "\\)");
+	}
+
 	protected String replaceTemplate(String template) {
 		if (Validator.isNull(template)) {
 			return null;
@@ -864,21 +869,21 @@ public abstract class BaseDB implements DB {
 		Matcher matcher = _columnLengthPattern.matcher(template);
 
 		if (stringIndexMaxLength < 0) {
-			return matcher.replaceAll(StringPool.BLANK);
+			return matcher.replaceAll("$1");
 		}
 
 		StringBuffer sb = new StringBuffer();
 
-		String replacement = "\\(" + stringIndexMaxLength + "\\)";
-
 		while (matcher.find()) {
-			int length = Integer.valueOf(matcher.group(1));
+			int length = Integer.valueOf(matcher.group(2));
 
 			if (length > stringIndexMaxLength) {
-				matcher.appendReplacement(sb, replacement);
+				matcher.appendReplacement(
+					sb,
+					limitColumnLength(matcher.group(1), stringIndexMaxLength));
 			}
 			else {
-				matcher.appendReplacement(sb, StringPool.BLANK);
+				matcher.appendReplacement(sb, matcher.group(1));
 			}
 		}
 
@@ -902,7 +907,7 @@ public abstract class BaseDB implements DB {
 	private static final Log _log = LogFactoryUtil.getLog(BaseDB.class);
 
 	private static final Pattern _columnLengthPattern = Pattern.compile(
-		"\\[\\$COLUMN_LENGTH:(\\d+)\\$\\]");
+		"([^,(\\s]+)\\[\\$COLUMN_LENGTH:(\\d+)\\$\\]");
 	private static final Pattern _templatePattern;
 
 	static {

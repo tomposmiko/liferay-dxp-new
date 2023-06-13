@@ -19,7 +19,6 @@ Export-Package:\
 	\
 	!aQute.lib.filter,\
 	\
-	!com.liferay.portal.aspectj,\
 	!com.liferay.portal.cache.thread.local,\
 	!com.liferay.portal.dao.jdbc.aop,\
 	!com.liferay.portal.fabric,\
@@ -55,7 +54,6 @@ Export-Package:\
 	!com.liferay.portal.tools.sourceformatter,\
 	!com.liferay.portal.tools.sql,\
 	!com.liferay.portal.velocity,\
-	!com.liferay.portal.xuggler,\
 	!com.liferay.portlet.documentlibrary.sharepoint,\
 	!com.liferay.portlet.layoutsadmin.lar,\
 	!com.liferay.portlet.sitesadmin.lar,\
@@ -102,18 +100,17 @@ Export-Package:\
 	\
 	com.liferay.ibm.icu.*;version='4.0.1',\
 	\
+	com.rometools.rome;version='1.16.0',\
+	com.rometools.rome.feed;version='1.16.0',\
+	com.rometools.rome.feed.atom;version='1.16.0',\
+	com.rometools.rome.feed.impl;version='1.16.0',\
+	com.rometools.rome.feed.module;version='1.16.0',\
+	com.rometools.rome.feed.rss;version='1.16.0',\
+	com.rometools.rome.feed.synd;version='1.16.0',\
+	com.rometools.rome.io;version='1.16.0',\
+	com.rometools.utils;version='1.16.0',\
+	\
 	com.sun.security.auth.module,\
-	com.sun.syndication;version='1.0',\
-	com.sun.syndication.feed;version='1.0',\
-	com.sun.syndication.feed.atom;version='1.0',\
-	com.sun.syndication.feed.impl;version='1.0',\
-	com.sun.syndication.feed.module;version='1.0',\
-	com.sun.syndication.feed.module.impl;version='1.0',\
-	com.sun.syndication.feed.rss;version='1.0',\
-	com.sun.syndication.feed.synd;version='1.0',\
-	com.sun.syndication.feed.synd.impl;version='1.0',\
-	com.sun.syndication.io;version='1.0',\
-	com.sun.syndication.io.impl;version='1.0',\
 	\
 	com.thoughtworks.xstream.*;version='1.4.17',\
 	\
@@ -225,20 +222,20 @@ Export-Package:\
 	org.apache.commons.logging;version="1.2",\
 	org.apache.commons.logging.impl;version="1.2",\
 	org.apache.commons.validator.routines;version='1.5.1',\
-	org.apache.log4j;version='2.14.1',\
-	org.apache.log4j.spi;version='2.14.1',\
-	org.apache.logging.log4j;version='2.14.1',\
-	org.apache.logging.log4j.core;version='2.14.1',\
-	org.apache.logging.log4j.core.appender;version='2.14.1',\
-	org.apache.logging.log4j.core.config;version='2.14.1',\
-	org.apache.logging.log4j.core.config.composite;version='2.14.1',\
-	org.apache.logging.log4j.core.config.xml;version='2.14.1',\
-	org.apache.logging.log4j.core.impl;version='2.14.1',\
-	org.apache.logging.log4j.core.layout;version='2.14.1',\
-	org.apache.logging.log4j.core.selector;version='2.14.1',\
-	org.apache.logging.log4j.core.util;version='2.14.1',\
-	org.apache.logging.log4j.message;version='2.14.1',\
-	org.apache.logging.log4j.spi;version='2.14.1',\
+	org.apache.log4j;version='2.17.0',\
+	org.apache.log4j.spi;version='2.17.0',\
+	org.apache.logging.log4j;version='2.17.0',\
+	org.apache.logging.log4j.core;version='2.17.0',\
+	org.apache.logging.log4j.core.appender;version='2.17.0',\
+	org.apache.logging.log4j.core.config;version='2.17.0',\
+	org.apache.logging.log4j.core.config.composite;version='2.17.0',\
+	org.apache.logging.log4j.core.config.xml;version='2.17.0',\
+	org.apache.logging.log4j.core.impl;version='2.17.0',\
+	org.apache.logging.log4j.core.layout;version='2.17.0',\
+	org.apache.logging.log4j.core.selector;version='2.17.0',\
+	org.apache.logging.log4j.core.util;version='2.17.0',\
+	org.apache.logging.log4j.message;version='2.17.0',\
+	org.apache.logging.log4j.spi;version='2.17.0',\
 	org.apache.naming.java,\
 	org.apache.regexp;version='2.7.1',\
 	org.apache.tika.*;version='1.26.0',\
@@ -254,15 +251,13 @@ Export-Package:\
 	org.apache.xmlcommons;version='1.4.01',\
 	org.apache.xpath.*;version='2.7.1',\
 	\
-	org.aspectj.*,\
-	\
 	org.dom4j.*;version='2.1.3',\
 	\
 	org.hibernate.*;version='3.6.10',\
 	\
 	org.jaxen.*;version='1.1.6',\
 	\
-	org.jdom.*;version='1.1.3',\
+	org.jdom2.*;version='2.0.6',\
 	\
 	org.json.*;version='20180813',\
 	\
@@ -328,7 +323,6 @@ Provide-Capability:\
 	@../../../lib/portal/asm-tree.jar,\
 	@../../../lib/portal/asm-util.jar,\
 	@../../../lib/portal/asm.jar,\
-	@../../../lib/portal/aspectj-rt.jar,\
 	@../../../lib/portal/ccpp.jar,\
 	@../../../lib/portal/commons-beanutils.jar,\
 	@../../../lib/portal/commons-chain.jar,\
@@ -342,7 +336,7 @@ Provide-Capability:\
 	@../../../lib/portal/hibernate-core.jar,\
 	@../../../lib/portal/jaxen.jar,\
 	@../../../lib/portal/jaxrpc.jar,\
-	@../../../lib/portal/jdom.jar!/org/**,\
+	@../../../lib/portal/jdom2.jar!/org/**,\
 	@../../../lib/portal/jodd-json.jar,\
 	@../../../lib/portal/jodd-proxetta.jar,\
 	@../../../lib/portal/jodd-util.jar,\
@@ -355,7 +349,8 @@ Provide-Capability:\
 	@../../../lib/portal/persistence.jar,\
 	@../../../lib/portal/portlet.jar,\
 	@../../../lib/portal/portletmvc4spring-framework.jar,\
-	@../../../lib/portal/rome.jar,\
+	@../../../lib/portal/rometools-utils.jar,\
+	@../../../lib/portal/rometools.jar,\
 	@../../../lib/portal/slf4j-api.jar,\
 	@../../../lib/portal/spring-aop.jar,\
 	@../../../lib/portal/spring-aspects.jar,\

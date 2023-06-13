@@ -21,9 +21,9 @@ export const DIAGRAM_EVENTS = {
 
 export const DIAGRAM_TABLE_EVENTS = {
 	HIGHLIGHT_PIN: 'diagram-highlight-pin',
-	PINS_UPDATED: 'diagram-table-updated',
 	REMOVE_PIN_HIGHLIGHT: 'diagram-remove-pin-highlight',
 	SELECT_PIN: 'diagram-select-pin',
+	TABLE_UPDATED: 'diagram-table-updated',
 };
 
 export const RADIUS_SIZES = [
@@ -55,7 +55,7 @@ export const ZOOM_STEP = 0.25;
 export const ZOOM_VALUES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 3, 5];
 
 export const HEADERS = new Headers({
-	Accept: 'application/json',
+	'Accept': 'application/json',
 	'Accept-Language': Liferay.ThemeDisplay.getBCP47LanguageId(),
 	'Content-Type': 'application/json',
 });
@@ -104,3 +104,7 @@ export const LINKING_OPTIONS = {
 };
 
 export const DIAGRAM_LABELS_MAX_LENGTH = 6;
+
+export const ZOOM_DISABLED = process.env.NODE_ENV === 'test';
+
+export const TRANSITIONS_DISABLED = ZOOM_DISABLED;

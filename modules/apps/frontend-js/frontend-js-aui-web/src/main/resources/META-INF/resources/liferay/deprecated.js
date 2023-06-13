@@ -12,14 +12,14 @@
  * details.
  */
 
+/* eslint-disable @liferay/aui/no-one */
+
 // For details about this file see: LPS-2155
 
 (function (A) {
 	var Util = Liferay.Util;
 
 	var Lang = A.Lang;
-
-	var AObject = A.Object;
 
 	var htmlEscapedValues = [];
 	var htmlUnescapedValues = [];
@@ -36,7 +36,8 @@
 
 	var MAP_HTML_CHARS_UNESCAPED = {};
 
-	AObject.each(MAP_HTML_CHARS_ESCAPED, (item, index) => {
+	// eslint-disable-next-line @liferay/aui/no-object
+	A.Object.each(MAP_HTML_CHARS_ESCAPED, (item, index) => {
 		MAP_HTML_CHARS_UNESCAPED[item] = index;
 
 		htmlEscapedValues.push(item);
@@ -105,8 +106,8 @@
 				var nodeType = target.get('type');
 
 				if (
-					(tagName == 'input' && /text|password/.test(nodeType)) ||
-					tagName == 'textarea'
+					(tagName === 'input' && /text|password/.test(nodeType)) ||
+					tagName === 'textarea'
 				) {
 					var action = 'addClass';
 
@@ -290,7 +291,7 @@
 				var disabled = function () {
 					var currentValue = selectBox.val();
 
-					var visible = value == currentValue;
+					var visible = value === currentValue;
 
 					if (dynamicValue) {
 						visible = value(currentValue, value);
@@ -316,7 +317,7 @@
 		(textarea) => {
 			textarea = A.one(textarea);
 
-			if (textarea && textarea.attr('textareatabs') != 'enabled') {
+			if (textarea && textarea.attr('textareatabs') !== 'enabled') {
 				textarea.attr('textareatabs', 'disabled');
 
 				textarea.detach('keydown', Util.textareaTabs);
@@ -334,7 +335,7 @@
 		(textarea) => {
 			textarea = A.one(textarea);
 
-			if (textarea && textarea.attr('textareatabs') != 'enabled') {
+			if (textarea && textarea.attr('textareatabs') !== 'enabled') {
 				textarea.attr('textareatabs', 'disabled');
 
 				textarea.on('keydown', Util.textareaTabs);
@@ -382,6 +383,7 @@
 			}
 
 			if (element) {
+				// eslint-disable-next-line @liferay/aui/no-get-body
 				var pageBody = A.getBody();
 
 				var diff;
@@ -392,7 +394,7 @@
 					if (usingRichEditor) {
 						try {
 							if (
-								element.get('nodeName').toLowerCase() !=
+								element.get('nodeName').toLowerCase() !==
 								'iframe'
 							) {
 								element = window[elString];

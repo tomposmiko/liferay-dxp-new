@@ -22,7 +22,7 @@ definition {
 				userLoginEmailAddress = "test@liferay.com",
 				userLoginFullName = "Test Test");
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 
 			Site.tearDownCP();
 		}
@@ -325,14 +325,12 @@ definition {
 		PageEditor.editFragmentText(
 			contributed = "false",
 			fragmentName = "Content",
-			id = "content",
 			text = "Editing Finished");
 
 		PageEditor.viewFragmentEditableText(
 			contributed = "false",
 			editableText = "Editing Finished",
-			fragmentName = "Content",
-			id = "content");
+			fragmentName = "Content");
 
 		SiteTemplatesNavigator.openSiteTemplatesAdmin();
 
@@ -362,15 +360,14 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Edit",
 			pageName = "Test Template Content Page");
 
 		PageEditor.viewFragmentEditableText(
 			contributed = "false",
 			editableText = "Editing Finished",
-			fragmentName = "Content",
-			id = "content");
+			fragmentName = "Content");
 
 		AssertConsoleTextNotPresent(value1 = "javax.portlet.PortletException:");
 
@@ -419,9 +416,7 @@ definition {
 			dmDocumentFile = "Document_1.jpg",
 			dmDocumentTitle = "DM Document Title");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		DMNavigator.gotoDocumentType();
+		DMNavigator.openDocumentTypesAdmin(siteURLKey = "site-name");
 
 		DMDocumentType.add(
 			dmDocumentTypeDescription = "DM Document Type Description",
@@ -464,7 +459,7 @@ definition {
 		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "global");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLDataDefinition.addCP(
@@ -481,7 +476,7 @@ definition {
 		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "global");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLList.addCP(
@@ -507,7 +502,7 @@ definition {
 		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "global");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		LAR.exportPortlet(
@@ -517,7 +512,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		LAR.importPortlet(
@@ -529,7 +524,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLNavigator.gotoListRecords(ddlListName = "DDL List");
@@ -1022,7 +1017,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPrivatePage(pageName = "Private Page");
+		PagesAdmin.addPrivatePage(pageName = "Private Page");
 
 		Navigator.gotoPrivateSitePage(
 			pageName = "Private Page",
@@ -1222,13 +1217,13 @@ definition {
 	test ExportImportThemeSettings {
 		JSONGroup.addGroup(groupName = "Site Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "Site Name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "Site Name");
 
-		SitePages.addPublicPage(pageName = "Test Page");
+		PagesAdmin.addPublicPage(pageName = "Test Page");
 
-		SitePages.openPagesAdmin(siteURLKey = "Site Name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "Site Name");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Page");
 
@@ -1270,7 +1265,7 @@ definition {
 			pageName = "Test Page",
 			siteName = "Site Name 2");
 
-		Page.viewCurrentThemeSettings(
+		PagesAdmin.viewWidgetPageCurrentTheme(
 			checkThemeSettingList = "Show Maximize/Minimize Application Links",
 			pageName = "Test Page",
 			uncheckThemeSettingList = "Show Header Search");
@@ -1703,7 +1698,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Bookmarks");
 
 		AssertTextEquals(
@@ -1713,9 +1708,60 @@ definition {
 		LAR.importPortlet(
 			cannotImport = "true",
 			compressedFile = "true",
-			filePath = "enduser/exportimport",
 			larFileName = "bookmarks-corrupted.portlet.lar",
 			uploadFrom = "dependencies");
+	}
+
+	@description = "This is a test for LPS-135706 - Verified that exporting and importing a Documents & Media URL does not append UUID to the imported URL if it was not there to begin with"
+	@priority = "3"
+	test ImportDMUrlWithoutUUID {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.jpg",
+			dmDocumentTitle = "DM Document Title");
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
+
+		DMDocument.expandInfo();
+
+		var dmDocumentURL = selenium.getAttribute("//input[contains(@id,'urlInput')]@value");
+		var editDocumentURL = StringUtil.extractFirst("${dmDocumentURL}", "jpg");
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+
+		WebContentNavigator.gotoAddCP();
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		CKEditor.addSourceContent(content = '''<a href="${editDocumentURL}jpg">Link to Document</a>''');
+
+		PortletEntry.publish();
+
+		ProductMenu.gotoPortlet(
+			category = "Publishing",
+			portlet = "Export");
+
+		LexiconEntry.gotoAdd();
+
+		LAR.exportWithAssertionOnSuccess();
+
+		var larFileName = LAR.getLarFileName();
+
+		LAR.downloadLar();
+
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		LAR.importSiteCP(
+			larFileName = "${larFileName}",
+			siteName = "Site Name");
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		CKEditor.assertSourceContent();
 	}
 
 	@description = "This is a use case for LPS-84290 - Verified that can export Home Folder Permissions"

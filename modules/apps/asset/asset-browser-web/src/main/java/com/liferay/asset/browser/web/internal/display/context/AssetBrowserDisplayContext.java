@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Sort;
@@ -148,6 +149,9 @@ public class AssetBrowserDisplayContext {
 
 		if (Objects.equals(getOrderByCol(), "modified-date")) {
 			sort = new Sort(Field.MODIFIED_DATE, Sort.LONG_TYPE, !orderByAsc);
+		}
+		else if (Objects.equals(getOrderByCol(), "relevance")) {
+			sort = new Sort(null, Sort.SCORE_TYPE, false);
 		}
 		else if (Objects.equals(getOrderByCol(), "title")) {
 			String sortFieldName = Field.getSortableFieldName(
@@ -454,50 +458,47 @@ public class AssetBrowserDisplayContext {
 	}
 
 	protected String getOrderByCol() {
-		if (_orderByCol != null) {
+		if (Validator.isNotNull(_orderByCol)) {
 			return _orderByCol;
 		}
 
-		String orderByCol = ParamUtil.getString(
-			_httpServletRequest, "orderByCol");
+		if (isSearch()) {
+			_orderByCol = ParamUtil.getString(
+				_httpServletRequest, "orderByCol", "relevance");
 
-		if (Validator.isNotNull(orderByCol)) {
-			_portalPreferences.setValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-col",
-				orderByCol);
-		}
-		else {
-			orderByCol = _portalPreferences.getValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-col",
-				"modified-date");
+			return _orderByCol;
 		}
 
-		_orderByCol = orderByCol;
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_httpServletRequest, AssetBrowserPortletKeys.ASSET_BROWSER,
+			"modified-date");
 
 		return _orderByCol;
 	}
 
 	protected String getOrderByType() {
-		if (_orderByType != null) {
+		if (Validator.isNotNull(_orderByType)) {
 			return _orderByType;
 		}
 
-		String orderByType = ParamUtil.getString(
-			_httpServletRequest, "orderByType");
-
-		if (Validator.isNotNull(orderByType)) {
-			_portalPreferences.setValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-type",
-				orderByType);
-		}
-		else {
-			orderByType = _portalPreferences.getValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-type", "asc");
+		if (Objects.equals(getOrderByCol(), "relevance")) {
+			return "desc";
 		}
 
-		_orderByType = orderByType;
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_httpServletRequest, AssetBrowserPortletKeys.ASSET_BROWSER, "asc");
 
 		return _orderByType;
+	}
+
+	protected boolean isSearch() {
+		if (AssetBrowserWebConfigurationValues.SEARCH_WITH_DATABASE ||
+			Validator.isNull(_getKeywords())) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	private long[] _getClassNameIds() {

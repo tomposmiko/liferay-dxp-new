@@ -1,14 +1,12 @@
 definition {
 
-	macro addSiteAndPage {
+	macro addPage {
 		if (!(isSet(siteName))) {
-			siteName = "Site Name";
+			var siteName = "Site Name";
 		}
 
-		JSONGroup.addGroup(groupName = "${siteName}");
-
 		if (!(isSet(layoutName))) {
-			layoutName = "AC Page";
+			var layoutName = "AC Page";
 		}
 
 		JSONLayout.addPublicLayout(
@@ -16,9 +14,25 @@ definition {
 			layoutName = "${layoutName}");
 	}
 
+	macro addSiteAndPage {
+		if (!(isSet(siteName))) {
+			var siteName = "Site Name";
+		}
+
+		JSONGroup.addGroup(groupName = "${siteName}");
+
+		if (!(isSet(layoutName))) {
+			var layoutName = "AC Page";
+		}
+
+		ACUtils.addPage(
+			layoutName = "${layoutName}",
+			siteName = "${siteName}");
+	}
+
 	macro addWidgetToPage {
 		if (!(isSet(layoutName))) {
-			layoutName = "AC Page";
+			var layoutName = "AC Page";
 		}
 
 		JSONLayout.addWidgetToPublicLayout(
@@ -31,6 +45,121 @@ definition {
 			siteName = "Site Name");
 	}
 
+	macro assertActiveIndividualChart {
+		var key_timeFilter = "${timeFilter}";
+
+		if (isSet(visitorLegend)) {
+			var key_visitorLegend = "${visitorLegend}";
+
+			MouseOver(locator1 = "ACIndividualsDashboard#VISITORS_LEGEND");
+
+			while (IsElementNotPresent(locator1 = "ACIndividualsDashboard#ACTIVE_INDIVIDUAL_CHART") && (maxIterations = "50")) {
+				TestUtils.hardRefresh();
+
+				if ("${timeFilter}" != "Custom Range") {
+					ACTimeFilter.clickTimeFilterButton();
+
+					if ("${timeFilter}" == "Last 24 hours") {
+						ACTimeFilter.setLast24Hours();
+					}
+
+					if ("${timeFilter}" == "Yesterday") {
+						ACTimeFilter.setYesterday();
+					}
+
+					if ("${timeFilter}" == "Last 7 days") {
+						ACTimeFilter.setLast7Days();
+					}
+
+					if ("${timeFilter}" == "Last 28 days") {
+						ACTimeFilter.setLast28Days();
+					}
+
+					if ("${timeFilter}" == "Last 30 days") {
+						ACTimeFilter.setLast30Days();
+					}
+
+					if ("${timeFilter}" == "Last 90 days") {
+						ACTimeFilter.setLast90Days();
+					}
+
+					if ("${timeFilter}" == "Last 180 days") {
+						ACTimeFilter.setLast180Days();
+					}
+
+					if ("${timeFilter}" == "Last Year") {
+						ACTimeFilter.setLastYear();
+					}
+				}
+
+				if ("${timeFilter}" == "Custom Range") {
+					ACTimeFilter.setCustomRange(
+						endDay = "${endDay}",
+						endMonth = "${endMonth}",
+						endYear = "${endYear}",
+						startDay = "${startDay}",
+						startMonth = "${startMonth}",
+						startYear = "${startYear}");
+				}
+
+				MouseOver(locator1 = "ACIndividualsDashboard#VISITORS_LEGEND");
+			}
+		}
+		else {
+			while (IsElementNotPresent(locator1 = "ACIndividualsDashboard#ACTIVE_INDIVIDUAL_CHART") && (maxIterations = "50")) {
+				TestUtils.hardRefresh();
+
+				if ("${timeFilter}" != "Custom Range") {
+					ACTimeFilter.clickTimeFilterButton();
+
+					if ("${timeFilter}" == "Last 24 hours") {
+						ACTimeFilter.setLast24Hours();
+					}
+
+					if ("${timeFilter}" == "Yesterday") {
+						ACTimeFilter.setYesterday();
+					}
+
+					if ("${timeFilter}" == "Last 7 days") {
+						ACTimeFilter.setLast7Days();
+					}
+
+					if ("${timeFilter}" == "Last 28 days") {
+						ACTimeFilter.setLast28Days();
+					}
+
+					if ("${timeFilter}" == "Last 30 days") {
+						ACTimeFilter.setLast30Days();
+					}
+
+					if ("${timeFilter}" == "Last 90 days") {
+						ACTimeFilter.setLast90Days();
+					}
+
+					if ("${timeFilter}" == "Last 180 days") {
+						ACTimeFilter.setLast180Days();
+					}
+
+					if ("${timeFilter}" == "Last Year") {
+						ACTimeFilter.setLastYear();
+					}
+				}
+
+				if ("${timeFilter}" == "Custom Range") {
+					ACTimeFilter.setCustomRange(
+						endDay = "${endDay}",
+						endMonth = "${endMonth}",
+						endYear = "${endYear}",
+						startDay = "${startDay}",
+						startMonth = "${startMonth}",
+						startYear = "${startYear}");
+				}
+			}
+		}
+
+		AssertElementPresent(locator1 = "ACIndividualsDashboard#ACTIVE_INDIVIDUAL_CHART");
+	}
+
 	macro assertAudienceCard {
 		var key_index = "${index}";
 
@@ -41,7 +170,9 @@ definition {
 				TestUtils.hardRefresh();
 			}
 
-			AssertElementPresent(locator1 = "ACUtils#METRIC_VALUE_PERCENTAGE");
+			AssertTextEquals(
+				locator1 = "ACUtils#METRIC_VALUE_PERCENTAGE",
+				value1 = "${percentage}");
 		}
 	}
 
@@ -77,7 +208,6 @@ definition {
 		if ("${match}" == "true") {
 			echo("PASSED");
 		}
-
 		else {
 			fail("The ${date} doesn't follow the expected format ${format}");
 		}
@@ -93,7 +223,7 @@ definition {
 
 	macro assertEventNotPresent {
 		var postDataText = ProxyUtil.getHarRecording("$..request..postData..text");
-		var actual = JSONUtil.getWithJSONPath("[${postDataText}]","$..[?(@['applicationId'] == '${applicationId}' && @['eventId'] == '${eventId}')]['eventId']");
+		var actual = JSONUtil.getWithJSONPath("[${postDataText}]", "$..[?(@['applicationId'] == '${applicationId}' && @['eventId'] == '${eventId}')]['eventId']");
 
 		TestUtils.assertEquals(
 			actual = "${actual}",
@@ -102,7 +232,7 @@ definition {
 
 	macro assertEventPresent {
 		var postDataText = ProxyUtil.getHarRecording("$..request..postData..text");
-		var actual = JSONUtil.getWithJSONPath("[${postDataText}]","$..[?(@['applicationId'] == '${applicationId}' && @['eventId'] == '${eventId}')]['eventId']");
+		var actual = JSONUtil.getWithJSONPath("[${postDataText}]", "$..[?(@['applicationId'] == '${applicationId}' && @['eventId'] == '${eventId}')]['eventId']");
 
 		TestUtils.assertEquals(
 			actual = "${actual}",
@@ -111,7 +241,7 @@ definition {
 
 	macro assertEventPropertyValue {
 		var postDataText = ProxyUtil.getHarRecording("$..request..postData..text");
-		var actual = JSONUtil.getWithJSONPath("[${postDataText}]","$..[?(@['applicationId'] == '${applicationId}' && @['eventId'] == '${eventId}')]..${property}");
+		var actual = JSONUtil.getWithJSONPath("[${postDataText}]", "$..[?(@['applicationId'] == '${applicationId}' && @['eventId'] == '${eventId}')]..${property}");
 
 		TestUtils.assertEquals(
 			actual = "${actual}",
@@ -214,7 +344,6 @@ definition {
 		if ("${match}" == "true") {
 			echo("PASSED");
 		}
-
 		else {
 			fail("The ${time} doesn't follow the expected format ${format}");
 		}
@@ -222,6 +351,7 @@ definition {
 
 	macro assertXAxisTimedGraph {
 		var key_parentName = "${parentName}";
+
 		AssertElementPresent(locator1 = "ACUtils#SVG_TIMED_GRAPH");
 	}
 
@@ -255,6 +385,7 @@ definition {
 
 	macro clickAnyButton {
 		var buttonName = "${button}";
+
 		Click(
 			key_buttonName = "${buttonName}",
 			locator1 = "ACUtils#GENERIC_BUTTON");
@@ -270,11 +401,7 @@ definition {
 		var cleanCurl = '''
 			${analyticsCloudAsahCuratorURL}/admin/sessions/close \
 			-H 'Content-Type: application/json' \
-			-d '{
-				"query": {
-					"match_all": {}
-				}
-			}'
+			-H 'osb-asah-project-id: osbasah'
 		''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${cleanCurl}");
@@ -295,7 +422,7 @@ definition {
 
 	macro createBlogsAndAddToPage {
 		if (!(isSet(layoutName))) {
-			layoutName = "AC Page";
+			var layoutName = "AC Page";
 		}
 
 		Navigator.gotoSitePage(
@@ -309,7 +436,7 @@ definition {
 		}
 
 		if (!(isSet(entryTitle))) {
-			entryTitle = "Blogs AC Title";
+			var entryTitle = "Blogs AC Title";
 		}
 
 		JSONBlog.addEntry(
@@ -320,7 +447,7 @@ definition {
 
 	macro createDMAndAddToPage {
 		if (!(isSet(layoutName))) {
-			layoutName = "AC Page";
+			var layoutName = "AC Page";
 		}
 
 		Navigator.gotoSitePage(
@@ -334,11 +461,11 @@ definition {
 		}
 
 		if (!(isSet(dmDocumentTitle))) {
-			dmDocumentTitle = "DM AC Title";
+			var dmDocumentTitle = "DM AC Title";
 		}
 
 		if (!(isSet(dmDocumentFile))) {
-			dmDocumentFile = "Document_1.jpg";
+			var dmDocumentFile = "Document_1.jpg";
 		}
 
 		JSONDocument.addFileWithUploadedFile(
@@ -354,7 +481,7 @@ definition {
 		}
 
 		if (!(isSet(layoutName))) {
-			layoutName = "AC Page";
+			var layoutName = "AC Page";
 		}
 
 		ACUtils.addWidgetToPage(
@@ -386,15 +513,15 @@ definition {
 
 	macro createWCAndAddToPage {
 		if (!(isSet(layoutName))) {
-			layoutName = "AC Page";
+			var layoutName = "AC Page";
 		}
 
 		if (!(isSet(webContentTitle))) {
-			webContentTitle = "Web Content AC Title";
+			var webContentTitle = "Web Content AC Title";
 		}
 
 		if (!(isSet(webContentContent))) {
-			webContentContent = "This is the web content test for AC";
+			var webContentContent = "This is the web content test for AC";
 
 			JSONWebcontent.addWebContent(
 				content = "${webContentContent}",
@@ -420,16 +547,22 @@ definition {
 			siteName = "Site Name");
 	}
 
+	@summary = "Dismiss Onboarding Modal if it appears when launching AC"
+	macro dismissOnboardingModal {
+		if (IsElementPresent(locator1 = "ACSettings#MODAL_SCREEN")) {
+			Click(locator1 = "ACSettings#CLOSE_ONBOARDING_MODAL");
+		}
+	}
+
 	macro getEventPropertyValue {
 		var postDataText = ProxyUtil.getHarRecording("$..request..postData..text");
-		var value = JSONUtil.getWithJSONPath("[${postDataText}]","$..[?(@['applicationId'] == '${applicationId}' && @['eventId'] == '${eventId}')]..${property}");
+		var value = JSONUtil.getWithJSONPath("[${postDataText}]", "$..[?(@['applicationId'] == '${applicationId}' && @['eventId'] == '${eventId}')]..${property}");
 
 		return "${value}";
 	}
 
 	macro getIPCountry {
 		var curl = '''https://ipinfo.io''';
-
 		var code = JSONCurlUtil.get("${curl}", "$.country");
 
 		if ("${code}" == "GB") {
@@ -461,14 +594,14 @@ definition {
 
 	macro getPageRefRequestPropertyValue {
 		var postDataText = ProxyUtil.getHarRecording("$..[?(@['pageref'] == '${pageRef}')].request[?(@.method == 'POST' && @.url contains '/${pageRef}')]..text");
-		var value = JSONUtil.getWithJSONPath("[${postDataText}]","$..${property}");
+		var value = JSONUtil.getWithJSONPath("[${postDataText}]", "$..${property}");
 
 		return "${value}";
 	}
 
 	macro getRequestCommonPropertyValue {
 		var postDataText = ProxyUtil.getHarRecording("$..request..postData..text");
-		var value = JSONUtil.getWithJSONPath("[${postDataText}]","$.[-1:].${property}");
+		var value = JSONUtil.getWithJSONPath("[${postDataText}]", "$.[-1:].${property}");
 
 		return "${value}";
 	}
@@ -479,7 +612,7 @@ definition {
 		Open(locator1 = "${analyticsCloudURL}");
 
 		if (!(isSet(emailAddress))) {
-			emailAddress = "test@liferay.com";
+			var emailAddress = "test@liferay.com";
 		}
 
 		if (IsElementPresent(locator1 = "ACLogin#EMAIL_LOGIN_FIELD")) {
@@ -500,7 +633,7 @@ definition {
 		Navigator.openURL();
 
 		if (!(isSet(userEmailAddress))) {
-			userEmailAddress = "test@liferay.com";
+			var userEmailAddress = "test@liferay.com";
 		}
 
 		if (IsElementNotPresent(locator1 = "ApplicationsMenu#APPLICATIONS_MENU")) {
@@ -656,8 +789,12 @@ definition {
 		for (var name : list "${nameList}") {
 			var key_nameList = "${name}";
 
+			WaitForPageLoad();
+
 			while (IsElementNotPresent(locator1 = "ACUtils#NAME_LIST") && (maxIterations = "50")) {
-				Refresh();
+				ACSegments.searchSegment(findSegment = "${name}");
+
+				ACUtils.clearSearchBar();
 			}
 
 			AssertTextEquals(
@@ -668,8 +805,9 @@ definition {
 
 	macro viewNameListInOrder {
 		var key_userName = "${name}";
-
 		var index = "${index}";
+
+		WaitForPageLoad();
 
 		while (IsElementNotPresent(locator1 = "ACSegments#ADD_MEMBERS_INDEX_TABLE") && (maxIterations = "50")) {
 			Refresh();
@@ -682,6 +820,8 @@ definition {
 
 	macro viewNoResultsMessage {
 		var key_noResultMessage = "${noResultMessage}";
+
+		WaitForPageLoad();
 
 		while (IsElementNotPresent(locator1 = "ACAssets#NO_RESULTS_CONTENT_MESSAGE") && (maxIterations = "50")) {
 			TestUtils.hardRefresh();

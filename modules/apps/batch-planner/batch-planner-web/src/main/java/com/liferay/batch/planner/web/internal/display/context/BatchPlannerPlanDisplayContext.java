@@ -60,6 +60,8 @@ public class BatchPlannerPlanDisplayContext extends BaseDisplayContext {
 		_searchContainer = new SearchContainer<>(
 			renderRequest, getPortletURL(), null, "no-items-were-found");
 
+		_searchContainer.setId("batchPlannerPlanSearchContainer");
+
 		String orderByCol = ParamUtil.getString(
 			renderRequest, SearchContainer.DEFAULT_ORDER_BY_COL_PARAM,
 			"modifiedDate");
@@ -82,28 +84,28 @@ public class BatchPlannerPlanDisplayContext extends BaseDisplayContext {
 		if (navigation.equals("all")) {
 			_searchContainer.setResults(
 				BatchPlannerPlanServiceUtil.getBatchPlannerPlans(
-					companyId, _searchContainer.getStart(),
+					companyId, true, _searchContainer.getStart(),
 					_searchContainer.getEnd(),
 					OrderByComparatorFactoryUtil.create(
 						"BatchPlannerPlan", orderByCol,
 						orderByType.equals("asc"))));
 			_searchContainer.setTotal(
 				BatchPlannerPlanServiceUtil.getBatchPlannerPlansCount(
-					companyId));
+					companyId, true));
 		}
 		else {
 			boolean export = isExport(navigation);
 
 			_searchContainer.setResults(
 				BatchPlannerPlanServiceUtil.getBatchPlannerPlans(
-					companyId, export, _searchContainer.getStart(),
+					companyId, export, true, _searchContainer.getStart(),
 					_searchContainer.getEnd(),
 					OrderByComparatorFactoryUtil.create(
 						"BatchPlannerPlan", orderByCol,
 						orderByType.equals("asc"))));
 			_searchContainer.setTotal(
 				BatchPlannerPlanServiceUtil.getBatchPlannerPlansCount(
-					companyId, export));
+					companyId, export, true));
 		}
 
 		return _searchContainer;

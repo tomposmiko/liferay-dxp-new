@@ -213,6 +213,10 @@ public class PropsValues {
 	public static final String AUTH_LOGIN_PORTLET_NAME = PropsUtil.get(
 		PropsKeys.AUTH_LOGIN_PORTLET_NAME);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
 	public static final boolean AUTH_LOGIN_PROMPT_ENABLED =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.AUTH_LOGIN_PROMPT_ENABLED));
@@ -268,14 +272,8 @@ public class PropsValues {
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.AUTO_DEPLOY_CUSTOM_PORTLET_XML));
 
-	public static final String AUTO_DEPLOY_DEFAULT_DEST_DIR = PropsUtil.get(
-		PropsKeys.AUTO_DEPLOY_DEFAULT_DEST_DIR);
-
 	public static final String AUTO_DEPLOY_DEPLOY_DIR = PropsUtil.get(
 		PropsKeys.AUTO_DEPLOY_DEPLOY_DIR);
-
-	public static final String AUTO_DEPLOY_DEST_DIR = PropsUtil.get(
-		PropsKeys.AUTO_DEPLOY_DEST_DIR);
 
 	public static final boolean AUTO_DEPLOY_ENABLED = GetterUtil.getBoolean(
 		PropsUtil.get(PropsKeys.AUTO_DEPLOY_ENABLED));
@@ -283,20 +281,8 @@ public class PropsValues {
 	public static final int AUTO_DEPLOY_INTERVAL = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.AUTO_DEPLOY_INTERVAL));
 
-	public static final String AUTO_DEPLOY_JBOSS_PREFIX = PropsUtil.get(
-		PropsKeys.AUTO_DEPLOY_JBOSS_PREFIX);
-
 	public static final String AUTO_DEPLOY_TOMCAT_CONF_DIR = PropsUtil.get(
 		PropsKeys.AUTO_DEPLOY_TOMCAT_CONF_DIR);
-
-	public static final String AUTO_DEPLOY_TOMCAT_DEST_DIR = PropsUtil.get(
-		PropsKeys.AUTO_DEPLOY_TOMCAT_DEST_DIR);
-
-	public static final String AUTO_DEPLOY_TOMCAT_LIB_DIR = PropsUtil.get(
-		PropsKeys.AUTO_DEPLOY_TOMCAT_LIB_DIR);
-
-	public static final boolean AUTO_DEPLOY_UNPACK_WAR = GetterUtil.getBoolean(
-		PropsUtil.get(PropsKeys.AUTO_DEPLOY_UNPACK_WAR));
 
 	public static final String
 		AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_INSTALL_OPTIONS =
@@ -323,9 +309,6 @@ public class PropsValues {
 
 	public static final String AUTO_DEPLOY_WEBSPHERE_WSADMIN_PROPERTIES_FILE =
 		PropsUtil.get(PropsKeys.AUTO_DEPLOY_WEBSPHERE_WSADMIN_PROPERTIES_FILE);
-
-	public static final String AUTO_DEPLOY_WILDFLY_PREFIX = PropsUtil.get(
-		PropsKeys.AUTO_DEPLOY_WILDFLY_PREFIX);
 
 	public static final boolean AXIS_SERVLET_ENABLED = GetterUtil.getBoolean(
 		PropsUtil.get(PropsKeys.AXIS_SERVLET_ENABLED));
@@ -1153,16 +1136,6 @@ public class PropsValues {
 		HIBERNATE_SESSION_FACTORY_IMPORTED_CLASS_NAME_REGEXP = PropsUtil.get(
 			PropsKeys.HIBERNATE_SESSION_FACTORY_IMPORTED_CLASS_NAME_REGEXP);
 
-	public static final boolean HOT_UNDEPLOY_ENABLED = GetterUtil.getBoolean(
-		PropsUtil.get(PropsKeys.HOT_UNDEPLOY_ENABLED));
-
-	public static final int HOT_UNDEPLOY_INTERVAL = GetterUtil.getInteger(
-		PropsUtil.get(PropsKeys.HOT_UNDEPLOY_INTERVAL));
-
-	public static final boolean HOT_UNDEPLOY_ON_REDEPLOY =
-		GetterUtil.getBoolean(
-			PropsUtil.get(PropsKeys.HOT_UNDEPLOY_ON_REDEPLOY));
-
 	public static final String HTTP_HEADER_VERSION_VERBOSITY = PropsUtil.get(
 		PropsKeys.HTTP_HEADER_VERSION_VERBOSITY);
 
@@ -1257,9 +1230,6 @@ public class PropsValues {
 	public static final boolean INTRABAND_PROXY_DUMP_CLASSES_ENABLED =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.INTRABAND_PROXY_DUMP_CLASSES_ENABLED));
-
-	public static final boolean JAVADOC_MANAGER_ENABLED = GetterUtil.getBoolean(
-		PropsUtil.get(PropsKeys.JAVADOC_MANAGER_ENABLED));
 
 	public static final boolean JAVASCRIPT_BAREBONE_ENABLED =
 		GetterUtil.getBoolean(
@@ -1528,6 +1498,10 @@ public class PropsValues {
 	public static final String LIFERAY_HOME = PropsUtil.get(
 		PropsKeys.LIFERAY_HOME);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String LIFERAY_LIB_GLOBAL_DIR = PropsUtil.get(
 		PropsKeys.LIFERAY_LIB_GLOBAL_DIR);
 
@@ -2139,25 +2113,6 @@ public class PropsValues {
 
 	public static String PHONE_NUMBER_FORMAT_USA_REGEXP = GetterUtil.getString(
 		PropsUtil.get(PropsKeys.PHONE_NUMBER_FORMAT_USA_REGEXP));
-
-	public static final boolean PLUGIN_NOTIFICATIONS_ENABLED =
-		GetterUtil.getBoolean(
-			PropsUtil.get(PropsKeys.PLUGIN_NOTIFICATIONS_ENABLED));
-
-	public static final String[] PLUGIN_NOTIFICATIONS_PACKAGES_IGNORED =
-		StringUtil.splitLines(
-			PropsUtil.get(PropsKeys.PLUGIN_NOTIFICATIONS_PACKAGES_IGNORED));
-
-	public static final String[] PLUGIN_REPOSITORIES_TRUSTED =
-		StringUtil.splitLines(
-			PropsUtil.get(PropsKeys.PLUGIN_REPOSITORIES_TRUSTED));
-
-	public static final String[] PLUGIN_REPOSITORIES_UNTRUSTED =
-		StringUtil.splitLines(
-			PropsUtil.get(PropsKeys.PLUGIN_REPOSITORIES_UNTRUSTED));
-
-	public static final String[] PLUGIN_TYPES = PropsUtil.getArray(
-		PropsKeys.PLUGIN_TYPES);
 
 	public static final long POLLER_NOTIFICATIONS_TIMEOUT =
 		GetterUtil.getInteger(
@@ -3238,18 +3193,16 @@ public class PropsValues {
 	public static final boolean XML_VALIDATION_ENABLED = GetterUtil.getBoolean(
 		PropsUtil.get(PropsKeys.XML_VALIDATION_ENABLED));
 
-	public static final boolean XUGGLER_ENABLED = GetterUtil.getBoolean(
-		PropsUtil.get(PropsKeys.XUGGLER_ENABLED));
-
-	public static final String XUGGLER_JAR_URL = PropsUtil.get(
-		PropsKeys.XUGGLER_JAR_URL);
-
 	public static final int YUI_COMPRESSOR_CSS_LINE_BREAK =
 		GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.YUI_COMPRESSOR_CSS_LINE_BREAK));
 
 	public static final String ZIP_FILE_NAME_ENCODING = GetterUtil.getString(
 		PropsUtil.get(PropsKeys.ZIP_FILE_NAME_ENCODING));
+
+	public static final long ZIP_FILE_WRITER_EXPORT_BUFFER_SIZE =
+		GetterUtil.getLong(
+			PropsUtil.get(PropsKeys.ZIP_FILE_WRITER_EXPORT_BUFFER_SIZE));
 
 	static {
 		if (!LAYOUT_USER_PRIVATE_LAYOUTS_ENABLED) {

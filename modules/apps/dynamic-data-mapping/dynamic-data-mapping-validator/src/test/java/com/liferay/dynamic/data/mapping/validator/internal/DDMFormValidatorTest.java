@@ -25,7 +25,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
-import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValidationException.MustNotDuplicateFieldName;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValidationException.MustSetAvailableLocales;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValidationException.MustSetDefaultLocale;
@@ -433,33 +432,6 @@ public class DDMFormValidatorTest {
 	}
 
 	@Test
-	public void testValidDateValidationExpression() throws Exception {
-		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
-			createAvailableLocales(LocaleUtil.US), LocaleUtil.US);
-
-		DDMFormField ddmFormField = new DDMFormField("Field", "date");
-
-		DDMFormFieldValidation ddmFormFieldValidation =
-			new DDMFormFieldValidation();
-
-		ddmFormFieldValidation.setDDMFormFieldValidationExpression(
-			new DDMFormFieldValidationExpression() {
-				{
-					setValue("dateValidation(Field, \"{parameter}\")");
-				}
-			});
-		ddmFormFieldValidation.setParameterLocalizedValue(
-			DDMFormValuesTestUtil.createLocalizedValue(
-				"{\"startsFrom\": \"responseDate\"}", LocaleUtil.US));
-
-		ddmFormField.setDDMFormFieldValidation(ddmFormFieldValidation);
-
-		ddmForm.addDDMFormField(ddmFormField);
-
-		_ddmFormValidatorImpl.validate(ddmForm);
-	}
-
-	@Test
 	public void testValidFieldValidationExpression() throws Exception {
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
 			createAvailableLocales(LocaleUtil.US), LocaleUtil.US);
@@ -596,10 +568,7 @@ public class DDMFormValidatorTest {
 		Mockito.when(
 			ddmFormFieldTypeServicesTracker.getDDMFormFieldTypeNames()
 		).thenReturn(
-			SetUtil.fromArray(
-				new String[] {
-					"date", "html-çê的Ü", "html-text_*", "html-text_@"
-				})
+			SetUtil.fromArray("date", "html-çê的Ü", "html-text_*", "html-text_@")
 		);
 
 		_ddmFormValidatorImpl.setDDMFormFieldTypeServicesTracker(

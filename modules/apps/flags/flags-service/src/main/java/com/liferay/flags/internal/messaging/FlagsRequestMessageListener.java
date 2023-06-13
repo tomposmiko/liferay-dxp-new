@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroupGroupRole;
 import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserGroupGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -231,6 +233,17 @@ public class FlagsRequestMessageListener extends BaseMessageListener {
 			for (UserGroupRole userGroupRole : userGroupRoles) {
 				recipients.add(userGroupRole.getUser());
 			}
+
+			List<UserGroupGroupRole> userGroupGroupRoles =
+				_userGroupGroupRoleLocalService.
+					getUserGroupGroupRolesByGroupAndRole(
+						groupId, role.getRoleId());
+
+			for (UserGroupGroupRole userGroupGroupRole : userGroupGroupRoles) {
+				recipients.addAll(
+					_userLocalService.getUserGroupUsers(
+						userGroupGroupRole.getUserGroupId()));
+			}
 		}
 
 		if (recipients.isEmpty()) {
@@ -283,42 +296,6 @@ public class FlagsRequestMessageListener extends BaseMessageListener {
 		subscriptionSender.flushNotificationsAsync();
 	}
 
-	@Reference(unbind = "-")
-	protected void setCompanyLocalService(
-		CompanyLocalService companyLocalService) {
-
-		_companyLocalService = companyLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setGroupLocalService(GroupLocalService groupLocalService) {
-		_groupLocalService = groupLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setLayoutLocalService(
-		LayoutLocalService layoutLocalService) {
-
-		_layoutLocalService = layoutLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setRoleLocalService(RoleLocalService roleLocalService) {
-		_roleLocalService = roleLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setUserGroupRoleLocalService(
-		UserGroupRoleLocalService userGroupRoleLocalService) {
-
-		_userGroupRoleLocalService = userGroupRoleLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setUserLocalService(UserLocalService userLocalService) {
-		_userLocalService = userLocalService;
-	}
-
 	private String _getGroupDescriptiveName(Group group, Locale locale) {
 		try {
 			return group.getDescriptiveName(locale);
@@ -336,12 +313,27 @@ public class FlagsRequestMessageListener extends BaseMessageListener {
 	private static final Log _log = LogFactoryUtil.getLog(
 		FlagsRequestMessageListener.class);
 
+	@Reference
 	private CompanyLocalService _companyLocalService;
+
 	private DefaultMessagingConfigurator _defaultMessagingConfigurator;
+
+	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
 	private LayoutLocalService _layoutLocalService;
+
+	@Reference
 	private RoleLocalService _roleLocalService;
+
+	@Reference
+	private UserGroupGroupRoleLocalService _userGroupGroupRoleLocalService;
+
+	@Reference
 	private UserGroupRoleLocalService _userGroupRoleLocalService;
+
+	@Reference
 	private UserLocalService _userLocalService;
 
 }

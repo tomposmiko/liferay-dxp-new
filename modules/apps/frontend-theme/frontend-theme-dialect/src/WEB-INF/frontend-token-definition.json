@@ -755,19 +755,6 @@
 							],
 							"name": "colorActionPrimaryInvertedDisabled",
 							"type": "String"
-						},
-						{
-							"defaultValue": "#5e38ba",
-							"editorType": "ColorPicker",
-							"label": "color-action-primary-visited",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "color-action-primary-visited"
-								}
-							],
-							"name": "colorActionPrimaryVisited",
-							"type": "String"
 						}
 					],
 					"label": "primary-actions",
@@ -891,19 +878,6 @@
 							],
 							"name": "colorActionSecondaryInvertedDisabled",
 							"type": "String"
-						},
-						{
-							"defaultValue": "#5e38ba",
-							"editorType": "ColorPicker",
-							"label": "color-action-secondary-visited",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "color-action-secondary-visited"
-								}
-							],
-							"name": "colorActionSecondaryVisited",
-							"type": "String"
 						}
 					],
 					"label": "secondary-actions",
@@ -1026,19 +1000,6 @@
 								}
 							],
 							"name": "colorActionNeutralInvertedDisabled",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#5e38ba",
-							"editorType": "ColorPicker",
-							"label": "color-action-neutral-visited",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "color-action-neutral-visited"
-								}
-							],
-							"name": "colorActionNeutralVisited",
 							"type": "String"
 						}
 					],
@@ -1329,6 +1290,19 @@
 						{
 							"defaultValue": "#fdcc4a",
 							"editorType": "ColorPicker",
+							"label": "color-chart-1",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "color-chart-1"
+								}
+							],
+							"name": "colorChart1",
+							"type": "String"
+						},
+						{
+							"defaultValue": "#ad9ee9",
+							"editorType": "ColorPicker",
 							"label": "color-chart-2",
 							"mappings": [
 								{
@@ -1340,7 +1314,7 @@
 							"type": "String"
 						},
 						{
-							"defaultValue": "#ad9ee9",
+							"defaultValue": "#fe8856",
 							"editorType": "ColorPicker",
 							"label": "color-chart-3",
 							"mappings": [
@@ -1353,7 +1327,7 @@
 							"type": "String"
 						},
 						{
-							"defaultValue": "#fe8856",
+							"defaultValue": "#002c62",
 							"editorType": "ColorPicker",
 							"label": "color-chart-4",
 							"mappings": [
@@ -1366,7 +1340,7 @@
 							"type": "String"
 						},
 						{
-							"defaultValue": "#002c62",
+							"defaultValue": "#78cc88",
 							"editorType": "ColorPicker",
 							"label": "color-chart-5",
 							"mappings": [
@@ -1376,6 +1350,97 @@
 								}
 							],
 							"name": "colorChart5",
+							"type": "String"
+						},
+						{
+							"defaultValue": "#912600",
+							"editorType": "ColorPicker",
+							"label": "color-chart-6",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "color-chart-6"
+								}
+							],
+							"name": "colorChart6",
+							"type": "String"
+						},
+						{
+							"defaultValue": "#ff8585",
+							"editorType": "ColorPicker",
+							"label": "color-chart-7",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "color-chart-7"
+								}
+							],
+							"name": "colorChart7",
+							"type": "String"
+						},
+						{
+							"defaultValue": "#41a0a6",
+							"editorType": "ColorPicker",
+							"label": "color-chart-8",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "color-chart-8"
+								}
+							],
+							"name": "colorChart8",
+							"type": "String"
+						},
+						{
+							"defaultValue": "#3a6ba1",
+							"editorType": "ColorPicker",
+							"label": "color-chart-9",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "color-chart-9"
+								}
+							],
+							"name": "colorChart9",
+							"type": "String"
+						},
+						{
+							"defaultValue": "#4d006e",
+							"editorType": "ColorPicker",
+							"label": "color-chart-10",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "color-chart-10"
+								}
+							],
+							"name": "colorChart10",
+							"type": "String"
+						},
+						{
+							"defaultValue": "#8a6a00",
+							"editorType": "ColorPicker",
+							"label": "color-chart-11",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "color-chart-11"
+								}
+							],
+							"name": "colorChart11",
+							"type": "String"
+						},
+						{
+							"defaultValue": "#00520a",
+							"editorType": "ColorPicker",
+							"label": "color-chart-12",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "color-chart-12"
+								}
+							],
+							"name": "colorChart12",
 							"type": "String"
 						}
 					],
@@ -1402,11 +1467,149 @@
 					"name": "global"
 				}
 			],
-			"label": "dialect-colors",
-			"name": "dialectColors"
+			"label": "color-system",
+			"name": "colorSystem"
 		},
 		{
 			"frontendTokenSets": [
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "Manrope, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+							"label": "font-family-sans-serif",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "font-family-sans-serif"
+								}
+							],
+							"name": "fontFamilySansSerif",
+							"type": "String"
+						},
+						{
+							"defaultValue": "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+							"label": "font-family-monospace",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "font-family-monospace"
+								}
+							],
+							"name": "fontFamilyMonospace",
+							"type": "String"
+						},
+						{
+							"defaultValue": "Manrope, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+							"label": "font-family-base",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "font-family-base"
+								}
+							],
+							"name": "fontFamilyBase",
+							"type": "String"
+						}
+					],
+					"label": "font-family",
+					"name": "fontFamily"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--text-paragraph-font-size)",
+							"label": "font-size-base",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "font-size-base"
+								}
+							],
+							"name": "fontSizeBase",
+							"type": "String"
+						}
+					],
+					"label": "font-size",
+					"name": "fontSize"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "lighter",
+							"label": "font-weight-lighter",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "font-weight-lighter"
+								}
+							],
+							"name": "fontWeightLighter",
+							"type": "String"
+						},
+						{
+							"defaultValue": "300",
+							"label": "font-weight-light",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "font-weight-light"
+								}
+							],
+							"name": "fontWeightLight",
+							"type": "String"
+						},
+						{
+							"defaultValue": "500",
+							"label": "font-weight-normal",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "font-weight-normal"
+								}
+							],
+							"name": "fontWeightNormal",
+							"type": "String"
+						},
+						{
+							"defaultValue": "600",
+							"label": "font-weight-semi-bold",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "font-weight-semi-bold"
+								}
+							],
+							"name": "fontWeightSemiBold",
+							"type": "String"
+						},
+						{
+							"defaultValue": "700",
+							"label": "font-weight-bold",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "font-weight-bold"
+								}
+							],
+							"name": "fontWeightBold",
+							"type": "String"
+						},
+						{
+							"defaultValue": "800",
+							"label": "font-weight-bolder",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "font-weight-bolder"
+								}
+							],
+							"name": "fontWeightBolder",
+							"type": "String"
+						}
+					],
+					"label": "font-weight",
+					"name": "fontWeight"
+				},
 				{
 					"frontendTokens": [
 						{
@@ -1536,7 +1739,199 @@
 				{
 					"frontendTokens": [
 						{
+							"defaultValue": "2.3125rem",
+							"label": "h1-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "h1-font-size"
+								}
+							],
+							"name": "h1FontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "2rem",
+							"label": "h2-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "h2-font-size"
+								}
+							],
+							"name": "h2FontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1.75rem",
+							"label": "h3-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "h3-font-size"
+								}
+							],
+							"name": "h3FontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1.5rem",
+							"label": "h4-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "h4-font-size"
+								}
+							],
+							"name": "h4FontSize",
+							"type": "String"
+						},
+						{
 							"defaultValue": "1.125rem",
+							"label": "h5-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "h5-font-size"
+								}
+							],
+							"name": "h5FontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0.875rem",
+							"label": "h6-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "h6-font-size"
+								}
+							],
+							"name": "h6FontSize",
+							"type": "String"
+						}
+					],
+					"label": "headings",
+					"name": "headings"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "6rem",
+							"label": "display-1-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "display1-size"
+								}
+							],
+							"name": "display1Size",
+							"type": "String"
+						},
+						{
+							"defaultValue": "5.5rem",
+							"label": "display-2-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "display2-size"
+								}
+							],
+							"name": "display2Size",
+							"type": "String"
+						},
+						{
+							"defaultValue": "3.0625rem",
+							"label": "display-3-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "display3-size"
+								}
+							],
+							"name": "display3Size",
+							"type": "String"
+						},
+						{
+							"defaultValue": "2.6875rem",
+							"label": "display-4-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "display4-size"
+								}
+							],
+							"name": "display4Size",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--font-weight-light)",
+							"label": "display-1-weight",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "display1-weight"
+								}
+							],
+							"name": "display1Weight",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--font-weight-light)",
+							"label": "display-2-weight",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "display2-weight"
+								}
+							],
+							"name": "display2Weight",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--font-weight-light)",
+							"label": "display-3-weight",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "display3-weight"
+								}
+							],
+							"name": "display3Weight",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--font-weight-light)",
+							"label": "display-4-weight",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "display4-weight"
+								}
+							],
+							"name": "display4Weight",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1.2",
+							"label": "display-line-height",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "display-line-height"
+								}
+							],
+							"name": "displayLineHeight",
+							"type": "String"
+						}
+					],
+					"label": "displays",
+					"name": "displays"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "0.875rem",
 							"label": "text-small-caps-font-size",
 							"mappings": [
 								{
@@ -1652,13 +2047,242 @@
 					],
 					"label": "text-links",
 					"name": "textLinks"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "1.25rem",
+							"label": "lead-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "lead-font-size"
+								}
+							],
+							"name": "leadFontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--font-weight-light)",
+							"label": "lead-font-weight",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "lead-font-weight"
+								}
+							],
+							"name": "leadFontWeight",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-neutral-4)",
+							"editorType": "ColorPicker",
+							"label": "text-muted",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "text-muted"
+								}
+							],
+							"name": "textMuted",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1.25rem",
+							"label": "blockquote-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "blockquote-font-size"
+								}
+							],
+							"name": "blockquoteFontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-neutral-6)",
+							"editorType": "ColorPicker",
+							"label": "blockquote-small-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "blockquote-small-color"
+								}
+							],
+							"name": "blockquoteSmallColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "80%",
+							"label": "blockquote-small-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "blockquote-small-font-size"
+								}
+							],
+							"name": "blockquoteSmallFontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "rgba(0, 0, 0, .1)",
+							"label": "hr-border-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "hr-border-color"
+								}
+							],
+							"name": "hrBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1px",
+							"label": "hr-border-width",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "hr-border-width"
+								}
+							],
+							"name": "hrBorderWidth",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1rem",
+							"label": "hr-border-margin-y",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "hr-border-margin-y"
+								}
+							],
+							"name": "hrBorderMarginY",
+							"type": "String"
+						}
+					],
+					"label": "other",
+					"name": "other"
 				}
 			],
-			"label": "dialect-typography",
-			"name": "dialectTypography"
+			"label": "typography",
+			"name": "typography"
 		},
 		{
 			"frontendTokenSets": [
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--color-neutral-0)",
+							"editorType": "ColorPicker",
+							"label": "body-bg",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "body-bg"
+								}
+							],
+							"name": "bodyBgColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-neutral-9)",
+							"editorType": "ColorPicker",
+							"label": "body-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "body-color"
+								}
+							],
+							"name": "bodyColor",
+							"type": "String"
+						}
+					],
+					"label": "body",
+					"name": "body"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--color-action-primary-default)",
+							"editorType": "ColorPicker",
+							"label": "link-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "link-color"
+								}
+							],
+							"name": "linkColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-action-primary-hover)",
+							"editorType": "ColorPicker",
+							"label": "link-hover-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "link-hover-color"
+								}
+							],
+							"name": "linkHoverColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "initial",
+							"editorType": "ColorPicker",
+							"label": "link-visited-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "link-visited-color"
+								}
+							],
+							"name": "linkVisitedColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "none",
+							"label": "link-text-decoration",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "link-text-decoration"
+								}
+							],
+							"name": "linkTextDecoration",
+							"type": "String"
+						},
+						{
+							"defaultValue": "underline",
+							"label": "link-hover-text-decoration",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "link-hover-text-decoration"
+								}
+							],
+							"name": "linkHoverTextDecoration",
+							"type": "String"
+						},
+						{
+							"defaultValue": "none",
+							"label": "link-visited-text-decoration",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "link-visited-text-decoration"
+								}
+							],
+							"name": "linkVisitedTextDecoration",
+							"type": "String"
+						}
+					],
+					"label": "links",
+					"name": "links"
+				},
 				{
 					"frontendTokens": [
 						{
@@ -1760,6 +2384,48 @@
 					],
 					"label": "border-radius",
 					"name": "borderRadius"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--elevation-tight-3) rgba(0, 0, 0, .15)",
+							"label": "box-shadow",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "box-shadow"
+								}
+							],
+							"name": "boxShadow",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--elevation-tight-1) rgba(0, 0, 0, .075)",
+							"label": "box-shadow-sm",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "box-shadow-sm"
+								}
+							],
+							"name": "boxShadowSm",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--elevation-fluffy-3) rgba(0, 0, 0, .175)",
+							"label": "box-shadow-lg",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "box-shadow-lg"
+								}
+							],
+							"name": "boxShadowLg",
+							"type": "String"
+						}
+					],
+					"label": "box-shadows",
+					"name": "boxShadows"
 				},
 				{
 					"frontendTokens": [
@@ -1958,94 +2624,1174 @@
 					],
 					"label": "elevations",
 					"name": "elevations"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "100%",
+							"label": "aspect-ratio-1",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "aspect-ratio-1"
+								}
+							],
+							"name": "aspectRatio1",
+							"type": "String"
+						},
+						{
+							"defaultValue": "calc(3 / 4 * 100%)",
+							"label": "aspect-ratio-2",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "aspect-ratio-2"
+								}
+							],
+							"name": "aspectRatio2",
+							"type": "String"
+						},
+						{
+							"defaultValue": "calc(2 / 3 * 100%)",
+							"label": "aspect-ratio-3",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "aspect-ratio-3"
+								}
+							],
+							"name": "aspectRatio3",
+							"type": "String"
+						},
+						{
+							"defaultValue": "calc(5 / 8 * 100%)",
+							"label": "aspect-ratio-4",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "aspect-ratio-4"
+								}
+							],
+							"name": "aspectRatio4",
+							"type": "String"
+						},
+						{
+							"defaultValue": "calc(9 / 16 * 100%)",
+							"label": "aspect-ratio-5",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "aspect-ratio-5"
+								}
+							],
+							"name": "aspectRatio5",
+							"type": "String"
+						},
+						{
+							"defaultValue": "calc(1 / 2 * 100%)",
+							"label": "aspect-ratio-6",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "aspect-ratio-6"
+								}
+							],
+							"name": "aspectRatio6",
+							"type": "String"
+						}
+					],
+					"label": "aspect-ratios",
+					"name": "aspectRatios"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "0.2s ease-in-out",
+							"label": "transition-base",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "transition-base"
+								}
+							],
+							"name": "transitionBase",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0.35s ease",
+							"label": "transition-collapse",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "transition-collapse"
+								}
+							],
+							"name": "transitionCollapse",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0.15s linear",
+							"label": "transition-fade",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "transition-fade"
+								}
+							],
+							"name": "transitionFade",
+							"type": "String"
+						}
+					],
+					"label": "transitions",
+					"name": "transitions"
 				}
 			],
-			"label": "dialect-general",
-			"name": "dialectGeneral"
+			"label": "general",
+			"name": "general"
 		},
 		{
 			"frontendTokenSets": [
 				{
 					"frontendTokens": [
 						{
-							"defaultValue": "100%",
-							"label": "nav-link-horizontal-active-indicator-length",
+							"defaultValue": "0",
+							"label": "spacer-0",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "nav-link-horizontal-active-indicator-length"
+									"value": "spacer-0"
 								}
 							],
-							"name": "navLinkHorizontalActiveIndicatorLength",
-							"type": "String"
-						},
-						{
-							"defaultValue": "0.125rem",
-							"label": "nav-link-horizontal-active-indicator-thickness",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "nav-link-horizontal-active-indicator-thickness"
-								}
-							],
-							"name": "navLinkHorizontalActiveIndicatorThickness",
-							"type": "String"
-						},
-						{
-							"defaultValue": "0 1rem",
-							"label": "nav-link-horizontal-margin",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "nav-link-horizontal-margin"
-								}
-							],
-							"name": "navLinkHorizontalMargin",
-							"type": "String"
-						},
-						{
-							"defaultValue": "100%",
-							"label": "nav-link-vertical-active-indicator-length",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "nav-link-vertical-active-indicator-length"
-								}
-							],
-							"name": "navLinkVerticalActiveIndicatorLength",
+							"name": "spacer0",
 							"type": "String"
 						},
 						{
 							"defaultValue": "0.25rem",
-							"label": "nav-link-vertical-active-indicator-thickness",
+							"label": "spacer-1",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "nav-link-vertical-active-indicator-thickness"
+									"value": "spacer-1"
 								}
 							],
-							"name": "navLinkVerticalActiveIndicatorThickness",
+							"name": "spacer1",
 							"type": "String"
 						},
 						{
-							"defaultValue": "1rem 0",
-							"label": "nav-link-vertical-margin",
+							"defaultValue": "0.5rem",
+							"label": "spacer-2",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "nav-link-vertical-margin"
+									"value": "spacer-2"
 								}
 							],
-							"name": "navLinkVerticalMargin",
+							"name": "spacer2",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1rem",
+							"label": "spacer-3",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "spacer-3"
+								}
+							],
+							"name": "spacer3",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1.5rem",
+							"label": "spacer-4",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "spacer-4"
+								}
+							],
+							"name": "spacer4",
+							"type": "String"
+						},
+						{
+							"defaultValue": "3rem",
+							"label": "spacer-5",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "spacer-5"
+								}
+							],
+							"name": "spacer5",
+							"type": "String"
+						},
+						{
+							"defaultValue": "4.5rem",
+							"label": "spacer-6",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "spacer-6"
+								}
+							],
+							"name": "spacer6",
+							"type": "String"
+						},
+						{
+							"defaultValue": "6rem",
+							"label": "spacer-7",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "spacer-7"
+								}
+							],
+							"name": "spacer7",
+							"type": "String"
+						},
+						{
+							"defaultValue": "7.5rem",
+							"label": "spacer-8",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "spacer-8"
+								}
+							],
+							"name": "spacer8",
+							"type": "String"
+						},
+						{
+							"defaultValue": "9rem",
+							"label": "spacer-9",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "spacer-9"
+								}
+							],
+							"name": "spacer9",
+							"type": "String"
+						},
+						{
+							"defaultValue": "10rem",
+							"label": "spacer-10",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "spacer-10"
+								}
+							],
+							"name": "spacer10",
 							"type": "String"
 						}
 					],
-					"label": "nav-link",
-					"name": "navLink"
+					"label": "spacing",
+					"name": "spacing"
 				}
 			],
-			"label": "dialect-navigation",
-			"name": "dialectNavigation"
+			"label": "spacing",
+			"name": "spacing"
+		},
+		{
+			"frontendTokenSets": [
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "540px",
+							"label": "small",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "container-max-sm"
+								}
+							],
+							"name": "containerMaxSm",
+							"type": "String"
+						},
+						{
+							"defaultValue": "720px",
+							"label": "medium",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "container-max-md"
+								}
+							],
+							"name": "containerMaxMd",
+							"type": "String"
+						},
+						{
+							"defaultValue": "960px",
+							"label": "large",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "container-max-lg"
+								}
+							],
+							"name": "containerMaxLg",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1248px",
+							"label": "extra-large",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "container-max-xl"
+								}
+							],
+							"name": "containerMaxXl",
+							"type": "String"
+						}
+					],
+					"label": "container-max-widths",
+					"name": "containerMaxWidths"
+				}
+			],
+			"label": "layout",
+			"name": "layout"
+		},
+		{
+			"frontendTokenSets": [
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "0.0625rem",
+							"label": "btn-border-width",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-border-width"
+								}
+							],
+							"name": "btnBorderWidth",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--font-weight-semi-bold)",
+							"label": "btn-font-weight",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-font-weight"
+								}
+							],
+							"name": "btnFontWeight",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--spacer-1)",
+							"label": "btn-inline-item-spacer-x",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-inline-item-spacer-x"
+								}
+							],
+							"name": "btnInlineItemSpacerX",
+							"type": "String"
+						}
+					],
+					"label": "general",
+					"name": "buttonGeneral"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--border-radius-sm)",
+							"label": "btn-border-radius",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-border-radius"
+								}
+							],
+							"name": "btnBorderRadius",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1rem",
+							"label": "btn-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-font-size"
+								}
+							],
+							"name": "btnFontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--btn-font-size)",
+							"label": "btn-inline-item-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-inline-item-font-size"
+								}
+							],
+							"name": "btnInlineItemFontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "24px",
+							"label": "btn-line-height",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-line-height"
+								}
+							],
+							"name": "btnLineHeight",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1rem",
+							"label": "btn-padding-x",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-padding-x"
+								}
+							],
+							"name": "btnPaddingX",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0.75rem",
+							"label": "btn-padding-y",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-padding-y"
+								}
+							],
+							"name": "btnPaddingY",
+							"type": "String"
+						}
+					],
+					"label": "button",
+					"name": "button"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--border-radius)",
+							"label": "btn-lg-border-radius",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-lg-border-radius"
+								}
+							],
+							"name": "btnLgBorderRadius",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1.125rem",
+							"label": "btn-lg-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-lg-font-size"
+								}
+							],
+							"name": "btnLgFontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--btn-lg-font-size)",
+							"label": "btn-lg-inline-item-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-lg-inline-item-font-size"
+								}
+							],
+							"name": "btnLgInlineItemFontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "28px",
+							"label": "btn-lg-line-height",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-lg-line-height"
+								}
+							],
+							"name": "btnLgLineHeight",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1.125rem",
+							"label": "btn-lg-padding-x",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-lg-padding-x"
+								}
+							],
+							"name": "btnLgPaddingX",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0.875rem",
+							"label": "btn-lg-padding-y",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-lg-padding-y"
+								}
+							],
+							"name": "btnLgPaddingY",
+							"type": "String"
+						}
+					],
+					"label": "button-large",
+					"name": "buttonLarge"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--border-radius-xs)",
+							"label": "btn-sm-border-radius",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-sm-border-radius"
+								}
+							],
+							"name": "btnSmBorderRadius",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0.875rem",
+							"label": "btn-sm-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-sm-font-size"
+								}
+							],
+							"name": "btnSmFontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--btn-sm-font-size)",
+							"label": "btn-sm-inline-item-font-size",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-sm-inline-item-font-size"
+								}
+							],
+							"name": "btnSmInlineItemFontSize",
+							"type": "String"
+						},
+						{
+							"defaultValue": "20px",
+							"label": "btn-sm-line-height",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-sm-line-height"
+								}
+							],
+							"name": "btnSmLineHeight",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0.75rem",
+							"label": "btn-sm-padding-x",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-sm-padding-x"
+								}
+							],
+							"name": "btnSmPaddingX",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0.5rem",
+							"label": "btn-sm-padding-y",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "btn-sm-padding-y"
+								}
+							],
+							"name": "btnSmPaddingY",
+							"type": "String"
+						}
+					],
+					"label": "button-small",
+					"name": "buttonSmall"
+				}
+			],
+			"label": "buttons",
+			"name": "buttons"
+		},
+		{
+			"frontendTokenSets": [
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--spacer-4)",
+							"label": "card-aspect-ratio-item-offset",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-aspect-ratio-item-offset"
+								}
+							],
+							"name": "cardAspectRatioItemOffset",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--border-radius)",
+							"label": "card-border-radius",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-border-radius"
+								}
+							],
+							"name": "cardBorderRadius",
+							"type": "String"
+						}
+					],
+					"label": "general",
+					"name": "cardGeneral"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--spacer-3)",
+							"label": "card-body-padding-top",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-body-padding-top"
+								}
+							],
+							"name": "cardBodyPaddingTop",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--spacer-4)",
+							"label": "card-body-padding-right",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-body-padding-right"
+								}
+							],
+							"name": "cardBodyPaddingRight",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--spacer-4)",
+							"label": "card-body-padding-bottom",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-body-padding-bottom"
+								}
+							],
+							"name": "cardBodyPaddingBottom",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--spacer-4)",
+							"label": "card-body-padding-left",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-body-padding-left"
+								}
+							],
+							"name": "cardBodyPaddingLeft",
+							"type": "String"
+						}
+					],
+					"label": "card-body",
+					"name": "cardBody"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--aspect-ratio-3)",
+							"label": "card-vertical-aspect-ratio-default",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-vertical-aspect-ratio-default"
+								}
+							],
+							"name": "cardVerticalAspectRatioDefault",
+							"type": "String"
+						}
+					],
+					"label": "vertical-cards",
+					"name": "verticalCards"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--aspect-ratio-1)",
+							"label": "card-horizontal-aspect-ratio-default",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-horizontal-aspect-ratio-default"
+								}
+							],
+							"name": "cardHorizontalAspectRatioDefault",
+							"type": "String"
+						},
+						{
+							"defaultValue": "8rem",
+							"label": "autofit-col-sm-width",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "autofit-col-sm-width"
+								}
+							],
+							"name": "autofitColSmWidth",
+							"type": "String"
+						},
+						{
+							"defaultValue": "16rem",
+							"label": "autofit-col-md-width",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "autofit-col-md-width"
+								}
+							],
+							"name": "autofitColMdWidth",
+							"type": "String"
+						},
+						{
+							"defaultValue": "24rem",
+							"label": "autofit-col-lg-width",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "autofit-col-lg-width"
+								}
+							],
+							"name": "autofitColLgWidth",
+							"type": "String"
+						}
+					],
+					"label": "horizontal-cards",
+					"name": "horizontalCards"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--color-neutral-0)",
+							"editorType": "ColorPicker",
+							"label": "card-elevated-background-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-elevated-background-color"
+								}
+							],
+							"name": "cardElevatedBackgroundColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-neutral-0)",
+							"editorType": "ColorPicker",
+							"label": "card-elevated-active-background-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-elevated-active-background-color"
+								}
+							],
+							"name": "cardElevatedActiveBackgroundColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-neutral-0)",
+							"editorType": "ColorPicker",
+							"label": "card-elevated-hover-background-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-elevated-hover-background-color"
+								}
+							],
+							"name": "cardElevatedHoverBackgroundColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "transparent",
+							"editorType": "ColorPicker",
+							"label": "card-elevated-border-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-elevated-border-color"
+								}
+							],
+							"name": "cardElevatedBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "transparent",
+							"editorType": "ColorPicker",
+							"label": "card-elevated-active-border-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-elevated-active-border-color"
+								}
+							],
+							"name": "cardElevatedActiveBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "transparent",
+							"editorType": "ColorPicker",
+							"label": "card-elevated-hover-border-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-elevated-hover-border-color"
+								}
+							],
+							"name": "cardElevatedHoverBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0rem",
+							"label": "card-elevated-border-width",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-elevated-border-width"
+								}
+							],
+							"name": "cardElevatedBorderWidth",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--elevation-tight-3) rgba(89, 36, 235, 0.22)",
+							"label": "card-elevated-box-shadow",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-elevated-box-shadow"
+								}
+							],
+							"name": "cardElevatedBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--elevation-tight-3) rgba(89, 36, 235, 0.22)",
+							"label": "card-elevated-active-box-shadow",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-elevated-active-box-shadow"
+								}
+							],
+							"name": "cardElevatedActiveBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--elevation-tight-7) rgba(89, 36, 235, 0.17)",
+							"label": "card-elevated-hover-box-shadow",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-elevated-hover-box-shadow"
+								}
+							],
+							"name": "cardElevatedHoverBorderColor",
+							"type": "String"
+						}
+					],
+					"label": "elevated-cards",
+					"name": "elevatedCards"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--color-neutral-0)",
+							"editorType": "ColorPicker",
+							"label": "card-outlined-background-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-outlined-background-color"
+								}
+							],
+							"name": "cardOutlinedBackgroundColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-neutral-0)",
+							"editorType": "ColorPicker",
+							"label": "card-outlined-active-background-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-outlined-active-background-color"
+								}
+							],
+							"name": "cardOutlinedActiveBackgroundColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-neutral-0)",
+							"editorType": "ColorPicker",
+							"label": "card-outlined-hover-background-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-outlined-hover-background-color"
+								}
+							],
+							"name": "cardOutlinedHoverBackgroundColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-neutral-3)",
+							"editorType": "ColorPicker",
+							"label": "card-outlined-border-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-outlined-border-color"
+								}
+							],
+							"name": "cardOutlinedBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-action-primary-active)",
+							"editorType": "ColorPicker",
+							"label": "card-outlined-active-border-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-outlined-active-border-color"
+								}
+							],
+							"name": "cardOutlinedActiveBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-action-primary-hover)",
+							"editorType": "ColorPicker",
+							"label": "card-outlined-hover-border-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-outlined-hover-border-color"
+								}
+							],
+							"name": "cardOutlinedHoverBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0.0625rem",
+							"label": "card-outlined-border-width",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-outlined-border-width"
+								}
+							],
+							"name": "cardOutlinedBorderWidth",
+							"type": "String"
+						},
+						{
+							"defaultValue": "none",
+							"label": "card-outlined-box-shadow",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-outlined-box-shadow"
+								}
+							],
+							"name": "cardOutlinedBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "none",
+							"label": "card-outlined-active-box-shadow",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-outlined-active-box-shadow"
+								}
+							],
+							"name": "cardOutlinedActiveBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "none",
+							"label": "card-outlined-hover-box-shadow",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-outlined-hover-box-shadow"
+								}
+							],
+							"name": "cardOutlinedHoverBorderColor",
+							"type": "String"
+						}
+					],
+					"label": "outlined-cards",
+					"name": "outlinedCards"
+				},
+				{
+					"frontendTokens": [
+						{
+							"defaultValue": "var(--color-neutral-1)",
+							"editorType": "ColorPicker",
+							"label": "card-flat-background-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-flat-background-color"
+								}
+							],
+							"name": "cardFlatBackgroundColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-neutral-1)",
+							"editorType": "ColorPicker",
+							"label": "card-flat-active-background-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-flat-active-background-color"
+								}
+							],
+							"name": "cardFlatActiveBackgroundColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-neutral-1)",
+							"editorType": "ColorPicker",
+							"label": "card-flat-hover-background-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-flat-hover-background-color"
+								}
+							],
+							"name": "cardFlatHoverBackgroundColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-neutral-1)",
+							"editorType": "ColorPicker",
+							"label": "card-flat-border-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-flat-border-color"
+								}
+							],
+							"name": "cardFlatBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-action-primary-active)",
+							"editorType": "ColorPicker",
+							"label": "card-flat-active-border-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-flat-active-border-color"
+								}
+							],
+							"name": "cardFlatActiveBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "var(--color-action-primary-hover)",
+							"editorType": "ColorPicker",
+							"label": "card-flat-hover-border-color",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-flat-hover-border-color"
+								}
+							],
+							"name": "cardFlatHoverBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0.0625rem",
+							"label": "card-flat-border-width",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-flat-border-width"
+								}
+							],
+							"name": "cardFlatBorderWidth",
+							"type": "String"
+						},
+						{
+							"defaultValue": "none",
+							"label": "card-flat-box-shadow",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-flat-box-shadow"
+								}
+							],
+							"name": "cardFlatBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "none",
+							"label": "card-flat-active-box-shadow",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-flat-active-box-shadow"
+								}
+							],
+							"name": "cardFlatActiveBorderColor",
+							"type": "String"
+						},
+						{
+							"defaultValue": "none",
+							"label": "card-flat-hover-box-shadow",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "card-flat-hover-box-shadow"
+								}
+							],
+							"name": "cardFlatHoverBorderColor",
+							"type": "String"
+						}
+					],
+					"label": "flat-cards",
+					"name": "flatCards"
+				}
+			],
+			"label": "cards",
+			"name": "cards"
 		},
 		{
 			"frontendTokenSets": [
@@ -2857,1549 +4603,296 @@
 					"name": "condensed"
 				}
 			],
-			"label": "dialect-forms",
-			"name": "dialectForms"
+			"label": "forms",
+			"name": "forms"
 		},
 		{
 			"frontendTokenSets": [
 				{
 					"frontendTokens": [
 						{
-							"defaultValue": "var(--color-brand-primary)",
-							"editorType": "ColorPicker",
-							"label": "brand-color-1",
+							"defaultValue": "0.375rem",
+							"label": "label-item-spacer-x",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "brand-color-1"
+									"value": "label-item-spacer-x"
 								}
 							],
-							"name": "brandColor1",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-6)",
-							"editorType": "ColorPicker",
-							"label": "brand-color-2",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "brand-color-2"
-								}
-							],
-							"name": "brandColor2",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-brand-primary-darken-2)",
-							"editorType": "ColorPicker",
-							"label": "brand-color-3",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "brand-color-3"
-								}
-							],
-							"name": "brandColor3",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-9)",
-							"editorType": "ColorPicker",
-							"label": "brand-color-4",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "brand-color-4"
-								}
-							],
-							"name": "brandColor4",
+							"name": "labelItemSpacerX",
 							"type": "String"
 						}
 					],
-					"label": "brand-colors",
-					"name": "brandColors"
+					"label": "label",
+					"name": "label"
 				},
 				{
 					"frontendTokens": [
 						{
-							"defaultValue": "var(--color-neutral-0)",
-							"editorType": "ColorPicker",
-							"label": "white",
+							"defaultValue": "var(--border-radius-xs)",
+							"label": "label-lg-border-radius",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "white"
+									"value": "label-lg-border-radius"
 								}
 							],
-							"name": "whiteColor",
+							"name": "labelLgBorderRadius",
 							"type": "String"
 						},
 						{
-							"defaultValue": "var(--color-neutral-1)",
-							"editorType": "ColorPicker",
-							"label": "gray-100",
+							"defaultValue": "var(--text-paragraph-sm-font-size)",
+							"label": "label-lg-font-size",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "gray-100"
+									"value": "label-lg-font-size"
 								}
 							],
-							"name": "gray100Color",
+							"name": "labelLgFontSize",
 							"type": "String"
 						},
 						{
-							"defaultValue": "var(--color-neutral-2)",
-							"editorType": "ColorPicker",
-							"label": "gray-200",
+							"defaultValue": "var(--font-weight-bolder)",
+							"label": "label-lg-font-weight",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "gray-200"
+									"value": "label-lg-font-weight"
 								}
 							],
-							"name": "gray200Color",
+							"name": "labelLgFontWeight",
 							"type": "String"
 						},
 						{
-							"defaultValue": "var(--color-neutral-3)",
-							"editorType": "ColorPicker",
-							"label": "gray-300",
+							"defaultValue": "0.875rem",
+							"label": "label-lg-icon-size",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "gray-300"
+									"value": "label-lg-icon-size"
 								}
 							],
-							"name": "gray300Color",
+							"name": "labelLgIconSize",
 							"type": "String"
 						},
 						{
-							"defaultValue": "var(--color-neutral-4)",
-							"editorType": "ColorPicker",
-							"label": "gray-400",
+							"defaultValue": "var(--text-paragraph-sm-line-height)",
+							"label": "label-lg-line-height",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "gray-400"
+									"value": "label-lg-line-height"
 								}
 							],
-							"name": "gray400Color",
+							"name": "labelLgLineHeight",
 							"type": "String"
 						},
 						{
-							"defaultValue": "var(--color-neutral-5)",
-							"editorType": "ColorPicker",
-							"label": "gray-500",
+							"defaultValue": "var(--spacer-2)",
+							"label": "label-lg-padding-x",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "gray-500"
+									"value": "label-lg-padding-x"
 								}
 							],
-							"name": "gray500Color",
+							"name": "labelLgPaddingX",
 							"type": "String"
 						},
 						{
-							"defaultValue": "var(--color-neutral-6)",
-							"editorType": "ColorPicker",
-							"label": "gray-600",
+							"defaultValue": "0.125rem",
+							"label": "label-lg-padding-y",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "gray-600"
+									"value": "label-lg-padding-y"
 								}
 							],
-							"name": "gray600Color",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-7)",
-							"editorType": "ColorPicker",
-							"label": "gray-700",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "gray-700"
-								}
-							],
-							"name": "gray700Color",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-8)",
-							"editorType": "ColorPicker",
-							"label": "gray-800",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "gray-800"
-								}
-							],
-							"name": "gray800Color",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-9)",
-							"editorType": "ColorPicker",
-							"label": "gray-900",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "gray-900"
-								}
-							],
-							"name": "gray900Color",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-10)",
-							"editorType": "ColorPicker",
-							"label": "black",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "black"
-								}
-							],
-							"name": "blackColor",
+							"name": "labelLgPaddingY",
 							"type": "String"
 						}
 					],
-					"label": "grays",
-					"name": "grays"
+					"label": "label-large",
+					"name": "labelLarge"
 				},
 				{
 					"frontendTokens": [
 						{
-							"defaultValue": "var(--color-brand-primary)",
-							"editorType": "ColorPicker",
-							"label": "primary",
+							"defaultValue": "var(--border-radius-xs)",
+							"label": "label-sm-border-radius",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "primary"
+									"value": "label-sm-border-radius"
 								}
 							],
-							"name": "primaryColor",
+							"name": "labelSmBorderRadius",
 							"type": "String"
 						},
 						{
-							"defaultValue": "var(--color-neutral-6)",
-							"editorType": "ColorPicker",
-							"label": "secondary",
+							"defaultValue": "var(--text-paragraph-xs-font-size)",
+							"label": "label-sm-font-size",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "secondary"
+									"value": "label-sm-font-size"
 								}
 							],
-							"name": "secondaryColor",
+							"name": "labelSmFontSize",
 							"type": "String"
 						},
 						{
-							"defaultValue": "var(--dangersuccess)",
-							"editorType": "ColorPicker",
-							"label": "success",
+							"defaultValue": "var(--font-weight-bolder)",
+							"label": "label-sm-font-weight",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "success"
+									"value": "label-sm-font-weight"
 								}
 							],
-							"name": "successColor",
+							"name": "labelSmFontWeight",
 							"type": "String"
 						},
 						{
-							"defaultValue": "var(--dangerinfo)",
-							"editorType": "ColorPicker",
-							"label": "info",
+							"defaultValue": "0.75rem",
+							"label": "label-sm-icon-size",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "info"
+									"value": "label-sm-icon-size"
 								}
 							],
-							"name": "infoColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--dangerwarning)",
-							"editorType": "ColorPicker",
-							"label": "warning",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "warning"
-								}
-							],
-							"name": "warningColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--dangererror)",
-							"editorType": "ColorPicker",
-							"label": "danger",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "danger"
-								}
-							],
-							"name": "dangerColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-8)",
-							"editorType": "ColorPicker",
-							"label": "gray-dark",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "gray-dark"
-								}
-							],
-							"name": "grayDarkColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-9)",
-							"editorType": "ColorPicker",
-							"label": "dark",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "dark"
-								}
-							],
-							"name": "darkColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-2)",
-							"editorType": "ColorPicker",
-							"label": "light",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "light"
-								}
-							],
-							"name": "lightColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-1)",
-							"editorType": "ColorPicker",
-							"label": "lighter",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "lighter"
-								}
-							],
-							"name": "lighterColor",
-							"type": "String"
-						}
-					],
-					"label": "theme-colors",
-					"name": "themeColors"
-				}
-			],
-			"label": "color-system",
-			"name": "colorSystem"
-		},
-		{
-			"frontendTokenSets": [
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "0",
-							"label": "spacer-0",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "spacer-0"
-								}
-							],
-							"name": "spacer0",
-							"type": "String"
-						},
-						{
-							"defaultValue": "0.25rem",
-							"label": "spacer-1",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "spacer-1"
-								}
-							],
-							"name": "spacer1",
-							"type": "String"
-						},
-						{
-							"defaultValue": "0.5rem",
-							"label": "spacer-2",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "spacer-2"
-								}
-							],
-							"name": "spacer2",
+							"name": "labelSmIconSize",
 							"type": "String"
 						},
 						{
 							"defaultValue": "1rem",
-							"label": "spacer-3",
+							"label": "label-sm-line-height",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "spacer-3"
+									"value": "label-sm-line-height"
 								}
 							],
-							"name": "spacer3",
+							"name": "labelSmLineHeight",
 							"type": "String"
 						},
 						{
-							"defaultValue": "1.5rem",
-							"label": "spacer-4",
+							"defaultValue": "var(--spacer-1)",
+							"label": "label-sm-padding-x",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "spacer-4"
+									"value": "label-sm-padding-x"
 								}
 							],
-							"name": "spacer4",
+							"name": "labelSmPaddingX",
 							"type": "String"
 						},
 						{
-							"defaultValue": "3rem",
-							"label": "spacer-5",
+							"defaultValue": "0.0625rem",
+							"label": "label-sm-padding-y",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "spacer-5"
+									"value": "label-sm-padding-y"
 								}
 							],
-							"name": "spacer5",
-							"type": "String"
-						},
-						{
-							"defaultValue": "4.5rem",
-							"label": "spacer-6",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "spacer-6"
-								}
-							],
-							"name": "spacer6",
-							"type": "String"
-						},
-						{
-							"defaultValue": "6rem",
-							"label": "spacer-7",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "spacer-7"
-								}
-							],
-							"name": "spacer7",
-							"type": "String"
-						},
-						{
-							"defaultValue": "7.5rem",
-							"label": "spacer-8",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "spacer-8"
-								}
-							],
-							"name": "spacer8",
-							"type": "String"
-						},
-						{
-							"defaultValue": "9rem",
-							"label": "spacer-9",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "spacer-9"
-								}
-							],
-							"name": "spacer9",
-							"type": "String"
-						},
-						{
-							"defaultValue": "10rem",
-							"label": "spacer-10",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "spacer-10"
-								}
-							],
-							"name": "spacer10",
+							"name": "labelSmPaddingY",
 							"type": "String"
 						}
 					],
-					"label": "spacing",
-					"name": "spacing"
+					"label": "label-small",
+					"name": "labelSmall"
 				}
 			],
-			"label": "spacing",
-			"name": "spacing"
+			"label": "labels",
+			"name": "labels"
 		},
 		{
 			"frontendTokenSets": [
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "#fff",
-							"editorType": "ColorPicker",
-							"label": "body-bg",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "body-bg"
-								}
-							],
-							"name": "bodyBgColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#272833",
-							"editorType": "ColorPicker",
-							"label": "body-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "body-color"
-								}
-							],
-							"name": "bodyColor",
-							"type": "String"
-						}
-					],
-					"label": "body",
-					"name": "body"
-				},
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "var(--elevation-tight-3) rgba(0, 0, 0, .15)",
-							"label": "box-shadow",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "box-shadow"
-								}
-							],
-							"name": "boxShadow",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--elevation-tight-1) rgba(0, 0, 0, .075)",
-							"label": "box-shadow-sm",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "box-shadow-sm"
-								}
-							],
-							"name": "boxShadowSm",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--elevation-fluffy-3) rgba(0, 0, 0, .175)",
-							"label": "box-shadow-lg",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "box-shadow-lg"
-								}
-							],
-							"name": "boxShadowLg",
-							"type": "String"
-						}
-					],
-					"label": "box-shadows",
-					"name": "boxShadows"
-				},
 				{
 					"frontendTokens": [
 						{
 							"defaultValue": "100%",
-							"label": "aspect-ratio",
+							"label": "nav-link-horizontal-active-indicator-length",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "aspect-ratio"
+									"value": "nav-link-horizontal-active-indicator-length"
 								}
 							],
-							"name": "aspectRatio",
+							"name": "navLinkHorizontalActiveIndicatorLength",
 							"type": "String"
 						},
 						{
-							"defaultValue": "75%",
-							"label": "aspect-ratio-4-to-3",
+							"defaultValue": "0.125rem",
+							"label": "nav-link-horizontal-active-indicator-thickness",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "aspect-ratio-4-to-3"
+									"value": "nav-link-horizontal-active-indicator-thickness"
 								}
 							],
-							"name": "aspectRatio4To3",
+							"name": "navLinkHorizontalActiveIndicatorThickness",
 							"type": "String"
 						},
 						{
-							"defaultValue": "37.5%",
-							"label": "aspect-ratio-8-to-3",
+							"defaultValue": "0 1rem",
+							"label": "nav-link-horizontal-margin",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "aspect-ratio-8-to-3"
+									"value": "nav-link-horizontal-margin"
 								}
 							],
-							"name": "aspectRatio8To3",
+							"name": "navLinkHorizontalMargin",
 							"type": "String"
 						},
 						{
-							"defaultValue": "56.25%",
-							"label": "aspect-ratio-16-to-9",
+							"defaultValue": "100%",
+							"label": "nav-link-vertical-active-indicator-length",
 							"mappings": [
 								{
 									"type": "cssVariable",
-									"value": "aspect-ratio-16-to-9"
+									"value": "nav-link-vertical-active-indicator-length"
 								}
 							],
-							"name": "aspectRatio16To9",
+							"name": "navLinkVerticalActiveIndicatorLength",
+							"type": "String"
+						},
+						{
+							"defaultValue": "0.25rem",
+							"label": "nav-link-vertical-active-indicator-thickness",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "nav-link-vertical-active-indicator-thickness"
+								}
+							],
+							"name": "navLinkVerticalActiveIndicatorThickness",
+							"type": "String"
+						},
+						{
+							"defaultValue": "1rem 0",
+							"label": "nav-link-vertical-margin",
+							"mappings": [
+								{
+									"type": "cssVariable",
+									"value": "nav-link-vertical-margin"
+								}
+							],
+							"name": "navLinkVerticalMargin",
 							"type": "String"
 						}
 					],
-					"label": "aspect-ratios",
-					"name": "aspectRatios"
-				},
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "height .35s ease",
-							"label": "transition-collapse",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "transition-collapse"
-								}
-							],
-							"name": "transitionCollapse",
-							"type": "String"
-						},
-						{
-							"defaultValue": "opacity .15s linear",
-							"label": "transition-fade",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "transition-fade"
-								}
-							],
-							"name": "transitionFade",
-							"type": "String"
-						}
-					],
-					"label": "transitions",
-					"name": "transitions"
+					"label": "nav-link",
+					"name": "navLink"
 				}
 			],
-			"label": "general",
-			"name": "general"
-		},
-		{
-			"frontendTokenSets": [
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "540px",
-							"label": "small",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "container-max-sm"
-								}
-							],
-							"name": "containerMaxSm",
-							"type": "String"
-						},
-						{
-							"defaultValue": "720px",
-							"label": "medium",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "container-max-md"
-								}
-							],
-							"name": "containerMaxMd",
-							"type": "String"
-						},
-						{
-							"defaultValue": "960px",
-							"label": "large",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "container-max-lg"
-								}
-							],
-							"name": "containerMaxLg",
-							"type": "String"
-						},
-						{
-							"defaultValue": "1248px",
-							"label": "extra-large",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "container-max-xl"
-								}
-							],
-							"name": "containerMaxXl",
-							"type": "String"
-						}
-					],
-					"label": "container-max-widths",
-					"name": "containerMaxWidths"
-				}
-			],
-			"label": "layout",
-			"name": "layout"
-		},
-		{
-			"frontendTokenSets": [
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "Manrope, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
-							"label": "font-family-sans-serif",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-family-sans-serif"
-								}
-							],
-							"name": "fontFamilySansSerif",
-							"type": "String"
-						},
-						{
-							"defaultValue": "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-							"label": "font-family-monospace",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-family-monospace"
-								}
-							],
-							"name": "fontFamilyMonospace",
-							"type": "String"
-						},
-						{
-							"defaultValue": "Manrope, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
-							"label": "font-family-base",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-family-base"
-								}
-							],
-							"name": "fontFamilyBase",
-							"type": "String"
-						}
-					],
-					"label": "font-family",
-					"name": "fontFamily"
-				},
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "1rem",
-							"label": "font-size-base",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-size-base"
-								}
-							],
-							"name": "fontSizeBase",
-							"type": "String"
-						},
-						{
-							"defaultValue": "0.875rem",
-							"label": "font-size-sm",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-size-sm"
-								}
-							],
-							"name": "fontSizeSm",
-							"type": "String"
-						},
-						{
-							"defaultValue": "1.25rem",
-							"label": "font-size-lg",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-size-lg"
-								}
-							],
-							"name": "fontSizeLg",
-							"type": "String"
-						}
-					],
-					"label": "font-size",
-					"name": "fontSize"
-				},
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "lighter",
-							"label": "font-weight-lighter",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-weight-lighter"
-								}
-							],
-							"name": "fontWeightLighter",
-							"type": "String"
-						},
-						{
-							"defaultValue": "300",
-							"label": "font-weight-light",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-weight-light"
-								}
-							],
-							"name": "fontWeightLight",
-							"type": "String"
-						},
-						{
-							"defaultValue": "500",
-							"label": "font-weight-normal",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-weight-normal"
-								}
-							],
-							"name": "fontWeightNormal",
-							"type": "String"
-						},
-						{
-							"defaultValue": "600",
-							"label": "font-weight-semi-bold",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-weight-semi-bold"
-								}
-							],
-							"name": "fontWeightSemiBold",
-							"type": "String"
-						},
-						{
-							"defaultValue": "700",
-							"label": "font-weight-bold",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-weight-bold"
-								}
-							],
-							"name": "fontWeightBold",
-							"type": "String"
-						},
-						{
-							"defaultValue": "800",
-							"label": "font-weight-bolder",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "font-weight-bolder"
-								}
-							],
-							"name": "fontWeightBolder",
-							"type": "String"
-						}
-					],
-					"label": "font-weight",
-					"name": "fontWeight"
-				},
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "2.3125rem",
-							"label": "h1-font-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "h1-font-size"
-								}
-							],
-							"name": "h1FontSize",
-							"type": "String"
-						},
-						{
-							"defaultValue": "2rem",
-							"label": "h2-font-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "h2-font-size"
-								}
-							],
-							"name": "h2FontSize",
-							"type": "String"
-						},
-						{
-							"defaultValue": "1.75rem",
-							"label": "h3-font-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "h3-font-size"
-								}
-							],
-							"name": "h3FontSize",
-							"type": "String"
-						},
-						{
-							"defaultValue": "1.5rem",
-							"label": "h4-font-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "h4-font-size"
-								}
-							],
-							"name": "h4FontSize",
-							"type": "String"
-						},
-						{
-							"defaultValue": "1.125rem",
-							"label": "h5-font-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "h5-font-size"
-								}
-							],
-							"name": "h5FontSize",
-							"type": "String"
-						},
-						{
-							"defaultValue": "0.875rem",
-							"label": "h6-font-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "h6-font-size"
-								}
-							],
-							"name": "h6FontSize",
-							"type": "String"
-						}
-					],
-					"label": "headings",
-					"name": "headings"
-				},
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "6rem",
-							"label": "display-1-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "display1-size"
-								}
-							],
-							"name": "display1Size",
-							"type": "String"
-						},
-						{
-							"defaultValue": "5.5rem",
-							"label": "display-2-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "display2-size"
-								}
-							],
-							"name": "display2Size",
-							"type": "String"
-						},
-						{
-							"defaultValue": "3.0625rem",
-							"label": "display-3-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "display3-size"
-								}
-							],
-							"name": "display3Size",
-							"type": "String"
-						},
-						{
-							"defaultValue": "2.6875rem",
-							"label": "display-4-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "display4-size"
-								}
-							],
-							"name": "display4Size",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--font-weight-light)",
-							"label": "display-1-weight",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "display1-weight"
-								}
-							],
-							"name": "display1Weight",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--font-weight-light)",
-							"label": "display-2-weight",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "display2-weight"
-								}
-							],
-							"name": "display2Weight",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--font-weight-light)",
-							"label": "display-3-weight",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "display3-weight"
-								}
-							],
-							"name": "display3Weight",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--font-weight-light)",
-							"label": "display-4-weight",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "display4-weight"
-								}
-							],
-							"name": "display4Weight",
-							"type": "String"
-						},
-						{
-							"defaultValue": "1.2",
-							"label": "display-line-height",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "display-line-height"
-								}
-							],
-							"name": "displayLineHeight",
-							"type": "String"
-						}
-					],
-					"label": "displays",
-					"name": "displays"
-				},
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "1.25rem",
-							"label": "lead-font-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "lead-font-size"
-								}
-							],
-							"name": "leadFontSize",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--font-weight-light)",
-							"label": "lead-font-weight",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "lead-font-weight"
-								}
-							],
-							"name": "leadFontWeight",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-4)",
-							"editorType": "ColorPicker",
-							"label": "text-muted",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "text-muted"
-								}
-							],
-							"name": "textMuted",
-							"type": "String"
-						},
-						{
-							"defaultValue": "1.25rem",
-							"label": "blockquote-font-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "blockquote-font-size"
-								}
-							],
-							"name": "blockquoteFontSize",
-							"type": "String"
-						},
-						{
-							"defaultValue": "var(--color-neutral-6)",
-							"editorType": "ColorPicker",
-							"label": "blockquote-small-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "blockquote-small-color"
-								}
-							],
-							"name": "blockquoteSmallColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "80%",
-							"label": "blockquote-small-font-size",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "blockquote-small-font-size"
-								}
-							],
-							"name": "blockquoteSmallFontSize",
-							"type": "String"
-						},
-						{
-							"defaultValue": "rgba(0, 0, 0, .1)",
-							"label": "hr-border-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "hr-border-color"
-								}
-							],
-							"name": "hrBorderColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "1px",
-							"label": "hr-border-width",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "hr-border-width"
-								}
-							],
-							"name": "hrBorderWidth",
-							"type": "String"
-						},
-						{
-							"defaultValue": "1rem",
-							"label": "hr-border-margin-y",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "hr-border-margin-y"
-								}
-							],
-							"name": "hrBorderMarginY",
-							"type": "String"
-						}
-					],
-					"label": "other",
-					"name": "other"
-				}
-			],
-			"label": "typography",
-			"name": "typography"
-		},
-		{
-			"frontendTokenSets": [
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "#0b5fff",
-							"editorType": "ColorPicker",
-							"label": "background-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-primary-background-color"
-								}
-							],
-							"name": "btnPrimaryBackgroundColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#0b5fff",
-							"editorType": "ColorPicker",
-							"label": "border-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-primary-border-color"
-								}
-							],
-							"name": "btnPrimaryBorderColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#fff",
-							"editorType": "ColorPicker",
-							"label": "color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-primary-color"
-								}
-							],
-							"name": "btnPrimaryColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#0053f0",
-							"editorType": "ColorPicker",
-							"label": "hover-background-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-primary-hover-background-color"
-								}
-							],
-							"name": "btnPrimaryHoverBackgroundColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "transparent",
-							"editorType": "ColorPicker",
-							"label": "hover-border-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-primary-hover-border-color"
-								}
-							],
-							"name": "btnPrimaryHoverBorderColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#fff",
-							"editorType": "ColorPicker",
-							"label": "hover-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-primary-hover-color"
-								}
-							],
-							"name": "btnPrimaryHoverColor",
-							"type": "String"
-						}
-					],
-					"label": "button-primary",
-					"name": "btnPrimary"
-				},
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "#0b5fff",
-							"editorType": "ColorPicker",
-							"label": "border-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-outline-primary-border-color"
-								}
-							],
-							"name": "btnOutlinePrimaryBorderColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#0b5fff",
-							"editorType": "ColorPicker",
-							"label": "color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-outline-primary-color"
-								}
-							],
-							"name": "btnOutlinePrimaryColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#f0f5ff",
-							"editorType": "ColorPicker",
-							"label": "hover-background-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-outline-primary-hover-background-color"
-								}
-							],
-							"name": "btnOutlinePrimaryHoverBackgroundColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#0b5fff",
-							"editorType": "ColorPicker",
-							"label": "hover-border-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-outline-primary-hover-border-color"
-								}
-							],
-							"name": "btnOutlinePrimaryHoverBorderColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#0b5fff",
-							"editorType": "ColorPicker",
-							"label": "hover-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-outline-primary-hover-color"
-								}
-							],
-							"name": "btnOutlinePrimaryHoverColor",
-							"type": "String"
-						}
-					],
-					"label": "button-outline-primary",
-					"name": "btnOutlinePrimary"
-				},
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "#fff",
-							"editorType": "ColorPicker",
-							"label": "background-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-secondary-background-color"
-								}
-							],
-							"name": "btnSecondaryBackgroundColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#cdced9",
-							"editorType": "ColorPicker",
-							"label": "border-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-secondary-border-color"
-								}
-							],
-							"name": "btnSecondaryBorderColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#6b6c7e",
-							"editorType": "ColorPicker",
-							"label": "color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-secondary-color"
-								}
-							],
-							"name": "btnSecondaryColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#f7f8f9",
-							"editorType": "ColorPicker",
-							"label": "hover-background-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-secondary-hover-background-color"
-								}
-							],
-							"name": "btnSecondaryHoverBackgroundColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#cdced9",
-							"editorType": "ColorPicker",
-							"label": "hover-border-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-secondary-hover-border-color"
-								}
-							],
-							"name": "btnSecondaryHoverBorderColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#272833",
-							"editorType": "ColorPicker",
-							"label": "hover-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-secondary-hover-color"
-								}
-							],
-							"name": "btnSecondaryHoverColor",
-							"type": "String"
-						}
-					],
-					"label": "button-secondary",
-					"name": "btnSecondary"
-				},
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "#cdced9",
-							"editorType": "ColorPicker",
-							"label": "border-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-outline-secondary-border-color"
-								}
-							],
-							"name": "btnOutlineSecondaryBorderColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#6b6c7e",
-							"editorType": "ColorPicker",
-							"label": "color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-outline-secondary-color"
-								}
-							],
-							"name": "btnOutlineSecondaryColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "rgba(39, 40, 51, 0.03)",
-							"editorType": "ColorPicker",
-							"label": "hover-background-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-outline-secondary-hover-background-color"
-								}
-							],
-							"name": "btnOutlineSecondaryHoverBackgroundColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "transparent",
-							"editorType": "ColorPicker",
-							"label": "hover-border-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-outline-secondary-hover-border-color"
-								}
-							],
-							"name": "btnOutlineSecondaryHoverBorderColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#272833",
-							"editorType": "ColorPicker",
-							"label": "hover-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-outline-secondary-hover-color"
-								}
-							],
-							"name": "btnOutlineSecondaryHoverColor",
-							"type": "String"
-						}
-					],
-					"label": "button-outline-secondary",
-					"name": "btnOutlineSecondary"
-				},
-				{
-					"frontendTokens": [
-						{
-							"defaultValue": "#0b5fff",
-							"editorType": "ColorPicker",
-							"label": "color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-link-color"
-								}
-							],
-							"name": "btnLinkColor",
-							"type": "String"
-						},
-						{
-							"defaultValue": "#004ad7",
-							"editorType": "ColorPicker",
-							"label": "hover-color",
-							"mappings": [
-								{
-									"type": "cssVariable",
-									"value": "btn-link-hover-color"
-								}
-							],
-							"name": "btnLinkHoverColor",
-							"type": "String"
-						}
-					],
-					"label": "button-link",
-					"name": "btnLink"
-				}
-			],
-			"label": "buttons",
-			"name": "buttons"
+			"label": "navigation",
+			"name": "navigation"
 		}
 	]
 }

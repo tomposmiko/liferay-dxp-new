@@ -53,6 +53,7 @@ export default function ColorPalette({
 								displayType="unstyled"
 								onClick={(event) => onColorSelect(color, event)}
 								small
+								title={color}
 							/>
 						</li>
 					))}

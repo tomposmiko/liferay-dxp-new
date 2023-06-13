@@ -30,6 +30,10 @@ public class LayoutPageTemplateCollectionLocalServiceWrapper
 	implements LayoutPageTemplateCollectionLocalService,
 			   ServiceWrapper<LayoutPageTemplateCollectionLocalService> {
 
+	public LayoutPageTemplateCollectionLocalServiceWrapper() {
+		this(null);
+	}
+
 	public LayoutPageTemplateCollectionLocalServiceWrapper(
 		LayoutPageTemplateCollectionLocalService
 			layoutPageTemplateCollectionLocalService) {
@@ -442,6 +446,20 @@ public class LayoutPageTemplateCollectionLocalServiceWrapper
 	public int getLayoutPageTemplateCollectionsCount() {
 		return _layoutPageTemplateCollectionLocalService.
 			getLayoutPageTemplateCollectionsCount();
+	}
+
+	@Override
+	public int getLayoutPageTemplateCollectionsCount(long groupId) {
+		return _layoutPageTemplateCollectionLocalService.
+			getLayoutPageTemplateCollectionsCount(groupId);
+	}
+
+	@Override
+	public int getLayoutPageTemplateCollectionsCount(
+		long groupId, String name) {
+
+		return _layoutPageTemplateCollectionLocalService.
+			getLayoutPageTemplateCollectionsCount(groupId, name);
 	}
 
 	/**

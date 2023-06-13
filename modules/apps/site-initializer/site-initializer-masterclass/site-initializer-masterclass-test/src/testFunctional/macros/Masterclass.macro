@@ -1,0 +1,147 @@
+definition {
+
+	macro addMasterclassSite {
+		ApplicationsMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites");
+
+		LexiconEntry.gotoAdd();
+
+		LexiconCard.clickCard(card = "Masterclass");
+
+		PortletEntry.inputName(name = "${siteName}");
+
+		Modal.save();
+
+		while (IsElementNotPresent(locator1 = "Raylife#SITE_TITLE", siteTitle = "${siteName}")) {
+			WaitForPageLoad();
+		}
+
+		Click(locator1 = "ProductMenu#TOGGLE");
+
+		WaitForElementPresent(
+			locator1 = "Raylife#SITE_TITLE",
+			siteTitle = "${siteName}");
+	}
+
+	macro createAccount {
+		Click(
+			labelOption = "Create Account",
+			locator1 = "FormViewBuilder#FIELD_LABEL_OPTION");
+
+		Type(
+			labelTitle = "Screen Name",
+			locator1 = "Masterclass#SIGN_IN_FORM",
+			value1 = "${screenName}");
+
+		Type(
+			labelTitle = "Email Address",
+			locator1 = "Masterclass#SIGN_IN_FORM",
+			value1 = "${emailAddress}");
+
+		Type(
+			labelTitle = "First Name",
+			locator1 = "Masterclass#SIGN_IN_FORM",
+			value1 = "${firstName}");
+
+		Type(
+			labelTitle = "Last Name",
+			locator1 = "Masterclass#SIGN_IN_FORM",
+			value1 = "${lastName}");
+
+		Type(
+			labelTitle = "Password",
+			locator1 = "Masterclass#SIGN_IN_FORM",
+			value1 = "${password}");
+
+		Type(
+			labelTitle = "Enter Again",
+			locator1 = "Masterclass#SIGN_IN_FORM",
+			value1 = "${password}");
+
+		Click(locator1 = "Button#SUBMIT");
+	}
+
+	macro gotoNavItem {
+		var key_navItem = "${navItem}";
+
+		Click(locator1 = "Masterclass#NAV_TAB");
+
+		Click(locator1 = "Masterclass#NAV_ITEM");
+	}
+
+	macro previewPageandAssertFragment {
+		PageEditor.openPreviewMode();
+
+		AssertElementPresent(
+			key_fragmentName = "${fragmentName}",
+			locator1 = "Masterclass#FRAGMENT_NAME");
+	}
+
+	macro signIn {
+		if (isSet(emailAddress)) {
+			Type(
+				labelTitle = "Email Address",
+				locator1 = "Masterclass#SIGN_IN_FORM",
+				value1 = "${emailAddress}");
+		}
+		else {
+			Type(
+				labelTitle = "Email Address",
+				locator1 = "Masterclass#SIGN_IN_FORM",
+				value1 = "test@liferay.com");
+		}
+
+		if (isSet(password)) {
+			Type(
+				labelTitle = "Password",
+				locator1 = "Masterclass#SIGN_IN_FORM",
+				value1 = "${password}");
+		}
+		else {
+			Type(
+				labelTitle = "Password",
+				locator1 = "Masterclass#SIGN_IN_FORM",
+				value1 = "test");
+		}
+
+		Check(
+			inputFieldId = "rememberMe",
+			locator1 = "TextInput#INPUT_ID");
+
+		Click(locator1 = "Button#SIGN_IN");
+	}
+
+	macro simulateAndViewPageElements {
+		MobileDevice.previewPG(deviceType = "${deviceType}");
+
+		for (var element : list "${elementsList}") {
+			AssertElementPresent(
+				key_fragmentName = "${element}",
+				locator1 = "Masterclass#FRAGMENTS_IN_SIMULATION");
+		}
+	}
+
+	macro viewCoursesInPage {
+		if (isSet(title)) {
+			AssertElementPresent(
+				key_title = "${key_title}",
+				locator1 = "Masterclass#FRAGMENT_HEADING");
+		}
+
+		if (isSet(description)) {
+			AssertElementPresent(
+				key_description = "${key_description}",
+				locator1 = "Masterclass#FRAGMENT_TEXT_BLOCK");
+		}
+
+		if (isSet(link)) {
+			AssertElementPresent(
+				key_buttonName = "${key_buttonName}",
+				key_href = "${key_href}",
+				locator1 = "Masterclass#FRAGMENT_LINK");
+		}
+	}
+
+}

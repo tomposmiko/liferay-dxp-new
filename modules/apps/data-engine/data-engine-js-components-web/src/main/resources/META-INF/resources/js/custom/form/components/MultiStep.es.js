@@ -22,7 +22,7 @@ import {getFormId, getFormNode} from '../../../utils/formId.es';
 import nextPage from '../thunks/nextPage.es';
 import previousPage from '../thunks/previousPage.es';
 
-export const MultiStep = ({activePage, editable, pages}) => {
+export function MultiStep({activePage, editable, pages}) {
 	const {containerElement} = usePage();
 
 	const createPreviousPage = useEvaluate(previousPage);
@@ -36,8 +36,8 @@ export const MultiStep = ({activePage, editable, pages}) => {
 				{pages.map((page, index) => (
 					<li
 						className={classnames('multi-step-item', {
-							active: index === activePage,
-							complete: index < activePage,
+							'active': index === activePage,
+							'complete': index < activePage,
 							'multi-step-item-expand':
 								index + 1 !== pages.length,
 						})}
@@ -70,6 +70,7 @@ export const MultiStep = ({activePage, editable, pages}) => {
 						}}
 					>
 						<div className="multi-step-divider"></div>
+
 						<div className="multi-step-indicator">
 							<div className="multi-step-indicator-label">
 								{page.paginationItemRenderer ===
@@ -98,4 +99,4 @@ export const MultiStep = ({activePage, editable, pages}) => {
 			</ol>
 		</div>
 	);
-};
+}

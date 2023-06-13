@@ -20,6 +20,7 @@ import com.liferay.fragment.model.FragmentEntryTable;
 import com.liferay.fragment.model.impl.FragmentEntryImpl;
 import com.liferay.fragment.model.impl.FragmentEntryModelImpl;
 import com.liferay.fragment.service.persistence.FragmentEntryPersistence;
+import com.liferay.fragment.service.persistence.FragmentEntryUtil;
 import com.liferay.fragment.service.persistence.impl.constants.FragmentPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -52,6 +53,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -15107,6 +15109,7 @@ public class FragmentEntryPersistenceImpl
 		ctStrictColumnNames.add("js");
 		ctStrictColumnNames.add("cacheable");
 		ctStrictColumnNames.add("configuration");
+		ctStrictColumnNames.add("icon");
 		ctStrictColumnNames.add("previewFileEntryId");
 		ctStrictColumnNames.add("readOnly");
 		ctStrictColumnNames.add("type_");
@@ -15693,11 +15696,31 @@ public class FragmentEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByHeadId",
 			new String[] {Long.class.getName()}, new String[] {"headId"},
 			false);
+
+		_setFragmentEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
+		_setFragmentEntryUtilPersistence(null);
+
 		entityCache.removeCache(FragmentEntryImpl.class.getName());
+	}
+
+	private void _setFragmentEntryUtilPersistence(
+		FragmentEntryPersistence fragmentEntryPersistence) {
+
+		try {
+			Field field = FragmentEntryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, fragmentEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@Override

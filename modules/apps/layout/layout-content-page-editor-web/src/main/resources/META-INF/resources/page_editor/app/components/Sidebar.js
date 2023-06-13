@@ -298,11 +298,12 @@ export default function Sidebar() {
 						}
 					}, [])}
 				</div>
+
 				<div
 					className={classNames({
 						'page-editor__sidebar__content': true,
 						'page-editor__sidebar__content--open': sidebarOpen,
-						rtl:
+						'rtl':
 							Liferay.Language.direction[
 								themeDisplay?.getLanguageId()
 							] === 'rtl',

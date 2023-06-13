@@ -3,7 +3,7 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Translation Management";
+	property testray.main.component.name = "Translations Management";
 
 	setUp {
 		TestCase.setUpPortalInstance();
@@ -24,8 +24,8 @@ definition {
 
 	@description = "This ensures that the translation in the web content will not be retained after deleting the translation in draft status from the app."
 	@priority = "4"
-	@refactorneeded
-	test DeleteDraftTranslation {
+	@refactordone
+	test CanDeleteDraftTranslation {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
 			description = "Description",
@@ -58,32 +58,24 @@ definition {
 			status = "Draft",
 			title = "Translation of WC WebContent Title to es-ES");
 
-		LexiconEntry.delete(
+		Translations.deleteTranslationEntry(
 			confirmationText = "Are you sure you want to delete this? It will be deleted immediately.",
-			rowEntry = "Translation of WC WebContent Title to es-ES");
+			translationEntry = "Translation of WC WebContent Title to es-ES");
 
-		AssertElementNotPresent(
-			key_rowEntry = "Translation of WC WebContent Title to es-ES",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME");
+		Translations.viewEmptyState();
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openToEditWCInSite(
+			groupName = "Guest",
+			siteURLKey = "guest",
+			webContentTitle = "WC WebContent Title");
 
-		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
-
-		Click.clickNoMouseOver(
-			key_currentLocale = StringUtil.lowerCase("en-US"),
-			locator1 = "Button#TRANSLATIONS_LOCALIZATION");
-
-		AssertTextEquals(
-			key_localizedLanguage = "es-ES",
-			locator1 = "Translation#TRANSLATION_STATUS_TITLE",
-			value1 = "Untranslated");
+		Translations.viewUntranslatedStatus(locale = "es-ES");
 	}
 
 	@description = "This ensures that The translation in the web content remains after deleting the translation in approved status from the app."
 	@priority = "5"
-	@refactorneeded
-	test DeleteTranslation {
+	@refactordone
+	test CanDeleteTranslation {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
 			description = "Description",
@@ -116,17 +108,17 @@ definition {
 			status = "Approved",
 			title = "Translation of WC WebContent Title to es-ES");
 
-		LexiconEntry.delete(
+		Translations.deleteTranslationEntry(
 			confirmationText = "Are you sure you want to delete this? It will be deleted immediately.",
-			rowEntry = "Translation of WC WebContent Title to es-ES");
+			translationEntry = "Translation of WC WebContent Title to es-ES");
 
-		AssertElementNotPresent(
-			key_rowEntry = "Translation of WC WebContent Title to es-ES",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME");
+		Translations.viewEmptyState();
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
-
-		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
+		WebContentNavigator.openToEditWCInSite(
+			groupName = "Guest",
+			siteURLKey = "guest",
+			version = "1.1",
+			webContentTitle = "WC WebContent Title");
 
 		PortletEntry.changeLocale(locale = "es-ES");
 
@@ -138,8 +130,8 @@ definition {
 
 	@description = "This ensures that the translation can be edited under Translations app."
 	@priority = "5"
-	@refactorneeded
-	test EditTranslation {
+	@refactordone
+	test CanEditTranslation {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
 			description = "Description",
@@ -176,9 +168,7 @@ definition {
 			status = "Approved",
 			title = "Translation of WC WebContent Title to es-ES");
 
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Edit",
-			rowEntry = "Translation of WC WebContent Title to es-ES");
+		Translations.editTranslationEntry(translationEntry = "Translation of WC WebContent Title to es-ES");
 
 		Translations.viewTranslationDetails(
 			currentTargetLocale = "es-ES",
@@ -193,9 +183,7 @@ definition {
 
 		PortletEntry.publish();
 
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Edit",
-			rowEntry = "Translation of WC WebContent Title to es-ES");
+		Translations.editTranslationEntry(translationEntry = "Translation of WC WebContent Title to es-ES");
 
 		Translations.viewTranslationDetails(
 			currentTargetLocale = "es-ES",
@@ -203,9 +191,11 @@ definition {
 			webContentDescription = "WC WebContent Descripción editar",
 			webContentTitle = "WC WebContent Título editar");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
-
-		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
+		WebContentNavigator.openToEditWCInSite(
+			groupName = "Guest",
+			siteURLKey = "guest",
+			version = "1.1",
+			webContentTitle = "WC WebContent Title");
 
 		PortletEntry.changeLocale(locale = "es-ES");
 
@@ -217,8 +207,8 @@ definition {
 
 	@description = "This ensures that the translation can be edited to a new language under Translations app."
 	@priority = "5"
-	@refactorneeded
-	test EditTranslationToNewLanguage {
+	@refactordone
+	test CanEditTranslationToNewLanguage {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
 			description = "Description",
@@ -251,9 +241,7 @@ definition {
 			status = "Approved",
 			title = "Translation of WC WebContent Title to es-ES");
 
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Edit",
-			rowEntry = "Translation of WC WebContent Title to es-ES");
+		Translations.editTranslationEntry(translationEntry = "Translation of WC WebContent Title to es-ES");
 
 		Translations.viewTranslationDetails(
 			currentTargetLocale = "es-ES",
@@ -272,9 +260,7 @@ definition {
 
 		PortletEntry.publish();
 
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Edit",
-			rowEntry = "Translation of WC WebContent Title to ja-JP");
+		Translations.editTranslationEntry(translationEntry = "Translation of WC WebContent Title to ja-JP");
 
 		Translations.viewTranslationDetails(
 			currentTargetLocale = "ja-JP",
@@ -282,9 +268,11 @@ definition {
 			webContentDescription = "wc webcontent記述",
 			webContentTitle = "wc webcontentタイトル");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
-
-		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
+		WebContentNavigator.openToEditWCInSite(
+			groupName = "Guest",
+			siteURLKey = "guest",
+			version = "1.1",
+			webContentTitle = "WC WebContent Title");
 
 		PortletEntry.changeLocale(locale = "es-ES");
 
@@ -303,8 +291,8 @@ definition {
 
 	@description = "This test covers LPS-127980. This ensures that the newly added field can be translated after updating the WC structure."
 	@priority = "4"
-	@refactorneeded
-	test TranslateWCAfterEditingStructure {
+	@refactordone
+	test CanTranslateWCAfterEditingStructure {
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		NavItem.gotoStructures();
@@ -384,9 +372,7 @@ definition {
 
 		Translations.openTranslationAdmin(siteURLKey = "guest");
 
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Edit",
-			rowEntry = "Translation of WC WebContent Title to es-ES");
+		Translations.editTranslationEntry(translationEntry = "Translation of WC WebContent Title to es-ES");
 
 		Translations.viewTranslationDetails(
 			currentTargetLocale = "es-ES",
@@ -397,8 +383,8 @@ definition {
 
 	@description = "This ensures that the modification date of a translation can be displayed correctly after editing."
 	@priority = "3"
-	@refactorneeded
-	test ViewEntryModifiedDate {
+	@refactordone
+	test CanViewEntryModifiedDate {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
 			groupName = "Guest",
@@ -420,7 +406,7 @@ definition {
 		Button.clickPublish();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Translation Processes");
 
 		Translations.viewTranslationEntry(
@@ -452,7 +438,7 @@ definition {
 		Button.clickPublish();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Translation Processes");
 
 		Translations.viewTranslationEntry(
@@ -462,10 +448,70 @@ definition {
 			title = "Translation of WC WebContent Title to es-ES");
 	}
 
+	@description = "This test covers LPS-142411. It ensures that a translation entry is not shown after deleting translated content page with new experience."
+	@priority = "4"
+	test EntryIsNotShownAfterDeletingTranslatedPage {
+		property osgi.module.configuration.file.names = "com.liferay.translation.web.internal.configuration.FFLayoutExperienceSelectorConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
+
+		JSONGroup.addGroup(groupName = "Test Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Test Content Page Name",
+			type = "content");
+
+		JSONSegmentsentry.addSegment(
+			fieldName = "Email Address",
+			groupName = "Test Site Name",
+			operator = "contains",
+			segmentName = "Segment Email Address",
+			text = "test@liferay.com");
+
+		ContentPagesNavigator.openEditContentPage(
+			pageName = "Test Content Page Name",
+			siteName = "Test Site Name");
+
+		PageEditor.addExperience(
+			experienceName = "Segment Email Experience",
+			segmentName = "Segment Email Address");
+
+		PageEditor.addFragment(
+			collectionName = "Basic Components",
+			fragmentName = "Heading");
+
+		PageEditor.clickPublish();
+
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+
+		WaitForPageLoad();
+
+		ContentPagesNavigator.goToTranslation(pageName = "Test Content Page Name");
+
+		Translations.changeTargetLocale(
+			currentTargetLocale = "ar-SA",
+			newTargetLocale = "ja-JP");
+
+		Translations.translateFragmentField(
+			experienceName = "Segment Email Experience",
+			fieldName = "element-text",
+			fragmentText = "経験をテストする");
+
+		PortletEntry.publish();
+
+		JSONLayout.deletePublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Test Content Page Name");
+
+		Translations.openTranslationAdmin(siteURLKey = "test-site-name");
+
+		Translations.viewEmptyState();
+	}
+
 	@description = "This test covers LPS-125966. This ensures that a warning message shows when viewing a translation that its web content has been deleted."
 	@priority = "4"
-	@refactorneeded
-	test ViewTranslateAfterWebContentDeleted {
+	@refactordone
+	test WarningAppearsForTranslationAfterWCIsDeleted {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
 			groupName = "Guest",
@@ -490,18 +536,9 @@ definition {
 
 		PortletEntry.publish();
 
-		Translations.openTranslationAdmin(siteURLKey = "guest");
-
-		Translations.viewTranslationEntry(
-			language = "es-ES",
-			status = "Approved",
-			title = "Translation of WC WebContent Title to es-ES");
-
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
-
-		WebContent.moveToRecycleBinCP(
-			assetType = "Web Content Article",
-			webContentTitle = "WC WebContent Title");
+		JSONWebcontent.moveWebContentToTrash(
+			groupName = "Guest",
+			title = "WC WebContent Title");
 
 		Translations.openTranslationAdmin(siteURLKey = "guest");
 
@@ -510,12 +547,12 @@ definition {
 		Translations.viewTranslationEntry(
 			language = "es-ES",
 			status = "Approved",
-			title = "Translation");
+			title = "Translation of Translation to es-ES");
 
 		AssertClick(
-			key_rowEntry = "Translation",
+			key_rowEntry = "Translation of Translation to es-ES",
 			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "Translation");
+			value1 = "Translation of Translation to es-ES");
 
 		AssertTextEquals(
 			locator1 = "Message#INFO",
@@ -527,13 +564,9 @@ definition {
 			assetName = "WC WebContent Title",
 			assetType = "Web Content Article");
 
-		AssertElementNotPresent(
-			key_rowEntry = "Translation",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME");
+		Translations.openTranslationAdmin(siteURLKey = "guest");
 
-		AssertElementNotPresent(
-			key_rowEntry = "Translation of WC WebContent Title to es-ES",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME");
+		Translations.viewEmptyState();
 	}
 
 }

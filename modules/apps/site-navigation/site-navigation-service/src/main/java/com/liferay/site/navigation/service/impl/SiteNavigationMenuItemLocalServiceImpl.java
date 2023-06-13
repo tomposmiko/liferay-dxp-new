@@ -123,6 +123,15 @@ public class SiteNavigationMenuItemLocalServiceImpl
 			long siteNavigationMenuItemId)
 		throws PortalException {
 
+		return siteNavigationMenuItemLocalService.deleteSiteNavigationMenuItem(
+			siteNavigationMenuItemId, false);
+	}
+
+	@Override
+	public SiteNavigationMenuItem deleteSiteNavigationMenuItem(
+			long siteNavigationMenuItemId, boolean deleteChildren)
+		throws PortalException {
+
 		SiteNavigationMenuItem siteNavigationMenuItem =
 			getSiteNavigationMenuItem(siteNavigationMenuItemId);
 
@@ -136,6 +145,12 @@ public class SiteNavigationMenuItemLocalServiceImpl
 				siteNavigationMenuItem.getSiteNavigationMenuId(),
 				siteNavigationMenuItem.getParentSiteNavigationMenuItemId());
 
+		int siblingOrderOffset = siteNavigationMenuItems.size();
+
+		if (deleteChildren) {
+			siblingOrderOffset = 0;
+		}
+
 		for (SiteNavigationMenuItem siblingSiteNavigationMenuItem :
 				siblingsSiteNavigationMenuItems) {
 
@@ -146,8 +161,8 @@ public class SiteNavigationMenuItemLocalServiceImpl
 			}
 
 			siblingSiteNavigationMenuItem.setOrder(
-				siteNavigationMenuItems.size() +
-					siblingSiteNavigationMenuItem.getOrder() - 1);
+				siblingOrderOffset + siblingSiteNavigationMenuItem.getOrder() -
+					1);
 
 			siteNavigationMenuItemPersistence.update(
 				siblingSiteNavigationMenuItem);
@@ -156,6 +171,14 @@ public class SiteNavigationMenuItemLocalServiceImpl
 		for (int i = 0; i < siteNavigationMenuItems.size(); i++) {
 			SiteNavigationMenuItem childSiteNavigationMenuItem =
 				siteNavigationMenuItems.get(i);
+
+			if (deleteChildren) {
+				siteNavigationMenuItemLocalService.deleteSiteNavigationMenuItem(
+					childSiteNavigationMenuItem.getSiteNavigationMenuItemId(),
+					true);
+
+				continue;
+			}
 
 			childSiteNavigationMenuItem.setParentSiteNavigationMenuItemId(
 				siteNavigationMenuItem.getParentSiteNavigationMenuItemId());

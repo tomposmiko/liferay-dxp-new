@@ -34,6 +34,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8351 | Test Summary: Page profile audience card shows known and anonymous individuals as well as segmented/unsegmented individuals"
+	@ignore = "true"
 	@priority = "5"
 	test ShowsKnownAnonymousIndividualsAsWellAsSegmentedUnsegmentedIndividuals {
 		property portal.upstream = "quarantine";
@@ -42,7 +43,6 @@ definition {
 		// AC Refactor ticket: LRAC-9409
 
 		var usernameList = "ac,liferay";
-
 		var emailList = "ac@liferay.com,liferay@liferay.com";
 
 		task ("Add page and Blog for interaction with the AC") {

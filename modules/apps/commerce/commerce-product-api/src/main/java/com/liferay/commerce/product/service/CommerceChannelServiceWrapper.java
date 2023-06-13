@@ -26,6 +26,10 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CommerceChannelServiceWrapper
 	implements CommerceChannelService, ServiceWrapper<CommerceChannelService> {
 
+	public CommerceChannelServiceWrapper() {
+		this(null);
+	}
+
 	public CommerceChannelServiceWrapper(
 		CommerceChannelService commerceChannelService) {
 
@@ -44,6 +48,23 @@ public class CommerceChannelServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceChannelService.addCommerceChannel(
+			externalReferenceCode, siteGroupId, name, type,
+			typeSettingsUnicodeProperties, commerceCurrencyCode,
+			serviceContext);
+	}
+
+	@Override
+	public com.liferay.commerce.product.model.CommerceChannel
+			addOrUpdateCommerceChannel(
+				String externalReferenceCode, long siteGroupId, String name,
+				String type,
+				com.liferay.portal.kernel.util.UnicodeProperties
+					typeSettingsUnicodeProperties,
+				String commerceCurrencyCode,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _commerceChannelService.addOrUpdateCommerceChannel(
 			externalReferenceCode, siteGroupId, name, type,
 			typeSettingsUnicodeProperties, commerceCurrencyCode,
 			serviceContext);

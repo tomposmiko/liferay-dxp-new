@@ -26,6 +26,10 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class SXPElementLocalServiceWrapper
 	implements ServiceWrapper<SXPElementLocalService>, SXPElementLocalService {
 
+	public SXPElementLocalServiceWrapper() {
+		this(null);
+	}
+
 	public SXPElementLocalServiceWrapper(
 		SXPElementLocalService sxpElementLocalService) {
 
@@ -84,6 +88,13 @@ public class SXPElementLocalServiceWrapper
 		long sxpElementId) {
 
 		return _sxpElementLocalService.createSXPElement(sxpElementId);
+	}
+
+	@Override
+	public void deleteCompanySXPElements(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_sxpElementLocalService.deleteCompanySXPElements(companyId);
 	}
 
 	/**
@@ -352,6 +363,13 @@ public class SXPElementLocalServiceWrapper
 		getSXPElements(int start, int end) {
 
 		return _sxpElementLocalService.getSXPElements(start, end);
+	}
+
+	@Override
+	public java.util.List<com.liferay.search.experiences.model.SXPElement>
+		getSXPElements(long companyId, boolean readOnly) {
+
+		return _sxpElementLocalService.getSXPElements(companyId, readOnly);
 	}
 
 	/**

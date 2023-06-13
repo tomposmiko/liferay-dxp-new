@@ -77,7 +77,7 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-129360. The user could change the display style of Documents and Media in display page template."
+	@description = "This is a use case for LPS-129360 and LPS-106776. The user could change the display style of Documents and Media in display page template."
 	@priority = "4"
 	test ChangeDisplayStyleOfDocumentsAndMediaInDisplayPageTemplate {
 		task ("Add a Documents and Media widget to the display page template") {
@@ -428,7 +428,7 @@ definition {
 		}
 	}
 
-	@description = "User can edit a display page. This includes adding and removing fragments and includes editing text in fragment editable fields."
+	@description = "This is a use case for LPS-106776. User can edit a display page. This includes adding and removing fragments and includes editing text in fragment editable fields."
 	@priority = "5"
 	@uitest
 	test EditDisplayPageTemplate {
@@ -496,7 +496,7 @@ definition {
 		}
 
 		task ("View the Button is not shown") {
-			PageEditor.viewNoFragment(fragmentName = "Button");
+			PageEditor.viewFragmentNotPresent(fragmentName = "Button");
 		}
 
 		task ("View the Heading and HTML fragments are shown") {
@@ -506,9 +506,10 @@ definition {
 				id = "element-text");
 
 			AssertTextEquals.assertPartialText(
+				fragmentName = "html",
 				id = "element-html",
-				key_fragmentName = "HTML",
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD",
+				index = "1",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
 				value1 = "HTML Example");
 		}
 	}
@@ -604,6 +605,114 @@ definition {
 			AssertElementPresent(
 				key_card = "TestMaster",
 				locator1 = "Card#CARD_SELECTED");
+		}
+	}
+
+	@description = "This is a test for LPS-140197. Draft version can only be accessed by author."
+	@priority = "4"
+	test ViewPreviewDraftViaURLFromNonAuthor {
+		property custom.properties = "jsonws.web.service.paths.excludes=";
+
+		task ("Add a user and assign it to the created site") {
+			JSONUser.addUser(
+				userEmailAddress = "userea@liferay.com",
+				userFirstName = "userfn",
+				userLastName = "userln",
+				userScreenName = "usersn");
+
+			JSONUser.setFirstPassword(
+				agreeToTermsAndAnswerReminderQuery = "true",
+				requireReset = "false",
+				userEmailAddress = "userea@liferay.com");
+
+			JSONUser.addUserToSite(
+				groupName = "Test Site Name",
+				userEmailAddress = "userea@liferay.com");
+		}
+
+		task ("Add a role and assign view web content permissions to the user") {
+			JSONRole.addSiteRole(
+				roleKey = "Web Content Viewer",
+				roleTitle = "Web Content Viewer");
+
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "VIEW_SITE_ADMINISTRATION",
+				resourceName = "com.liferay.portal.kernel.model.Group",
+				roleTitle = "Web Content Viewer",
+				roleType = "site");
+
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "ACCESS_IN_CONTROL_PANEL",
+				resourceName = "com_liferay_journal_web_portlet_JournalPortlet",
+				roleTitle = "Web Content Viewer",
+				roleType = "site");
+
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "VIEW",
+				resourceName = "com_liferay_journal_web_portlet_JournalPortlet",
+				roleTitle = "Web Content Viewer",
+				roleType = "site");
+
+			JSONRole.assignSiteRoleToUser(
+				groupName = "Test Site Name",
+				roleTitle = "Web Content Viewer",
+				userEmailAddress = "userea@liferay.com");
+		}
+
+		task ("Add a Display Page Content fragment and publish") {
+			PageEditor.addFragment(
+				collectionName = "Content Display",
+				fragmentName = "Display Page Content");
+
+			PageEditor.clickPublish();
+		}
+
+		task ("Mark the display page template as default") {
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+		}
+
+		task ("Add a web content") {
+			JSONWebcontent.addWebContent(
+				content = "Webcontent Content",
+				groupName = "Test Site Name",
+				title = "Webcontent Title");
+		}
+
+		task ("Save web content as draft") {
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+			WebContentNavigator.gotoEditCP(webContentTitle = "Webcontent Title");
+
+			WebContent.editCP(
+				saveAsDraft = "true",
+				webContentContentEdit = "WC WebContent Content Draft",
+				webContentTitle = "WC WebContent Title",
+				webContentTitleEdit = "WC WebContent Title Draft");
+		}
+
+		task ("Preview draft and get its URL") {
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+			WebContentNavigator.gotoEntryMenuItem(
+				entry = "WC WebContent Title Draft",
+				menuItem = "Preview Draft");
+
+			AssertElementPresent(locator1 = "IFrame#MODAL_BODY");
+
+			var url = selenium.getAttribute("//iframe@src");
+
+			User.logoutPG();
+
+			User.firstLoginUI(
+				password = "test",
+				specificURL = "${url}",
+				userEmailAddress = "userea@liferay.com");
+		}
+
+		task ("View the content is in published version") {
+			AssertTextEquals(
+				locator1 = "PageEditor#CONTENT_PAGE_WEB_CONTENT_CONTENT",
+				value1 = "WC WebContent Content");
 		}
 	}
 

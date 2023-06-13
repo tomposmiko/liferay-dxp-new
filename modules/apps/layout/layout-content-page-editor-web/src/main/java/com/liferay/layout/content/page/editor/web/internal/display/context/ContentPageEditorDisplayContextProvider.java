@@ -108,7 +108,7 @@ public class ContentPageEditorDisplayContextProvider {
 			_fragmentRendererTracker, _frontendTokenDefinitionRegistry,
 			httpServletRequest, _infoItemServiceTracker, _itemSelector,
 			_pageEditorConfiguration, pageIsDisplayPage, portletRequest,
-			renderResponse);
+			renderResponse, _stagingGroupHelper);
 	}
 
 	@Activate
@@ -178,9 +178,8 @@ public class ContentPageEditorDisplayContextProvider {
 		_layoutPageTemplateEntryLocalService;
 
 	private volatile PageEditorConfiguration _pageEditorConfiguration;
-	private volatile ServiceTrackerList
-		<ContentPageEditorSidebarPanel, ContentPageEditorSidebarPanel>
-			_serviceTrackerList;
+	private volatile ServiceTrackerList<ContentPageEditorSidebarPanel>
+		_serviceTrackerList;
 
 	@Reference
 	private StagingGroupHelper _stagingGroupHelper;

@@ -28,6 +28,7 @@ import com.liferay.headless.admin.user.resource.v1_0.SegmentUserResource;
 import com.liferay.headless.admin.user.resource.v1_0.SiteResource;
 import com.liferay.headless.admin.user.resource.v1_0.SubscriptionResource;
 import com.liferay.headless.admin.user.resource.v1_0.UserAccountResource;
+import com.liferay.headless.admin.user.resource.v1_0.UserGroupResource;
 import com.liferay.headless.admin.user.resource.v1_0.WebUrlResource;
 import com.liferay.portal.vulcan.graphql.servlet.ServletData;
 
@@ -62,6 +63,8 @@ public class ServletDataImpl implements ServletData {
 			_subscriptionResourceComponentServiceObjects);
 		Mutation.setUserAccountResourceComponentServiceObjects(
 			_userAccountResourceComponentServiceObjects);
+		Mutation.setUserGroupResourceComponentServiceObjects(
+			_userGroupResourceComponentServiceObjects);
 
 		Query.setAccountResourceComponentServiceObjects(
 			_accountResourceComponentServiceObjects);
@@ -87,6 +90,8 @@ public class ServletDataImpl implements ServletData {
 			_subscriptionResourceComponentServiceObjects);
 		Query.setUserAccountResourceComponentServiceObjects(
 			_userAccountResourceComponentServiceObjects);
+		Query.setUserGroupResourceComponentServiceObjects(
+			_userGroupResourceComponentServiceObjects);
 		Query.setWebUrlResourceComponentServiceObjects(
 			_webUrlResourceComponentServiceObjects);
 	}
@@ -129,6 +134,10 @@ public class ServletDataImpl implements ServletData {
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<UserAccountResource>
 		_userAccountResourceComponentServiceObjects;
+
+	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
+	private ComponentServiceObjects<UserGroupResource>
+		_userGroupResourceComponentServiceObjects;
 
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<EmailAddressResource>

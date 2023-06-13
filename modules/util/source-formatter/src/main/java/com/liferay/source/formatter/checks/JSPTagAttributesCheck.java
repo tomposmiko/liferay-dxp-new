@@ -64,11 +64,19 @@ public class JSPTagAttributesCheck extends BaseTagAttributesCheck {
 
 	@Override
 	protected Tag doFormatLineBreaks(Tag tag, String absolutePath) {
-		String tagName = tag.getName();
+		Map<String, String> attributesMap = tag.getAttributesMap();
 
-		if (!tagName.contains(StringPool.COLON) || tagName.startsWith("aui:") ||
-			tagName.startsWith("c:") || tagName.startsWith("portlet:") ||
-			ArrayUtil.contains(_SINGLE_LINE_TAG_WHITELIST, tagName)) {
+		if (attributesMap.isEmpty()) {
+			tag.setMultiLine(false);
+
+			return tag;
+		}
+
+		String taglibName = tag.getTaglibName();
+
+		if ((taglibName == null) || taglibName.equals("aui") ||
+			taglibName.equals("c") || taglibName.equals("portlet") ||
+			ArrayUtil.contains(_SINGLE_LINE_TAG_WHITELIST, tag.getFullName())) {
 
 			tag.setMultiLine(false);
 		}
@@ -101,7 +109,8 @@ public class JSPTagAttributesCheck extends BaseTagAttributesCheck {
 			return tag;
 		}
 
-		Map<String, String> setMethodsMap = _getSetMethodsMap(tag.getName());
+		Map<String, String> setMethodsMap = _getSetMethodsMap(
+			tag.getFullName());
 
 		Map<String, String> attributesMap = tag.getAttributesMap();
 
@@ -115,15 +124,16 @@ public class JSPTagAttributesCheck extends BaseTagAttributesCheck {
 			String attributeName = entry.getKey();
 			String attributeValue = entry.getValue();
 
-			String tagName = tag.getName();
+			String tagFullName = tag.getFullName();
 
-			if (tagName.matches("\\w+")) {
+			if (tagFullName.matches("\\w+")) {
 				tag.putAttribute(
 					attributeName,
 					_formatPortletNamespaceValue(attributeValue));
 			}
 
-			if (tagName.equals("aui:button") && attributeName.equals("type") &&
+			if (tagFullName.equals("aui:button") &&
+				attributeName.equals("type") &&
 				attributeValue.equals("button")) {
 
 				iterator.remove();
@@ -131,7 +141,17 @@ public class JSPTagAttributesCheck extends BaseTagAttributesCheck {
 				continue;
 			}
 
-			if (tagName.equals("liferay-ui:message") &&
+			if ((tagFullName.equals("aui:form") ||
+				 tagFullName.equals("liferay-frontend:edit-form")) &&
+				attributeName.equals("action") &&
+				StringUtil.endsWith(attributeValue, "url.toString() %>")) {
+
+				tag.putAttribute(
+					attributeName,
+					StringUtil.replaceLast(attributeValue, ".toString()", ""));
+			}
+
+			if (tagFullName.equals("liferay-ui:message") &&
 				attributeName.equals("arguments")) {
 
 				tag.putAttribute(
@@ -140,8 +160,8 @@ public class JSPTagAttributesCheck extends BaseTagAttributesCheck {
 			}
 
 			if (attributeName.equals("style") &&
-				(!tagName.contains(StringPool.COLON) ||
-				 tagName.startsWith("aui:"))) {
+				(!tagFullName.contains(StringPool.COLON) ||
+				 tagFullName.startsWith("aui:"))) {
 
 				tag.putAttribute(
 					attributeName, _formatStyleAttributeValue(attributeValue));
@@ -252,7 +272,7 @@ public class JSPTagAttributesCheck extends BaseTagAttributesCheck {
 				String trimmedLine = StringUtil.trimLeading(line);
 
 				if (trimmedLine.matches("<\\w+ .*>.*")) {
-					String htmlTag = _getTag(trimmedLine, 0);
+					String htmlTag = getTag(trimmedLine, 0);
 
 					if (htmlTag != null) {
 						String newHTMLTag = formatTagAttributes(
@@ -262,7 +282,7 @@ public class JSPTagAttributesCheck extends BaseTagAttributesCheck {
 					}
 				}
 
-				for (String jspTag : _getJSPTag(line)) {
+				for (String jspTag : getJSPTags(line)) {
 					boolean forceSingleLine = false;
 
 					if (!line.equals(jspTag)) {
@@ -369,32 +389,12 @@ public class JSPTagAttributesCheck extends BaseTagAttributesCheck {
 		return newAttributeValue;
 	}
 
-	private List<String> _getJSPTag(String line) {
-		List<String> jspTags = new ArrayList<>();
-
-		Matcher matcher = _jspTaglibPattern.matcher(line);
-
-		while (matcher.find()) {
-			String tag = _getTag(line, matcher.start());
-
-			if (tag == null) {
-				return jspTags;
-			}
-
-			jspTags.add(tag);
-		}
-
-		return jspTags;
-	}
-
 	private synchronized Set<String> _getPrimitiveTagAttributeDataTypes() {
 		if (_primitiveTagAttributeDataTypes == null) {
 			_primitiveTagAttributeDataTypes = SetUtil.fromArray(
-				new String[] {
-					"java.lang.Boolean", "Boolean", "boolean",
-					"java.lang.Double", "Double", "double", "java.lang.Integer",
-					"Integer", "int", "java.lang.Long", "Long", "long"
-				});
+				"java.lang.Boolean", "Boolean", "boolean", "java.lang.Double",
+				"Double", "double", "java.lang.Integer", "Integer", "int",
+				"java.lang.Long", "Long", "long");
 		}
 
 		return _primitiveTagAttributeDataTypes;
@@ -572,24 +572,6 @@ public class JSPTagAttributesCheck extends BaseTagAttributesCheck {
 		return setMethodsMap;
 	}
 
-	private String _getTag(String s, int fromIndex) {
-		int x = fromIndex;
-
-		while (true) {
-			x = s.indexOf(">", x + 1);
-
-			if (x == -1) {
-				return null;
-			}
-
-			String part = s.substring(fromIndex, x + 1);
-
-			if (getLevel(part, "<", ">") == 0) {
-				return part;
-			}
-		}
-	}
-
 	private boolean _isValidTagAttributeValue(String value, String dataType) {
 		if (dataType.endsWith("Boolean") || dataType.equals("boolean")) {
 			return Validator.isBoolean(value);
@@ -636,8 +618,6 @@ public class JSPTagAttributesCheck extends BaseTagAttributesCheck {
 
 	private static final Pattern _javaSourceInsideTagPattern = Pattern.compile(
 		"<%.*?%>");
-	private static final Pattern _jspTaglibPattern = Pattern.compile(
-		"\t*<[-\\w]+:[-\\w]+ .");
 	private static final Pattern _messageArgumentArrayPattern = Pattern.compile(
 		"^(<%= )new \\w+\\[\\] \\{([^<>]+)\\}( %>)$");
 	private static final Pattern _styleAttributePattern = Pattern.compile(

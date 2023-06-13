@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.SetUtil;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -70,6 +69,7 @@ public class NumericInputMaskDDMFormFieldTemplateContextContributorTest
 
 		Assert.assertEquals("$", parameters.get("append"));
 		Assert.assertEquals("prefix", parameters.get("appendType"));
+		Assert.assertEquals(2, parameters.get("decimalPlaces"));
 		Assert.assertEquals(",", parameters.get("decimalSymbol"));
 
 		List<Object> decimalSymbols = (List<Object>)parameters.get(
@@ -164,6 +164,8 @@ public class NumericInputMaskDDMFormFieldTemplateContextContributorTest
 			).put(
 				"appendType", "prefix"
 			).put(
+				"decimalPlaces", 2
+			).put(
 				"symbols",
 				JSONUtil.put(
 					"decimalSymbol", ","
@@ -206,7 +208,7 @@ public class NumericInputMaskDDMFormFieldTemplateContextContributorTest
 		when(
 			language.getAvailableLocales()
 		).thenReturn(
-			SetUtil.fromArray(new Locale[] {LocaleUtil.US})
+			SetUtil.fromArray(LocaleUtil.US)
 		);
 
 		when(

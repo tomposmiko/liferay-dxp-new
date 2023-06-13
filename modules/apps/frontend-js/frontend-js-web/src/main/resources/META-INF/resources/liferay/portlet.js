@@ -12,6 +12,9 @@
  * details.
  */
 
+/* eslint-disable @liferay/aui/no-node */
+/* eslint-disable @liferay/aui/no-one */
+
 (function (A) {
 	var Lang = A.Lang;
 
@@ -77,8 +80,6 @@
 				response.footerJavaScriptPaths || []
 			);
 
-			var body = A.getBody();
-
 			var head = A.one(STR_HEAD);
 
 			if (headerCssPaths.length) {
@@ -87,7 +88,7 @@
 				});
 			}
 
-			var lastChild = body.get('lastChild').getDOM();
+			var lastChild = document.body.lastChild;
 
 			if (footerCssPaths.length) {
 				A.Get.css(footerCssPaths, {
@@ -488,7 +489,7 @@
 
 			var canEditTitle = options.canEditTitle;
 			var columnPos = options.columnPos;
-			var isStatic = options.isStatic == 'no' ? null : options.isStatic;
+			var isStatic = options.isStatic === 'no' ? null : options.isStatic;
 			var namespacedId = options.namespacedId;
 			var portletId = options.portletId;
 			var refreshURL = options.refreshURL;
@@ -560,7 +561,10 @@
 
 			if (portlet) {
 				if (mergeWithRefreshURLData) {
-					data = A.merge(portlet.refreshURLData || {}, data || {});
+					data = {
+						...(portlet.refreshURLData || {}),
+						...(data || {}),
+					};
 				}
 				else {
 					data = data || portlet.refreshURLData || {};

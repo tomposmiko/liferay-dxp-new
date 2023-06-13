@@ -19,6 +19,7 @@ import com.liferay.blogs.internal.upgrade.v1_1_2.BlogsImagesUpgradeProcess;
 import com.liferay.blogs.internal.upgrade.v2_0_0.util.BlogsEntryTable;
 import com.liferay.blogs.internal.upgrade.v2_0_0.util.BlogsStatsUserTable;
 import com.liferay.blogs.internal.upgrade.v2_2_0.BlogsEntryExternalReferenceCodeUpgradeProcess;
+import com.liferay.blogs.internal.upgrade.v3_0_0.BlogsStatsUserUpgradeProcess;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.comment.upgrade.UpgradeDiscussionSubscriptionClassName;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
@@ -33,6 +34,7 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ImageLocalService;
 import com.liferay.portal.kernel.upgrade.BaseSQLServerDatetimeUpgradeProcess;
+import com.liferay.portal.kernel.upgrade.CTModelUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.kernel.upgrade.MVCCVersionUpgradeProcess;
@@ -109,6 +111,11 @@ public class BlogsServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"2.1.2", "2.2.0",
 			new BlogsEntryExternalReferenceCodeUpgradeProcess());
+
+		registry.register("2.2.0", "3.0.0", new BlogsStatsUserUpgradeProcess());
+
+		registry.register(
+			"3.0.0", "3.1.0", new CTModelUpgradeProcess("BlogsEntry"));
 	}
 
 	private UnsafeBiFunction<String, Connection, Boolean, Exception>

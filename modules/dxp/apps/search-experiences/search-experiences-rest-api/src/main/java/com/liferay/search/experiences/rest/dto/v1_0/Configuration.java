@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -59,20 +60,23 @@ public class Configuration implements Serializable {
 
 	@Schema
 	@Valid
-	public Advanced getAdvanced() {
-		return advanced;
+	public AdvancedConfiguration getAdvancedConfiguration() {
+		return advancedConfiguration;
 	}
 
-	public void setAdvanced(Advanced advanced) {
-		this.advanced = advanced;
+	public void setAdvancedConfiguration(
+		AdvancedConfiguration advancedConfiguration) {
+
+		this.advancedConfiguration = advancedConfiguration;
 	}
 
 	@JsonIgnore
-	public void setAdvanced(
-		UnsafeSupplier<Advanced, Exception> advancedUnsafeSupplier) {
+	public void setAdvancedConfiguration(
+		UnsafeSupplier<AdvancedConfiguration, Exception>
+			advancedConfigurationUnsafeSupplier) {
 
 		try {
-			advanced = advancedUnsafeSupplier.get();
+			advancedConfiguration = advancedConfigurationUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -84,7 +88,7 @@ public class Configuration implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Advanced advanced;
+	protected AdvancedConfiguration advancedConfiguration;
 
 	@Schema
 	@Valid
@@ -121,18 +125,23 @@ public class Configuration implements Serializable {
 
 	@Schema
 	@Valid
-	public Facet getFacet() {
-		return facet;
+	public GeneralConfiguration getGeneralConfiguration() {
+		return generalConfiguration;
 	}
 
-	public void setFacet(Facet facet) {
-		this.facet = facet;
+	public void setGeneralConfiguration(
+		GeneralConfiguration generalConfiguration) {
+
+		this.generalConfiguration = generalConfiguration;
 	}
 
 	@JsonIgnore
-	public void setFacet(UnsafeSupplier<Facet, Exception> facetUnsafeSupplier) {
+	public void setGeneralConfiguration(
+		UnsafeSupplier<GeneralConfiguration, Exception>
+			generalConfigurationUnsafeSupplier) {
+
 		try {
-			facet = facetUnsafeSupplier.get();
+			generalConfiguration = generalConfigurationUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -144,24 +153,27 @@ public class Configuration implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Facet facet;
+	protected GeneralConfiguration generalConfiguration;
 
 	@Schema
 	@Valid
-	public General getGeneral() {
-		return general;
+	public HighlightConfiguration getHighlightConfiguration() {
+		return highlightConfiguration;
 	}
 
-	public void setGeneral(General general) {
-		this.general = general;
+	public void setHighlightConfiguration(
+		HighlightConfiguration highlightConfiguration) {
+
+		this.highlightConfiguration = highlightConfiguration;
 	}
 
 	@JsonIgnore
-	public void setGeneral(
-		UnsafeSupplier<General, Exception> generalUnsafeSupplier) {
+	public void setHighlightConfiguration(
+		UnsafeSupplier<HighlightConfiguration, Exception>
+			highlightConfigurationUnsafeSupplier) {
 
 		try {
-			general = generalUnsafeSupplier.get();
+			highlightConfiguration = highlightConfigurationUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -173,24 +185,27 @@ public class Configuration implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected General general;
+	protected HighlightConfiguration highlightConfiguration;
 
 	@Schema
 	@Valid
-	public Highlight getHighlight() {
-		return highlight;
+	public ParameterConfiguration getParameterConfiguration() {
+		return parameterConfiguration;
 	}
 
-	public void setHighlight(Highlight highlight) {
-		this.highlight = highlight;
+	public void setParameterConfiguration(
+		ParameterConfiguration parameterConfiguration) {
+
+		this.parameterConfiguration = parameterConfiguration;
 	}
 
 	@JsonIgnore
-	public void setHighlight(
-		UnsafeSupplier<Highlight, Exception> highlightUnsafeSupplier) {
+	public void setParameterConfiguration(
+		UnsafeSupplier<ParameterConfiguration, Exception>
+			parameterConfigurationUnsafeSupplier) {
 
 		try {
-			highlight = highlightUnsafeSupplier.get();
+			parameterConfiguration = parameterConfigurationUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -202,37 +217,7 @@ public class Configuration implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Highlight highlight;
-
-	@Schema
-	@Valid
-	public Map<String, Parameter> getParameters() {
-		return parameters;
-	}
-
-	public void setParameters(Map<String, Parameter> parameters) {
-		this.parameters = parameters;
-	}
-
-	@JsonIgnore
-	public void setParameters(
-		UnsafeSupplier<Map<String, Parameter>, Exception>
-			parametersUnsafeSupplier) {
-
-		try {
-			parameters = parametersUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Map<String, Parameter> parameters;
+	protected ParameterConfiguration parameterConfiguration;
 
 	@Schema
 	@Valid
@@ -263,6 +248,39 @@ public class Configuration implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected QueryConfiguration queryConfiguration;
+
+	@Schema
+	@Valid
+	public Map<String, Object> getSearchContextAttributes() {
+		return searchContextAttributes;
+	}
+
+	public void setSearchContextAttributes(
+		Map<String, Object> searchContextAttributes) {
+
+		this.searchContextAttributes = searchContextAttributes;
+	}
+
+	@JsonIgnore
+	public void setSearchContextAttributes(
+		UnsafeSupplier<Map<String, Object>, Exception>
+			searchContextAttributesUnsafeSupplier) {
+
+		try {
+			searchContextAttributes =
+				searchContextAttributesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Map<String, Object> searchContextAttributes;
 
 	@Schema
 	@Valid
@@ -321,14 +339,14 @@ public class Configuration implements Serializable {
 
 		sb.append("{");
 
-		if (advanced != null) {
+		if (advancedConfiguration != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"advanced\": ");
+			sb.append("\"advancedConfiguration\": ");
 
-			sb.append(String.valueOf(advanced));
+			sb.append(String.valueOf(advancedConfiguration));
 		}
 
 		if (aggregationConfiguration != null) {
@@ -341,44 +359,34 @@ public class Configuration implements Serializable {
 			sb.append(String.valueOf(aggregationConfiguration));
 		}
 
-		if (facet != null) {
+		if (generalConfiguration != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"facet\": ");
+			sb.append("\"generalConfiguration\": ");
 
-			sb.append(String.valueOf(facet));
+			sb.append(String.valueOf(generalConfiguration));
 		}
 
-		if (general != null) {
+		if (highlightConfiguration != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"general\": ");
+			sb.append("\"highlightConfiguration\": ");
 
-			sb.append(String.valueOf(general));
+			sb.append(String.valueOf(highlightConfiguration));
 		}
 
-		if (highlight != null) {
+		if (parameterConfiguration != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"highlight\": ");
+			sb.append("\"parameterConfiguration\": ");
 
-			sb.append(String.valueOf(highlight));
-		}
-
-		if (parameters != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"parameters\": ");
-
-			sb.append(_toJSON(parameters));
+			sb.append(String.valueOf(parameterConfiguration));
 		}
 
 		if (queryConfiguration != null) {
@@ -389,6 +397,16 @@ public class Configuration implements Serializable {
 			sb.append("\"queryConfiguration\": ");
 
 			sb.append(String.valueOf(queryConfiguration));
+		}
+
+		if (searchContextAttributes != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"searchContextAttributes\": ");
+
+			sb.append(_toJSON(searchContextAttributes));
 		}
 
 		if (sortConfiguration != null) {
@@ -414,9 +432,9 @@ public class Configuration implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		String string = String.valueOf(object);
-
-		return string.replaceAll("\"", "\\\\\"");
+		return StringUtil.replace(
+			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
+			_JSON_ESCAPE_STRINGS[1]);
 	}
 
 	private static boolean _isArray(Object value) {
@@ -442,7 +460,7 @@ public class Configuration implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(entry.getKey());
+			sb.append(_escape(entry.getKey()));
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -474,7 +492,7 @@ public class Configuration implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(value);
+				sb.append(_escape(value));
 				sb.append("\"");
 			}
 			else {
@@ -490,5 +508,10 @@ public class Configuration implements Serializable {
 
 		return sb.toString();
 	}
+
+	private static final String[][] _JSON_ESCAPE_STRINGS = {
+		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
+		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
+	};
 
 }

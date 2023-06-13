@@ -396,6 +396,7 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 			overrideAllAssetCategoryIds, overrideAllAssetTagNames,
 			overrideAllKeywords);
 
+		assetEntryQuery.setAttribute("showNonindexable", Boolean.TRUE);
 		assetEntryQuery.setGroupIds(groupIds);
 
 		boolean anyAssetType = GetterUtil.getBoolean(
@@ -433,6 +434,8 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 		if (showOnlyLayoutAssets) {
 			assetEntryQuery.setLayout(layout);
 		}
+
+		assetEntryQuery.setListable(null);
 
 		String orderByColumn1 = GetterUtil.getString(
 			portletPreferences.getValue("orderByColumn1", "modifiedDate"));
@@ -1336,7 +1339,7 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 
 		for (String assetTagName : allAssetTagNames) {
 			long[] allAssetTagIds = _assetTagLocalService.getTagIds(
-				siteGroupIds, assetTagName);
+				assetTagName);
 
 			assetEntryQuery.addAllTagIdsArray(allAssetTagIds);
 		}

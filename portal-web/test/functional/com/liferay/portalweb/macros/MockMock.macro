@@ -12,7 +12,6 @@ definition {
 
 			SelectWindow.selectPopUp(locator1 = "null");
 		}
-
 		else {
 			Navigator.openSpecificURL(url = "http://localhost:8282");
 		}
@@ -71,10 +70,24 @@ definition {
 		AssertTextEquals.assertPartialText(
 			locator1 = "MockMock#MOCKMOCK_MESSAGE_BODY",
 			value1 = "${content}");
+
+		if (isSet(fromAddress)) {
+			AssertTextEquals.assertPartialText(
+				locator1 = "MockMock#MOCKMOCK_MESSAGE_BODY",
+				value1 = "${fromAddress}");
+		}
+
+		if (isSet(toName)) {
+			AssertTextEquals.assertPartialText(
+				locator1 = "MockMock#MOCKMOCK_MESSAGE_BODY",
+				value1 = "${toName}");
+		}
 	}
 
 	macro clickBodyLink {
-		MockMock._gotoMailMessage(asset = "${asset}");
+		MockMock._gotoMailMessage(
+			asset = "${asset}",
+			recipient = "${recipient}");
 
 		var key_bodyLink = "${bodyLink}";
 
@@ -88,15 +101,22 @@ definition {
 
 		MockMock._gotoMail(newTab = "${newTab}");
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "MockMock#MOCKMOCK_SUBJECT_FIELD_LINK",
-			value1 = "${asset}");
+		if (isSet(deleteAll)) {
+			Click(
+				key_text = "Delete all",
+				locator1 = "Link#ANY");
+		}
+		else {
+			AssertTextEquals.assertPartialText(
+				locator1 = "MockMock#MOCKMOCK_SUBJECT_FIELD_LINK",
+				value1 = "${asset}");
 
-		AssertClick(
-			locator1 = "MockMock#MOCKMOCK_DELETE_FIELD",
-			value1 = "Delete");
+			AssertClick(
+				locator1 = "MockMock#MOCKMOCK_DELETE_FIELD",
+				value1 = "Delete");
 
-		AssertElementNotPresent(locator1 = "MockMock#MOCKMOCK_SUBJECT_FIELD_LINK");
+			AssertElementNotPresent(locator1 = "MockMock#MOCKMOCK_SUBJECT_FIELD_LINK");
+		}
 	}
 
 	macro getBodySpecificText {
@@ -186,11 +206,14 @@ definition {
 			subject = "${subject}");
 
 		var bodyContent = selenium.getText("MockMock#MOCKMOCK_MESSAGE_BODY");
-
-		var bodyContent = StringUtil.extractLast("${bodyContent}", "href=&quot;");
-		var bodyURL = StringUtil.extractFirst("${bodyContent}", "&quot;");
+		var bodyContent = StringUtil.extractLast("${bodyContent}", "href=\"");
+		var bodyURL = StringUtil.extractFirst("${bodyContent}", "\"");
 
 		Navigator.openSpecificURL(url = "${bodyURL}");
+	}
+
+	macro openMockMock {
+		MockMock._gotoMail();
 	}
 
 	macro viewMail {
@@ -207,7 +230,9 @@ definition {
 
 		MockMock._viewMailMessage(
 			content = "${content}",
-			subject = "${subject}");
+			fromAddress = "${fromAddress}",
+			subject = "${subject}",
+			toName = "${toName}");
 
 		MockMock._backtoInbox();
 	}
@@ -239,6 +264,23 @@ definition {
 		MockMock._gotoMail();
 
 		AssertElementPresent(locator1 = "MockMock#MOCKMOCK_NO_EMAIL_IN_QUEUE");
+	}
+
+	macro viewUnformattedHTMLText {
+		MockMock._gotoMail();
+
+		MockMock._viewMailFromInbox(
+			asset = "${asset}",
+			recipient = "${recipient}",
+			sender = "${sender}");
+
+		MockMock._gotoMailMessage(
+			asset = "${subject}",
+			recipient = "${recipient}");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "MockMock#MOCKMOCK_HTML_BODY_UNFORMATTED_FIELD",
+			value1 = "${unFormattedContent}");
 	}
 
 }

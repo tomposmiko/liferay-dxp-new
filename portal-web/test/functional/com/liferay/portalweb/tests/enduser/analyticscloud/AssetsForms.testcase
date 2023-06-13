@@ -38,6 +38,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8433 | Test Summary: Form appears on card shows the pages that the form appears on"
+	@ignore = "true"
 	@priority = "5"
 	test AssertAppearsOnListShowsPagesFormsExists {
 		property portal.upstream = "quarantine";
@@ -80,6 +81,7 @@ definition {
 			// This data takes too long to appear
 
 			var portalURL = PropsUtil.get("portal.url");
+
 			var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 			ACAssets.viewAssetAppearsOnMetric(
@@ -90,10 +92,14 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8423 | Test Summary: Forms audience card shows expected amount of known and anonymous individuals"
+	@ignore = "true"
 	@priority = "5"
 	test AudienceCardShowsExpectedAmountKnowAndAnonymousIndividualsInForms {
-		var usernameList = "ac,ac2";
+		property portal.upstream = "quarantine";
 
+		// AC Bug Ticket: LRAC-10154
+
+		var usernameList = "ac,ac2";
 		var emailList = "ac@liferay.com,ac2@liferay.com";
 
 		task ("Create users and connect to AC") {
@@ -157,10 +163,14 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8424 | Test Summary: Forms audience card shows expected amount of segmented and unsegmented individuals"
+	@ignore = "true"
 	@priority = "5"
 	test AudienceCardShowsExpectedAmountSegmentedAndUnsegmentedInForms {
-		var usernameList = "ac,ac2";
+		property portal.upstream = "quarantine";
 
+		// AC Bug Ticket: LRAC-10154
+
+		var usernameList = "ac,ac2";
 		var emailList = "ac@liferay.com,ac2@liferay.com";
 
 		task ("Create users and connect to AC") {
@@ -179,16 +189,6 @@ definition {
 			ACUtils.navigateToSitePageWithUser(
 				actionType = "Submit Form",
 				emailList = "${emailList}",
-				pageName = "AC Page",
-				siteName = "Site Name",
-				submitText = "Test Assets");
-		}
-
-		task ("Download the document with anonymous user") {
-			User.logoutPG();
-
-			ACUtils.navigateToSitePage(
-				actionType = "Submit Form",
 				pageName = "AC Page",
 				siteName = "Site Name",
 				submitText = "Test Assets");
@@ -217,7 +217,16 @@ definition {
 		task ("Go to form and submit to get data for segmented individuals") {
 			ACUtils.launchDXP();
 
-			ACUtils.launchDXP(userEmailAddress = "ac@liferay.com");
+			ACUtils.navigateToSitePageWithUser(
+				actionType = "Submit Form",
+				emailList = "ac@liferay.com",
+				pageName = "AC Page",
+				siteName = "Site Name",
+				submitText = "Test Assets");
+		}
+
+		task ("Download the document with anonymous user") {
+			User.logoutPG();
 
 			ACUtils.navigateToSitePage(
 				actionType = "Submit Form",
@@ -252,11 +261,16 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8417 | Test Summary: Forms list is searchable"
+	@ignore = "true"
 	@priority = "5"
 	test CanFormsListSearchable {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10154
+
 		var formNameList = "Created Form Name,Created Form Name 1";
 
-		ACUtils.addSiteAndPage(layoutName = "AC Page 1");
+		ACUtils.addPage(layoutName = "AC Page 1");
 
 		ACUtils.createFormAndAddToPage(
 			formACTitle = "Created Form Name 1",
@@ -268,9 +282,10 @@ definition {
 
 		for (var pageName : list "AC Page,AC Page 1") {
 			ACUtils.navigateToSitePage(
-				actionType = "View Form",
+				actionType = "Submit Form",
 				pageName = "${pageName}",
-				siteName = "Site Name");
+				siteName = "Site Name",
+				submitText = "Test Assets");
 		}
 
 		ACUtils.closeAllSessionsAndWait();
@@ -299,8 +314,13 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8121 | Test Summary: Assert clicking a form in the forms list navigates to the form overview page"
+	@ignore = "true"
 	@priority = "5"
 	test CanNavigatesToFormsOverviewPage {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10154
+
 		Navigator.openURL();
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
@@ -357,6 +377,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8421 | Test Summary: Assert Assets Forms Custom Range Time Filter in Behaviour Report	"
+	@ignore = "true"
 	@priority = "5"
 	test CanTimeFilterUseCustomRangeInFormsBehaviourReport {
 		property portal.upstream = "quarantine";
@@ -417,8 +438,8 @@ definition {
 			var curr_metricValue = "";
 
 			for (var current : list "Abandonment-${expectedValue1},Submissions-${expectedValue2},Views-${expectedValue3},Completion Time-${expectedValue4}") {
-				curr_metricName = StringUtil.extractFirst("${current}","-");
-				curr_metricValue = StringUtil.extractLast("${current}","-");
+				var curr_metricName = StringUtil.extractFirst("${current}", "-");
+				var curr_metricValue = StringUtil.extractLast("${current}", "-");
 
 				ACCards.viewMetricValue(
 					cardTitle = "Visitors Behavior",
@@ -429,8 +450,13 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8431 | Test Summary: Form abandonment card shows the expected amount of form abandonment based on how many times the form was started but not completed"
+	@ignore = "true"
 	@priority = "5"
 	test FormAbandonmentCardShowsExpectedAmountFormAbandonment {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10154
+
 		Navigator.openURL();
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
@@ -470,10 +496,11 @@ definition {
 		ACCards.viewMetricValue(
 			cardTitle = "Visitors Behavior",
 			metricName = "Abandonment",
-			metricValue = "66.7%");
+			metricValue = "66.7");
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8426 | Test Summary: Forms submissions by location card shows expected views by location"
+	@ignore = "true"
 	@priority = "5"
 	test FormsLocationCardShowsViewsByExpectedLocation {
 		property portal.upstream = "quarantine";
@@ -528,8 +555,13 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8429 | Test Summary: Form submissions by technology card shows views by expected browser"
+	@ignore = "true"
 	@priority = "5"
 	test FormsTechnologyCardShowsViewsByExpectedBrowser {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10154
+
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		task ("Form submit") {
@@ -574,8 +606,13 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8428 | Test Summary: Form submissions by technology card shows views by expected device"
+	@ignore = "true"
 	@priority = "5"
 	test FormsTechnologyCardShowsViewsByExpectedDevice {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10154
+
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		task ("Submit the form") {
@@ -618,12 +655,15 @@ definition {
 	}
 
 	@description = "Form known individuals shows which individuals interact with the form"
+	@ignore = "true"
 	@priority = "5"
 	test KnownIndividualsShowsWhichIndividualsInteractWithForm {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10154
+
 		var nameList = "ac ac,liferay liferay,dxp dxp";
-
 		var usernameList = "ac,liferay,dxp";
-
 		var emailList = "ac@liferay.com,liferay@liferay.com,dxp@liferay.com";
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
@@ -671,12 +711,17 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8120 | Test Summary: Assert forms list shows all of the forms in a list"
+	@ignore = "true"
 	@priority = "5"
 	test ViewAllFormsShownInAssetList {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10154
+
 		var formNameList = "Created Form Name,Created Form Name 1,Created Form Name 2,Created Form Name 3";
 
 		for (var n : list "1,2,3") {
-			ACUtils.addSiteAndPage(layoutName = "AC Page ${n}");
+			ACUtils.addPage(layoutName = "AC Page ${n}");
 		}
 
 		for (var n : list "1,2,3") {
@@ -715,8 +760,14 @@ definition {
 	}
 
 	@description = "Forms visitor behavior card shows expected amount of views"
+	@ignore = "true"
 	@priority = "5"
 	test VisitorBehaviorCardShowsExpectedAmountOfViews {
+		property portal.acceptance = "false";
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10154
+
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		ACUtils.navigateToSitePage(

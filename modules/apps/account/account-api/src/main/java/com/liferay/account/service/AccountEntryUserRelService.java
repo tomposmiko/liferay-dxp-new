@@ -54,7 +54,8 @@ public interface AccountEntryUserRelService extends BaseService {
 	public AccountEntryUserRel addAccountEntryUserRel(
 			long accountEntryId, long creatorUserId, String screenName,
 			String emailAddress, Locale locale, String firstName,
-			String middleName, String lastName, long prefixId, long suffixId)
+			String middleName, String lastName, long prefixId, long suffixId,
+			String jobTitle)
 		throws PortalException;
 
 	public AccountEntryUserRel addAccountEntryUserRelByEmailAddress(
@@ -62,8 +63,23 @@ public interface AccountEntryUserRelService extends BaseService {
 			String userExternalReferenceCode, ServiceContext serviceContext)
 		throws PortalException;
 
+	public void addAccountEntryUserRels(
+			long accountEntryId, long[] accountUserIds)
+		throws PortalException;
+
+	public AccountEntryUserRel addPersonTypeAccountEntryUserRel(
+			long accountEntryId, long creatorUserId, String screenName,
+			String emailAddress, Locale locale, String firstName,
+			String middleName, String lastName, long prefixId, long suffixId,
+			String jobTitle)
+		throws PortalException;
+
 	public void deleteAccountEntryUserRelByEmailAddress(
 			long accountEntryId, String emailAddress)
+		throws PortalException;
+
+	public void deleteAccountEntryUserRels(
+			long accountEntryId, long[] accountUserIds)
 		throws PortalException;
 
 	/**
@@ -72,5 +88,8 @@ public interface AccountEntryUserRelService extends BaseService {
 	 * @return the OSGi service identifier
 	 */
 	public String getOSGiServiceIdentifier();
+
+	public void setPersonTypeAccountEntryUser(long accountEntryId, long userId)
+		throws PortalException;
 
 }

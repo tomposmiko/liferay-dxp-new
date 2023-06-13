@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.4.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_4_0.dtd">
 
-<service-builder auto-namespace-tables="false" mvcc-enabled="false" package-path="com.liferay.commerce">
+<service-builder auto-namespace-tables="false" mvcc-enabled="true" package-path="com.liferay.commerce">
 	<author>Alessio Antonio Rendina</author>
 	<namespace>Commerce</namespace>
 	<entity external-reference-code="true" local-service="true" name="CommerceAddress" persistence="false" remote-service="true">
@@ -323,9 +323,10 @@
 		<column name="commerceOrderId" type="long" />
 		<column name="commercePriceListId" type="long" />
 		<column name="CPInstanceId" type="long" />
+		<column name="CPMeasurementUnitId" type="long" />
 		<column name="CProductId" type="long" />
 		<column name="parentCommerceOrderItemId" type="long" />
-		<column name="shippingAddressId" type="long" />
+		<column name="decimalQuantity" type="BigDecimal" />
 		<column name="deliveryGroup" type="String" />
 		<column name="deliveryMaxSubscriptionCycles" type="long" />
 		<column name="deliverySubscriptionLength" type="int" />
@@ -355,6 +356,7 @@
 		<column name="promoPriceWithTaxAmount" type="BigDecimal" />
 		<column name="quantity" type="int" />
 		<column name="requestedDeliveryDate" type="Date" />
+		<column name="shippingAddressId" type="long" />
 		<column name="shipSeparately" type="boolean" />
 		<column name="shippable" type="boolean" />
 		<column name="shippedQuantity" type="int" />

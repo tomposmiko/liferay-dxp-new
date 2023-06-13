@@ -23,7 +23,7 @@ PortletURL portletURL = corEntryDisplayContext.getPortletURL();
 %>
 
 <div class="pt-4">
-	<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
+	<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 		<aui:input name="deleteCOREntries" type="hidden" />
@@ -32,7 +32,7 @@ PortletURL portletURL = corEntryDisplayContext.getPortletURL();
 			apiURL="/o/headless-commerce-admin-order/v1.0/order-rules"
 			clayDataSetActionDropdownItems="<%= corEntryDisplayContext.getCOREntryClayDataSetActionDropdownItems() %>"
 			creationMenu="<%= corEntryDisplayContext.getCreationMenu() %>"
-			formId="fm"
+			formName="fm"
 			id="<%= COREntryClayDataSetDisplayNames.COR_ENTRIES %>"
 			itemsPerPage="<%= 10 %>"
 			namespace="<%= liferayPortletResponse.getNamespace() %>"

@@ -27,6 +27,10 @@ public class BatchPlannerPlanLocalServiceWrapper
 	implements BatchPlannerPlanLocalService,
 			   ServiceWrapper<BatchPlannerPlanLocalService> {
 
+	public BatchPlannerPlanLocalServiceWrapper() {
+		this(null);
+	}
+
 	public BatchPlannerPlanLocalServiceWrapper(
 		BatchPlannerPlanLocalService batchPlannerPlanLocalService) {
 
@@ -55,12 +59,12 @@ public class BatchPlannerPlanLocalServiceWrapper
 	public com.liferay.batch.planner.model.BatchPlannerPlan addBatchPlannerPlan(
 			long userId, boolean export, String externalType,
 			String externalURL, String internalClassName, String name,
-			boolean template)
+			String taskItemDelegateName, boolean template)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _batchPlannerPlanLocalService.addBatchPlannerPlan(
 			userId, export, externalType, externalURL, internalClassName, name,
-			template);
+			taskItemDelegateName, template);
 	}
 
 	/**

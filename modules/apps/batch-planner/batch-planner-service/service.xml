@@ -4,7 +4,7 @@
 <service-builder auto-namespace-tables="false" mvcc-enabled="true" package-path="com.liferay.batch.planner">
 	<author>Igor Beslic</author>
 	<namespace>BatchPlanner</namespace>
-	<entity local-service="true" name="BatchPlannerLog">
+	<entity local-service="true" name="BatchPlannerLog" remote-service="true">
 
 		<!-- PK fields -->
 
@@ -42,12 +42,10 @@
 		<finder name="BatchPlannerPlanId" return-type="BatchPlannerLog">
 			<finder-column name="batchPlannerPlanId" />
 		</finder>
-		<finder name="BPPI_BEETERC" return-type="BatchPlannerLog" unique="true">
-			<finder-column name="batchPlannerPlanId" />
+		<finder name="BatchEngineExportTaskERC" return-type="BatchPlannerLog" unique="true">
 			<finder-column name="batchEngineExportTaskERC" />
 		</finder>
-		<finder name="BPPI_BEITERC" return-type="BatchPlannerLog" unique="true">
-			<finder-column name="batchPlannerPlanId" />
+		<finder name="BatchEngineImportTaskERC" return-type="BatchPlannerLog" unique="true">
 			<finder-column name="batchEngineImportTaskERC" />
 		</finder>
 		<finder name="BPPI_DTERC" return-type="BatchPlannerLog" unique="true">
@@ -117,6 +115,7 @@
 		<column name="externalURL" type="String" />
 		<column name="internalClassName" type="String" />
 		<column name="name" type="String" />
+		<column name="taskItemDelegateName" type="String" />
 		<column name="template" type="boolean" />
 
 		<!-- Order -->
@@ -141,6 +140,10 @@
 		<finder name="C_N" return-type="BatchPlannerPlan" unique="true">
 			<finder-column name="companyId" />
 			<finder-column name="name" />
+		</finder>
+		<finder name="C_T" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="template" />
 		</finder>
 		<finder name="C_E_T" return-type="Collection">
 			<finder-column name="companyId" />
@@ -192,6 +195,7 @@
 		<exception>BatchPlannerMappingInternalFieldName</exception>
 		<exception>BatchPlannerMappingInternalFieldType</exception>
 		<exception>BatchPlannerPlanExternalType</exception>
+		<exception>BatchPlannerPlanInternalClassName</exception>
 		<exception>BatchPlannerPlanName</exception>
 		<exception>BatchPlannerPolicyName</exception>
 		<exception>DuplicateBatchPlannerPlan</exception>

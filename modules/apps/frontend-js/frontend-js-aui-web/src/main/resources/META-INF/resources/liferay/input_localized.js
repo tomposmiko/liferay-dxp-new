@@ -37,7 +37,7 @@ AUI.add(
 
 		var availableLanguageIds = A.Array.dedupe(
 			[defaultLanguageId, userLanguageId].concat(
-				A.Object.keys(availableLanguages)
+				Object.keys(availableLanguages)
 			)
 		);
 
@@ -391,17 +391,16 @@ AUI.add(
 						document.body.appendChild(modalContainer);
 					}
 
-					var availableLocales = Object.entries(
-						instance.get('availableLocales')
-					).map((entry) => {
-						var key = entry[0];
-						var value = entry[1];
+					var availableLocales = instance.get('availableLocales');
 
-						var label = key.replace(/_/, '-');
+					var locales = instance.get('items').map((languageId) => {
+						var displayName = availableLocales[languageId];
+
+						var label = languageId.replace(/_/, '-');
 
 						return {
-							displayName: value,
-							id: key,
+							displayName,
+							id: languageId,
 							label,
 							symbol: label.toLowerCase(),
 						};
@@ -422,7 +421,7 @@ AUI.add(
 
 					var props = {
 						activeLanguageIds: instance.get('activeLanguageIds'),
-						availableLocales,
+						availableLocales: locales,
 						defaultLanguageId: instance.get('defaultLanguageId'),
 						onClose(newActiveLanguageIds) {
 							instance._State.writeAtom(
@@ -521,6 +520,12 @@ AUI.add(
 
 					currentFlagsNode.innerHTML = newFlagsNode.innerHTML;
 
+					Object.entries(instance.get('availableLocales')).forEach(
+						([key]) => {
+							this._updateTranslationStatus(key);
+						}
+					);
+
 					var boundingBox = instance.get('boundingBox');
 					instance._flags = boundingBox.one('.palette-container');
 
@@ -603,7 +608,7 @@ AUI.add(
 					);
 
 					var translationStatus = Liferay.Language.get(
-						'untranslated'
+						'not-translated'
 					);
 					var translationStatusCssClass = 'warning';
 
@@ -626,7 +631,7 @@ AUI.add(
 					if (languageStatusNode) {
 						languageStatusNode.setHTML(
 							A.Lang.sub(instance.TRANSLATION_STATUS_TEMPLATE, {
-								languageId,
+								languageId: languageId.replace(/_/, '-'),
 								translationStatus,
 								translationStatusCssClass,
 							})
@@ -656,7 +661,7 @@ AUI.add(
 					'<input id="{namespace}{id}_{value}" name="{namespace}{fieldNamePrefix}{name}_{value}{fieldNameSuffix}" type="hidden" value="" />',
 
 				TRANSLATION_STATUS_TEMPLATE:
-					'{languageId} <span class="label label-{translationStatusCssClass}">{translationStatus}</span>',
+					'{languageId} <span class="dropdown-item-indicator-end w-auto"><span class="label label-{translationStatusCssClass}">{translationStatus}</span></span>',
 
 				TRIGGER_TEMPLATE:
 					'<span class="inline-item">{flag}</span><span class="btn-section">{languageId}</span>',

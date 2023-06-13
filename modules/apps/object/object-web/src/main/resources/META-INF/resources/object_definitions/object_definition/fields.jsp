@@ -33,7 +33,7 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 	apiURL="<%= objectDefinitionsFieldsDisplayContext.getAPIURL() %>"
 	clayDataSetActionDropdownItems="<%= objectDefinitionsFieldsDisplayContext.getClayDataSetActionDropdownItems() %>"
 	creationMenu="<%= objectDefinitionsFieldsDisplayContext.getCreationMenu(objectDefinition) %>"
-	formId="fm"
+	formName="fm"
 	id="<%= ObjectDefinitionsClayDataSetDisplayNames.OBJECT_FIELDS %>"
 	itemsPerPage="<%= 20 %>"
 	namespace="<%= liferayPortletResponse.getNamespace() %>"
@@ -48,6 +48,8 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 		props='<%=
 			HashMapBuilder.<String, Object>put(
 				"apiURL", objectDefinitionsFieldsDisplayContext.getAPIURL()
+			).put(
+				"ffClobObjectFieldTypeConfigurationEnabled", objectDefinitionsFieldsDisplayContext.isFFClobObjectFieldTypeConfigurationEnabled()
 			).build()
 		%>'
 	/>

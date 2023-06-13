@@ -19,7 +19,6 @@ import {createAutoCorrectedDatePipe} from 'text-mask-addons';
 import {createTextMaskInputElement} from 'text-mask-core';
 
 import {FieldBase} from '../FieldBase/ReactFieldBase.es';
-import {useSyncValue} from '../hooks/useSyncValue.es';
 
 const DIGIT_REGEX = /\d/i;
 const LETTER_REGEX = /[a-z]/i;
@@ -55,11 +54,11 @@ const getDateMask = (dateDelimiter, dateFormat) => {
 const getDelimiter = (dateFormat) => {
 	let dateDelimiter = '/';
 
-	if (dateFormat.indexOf('.') != -1) {
+	if (dateFormat.indexOf('.') !== -1) {
 		dateDelimiter = '.';
 	}
 
-	if (dateFormat.indexOf('-') != -1) {
+	if (dateFormat.indexOf('-') !== -1) {
 		dateDelimiter = '-';
 	}
 
@@ -173,14 +172,17 @@ const DatePicker = ({
 	disabled,
 	formatInEditingLocale,
 	locale,
+	localizable,
 	localizedValue: localizedValueInitial = {},
 	name,
+	onBlur,
 	onChange,
+	onFocus,
 	spritemap,
 	value: initialValue,
 }) => {
 	const inputRef = useRef(null);
-	const maskInstance = useRef(null);
+	const maskInstanceRef = useRef(null);
 
 	const [expanded, setExpand] = useState(false);
 
@@ -197,7 +199,12 @@ const DatePicker = ({
 		[defaultLanguageId, formatInEditingLocale, initialValue, locale]
 	);
 
-	const [value, setValue] = useSyncValue(initialValueMemoized);
+	const [value, setValue] = useState(initialValueMemoized);
+
+	useEffect(() => {
+		setValue(initialValueMemoized);
+	}, [initialValueMemoized]);
+
 	const [years, setYears] = useState(() => {
 		const currentYear = new Date().getFullYear();
 
@@ -211,7 +218,7 @@ const DatePicker = ({
 
 	useEffect(() => {
 		if (inputRef.current && inputMask && dateMask) {
-			maskInstance.current = createTextMaskInputElement({
+			maskInstanceRef.current = createTextMaskInputElement({
 				guide: true,
 				inputElement: inputRef.current,
 				keepCharPositions: true,
@@ -220,15 +227,17 @@ const DatePicker = ({
 				showMask: true,
 			});
 
-			const currentValue = localizedValue[locale];
+			const currentValue = localizable ? localizedValue[locale] : value;
 
 			if (currentValue) {
-				inputRef.current.value =
-					currentValue.includes('/') ||
-					currentValue.includes('.') ||
-					(currentValue.includes('-') && currentValue.includes('_'))
-						? currentValue
-						: moment(currentValue).format(dateMask.toUpperCase());
+				if (
+					currentValue !== inputRef.current.value ||
+					!/[//.-]/.test(currentValue)
+				) {
+					inputRef.current.value = moment(currentValue).format(
+						dateMask.toUpperCase()
+					);
+				}
 			}
 			else if (initialValueMemoized) {
 				var year = parseInt(
@@ -255,7 +264,7 @@ const DatePicker = ({
 				inputRef.current.value.match(LETTER_DIGIT_REGEX) ||
 				inputRef.current.value === ''
 			) {
-				maskInstance.current.update(inputRef.current.value);
+				maskInstanceRef.current.update(inputRef.current.value);
 			}
 		}
 	}, [
@@ -263,8 +272,10 @@ const DatePicker = ({
 		inputMask,
 		inputRef,
 		initialValueMemoized,
+		localizable,
 		localizedValue,
 		locale,
+		value,
 	]);
 
 	const handleNavigation = (date) => {
@@ -280,23 +291,23 @@ const DatePicker = ({
 		<>
 			<input
 				aria-hidden="true"
-				id={name + '_fieldDetails'}
 				name={name}
 				type="hidden"
 				value={getValueForHidden(value, locale)}
 			/>
 			<ClayDatePicker
-				aria-labelledby={name + '_fieldDetails'}
 				dateFormat={dateMask}
 				disabled={disabled}
 				expanded={expanded}
 				initialMonth={getInitialMonth(value)}
 				months={Months}
+				onBlur={onBlur}
 				onExpandedChange={(expand) => {
 					setExpand(expand);
 				}}
+				onFocus={onFocus}
 				onInput={(event) => {
-					maskInstance.current.update(event.target.value);
+					maskInstanceRef.current.update(event.target.value);
 					setLocalizedValue({
 						...localizedValue,
 						[locale]: event.target.value,
@@ -318,7 +329,8 @@ const DatePicker = ({
 
 					if (
 						!value ||
-						value === maskInstance.current.state.previousPlaceholder
+						value ===
+							maskInstanceRef.current.state.previousPlaceholder
 					) {
 						return onChange('');
 					}
@@ -346,9 +358,12 @@ const DatePicker = ({
 const Main = ({
 	defaultLanguageId,
 	locale = themeDisplay.getDefaultLanguageId(),
+	localizable,
 	localizedValue,
 	name,
+	onBlur,
 	onChange,
+	onFocus,
 	placeholder,
 	predefinedValue,
 	readOnly,
@@ -367,12 +382,17 @@ const Main = ({
 			defaultLanguageId={defaultLanguageId}
 			disabled={readOnly}
 			formatInEditingLocale={
-				localizedValue && localizedValue[locale] != undefined
+				localizedValue &&
+				localizedValue[locale] !== undefined &&
+				localizedValue[locale] !== null
 			}
 			locale={locale}
+			localizable={localizable}
 			localizedValue={localizedValue}
 			name={name}
+			onBlur={onBlur}
 			onChange={(value) => onChange({}, value)}
+			onFocus={onFocus}
 			placeholder={placeholder}
 			spritemap={spritemap}
 			value={value ? value : predefinedValue}

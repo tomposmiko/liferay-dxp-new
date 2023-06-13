@@ -70,6 +70,11 @@ public class SamlSpSessionLocalServiceImpl
 		}
 
 		if (samlPeerBinding == null) {
+			_deleteSamlPeerBindings(
+				samlPeerBindingPersistence.findByC_U_D_SNIF_SNINQ_SPEI(
+					user.getCompanyId(), user.getUserId(), false, nameIdFormat,
+					nameIdNameQualifier, samlIdpEntityId));
+
 			samlPeerBinding = _samlPeerBindingLocalService.addSamlPeerBinding(
 				user.getUserId(), nameIdFormat, nameIdNameQualifier,
 				nameIdSPNameQualifier, null, nameIdValue, samlIdpEntityId);
@@ -147,6 +152,7 @@ public class SamlSpSessionLocalServiceImpl
 		return samlSpSessionPersistence.findByC_SI(companyId, sessionIndex);
 	}
 
+	@Override
 	public List<SamlSpSession> getSamlSpSessions(
 		long companyId, String nameIdFormat, String nameIdNameQualifier,
 		String nameIdSPNameQualifier, String nameIdValue,
@@ -231,6 +237,16 @@ public class SamlSpSessionLocalServiceImpl
 		samlSpSession.setSessionIndex(sessionIndex);
 
 		return samlSpSessionPersistence.update(samlSpSession);
+	}
+
+	private void _deleteSamlPeerBindings(
+		List<SamlPeerBinding> samlPeerBindings) {
+
+		for (SamlPeerBinding samlPeerBinding : samlPeerBindings) {
+			samlPeerBinding.setDeleted(true);
+
+			samlPeerBindingPersistence.update(samlPeerBinding);
+		}
 	}
 
 	@Reference
